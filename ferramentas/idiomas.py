@@ -61,7 +61,8 @@ def frases_do_codigo():
         for raiz, dirs, arquivos in os.walk(os.path.join(BASE, pasta)):
             dirs[:] = [d for d in dirs if d not in ('bin', 'obj', 'idiomas')]
             for nome in arquivos:
-                if not nome.endswith(('.cs', '.xaml')):
+                # Os testes chamam Idioma.T com frases de mentira: nao sao interface.
+                if not nome.endswith(('.cs', '.xaml')) or nome.startswith('Autoteste'):
                     continue
                 caminho = os.path.join(raiz, nome)
                 texto = io.open(caminho, encoding='utf-8-sig').read()

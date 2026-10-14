@@ -14,3 +14,6 @@ node_modules/
 
 # As compilacoes de cada agente (dotnet build --artifacts-path .artefatos/<agente>)
 .artefatos/
+
+# As verificacoes rodadas (ferramentas\verificar.ps1): saidas de cada vez
+coordenacao/verificacao/
