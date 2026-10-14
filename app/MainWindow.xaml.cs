@@ -1732,6 +1732,15 @@ public partial class MainWindow : Window
                 };
                 opcoesObjeto.Children.Add(quadro);
             }
+            var virar = new Button
+            {
+                Style = (Style)FindResource("AcaoObj"),
+                Content = peca.Virada ? Idioma.T("desvirar (lado de cima)") : Idioma.T("virar (lado de baixo)"),
+                ToolTip = Idioma.T("Vira a placa com o que está montado nela: o lado de baixo aparece, e o fio feito assim é a trilha de solda entre os furos."),
+                Margin = new Thickness(8, 0, 0, 0),
+            };
+            virar.Click += (_, _) => { editor.VirarPcbSelecionada(); AtualizarBarraObjeto(); };
+            opcoesObjeto.Children.Add(virar);
         }
         else if (Catalogo.EhProtoboard(peca.Tipo))
         {

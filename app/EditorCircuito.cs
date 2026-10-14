@@ -1102,7 +1102,9 @@ public partial class EditorCircuito : Border
         visuais.Clear(); parteMovel.Clear(); brilhos.Clear();
         telasLcd.Clear(); bracosServo.Clear(); ledsDePlaca.Clear();
 
+        CalcularLadosDasPcbs();
         foreach (var peca in Atual.Pecas) CriarVisual(peca);
+        ApagarOOutroLado();
         RedesenharFios();
         DesenharBotoesDaPlaca();
         AtualizarRealce();
@@ -2116,13 +2118,15 @@ public partial class EditorCircuito : Border
         ("vermelha", "Vermelha", "#A3242A"), ("roxa", "Roxa", "#5B2A86"), ("fenolite", "Fenolite", "#C8955A"),
     ];
 
-    static FrameworkElement DesenharPcb(PecaNoCircuito peca, PecaDef def)
+    FrameworkElement DesenharPcb(PecaNoCircuito peca, PecaDef def)
     {
         var (colunas, linhas) = Catalogo.TamanhoDaPcb(peca.Tipo)!.Value;
         double P = Catalogo.Passo, m = P;
         string hex = CoresDePcb.FirstOrDefault(c => c.id == peca.Cor).hex ?? CoresDePcb[0].hex;
         var mascara = (Color)ColorConverter.ConvertFromString(hex);
         bool fenolite = peca.Cor == "fenolite";
+        // Virada: o lado de baixo, um tom mais escuro.
+        if (peca.Virada) mascara = Puxar(mascara, 0.78);
         var caixa = new Canvas { Width = def.Largura, Height = def.Altura };
 
         caixa.Children.Add(new Rectangle
@@ -2150,12 +2154,35 @@ public partial class EditorCircuito : Border
         });
         caixa.Children.Add(new Path { Data = furos, Fill = new SolidColorBrush(Color.FromRgb(0x16, 0x16, 0x18)) });
 
+        // As soldas das pernas (so do lado de baixo): estanho por cima do furo.
+        var soldas = SoldasDaPcb(peca, def);
+        if (soldas.Children.Count > 0)
+            caixa.Children.Add(new Path
+            {
+                Data = soldas,
+                Fill = new RadialGradientBrush(Colors.White, Color.FromRgb(0x8E, 0x94, 0x9C))
+                {
+                    GradientOrigin = new Point(0.35, 0.3), Center = new Point(0.45, 0.4), RadiusX = 0.7, RadiusY = 0.7,
+                },
+                Stroke = new SolidColorBrush(Color.FromRgb(0x3E, 0x43, 0x4A)), StrokeThickness = 0.7,
+            });
+
         // A serigrafia: a numeracao das colunas e das linhas, de 5 em 5.
         var corDaSerigrafia = fenolite ? Color.FromRgb(0x5A, 0x34, 0x12) : Color.FromRgb(0xE6, 0xE8, 0xEA);
-        for (int c = 0; c < colunas; c += 5)
-            caixa.Children.Add(Rotulo((c + 1).ToString(), m + c * P - 2.2, 0.2, corDaSerigrafia));
-        for (int l = 4; l < linhas; l += 5)
-            caixa.Children.Add(Rotulo((l + 1).ToString(), 0.6, m + l * P - 3.2, corDaSerigrafia));
+        // Com a placa espelhada (virada), cada numero e desespelhado no lugar:
+        // a serigrafia continua legivel.
+        void Numero(string texto, double x, double y)
+        {
+            var rotulo = Rotulo(texto, x, y, corDaSerigrafia);
+            if (peca.Espelhada)
+            {
+                rotulo.RenderTransformOrigin = new Point(0.5, 0.5);
+                rotulo.RenderTransform = new ScaleTransform(-1, 1);
+            }
+            caixa.Children.Add(rotulo);
+        }
+        for (int c = 0; c < colunas; c += 5) Numero((c + 1).ToString(), m + c * P - 2.2, 0.2);
+        for (int l = 4; l < linhas; l += 5) Numero((l + 1).ToString(), 0.6, m + l * P - 3.2);
         return caixa;
     }
 
@@ -2859,6 +2886,8 @@ public partial class EditorCircuito : Border
                     Opacity = 0.95
                 };
             }
+            // O fio do outro lado da PCB: apagado, como visto atraves da placa.
+            if (FioDoOutroLado(fio)) { traco.Opacity = 0.18; contorno.Opacity = 0.1; }
             Panel.SetZIndex(traco, escolhido ? 520 : 500);
             mundo.Children.Add(traco);
             visuaisFios.Add(traco);
@@ -3296,6 +3325,7 @@ public partial class EditorCircuito : Border
         for (int i = 0; i < Atual.Fios.Count; i++)
         {
             var fio = Atual.Fios[i];
+            if (FioDoOutroLado(fio)) continue;
             var a = PosicaoPino(fio.DePeca, fio.DePino);
             var b = PosicaoPino(fio.ParaPeca, fio.ParaPino);
             if (a is null || b is null) continue;
@@ -3580,7 +3610,9 @@ public partial class EditorCircuito : Border
 
     internal Acerto Resolver(Point p)
     {
-        var naoPlacas = Atual.Pecas.Where(x => !Catalogo.EhProtoboard(x.Tipo)).ToList();
+        // As pecas do outro lado de uma PCB virada nao recebem clique: o
+        // clique e do furo e da trilha do lado que se ve.
+        var naoPlacas = Atual.Pecas.Where(x => !Catalogo.EhProtoboard(x.Tipo) && !EstaDoOutroLado(x)).ToList();
 
         // 1) botao fisico
         foreach (var peca in naoPlacas)
@@ -4001,14 +4033,23 @@ public partial class EditorCircuito : Border
 
         if (origemFio.Value.peca == idPeca && origemFio.Value.pino == pino) return;
 
+        // Com a PCB virada, o fio entre os furos dela e a trilha de baixo.
+        string pcbDoFio = PcbDaPonta(origemFio.Value.peca) ?? PcbDaPonta(idPeca);
         Atual.Fios.Add(new Fio
         {
             DePeca = origemFio.Value.peca,
             DePino = origemFio.Value.pino,
             ParaPeca = idPeca,
             ParaPino = pino,
-            Cor = CorDoFio
+            Cor = CorDoFio,
+            Lado = pcbDoFio is not null && Atual.Achar(pcbDoFio)?.Virada == true ? Fio.LadoDeBaixo : null,
         });
+        // A trilha de baixo e o fio de estanho, reto, de furo a furo.
+        if (Atual.Fios[^1].Lado == Fio.LadoDeBaixo)
+        {
+            Atual.Fios[^1].Cor = CorDaTrilha;
+            Atual.Fios[^1].Estilo = Fio.EstiloReto;
+        }
         CancelarFio();
         RedesenharFios();
         Mudou?.Invoke();

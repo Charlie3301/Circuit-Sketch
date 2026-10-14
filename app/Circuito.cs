@@ -26,6 +26,9 @@ public class PecaNoCircuito
     public double Ohms { get; set; } = 220;
     /// <summary>Espelhada na horizontal.</summary>
     public bool Espelhada { get; set; }
+
+    /// <summary>A PCB virada: o lado de baixo para cima (as pecas montadas nela foram junto).</summary>
+    public bool Virada { get; set; }
     /// <summary>Posicao do potenciometro / sensor, de 0 a 1.</summary>
     public double Giro { get; set; }
     /// <summary>Segundo eixo (joystick), de 0 a 1.</summary>
@@ -169,7 +172,7 @@ public class PecaNoCircuito
     public PecaNoCircuito Copia() => new()
     {
         Tipo = Tipo, X = X, Y = Y, Cor = Cor, Nome = Nome, Rotacao = Rotacao,
-        Ohms = Ohms, Espelhada = Espelhada,
+        Ohms = Ohms, Espelhada = Espelhada, Virada = Virada,
         Giro = Giro, Giro2 = Giro2, Giro3 = Giro3, Giro4 = Giro4, Bits = Bits,
         Volts = Volts, MiliAmperes = MiliAmperes, MiliAmperesHora = MiliAmperesHora,
         Teclas = Teclas is null ? null : new Dictionary<string, string>(Teclas),
@@ -225,6 +228,14 @@ public class Fio
     /// o fio continuar com as mesmas dobras, ele sai de volta escrito igual.
     /// </summary>
     public List<string> CaminhoDoWokwi { get; set; }
+
+    /// <summary>
+    /// O lado da PCB por onde o fio passa: nulo (o de cima, o de sempre) ou
+    /// "baixo" -- a trilha de solda feita com a placa virada.
+    /// </summary>
+    public string Lado { get; set; }
+
+    public const string LadoDeBaixo = "baixo";
 
     public const string EstiloSolto = "solto";
     public const string EstiloReto = "reto";
