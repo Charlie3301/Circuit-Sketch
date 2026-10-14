@@ -155,6 +155,8 @@ public static partial class Autoteste
         Bloco("Memoria_EepromERtc", Memoria_EepromERtc);
         Bloco("MicroPython_Perifericos", MicroPython_Perifericos);
         Bloco("Bibliotecas_DeFora", Bibliotecas_DeFora);
+        Bloco("Bibliotecas_Online", Bibliotecas_Online);
+        Bloco("Bibliotecas_Janela", Bibliotecas_Janela);
         Bloco("Rede_MqttNaAula", Rede_MqttNaAula);
         Bloco("Rede_BluetoothNaAula", Rede_BluetoothNaAula);
         Bloco("Ble_ComoNoCore", Ble_ComoNoCore);

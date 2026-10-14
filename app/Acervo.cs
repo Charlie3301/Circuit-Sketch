@@ -419,8 +419,14 @@ public static class Acervo
             nome = System.Text.RegularExpressions.Regex.Replace(nome, @"-v?\d+(\.\d+)+$", "");
         }
 
+        return NomeLimpo(nome);
+    }
+
+    /// <summary>O nome da pasta de uma biblioteca: "DHT sensor library" vira "DHT_sensor_library".</summary>
+    public static string NomeLimpo(string nome)
+    {
         var limpo = new System.Text.StringBuilder();
-        foreach (char c in nome.Trim())
+        foreach (char c in (nome ?? "").Trim())
             limpo.Append(char.IsLetterOrDigit(c) || c is '_' or '-' or '.' ? c : '_');
         return limpo.Length == 0 ? "biblioteca" : limpo.ToString();
     }
