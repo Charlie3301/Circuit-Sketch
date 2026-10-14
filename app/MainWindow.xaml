@@ -276,7 +276,7 @@
                         <MenuItem x:Name="miInternet" Header="Usar a internet do computador"
                                   IsCheckable="True" IsChecked="True" Click="AlternarInternet"/>
                         <MenuItem Header="Novo chip..." Click="NovoChip"/>
-                        <MenuItem Header="Bibliotecas..." Click="AbrirBibliotecas"/>
+                        <MenuItem Header="Gerenciador de bibliotecas..." InputGestureText="Ctrl+Shift+I" Click="AbrirBibliotecas"/>
                         <MenuItem Header="Configurações..." Click="AbrirConfiguracoes"/>
                         <MenuItem Header="Ajuda e atalhos" InputGestureText="?" Click="Ajuda"/>
                     </ContextMenu>

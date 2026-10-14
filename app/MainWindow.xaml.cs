@@ -3488,6 +3488,7 @@ public partial class MainWindow : Window
             case "salvar-como": SalvarComo(); break;
             case "abrir": AbrirCircuito(); break;
             case "importar": ImportarDoWokwi(); break;
+            case "bibliotecas": AbrirBibliotecas(); break;
             case "monitor": FocarSerial(); break;
 
             case "desfazer": if (noTexto) return; Desfazer(); break;

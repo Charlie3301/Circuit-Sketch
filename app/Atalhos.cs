@@ -20,6 +20,7 @@ public static class AtalhosDoPrograma
         new("salvar-como", "Salvar projeto como", Key.S, ModifierKeys.Control | ModifierKeys.Shift),
         new("abrir", "Abrir projeto", Key.O, ModifierKeys.Control),
         new("importar", "Importar do Wokwi", Key.I, ModifierKeys.Control),
+        new("bibliotecas", "Gerenciador de bibliotecas", Key.I, ModifierKeys.Control | ModifierKeys.Shift),   // o mesmo da Arduino IDE
         new("monitor", "Ir para o monitor serial", Key.M, ModifierKeys.Control),
         new("desfazer", "Desfazer", Key.Z, ModifierKeys.Control),
         new("refazer", "Refazer", Key.Y, ModifierKeys.Control),

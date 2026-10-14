@@ -67,9 +67,9 @@ public class JanelaFaltando : Window
                 ? "Em MicroPython os módulos vêm dentro do firmware da placa: não há "
                   + "pasta para instalar. O simulador implementa os que implementa, e "
                   + "os que faltam estão listados abaixo."
-                : "O simulador não baixa da internet — ele é offline de propósito. "
-                  + "Quando a biblioteca já está instalada na Arduino IDE deste "
-                  + "computador, dá para copiá-la daqui mesmo.",
+                : "Baixe pelo índice oficial da Arduino (o mesmo da Arduino IDE; a internet só é "
+                  + "usada para isso), ou, se a biblioteca já está na Arduino IDE deste computador, "
+                  + "copie daqui mesmo.",
             Foreground = Tema.Pincel(Tema.TextoFraco),
             FontSize = 12,
             Margin = new Thickness(0, 6, 0, 0),
@@ -139,14 +139,22 @@ public class JanelaFaltando : Window
             DockPanel.SetDock(criar, Dock.Right);
             linha.Children.Add(criar);
         }
-        else if (f.Candidata is not null)
+        else
         {
-            var instalar = Botao($"Instalar ({f.TamanhoEmTexto})", () => Instalar(f),
-                                 destaque: true);
-            instalar.Margin = new Thickness(12, 0, 0, 0);
-            instalar.VerticalAlignment = VerticalAlignment.Center;
-            DockPanel.SetDock(instalar, Dock.Right);
-            linha.Children.Add(instalar);
+            // Da internet (o indice da Arduino) sempre; do disco, quando achou.
+            var botoes = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(12, 0, 0, 0) };
+            var baixar = Botao("Baixar da internet…", () => BaixarDaInternet(f), destaque: f.Candidata is null);
+            baixar.Margin = new Thickness(0);
+            botoes.Children.Add(baixar);
+            if (f.Candidata is not null)
+            {
+                var instalar = Botao($"Copiar daqui ({f.TamanhoEmTexto})", () => Instalar(f), destaque: true);
+                instalar.Margin = new Thickness(0, 6, 0, 0);
+                botoes.Children.Insert(0, instalar);
+                baixar.Margin = new Thickness(0, 6, 0, 0);
+            }
+            DockPanel.SetDock(botoes, Dock.Right);
+            linha.Children.Add(botoes);
         }
 
         var coluna = new StackPanel();
@@ -166,7 +174,7 @@ public class JanelaFaltando : Window
                 ? "Escrito com aspas: é um arquivo DESTE projeto, e não uma biblioteca. "
                   + "Ele deveria estar numa aba ao lado do sketch, e não está."
                 : f.Candidata is null
-                ? "Não achei esta biblioteca nas pastas da Arduino IDE deste computador."
+                ? "Não está nas pastas da Arduino IDE deste computador: baixe pelo índice da Arduino."
                 : $"Achei em {f.Candidata}\n"
                   + $"{f.Arquivos} arquivo(s), {f.TamanhoEmTexto} em disco.",
             Foreground = Tema.Pincel(Tema.TextoFraco),
@@ -226,6 +234,20 @@ public class JanelaFaltando : Window
             MessageBox.Show(this, "Não deu para copiar: " + e.Message,
                 "Biblioteca", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
+    }
+
+    /// <summary>
+    /// O gerenciador na aba da internet, ja mostrando quem fornece este
+    /// #include. Instalada la, ela sai desta lista.
+    /// </summary>
+    void BaixarDaInternet(Faltando f)
+    {
+        new JanelaBibliotecas(this, $"#include <{f.Cabecalho}>", abrirNaInternet: true).ShowDialog();
+        if (Acervo.OQueFalta($"#include <{f.Cabecalho}>").Count > 0) return;
+        Instalou = true;
+        faltando.Remove(f);
+        if (faltando.Count == 0) { Prosseguir = true; Close(); return; }
+        Preencher();
     }
 
     /// <summary>Quando a biblioteca esta em outro lugar do disco.</summary>

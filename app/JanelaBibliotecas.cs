@@ -50,7 +50,7 @@ public class JanelaBibliotecas : Window
         navegador = null;
     }
 
-    public JanelaBibliotecas(Window dono, string sketch)
+    public JanelaBibliotecas(Window dono, string sketch, bool abrirNaInternet = false)
     {
         this.sketch = sketch;
 
@@ -160,7 +160,7 @@ public class JanelaBibliotecas : Window
 
         Content = raiz;
         Closed += (_, _) => cancelar.Cancel();
-        TrocarAba(false);
+        TrocarAba(abrirNaInternet);
     }
 
     Button Aba(string texto, Action aoClicar)
