@@ -248,6 +248,14 @@ public static class FormatoWokwi
     public static string CorDoLedDoWokwi(string deles)
         => CoresDeLed.FirstOrDefault(c => string.Equals(c.Deles, deles, StringComparison.OrdinalIgnoreCase)).Nosso ?? "vermelho";
 
+    /// <summary>Os bracos que o wokwi-servo tambem tem ("horn"); o nenhum e os do MG996R vao no "braco".</summary>
+    static readonly (string Nosso, string Deles)[] BracosDoServo = [("simples", "single"), ("duplo", "double"), ("cruz", "cross")];
+
+    public static string BracoParaWokwi(string nosso) => BracosDoServo.FirstOrDefault(b => b.Nosso == nosso).Deles;
+
+    public static string BracoDoWokwi(string deles)
+        => BracosDoServo.FirstOrDefault(b => string.Equals(b.Deles, deles, StringComparison.OrdinalIgnoreCase)).Nosso;
+
     // =====================================================================
     //  os ids
     // =====================================================================
@@ -313,6 +321,7 @@ public static class FormatoWokwi
         "modelo", "ficha-volts", "ficha-rpm-kv", "ficha-resistencia", "ficha-corrente-vazio",
         "ficha-corrente-maxima", "ficha-inercia", "ficha-medida-a", "ficha-medida-b", "ficha-polos",
         "amperes", "acabamento", "ssid", "senha", "placa-que-manda", "janela-us", "espelhada", "teclas", "usb",
+        "braco",
     ];
 
     /// <summary>Este atributo o simulador entende nesta peca? (Os outros sao guardados como vieram.)</summary>
@@ -321,6 +330,7 @@ public static class FormatoWokwi
         "color" => tipo == "led",
         "value" => tipo == "resistor",
         "pins" => tipo is "lcd1602-i2c" or "lcd2004-i2c",
+        "horn" => tipo == "servo",
         "text" => tipo == "texto",
         _ => ChavesNossas.Contains(chave),
     };

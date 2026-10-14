@@ -20,7 +20,7 @@ public partial class EditorCircuito
         ["motor-dc"] = (14.0, 12.5),
         ["motor-tt"] = (12.0, 13.0),
         ["motor-brushless"] = (18.0, 18.0),
-        ["servo-360"] = (33.0, 12.0),
+        ["servo-360"] = (23.15, 12.0),
     };
 
     /// <summary>
@@ -151,4 +151,7 @@ public partial class EditorCircuito
 
     /// <summary>Para o teste: soltar um acessorio (encaixa no eixo mais perto).</summary>
     internal void SoltarAcessorioParaTeste(string idDaPeca) => EncaixarAcessorio(idDaPeca);
+
+    /// <summary>Para o teste: onde fica o eixo do motor na tela (onde a roda encaixa).</summary>
+    internal Point? EixoDoMotorParaTeste(string idDoMotor) => Atual.Achar(idDoMotor) is { } motor ? EixoNaTela(motor) : null;
 }

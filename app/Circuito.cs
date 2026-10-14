@@ -86,6 +86,12 @@ public class PecaNoCircuito
     public string Acabamento { get; set; }
 
     /// <summary>
+    /// Servo: o braco parafusado no eixo -- "nenhum", "simples", "duplo",
+    /// "cruz" e, no MG996R, "estrela" e "disco" (nulo: o que vem montado).
+    /// </summary>
+    public string Braco { get; set; }
+
+    /// <summary>
     /// Os "attrs" do Wokwi que o simulador nao usa (o volume do buzzer, a
     /// tecla e o rotulo do botao...): guardados como vieram, para o
     /// diagram.json sair de volta igual.
@@ -184,7 +190,7 @@ public class PecaNoCircuito
         Codigo = Codigo is null ? null : [.. Codigo],
         PlacaQueManda = PlacaQueManda,
         JanelaUs = JanelaUs,
-        Modelo = Modelo, Ficha = Ficha?.Copia(), Amperes = Amperes, Acabamento = Acabamento, Usb = Usb,
+        Modelo = Modelo, Ficha = Ficha?.Copia(), Amperes = Amperes, Acabamento = Acabamento, Braco = Braco, Usb = Usb,
         AtributosDoWokwi = AtributosDoWokwi is null ? null : new Dictionary<string, string>(AtributosDoWokwi),
     };
 

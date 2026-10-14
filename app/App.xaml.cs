@@ -260,7 +260,7 @@ public partial class App : Application
                 recorte = new Rect(N(partes[0]), N(partes[1]), N(partes[2]), N(partes[3]));
             }
             int codigo;
-            try { codigo = FotoDePeca.Gravar(e.Args[iDesenho + 1], Valor("--cor"), zoom, recorte, Array.IndexOf(e.Args, "--furos") >= 0, Array.IndexOf(e.Args, "--virada") >= 0, e.Args[iDesenho + 2]); }
+            try { codigo = FotoDePeca.Gravar(e.Args[iDesenho + 1], Valor("--cor"), Valor("--braco"), zoom, recorte, Array.IndexOf(e.Args, "--furos") >= 0, Array.IndexOf(e.Args, "--virada") >= 0, e.Args[iDesenho + 2]); }
             catch (Exception erro) { Registrar("--desenho", erro); codigo = 1; }
             Shutdown(codigo);
             return;

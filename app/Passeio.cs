@@ -298,6 +298,24 @@ public static class Passeio
                 }
                 janela.TesteAbrir(c, "void setup() {}" + Environment.NewLine + "void loop() {}");
             }));
+            // Os servos com os bracos de cada um (Alpha 25), e a escolha na barra.
+            passos.Add((1200, $"{23 + passos.Count - 22:00} barra: braco do servo", () =>
+            {
+                janela.TesteParar();
+                var c = new Circuito();
+                double x = 40;
+                foreach (var (tipo, braco) in new (string, string)[]
+                         {
+                             ("servo", "duplo"), ("servo-360", "cruz"), ("servo-mg996r", "disco"), ("servo-mg996r", "estrela"),
+                         })
+                {
+                    var p = new PecaNoCircuito { Tipo = tipo, Braco = braco, X = x, Y = 140 };
+                    c.Pecas.Add(p);
+                    x += Geometria.Tamanho(p, Catalogo.Obter(tipo)).Largura + 30;
+                }
+                janela.TesteAbrir(c, "void setup() {}" + Environment.NewLine + "void loop() {}");
+                janela.TesteSelecionar(2);
+            }));
             passos.Add((1200, $"{23 + passos.Count - 22:00} componentes com MOTORES recolhida", () =>
             {
                 var paletaRecolhida = new JanelaPecas(janela);

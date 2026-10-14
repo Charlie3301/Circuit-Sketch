@@ -131,6 +131,7 @@ public static class ExportarWokwi
             case "resistor": Por("value", FormatoWokwi.Num(p.Ohms <= 0 ? 220 : p.Ohms)); break;
             case "lcd1602-i2c" or "lcd2004-i2c": Por("pins", "i2c"); break;
             case "texto": Por("text", p.Nome ?? ""); break;
+            case "servo" when FormatoWokwi.BracoParaWokwi(p.Braco) is { } horn: Por("horn", horn); break;
         }
 
         // Os do Wokwi que vieram num diagrama deles e o simulador nao usa.
@@ -164,6 +165,7 @@ public static class ExportarWokwi
         }
         if (p.Amperes != 0) Por("amperes", Exato(p.Amperes));
         if (p.Acabamento is not null) Por("acabamento", p.Acabamento);
+        if (p.Braco is not null && !(p.Tipo == "servo" && FormatoWokwi.BracoParaWokwi(p.Braco) is not null)) Por("braco", p.Braco);
         if (p.Ssid is not null) Por("ssid", p.Ssid);
         if (p.Senha is not null) Por("senha", p.Senha);
         if (p.PlacaQueManda is not null) Por("placa-que-manda", p.PlacaQueManda);

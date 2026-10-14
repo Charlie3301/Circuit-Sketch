@@ -92,7 +92,7 @@ public partial class EditorCircuito : Border
     }
     readonly Dictionary<string, TextBlock> rotulosDePeca = [];
     readonly Dictionary<string, TextBlock[,]> telasLcd = [];
-    readonly Dictionary<string, Rectangle> bracosServo = [];
+    readonly Dictionary<string, FrameworkElement> bracosServo = [];
 
     /// <summary>
     /// Grade de caracteres de cada display, ja em coordenadas da CAIXA da
@@ -1167,7 +1167,7 @@ public partial class EditorCircuito : Border
         CriarLuzesDeModulo(peca, def);
         if (Grades.TryGetValue(peca.Tipo, out var grade)) CriarTelaLcd(peca, grade);
         if (AreasDeTela.ContainsKey(peca.Tipo)) CriarTelaTft(peca, def);
-        if (BracosDeServo.ContainsKey(peca.Tipo)) CriarBracoServo(peca, def);
+        if (TemBraco(peca.Tipo)) CriarBracoServo(peca, def);
 
         if (Pecas.Existe($"{peca.Tipo}-movel"))
         {
@@ -1240,9 +1240,6 @@ public partial class EditorCircuito : Border
         ["motor-tt"] = new(12.0 / 74.0, 0.5),
         ["motor-brushless"] = new(0.5, 18.0 / 44.0),
         ["motor-28byj48"] = new(0.5, 12.0 / 46.0),
-
-        // O disco do servo de rotacao continua.
-        ["servo-360"] = new(0.6875, 0.5),
 
         // Rodas e helices giram inteiras, no centro.
         ["roda-tt"] = new(0.5, 0.5),
@@ -1496,10 +1493,6 @@ public partial class EditorCircuito : Border
 
             case "slide-switch":
                 anda.X = peca.Giro > 0.5 ? jeito.CursoX : 0;
-                break;
-
-            case "servo-360":
-                gira.Angle = AnguloDoServo(peca);
                 break;
 
             // Encaixada num eixo, gira com ele; a helice rapida vira um borrao.
@@ -1870,55 +1863,6 @@ public partial class EditorCircuito : Border
             }
         }
         telasLcd[peca.Id] = celulas;
-    }
-
-    /// <summary>
-    /// Braco do servo desenhado por cima: o SVG do wokwi nao marca o
-    /// horn com id, entao nao da para recortar e girar so ele.
-    /// </summary>
-    /// <summary>
-    /// O eixo de cada servo (pixels da peca) e o tamanho do braco. O do SG90
-    /// vem do SVG do Wokwi; o do MG996R, do pecas-servos.py.
-    /// </summary>
-    static readonly Dictionary<string, (double X, double Y, double Largura, double Altura)> BracosDeServo = new()
-    {
-        ["servo"] = (91.4, 60.0, 58, 6),
-        ["servo-mg996r"] = (181.4, 49.1, 84, 8.5),
-    };
-
-    void CriarBracoServo(PecaNoCircuito peca, PecaDef def)
-    {
-        var medidas = BracosDeServo[peca.Tipo];
-        var braco = new Rectangle
-        {
-            Width = medidas.Largura,
-            Height = medidas.Altura,
-            RadiusX = medidas.Altura / 2.4,
-            RadiusY = medidas.Altura / 2.4,
-            Fill = new SolidColorBrush(Color.FromRgb(0xF2, 0xF2, 0xF2)),
-            Stroke = new SolidColorBrush(Color.FromRgb(0x88, 0x88, 0x88)),
-            StrokeThickness = 0.6,
-            IsHitTestVisible = false,
-            RenderTransformOrigin = new Point(0.08, 0.5),
-            RenderTransform = new RotateTransform(0)
-        };
-        Panel.SetZIndex(braco, 140);
-        mundo.Children.Add(braco);
-        bracosServo[peca.Id] = braco;
-        PosicionarBracoServo(peca, def);
-    }
-
-    // Centro do horn, lido do proprio SVG: <circle cx="91.467" cy="59.773">
-    // no viewBox 170,08 x 119,55, que a caixa de 170x120 reproduz quase 1:1.
-    const double ServoEixoX = 91.4, ServoEixoY = 60.0;
-
-    void PosicionarBracoServo(PecaNoCircuito peca, PecaDef def)
-    {
-        if (!bracosServo.TryGetValue(peca.Id, out var braco)) return;
-        var (ex, ey, _, _) = BracosDeServo.GetValueOrDefault(peca.Tipo, (ServoEixoX, ServoEixoY, 58, 6));
-        var eixo = Geometria.PosicaoLocal(peca, def, ex, ey);
-        Canvas.SetLeft(braco, eixo.X - braco.Width * 0.08);
-        Canvas.SetTop(braco, eixo.Y - braco.Height / 2);
     }
 
     /// <summary>
@@ -4293,7 +4237,7 @@ public partial class EditorCircuito : Border
             PosicionarEstouro(peca, def);
             PosicionarTft(peca, def);
         }
-        if (def is not null && BracosDeServo.ContainsKey(peca.Tipo)) PosicionarBracoServo(peca, def);
+        if (def is not null && TemBraco(peca.Tipo)) PosicionarBracoServo(peca, def);
         if (def is not null && peca.Tipo == "esp32-devkit-v1") PosicionarLedsDaPlaca(peca, def);
         if (def is not null) PosicionarLuzesDeModulo(peca, def);
         if (peca.Tipo == "radio-controle") AtualizarRadio(peca);
@@ -6462,16 +6406,9 @@ public partial class EditorCircuito : Border
                 // datasheet, e so com o V+ alimentado), e nao onde foi mandado.
                 case "servo":
                 case "servo-mg996r":
-                {
-                    if (bracosServo.TryGetValue(peca.Id, out var braco)
-                        && braco.RenderTransform is RotateTransform giroS)
-                    {
-                        // 0 grau aponta para a esquerda, 180 para a direita.
-                        giroS.Angle = peca.Rotacao + AnguloDoServo(peca) - 90;
-                        braco.Opacity = servos.TryGetValue(peca.Id, out var est) && est.Recebendo ? 1.0 : 0.6;
-                    }
+                case "servo-360":
+                    AnimarBracoServo(peca);
                     break;
-                }
 
                 case "buzzer":
                 {

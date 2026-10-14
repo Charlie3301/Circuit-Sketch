@@ -1973,6 +1973,19 @@ public partial class MainWindow : Window
                 opcoesObjeto.Children.Add(chave);
             }
         }
+        else if (EditorCircuito.TemBraco(peca.Tipo))
+        {
+            // O braco parafusado no eixo: um dos que vem com o servo, ou nenhum.
+            opcoesObjeto.Children.Add(new TextBlock
+            {
+                Text = Idioma.T("Braço"), Foreground = Cinza, FontSize = 10,
+                VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
+            });
+            var bracos = EditorCircuito.OpcoesDeBraco(peca.Tipo);
+            string montado = EditorCircuito.BracoDa(peca);
+            Escolha([.. bracos.Select(b => Idioma.T(b.Nome))], Array.FindIndex(bracos, b => b.Id == montado),
+                    i => { editor.DefinirBracoDoServo(bracos[i].Id); AtualizarBarraObjeto(); });
+        }
         else if (peca.Tipo == "bateria")
         {
             MontarBarraDaBateria(peca);

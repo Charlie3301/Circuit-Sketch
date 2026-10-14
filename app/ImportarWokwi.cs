@@ -262,6 +262,7 @@ public static class ImportarWokwi
             : null;
         p.Amperes = N("amperes", 0);
         p.Acabamento = A("acabamento");
+        p.Braco = A("braco") ?? (p.Tipo == "servo" ? FormatoWokwi.BracoDoWokwi(A("horn")) : null);
         p.Ssid = A("ssid");
         p.Senha = A("senha");
         p.PlacaQueManda = A("placa-que-manda");

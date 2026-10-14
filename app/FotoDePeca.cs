@@ -15,23 +15,26 @@ namespace Simulador.App;
 ///                     [--recorte x,y,largura,altura]   (em pixels da peca)
 ///                     [--furos]                         (marca o centro de cada pino)
 ///                     [--virada]                        (a PCB pelo lado de baixo)
+///                     [--braco id]                      (o braco do servo: nenhum, simples, duplo...)
 ///
 /// O --furos desenha um ponto vermelho no lugar de cada pino do catalogo:
 /// e o que mostra que o desenho novo nao tirou nenhum furo do lugar.
 /// </summary>
 internal static class FotoDePeca
 {
-    public static int Gravar(string tipo, string cor, double zoom, Rect? recorte, bool furos, bool virada, string png)
+    public static int Gravar(string tipo, string cor, string braco, double zoom, Rect? recorte, bool furos, bool virada, string png)
     {
         var def = Catalogo.Obter(tipo);
         if (def is null) return 2;
 
-        var peca = new PecaNoCircuito { Id = "foto", Tipo = tipo, Cor = cor, Virada = virada };
+        var peca = new PecaNoCircuito { Id = "foto", Tipo = tipo, Cor = cor, Virada = virada, Braco = braco };
         var editor = new EditorCircuito();
         var desenho = editor.DesenhoDa(peca, def);
 
         var tela = new Canvas { Width = def.Largura, Height = def.Altura };
         tela.Children.Add(desenho);
+        // O braco do servo, que o editor desenha por cima, num angulo de exemplo.
+        if (EditorCircuito.BracoParaFoto(peca, 125) is { } doServo) tela.Children.Add(doServo);
         if (furos)
             foreach (var pino in def.Pinos)
             {

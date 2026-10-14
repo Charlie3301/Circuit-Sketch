@@ -189,6 +189,7 @@ public static partial class Autoteste
         Bloco("Passo_Drivers", Passo_Drivers);
         Bloco("Passo_AccelStepper", Passo_AccelStepper);
         Bloco("Servos_Fisicos", Servos_Fisicos);
+        Bloco("Servos_Bracos", Servos_Bracos);
         Bloco("Chave_FimDeCurso", Chave_FimDeCurso);
         Bloco("Esc_Brushless", Esc_Brushless);
         Bloco("Receptor_Radio", Receptor_Radio);

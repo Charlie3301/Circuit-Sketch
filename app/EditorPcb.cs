@@ -129,6 +129,7 @@ public partial class EditorCircuito
         {
             if (visuais.TryGetValue(id, out var visual)) { visual.Opacity = 0.2; visual.IsHitTestVisible = false; }
             if (parteMovel.TryGetValue(id, out var movel)) movel.Opacity = 0.2;
+            if (bracosServo.TryGetValue(id, out var braco)) braco.Opacity = 0.2;
             if (rotulosDePeca.TryGetValue(id, out var rotulo)) rotulo.Opacity = 0.35;
         }
     }
