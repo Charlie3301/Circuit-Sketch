@@ -5,9 +5,9 @@
  * dois. MP3, FLAC (tambem dentro do Ogg), WAV (PCM, float, ADPCM, A-law,
  * u-law, RF64, W64) e Ogg Vorbis sao das bibliotecas dr_libs e stb_vorbis
  * (dominio publico); o AIFF/AIFC e o DSD (DSF e DSDIFF) sao daqui. O ALAC
- * (no M4A), o AAC (no M4A e cru), o Opus, o WavPack e o Monkey's Audio
- * moram nos seus arquivos (dap_m4a.c, dap_aac.c, dap_opus.c, dap_wv.c,
- * dap_ape.c), atras da mesma interface.
+ * (no M4A), o AAC (no M4A e cru), o WMA, o Opus, o WavPack e o Monkey's
+ * Audio moram nos seus arquivos (dap_m4a.c, dap_aac.c, dap_wma.c,
+ * dap_opus.c, dap_wv.c, dap_ape.c), atras da mesma interface.
  *
  * O DSD e 1 bit a 2,8224 MHz (DSD64) ou 5,6448 MHz (DSD128): vira PCM de
  * 88,2 kHz por dois filtros FIR -- o primeiro, com tabelas de 8 bits por
@@ -38,7 +38,7 @@ int dap_formato_tocavel(int formato)
     switch (formato) {
     case DAP_FMT_MP3: case DAP_FMT_FLAC: case DAP_FMT_WAV: case DAP_FMT_AIFF: case DAP_FMT_OGG:
     case DAP_FMT_DSF: case DAP_FMT_DFF: case DAP_FMT_ALAC: case DAP_FMT_OPUS: case DAP_FMT_WV:
-    case DAP_FMT_APE: case DAP_FMT_M4A:
+    case DAP_FMT_APE: case DAP_FMT_M4A: case DAP_FMT_WMA:
         return 1;
     default:
         return 0;
@@ -54,6 +54,7 @@ static const dap_formato_t *de_fora(int formato)
     case DAP_FMT_WV: return &dap_formato_wv;
     case DAP_FMT_APE: return &dap_formato_ape;
     case DAP_FMT_M4A: return &dap_formato_aac;
+    case DAP_FMT_WMA: return &dap_formato_wma;
     default: return NULL;
     }
 }

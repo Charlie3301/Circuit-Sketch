@@ -243,6 +243,14 @@ public static partial class Autoteste
     static void PlayerDap_Aac() => TocarNoPlayer("aac", "AAC (M4A e ADTS)", ("tom-aac.m4a", "Acorde M4A.m4a"), ("tom.aac", "Acorde ADTS.aac"));
 
     /// <summary>
+    /// O WMA 1 e 2 pelo libwma do Rockbox (Alpha 24), no ASF. Os de teste sao o
+    /// acorde, codificado pelo ffmpeg; contra a decodificacao dele o libwma
+    /// fica a 87 dB (v2) e 69 dB (v1, ponto fixo contra float) -- a bancada no
+    /// computador, que confere tambem as buscas e a recusa do WMA Lossless.
+    /// </summary>
+    static void PlayerDap_Wma() => TocarNoPlayer("wma", "WMA (v1 e v2)", ("tom.wma", "Acorde WMA2.wma"), ("tom-v1.wma", "Acorde WMA1.wma"));
+
+    /// <summary>
     /// Os arquivos de teste numa pasta do cartao, o player le a biblioteca e
     /// toca: todos entram, o som sai e nenhum da erro ao abrir.
     /// </summary>

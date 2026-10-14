@@ -318,6 +318,84 @@ static void ler_wv(FILE *f, dap_etiquetas_t *e)
     if (!e->titulo[0]) ler_id3v1(f, e);
 }
 
+/* ------------------------------------------------------------- ASF */
+
+/* WMA: o Content Description (titulo e autor) e o Extended Content
+ * Description (WM/AlbumTitle, WM/Genre, WM/Year...), em UTF-16LE; a duracao
+ * no File Properties (em 100 ns, contando o preroll, que vem em ms). Os
+ * objetos sao lidos um a um: a capa (WM/Picture) pode ser grande e fica. */
+static void ler_asf(FILE *f, dap_etiquetas_t *e)
+{
+    static const uint8_t cabecalho[16] = { 0x30, 0x26, 0xB2, 0x75, 0x8E, 0x66, 0xCF, 0x11, 0xA6, 0xD9, 0x00, 0xAA, 0x00, 0x62, 0xCE, 0x6C };
+    static const uint8_t arquivo[16] = { 0xA1, 0xDC, 0xAB, 0x8C, 0x47, 0xA9, 0xCF, 0x11, 0x8E, 0xE4, 0x00, 0xC0, 0x0C, 0x20, 0x53, 0x65 };
+    static const uint8_t descricao[16] = { 0x33, 0x26, 0xB2, 0x75, 0x8E, 0x66, 0xCF, 0x11, 0xA6, 0xD9, 0x00, 0xAA, 0x00, 0x62, 0xCE, 0x6C };
+    static const uint8_t estendida[16] = { 0x40, 0xA4, 0xD0, 0xD2, 0x07, 0xE3, 0xD2, 0x11, 0x97, 0xF0, 0x00, 0xA0, 0xC9, 0x5E, 0xA8, 0x50 };
+    uint8_t h[30];
+    if (fseek(f, 0, SEEK_SET) != 0 || fread(h, 1, 30, f) != 30 || memcmp(h, cabecalho, 16) != 0) return;
+    uint64_t fim = (uint64_t)le32t(h + 16) | (uint64_t)le32t(h + 20) << 32, p = 30;
+    while (p + 24 <= fim) {
+        uint8_t o[24];
+        if (fseek(f, (long)p, SEEK_SET) != 0 || fread(o, 1, 24, f) != 24) return;
+        uint64_t t = (uint64_t)le32t(o + 16) | (uint64_t)le32t(o + 20) << 32;
+        if (t < 24 || t > fim - p) return;
+        uint32_t tc = (uint32_t)(t - 24);
+        int interessa = !memcmp(o, arquivo, 16) || !memcmp(o, descricao, 16) || !memcmp(o, estendida, 16);
+        uint8_t *b = interessa && tc >= 2 && tc < (1u << 20) ? (uint8_t *)malloc(tc) : NULL;
+        if (b && fread(b, 1, tc, f) == tc) {
+            if (!memcmp(o, arquivo, 16) && tc >= 80) {
+                uint64_t d = (uint64_t)le32t(b + 40) | (uint64_t)le32t(b + 44) << 32;
+                uint64_t preroll = (uint64_t)le32t(b + 56) | (uint64_t)le32t(b + 60) << 32;
+                uint64_t ms = d / 10000;
+                if (!e->duracao_ms && ms > preroll) e->duracao_ms = (int)(ms - preroll);
+            } else if (!memcmp(o, descricao, 16) && tc >= 10) {
+                static const char *const nomes[2] = { "TITLE", "ARTIST" };
+                uint32_t q = 10;
+                for (int i = 0; i < 2; i++) {
+                    uint32_t n = b[2 * i] | b[2 * i + 1] << 8;
+                    if (q + n > tc) break;
+                    char v[192];
+                    texto_id3(v, sizeof(v), b + q, (int)n, 1);
+                    campo(e, nomes[i], v);
+                    q += n;
+                }
+            } else if (!memcmp(o, estendida, 16)) {
+                uint32_t itens = b[0] | b[1] << 8, q = 2;
+                for (uint32_t i = 0; i < itens && q + 2 <= tc; i++) {
+                    uint32_t n = b[q] | b[q + 1] << 8;
+                    if (q + 2 + n + 4 > tc) break;
+                    char nome[64], v[192];
+                    texto_id3(nome, sizeof(nome), b + q + 2, (int)n, 1);
+                    q += 2 + n;
+                    uint32_t tipo = b[q] | b[q + 1] << 8, tv = b[q + 2] | b[q + 3] << 8;
+                    q += 4;
+                    if (q + tv > tc) break;
+                    const uint8_t *x = b + q;
+                    v[0] = 0;
+                    if (tipo == 0) texto_id3(v, sizeof(v), x, (int)tv, 1);
+                    else if (tipo == 3 && tv >= 4) snprintf(v, sizeof(v), "%lu", (unsigned long)le32t(x));
+                    else if (tipo == 5 && tv >= 2) snprintf(v, sizeof(v), "%u", (unsigned)(x[0] | x[1] << 8));
+                    q += tv;
+                    if (!strcmp(nome, "WM/AlbumTitle")) campo(e, "ALBUM", v);
+                    else if (!strcmp(nome, "WM/AlbumArtist")) campo(e, "ALBUMARTIST", v);
+                    else if (!strcmp(nome, "WM/Genre")) campo(e, "GENRE", v);
+                    else if (!strcmp(nome, "WM/Year")) campo(e, "YEAR", v);
+                    else if (!strcmp(nome, "WM/Composer")) campo(e, "COMPOSER", v);
+                    else if (!strcmp(nome, "WM/PartOfSet")) campo(e, "DISCNUMBER", v);
+                    else if (!strcmp(nome, "WM/TrackNumber")) campo(e, "TRACKNUMBER", v);
+                    else if (!strcmp(nome, "WM/Track") && v[0]) {
+                        /* o antigo, que conta do zero */
+                        char um[16];
+                        snprintf(um, sizeof(um), "%d", atoi(v) + 1);
+                        campo(e, "TRACKNUMBER", um);
+                    }
+                }
+            }
+        }
+        free(b);
+        p += t;
+    }
+}
+
 /* Monkey's Audio: a duracao pelo cabecalho (o da 3.98 em diante vem depois
  * do descritor; o antigo, logo depois do "MAC " e da versao). */
 static void ler_mac(FILE *f, long inicio, dap_etiquetas_t *e)
@@ -789,6 +867,7 @@ void dap_ler_etiquetas(const char *caminho, int formato, dap_etiquetas_t *e)
         case DAP_FMT_ALAC: ler_m4a(f, e); break;
         case DAP_FMT_APE: ler_mac(f, depois_da_id3, e); ler_wv(f, e); break;
         case DAP_FMT_WV: ler_wv(f, e); break;
+        case DAP_FMT_WMA: ler_asf(f, e); break;
         default: ler_id3v1(f, e); break;
         }
         fclose(f);

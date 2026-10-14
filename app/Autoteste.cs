@@ -195,6 +195,7 @@ public static partial class Autoteste
         Bloco("PlayerDap_Formatos", PlayerDap_Formatos);
         Bloco("PlayerDap_Ape", PlayerDap_Ape);
         Bloco("PlayerDap_Aac", PlayerDap_Aac);
+        Bloco("PlayerDap_Wma", PlayerDap_Wma);
         Bloco("Demo_PlayerDap", Demo_PlayerDap);
         Bloco("Temas_TodosLegiveis", Temas_TodosLegiveis);
         Bloco("Tempo_ComoNoChip", Tempo_ComoNoChip);
