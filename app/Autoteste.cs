@@ -192,6 +192,7 @@ public static partial class Autoteste
         Bloco("Acessorios_RodasHelices", Acessorios_RodasHelices);
         Bloco("PlayerDap_Pecas", PlayerDap_Pecas);
         Bloco("PlayerDap_Formatos", PlayerDap_Formatos);
+        Bloco("PlayerDap_Ape", PlayerDap_Ape);
         Bloco("Demo_PlayerDap", Demo_PlayerDap);
         Bloco("Temas_TodosLegiveis", Temas_TodosLegiveis);
         Bloco("Tempo_ComoNoChip", Tempo_ComoNoChip);

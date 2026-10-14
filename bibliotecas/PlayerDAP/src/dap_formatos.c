@@ -37,6 +37,7 @@ int dap_formato_tocavel(int formato)
     switch (formato) {
     case DAP_FMT_MP3: case DAP_FMT_FLAC: case DAP_FMT_WAV: case DAP_FMT_AIFF: case DAP_FMT_OGG:
     case DAP_FMT_DSF: case DAP_FMT_DFF: case DAP_FMT_ALAC: case DAP_FMT_OPUS: case DAP_FMT_WV:
+    case DAP_FMT_APE:
         return 1;
     default:
         return 0;
@@ -50,6 +51,7 @@ static const dap_formato_t *de_fora(int formato)
     case DAP_FMT_ALAC: return &dap_formato_alac;
     case DAP_FMT_OPUS: return &dap_formato_opus;
     case DAP_FMT_WV: return &dap_formato_wv;
+    case DAP_FMT_APE: return &dap_formato_ape;
     default: return NULL;
     }
 }

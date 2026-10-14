@@ -225,6 +225,62 @@ public static partial class Autoteste
         }
     }
 
+    /// <summary>
+    /// O Monkey's Audio (APE), pelo libdemac (Alpha 24): o arquivo de teste e o
+    /// "mac-399.ape" do TagLib (versao 3.99, 3,5 s, estereo). Que o decodificador
+    /// acerta amostra por amostra (pelo CRC de cada quadro) e que a busca cai no
+    /// lugar, quem confere e a bancada do decodificador no computador; aqui e o
+    /// player: o formato reconhecido, a musica na biblioteca e o som saindo.
+    /// </summary>
+    static void PlayerDap_Ape()
+    {
+        saida.AppendLine("player: Monkey's Audio (APE)");
+        string raiz = Path.Combine(Path.GetTempPath(), "circuitsketch-teste-ape-" + Guid.NewGuid().ToString("N")[..8]);
+        string pasta = Path.Combine(raiz, "APE");
+        Directory.CreateDirectory(pasta);
+        byte[] bytes = ArquivoDeTeste("taglib-mac-399.ape");
+        Conferir("ape: o arquivo de teste vem com o programa", bytes is { Length: > 80000 });
+        if (bytes is null) return;
+        File.WriteAllBytes(Path.Combine(pasta, "Monkey.ape"), bytes);
+
+        var janela = new MainWindow();
+        try
+        {
+            janela.TesteAbrirDemo("esp32s3-player-dap");
+            var pecas = janela.TesteEditorCircuito.Atual.Pecas;
+            var placa = pecas.First(p => p.Tipo == "esp32-s3-devkit");
+            var falante = pecas.First(p => p.Tipo == "alto-falante");
+            pecas.First(p => p.Tipo == "microsd-card").PastaDoComputador = raiz;
+
+            janela.TesteRodar();
+            var maquina = janela.TesteMaquinaDa(placa.Id);
+            string Serial() => string.Join(" | ", LinhasDoSerial(maquina).TakeLast(8));
+            bool leu = EsperarPor(() => LinhasDoSerial(maquina).Any(l => l.Contains(" artistas, ")), 40000);
+            Conferir("ape: o APE entra na biblioteca", leu && LinhasDoSerial(maquina).Any(l => l.Contains("1 musicas na biblioteca")), Serial());
+
+            janela.TesteEditorCircuito.BotoesPressionados.Add("pausa");
+            EsperarPor(() => false, 150);
+            janela.TesteEditorCircuito.BotoesPressionados.Remove("pausa");
+            double pico = 0;
+            EsperarPor(() =>
+            {
+                var (audio, _) = janela.TesteEditorCircuito.SomDoAltoFalante(falante, janela.TesteBancada, janela.TesteRede);
+                pico = Math.Max(pico, audio?.Nivel ?? 0);
+                return false;
+            }, 3000);
+            saida.AppendLine($"        som: pico {pico:0.000}");
+            Conferir("ape: o som sai no alto-falante", pico > 0.005, $"{pico:0.000}");
+            var erros = LinhasDoSerial(maquina).Where(l => l.StartsWith("DAP: /")).ToList();
+            Conferir("ape: o arquivo abre sem erro", erros.Count == 0, string.Join(" | ", erros));
+        }
+        finally
+        {
+            janela.TesteParar();
+            try { janela.Close(); } catch (InvalidOperationException) { }
+            try { Directory.Delete(raiz, true); } catch (IOException) { } catch (UnauthorizedAccessException) { }
+        }
+    }
+
     static void Demo_PlayerDap()
     {
         saida.AppendLine("demo PLAYER DE MUSICA (DAP)");

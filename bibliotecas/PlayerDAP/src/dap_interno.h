@@ -132,7 +132,7 @@ typedef struct {
     void (*fechar)(void *estado);
 } dap_formato_t;
 
-extern const dap_formato_t dap_formato_alac, dap_formato_opus, dap_formato_wv;
+extern const dap_formato_t dap_formato_alac, dap_formato_opus, dap_formato_wv, dap_formato_ape;
 
 /* MP4/M4A: acha a caixa "tipo" em [inicio, fim) -- onde o conteudo comeca e
  * o tamanho dele --, e o codec da trilha de som (DAP_FMT_ALAC ou DAP_FMT_M4A). */
