@@ -232,16 +232,33 @@ public static partial class Autoteste
     /// lugar, quem confere e a bancada do decodificador no computador; aqui e o
     /// player: o formato reconhecido, a musica na biblioteca e o som saindo.
     /// </summary>
-    static void PlayerDap_Ape()
+    static void PlayerDap_Ape() => TocarNoPlayer("ape", "Monkey's Audio (APE)", ("taglib-mac-399.ape", "Monkey.ape"));
+
+    /// <summary>
+    /// O AAC pelo faad2 (Alpha 24): no M4A (o esds e a tabela de pacotes) e cru
+    /// (ADTS). Os dois de teste sao o mesmo acorde de 4 s, codificado pelo
+    /// ffmpeg; contra a decodificacao do proprio ffmpeg o faad2 fica a mais de
+    /// 130 dB (a bancada no computador, que confere tambem as buscas).
+    /// </summary>
+    static void PlayerDap_Aac() => TocarNoPlayer("aac", "AAC (M4A e ADTS)", ("tom-aac.m4a", "Acorde M4A.m4a"), ("tom.aac", "Acorde ADTS.aac"));
+
+    /// <summary>
+    /// Os arquivos de teste numa pasta do cartao, o player le a biblioteca e
+    /// toca: todos entram, o som sai e nenhum da erro ao abrir.
+    /// </summary>
+    static void TocarNoPlayer(string rotulo, string titulo, params (string Recurso, string Nome)[] arquivos)
     {
-        saida.AppendLine("player: Monkey's Audio (APE)");
-        string raiz = Path.Combine(Path.GetTempPath(), "circuitsketch-teste-ape-" + Guid.NewGuid().ToString("N")[..8]);
-        string pasta = Path.Combine(raiz, "APE");
+        saida.AppendLine($"player: {titulo}");
+        string raiz = Path.Combine(Path.GetTempPath(), $"circuitsketch-teste-{rotulo}-" + Guid.NewGuid().ToString("N")[..8]);
+        string pasta = Path.Combine(raiz, rotulo.ToUpperInvariant());
         Directory.CreateDirectory(pasta);
-        byte[] bytes = ArquivoDeTeste("taglib-mac-399.ape");
-        Conferir("ape: o arquivo de teste vem com o programa", bytes is { Length: > 80000 });
-        if (bytes is null) return;
-        File.WriteAllBytes(Path.Combine(pasta, "Monkey.ape"), bytes);
+        foreach (var (recurso, nome) in arquivos)
+        {
+            byte[] bytes = ArquivoDeTeste(recurso);
+            Conferir($"{rotulo}: o {recurso} de teste vem com o programa", bytes is { Length: > 1000 });
+            if (bytes is null) return;
+            File.WriteAllBytes(Path.Combine(pasta, nome), bytes);
+        }
 
         var janela = new MainWindow();
         try
@@ -256,7 +273,8 @@ public static partial class Autoteste
             var maquina = janela.TesteMaquinaDa(placa.Id);
             string Serial() => string.Join(" | ", LinhasDoSerial(maquina).TakeLast(8));
             bool leu = EsperarPor(() => LinhasDoSerial(maquina).Any(l => l.Contains(" artistas, ")), 40000);
-            Conferir("ape: o APE entra na biblioteca", leu && LinhasDoSerial(maquina).Any(l => l.Contains("1 musicas na biblioteca")), Serial());
+            Conferir($"{rotulo}: {(arquivos.Length == 1 ? "o arquivo entra" : "todos entram")} na biblioteca",
+                leu && LinhasDoSerial(maquina).Any(l => l.Contains($"{arquivos.Length} musicas na biblioteca")), Serial());
 
             janela.TesteEditorCircuito.BotoesPressionados.Add("pausa");
             EsperarPor(() => false, 150);
@@ -269,9 +287,9 @@ public static partial class Autoteste
                 return false;
             }, 3000);
             saida.AppendLine($"        som: pico {pico:0.000}");
-            Conferir("ape: o som sai no alto-falante", pico > 0.005, $"{pico:0.000}");
+            Conferir($"{rotulo}: o som sai no alto-falante", pico > 0.005, $"{pico:0.000}");
             var erros = LinhasDoSerial(maquina).Where(l => l.StartsWith("DAP: /")).ToList();
-            Conferir("ape: o arquivo abre sem erro", erros.Count == 0, string.Join(" | ", erros));
+            Conferir($"{rotulo}: abre sem erro", erros.Count == 0, string.Join(" | ", erros));
         }
         finally
         {

@@ -9,9 +9,7 @@
  * bloco comeca).
  *
  * O ALAC (Apple Lossless) e o decodificador da propria Apple, em src/alac
- * (Apache 2.0). O AAC nao toca: os decodificadores livres dele sao GPL ou
- * de licenca fechada -- o arquivo aparece na biblioteca, com as etiquetas,
- * e o player diz por que nao toca.
+ * (Apache 2.0). O AAC mora no dap_aac.c, que usa as mesmas tabelas.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,18 +48,23 @@ int dap_m4a_caixa(FILE *f, long inicio, long fim, const char *tipo, long *conteu
     return 0;
 }
 
-/* O mdia da trilha de som (o primeiro trak com hdlr 'soun'). */
-static int trilha_de_som(FILE *f, long moov, long tamanho, long *mdia, long *tmdia)
+/* O mdia da trilha de som (o primeiro trak com hdlr 'soun') e o track_ID dela. */
+static int trilha_de_som(FILE *f, long moov, long tamanho, long *mdia, long *tmdia, uint32_t *trilha)
 {
     long p = moov, fim = moov + tamanho;
     long c, t;
     while (p < fim && dap_m4a_caixa(f, p, fim, "trak", &c, &t)) {
         long m, tm, h, th;
         if (dap_m4a_caixa(f, c, c + t, "mdia", &m, &tm) && dap_m4a_caixa(f, m, m + tm, "hdlr", &h, &th) && th >= 12) {
-            uint8_t b[12];
+            uint8_t b[24];
             if (fseek(f, h, SEEK_SET) == 0 && fread(b, 1, 12, f) == 12 && memcmp(b + 8, "soun", 4) == 0) {
                 *mdia = m;
                 *tmdia = tm;
+                /* o tkhd: o track_ID depois das datas (de 32 bits na versao 0, de 64 na 1) */
+                *trilha = 0;
+                long k, tk;
+                if (dap_m4a_caixa(f, c, c + t, "tkhd", &k, &tk) && tk >= 24 && fseek(f, k, SEEK_SET) == 0 && fread(b, 1, 24, f) == 24)
+                    *trilha = b[0] == 1 ? be32(b + 20) : be32(b + 12);
                 return 1;
             }
         }
@@ -70,23 +73,17 @@ static int trilha_de_som(FILE *f, long moov, long tamanho, long *mdia, long *tmd
     return 0;
 }
 
-typedef struct {
-    uint32_t escala;          /* do mdhd: quadros por segundo da duracao */
-    uint64_t duracao;
-    char codec[5];            /* 'alac', 'mp4a'... */
-    int canais, bits, taxa;   /* da entrada do stsd */
-    long stbl, tstbl;
-    long filhos, tfilhos;     /* as caixas dentro da entrada do stsd (a do ALAC: 'alac') */
-} m4a_t;
-
-static int ler_m4a(FILE *f, m4a_t *m)
+int dap_m4a_ler(FILE *f, dap_m4a_t *m)
 {
     memset(m, 0, sizeof(*m));
     if (fseek(f, 0, SEEK_END) != 0) return 0;
     long fim = ftell(f);
     long moov, tmoov, mdia, tmdia, c, t;
     if (!dap_m4a_caixa(f, 0, fim, "moov", &moov, &tmoov)) return 0;
-    if (!trilha_de_som(f, moov, tmoov, &mdia, &tmdia)) return 0;
+    if (!trilha_de_som(f, moov, tmoov, &mdia, &tmdia, &m->trilha)) return 0;
+    m->moov = moov;
+    m->tmoov = tmoov;
+    m->fim = fim;
 
     if (dap_m4a_caixa(f, mdia, mdia + tmdia, "mdhd", &c, &t) && t >= 24) {
         uint8_t b[32];
@@ -121,8 +118,8 @@ static int ler_m4a(FILE *f, m4a_t *m)
 
 int dap_m4a_codec(FILE *f)
 {
-    m4a_t m;
-    if (!ler_m4a(f, &m)) return DAP_FMT_M4A;
+    dap_m4a_t m;
+    if (!dap_m4a_ler(f, &m)) return DAP_FMT_M4A;
     return memcmp(m.codec, "alac", 4) == 0 ? DAP_FMT_ALAC : DAP_FMT_M4A;
 }
 
@@ -155,26 +152,117 @@ static uint8_t *caixa_inteira(FILE *f, long stbl, long tstbl, const char *tipo, 
     return b;
 }
 
-/* As tabelas do stbl viram o tamanho e a posicao de cada pacote. */
-static int montar_pacotes(alac_t *a, long stbl, long tstbl)
+/* Mais um pacote na tabela (a dos fragmentos cresce aos poucos). */
+static int acrescentar(uint32_t *n, uint32_t *cap, uint32_t **tamanhos, uint32_t **posicoes, uint32_t tamanho, uint64_t posicao)
 {
+    if (*n >= 4000000 || posicao > 0xFFFFFFFFull) return 0;
+    if (*n >= *cap) {
+        uint32_t novo = *cap ? *cap * 2 : 256;
+        uint32_t *t = (uint32_t *)dap_realocar(*tamanhos, novo * sizeof(uint32_t));
+        if (!t) return 0;
+        *tamanhos = t;
+        uint32_t *p = (uint32_t *)dap_realocar(*posicoes, novo * sizeof(uint32_t));
+        if (!p) return 0;
+        *posicoes = p;
+        *cap = novo;
+    }
+    (*tamanhos)[*n] = tamanho;
+    (*posicoes)[*n] = (uint32_t)posicao;
+    (*n)++;
+    return 1;
+}
+
+/* O MP4 fragmentado (o DASH das lojas e do YouTube, o 3GP de celular):
+ * depois do moov vem pares moof/mdat, e cada traf da trilha diz, no trun,
+ * quantos pacotes, o tamanho de cada um e onde comecam. O tamanho que o
+ * trun nao traz vem do tfhd ou do trex (no mvex do moov). */
+static void fragmentos(FILE *f, const dap_m4a_t *m, uint32_t *n, uint32_t *cap, uint32_t **tamanhos, uint32_t **posicoes)
+{
+    uint32_t tamanho_trex = 0;
+    long c, t, k, tk;
+    if (dap_m4a_caixa(f, m->moov, m->moov + m->tmoov, "mvex", &c, &t)) {
+        long p = c;
+        while (p < c + t && dap_m4a_caixa(f, p, c + t, "trex", &k, &tk)) {
+            uint8_t b[24];
+            if (tk >= 24 && fseek(f, k, SEEK_SET) == 0 && fread(b, 1, 24, f) == 24 && be32(b + 4) == m->trilha) tamanho_trex = be32(b + 16);
+            p = k + tk;
+        }
+    } else {
+        return;   /* sem mvex nao ha fragmentos */
+    }
+
+    long p = 0;
+    while (p < m->fim && dap_m4a_caixa(f, p, m->fim, "moof", &c, &t)) {
+        long moof = c - 8, q = c;
+        while (q < c + t && dap_m4a_caixa(f, q, c + t, "traf", &k, &tk)) {
+            long h, th, r, tr;
+            uint8_t b[40];
+            memset(b, 0, sizeof(b));
+            if (dap_m4a_caixa(f, k, k + tk, "tfhd", &h, &th) && th >= 8 && fseek(f, h, SEEK_SET) == 0
+                && fread(b, 1, th < 40 ? (size_t)th : 40, f) >= 8 && be32(b + 4) == m->trilha) {
+                uint32_t flags = be32(b) & 0xFFFFFF;
+                int i = 8;
+                uint64_t base = (uint64_t)moof;   /* sem base explicita: o comeco do moof */
+                uint32_t tamanho_padrao = tamanho_trex;
+                if (flags & 0x01) { base = be64(b + i); i += 8; }
+                if (flags & 0x02) i += 4;
+                if (flags & 0x08) i += 4;
+                if (flags & 0x10) { tamanho_padrao = be32(b + i); i += 4; }
+
+                uint64_t pos = base;
+                long s = k;
+                while (s < k + tk && dap_m4a_caixa(f, s, k + tk, "trun", &r, &tr)) {
+                    uint8_t *run = tr >= 8 && tr < (1 << 24) ? (uint8_t *)dap_alocar((size_t)tr) : NULL;
+                    if (run && fseek(f, r, SEEK_SET) == 0 && fread(run, 1, (size_t)tr, f) == (size_t)tr) {
+                        uint32_t fl = be32(run) & 0xFFFFFF, amostras = be32(run + 4);
+                        long j = 8;
+                        if (fl & 0x001) { pos = base + (uint64_t)(int64_t)(int32_t)be32(run + j); j += 4; }
+                        if (fl & 0x004) j += 4;
+                        int por_amostra = ((fl & 0x100) ? 4 : 0) + ((fl & 0x200) ? 4 : 0) + ((fl & 0x400) ? 4 : 0) + ((fl & 0x800) ? 4 : 0);
+                        for (uint32_t a = 0; a < amostras && j + por_amostra <= tr; a++) {
+                            uint32_t tam = tamanho_padrao;
+                            long o = j + ((fl & 0x100) ? 4 : 0);
+                            if (fl & 0x200) tam = be32(run + o);
+                            j += por_amostra;
+                            if (!tam || !acrescentar(n, cap, tamanhos, posicoes, tam, pos)) break;
+                            pos += tam;
+                        }
+                    }
+                    free(run);
+                    s = r + tr;
+                }
+            }
+            q = k + tk;
+        }
+        p = c + t;
+    }
+}
+
+/* As tabelas do stbl (e os fragmentos) viram o tamanho e a posicao de cada pacote. */
+int dap_m4a_pacotes(FILE *f, const dap_m4a_t *m, uint32_t *n_saida, uint32_t **tamanhos, uint32_t **posicoes)
+{
+    long stbl = m->stbl, tstbl = m->tstbl;
     long tsz, tco, tsc;
     int co64 = 0;
-    uint8_t *sz = caixa_inteira(a->f, stbl, tstbl, "stsz", &tsz);
-    uint8_t *co = caixa_inteira(a->f, stbl, tstbl, "stco", &tco);
-    if (!co) { co = caixa_inteira(a->f, stbl, tstbl, "co64", &tco); co64 = 1; }
-    uint8_t *sc = caixa_inteira(a->f, stbl, tstbl, "stsc", &tsc);
+    uint8_t *sz = caixa_inteira(f, stbl, tstbl, "stsz", &tsz);
+    uint8_t *co = caixa_inteira(f, stbl, tstbl, "stco", &tco);
+    if (!co) { co = caixa_inteira(f, stbl, tstbl, "co64", &tco); co64 = 1; }
+    uint8_t *sc = caixa_inteira(f, stbl, tstbl, "stsc", &tsc);
     int ok = 0;
-    if (sz && co && sc && tsz >= 12) {
+    uint32_t cap = 0;
+    *n_saida = 0;
+    *tamanhos = *posicoes = NULL;
+    if (sz && co && sc && tsz >= 12 && be32(sz + 8) == 0) ok = 1;   /* tudo nos fragmentos */
+    else if (sz && co && sc && tsz >= 12) {
         uint32_t fixo = be32(sz + 4), n = be32(sz + 8);
         uint32_t blocos = be32(co + 4), entradas = be32(sc + 4);
         if (n > 0 && n < 4000000 && (fixo || (uint64_t)tsz >= 12 + 4ull * n)
             && (uint64_t)tco >= 8 + (co64 ? 8ull : 4ull) * blocos && (uint64_t)tsc >= 8 + 12ull * entradas && entradas > 0) {
-            a->n = n;
-            a->tamanhos = (uint32_t *)dap_alocar(n * sizeof(uint32_t));
-            a->posicoes = (uint32_t *)dap_alocar(n * sizeof(uint32_t));
-            if (a->tamanhos && a->posicoes) {
-                for (uint32_t i = 0; i < n; i++) a->tamanhos[i] = fixo ? fixo : be32(sz + 12 + 4 * i);
+            *n_saida = cap = n;
+            *tamanhos = (uint32_t *)dap_alocar(n * sizeof(uint32_t));
+            *posicoes = (uint32_t *)dap_alocar(n * sizeof(uint32_t));
+            if (*tamanhos && *posicoes) {
+                for (uint32_t i = 0; i < n; i++) (*tamanhos)[i] = fixo ? fixo : be32(sz + 12 + 4 * i);
                 uint32_t pacote = 0;
                 for (uint32_t b = 0; b < blocos && pacote < n; b++) {
                     /* quantos pacotes este bloco tem: a ultima entrada do stsc que comeca nele ou antes */
@@ -185,8 +273,8 @@ static int montar_pacotes(alac_t *a, long stbl, long tstbl)
                     }
                     uint64_t pos = co64 ? be64(co + 8 + 8 * b) : be32(co + 8 + 4 * b);
                     for (uint32_t k = 0; k < por_bloco && pacote < n; k++) {
-                        a->posicoes[pacote] = (uint32_t)pos;
-                        pos += a->tamanhos[pacote++];
+                        (*posicoes)[pacote] = (uint32_t)pos;
+                        pos += (*tamanhos)[pacote++];
                     }
                 }
                 ok = pacote == n;
@@ -196,7 +284,8 @@ static int montar_pacotes(alac_t *a, long stbl, long tstbl)
     free(sz);
     free(co);
     free(sc);
-    return ok;
+    if (ok) fragmentos(f, m, n_saida, &cap, tamanhos, posicoes);
+    return ok && *n_saida > 0;
 }
 
 static void alac_fechar(void *s)
@@ -218,9 +307,9 @@ static void *alac_abrir(const char *caminho, dap_info_audio_t *info, char *erro,
     alac_t *a = (alac_t *)calloc(1, sizeof(alac_t));
     if (!a) return NULL;
     a->f = fopen(caminho, "rb");
-    m4a_t m;
+    dap_m4a_t m;
     long c, t;
-    if (!a->f || !ler_m4a(a->f, &m)) {
+    if (!a->f || !dap_m4a_ler(a->f, &m)) {
         snprintf(erro, tam_erro, "o M4A esta estragado");
         alac_fechar(a);
         return NULL;
@@ -239,7 +328,7 @@ static void *alac_abrir(const char *caminho, dap_info_audio_t *info, char *erro,
         return NULL;
     }
     a->canais = a->alac.config.numChannels;
-    if (!montar_pacotes(a, m.stbl, m.tstbl)) {
+    if (!dap_m4a_pacotes(a->f, &m, &a->n, &a->tamanhos, &a->posicoes)) {
         snprintf(erro, tam_erro, "o M4A nao tem a tabela dos pacotes");
         alac_fechar(a);
         return NULL;

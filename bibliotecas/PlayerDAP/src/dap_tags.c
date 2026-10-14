@@ -318,6 +318,59 @@ static void ler_wv(FILE *f, dap_etiquetas_t *e)
     if (!e->titulo[0]) ler_id3v1(f, e);
 }
 
+/* Monkey's Audio: a duracao pelo cabecalho (o da 3.98 em diante vem depois
+ * do descritor; o antigo, logo depois do "MAC " e da versao). */
+static void ler_mac(FILE *f, long inicio, dap_etiquetas_t *e)
+{
+    uint8_t h[80];
+    memset(h, 0, sizeof(h));
+    if (fseek(f, inicio, SEEK_SET) != 0 || fread(h, 1, 8, f) != 8 || memcmp(h, "MAC ", 4) != 0) return;
+    int versao = h[4] | h[5] << 8;
+    uint32_t por_quadro, ultimo, quadros, taxa;
+    if (versao >= 3980) {
+        /* o tamanho do descritor (logo depois do "MAC ", da versao e de 2 bytes
+         * vazios); o cabecalho comeca no fim dele */
+        if (fread(h, 1, 4, f) != 4) return;
+        uint32_t descritor = le32t(h);
+        if (descritor < 52 || descritor > 1024 || fseek(f, inicio + (long)descritor, SEEK_SET) != 0 || fread(h, 1, 24, f) != 24) return;
+        por_quadro = le32t(h + 4);
+        ultimo = le32t(h + 8);
+        quadros = le32t(h + 12);
+        taxa = le32t(h + 20);
+    } else {
+        /* compressao, bandeiras, canais, taxa, os dois tamanhos, quadros e o ultimo */
+        if (fseek(f, inicio + 6, SEEK_SET) != 0 || fread(h, 1, 26, f) != 26) return;
+        int compressao = h[0] | h[1] << 8;
+        taxa = le32t(h + 6);
+        quadros = le32t(h + 18);
+        ultimo = le32t(h + 22);
+        por_quadro = versao >= 3950 ? 73728 * 4 : (versao >= 3900 || (versao >= 3800 && compressao == 4000)) ? 73728 : 9216;
+    }
+    if (taxa && quadros && !e->duracao_ms)
+        e->duracao_ms = (int)(((uint64_t)(quadros - 1) * por_quadro + ultimo) * 1000 / taxa);
+}
+
+/* AAC cru (ADTS): a duracao pelo tamanho medio dos primeiros quadros (1024
+ * amostras cada) e o tamanho do arquivo. */
+static void duracao_adts(FILE *f, long inicio, dap_etiquetas_t *e)
+{
+    static const int taxas[13] = { 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350 };
+    if (e->duracao_ms || fseek(f, 0, SEEK_END) != 0) return;
+    long tamanho = ftell(f), p = inicio, soma = 0;
+    int quadros = 0, taxa = 0;
+    uint8_t h[7];
+    while (quadros < 64 && fseek(f, p, SEEK_SET) == 0 && fread(h, 1, 7, f) == 7) {
+        if (h[0] != 0xFF || (h[1] & 0xF6) != 0xF0) break;
+        int indice = (h[2] >> 2) & 0x0F, t = ((h[3] & 3) << 11) | (h[4] << 3) | (h[5] >> 5);
+        if (indice >= 13 || t < 7) break;
+        taxa = taxas[indice];
+        soma += t;
+        p += t;
+        quadros++;
+    }
+    if (quadros && taxa) e->duracao_ms = (int)((double)(tamanho - inicio) / ((double)soma / quadros) * 1024.0 * 1000.0 / taxa);
+}
+
 /* ------------------------------------------------------------- M4A */
 
 /* M4A: as etiquetas do iTunes em moov/udta/meta/ilst (cada item com uma
@@ -334,6 +387,15 @@ static void ler_m4a(FILE *f, dap_etiquetas_t *e)
             uint32_t escala = b[0] == 1 ? be32t(b + 20) : be32t(b + 12);
             uint64_t d = b[0] == 1 ? ((uint64_t)be32t(b + 24) << 32 | be32t(b + 28)) : be32t(b + 16);
             if (escala) e->duracao_ms = (int)(d * 1000 / escala);
+            /* no fragmentado, o mvhd conta so o que esta no moov (ou vem
+             * zerado); a duracao inteira e a do mvex/mehd */
+            long x, tx, h, th;
+            uint8_t m[12];
+            if (escala && dap_m4a_caixa(f, moov, moov + tmoov, "mvex", &x, &tx) && dap_m4a_caixa(f, x, x + tx, "mehd", &h, &th)
+                && th >= 8 && fseek(f, h, SEEK_SET) == 0 && fread(m, 1, th >= 12 ? 12 : 8, f) >= 8) {
+                uint64_t df = m[0] == 1 && th >= 12 ? ((uint64_t)be32t(m + 4) << 32 | be32t(m + 8)) : be32t(m + 4);
+                if (df > d) e->duracao_ms = (int)(df * 1000 / escala);
+            }
         }
     }
     long meta, tmeta, ilst, tilst;
@@ -718,9 +780,15 @@ void dap_ler_etiquetas(const char *caminho, int formato, dap_etiquetas_t *e)
         case DAP_FMT_DSF: ler_dsf(f, e); break;
         case DAP_FMT_DFF: ler_dff(f, e); break;
         case DAP_FMT_M4A:
+            ler_m4a(f, e);
+            if (!e->duracao_ms) {   /* AAC cru (ADTS) */
+                duracao_adts(f, depois_da_id3, e);
+                if (!e->titulo[0]) ler_id3v1(f, e);
+            }
+            break;
         case DAP_FMT_ALAC: ler_m4a(f, e); break;
-        case DAP_FMT_WV:
-        case DAP_FMT_APE: ler_wv(f, e); break;
+        case DAP_FMT_APE: ler_mac(f, depois_da_id3, e); ler_wv(f, e); break;
+        case DAP_FMT_WV: ler_wv(f, e); break;
         default: ler_id3v1(f, e); break;
         }
         fclose(f);

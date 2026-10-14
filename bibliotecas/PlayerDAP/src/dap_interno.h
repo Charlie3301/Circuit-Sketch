@@ -133,11 +133,29 @@ typedef struct {
 } dap_formato_t;
 
 extern const dap_formato_t dap_formato_alac, dap_formato_opus, dap_formato_wv, dap_formato_ape;
+extern const dap_formato_t dap_formato_aac, dap_formato_wma;
 
 /* MP4/M4A: acha a caixa "tipo" em [inicio, fim) -- onde o conteudo comeca e
  * o tamanho dele --, e o codec da trilha de som (DAP_FMT_ALAC ou DAP_FMT_M4A). */
 int dap_m4a_caixa(FILE *f, long inicio, long fim, const char *tipo, long *conteudo, long *tamanho);
 int dap_m4a_codec(FILE *f);
+
+/* A trilha de som do M4A (dap_m4a.c), para o ALAC e o AAC. */
+typedef struct {
+    uint32_t escala;          /* do mdhd: quadros por segundo da duracao */
+    uint64_t duracao;
+    char codec[5];            /* 'alac', 'mp4a'... */
+    int canais, bits, taxa;   /* da entrada do stsd */
+    long stbl, tstbl;
+    long filhos, tfilhos;     /* as caixas dentro da entrada do stsd ('alac', 'esds') */
+    long moov, tmoov;
+    long fim;                 /* o tamanho do arquivo */
+    uint32_t trilha;          /* o track_ID (do tkhd), para os fragmentos */
+} dap_m4a_t;
+int dap_m4a_ler(FILE *f, dap_m4a_t *m);
+/* O tamanho e a posicao de cada pacote no mdat: do stsz, stsc e stco/co64,
+ * e dos fragmentos (moof/traf/trun) que vem depois do moov. */
+int dap_m4a_pacotes(FILE *f, const dap_m4a_t *m, uint32_t *n, uint32_t **tamanhos, uint32_t **posicoes);
 
 /* ===================================================================
  *  etiquetas (dap_tags.c)

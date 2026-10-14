@@ -47,6 +47,17 @@ sua licenca, que vai aqui por inteiro, como elas pedem.
      GPL -- a versao 3, porque as partes 4 e 5 sao Apache 2.0, que a GPL 2
      nao aceita. Quem distribuir o firmware entrega junto o codigo-fonte.
 
+  9. AAC (src/aac: o libfaad do FAAD2 2.11.4)
+     M. Bakker, Nero AG e os outros autores (src/aac/AUTHORS),
+     https://github.com/knik0/faad2
+     GNU GPL versao 2 ou mais nova (o texto e o da parte 8), com o aviso
+     que o FAAD2 pede: "Code from FAAD2 is copyright (c) Nero AG,
+     www.nero.com". Mudancas marcadas ("PlayerDAP:"): a configuracao num
+     faad_config.h (AAC-LC, HE-AAC v1 e v2; sem MAIN, LTP, LD, ER e DRM),
+     o faad_malloc na PSRAM, o hcb.h achando as tabelas ao lado dele e o
+     common.h com o stdint.h no TinyCC. O dap_aac.c (o M4A e o ADTS) e
+     novo e vai sob a GPL. Como o APE, deixa o firmware sob a GPL 3.
+
 ==============================================================================
 1. dr_libs (dr_mp3, dr_flac, dr_wav)
 ==============================================================================
@@ -876,3 +887,21 @@ proprietary programs.  If your program is a subroutine library, you may
 consider it more useful to permit linking proprietary applications with the
 library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.
+
+==============================================================================
+9. AAC (FAAD2) -- GNU GPL versao 2 (ou mais nova); o texto e o da parte 8
+==============================================================================
+FAAD2 - Freeware Advanced Audio (AAC) Decoder including SBR decoding
+Copyright (C) 2003-2005 M. Bakker, Nero AG, http://www.nero.com
+
+Code from FAAD2 is copyright (c) Nero AG, www.nero.com
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
