@@ -8560,6 +8560,283 @@
   "metades": false
  },
  {
+  "id": "modulo-rele-1",
+  "largura": 98,
+  "altura": 197,
+  "pinos": [
+   {
+    "nome": "NO",
+    "x": 31.29,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NO (normalmente aberto): liga no COM so com o rele ligado (a carga que o rele liga)"
+   },
+   {
+    "nome": "COM",
+    "x": 50.49,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "COM (comum): a chave do rele; vai para o NO ligado e para o NC desligado"
+   },
+   {
+    "nome": "NC",
+    "x": 69.69,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NC (normalmente fechado): ligado no COM com o rele DESLIGADO"
+   },
+   {
+    "nome": "VCC",
+    "x": 12.09,
+    "y": 185.95,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "VCC: 5 V (o 5V da placa ou uma fonte). A bobina do rele puxa ~70 mA daqui por canal ligado"
+   },
+   {
+    "nome": "GND",
+    "x": 21.69,
+    "y": 185.95,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND: o GND da placa (em comum com o VCC)"
+   },
+   {
+    "nome": "IN",
+    "x": 31.29,
+    "y": 185.95,
+    "sinais": [],
+    "descricao": "IN: o sinal do canal 1. Em LOW o rele liga (ativo em LOW, pelo optoacoplador: o pino so acende o LED de dentro, ~2 mA); em HIGH ou solto, desliga"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "modulo-rele-2",
+  "largura": 151,
+  "altura": 197,
+  "pinos": [
+   {
+    "nome": "NO1",
+    "x": 21.69,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NO (normalmente aberto): liga no COM so com o rele ligado (a carga que o rele liga) -- canal 1"
+   },
+   {
+    "nome": "COM1",
+    "x": 40.89,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "COM (comum): a chave do rele; vai para o NO ligado e para o NC desligado -- canal 1"
+   },
+   {
+    "nome": "NC1",
+    "x": 60.09,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NC (normalmente fechado): ligado no COM com o rele DESLIGADO -- canal 1"
+   },
+   {
+    "nome": "NO2",
+    "x": 88.89,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NO (normalmente aberto): liga no COM so com o rele ligado (a carga que o rele liga) -- canal 2"
+   },
+   {
+    "nome": "COM2",
+    "x": 108.09,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "COM (comum): a chave do rele; vai para o NO ligado e para o NC desligado -- canal 2"
+   },
+   {
+    "nome": "NC2",
+    "x": 127.29,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NC (normalmente fechado): ligado no COM com o rele DESLIGADO -- canal 2"
+   },
+   {
+    "nome": "GND",
+    "x": 12.09,
+    "y": 185.95,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND: o GND da placa (em comum com o VCC)"
+   },
+   {
+    "nome": "IN1",
+    "x": 21.69,
+    "y": 185.95,
+    "sinais": [],
+    "descricao": "IN1: o sinal do canal 1. Em LOW o rele liga (ativo em LOW, pelo optoacoplador: o pino so acende o LED de dentro, ~2 mA); em HIGH ou solto, desliga"
+   },
+   {
+    "nome": "IN2",
+    "x": 31.29,
+    "y": 185.95,
+    "sinais": [],
+    "descricao": "IN2: o sinal do canal 2. Em LOW o rele liga (ativo em LOW, pelo optoacoplador: o pino so acende o LED de dentro, ~2 mA); em HIGH ou solto, desliga"
+   },
+   {
+    "nome": "VCC",
+    "x": 40.89,
+    "y": 185.95,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "VCC: 5 V (o 5V da placa ou uma fonte). A bobina do rele puxa ~70 mA daqui por canal ligado"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "modulo-rele-4",
+  "largura": 287,
+  "altura": 197,
+  "pinos": [
+   {
+    "nome": "NO1",
+    "x": 21.69,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NO (normalmente aberto): liga no COM so com o rele ligado (a carga que o rele liga) -- canal 1"
+   },
+   {
+    "nome": "COM1",
+    "x": 40.89,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "COM (comum): a chave do rele; vai para o NO ligado e para o NC desligado -- canal 1"
+   },
+   {
+    "nome": "NC1",
+    "x": 60.09,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NC (normalmente fechado): ligado no COM com o rele DESLIGADO -- canal 1"
+   },
+   {
+    "nome": "NO2",
+    "x": 88.89,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NO (normalmente aberto): liga no COM so com o rele ligado (a carga que o rele liga) -- canal 2"
+   },
+   {
+    "nome": "COM2",
+    "x": 108.09,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "COM (comum): a chave do rele; vai para o NO ligado e para o NC desligado -- canal 2"
+   },
+   {
+    "nome": "NC2",
+    "x": 127.29,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NC (normalmente fechado): ligado no COM com o rele DESLIGADO -- canal 2"
+   },
+   {
+    "nome": "NO3",
+    "x": 156.09,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NO (normalmente aberto): liga no COM so com o rele ligado (a carga que o rele liga) -- canal 3"
+   },
+   {
+    "nome": "COM3",
+    "x": 175.29,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "COM (comum): a chave do rele; vai para o NO ligado e para o NC desligado -- canal 3"
+   },
+   {
+    "nome": "NC3",
+    "x": 194.49,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NC (normalmente fechado): ligado no COM com o rele DESLIGADO -- canal 3"
+   },
+   {
+    "nome": "NO4",
+    "x": 223.29,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NO (normalmente aberto): liga no COM so com o rele ligado (a carga que o rele liga) -- canal 4"
+   },
+   {
+    "nome": "COM4",
+    "x": 242.49,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "COM (comum): a chave do rele; vai para o NO ligado e para o NC desligado -- canal 4"
+   },
+   {
+    "nome": "NC4",
+    "x": 261.69,
+    "y": 13.15,
+    "sinais": [],
+    "descricao": "NC (normalmente fechado): ligado no COM com o rele DESLIGADO -- canal 4"
+   },
+   {
+    "nome": "GND",
+    "x": 12.09,
+    "y": 185.95,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND: o GND da placa (em comum com o VCC)"
+   },
+   {
+    "nome": "IN1",
+    "x": 21.69,
+    "y": 185.95,
+    "sinais": [],
+    "descricao": "IN1: o sinal do canal 1. Em LOW o rele liga (ativo em LOW, pelo optoacoplador: o pino so acende o LED de dentro, ~2 mA); em HIGH ou solto, desliga"
+   },
+   {
+    "nome": "IN2",
+    "x": 31.29,
+    "y": 185.95,
+    "sinais": [],
+    "descricao": "IN2: o sinal do canal 2. Em LOW o rele liga (ativo em LOW, pelo optoacoplador: o pino so acende o LED de dentro, ~2 mA); em HIGH ou solto, desliga"
+   },
+   {
+    "nome": "IN3",
+    "x": 40.89,
+    "y": 185.95,
+    "sinais": [],
+    "descricao": "IN3: o sinal do canal 3. Em LOW o rele liga (ativo em LOW, pelo optoacoplador: o pino so acende o LED de dentro, ~2 mA); em HIGH ou solto, desliga"
+   },
+   {
+    "nome": "IN4",
+    "x": 50.49,
+    "y": 185.95,
+    "sinais": [],
+    "descricao": "IN4: o sinal do canal 4. Em LOW o rele liga (ativo em LOW, pelo optoacoplador: o pino so acende o LED de dentro, ~2 mA); em HIGH ou solto, desliga"
+   },
+   {
+    "nome": "VCC",
+    "x": 60.09,
+    "y": 185.95,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "VCC: 5 V (o 5V da placa ou uma fonte). A bobina do rele puxa ~70 mA daqui por canal ligado"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "mosfet-n",
   "largura": 38,
   "altura": 102,

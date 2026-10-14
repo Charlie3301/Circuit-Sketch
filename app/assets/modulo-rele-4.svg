@@ -1,0 +1,191 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="76.0mm" height="52.0mm" viewBox="0 0 76.0 52.0">
+  <rect x="0.3" y="0.3" width="75.4" height="51.4" rx="1.2" fill="#1d4b9c" stroke="#0f2c61" stroke-width="0.3"/>
+  <circle cx="2.00" cy="2.00" r="1.2" fill="#0b1630"/>
+  <circle cx="2.00" cy="43.00" r="1.2" fill="#0b1630"/>
+  <circle cx="74.00" cy="2.00" r="1.2" fill="#0b1630"/>
+  <circle cx="74.00" cy="43.00" r="1.2" fill="#0b1630"/>
+  <rect x="2.90" y="0.48" width="15.84" height="6.0" rx="0.5" fill="#1f5fb4" stroke="#0f2f5c" stroke-width="0.25"/>
+  <circle cx="5.74" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M4.64 3.48 H6.84" stroke="#5a6068" stroke-width="0.45"/>
+  <text x="5.74" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">NO</text>
+  <circle cx="10.82" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M9.72 3.48 H11.92" stroke="#5a6068" stroke-width="0.45"/>
+  <text x="10.82" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">COM</text>
+  <circle cx="15.90" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M14.80 3.48 H17.00" stroke="#5a6068" stroke-width="0.45"/>
+  <text x="15.90" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">NC</text>
+  <rect x="3.12" y="9.48" width="15.4" height="19.0" rx="0.7" fill="#2b74d6" stroke="#123f80" stroke-width="0.3"/>
+  <rect x="3.72" y="10.08" width="14.20" height="1.4" rx="0.4" fill="#ffffff" opacity="0.16"/>
+  <text x="10.82" y="13.68" fill="#e8eef8" font-size="1.5px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">SONGLE</text>
+  <text x="10.82" y="17.08" fill="#e8eef8" font-size="1.05px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">SRD-05VDC-SL-C</text>
+  <text x="10.82" y="19.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">10A 250VAC</text>
+  <text x="10.82" y="21.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">10A 30VDC</text>
+  <text x="10.82" y="24.88" fill="#d7e2f4" font-size="1.0px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">CE</text>
+  <rect x="5.22" y="31.08" width="4.6" height="3.4" rx="0.3" fill="#1b1b1d"/>
+  <circle cx="5.92" cy="31.78" r="0.3" fill="#555"/>
+  <rect x="11.82" y="31.28" width="2.6" height="2.4" rx="0.3" fill="#1b1b1d"/>
+  <rect x="15.02" y="31.68" width="2.8" height="1.4" rx="0.3" fill="#1b1b1d"/>
+  <rect x="17.22" y="31.68" width="0.5" height="1.4" fill="#c9ccd1"/>
+  <text x="7.52" y="36.08" fill="#bfc6d2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">817C</text>
+  <circle cx="14.22" cy="37.48" r="0.9" fill="#5a1414" stroke="#2a0b0b" stroke-width="0.2"/>
+  <text x="14.22" y="39.88" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">IN1</text>
+  <rect x="20.68" y="0.48" width="15.84" height="6.0" rx="0.5" fill="#1f5fb4" stroke="#0f2f5c" stroke-width="0.25"/>
+  <circle cx="23.52" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M22.42 3.48 H24.62" stroke="#5a6068" stroke-width="0.45"/>
+  <text x="23.52" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">NO</text>
+  <circle cx="28.60" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M27.50 3.48 H29.70" stroke="#5a6068" stroke-width="0.45"/>
+  <text x="28.60" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">COM</text>
+  <circle cx="33.68" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M32.58 3.48 H34.78" stroke="#5a6068" stroke-width="0.45"/>
+  <text x="33.68" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">NC</text>
+  <rect x="20.90" y="9.48" width="15.4" height="19.0" rx="0.7" fill="#2b74d6" stroke="#123f80" stroke-width="0.3"/>
+  <rect x="21.50" y="10.08" width="14.20" height="1.4" rx="0.4" fill="#ffffff" opacity="0.16"/>
+  <text x="28.60" y="13.68" fill="#e8eef8" font-size="1.5px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">SONGLE</text>
+  <text x="28.60" y="17.08" fill="#e8eef8" font-size="1.05px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">SRD-05VDC-SL-C</text>
+  <text x="28.60" y="19.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">10A 250VAC</text>
+  <text x="28.60" y="21.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">10A 30VDC</text>
+  <text x="28.60" y="24.88" fill="#d7e2f4" font-size="1.0px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">CE</text>
+  <rect x="23.00" y="31.08" width="4.6" height="3.4" rx="0.3" fill="#1b1b1d"/>
+  <circle cx="23.70" cy="31.78" r="0.3" fill="#555"/>
+  <rect x="29.60" y="31.28" width="2.6" height="2.4" rx="0.3" fill="#1b1b1d"/>
+  <rect x="32.80" y="31.68" width="2.8" height="1.4" rx="0.3" fill="#1b1b1d"/>
+  <rect x="35.00" y="31.68" width="0.5" height="1.4" fill="#c9ccd1"/>
+  <text x="25.30" y="36.08" fill="#bfc6d2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">817C</text>
+  <circle cx="32.00" cy="37.48" r="0.9" fill="#5a1414" stroke="#2a0b0b" stroke-width="0.2"/>
+  <text x="32.00" y="39.88" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">IN2</text>
+  <rect x="38.46" y="0.48" width="15.84" height="6.0" rx="0.5" fill="#1f5fb4" stroke="#0f2f5c" stroke-width="0.25"/>
+  <circle cx="41.30" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M40.20 3.48 H42.40" stroke="#5a6068" stroke-width="0.45"/>
+  <text x="41.30" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">NO</text>
+  <circle cx="46.38" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M45.28 3.48 H47.48" stroke="#5a6068" stroke-width="0.45"/>
+  <text x="46.38" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">COM</text>
+  <circle cx="51.46" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M50.36 3.48 H52.56" stroke="#5a6068" stroke-width="0.45"/>
+  <text x="51.46" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">NC</text>
+  <rect x="38.68" y="9.48" width="15.4" height="19.0" rx="0.7" fill="#2b74d6" stroke="#123f80" stroke-width="0.3"/>
+  <rect x="39.28" y="10.08" width="14.20" height="1.4" rx="0.4" fill="#ffffff" opacity="0.16"/>
+  <text x="46.38" y="13.68" fill="#e8eef8" font-size="1.5px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">SONGLE</text>
+  <text x="46.38" y="17.08" fill="#e8eef8" font-size="1.05px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">SRD-05VDC-SL-C</text>
+  <text x="46.38" y="19.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">10A 250VAC</text>
+  <text x="46.38" y="21.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">10A 30VDC</text>
+  <text x="46.38" y="24.88" fill="#d7e2f4" font-size="1.0px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">CE</text>
+  <rect x="40.78" y="31.08" width="4.6" height="3.4" rx="0.3" fill="#1b1b1d"/>
+  <circle cx="41.48" cy="31.78" r="0.3" fill="#555"/>
+  <rect x="47.38" y="31.28" width="2.6" height="2.4" rx="0.3" fill="#1b1b1d"/>
+  <rect x="50.58" y="31.68" width="2.8" height="1.4" rx="0.3" fill="#1b1b1d"/>
+  <rect x="52.78" y="31.68" width="0.5" height="1.4" fill="#c9ccd1"/>
+  <text x="43.08" y="36.08" fill="#bfc6d2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">817C</text>
+  <circle cx="49.78" cy="37.48" r="0.9" fill="#5a1414" stroke="#2a0b0b" stroke-width="0.2"/>
+  <text x="49.78" y="39.88" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">IN3</text>
+  <rect x="56.24" y="0.48" width="15.84" height="6.0" rx="0.5" fill="#1f5fb4" stroke="#0f2f5c" stroke-width="0.25"/>
+  <circle cx="59.08" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M57.98 3.48 H60.18" stroke="#5a6068" stroke-width="0.45"/>
+  <text x="59.08" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">NO</text>
+  <circle cx="64.16" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M63.06 3.48 H65.26" stroke="#5a6068" stroke-width="0.45"/>
+  <text x="64.16" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">COM</text>
+  <circle cx="69.24" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M68.14 3.48 H70.34" stroke="#5a6068" stroke-width="0.45"/>
+  <text x="69.24" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">NC</text>
+  <rect x="56.46" y="9.48" width="15.4" height="19.0" rx="0.7" fill="#2b74d6" stroke="#123f80" stroke-width="0.3"/>
+  <rect x="57.06" y="10.08" width="14.20" height="1.4" rx="0.4" fill="#ffffff" opacity="0.16"/>
+  <text x="64.16" y="13.68" fill="#e8eef8" font-size="1.5px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">SONGLE</text>
+  <text x="64.16" y="17.08" fill="#e8eef8" font-size="1.05px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">SRD-05VDC-SL-C</text>
+  <text x="64.16" y="19.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">10A 250VAC</text>
+  <text x="64.16" y="21.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">10A 30VDC</text>
+  <text x="64.16" y="24.88" fill="#d7e2f4" font-size="1.0px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">CE</text>
+  <rect x="58.56" y="31.08" width="4.6" height="3.4" rx="0.3" fill="#1b1b1d"/>
+  <circle cx="59.26" cy="31.78" r="0.3" fill="#555"/>
+  <rect x="65.16" y="31.28" width="2.6" height="2.4" rx="0.3" fill="#1b1b1d"/>
+  <rect x="68.36" y="31.68" width="2.8" height="1.4" rx="0.3" fill="#1b1b1d"/>
+  <rect x="70.56" y="31.68" width="0.5" height="1.4" fill="#c9ccd1"/>
+  <text x="60.86" y="36.08" fill="#bfc6d2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">817C</text>
+  <circle cx="67.56" cy="37.48" r="0.9" fill="#5a1414" stroke="#2a0b0b" stroke-width="0.2"/>
+  <text x="67.56" y="39.88" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">IN4</text>
+  <rect x="2.00" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="2.82" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="3.20" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">GND</text>
+  <rect x="4.54" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="5.36" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="5.74" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">IN1</text>
+  <rect x="7.08" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="7.90" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="8.28" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">IN2</text>
+  <rect x="9.62" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="10.44" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="10.82" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">IN3</text>
+  <rect x="12.16" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="12.98" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="13.36" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">IN4</text>
+  <rect x="14.70" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="15.52" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="15.90" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">VCC</text>
+  <circle cx="20.84" cy="49.20" r="0.9" fill="#5a1414" stroke="#2a0b0b" stroke-width="0.2"/>
+  <text x="20.84" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">PWR</text>
+  <rect x="66.52" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="67.34" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="67.72" y="47.20" fill="#f2f2f2" font-size="0.7px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">GND</text>
+  <rect x="69.06" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="69.88" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="70.26" y="47.20" fill="#f2f2f2" font-size="0.7px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">VCC</text>
+  <rect x="71.60" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="72.42" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="72.80" y="47.20" fill="#f2f2f2" font-size="0.7px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">JD</text>
+  <rect x="68.96" y="47.80" width="5.14" height="2.8" rx="0.5" fill="#e8c21c" stroke="#8a7110" stroke-width="0.2"/>
+  <text x="38.00" y="44.40" fill="#cfe0ff" font-size="1.1px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">4 Relay Module</text>
+
+</svg>

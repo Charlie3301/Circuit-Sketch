@@ -491,6 +491,8 @@ public sealed partial class Energia
         MontarConversores(circuito, rede);
         // Transistor, MOSFET e opto: o canal acompanha a base, o gate, o LED.
         MontarChaves(circuito, rede);
+        // Os modulos de rele: a entrada (o LED do opto) liga a bobina.
+        MontarModulosDeRele(circuito, rede);
     }
 
     /// <summary>O no tem uma fonte positiva presa nele (o trilho de uma placa ligada)?</summary>
@@ -579,6 +581,9 @@ public sealed partial class Energia
             case "transistor-pnp":
             case "mosfet-n":
             case "optoacoplador":
+            case "modulo-rele-1":
+            case "modulo-rele-2":
+            case "modulo-rele-4":
                 yield break;
 
             // O fusivel e um fio fino; queimado (o editor desliga), aberto.

@@ -229,6 +229,13 @@ public partial class EditorCircuito
                         yield return new Energia.Contato(peca.Id, "1.l", "2.l", 0.05);
                     break;
 
+                // Os modulos de rele: o contato de cada canal (10 A).
+                case "modulo-rele-1":
+                case "modulo-rele-2":
+                case "modulo-rele-4":
+                    foreach (var contato in ContatosDoModuloDeRele(peca, bancada, rede)) yield return contato;
+                    break;
+
                 // O fim de curso: COM no NO apertado, no NC solto (5 A).
                 case "micro-switch":
                     yield return new Energia.Contato(peca.Id, "COM",
@@ -303,7 +310,7 @@ public partial class EditorCircuito
                                                        || Semicondutores.EhControlado(p.Tipo) || p.Tipo is "fusivel" or "varistor"
                                                        || DriverDePasso.De(p.Tipo) is not null || p.Tipo == "motor-28byj48"
                                                        || ModeloDeServo.De(p.Tipo) is not null || EhEsc(p.Tipo) || p.Tipo == "receptor-rc"
-                                                       || Reguladores.EhRegulador(p.Tipo));
+                                                       || Reguladores.EhRegulador(p.Tipo) || ModulosDeRele.EhModulo(p.Tipo));
         if (!energia)
         {
             relogioDosMotores.Reset();
@@ -399,6 +406,8 @@ public partial class EditorCircuito
 
         foreach (var peca in Atual.Pecas)
         {
+            if (ModulosDeRele.EhModulo(peca.Tipo)) achados.AddRange(AvisosDoModuloDeRele(peca, conta));
+
             // Saida de driver acima da corrente maxima por mais de um segundo
             // (a partida do motor passa disso por um instante, e pode): a
             // protecao termica corta.

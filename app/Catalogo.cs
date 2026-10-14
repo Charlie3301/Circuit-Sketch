@@ -534,6 +534,9 @@ public static class Catalogo
         "rotary-dialer" => "Disco de telefone",
         "led-ring" => "Anel de LEDs",
         "ks2e-m-dc5" => "Rele KS2E",
+        "modulo-rele-1" => "Módulo de relé 1 canal",
+        "modulo-rele-2" => "Módulo de relé 2 canais",
+        "modulo-rele-4" => "Módulo de relé 4 canais",
         "alto-falante" => "Alto-falante",
         "max98357a" => "Amplificador I2S MAX98357A",
         "pendrive-usb" => "Pendrive USB",
@@ -605,7 +608,7 @@ public static class Catalogo
             or "heart-beat-sensor" or "big-sound-sensor" or "small-sound-sensor"
             or "mpu6050" or "hx711" or "dht11" => "Sensores",
 
-        "buzzer" or "ks2e-m-dc5" or "alto-falante" => "Atuadores",
+        "buzzer" or "ks2e-m-dc5" or "alto-falante" or "modulo-rele-1" or "modulo-rele-2" or "modulo-rele-4" => "Atuadores",
 
         // A Alpha 23 trouxe motor, ponte H, driver, ESC, roda e helice: juntos
         // numa categoria so, com o servo e os de passo que ja existiam.

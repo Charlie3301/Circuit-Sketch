@@ -5476,6 +5476,7 @@ public partial class EditorCircuito : Border
 
     public void AplicarEntradas(Bancada bancada, Netlist rede)
     {
+        ultimaRede = rede;
         AplicarVinculos();
 
         if (rede is null || bancada is null) return;
@@ -5520,6 +5521,13 @@ public partial class EditorCircuito : Border
 
                 case "ks2e-m-dc5":
                     AplicarRele(peca, maq, rede);
+                    break;
+
+                case "modulo-rele-1":
+                case "modulo-rele-2":
+                case "modulo-rele-4":
+                    ultimaMaquinaDoRele[peca.Id] = maq;
+                    AplicarModuloDeRele(peca, maq, rede);
                     break;
 
                 // O fim de curso: o comum vai ao NO apertado e ao NC solto,

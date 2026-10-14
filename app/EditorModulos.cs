@@ -19,6 +19,22 @@ public partial class EditorCircuito
         ["l9110s"] = [(26.0 * Mm, 11.4 * Mm, 0.8 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "energia")],
         // A luz do receptor: acesa com o controle ligado, piscando sem ele.
         ["receptor-rc"] = [(8.0 * Mm, 22.6 * Mm, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "rx")],
+        // Os modulos de rele: a luz de energia e a de cada canal (o LED do opto).
+        ["modulo-rele-1"] = [(49.97, 185.95, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc"), (63.34, 141.66, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "canal1")],
+        ["modulo-rele-2"] =
+        [
+            (59.57, 185.95, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc"),
+            (53.74, 141.66, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "canal1"),
+            (120.94, 141.66, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "canal2"),
+        ],
+        ["modulo-rele-4"] =
+        [
+            (78.77, 185.95, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc"),
+            (53.74, 141.66, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "canal1"),
+            (120.94, 141.66, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "canal2"),
+            (188.14, 141.66, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "canal3"),
+            (255.34, 141.66, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "canal4"),
+        ],
         ["uln2003"] =
         [
             (26.0 * Mm, 12.5 * Mm, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "A"),
@@ -93,7 +109,7 @@ public partial class EditorCircuito
         }
     }
 
-    bool LuzAcesa(PecaNoCircuito peca, string chave) => chave switch
+    bool LuzAcesa(PecaNoCircuito peca, string chave) => ModulosDeRele.EhModulo(peca.Tipo) ? LuzDoModuloDeRele(peca, chave) : chave switch
     {
         "energia" => EnergiaDoQuadro?.DriversLigados.Contains(peca.Id) == true,
         // A fase do ULN2003: o LED esta na entrada, acende com ela em HIGH.

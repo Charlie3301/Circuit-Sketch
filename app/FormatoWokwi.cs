@@ -67,6 +67,7 @@ public static class FormatoWokwi
         // fios (SPI) e o elemento "wokwi-ssd1306".
         ["ssd1306-i2c"] = "board-ssd1306",
         ["vcc-symbol"] = "wokwi-vcc",
+        ["modulo-rele-1"] = "wokwi-relay-module",
         ["gnd-symbol"] = "wokwi-gnd",
         ["texto"] = "wokwi-text",
         // As portas logicas e os flip-flops do simulador de logica deles.
