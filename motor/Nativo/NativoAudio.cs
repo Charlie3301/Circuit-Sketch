@@ -1,14 +1,17 @@
 namespace Simulador;
 
 /// <summary>
-/// O som que sai pelo I2S da placa: as amostras, ja em mono de 16 bits, e
-/// os pinos por onde sairam. Quem toca (a janela) le daqui quando o circuito
-/// tem um amplificador ligado nesses pinos e um alto-falante nele.
+/// O som que sai pelo I2S da placa: os quadros em estereo (esquerdo e
+/// direito, 16 bits) e os pinos por onde sairam. Quem toca (a janela) le
+/// daqui quando o circuito tem um amplificador ligado nesses pinos e um
+/// alto-falante nele -- em mono, a media dos dois canais, que e o que o
+/// MAX98357A faz de fabrica --, ou um DAC estereo (o PCM5102A) com a saida de
+/// fone: aqui os dois canais vao separados.
 /// </summary>
 public sealed class SaidaDeAudio
 {
-    readonly short[] anel;
-    int inicio, quantas;
+    readonly short[] anel;     // os quadros intercalados: E, D, E, D...
+    int inicio, quantos;       // em quadros
     readonly object trava = new();
 
     public int Taxa { get; }
@@ -26,45 +29,82 @@ public sealed class SaidaDeAudio
         Ws = ws;
         Dout = dout;
         Geracao = geracao;
-        anel = new short[Taxa];   // um segundo de folga
+        anel = new short[Taxa * 2];   // um segundo de folga
     }
 
+    int Capacidade => anel.Length / 2;
+
+    void Por(short esquerdo, short direito)
+    {
+        if (quantos == Capacidade)
+        {
+            inicio = (inicio + 1) % Capacidade;
+            quantos--;
+        }
+        int k = (inicio + quantos) % Capacidade;
+        anel[2 * k] = esquerdo;
+        anel[2 * k + 1] = direito;
+        quantos++;
+    }
+
+    /// <summary>Amostras de um canal so: vao iguais para os dois lados.</summary>
     public void Escrever(ReadOnlySpan<short> amostras)
     {
         lock (trava)
-            foreach (short s in amostras)
-            {
-                if (quantas == anel.Length)
-                {
-                    inicio = (inicio + 1) % anel.Length;
-                    quantas--;
-                }
-                anel[(inicio + quantas) % anel.Length] = s;
-                quantas++;
-            }
+            foreach (short s in amostras) Por(s, s);
     }
 
-    /// <summary>Tira ate destino.Length amostras. Devolve quantas havia.</summary>
+    /// <summary>Quadros estereo intercalados (E, D, E, D...).</summary>
+    public void EscreverEstereo(ReadOnlySpan<short> intercalados)
+    {
+        lock (trava)
+            for (int i = 0; i + 1 < intercalados.Length; i += 2) Por(intercalados[i], intercalados[i + 1]);
+    }
+
+    /// <summary>Tira ate destino.Length quadros, em mono (a media dos dois canais). Devolve quantos havia.</summary>
     public int Ler(Span<short> destino)
     {
         lock (trava)
         {
-            int n = Math.Min(destino.Length, quantas);
-            for (int i = 0; i < n; i++) destino[i] = anel[(inicio + i) % anel.Length];
-            inicio = (inicio + n) % anel.Length;
-            quantas -= n;
+            int n = Math.Min(destino.Length, quantos);
+            for (int i = 0; i < n; i++)
+            {
+                int k = (inicio + i) % Capacidade;
+                destino[i] = (short)((anel[2 * k] + anel[2 * k + 1]) / 2);
+            }
+            inicio = (inicio + n) % Capacidade;
+            quantos -= n;
             return n;
         }
     }
 
+    /// <summary>Tira ate destino.Length / 2 quadros, intercalados (E, D...). Devolve quantos quadros.</summary>
+    public int LerEstereo(Span<short> destino)
+    {
+        lock (trava)
+        {
+            int n = Math.Min(destino.Length / 2, quantos);
+            for (int i = 0; i < n; i++)
+            {
+                int k = (inicio + i) % Capacidade;
+                destino[2 * i] = anel[2 * k];
+                destino[2 * i + 1] = anel[2 * k + 1];
+            }
+            inicio = (inicio + n) % Capacidade;
+            quantos -= n;
+            return n;
+        }
+    }
+
+    /// <summary>Quantos quadros esperam para tocar.</summary>
     public int Disponiveis
     {
-        get { lock (trava) return quantas; }
+        get { lock (trava) return quantos; }
     }
 
     public void Limpar()
     {
-        lock (trava) inicio = quantas = 0;
+        lock (trava) inicio = quantos = 0;
     }
 
     /// <summary>O pico das ultimas amostras (0..1), para a peca "pulsar" com o som.</summary>
@@ -118,26 +158,23 @@ public sealed unsafe partial class ModuloNativo
         if (quadros <= 0) return n;
 
         var dados = new ReadOnlySpan<byte>((void*)buf, quadros * quadro);
-        var mono = quadros <= 4096 ? stackalloc short[quadros] : new short[quadros];
+        // Os dois canais separados (o mono vai igual para os dois lados).
+        var estereo = quadros <= 2048 ? stackalloc short[quadros * 2] : new short[quadros * 2];
         int pico = 0;
         for (int i = 0; i < quadros; i++)
-        {
-            int soma = 0;
-            for (int k = 0; k < c.Canais; k++)
+            for (int lado = 0; lado < 2; lado++)
             {
-                var a = dados.Slice(i * quadro + k * bytesPorAmostra, bytesPorAmostra);
-                soma += bytesPorAmostra switch
+                var a = dados.Slice(i * quadro + Math.Min(lado, c.Canais - 1) * bytesPorAmostra, bytesPorAmostra);
+                int v = bytesPorAmostra switch
                 {
                     1 => (a[0] - 128) << 8,
                     2 => (short)(a[0] | (a[1] << 8)),
                     _ => (short)(a[2] | (a[3] << 8)),
                 };
+                estereo[2 * i + lado] = (short)v;
+                if (Math.Abs(v) > pico) pico = Math.Abs(v);
             }
-            int v = soma / c.Canais;
-            mono[i] = (short)v;
-            if (Math.Abs(v) > pico) pico = Math.Abs(v);
-        }
-        c.Saida.Escrever(mono);
+        c.Saida.EscreverEstereo(estereo);
         c.Saida.Nivel = pico / 32768.0;
 
         // O relogio do I2S.

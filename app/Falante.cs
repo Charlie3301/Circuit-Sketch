@@ -21,6 +21,7 @@ public sealed class Falante : IDisposable
     const int MsDeFolga = 150;
 
     volatile SaidaDeAudio fonte;
+    volatile bool estereo;
     volatile bool descartado;
     Thread fio;
     readonly object trava = new();
@@ -28,9 +29,13 @@ public sealed class Falante : IDisposable
     /// <summary>A ultima vez que o waveOut recusou abrir: sem placa de som, nao insiste a cada quadro.</summary>
     DateTime recusou = DateTime.MinValue;
 
-    /// <summary>O som a tocar agora; nulo e calar.</summary>
-    public void Tocar(SaidaDeAudio saida)
+    /// <summary>
+    /// O som a tocar agora; nulo e calar. Estereo: os dois canais separados
+    /// (o fone no DAC); senao, a media dos dois (o alto-falante no amplificador).
+    /// </summary>
+    public void Tocar(SaidaDeAudio saida, bool emEstereo = false)
     {
+        estereo = emEstereo;
         fonte = saida;
         if (saida is null || descartado) return;
         lock (trava)
@@ -46,7 +51,7 @@ public sealed class Falante : IDisposable
         try
         {
             // Volta a abrir quando a taxa muda (o sketch reabriu o I2S com outra).
-            while (!descartado && fonte is { } atual && TocarNaTaxa(atual.Taxa)) { }
+            while (!descartado && fonte is { } atual && TocarNaTaxa(atual.Taxa, estereo)) { }
         }
         catch
         {
@@ -58,17 +63,18 @@ public sealed class Falante : IDisposable
         }
     }
 
-    /// <summary>Toca enquanto a taxa for esta. Verdadeiro: a taxa mudou, e e para abrir de novo.</summary>
-    bool TocarNaTaxa(int taxa)
+    /// <summary>Toca enquanto a taxa (e o estereo) for esta. Verdadeiro: mudou, e e para abrir de novo.</summary>
+    bool TocarNaTaxa(int taxa, bool doisCanais)
     {
+        int canais = doisCanais ? 2 : 1;
         var formato = new WAVEFORMATEX
         {
             wFormatTag = 1,
-            nChannels = 1,
+            nChannels = (short)canais,
             nSamplesPerSec = taxa,
             wBitsPerSample = 16,
-            nBlockAlign = 2,
-            nAvgBytesPerSec = taxa * 2,
+            nBlockAlign = (short)(2 * canais),
+            nAvgBytesPerSec = taxa * 2 * canais,
         };
         if (waveOutOpen(out IntPtr dispositivo, -1, ref formato, IntPtr.Zero, IntPtr.Zero, 0) != 0)
         {
@@ -76,9 +82,9 @@ public sealed class Falante : IDisposable
             return false;
         }
 
-        int porBloco = Math.Max(64, taxa * MsPorBloco / 1000);
-        int bytes = porBloco * 2;
-        var amostras = new short[porBloco];
+        int porBloco = Math.Max(64, taxa * MsPorBloco / 1000);   // quadros
+        int bytes = porBloco * 2 * canais;
+        var amostras = new short[porBloco * canais];
         var buffers = new IntPtr[Blocos];
         var cabecas = new IntPtr[Blocos];
         var naFila = new bool[Blocos];
@@ -98,7 +104,7 @@ public sealed class Falante : IDisposable
             while (!descartado)
             {
                 var atual = fonte;
-                if (atual is null || atual.Taxa != taxa) return atual is not null;
+                if (atual is null || atual.Taxa != taxa || estereo != doisCanais) return atual is not null;
 
                 bool enfileirou = false;
                 for (int i = 0; i < Blocos; i++)
@@ -109,12 +115,12 @@ public sealed class Falante : IDisposable
                     // O que passou da folga e atraso: vai fora.
                     for (int sobra = atual.Disponiveis - taxa * MsDeFolga / 1000; sobra > 0;)
                     {
-                        int fora = atual.Ler(amostras.AsSpan(0, Math.Min(sobra, amostras.Length)));
+                        int fora = atual.Ler(amostras.AsSpan(0, Math.Min(sobra, porBloco)));
                         if (fora == 0) break;
                         sobra -= fora;
                     }
 
-                    int n = atual.Ler(amostras);
+                    int n = (doisCanais ? atual.LerEstereo(amostras) : atual.Ler(amostras)) * canais;
                     Array.Clear(amostras, n, amostras.Length - n);
                     calado = n == 0 ? calado + 1 : 0;
 

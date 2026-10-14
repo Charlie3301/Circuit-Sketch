@@ -708,6 +708,14 @@ public sealed partial class Energia
                 yield break;
             }
 
+            // O PCM5102A (com o regulador de 3,3 V do modulo): ~20 mA tocando.
+            case "pcm5102a":
+            {
+                var r = Entre("VIN", "GND", 220, 0, 0.02, 0.1);
+                if (r is not null) yield return r;
+                yield break;
+            }
+
             // O servo: sem saber o que ele faz, os ~550 mA de quem gira; com o
             // editor dizendo (parado, segurando, girando), a corrente de agora.
             case "servo":

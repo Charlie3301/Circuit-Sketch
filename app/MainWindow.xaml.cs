@@ -5792,7 +5792,15 @@ public partial class MainWindow : Window
         if (hz != ultimoHz) { ultimoHz = hz; buzina.Definir(hz); }
         // A suite e o passeio nao tocam no alto-falante de verdade (como nao
         // leem o teclado): o teste confere o caminho do som, e nao a caixa.
-        falante.Tocar(btParar.IsEnabled && !Controle.SemDispositivos ? somDoI2s : null);
+        // Sem alto-falante tocando: o DAC estereo (PCM5102A) com o fone, nos dois canais.
+        bool emEstereo = false;
+        if (somDoI2s is null && Preferencias.Ligado(Preferencias.SomDoBuzzer, true)
+            && editor.SomDoPcm5102a(bancada, rede) is { } doDac)
+        {
+            somDoI2s = doDac;
+            emEstereo = true;
+        }
+        falante.Tocar(btParar.IsEnabled && !Controle.SemDispositivos ? somDoI2s : null, emEstereo);
 
         // Uma placa ligou o Bluetooth (o SerialBT, ou comecou a anunciar pelo
         // BLE): o celular abre sozinho, uma vez por rodada. A suite e o

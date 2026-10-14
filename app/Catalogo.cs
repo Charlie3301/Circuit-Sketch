@@ -539,6 +539,7 @@ public static class Catalogo
         "modulo-rele-4" => "Módulo de relé 4 canais",
         "alto-falante" => "Alto-falante",
         "max98357a" => "Amplificador I2S MAX98357A",
+        "pcm5102a" => "DAC I2S estéreo PCM5102A (saída de fone)",
         "pendrive-usb" => "Pendrive USB",
         "motor-dc" => "Motor DC com escova (130, RS-540...)",
         "motor-tt" => "Motor TT amarelo (1:48)",
@@ -631,7 +632,7 @@ public static class Catalogo
             or "nor-gate" or "xnor-gate" or "mux-2" or "flip-flop-d"
             or "flip-flop-sr" or "flip-flop-dsr" or "clock-generator"
             or "logic-analyzer" => "Logica",
-        "modulo-i2c" or "nrf24l01" or "max98357a" => "Modulos",
+        "modulo-i2c" or "nrf24l01" or "max98357a" or "pcm5102a" => "Modulos",
         "wifi-ap" => "Rede",
         "texto" => "Anotacao",
         IdProtoboard or IdProtoboard830 or IdProtoboard170 => "Base",

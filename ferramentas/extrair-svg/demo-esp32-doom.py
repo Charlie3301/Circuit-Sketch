@@ -92,7 +92,7 @@ c.ligar('amplificador', 'OUT-', 'falante', '-', PRETO)
 c.peca('chave', 'slide-switch', 330, BY - 44, Giro=0, Nome='correr (Caps Lock)',
        Teclas={'alternar': 't:CapsLock|g:Back'})
 c.ligar('chave', '2', 'placa', '1', VERDE)
-c.ligar('chave', '1', 'placa', 'GND', PRETO)
+c.ligar('chave', '3', 'placa', 'GND', PRETO)   # o lado da direita: alavanca a direita (o 2 no 3, como no Wokwi) = ligada
 
 gravar('esp32s3-doom', sketch, c, '''
 ESP32-DOOM: o DOOM de verdade (motor PrBoom 2.5.0) numa ESP32-S3.

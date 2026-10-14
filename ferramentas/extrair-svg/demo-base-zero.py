@@ -134,7 +134,7 @@ c.pecas[-1]['Nome'] = 'som'
 c.peca('chave', 'slide-switch', 330, BY - 44, Giro=1, Nome='liga/desliga (L)',
        Teclas={'alternar': 't:L|g:Back'})
 c.ligar('chave', '2', 'placa', '1', VERDE)
-c.ligar('chave', '1', 'placa', 'GND', PRETO)
+c.ligar('chave', '3', 'placa', 'GND', PRETO)   # o lado da direita: alavanca a direita (o 2 no 3, como no Wokwi) = ligada
 
 gravar('esp32s3-base-zero', sketch, c, '''
 BASE ZERO: tiro em primeira pessoa no estilo do DOOM (1993), na ESP32-S3.

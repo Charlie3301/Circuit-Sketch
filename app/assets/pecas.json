@@ -9770,6 +9770,61 @@
   "metades": false
  },
  {
+  "id": "pcm5102a",
+  "largura": 121,
+  "altura": 83,
+  "pinos": [
+   {
+    "nome": "VIN",
+    "x": 36.47,
+    "y": 73.32,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "VIN: 3,3 a 5 V (o regulador da placa faz os 3,3 V do chip)"
+   },
+   {
+    "nome": "GND",
+    "x": 46.07,
+    "y": 73.32,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND: o GND da placa"
+   },
+   {
+    "nome": "LCK",
+    "x": 55.67,
+    "y": 73.32,
+    "sinais": [],
+    "descricao": "LCK (LRCK, WS): o canal da vez -- o pino de WS do I2S da placa"
+   },
+   {
+    "nome": "DIN",
+    "x": 65.27,
+    "y": 73.32,
+    "sinais": [],
+    "descricao": "DIN: os dados do audio -- o pino de saida de dados do I2S da placa (DOUT)"
+   },
+   {
+    "nome": "BCK",
+    "x": 74.87,
+    "y": 73.32,
+    "sinais": [],
+    "descricao": "BCK: o clock dos bits -- o pino de BCLK do I2S da placa"
+   },
+   {
+    "nome": "SCK",
+    "x": 84.47,
+    "y": 73.32,
+    "sinais": [],
+    "descricao": "SCK: o clock mestre. Ligue no GND: o chip tira o clock do BCK sozinho"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "pendrive-usb",
   "largura": 129,
   "altura": 57,

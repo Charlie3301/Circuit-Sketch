@@ -82,12 +82,13 @@ for pino, gpio, cor in [('CLK', '4', AZUL), ('DT', '5', VERDE), ('SW', '6', LARA
                         ('VCC', '3V3', VERMELHO), ('GND', 'GND', PRETO)]:
     c.ligar('roda', pino, 'placa', gpio, cor)
 
-# A chave de liga/desliga: o comum no GPIO 1, um lado no GND, e o resistor
-# de 10k para o 3V3 (o pull-up que vale tambem com a placa dormindo).
+# A chave de liga/desliga: o comum no GPIO 1, o lado da direita (3) no GND,
+# e o resistor de 10k para o 3V3 (o pull-up que vale tambem com a placa
+# dormindo). Alavanca a direita (como a do Wokwi: o 2 no 3) = ligada.
 c.peca('chave', 'slide-switch', 420, 40, Giro=1, Nome='liga / desliga',
        Teclas={'alternar': 't:F2'})
 c.ligar('chave', '2', 'placa', '1', VERDE)
-c.ligar('chave', '1', 'placa', 'GND', PRETO)
+c.ligar('chave', '3', 'placa', 'GND', PRETO)
 c.peca('r_chave', 'resistor', 430, 120, Ohms=10000)
 c.ligar('r_chave', '1', 'placa', '3V3', VERMELHO)
 c.ligar('r_chave', '2', 'placa', '1', VERDE)

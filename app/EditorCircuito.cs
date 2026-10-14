@@ -2691,6 +2691,30 @@ public partial class EditorCircuito : Border
     }
 
     /// <summary>
+    /// O som do PCM5102A: o DAC estereo com a saida de fone (o fone ligado no
+    /// P2 dele toca no fone do computador). Precisa do VIN e do GND, do SCK no
+    /// GND (ou solto: o PLL tira o clock do BCK) e do BCK, LCK e DIN nos pinos
+    /// em que o sketch abriu o I2S. Nulo: nenhum tocando.
+    /// </summary>
+    public SaidaDeAudio SomDoPcm5102a(Bancada bancada, Netlist rede)
+    {
+        foreach (var dac in Atual.Pecas)
+        {
+            if (dac.Tipo != "pcm5102a") continue;
+            if (!ChegaEm(rede, dac.Id, "VIN", terra: false) || !ChegaEm(rede, dac.Id, "GND", terra: true)) continue;
+            if (ChegaEm(rede, dac.Id, "SCK", terra: false)) continue;   // o SCK no VCC: sem clock, mudo
+            var (placa, bck) = rede.PinoDe(Atual, dac.Id, "BCK");
+            if (placa is null) continue;
+            var maq = bancada.De(placa);
+            if (!maq.Energizada || maq.Audio is not { } audio) continue;
+            if (bck != audio.Bclk || rede.GpioDe(Atual, dac.Id, "LCK") != audio.Ws
+                || rede.GpioDe(Atual, dac.Id, "DIN") != audio.Dout) continue;
+            return audio;
+        }
+        return null;
+    }
+
+    /// <summary>
     /// O no deste pino chega numa alimentacao (ou num terra) de verdade: o
     /// 3V3/5V/GND de uma placa, os simbolos de VCC e GND, a bateria.
     /// </summary>
