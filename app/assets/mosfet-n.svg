@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="10.0mm" height="27.0mm" viewBox="0 0 10.0 27.0">
+  <path d="M0.2 1.2 Q0.2 0.2 1.2 0.2 H8.8 Q9.8 0.2 9.8 1.2 V6.4 H0.2 Z" fill="#c4c9d0" stroke="#7b8088" stroke-width="0.25"/>
+  <circle cx="5.0" cy="3.2" r="1.8" fill="#2a2c30" stroke="#7b8088" stroke-width="0.3"/>
+  <rect x="2.24" y="15.00" width="0.44" height="11.40" fill="#b4b8be"/>
+  <rect x="4.78" y="15.00" width="0.44" height="11.40" fill="#b4b8be"/>
+  <rect x="7.32" y="15.00" width="0.44" height="11.40" fill="#b4b8be"/>
+  <rect x="0.4" y="6.0" width="9.2" height="9.4" rx="0.4" fill="#1d1e22" stroke="#0a0a0b" stroke-width="0.25"/>
+  <text x="5.00" y="9.60" fill="#d9dce0" font-size="1.35px" text-anchor="middle" font-family="Verdana" font-weight="bold">IRLZ44N</text>
+  <text x="5.00" y="11.60" fill="#8e949c" font-size="0.9px" text-anchor="middle" font-family="Verdana" font-weight="normal">nivel logico</text>
+  <text x="2.46" y="14.95" fill="#c9ccd1" font-size="0.68px" text-anchor="middle" font-family="Verdana" font-weight="bold">G</text>
+  <circle cx="2.46" cy="26.40" r="0.55" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.15"/>
+  <circle cx="2.46" cy="26.40" r="0.22" fill="#2a2a2a"/>
+  <text x="5.00" y="14.95" fill="#c9ccd1" font-size="0.68px" text-anchor="middle" font-family="Verdana" font-weight="bold">D</text>
+  <circle cx="5.00" cy="26.40" r="0.55" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.15"/>
+  <circle cx="5.00" cy="26.40" r="0.22" fill="#2a2a2a"/>
+  <text x="7.54" y="14.95" fill="#c9ccd1" font-size="0.68px" text-anchor="middle" font-family="Verdana" font-weight="bold">S</text>
+  <circle cx="7.54" cy="26.40" r="0.55" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.15"/>
+  <circle cx="7.54" cy="26.40" r="0.22" fill="#2a2a2a"/>
+
+</svg>

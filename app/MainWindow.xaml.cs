@@ -1969,6 +1969,20 @@ public partial class MainWindow : Window
                 AtualizarBarraObjeto();
             });
         }
+        else if (Semicondutores.TemModelo(peca.Tipo))
+        {
+            var opcoes = Semicondutores.Opcoes(peca.Tipo);
+            opcoesObjeto.Children.Add(new TextBlock
+            {
+                Text = Idioma.T("Modelo"), Foreground = Cinza, FontSize = 10,
+                VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
+            });
+            Escolha([.. opcoes.Select(o => o.Nome)], Array.FindIndex(opcoes, o => o.Modelo == Semicondutores.ModeloAtual(peca)), i =>
+            {
+                editor.DefinirModeloSimples(opcoes[i].Modelo);
+                AtualizarBarraObjeto();
+            });
+        }
         else if (Diodos.EhDiodo(peca.Tipo))
         {
             var modelos = Diodos.ModelosDe(peca.Tipo);

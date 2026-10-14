@@ -6621,6 +6621,29 @@
   "metades": false
  },
  {
+  "id": "fusivel",
+  "largura": 59,
+  "altura": 15,
+  "pinos": [
+   {
+    "nome": "1",
+    "x": 0.0,
+    "y": 7.56,
+    "sinais": [],
+    "descricao": "Terminal"
+   },
+   {
+    "nome": "2",
+    "x": 58.94,
+    "y": 7.56,
+    "sinais": [],
+    "descricao": "Terminal"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "gas-sensor",
   "largura": 137,
   "altura": 63,
@@ -8537,6 +8560,36 @@
   "metades": false
  },
  {
+  "id": "mosfet-n",
+  "largura": 38,
+  "altura": 102,
+  "pinos": [
+   {
+    "nome": "G",
+    "x": 9.3,
+    "y": 99.78,
+    "sinais": [],
+    "descricao": "Gate: a tensão aqui liga o canal (o IRLZ44N liga com 3,3 V; o IRF520 pede 10 V). Um resistor de 10 kohm ao GND evita o gate solto"
+   },
+   {
+    "nome": "D",
+    "x": 18.9,
+    "y": 99.78,
+    "sinais": [],
+    "descricao": "Dreno: no - da carga"
+   },
+   {
+    "nome": "S",
+    "x": 28.5,
+    "y": 99.78,
+    "sinais": [],
+    "descricao": "Source: no GND"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "motor-28byj48",
   "largura": 166,
   "altura": 174,
@@ -9367,6 +9420,43 @@
      "analog"
     ],
     "descricao": ""
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "optoacoplador",
+  "largura": 25,
+  "altura": 33,
+  "pinos": [
+   {
+    "nome": "A",
+    "x": 7.67,
+    "y": 31.37,
+    "sinais": [],
+    "descricao": "Anodo do LED de dentro (pelo resistor no pino da placa)"
+   },
+   {
+    "nome": "K",
+    "x": 17.27,
+    "y": 31.37,
+    "sinais": [],
+    "descricao": "Catodo do LED (no GND da placa)"
+   },
+   {
+    "nome": "C",
+    "x": 17.27,
+    "y": 1.13,
+    "sinais": [],
+    "descricao": "Coletor do fototransistor (o lado isolado: no - da carga)"
+   },
+   {
+    "nome": "E",
+    "x": 7.67,
+    "y": 1.13,
+    "sinais": [],
+    "descricao": "Emissor do fototransistor (no GND do outro circuito)"
    }
   ],
   "variantes": [],
@@ -11876,6 +11966,66 @@
   "metades": false
  },
  {
+  "id": "transistor-npn",
+  "largura": 29,
+  "altura": 49,
+  "pinos": [
+   {
+    "nome": "E",
+    "x": 4.76,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Emissor (E): no GND, no NPN que liga uma carga"
+   },
+   {
+    "nome": "B",
+    "x": 14.36,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Base (B): pelo resistor (1 kohm) no pino da placa"
+   },
+   {
+    "nome": "C",
+    "x": 23.96,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Coletor (C): no - da carga (o relé, o motor, o LED)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "transistor-pnp",
+  "largura": 29,
+  "altura": 49,
+  "pinos": [
+   {
+    "nome": "E",
+    "x": 4.76,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Emissor (E): no + da alimentação, no PNP"
+   },
+   {
+    "nome": "B",
+    "x": 14.36,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Base (B): pelo resistor no pino (LOW liga)"
+   },
+   {
+    "nome": "C",
+    "x": 23.96,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Coletor (C): no + da carga"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "uln2003",
   "largura": 132,
   "altura": 121,
@@ -11960,6 +12110,29 @@
     "y": 7.56,
     "sinais": [],
     "descricao": "Conector do motor: fio vermelho (o comum, ligado no + da placa)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "varistor",
+  "largura": 30,
+  "altura": 45,
+  "pinos": [
+   {
+    "nome": "1",
+    "x": 5.52,
+    "y": 44.22,
+    "sinais": [],
+    "descricao": "Terminal (sem polaridade)"
+   },
+   {
+    "nome": "2",
+    "x": 24.72,
+    "y": 44.22,
+    "sinais": [],
+    "descricao": "Terminal"
    }
   ],
   "variantes": [],

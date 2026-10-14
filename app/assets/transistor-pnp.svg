@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="7.6mm" height="13.0mm" viewBox="0 0 7.6 13.0">
+  <rect x="1.04" y="5.00" width="0.44" height="7.40" fill="#b4b8be"/>
+  <rect x="3.58" y="5.00" width="0.44" height="7.40" fill="#b4b8be"/>
+  <rect x="6.12" y="5.00" width="0.44" height="7.40" fill="#b4b8be"/>
+  <path d="M0.9 5.2 V2.2 Q0.9 0.3 3.8 0.3 Q6.7 0.3 6.7 2.2 V5.2 Z" fill="#1d1e22" stroke="#0a0a0b" stroke-width="0.12"/>
+  <rect x="1.3" y="0.9" width="5.0" height="0.5" rx="0.25" fill="#ffffff" opacity="0.1"/>
+  <text x="3.80" y="2.60" fill="#d9dce0" font-size="0.85px" text-anchor="middle" font-family="Verdana" font-weight="bold">2N2907</text>
+  <text x="3.80" y="3.70" fill="#d9dce0" font-size="0.85px" text-anchor="middle" font-family="Verdana" font-weight="bold">A</text>
+  <text x="1.26" y="6.60" fill="#e6ecf5" font-size="0.75px" text-anchor="middle" font-family="Verdana" font-weight="bold">E</text>
+  <circle cx="1.26" cy="12.40" r="0.55" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.15"/>
+  <circle cx="1.26" cy="12.40" r="0.22" fill="#2a2a2a"/>
+  <text x="3.80" y="6.60" fill="#e6ecf5" font-size="0.75px" text-anchor="middle" font-family="Verdana" font-weight="bold">B</text>
+  <circle cx="3.80" cy="12.40" r="0.55" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.15"/>
+  <circle cx="3.80" cy="12.40" r="0.22" fill="#2a2a2a"/>
+  <text x="6.34" y="6.60" fill="#e6ecf5" font-size="0.75px" text-anchor="middle" font-family="Verdana" font-weight="bold">C</text>
+  <circle cx="6.34" cy="12.40" r="0.55" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.15"/>
+  <circle cx="6.34" cy="12.40" r="0.22" fill="#2a2a2a"/>
+
+</svg>

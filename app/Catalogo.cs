@@ -493,6 +493,12 @@ public static class Catalogo
         "cristal" => "Cristal (16 MHz...)",
         "diodo-zener" => "Diodo Zener",
         "diodo-schottky" => "Diodo Schottky",
+        "transistor-npn" => "Transistor NPN (2N2222A...)",
+        "transistor-pnp" => "Transistor PNP (2N2907A...)",
+        "mosfet-n" => "MOSFET canal N (IRLZ44N, IRF520)",
+        "optoacoplador" => "Optoacoplador PC817",
+        "fusivel" => "Fusível",
+        "varistor" => "Varistor",
         "ams1117" => "Regulador AMS1117 (3,3 V)",
         "lm2596" => "Regulador step-down LM2596",
         "mt3608" => "Regulador step-up MT3608",
@@ -536,7 +542,9 @@ public static class Catalogo
 
         "resistor" or "junction" or "ldr"
             or "capacitor" or "capacitor-eletrolitico" or "indutor" or "cristal" => "Passivos",
-        "diodo" or "diodo-zener" or "diodo-schottky" => "Semicondutores",
+        "diodo" or "diodo-zener" or "diodo-schottky"
+            or "transistor-npn" or "transistor-pnp" or "mosfet-n" or "optoacoplador" => "Semicondutores",
+        "fusivel" or "varistor" => "Alimentacao",
         "vcc-symbol" or "gnd-symbol" or "bateria"
             or "regulador-7805" or "ams1117" or "lm2596" or "mt3608" => "Alimentacao",
 

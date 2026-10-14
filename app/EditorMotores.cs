@@ -299,7 +299,8 @@ public partial class EditorCircuito
     {
         bool motores = Atual.Pecas.Any(p => EhMotorDc(p.Tipo));
         bool energia = motores || PlacasSemCabo().Count > 0 || Atual.Pecas.Any(p => Netlist.EhBateria(p.Tipo) || DriverDeMotor.De(p.Tipo) is not null
-                                                       || Passivos.EhPassivoComValor(p.Tipo)
+                                                       || Passivos.EhPassivoComValor(p.Tipo) || Diodos.EhDiodo(p.Tipo)
+                                                       || Semicondutores.EhControlado(p.Tipo) || p.Tipo is "fusivel" or "varistor"
                                                        || DriverDePasso.De(p.Tipo) is not null || p.Tipo == "motor-28byj48"
                                                        || ModeloDeServo.De(p.Tipo) is not null || EhEsc(p.Tipo) || p.Tipo == "receptor-rc"
                                                        || Reguladores.EhRegulador(p.Tipo));
@@ -453,6 +454,49 @@ public partial class EditorCircuito
                         achados.Add(new Estouro(peca.Id, Idioma.T("o eletrolítico está ao contrário ({0:0.#} V no -): ele esquenta, incha e estoura. O - vai no lado de menor tensão (o GND).", -v)));
                     else if (Math.Abs(v) > ficha.Volts * 1.2)
                         achados.Add(new Estouro(peca.Id, Idioma.T("o capacitor de {0} recebeu {1:0.#} V, e aguenta {2:0} V: estourou.", ficha.Nome, Math.Abs(v), ficha.Volts)));
+                    break;
+                }
+                case "transistor-npn":
+                case "transistor-pnp":
+                {
+                    var f = Semicondutores.Transistor(peca);
+                    double ic = Math.Abs(conta.CorrenteDoRamo(peca.Id, "coletor"));
+                    double ib = Math.Abs(conta.CorrenteDoRamo(peca.Id, "base"));
+                    double vce = Math.Abs(conta.TensaoDoPino(peca.Id, "C") - conta.TensaoDoPino(peca.Id, "E"));
+                    double p = ic * vce;
+                    if (ic > f.CorrenteMaxima * 1.5 || p > f.Potencia * 1.5)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("o {0} passou {1:0.##} A ({2:0.##} W), e aguenta {3:0.##} A e {4:0.##} W: queimou.", f.Nome, ic, p, f.CorrenteMaxima, f.Potencia)));
+                    else if (ib > 0.02)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("a base do {0} está puxando {1:0} mA: falta o resistor da base (1 kohm é o comum).", f.Nome, ib * 1000), Queimou: false));
+                    else if (p > f.Potencia)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("o {0} está esquentando {1:0.##} W: ele não está saturando (corrente de base pequena para a carga).", f.Nome, p), Queimou: false));
+                    break;
+                }
+                case "mosfet-n":
+                {
+                    var f = Semicondutores.Mosfet(peca);
+                    double id = Math.Abs(conta.CorrenteDoRamo(peca.Id, "dreno"));
+                    double vds = Math.Abs(conta.TensaoDoPino(peca.Id, "D") - conta.TensaoDoPino(peca.Id, "S"));
+                    double vgs = conta.TensaoDoPino(peca.Id, "G") - conta.TensaoDoPino(peca.Id, "S");
+                    double p = id * vds;
+                    if (Math.Abs(vgs) > f.GateMaximo)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("o gate do {0} recebeu {1:0.#} V, e aguenta {2:0} V: queimou.", f.Nome, Math.Abs(vgs), f.GateMaximo)));
+                    else if (p > f.Potencia * 2)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("o {0} está dissipando {1:0.#} W sem dissipador: queimou.", f.Nome, p)));
+                    else if (p > f.Potencia)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("o {0} está esquentando {1:0.##} W: com {2:0.#} V no gate ele não liga inteiro. Use um MOSFET de nível lógico (IRLZ44N) ou 10 V no gate.", f.Nome, p, vgs), Queimou: false));
+                    break;
+                }
+                case "fusivel":
+                {
+                    double i = Math.Abs(conta.CorrenteDoRamo(peca.Id, "fusivel"));
+                    double nominal = Semicondutores.Protecao(peca).Valor;
+                    if (i <= nominal * 1.35) { excessoDesde.Remove((peca.Id, "fusivel")); break; }
+                    if (!excessoDesde.TryGetValue((peca.Id, "fusivel"), out double desde))
+                        excessoDesde[(peca.Id, "fusivel")] = desde = tempoDaEnergia;
+                    // O de vidro rapido: no dobro abre na hora; acima de 1,35 x, em ~1 s.
+                    if (i > nominal * 2 || tempoDaEnergia - desde >= 1.0)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("o fusível de {0:0.##} A abriu: passaram {1:0.##} A. Ele protegeu o circuito: procure o curto ou a carga grande demais.", nominal, i)));
                     break;
                 }
                 case "indutor":

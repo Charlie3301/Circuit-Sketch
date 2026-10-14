@@ -2193,6 +2193,7 @@ public partial class EditorCircuito : Border
         if (EhEsc(peca.Tipo) && (peca.Amperes > 0 || peca.Acabamento is not null)) return NomeSvgDoEsc(peca);
         if (Reguladores.EhRegulador(peca.Tipo)) return NomeSvgDoRegulador(peca);
         if (Diodos.EhDiodo(peca.Tipo)) return Diodos.Da(peca).Svg ?? peca.Tipo;
+        if (Semicondutores.TemModelo(peca.Tipo)) return Semicondutores.Svg(peca);
         return peca.Tipo;
     }
 

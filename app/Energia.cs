@@ -489,6 +489,8 @@ public sealed partial class Energia
 
         // Os reguladores de tensao: a entrada e a saida mudam com a propria resposta (o Resolver os acompanha).
         MontarConversores(circuito, rede);
+        // Transistor, MOSFET e opto: o canal acompanha a base, o gate, o LED.
+        MontarChaves(circuito, rede);
     }
 
     /// <summary>O no tem uma fonte positiva presa nele (o trilho de uma placa ligada)?</summary>
@@ -564,6 +566,36 @@ public sealed partial class Energia
                 double ohms = peca.Ohms <= 0 ? 220 : peca.Ohms;
                 var r = Entre("1", "2", ohms, 0, 0.0008, Math.Sqrt(0.25 / ohms));
                 if (r is not null) yield return r;
+                yield break;
+            }
+
+            // Montados a parte (os indices dos ramos ficam fixos): os
+            // reguladores e os semicondutores controlados.
+            case "regulador-7805":
+            case "ams1117":
+            case "lm2596":
+            case "mt3608":
+            case "transistor-npn":
+            case "transistor-pnp":
+            case "mosfet-n":
+            case "optoacoplador":
+                yield break;
+
+            // O fusivel e um fio fino; queimado (o editor desliga), aberto.
+            case "fusivel":
+            {
+                if (reguladoresDesligados?.Contains(peca.Id) == true) yield break;
+                var r = Entre("1", "2", 0.05, 0, 0.01, Semicondutores.Protecao(peca).Valor);
+                if (r is not null) yield return r with { Rotulo = "fusivel" };
+                yield break;
+            }
+
+            // O varistor: aberto ate a tensao dele, depois segura (nos dois sentidos).
+            case "varistor":
+            {
+                double v = Semicondutores.Protecao(peca).Valor;
+                if (Entre("1", "2", 2.0, v, 0.001, 5) is { } ida) yield return ida with { Rotulo = "varistor" };
+                if (Entre("2", "1", 2.0, v, 0.001, 5) is { } volta) yield return volta with { Rotulo = "varistor-volta" };
                 yield break;
             }
 
@@ -807,7 +839,9 @@ public sealed partial class Energia
         var viradas = new int[meiasPontes.Count];
         for (int k = 0; k < meiasPontes.Count; k++) sentido[k] = meiasPontes[k].K >= 0.5 ? 1 : -1;
 
-        for (int volta = 0; volta < 14; volta++)
+        // O transistor converge aos poucos (a resistencia do canal anda com a carga).
+        int voltas = chaves.Count > 0 ? 60 : 14;
+        for (int volta = 0; volta < voltas; volta++)
         {
             var g = new double[n, n];
             var i = new double[n];
@@ -867,6 +901,7 @@ public sealed partial class Energia
             // Os reguladores, com a resposta desta volta (e o estado dos
             // diodos que a deu): a saida que a entrada permite, e o que puxam dela.
             bool mudou = conversores.Count > 0 && AtualizarConversores(ligados);
+            if (chaves.Count > 0 && AtualizarChaves(ligados)) mudou = true;
 
             for (int k = 0; k < meiasPontes.Count; k++)
             {

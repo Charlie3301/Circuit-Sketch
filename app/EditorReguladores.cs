@@ -33,12 +33,12 @@ public partial class EditorCircuito
     /// <summary>Para o teste: a protecao termica esta cortando a saida?</summary>
     internal bool EmProtecaoTermicaParaTeste(string id) => emProtecaoTermica.Contains(id);
 
-    /// <summary>Os reguladores sem saida agora: a protecao termica, ou queimados.</summary>
+    /// <summary>As pecas fora da conta agora: o regulador na protecao termica ou queimado, o fusivel queimado.</summary>
     HashSet<string> ReguladoresDesligados()
     {
         var fora = new HashSet<string>(emProtecaoTermica);
         foreach (var p in Atual.Pecas)
-            if (Reguladores.EhRegulador(p.Tipo) && EstaQueimada(p.Id)) fora.Add(p.Id);
+            if ((Reguladores.EhRegulador(p.Tipo) || p.Tipo == "fusivel") && EstaQueimada(p.Id)) fora.Add(p.Id);
         return fora;
     }
 
