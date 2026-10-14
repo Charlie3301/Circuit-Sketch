@@ -6,6 +6,10 @@
     <UseWPF>true</UseWPF>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- O simulador e um interpretador: sem otimizacao do JIT (o padrao da
+         compilacao de depuracao) o executor do AVR nao dava os 16 MHz do chip.
+         Otimizado sempre, inclusive na que roda os testes. -->
+    <Optimize>true</Optimize>
     <RootNamespace>Simulador.App</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- O modo nativo desvia uma tarefa do C que falhou (ou travou) de volta

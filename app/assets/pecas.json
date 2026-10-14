@@ -2164,14 +2164,14 @@
    {
     "nome": "A",
     "x": 0,
-    "y": 5.67,
+    "y": 5.5,
     "sinais": [],
     "descricao": "Anodo (A): a corrente entra por aqui"
    },
    {
     "nome": "C",
     "x": 58.93,
-    "y": 5.67,
+    "y": 5.5,
     "sinais": [],
     "descricao": "Catodo (C, o lado da faixa): a corrente sai por aqui"
    }
@@ -2187,14 +2187,14 @@
    {
     "nome": "A",
     "x": 0,
-    "y": 5.67,
+    "y": 5.5,
     "sinais": [],
     "descricao": "Anodo (A)"
    },
    {
     "nome": "C",
     "x": 58.93,
-    "y": 5.67,
+    "y": 5.5,
     "sinais": [],
     "descricao": "Catodo (C, a faixa): cai so ~0,3 V (o diodo de protecao de bateria e de fonte)"
    }
@@ -2210,14 +2210,14 @@
    {
     "nome": "A",
     "x": 0,
-    "y": 5.67,
+    "y": 5.5,
     "sinais": [],
     "descricao": "Anodo (A): ligue no GND (no regulador de zener)"
    },
    {
     "nome": "C",
     "x": 58.93,
-    "y": 5.67,
+    "y": 5.5,
     "sinais": [],
     "descricao": "Catodo (C, a faixa): o lado positivo -- de ponta-cabeca ele segura a tensao do zener"
    }

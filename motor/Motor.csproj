@@ -4,6 +4,10 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- O simulador e um interpretador: sem otimizacao do JIT (o padrao da
+         compilacao de depuracao) o executor do AVR nao dava os 16 MHz do chip.
+         Otimizado sempre, inclusive na que roda os testes. -->
+    <Optimize>true</Optimize>
     <RootNamespace>Simulador</RootNamespace>
     <AssemblyName>motor</AssemblyName>
     <InvariantGlobalization>true</InvariantGlobalization>

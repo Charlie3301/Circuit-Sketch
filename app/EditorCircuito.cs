@@ -5854,15 +5854,18 @@ public partial class EditorCircuito : Border
     }
 
     /// <summary>
-    /// A bobina pegou? Com a conta de energia, pela tensao nela (o KS2E de
-    /// 5 V puxa a partir de ~3 V, nos dois sentidos). Sem a conta, pelo pino:
+    /// A bobina pegou? Com a conta de energia, pela tensao nela, nos dois
+    /// sentidos. O pino da placa entra na conta com ~30 ohms, e isso derruba
+    /// a tensao na bobina de 70 ohms (a ESP32 da ~2,3 V; o Uno, ~3,5 V): o
+    /// limite de 2 V e o que separa "o pino esta puxando" de "nao esta". Sem a
+    /// conta, pelo pino:
     /// a bobina entre o pino e o GND liga com o HIGH; entre o 5V e o pino --
     /// como nos modulos, ativos em LOW --, com o LOW.
     /// </summary>
     bool BobinaEnergizada(PecaNoCircuito peca, Maquina maq, Netlist rede)
     {
         if (EnergiaDoQuadro is { } conta)
-            return Math.Abs(conta.TensaoDoPino(peca.Id, "COIL1") - conta.TensaoDoPino(peca.Id, "COIL2")) >= 3.0;
+            return Math.Abs(conta.TensaoDoPino(peca.Id, "COIL1") - conta.TensaoDoPino(peca.Id, "COIL2")) >= 2.0;
         if (maq is null) return false;
         foreach (var (pino, outro) in new[] { ("COIL1", "COIL2"), ("COIL2", "COIL1") })
         {

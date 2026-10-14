@@ -16,7 +16,7 @@ import json
 
 BASE = 'C:/Users/seraf/OneDrive/Desktop/SimuladorESP32/'
 PX = 96 / 25.4
-L, A = 15.645, 3.0
+L, A = 15.645, round(11 / (96 / 25.4), 4)   # 11 px de altura: a caixa do catalogo e inteira
 pecas = []
 
 
