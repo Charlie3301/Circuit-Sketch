@@ -108,7 +108,8 @@ public static class TextoPy
                           + string.Join(", ", d.Pares().Select(
                               par => "'" + par.Key + "': " + Citar(par.Value)))
                           + "}",
-        Objeto o => "<" + o.Classe + ">",
+        // A excecao (e o IPAddress) se mostram pelo texto: o print(e) do except.
+        Objeto o => o.Texto ?? "<" + o.Classe + ">",
         ModuloPy m => "<module '" + m.Nome + "'>",
         MembroDeModuloPy m => "<class '" + m.Modulo + "." + m.Nome + "'>",
         _ => v.Referencia.ToString()

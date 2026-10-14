@@ -159,6 +159,7 @@ public static partial class Autoteste
         Bloco("Motor_VetorDeDimensoes", Motor_VetorDeDimensoes);
         Bloco("Memoria_EepromERtc", Memoria_EepromERtc);
         Bloco("MicroPython_Perifericos", MicroPython_Perifericos);
+        Bloco("MicroPython_Linguagem", MicroPython_Linguagem);
         Bloco("Bibliotecas_DeFora", Bibliotecas_DeFora);
         Bloco("Bibliotecas_Online", Bibliotecas_Online);
         Bloco("Bibliotecas_Janela", Bibliotecas_Janela);
@@ -10301,8 +10302,9 @@ public static partial class Autoteste
         // O que a linguagem ainda nao tem sai com o nome certo.
         foreach (var (codigo, oQue) in new[]
                  {
-                     ("class Motor:\n    pass", "class"),
-                     ("try:\n    pass\nexcept:\n    pass", "try"),
+                     // class, try, with e lambda chegaram na Alpha 24 (MicroPython_Linguagem).
+                     ("def contar():\n    yield 1", "yield"),
+                     ("async def tarefa():\n    pass", "async"),
                  })
         {
             string erro = Rodar(codigo);

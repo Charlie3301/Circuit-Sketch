@@ -75,13 +75,7 @@ public class ParserPython(List<Token> toks)
     /// </summary>
     static readonly Dictionary<string, string> Recusadas = new()
     {
-        ["class"] = "classe propria",
-        ["try"] = "try/except",
-        ["except"] = "try/except",
-        ["finally"] = "try/finally",
-        ["with"] = "with",
         ["yield"] = "yield",
-        ["lambda"] = "lambda",
         ["async"] = "async",
         ["await"] = "await",
     };
@@ -91,6 +85,7 @@ public class ParserPython(List<Token> toks)
     {
         var corpo = new List<Cmd>();
         var funcoes = new List<Funcao>();
+        var classes = new List<ClasseDecl>();
 
         while (Atual.Tipo != T.Fim)
         {
@@ -102,10 +97,16 @@ public class ParserPython(List<Token> toks)
                 continue;
             }
 
+            if (Checar("class"))
+            {
+                classes.Add(AnalisarClasse());
+                continue;
+            }
+
             corpo.Add(AnalisarComando());
         }
 
-        return MontarPrograma(corpo, funcoes);
+        return MontarPrograma(corpo, funcoes) with { Classes = classes };
     }
 
     /// <summary>
@@ -233,6 +234,12 @@ public class ParserPython(List<Token> toks)
                 $"{oQue} ainda nao e suportado pelo simulador", linha);
 
         if (Checar("import") || Checar("from")) return AnalisarImport();
+        if (Checar("try")) return AnalisarTente();
+        if (Checar("with")) return AnalisarCom();
+        if (Checar("raise")) return AnalisarLevanta();
+        if (Checar("assert")) return AnalisarAfirma();
+        if (Checar("class")) throw new ErroDeSintaxe(
+            "classe dentro de funcao ou de bloco ainda nao e suportada: declare a classe no comeco do arquivo", linha);
         if (Checar("if")) return AnalisarSe();
         if (Checar("while")) return AnalisarEnquanto();
         if (Checar("for")) return AnalisarPara();
@@ -388,8 +395,168 @@ public class ParserPython(List<Token> toks)
         return new CmdParaCada(nomes, sequencia, corpo, linha);
     }
 
+    // ================= classes, excecoes e with =================
+
+    /// <summary>
+    /// "class Botao(Base):" -- os def viram metodos (o self sai da lista: e o
+    /// objeto), o __init__ vira o construtor, e "x = 0" no corpo da classe vira
+    /// o valor de partida do campo em cada objeto.
+    /// </summary>
+    ClasseDecl AnalisarClasse()
+    {
+        int linha = Exigir("class").Linha;
+        string nome = Avancar().Texto;
+        var bases = new List<string>();
+        if (Aceitar("("))
+        {
+            while (!Checar(")"))
+            {
+                bases.Add(NomePontuado());
+                if (!Aceitar(",")) break;
+            }
+            Exigir(")");
+        }
+        Exigir(":");
+
+        var metodos = new List<Funcao>();
+        var campos = new List<Cmd>();
+        void Item()
+        {
+            if (Checar("def"))
+            {
+                var f = AnalisarDef();
+                bool comSelf = f.Params.Count > 0 && f.Params[0].Nome == "self";
+                bool construtor = f.Nome == "__init__";
+                metodos.Add(new Funcao("auto", construtor ? nome : f.Nome, comSelf ? f.Params.Skip(1).ToList() : f.Params, f.Corpo, f.Linha)
+                {
+                    Classe = nome,
+                    EhConstrutor = construtor,
+                    Estatico = !comSelf,
+                });
+                return;
+            }
+            var c = AnalisarComando();
+            if (c is CmdExpr { E: Atribuicao { Op: "=", Alvo: Variavel v } a })
+                campos.Add(new CmdDecl("auto", v.Nome, a.Valor, false, null, null, a.Linha));
+            // "pass" e a docstring nao fazem nada.
+        }
+
+        if (Atual.Tipo != T.Nova) Item();   // "class Erro(Exception): pass"
+        else
+        {
+            Avancar();
+            if (Atual.Tipo != T.Entra)
+                throw new ErroDeSintaxe("esperava o corpo da classe, indentado", Atual.Linha);
+            Avancar();
+            while (Atual.Tipo is not (T.Sai or T.Fim))
+            {
+                if (Atual.Tipo == T.Nova) { Avancar(); continue; }
+                Item();
+            }
+            if (Atual.Tipo == T.Sai) Avancar();
+        }
+
+        return new ClasseDecl(nome, bases, linha) { Metodos = metodos, Campos = campos, EhPython = true };
+    }
+
+    Cmd AnalisarTente()
+    {
+        int linha = Exigir("try").Linha;
+        Exigir(":");
+        var corpo = AnalisarBloco();
+        var casos = new List<CasoExcecao>();
+        CmdBloco senao = null, finalmente = null;
+        PularLinhasEmBranco();
+
+        while (Checar("except"))
+        {
+            Avancar();
+            var tipos = new List<string>();
+            string nome = null;
+            if (!Checar(":"))
+            {
+                if (Aceitar("("))
+                {
+                    do { tipos.Add(NomePontuado()); } while (Aceitar(",") && !Checar(")"));
+                    Exigir(")");
+                }
+                else tipos.Add(NomePontuado());
+                if (Aceitar("as")) nome = Avancar().Texto;
+            }
+            Exigir(":");
+            casos.Add(new CasoExcecao(tipos, nome, AnalisarBloco()));
+            PularLinhasEmBranco();
+        }
+        if (casos.Count > 0 && Aceitar("else"))
+        {
+            Exigir(":");
+            senao = AnalisarBloco();
+            PularLinhasEmBranco();
+        }
+        if (Aceitar("finally"))
+        {
+            Exigir(":");
+            finalmente = AnalisarBloco();
+        }
+        if (casos.Count == 0 && finalmente is null)
+            throw new ErroDeSintaxe("try sem except nem finally", linha);
+        return new CmdTente(corpo, casos, senao, finalmente, linha);
+    }
+
+    Cmd AnalisarLevanta()
+    {
+        int linha = Exigir("raise").Linha;
+        Expr valor = Atual.Tipo is T.Nova or T.Sai or T.Fim || Checar(";") ? null : AnalisarExpr();
+        if (Aceitar("from")) AnalisarExpr();   // "raise X from e": a causa nao muda nada aqui
+        ExigirFimDeLinha();
+        return new CmdLevanta(valor, linha);
+    }
+
+    /// <summary>"assert x > 0, 'negativo'": um if que levanta o AssertionError.</summary>
+    Cmd AnalisarAfirma()
+    {
+        int linha = Exigir("assert").Linha;
+        var cond = AnalisarExpr();
+        var args = new List<Expr>();
+        if (Aceitar(",")) args.Add(AnalisarExpr());
+        ExigirFimDeLinha();
+        var erro = new CmdLevanta(new Chamada(new Variavel("AssertionError", linha), args, linha), linha);
+        return new CmdSe(new Unaria("!", cond, linha), erro, null, linha);
+    }
+
+    Cmd AnalisarCom()
+    {
+        int linha = Exigir("with").Linha;
+        var itens = new List<(Expr, string)>();
+        do
+        {
+            var contexto = AnalisarExpr();
+            string nome = Aceitar("as") ? Avancar().Texto : null;
+            itens.Add((contexto, nome));
+        }
+        while (Aceitar(","));
+        Exigir(":");
+        return new CmdCom(itens, AnalisarBloco(), linha);
+    }
+
+    /// <summary>"lambda x, y=2: x + y" -- a funcao sem nome do C++, com um return so.</summary>
+    Expr AnalisarLambda()
+    {
+        int linha = Exigir("lambda").Linha;
+        var parametros = new List<Param>();
+        while (!Checar(":"))
+        {
+            string arg = Avancar().Texto;
+            parametros.Add(new Param("auto", arg) { Padrao = Aceitar("=") ? AnalisarTernaria() : null });
+            if (!Aceitar(",")) break;
+        }
+        Exigir(":");
+        var corpo = AnalisarExpr();
+        return new FuncaoAnonima(parametros, new CmdBloco([new CmdRetorno(corpo, linha)], linha), linha);
+    }
+
     // ================= expressoes =================
-    public Expr AnalisarExpr() => AnalisarTernaria();
+    public Expr AnalisarExpr() => Checar("lambda") ? AnalisarLambda() : AnalisarTernaria();
 
     /// <summary>"a if cond else b" -- o ternario do Python, ao contrario do C.</summary>
     Expr AnalisarTernaria()

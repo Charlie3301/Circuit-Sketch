@@ -139,6 +139,9 @@ public record ClasseDecl(string Nome, List<string> Bases, int Linha) : Cmd(Linha
 {
     public bool EhStruct { get; init; }
 
+    /// <summary>A classe e do Python: os campos nascem na primeira atribuicao, e o self e o objeto.</summary>
+    public bool EhPython { get; init; }
+
     /// <summary>Os campos de cada objeto, na ordem em que o C++ os inicia.</summary>
     public List<Cmd> Campos { get; init; } = [];
 
@@ -152,6 +155,19 @@ public record ClasseDecl(string Nome, List<string> Bases, int Linha) : Cmd(Linha
 /// <summary>Um item da lista de inicializacao: ": _pino(pino), Base(x)".</summary>
 public record Inicializador(string Nome, List<Expr> Args);
 public record CmdRetorno(Expr Valor, int Linha) : Cmd(Linha);
+
+// ---------- as excecoes e o with do Python ----------
+/// <summary>"try: ... except ValueError as e: ... else: ... finally: ...".</summary>
+public record CmdTente(CmdBloco Corpo, List<CasoExcecao> Casos, CmdBloco Senao, CmdBloco Finalmente, int Linha) : Cmd(Linha);
+
+/// <summary>Um "except": os tipos (vazio: todos) e o nome do "as".</summary>
+public record CasoExcecao(List<string> Tipos, string Nome, CmdBloco Corpo);
+
+/// <summary>"raise ValueError('x')", ou "raise" sozinho dentro do except (levanta de novo).</summary>
+public record CmdLevanta(Expr Valor, int Linha) : Cmd(Linha);
+
+/// <summary>"with open('a.txt') as f, lock:" -- o __enter__, o bloco e o __exit__ (ou o close()).</summary>
+public record CmdCom(List<(Expr Contexto, string Nome)> Itens, CmdBloco Corpo, int Linha) : Cmd(Linha);
 public record CmdBreak(int Linha) : Cmd(Linha);
 public record CmdContinue(int Linha) : Cmd(Linha);
 public record CmdVazio(int Linha) : Cmd(Linha);

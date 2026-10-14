@@ -323,7 +323,7 @@ public partial class Interpretador
             return;
         }
 
-        var local = new Ambiente(obj.Escopo);
+        var local = new Ambiente(EscopoComSelf(obj, info.Nome));
         CobrarChamada(args.Count);
         chamadasAbertas++;
         try
@@ -340,11 +340,18 @@ public partial class Interpretador
                 return;
             }
 
-            foreach (var b in info.Bases)
-            {
-                var ini = ctor?.Inicializadores.FirstOrDefault(x => x.Nome == b.Nome);
-                Inicializar(obj, b, ini?.Args ?? [], local, linha, fundo + 1);
-            }
+            // No Python, o __init__ da classe de cima so roda pelo super(): aqui
+            // entram so os valores de partida dos campos dela ("x = 0" no corpo).
+            if (info.Decl.EhPython)
+                foreach (var deCima in Hierarquia(info).Skip(1).Reverse())
+                    foreach (var campo in deCima.Decl.Campos)
+                        IniciarCampo(obj, campo, null, local);
+            else
+                foreach (var b in info.Bases)
+                {
+                    var ini = ctor?.Inicializadores.FirstOrDefault(x => x.Nome == b.Nome);
+                    Inicializar(obj, b, ini?.Args ?? [], local, linha, fundo + 1);
+                }
 
             foreach (var campo in info.Decl.Campos)
                 IniciarCampo(obj, campo, ctor?.Inicializadores, local);
@@ -699,7 +706,7 @@ public partial class Interpretador
                     $"{NomeParaMostrar(f)}() nao e static: precisa de um objeto para rodar", linha);
             escopo = classes.TryGetValue(f.Classe ?? "", out var info) ? info.Estaticos : global;
         }
-        else escopo = obj.Escopo;
+        else escopo = EscopoComSelf(obj, f.Classe);   // no Python, com o "self" (no C++, o proprio objeto)
 
         return ChamarUsuario(f, args, amb, escopo, linha);
     }

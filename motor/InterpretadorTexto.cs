@@ -785,8 +785,9 @@ public partial class Interpretador
                 case Valor v:
                     local.Declarar(p.Nome, Coagir(v, p.Tipo));
                     break;
+                // O argumento que nao veio: o padrao ("lambda a, b=10: a + b"), ou zero.
                 default:
-                    local.Declarar(p.Nome, Valor.DeInt(0));
+                    local.Declarar(p.Nome, p.Padrao is not null ? Avaliar(p.Padrao, local) : Valor.DeInt(0));
                     break;
             }
         }

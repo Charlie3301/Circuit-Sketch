@@ -149,6 +149,13 @@ public partial class Interpretador
         // ---- metodo: alvo.metodo(...) ----
         if (c.Alvo is Membro m)
         {
+            // "super().__init__(nome)": o metodo da classe de cima, no mesmo objeto.
+            if (m.Obj is Chamada { Alvo: Variavel { Nome: "super" } })
+            {
+                r = ChamarDoSuper(m.Nome, c, amb);
+                return true;
+            }
+
             var dono = AvaliarSeDer(m.Obj, amb);
             if (dono is null) return false;
 
@@ -160,6 +167,11 @@ public partial class Interpretador
 
                 case MembroDeModuloPy membro:
                     r = ChamarDeModulo(membro.Modulo, membro.Nome + "." + m.Nome, c, amb);
+                    return true;
+
+                // Um objeto de classe do sketch: o metodo dela.
+                case Objeto doSketch when doSketch.Escopo is not null && classes.ContainsKey(doSketch.Classe):
+                    r = ChamarObjeto(doSketch, m.Nome, c, amb);
                     return true;
 
                 case Objeto o:
@@ -188,6 +200,14 @@ public partial class Interpretador
         }
 
         if (c.Alvo is not Variavel v) return false;
+
+        // ---- uma classe do sketch, ou uma excecao: "Botao(14)", "ValueError('x')" ----
+        if (!funcoes.ContainsKey(v.Nome) && (classes.ContainsKey(v.Nome) || EhExcecaoEmbutida(v.Nome))
+            && InstanciarPython(v.Nome, [.. c.Args.Select(a => Avaliar(a, amb))], amb, c.Linha) is { } instancia)
+        {
+            r = instancia;
+            return true;
+        }
 
         // ---- construtor importado direto: "Pin(2, Pin.OUT)" ----
         if (amb.Buscar(v.Nome, out var achado)

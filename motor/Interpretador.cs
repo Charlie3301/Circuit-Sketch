@@ -412,6 +412,11 @@ public partial class Interpretador(Programa prog, Maquina maq)
             case CmdBreak: desvio = Desvio.Break; break;
             case CmdContinue: desvio = Desvio.Continue; break;
 
+            // O try, o raise e o with do Python (InterpretadorExcecoes.cs).
+            case CmdTente tente: ExecTente(tente, amb); break;
+            case CmdLevanta levanta: ExecLevanta(levanta, amb); break;
+            case CmdCom com: ExecCom(com, amb); break;
+
             default:
                 throw new ErroDeExecucao($"comando nao suportado: {c.GetType().Name}", c.Linha);
         }
@@ -2466,6 +2471,11 @@ public partial class Interpretador(Programa prog, Maquina maq)
         // "(*acao)()": o ponteiro de funcao escrito com a estrela.
         if (c.Alvo is Unaria { Op: "*" } estrela) c = c with { Alvo = estrela.Alvo };
 
+        // "(lambda x: x * 2)(21)", "acoes[0]()", "fabrica()()": a expressao
+        // devolve uma funcao, e e ela que se chama.
+        if (c.Alvo is not Variavel && ChamarGuardada(Avaliar(c.Alvo, amb), c, amb, out var devolvida))
+            return devolvida;
+
         if (c.Alvo is not Variavel fn)
             throw new ErroDeExecucao("chamada invalida", c.Linha);
 
@@ -3034,6 +3044,10 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 }
                 return Valor.Vazio;
         }
+
+        // Em Python, chamar uma classe monta o objeto: "Botao(14)", "ValueError('x')".
+        if (EhPython && !funcoes.ContainsKey(fn.Nome) && InstanciarPython(fn.Nome, args, amb, c.Linha) is { } instancia)
+            return instancia;
 
         // funcao definida pelo aluno
         if (funcoes.TryGetValue(fn.Nome, out var f))
