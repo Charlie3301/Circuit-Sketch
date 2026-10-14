@@ -1,0 +1,81 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Protecao contra polaridade reversa (Diodo Schottky)",
+  "",
+  "Diodo Schottky 1N5819 em serie com a alimentacao de 9 V.",
+  "Permite a passagem de corrente com queda minima e bloqueia polaridade invertida."
+ ],
+ "codigo": [
+  "// Protecao contra inversao de polaridade com diodo Schottky 1N5819.",
+  "// Com bateria normal, conduz com baixa queda (~0,3 V) e o LED acende.",
+  "// Com bateria invertida, o diodo bloqueia a corrente e evita danos."
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "bat",
+    "Tipo": "bateria",
+    "X": 80,
+    "Y": 200,
+    "Volts": 9,
+    "MiliAmperes": 20000,
+    "MiliAmperesHora": 1000,
+    "Nome": "Bateria 9 V"
+   },
+   {
+    "Id": "diodo",
+    "Tipo": "diodo-schottky",
+    "X": 240,
+    "Y": 140,
+    "Modelo": "1n5819"
+   },
+   {
+    "Id": "r",
+    "Tipo": "resistor",
+    "X": 340,
+    "Y": 200,
+    "Ohms": 330
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 440,
+    "Y": 200,
+    "Cor": "verde"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "bat",
+    "DePino": "+",
+    "ParaPeca": "diodo",
+    "ParaPino": "A",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "diodo",
+    "DePino": "C",
+    "ParaPeca": "r",
+    "ParaPino": "1",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "r",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "bat",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

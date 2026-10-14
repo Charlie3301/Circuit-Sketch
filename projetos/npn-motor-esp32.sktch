@@ -1,0 +1,133 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Motor DC acionado por transistor NPN (ESP32, 2N2222A)",
+  "",
+  "A ESP32 controla um motor DC de 6 V atraves de um transistor NPN 2N2222A,",
+  "com resistor de 1 kohm na base e diodo 1N4007 de roda livre."
+ ],
+ "codigo": [
+  "// Acionamento de motor DC com transistor NPN 2N2222A e ESP32.",
+  "// Diodo 1N4007 de roda livre em paralelo reverso com o motor.",
+  "const int PINO_MOTOR = 13;",
+  "",
+  "void setup() {",
+  "  pinMode(PINO_MOTOR, OUTPUT);",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(PINO_MOTOR, HIGH);",
+  "  delay(2500);",
+  "  digitalWrite(PINO_MOTOR, LOW);",
+  "  delay(7000);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 40,
+    "Y": 200,
+    "Usb": true
+   },
+   {
+    "Id": "pilhas",
+    "Tipo": "bateria",
+    "X": 520,
+    "Y": 420,
+    "Volts": 6,
+    "MiliAmperes": 2000,
+    "MiliAmperesHora": 2500,
+    "Nome": "4 pilhas AA (6 V)"
+   },
+   {
+    "Id": "q",
+    "Tipo": "transistor-npn",
+    "X": 400,
+    "Y": 200,
+    "Modelo": "2n2222a"
+   },
+   {
+    "Id": "rb",
+    "Tipo": "resistor",
+    "X": 260,
+    "Y": 200,
+    "Ohms": 1000
+   },
+   {
+    "Id": "motor",
+    "Tipo": "motor-dc",
+    "X": 600,
+    "Y": 200
+   },
+   {
+    "Id": "diodo",
+    "Tipo": "diodo",
+    "X": 600,
+    "Y": 80,
+    "Modelo": "1n4007"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D13",
+    "ParaPeca": "rb",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "rb",
+    "DePino": "2",
+    "ParaPeca": "q",
+    "ParaPino": "B",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "q",
+    "DePino": "E",
+    "ParaPeca": "pilhas",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "pilhas",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "pilhas",
+    "DePino": "+",
+    "ParaPeca": "motor",
+    "ParaPino": "+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "motor",
+    "DePino": "+",
+    "ParaPeca": "diodo",
+    "ParaPino": "C",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "motor",
+    "DePino": "-",
+    "ParaPeca": "diodo",
+    "ParaPino": "A",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "motor",
+    "DePino": "-",
+    "ParaPeca": "q",
+    "ParaPino": "C",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

@@ -1,0 +1,140 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Controle de carga 12 V com MOSFET IRLZ44N (Uno, PWM)",
+  "",
+  "O Arduino Uno modula uma carga de 12 V (LED com resistor) usando PWM",
+  "atraves de um MOSFET de potencia canal N de nivel logico (IRLZ44N)."
+ ],
+ "codigo": [
+  "// Controle de carga de 12 V com MOSFET IRLZ44N e PWM no Arduino Uno.",
+  "// O potenciometro no A0 ajusta o ciclo de trabalho no pino 9.",
+  "const int PINO_MOSFET = 9;",
+  "",
+  "void setup() {",
+  "  pinMode(PINO_MOSFET, OUTPUT);",
+  "}",
+  "",
+  "void loop() {",
+  "  int leitura = analogRead(A0);",
+  "  analogWrite(PINO_MOSFET, leitura / 4);",
+  "  delay(20);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 200,
+    "Usb": true
+   },
+   {
+    "Id": "pot",
+    "Tipo": "potentiometer",
+    "X": 40,
+    "Y": 440,
+    "Giro": 0.15
+   },
+   {
+    "Id": "bat",
+    "Tipo": "bateria",
+    "X": 520,
+    "Y": 420,
+    "Volts": 12,
+    "MiliAmperes": 10000,
+    "MiliAmperesHora": 2000,
+    "Nome": "Bateria 12 V"
+   },
+   {
+    "Id": "mosfet",
+    "Tipo": "mosfet-n",
+    "X": 380,
+    "Y": 220,
+    "Modelo": "irlz44n"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 480,
+    "Y": 80,
+    "Ohms": 470
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 580,
+    "Y": 80,
+    "Cor": "amarelo"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pot",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "SIG",
+    "ParaPeca": "placa",
+    "ParaPino": "A0",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "mosfet",
+    "ParaPino": "G",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "mosfet",
+    "DePino": "S",
+    "ParaPeca": "bat",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "bat",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "bat",
+    "DePino": "+",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "mosfet",
+    "ParaPino": "D",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

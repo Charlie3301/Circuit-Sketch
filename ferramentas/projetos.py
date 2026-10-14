@@ -25,7 +25,7 @@ import json
 import os
 import sys
 
-BASE = 'C:/Users/seraf/OneDrive/Desktop/SimuladorESP32/'
+BASE = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')).replace('\\', '/') + '/'
 SAIDA = sys.argv[1] if len(sys.argv) > 1 else BASE + 'projetos'
 DOWNLOADS = 'C:/Users/seraf/Downloads/'
 MM = 96 / 25.4
@@ -2180,12 +2180,414 @@ def pico_micropython():
     ], codigo, pecas + p + pb, f + fb, roteiro)
 
 
+# =====================================================================
+#  6) COMPONENTES NOVOS (ALPHA 24)
+# =====================================================================
+
+def npn_motor_esp32():
+    pecas = [
+        peca('placa', 'esp32-devkit-v1', 40, 200, Usb=True),
+        bateria('pilhas', 6, 2000, 2500, '4 pilhas AA (6 V)', 520, 420),
+        peca('q', 'transistor-npn', 400, 200, Modelo='2n2222a'),
+        peca('rb', 'resistor', 260, 200, Ohms=1000),
+        peca('motor', 'motor-dc', 600, 200),
+        peca('diodo', 'diodo', 600, 80, Modelo='1n4007'),
+    ]
+    fios = [
+        fio('placa', 'D13', 'rb', '1', VERDE),
+        fio('rb', '2', 'q', 'B', VERDE),
+        fio('q', 'E', 'pilhas', '-', PRETO),
+        fio('pilhas', '-', 'placa', 'GND.1', PRETO),
+        fio('pilhas', '+', 'motor', '+', VERMELHO),
+        fio('motor', '+', 'diodo', 'C', VERMELHO),
+        fio('motor', '-', 'diodo', 'A', PRETO),
+        fio('motor', '-', 'q', 'C', PRETO),
+    ]
+    codigo = [
+        '// Acionamento de motor DC com transistor NPN 2N2222A e ESP32.',
+        '// Diodo 1N4007 de roda livre em paralelo reverso com o motor.',
+        'const int PINO_MOTOR = 13;',
+        '',
+        'void setup() {',
+        '  pinMode(PINO_MOTOR, OUTPUT);',
+        '}',
+        '',
+        'void loop() {',
+        '  digitalWrite(PINO_MOTOR, HIGH);',
+        '  delay(2500);',
+        '  digitalWrite(PINO_MOTOR, LOW);',
+        '  delay(7000);',
+        '}',
+    ]
+    roteiro = [
+        confere('com o pino em HIGH o motor gira', 3, rpm_min=['motor'], valor=500),
+        confere('sem avisos no circuito', 1, sem_avisos=True),
+        esperar(2.8),
+        confere('com o pino em LOW o motor para', 3, rpm_max=['motor'], valor=50),
+    ]
+    projeto('npn-motor-esp32', 'Motor DC acionado por transistor NPN (ESP32, 2N2222A)', [
+        'A ESP32 controla um motor DC de 6 V atraves de um transistor NPN 2N2222A,',
+        'com resistor de 1 kohm na base e diodo 1N4007 de roda livre.',
+    ], codigo, pecas, fios, roteiro)
+
+
+def mosfet_fita_uno():
+    pecas = [
+        peca('placa', 'arduino-uno', 40, 200, Usb=True),
+        peca('pot', 'potentiometer', 40, 440, Giro=0.15),
+        bateria('bat', 12, 10000, 2000, 'Bateria 12 V', 520, 420),
+        peca('mosfet', 'mosfet-n', 380, 220, Modelo='irlz44n'),
+        peca('r_led', 'resistor', 480, 80, Ohms=470),
+        peca('led', 'led', 580, 80, Cor='amarelo'),
+    ]
+    fios = [
+        fio('pot', 'VCC', 'placa', '5V', VERMELHO),
+        fio('pot', 'GND', 'placa', 'GND.2', PRETO),
+        fio('pot', 'SIG', 'placa', 'A0', AMARELO),
+        fio('placa', '9', 'mosfet', 'G', LARANJA),
+        fio('mosfet', 'S', 'bat', '-', PRETO),
+        fio('bat', '-', 'placa', 'GND.1', PRETO),
+        fio('bat', '+', 'r_led', '1', VERMELHO),
+        fio('r_led', '2', 'led', 'A', VERMELHO),
+        fio('led', 'C', 'mosfet', 'D', PRETO),
+    ]
+    codigo = [
+        '// Controle de carga de 12 V com MOSFET IRLZ44N e PWM no Arduino Uno.',
+        '// O potenciometro no A0 ajusta o ciclo de trabalho no pino 9.',
+        'const int PINO_MOSFET = 9;',
+        '',
+        'void setup() {',
+        '  pinMode(PINO_MOSFET, OUTPUT);',
+        '}',
+        '',
+        'void loop() {',
+        '  int leitura = analogRead(A0);',
+        '  analogWrite(PINO_MOSFET, leitura / 4);',
+        '  delay(20);',
+        '}',
+    ]
+    roteiro = [
+        confere('com PWM baixo o brilho e fraco', 3, brilho={'peca': 'led', 'max': 0.35}),
+        mexer('pot', giro=0.95),
+        confere('com PWM alto o brilho e forte', 3, brilho={'peca': 'led', 'min': 0.70}),
+        confere('sem avisos', 1, sem_avisos=True),
+    ]
+    projeto('mosfet-fita-uno', 'Controle de carga 12 V com MOSFET IRLZ44N (Uno, PWM)', [
+        'O Arduino Uno modula uma carga de 12 V (LED com resistor) usando PWM',
+        'atraves de um MOSFET de potencia canal N de nivel logico (IRLZ44N).',
+    ], codigo, pecas, fios, roteiro)
+
+
+def zener_referencia():
+    pecas = [
+        peca('placa', 'arduino-uno', 40, 200, Usb=True),
+        bateria('bat', 9, 20000, 1000, 'Bateria 9 V', 400, 420),
+        peca('r_z', 'resistor', 400, 140, Ohms=470),
+        peca('zener', 'diodo-zener', 520, 200, Modelo='5v1'),
+        peca('r1', 'resistor', 320, 240, Ohms=10000),
+        peca('r2', 'resistor', 320, 320, Ohms=10000),
+    ]
+    fios = [
+        fio('bat', '+', 'r_z', '1', VERMELHO),
+        fio('r_z', '2', 'zener', 'C', VERMELHO),
+        fio('zener', 'A', 'bat', '-', PRETO),
+        fio('bat', '-', 'placa', 'GND.1', PRETO),
+        fio('zener', 'C', 'r1', '1', AZUL),
+        fio('r1', '2', 'r2', '1', AMARELO),
+        fio('r2', '2', 'placa', 'GND.2', PRETO),
+        fio('placa', 'A0', 'r1', '2', AMARELO),
+    ]
+    codigo = [
+        '// Referencia de tensao com diodo Zener de 5,1 V.',
+        '// O divisor de tensao (10k / 10k) divide por 2 para leitura segura no ADC.',
+        'void setup() {',
+        '  Serial.begin(9600);',
+        '}',
+        '',
+        'void loop() {',
+        '  int leitura = analogRead(A0);',
+        '  float v = (leitura * 5.0 / 1023.0) * 2.0;',
+        '  Serial.print("Zener: ");',
+        '  Serial.print(v, 1);',
+        '  Serial.println(" V");',
+        '  delay(300);',
+        '}',
+    ]
+    roteiro = [
+        confere('a tensao do zener e lida no monitor (~5,2 V)', 4, serial='Zener: 5.2 V'),
+        confere('sem avisos', 1, sem_avisos=True),
+    ]
+    projeto('zener-referencia', 'Referencia de tensao com diodo Zener de 5,1 V (Uno)', [
+        'Diodo Zener de 5,1 V polarizado por resistor de 470 ohms numa bateria de 9 V.',
+        'Um divisor resistivo 10k/10k divide a tensao pela metade para medicao precisa no A0.',
+    ], codigo, pecas, fios, roteiro)
+
+
+def capacitor_rc_led():
+    pecas = [
+        peca('placa', 'arduino-uno', 40, 200, Usb=True),
+        peca('r_carga', 'resistor', 240, 160, Ohms=330),
+        peca('diodo', 'diodo', 340, 160, Modelo='1n4148'),
+        peca('cap', 'capacitor-eletrolitico', 440, 220, Modelo='1000u-16v'),
+        peca('r_led', 'resistor', 520, 160, Ohms=330),
+        peca('led', 'led', 600, 160, Cor='verde'),
+    ]
+    fios = [
+        fio('placa', '13', 'r_carga', '1', VERDE),
+        fio('r_carga', '2', 'diodo', 'A', VERDE),
+        fio('diodo', 'C', 'cap', '+', VERDE),
+        fio('cap', '+', 'r_led', '1', VERDE),
+        fio('r_led', '2', 'led', 'A', VERDE),
+        fio('led', 'C', 'cap', '-', PRETO),
+        fio('cap', '-', 'placa', 'GND.1', PRETO),
+    ]
+    codigo = [
+        '// Circuito RC: o capacitor carrega com o pino 13 em HIGH.',
+        '// O diodo 1N4148 impede retorno ao pino quando vai a LOW;',
+        '// o capacitor descarrega pelo resistor e o LED apaga devagar.',
+        'const int PINO = 13;',
+        '',
+        'void setup() {',
+        '  pinMode(PINO, OUTPUT);',
+        '}',
+        '',
+        'void loop() {',
+        '  digitalWrite(PINO, HIGH);',
+        '  delay(2500);',
+        '  digitalWrite(PINO, LOW);',
+        '  delay(8000);',
+        '}',
+    ]
+    roteiro = [
+        confere('com pino em HIGH o capacitor carrega e o LED acende', 3, led={'peca': 'led', 'aceso': True}),
+        confere('sem avisos', 1, sem_avisos=True),
+        esperar(2.8),
+        confere('logo apos o pino ir a LOW o capacitor mantem o LED aceso', 1, led={'peca': 'led', 'aceso': True}),
+        esperar(2.5),
+        confere('apos descarregar o LED apaga', 2, led={'peca': 'led', 'aceso': False}),
+    ]
+    projeto('capacitor-rc-led', 'Carga e descarga RC com capacitor eletrolitico e LED (Uno)', [
+        'O pino 13 carrega um capacitor eletrolitico de 1000 uF.',
+        'Ao ir para LOW, a carga acumulada mantem o LED aceso por algum tempo antes de apagar.',
+    ], codigo, pecas, fios, roteiro)
+
+
+def opto_isolado():
+    pecas = [
+        peca('placa', 'arduino-uno', 40, 200, Usb=True),
+        peca('botao', 'pushbutton', 40, 420),
+        peca('r_opto', 'resistor', 240, 200, Ohms=330),
+        peca('opto', 'optoacoplador', 340, 260),
+        bateria('bat', 9, 20000, 1000, 'Bateria 9 V', 580, 420),
+        peca('r_led', 'resistor', 480, 200, Ohms=470),
+        peca('led', 'led', 580, 200, Cor='verde'),
+    ]
+    fios = [
+        fio('placa', '2', 'botao', '1.l', AZUL),
+        fio('botao', '2.l', 'placa', 'GND.1', PRETO),
+        fio('placa', '13', 'r_opto', '1', VERDE),
+        fio('r_opto', '2', 'opto', 'A', VERDE),
+        fio('opto', 'K', 'placa', 'GND.2', PRETO),
+        fio('bat', '+', 'r_led', '1', VERMELHO),
+        fio('r_led', '2', 'led', 'A', VERMELHO),
+        fio('led', 'C', 'opto', 'C', PRETO),
+        fio('opto', 'E', 'bat', '-', PRETO),
+    ]
+    codigo = [
+        '// Isolamento galvanico com optoacoplador PC817.',
+        '// O botao no pino 2 aciona o LED interno do opto (pino 13).',
+        '// O fototransistor conduz e acende o LED no circuito isolado.',
+        'const int BOTAO = 2, OPTO = 13;',
+        '',
+        'void setup() {',
+        '  pinMode(BOTAO, INPUT_PULLUP);',
+        '  pinMode(OPTO, OUTPUT);',
+        '}',
+        '',
+        'void loop() {',
+        '  digitalWrite(OPTO, digitalRead(BOTAO) == LOW ? HIGH : LOW);',
+        '  delay(20);',
+        '}',
+    ]
+    roteiro = [
+        confere('inicialmente o LED isolado esta apagado', 2, led={'peca': 'led', 'aceso': False}),
+        apertar('botao'),
+        confere('com o botao apertado o LED isolado acende', 2, led={'peca': 'led', 'aceso': True}),
+        soltar('botao'),
+        confere('soltando o botao o LED isolado apaga', 2, led={'peca': 'led', 'aceso': False}),
+        confere('sem avisos', 1, sem_avisos=True),
+    ]
+    projeto('opto-isolado', 'Circuito isolado com optoacoplador PC817 (Uno)', [
+        'Isolamento completo entre o Arduino Uno e o circuito de carga.',
+        'O aperto do botao aciona o optoacoplador, acendendo o LED alimentado por bateria.',
+    ], codigo, pecas, fios, roteiro)
+
+
+def fusivel_curto():
+    pecas = [
+        peca('placa', 'arduino-uno', 40, 200, Usb=True),
+        bateria('bat', 12, 20000, 2000, 'Bateria 12 V', 380, 420),
+        peca('fusivel', 'fusivel', 460, 240, Modelo='1a'),
+        peca('r_carga', 'resistor', 580, 240, Ohms=470),
+        peca('led', 'led', 660, 240, Cor='vermelho'),
+        peca('botao', 'pushbutton', 460, 360),
+    ]
+    fios = [
+        fio('bat', '+', 'fusivel', '1', VERMELHO),
+        fio('fusivel', '2', 'r_carga', '1', VERMELHO),
+        fio('r_carga', '2', 'led', 'A', VERMELHO),
+        fio('led', 'C', 'bat', '-', PRETO),
+        fio('bat', '-', 'placa', 'GND.1', PRETO),
+        fio('fusivel', '2', 'botao', '1.l', VERMELHO),
+        fio('botao', '2.l', 'bat', '-', PRETO),
+    ]
+    codigo = [
+        '// Circuito de protecao contra curto-circuito com fusivel de 1 A.',
+        '// A carga normal (LED com resistor em 12 V) consome ~20 mA.',
+        '// O botao de teste coloca a linha em curto com o terra;',
+        '// a corrente excede a capacidade do fusivel, que queima e abre o circuito.',
+        'void setup() {',
+        '  Serial.begin(9600);',
+        '}',
+        '',
+        'void loop() {',
+        '  delay(100);',
+        '}',
+    ]
+    roteiro = [
+        confere('em condicoes normais o LED acende', 2, led={'peca': 'led', 'aceso': True}),
+        confere('sem avisos em regime normal', 1, sem_avisos=True),
+        apertar('botao'),
+        esperar(0.5),
+        confere('o curto queima o fusivel e gera aviso', 3, serial='abriu'),
+        soltar('botao'),
+        confere('com o fusivel aberto o LED apaga', 2, led={'peca': 'led', 'aceso': False}),
+    ]
+    projeto('fusivel-curto', 'Protecao contra curto-circuito com fusivel 1 A', [
+        'Uma bateria de 12 V alimenta um LED atraves de um fusivel de 1 A.',
+        'Ao pressionar o botao de teste, um curto-circuito queima o fusivel e corta a corrente.',
+    ], codigo, pecas, fios, roteiro)
+
+
+def schottky_protecao():
+    pecas = [
+        bateria('bat', 9, 20000, 1000, 'Bateria 9 V', 80, 200),
+        peca('diodo', 'diodo-schottky', 240, 140, Modelo='1n5819'),
+        peca('r', 'resistor', 340, 200, Ohms=330),
+        peca('led', 'led', 440, 200, Cor='verde'),
+    ]
+    fios = [
+        fio('bat', '+', 'diodo', 'A', VERMELHO),
+        fio('diodo', 'C', 'r', '1', VERMELHO),
+        fio('r', '2', 'led', 'A', VERMELHO),
+        fio('led', 'C', 'bat', '-', PRETO),
+    ]
+    codigo = [
+        '// Protecao contra inversao de polaridade com diodo Schottky 1N5819.',
+        '// Com bateria normal, conduz com baixa queda (~0,3 V) e o LED acende.',
+        '// Com bateria invertida, o diodo bloqueia a corrente e evita danos.',
+    ]
+    roteiro = [
+        confere('com polaridade normal o LED acende', 2, led={'peca': 'led', 'aceso': True}),
+        confere('sem avisos na polaridade normal', 1, sem_avisos=True),
+        mexer('bat', volts=-9.0),
+        confere('com bateria invertida o LED apaga', 2, led={'peca': 'led', 'aceso': False}),
+        confere('e nada queima com a inversao', 1, sem_avisos=True),
+        mexer('bat', volts=9.0),
+        confere('com polaridade restabelecida o LED volta a acender', 2, led={'peca': 'led', 'aceso': True}),
+    ]
+    projeto('schottky-protecao', 'Protecao contra polaridade reversa (Diodo Schottky)', [
+        'Diodo Schottky 1N5819 em serie com a alimentacao de 9 V.',
+        'Permite a passagem de corrente com queda minima e bloqueia polaridade invertida.',
+    ], codigo, pecas, fios, roteiro)
+
+
+def pcb_semaforo():
+    """
+    O semaforo soldado numa PCB perfurada de verdade: os resistores e os LEDs
+    ESPETADOS nos furos (as pernas caem no furo pela posicao, sem fio), e as
+    ligacoes de furo a furo pelo lado de baixo -- a trilha de estanho
+    (Fio.Lado = "baixo"), que aparece com a placa virada. Do Uno para a placa
+    vao so os fios de fora: os tres pinos e o GND.
+    """
+    PASSO = 2.54 * 96 / 25.4
+    PX, PY = 360, 100                                  # a PCB 18x24
+    def furo(c, l):
+        return PX + PASSO * c, PY + PASSO * l
+    # pernas no desenho do catalogo (pecas.json)
+    R_1 = (0, 5.65)                                    # resistor: o 1 na esquerda, o 2 seis furos adiante
+    LED_C = (15, 42)                                   # LED: o catodo a esquerda do anodo (um furo)
+    def espetar(id_, tipo, perna, c, l, **extra):
+        x, y = furo(c, l)
+        return peca(id_, tipo, x - perna[0], y - perna[1], **extra)
+    def trilha(a, b):
+        return {**fio('pcb', a, 'pcb', b, '#C3C7CE'), 'Lado': 'baixo', 'Estilo': 'reto'}
+
+    pecas = [peca('placa', 'arduino-uno', 40, 200, Usb=True), peca('pcb', 'pcb-18x24', PX, PY)]
+    fios = []
+    for (letra, cor, pino, linha) in [('v', 'vermelho', '13', 6), ('a', 'amarelo', '12', 12), ('g', 'verde', '11', 18)]:
+        # o resistor do x3 ao x9, o LED com o catodo no x11 e o anodo no x12
+        pecas.append(espetar(f'r_{letra}', 'resistor', R_1, 3, linha, Ohms=220))
+        pecas.append(espetar(f'led_{letra}', 'led', LED_C, 11, linha, Cor=cor))
+        fios += [
+            fio('placa', pino, 'pcb', f'x1y{linha}', {'v': VERMELHO, 'a': AMARELO, 'g': VERDE}[letra]),
+            trilha(f'x1y{linha}', f'x3y{linha}'),       # do pino ao resistor
+            trilha(f'x9y{linha}', f'x12y{linha}'),      # do resistor ao anodo
+            trilha(f'x11y{linha}', f'x11y{linha + 2}'), # o catodo desce para a trilha de GND
+            trilha(f'x11y{linha + 2}', f'x16y{linha + 2}'),
+        ]
+    # o barramento de GND na coluna 16, por baixo, e o fio do GND do Uno
+    fios += [trilha('x16y8', 'x16y14'), trilha('x16y14', 'x16y20'), fio('placa', 'GND.1', 'pcb', 'x16y22', PRETO),
+             trilha('x16y20', 'x16y22')]
+    codigo = [
+        '// Semaforo soldado numa placa perfurada (PCB 18x24).',
+        '// Vermelho 2,5 s, verde 2,5 s, amarelo 1 s.',
+        'const int VERMELHO = 13, AMARELO = 12, VERDE = 11;',
+        '',
+        'void acender(int pino, int ms) {',
+        '  digitalWrite(VERMELHO, pino == VERMELHO);',
+        '  digitalWrite(AMARELO, pino == AMARELO);',
+        '  digitalWrite(VERDE, pino == VERDE);',
+        '  delay(ms);',
+        '}',
+        '',
+        'void setup() {',
+        '  pinMode(VERMELHO, OUTPUT);',
+        '  pinMode(AMARELO, OUTPUT);',
+        '  pinMode(VERDE, OUTPUT);',
+        '}',
+        '',
+        'void loop() {',
+        '  acender(VERMELHO, 2500);',
+        '  acender(VERDE, 2500);',
+        '  acender(AMARELO, 1000);',
+        '}',
+    ]
+    roteiro = [
+        confere('vermelho primeiro na PCB', 3, led={'peca': 'led_v', 'aceso': True}),
+        confere('depois o verde na PCB', 5, led={'peca': 'led_g', 'aceso': True}),
+        confere('depois o amarelo na PCB', 5, led={'peca': 'led_a', 'aceso': True}),
+        confere('sem avisos', 1, sem_avisos=True),
+    ]
+    projeto('pcb-semaforo', 'Semaforo soldado numa PCB perfurada 18x24 (Uno)', [
+        'O semaforo montado como na bancada de solda: os resistores e os LEDs',
+        'espetados nos furos da placa perfurada (5 x 7 cm, furos isolados), e as',
+        'ligacoes feitas por baixo, de furo a furo, com trilhas de estanho.',
+        '',
+        'Clique na placa e use "virar (lado de baixo)" na barra: a placa vira com',
+        'as pecas, e aparecem as soldas das pernas e as trilhas. Fio feito com a',
+        'placa virada e trilha de baixo.',
+    ], codigo, pecas, fios, roteiro)
+
+
 for gerar in [drone, carrinho_rc_sem_placa, carrinho_rc_arduino, rover_4wd, rover_4wd_hc_sr04, rover_4wd_reles,
               fonte_7805_uno, regulador_7805_servos, lm2596_esp32, mt3608_uno, ams1117_lipo_1s,
               semaforo, semaforo_pedestre, botao_esp32, dimmer, servo_pot, sensor_de_re, termometro_lcd,
               alarme_pir, luz_noturna, contador_7seg, relogio_rtc, fechadura, controle_ir, joystick_servos,
               anel_neopixel, oled_grafico, inclinometro, passo_28byj, ventilador, balanca, bluetooth_led,
-              espnow, servidor_web, sono_profundo, nrf24, lcd_paralelo, pico_micropython]:
+              espnow, servidor_web, sono_profundo, nrf24, lcd_paralelo, pico_micropython,
+              npn_motor_esp32, mosfet_fita_uno, zener_referencia, capacitor_rc_led,
+              opto_isolado, fusivel_curto, schottky_protecao, pcb_semaforo]:
     gerar()
 
 # Os que ainda esperam uma correcao do simulador (o resto e regressao).

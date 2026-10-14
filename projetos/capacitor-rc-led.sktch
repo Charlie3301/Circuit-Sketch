@@ -1,0 +1,125 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Carga e descarga RC com capacitor eletrolitico e LED (Uno)",
+  "",
+  "O pino 13 carrega um capacitor eletrolitico de 1000 uF.",
+  "Ao ir para LOW, a carga acumulada mantem o LED aceso por algum tempo antes de apagar."
+ ],
+ "codigo": [
+  "// Circuito RC: o capacitor carrega com o pino 13 em HIGH.",
+  "// O diodo 1N4148 impede retorno ao pino quando vai a LOW;",
+  "// o capacitor descarrega pelo resistor e o LED apaga devagar.",
+  "const int PINO = 13;",
+  "",
+  "void setup() {",
+  "  pinMode(PINO, OUTPUT);",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(PINO, HIGH);",
+  "  delay(2500);",
+  "  digitalWrite(PINO, LOW);",
+  "  delay(8000);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 200,
+    "Usb": true
+   },
+   {
+    "Id": "r_carga",
+    "Tipo": "resistor",
+    "X": 240,
+    "Y": 160,
+    "Ohms": 330
+   },
+   {
+    "Id": "diodo",
+    "Tipo": "diodo",
+    "X": 340,
+    "Y": 160,
+    "Modelo": "1n4148"
+   },
+   {
+    "Id": "cap",
+    "Tipo": "capacitor-eletrolitico",
+    "X": 440,
+    "Y": 220,
+    "Modelo": "1000u-16v"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 520,
+    "Y": 160,
+    "Ohms": 330
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 600,
+    "Y": 160,
+    "Cor": "verde"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "13",
+    "ParaPeca": "r_carga",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_carga",
+    "DePino": "2",
+    "ParaPeca": "diodo",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "diodo",
+    "DePino": "C",
+    "ParaPeca": "cap",
+    "ParaPino": "+",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "cap",
+    "DePino": "+",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "cap",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "cap",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

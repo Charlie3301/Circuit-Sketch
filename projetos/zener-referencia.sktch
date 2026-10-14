@@ -1,0 +1,134 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Referencia de tensao com diodo Zener de 5,1 V (Uno)",
+  "",
+  "Diodo Zener de 5,1 V polarizado por resistor de 470 ohms numa bateria de 9 V.",
+  "Um divisor resistivo 10k/10k divide a tensao pela metade para medicao precisa no A0."
+ ],
+ "codigo": [
+  "// Referencia de tensao com diodo Zener de 5,1 V.",
+  "// O divisor de tensao (10k / 10k) divide por 2 para leitura segura no ADC.",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "}",
+  "",
+  "void loop() {",
+  "  int leitura = analogRead(A0);",
+  "  float v = (leitura * 5.0 / 1023.0) * 2.0;",
+  "  Serial.print(\"Zener: \");",
+  "  Serial.print(v, 1);",
+  "  Serial.println(\" V\");",
+  "  delay(300);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 200,
+    "Usb": true
+   },
+   {
+    "Id": "bat",
+    "Tipo": "bateria",
+    "X": 400,
+    "Y": 420,
+    "Volts": 9,
+    "MiliAmperes": 20000,
+    "MiliAmperesHora": 1000,
+    "Nome": "Bateria 9 V"
+   },
+   {
+    "Id": "r_z",
+    "Tipo": "resistor",
+    "X": 400,
+    "Y": 140,
+    "Ohms": 470
+   },
+   {
+    "Id": "zener",
+    "Tipo": "diodo-zener",
+    "X": 520,
+    "Y": 200,
+    "Modelo": "5v1"
+   },
+   {
+    "Id": "r1",
+    "Tipo": "resistor",
+    "X": 320,
+    "Y": 240,
+    "Ohms": 10000
+   },
+   {
+    "Id": "r2",
+    "Tipo": "resistor",
+    "X": 320,
+    "Y": 320,
+    "Ohms": 10000
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "bat",
+    "DePino": "+",
+    "ParaPeca": "r_z",
+    "ParaPino": "1",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "r_z",
+    "DePino": "2",
+    "ParaPeca": "zener",
+    "ParaPino": "C",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "zener",
+    "DePino": "A",
+    "ParaPeca": "bat",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "bat",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "zener",
+    "DePino": "C",
+    "ParaPeca": "r1",
+    "ParaPino": "1",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "r1",
+    "DePino": "2",
+    "ParaPeca": "r2",
+    "ParaPino": "1",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "r2",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "A0",
+    "ParaPeca": "r1",
+    "ParaPino": "2",
+    "Cor": "#E8B400"
+   }
+  ]
+ }
+}

@@ -1,0 +1,264 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Semaforo soldado numa PCB perfurada 18x24 (Uno)",
+  "",
+  "O semaforo montado como na bancada de solda: os resistores e os LEDs",
+  "espetados nos furos da placa perfurada (5 x 7 cm, furos isolados), e as",
+  "ligacoes feitas por baixo, de furo a furo, com trilhas de estanho.",
+  "",
+  "Clique na placa e use \"virar (lado de baixo)\" na barra: a placa vira com",
+  "as pecas, e aparecem as soldas das pernas e as trilhas. Fio feito com a",
+  "placa virada e trilha de baixo."
+ ],
+ "codigo": [
+  "// Semaforo soldado numa placa perfurada (PCB 18x24).",
+  "// Vermelho 2,5 s, verde 2,5 s, amarelo 1 s.",
+  "const int VERMELHO = 13, AMARELO = 12, VERDE = 11;",
+  "",
+  "void acender(int pino, int ms) {",
+  "  digitalWrite(VERMELHO, pino == VERMELHO);",
+  "  digitalWrite(AMARELO, pino == AMARELO);",
+  "  digitalWrite(VERDE, pino == VERDE);",
+  "  delay(ms);",
+  "}",
+  "",
+  "void setup() {",
+  "  pinMode(VERMELHO, OUTPUT);",
+  "  pinMode(AMARELO, OUTPUT);",
+  "  pinMode(VERDE, OUTPUT);",
+  "}",
+  "",
+  "void loop() {",
+  "  acender(VERMELHO, 2500);",
+  "  acender(VERDE, 2500);",
+  "  acender(AMARELO, 1000);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 200,
+    "Usb": true
+   },
+   {
+    "Id": "pcb",
+    "Tipo": "pcb-18x24",
+    "X": 360,
+    "Y": 100
+   },
+   {
+    "Id": "r_v",
+    "Tipo": "resistor",
+    "X": 388.8,
+    "Y": 151.95,
+    "Ohms": 220
+   },
+   {
+    "Id": "led_v",
+    "Tipo": "led",
+    "X": 450.6,
+    "Y": 115.6,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_a",
+    "Tipo": "resistor",
+    "X": 388.8,
+    "Y": 209.55,
+    "Ohms": 220
+   },
+   {
+    "Id": "led_a",
+    "Tipo": "led",
+    "X": 450.6,
+    "Y": 173.2,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r_g",
+    "Tipo": "resistor",
+    "X": 388.8,
+    "Y": 267.15,
+    "Ohms": 220
+   },
+   {
+    "Id": "led_g",
+    "Tipo": "led",
+    "X": 450.6,
+    "Y": 230.8,
+    "Cor": "verde"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "13",
+    "ParaPeca": "pcb",
+    "ParaPino": "x1y6",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x1y6",
+    "ParaPeca": "pcb",
+    "ParaPino": "x3y6",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x9y6",
+    "ParaPeca": "pcb",
+    "ParaPino": "x12y6",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x11y6",
+    "ParaPeca": "pcb",
+    "ParaPino": "x11y8",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x11y8",
+    "ParaPeca": "pcb",
+    "ParaPino": "x16y8",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "12",
+    "ParaPeca": "pcb",
+    "ParaPino": "x1y12",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x1y12",
+    "ParaPeca": "pcb",
+    "ParaPino": "x3y12",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x9y12",
+    "ParaPeca": "pcb",
+    "ParaPino": "x12y12",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x11y12",
+    "ParaPeca": "pcb",
+    "ParaPino": "x11y14",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x11y14",
+    "ParaPeca": "pcb",
+    "ParaPino": "x16y14",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "11",
+    "ParaPeca": "pcb",
+    "ParaPino": "x1y18",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x1y18",
+    "ParaPeca": "pcb",
+    "ParaPino": "x3y18",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x9y18",
+    "ParaPeca": "pcb",
+    "ParaPino": "x12y18",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x11y18",
+    "ParaPeca": "pcb",
+    "ParaPino": "x11y20",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x11y20",
+    "ParaPeca": "pcb",
+    "ParaPino": "x16y20",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x16y8",
+    "ParaPeca": "pcb",
+    "ParaPino": "x16y14",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x16y14",
+    "ParaPeca": "pcb",
+    "ParaPino": "x16y20",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.1",
+    "ParaPeca": "pcb",
+    "ParaPino": "x16y22",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "pcb",
+    "DePino": "x16y20",
+    "ParaPeca": "pcb",
+    "ParaPino": "x16y22",
+    "Cor": "#C3C7CE",
+    "Lado": "baixo",
+    "Estilo": "reto"
+   }
+  ]
+ }
+}

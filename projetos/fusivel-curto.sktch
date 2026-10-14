@@ -1,0 +1,123 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Protecao contra curto-circuito com fusivel 1 A",
+  "",
+  "Uma bateria de 12 V alimenta um LED atraves de um fusivel de 1 A.",
+  "Ao pressionar o botao de teste, um curto-circuito queima o fusivel e corta a corrente."
+ ],
+ "codigo": [
+  "// Circuito de protecao contra curto-circuito com fusivel de 1 A.",
+  "// A carga normal (LED com resistor em 12 V) consome ~20 mA.",
+  "// O botao de teste coloca a linha em curto com o terra;",
+  "// a corrente excede a capacidade do fusivel, que queima e abre o circuito.",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "}",
+  "",
+  "void loop() {",
+  "  delay(100);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 200,
+    "Usb": true
+   },
+   {
+    "Id": "bat",
+    "Tipo": "bateria",
+    "X": 380,
+    "Y": 420,
+    "Volts": 12,
+    "MiliAmperes": 20000,
+    "MiliAmperesHora": 2000,
+    "Nome": "Bateria 12 V"
+   },
+   {
+    "Id": "fusivel",
+    "Tipo": "fusivel",
+    "X": 460,
+    "Y": 240,
+    "Modelo": "1a"
+   },
+   {
+    "Id": "r_carga",
+    "Tipo": "resistor",
+    "X": 580,
+    "Y": 240,
+    "Ohms": 470
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 660,
+    "Y": 240,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 460,
+    "Y": 360
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "bat",
+    "DePino": "+",
+    "ParaPeca": "fusivel",
+    "ParaPino": "1",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "fusivel",
+    "DePino": "2",
+    "ParaPeca": "r_carga",
+    "ParaPino": "1",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "r_carga",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "bat",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "bat",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "fusivel",
+    "DePino": "2",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "bat",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

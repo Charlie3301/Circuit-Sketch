@@ -1889,5 +1889,346 @@
    }
   ],
   "esperado": "funciona"
+ },
+ "npn-motor-esp32": {
+  "titulo": "Motor DC acionado por transistor NPN (ESP32, 2N2222A)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "com o pino em HIGH o motor gira",
+     "rpm_min": [
+      "motor"
+     ],
+     "valor": 500
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "sem avisos no circuito",
+     "sem_avisos": true
+    },
+    "ate": 1
+   },
+   {
+    "esperar": 2.8
+   },
+   {
+    "confere": {
+     "nome": "com o pino em LOW o motor para",
+     "rpm_max": [
+      "motor"
+     ],
+     "valor": 50
+    },
+    "ate": 3
+   }
+  ],
+  "esperado": "funciona"
+ },
+ "mosfet-fita-uno": {
+  "titulo": "Controle de carga 12 V com MOSFET IRLZ44N (Uno, PWM)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "com PWM baixo o brilho e fraco",
+     "brilho": {
+      "peca": "led",
+      "max": 0.35
+     }
+    },
+    "ate": 3
+   },
+   {
+    "peca": "pot",
+    "giro": 0.95
+   },
+   {
+    "confere": {
+     "nome": "com PWM alto o brilho e forte",
+     "brilho": {
+      "peca": "led",
+      "min": 0.7
+     }
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "sem avisos",
+     "sem_avisos": true
+    },
+    "ate": 1
+   }
+  ],
+  "esperado": "funciona"
+ },
+ "zener-referencia": {
+  "titulo": "Referencia de tensao com diodo Zener de 5,1 V (Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "a tensao do zener e lida no monitor (~5,2 V)",
+     "serial": "Zener: 5.2 V"
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "sem avisos",
+     "sem_avisos": true
+    },
+    "ate": 1
+   }
+  ],
+  "esperado": "funciona"
+ },
+ "capacitor-rc-led": {
+  "titulo": "Carga e descarga RC com capacitor eletrolitico e LED (Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "com pino em HIGH o capacitor carrega e o LED acende",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "sem avisos",
+     "sem_avisos": true
+    },
+    "ate": 1
+   },
+   {
+    "esperar": 2.8
+   },
+   {
+    "confere": {
+     "nome": "logo apos o pino ir a LOW o capacitor mantem o LED aceso",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 1
+   },
+   {
+    "esperar": 2.5
+   },
+   {
+    "confere": {
+     "nome": "apos descarregar o LED apaga",
+     "led": {
+      "peca": "led",
+      "aceso": false
+     }
+    },
+    "ate": 2
+   }
+  ],
+  "esperado": "funciona"
+ },
+ "opto-isolado": {
+  "titulo": "Circuito isolado com optoacoplador PC817 (Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "inicialmente o LED isolado esta apagado",
+     "led": {
+      "peca": "led",
+      "aceso": false
+     }
+    },
+    "ate": 2
+   },
+   {
+    "apertar": "botao"
+   },
+   {
+    "confere": {
+     "nome": "com o botao apertado o LED isolado acende",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 2
+   },
+   {
+    "soltar": "botao"
+   },
+   {
+    "confere": {
+     "nome": "soltando o botao o LED isolado apaga",
+     "led": {
+      "peca": "led",
+      "aceso": false
+     }
+    },
+    "ate": 2
+   },
+   {
+    "confere": {
+     "nome": "sem avisos",
+     "sem_avisos": true
+    },
+    "ate": 1
+   }
+  ],
+  "esperado": "funciona"
+ },
+ "fusivel-curto": {
+  "titulo": "Protecao contra curto-circuito com fusivel 1 A",
+  "passos": [
+   {
+    "confere": {
+     "nome": "em condicoes normais o LED acende",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 2
+   },
+   {
+    "confere": {
+     "nome": "sem avisos em regime normal",
+     "sem_avisos": true
+    },
+    "ate": 1
+   },
+   {
+    "apertar": "botao"
+   },
+   {
+    "esperar": 0.5
+   },
+   {
+    "confere": {
+     "nome": "o curto queima o fusivel e gera aviso",
+     "serial": "abriu"
+    },
+    "ate": 3
+   },
+   {
+    "soltar": "botao"
+   },
+   {
+    "confere": {
+     "nome": "com o fusivel aberto o LED apaga",
+     "led": {
+      "peca": "led",
+      "aceso": false
+     }
+    },
+    "ate": 2
+   }
+  ],
+  "esperado": "funciona"
+ },
+ "schottky-protecao": {
+  "titulo": "Protecao contra polaridade reversa (Diodo Schottky)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "com polaridade normal o LED acende",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 2
+   },
+   {
+    "confere": {
+     "nome": "sem avisos na polaridade normal",
+     "sem_avisos": true
+    },
+    "ate": 1
+   },
+   {
+    "peca": "bat",
+    "volts": -9.0
+   },
+   {
+    "confere": {
+     "nome": "com bateria invertida o LED apaga",
+     "led": {
+      "peca": "led",
+      "aceso": false
+     }
+    },
+    "ate": 2
+   },
+   {
+    "confere": {
+     "nome": "e nada queima com a inversao",
+     "sem_avisos": true
+    },
+    "ate": 1
+   },
+   {
+    "peca": "bat",
+    "volts": 9.0
+   },
+   {
+    "confere": {
+     "nome": "com polaridade restabelecida o LED volta a acender",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 2
+   }
+  ],
+  "esperado": "funciona"
+ },
+ "pcb-semaforo": {
+  "titulo": "Semaforo soldado numa PCB perfurada 18x24 (Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "vermelho primeiro na PCB",
+     "led": {
+      "peca": "led_v",
+      "aceso": true
+     }
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "depois o verde na PCB",
+     "led": {
+      "peca": "led_g",
+      "aceso": true
+     }
+    },
+    "ate": 5
+   },
+   {
+    "confere": {
+     "nome": "depois o amarelo na PCB",
+     "led": {
+      "peca": "led_a",
+      "aceso": true
+     }
+    },
+    "ate": 5
+   },
+   {
+    "confere": {
+     "nome": "sem avisos",
+     "sem_avisos": true
+    },
+    "ate": 1
+   }
+  ],
+  "esperado": "funciona"
  }
 }

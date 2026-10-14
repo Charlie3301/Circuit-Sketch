@@ -1,0 +1,146 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Circuito isolado com optoacoplador PC817 (Uno)",
+  "",
+  "Isolamento completo entre o Arduino Uno e o circuito de carga.",
+  "O aperto do botao aciona o optoacoplador, acendendo o LED alimentado por bateria."
+ ],
+ "codigo": [
+  "// Isolamento galvanico com optoacoplador PC817.",
+  "// O botao no pino 2 aciona o LED interno do opto (pino 13).",
+  "// O fototransistor conduz e acende o LED no circuito isolado.",
+  "const int BOTAO = 2, OPTO = 13;",
+  "",
+  "void setup() {",
+  "  pinMode(BOTAO, INPUT_PULLUP);",
+  "  pinMode(OPTO, OUTPUT);",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(OPTO, digitalRead(BOTAO) == LOW ? HIGH : LOW);",
+  "  delay(20);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 200,
+    "Usb": true
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 40,
+    "Y": 420
+   },
+   {
+    "Id": "r_opto",
+    "Tipo": "resistor",
+    "X": 240,
+    "Y": 200,
+    "Ohms": 330
+   },
+   {
+    "Id": "opto",
+    "Tipo": "optoacoplador",
+    "X": 340,
+    "Y": 260
+   },
+   {
+    "Id": "bat",
+    "Tipo": "bateria",
+    "X": 580,
+    "Y": 420,
+    "Volts": 9,
+    "MiliAmperes": 20000,
+    "MiliAmperesHora": 1000,
+    "Nome": "Bateria 9 V"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 480,
+    "Y": 200,
+    "Ohms": 470
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 580,
+    "Y": 200,
+    "Cor": "verde"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "2",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "13",
+    "ParaPeca": "r_opto",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_opto",
+    "DePino": "2",
+    "ParaPeca": "opto",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "opto",
+    "DePino": "K",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "bat",
+    "DePino": "+",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "opto",
+    "ParaPino": "C",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "opto",
+    "DePino": "E",
+    "ParaPeca": "bat",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}
