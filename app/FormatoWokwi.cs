@@ -270,6 +270,7 @@ public static class FormatoWokwi
         "attiny85" or "franzininho" => "tiny",
         "stm32-bluepill" or "st-nucleo-c031c6" or "st-nucleo-l031k6" => "stm",
         _ when tipo.StartsWith("esp", StringComparison.Ordinal) && PerfilPlaca.EhPlaca(tipo) => "esp",
+        _ when Catalogo.EhPcb(tipo) => "pcb",
         _ when Catalogo.EhProtoboard(tipo) => "bb",
         _ when tipo.StartsWith("lcd", StringComparison.Ordinal) => "lcd",
         _ when tipo.StartsWith("servo", StringComparison.Ordinal) => "servo",

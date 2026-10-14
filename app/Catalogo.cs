@@ -80,6 +80,47 @@ public static class Catalogo
 
     public static Formato FormatoDe(string id) => formatos.GetValueOrDefault(id);
 
+    // ---------------- PCB perfurada (Alpha 24) ----------------
+    //
+    // A placa de furos isolados, do tamanho que a pessoa quiser: o tamanho e
+    // o proprio tipo ("pcb-18x24": 18 colunas, 24 linhas de furos). Cada furo
+    // e um no sozinho -- quem liga e o fio (ou a solda) por baixo. Trocar o
+    // tamanho na barra troca o tipo da peca.
+
+    public const string IdPcbPadrao = "pcb-18x24";   // a de 5 x 7 cm
+    public const int PcbMinimo = 4, PcbMaximo = 80;
+
+    /// <summary>Colunas e linhas de furos de uma PCB ("pcb-18x24"), ou nulo se o id nao for de PCB.</summary>
+    public static (int Colunas, int Linhas)? TamanhoDaPcb(string id)
+    {
+        if (id is null || !id.StartsWith("pcb-", StringComparison.Ordinal)) return null;
+        var partes = id[4..].Split('x');
+        return partes.Length == 2 && int.TryParse(partes[0], out int c) && int.TryParse(partes[1], out int l)
+               && c is >= PcbMinimo and <= PcbMaximo && l is >= PcbMinimo and <= PcbMaximo ? (c, l) : null;
+    }
+
+    public static bool EhPcb(string id) => TamanhoDaPcb(id) is not null;
+
+    public static string IdDaPcb(int colunas, int linhas)
+        => $"pcb-{Math.Clamp(colunas, PcbMinimo, PcbMaximo)}x{Math.Clamp(linhas, PcbMinimo, PcbMaximo)}";
+
+    /// <summary>O nome do furo: coluna e linha, contadas de 1 ("x3y12").</summary>
+    public static string FuroDaPcb(int coluna, int linha) => $"x{coluna}y{linha}";
+
+    static PecaDef MontarPcb(string id)
+    {
+        var (colunas, linhas) = TamanhoDaPcb(id)!.Value;
+        var pinos = new List<PinoDef>();
+        double m = Passo;
+        for (int l = 0; l < linhas; l++)
+            for (int c = 0; c < colunas; c++)
+                pinos.Add(new PinoDef(FuroDaPcb(c + 1, l + 1), m + c * Passo, m + l * Passo, [], $"furo {c + 1}, {l + 1}"));
+        return new PecaDef(id, NomeDaPcb(colunas, linhas), m * 2 + (colunas - 1) * Passo, m * 2 + (linhas - 1) * Passo, pinos, "Base");
+    }
+
+    static string NomeDaPcb(int colunas, int linhas)
+        => $"PCB perfurada {colunas} x {linhas} furos ({(colunas + 1) * 2.54:0} x {(linhas + 1) * 2.54:0} mm)";
+
     static readonly Dictionary<string, PecaDef> porId = [];
     public static IReadOnlyCollection<PecaDef> Todas => porId.Values;
 
@@ -89,9 +130,17 @@ public static class Catalogo
         porId[IdProtoboard] = MontarProtoboard(IdProtoboard, "Protoboard 400");
         porId[IdProtoboard830] = MontarProtoboard(IdProtoboard830, "Protoboard 830");
         porId[IdProtoboard170] = MontarProtoboard(IdProtoboard170, "Protoboard 170");
+        porId[IdPcbPadrao] = MontarPcb(IdPcbPadrao);
     }
 
-    public static PecaDef Obter(string id) => porId.GetValueOrDefault(id);
+    public static PecaDef Obter(string id)
+    {
+        if (id is null) return null;
+        if (porId.TryGetValue(id, out var def)) return def;
+        // A PCB de qualquer tamanho nasce na primeira vez que alguem pede.
+        if (!EhPcb(id)) return null;
+        lock (porId) return porId.TryGetValue(id, out def) ? def : porId[id] = MontarPcb(id);
+    }
 
     /// <summary>
     /// Placa de desenvolvimento (ESP32, Arduino...). Elas tem dezenas de
@@ -100,7 +149,8 @@ public static class Catalogo
     public static bool EhPlacaDeDesenvolvimento(string id)
         => PerfilPlaca.EhPlaca(id);
 
-    public static bool EhProtoboard(string id) => formatos.ContainsKey(id);
+    /// <summary>Uma base com furos onde as pecas encaixam: as protoboards e as PCBs perfuradas.</summary>
+    public static bool EhProtoboard(string id) => id is not null && (formatos.ContainsKey(id) || EhPcb(id));
 
     /// <summary>
     /// A familia da placa -- "Arduino", "ESP32", ... --, ou null se o id
@@ -348,7 +398,8 @@ public static class Catalogo
             yield break;
         }
 
-        if (!EhProtoboard(idPeca)) yield break;
+        // A PCB perfurada nao tem trilha nenhuma por dentro: cada furo sozinho.
+        if (!EhProtoboard(idPeca) || EhPcb(idPeca)) yield break;
         int colunas = ColunasDe(idPeca);
         const string letras = "ABCDEFGHIJ";
 
@@ -556,6 +607,7 @@ public static class Catalogo
         "wifi-ap" => "Rede",
         "texto" => "Anotacao",
         IdProtoboard or IdProtoboard830 or IdProtoboard170 => "Base",
+        _ when EhPcb(id) => "Base",
         _ => "Outros",
     };
 }

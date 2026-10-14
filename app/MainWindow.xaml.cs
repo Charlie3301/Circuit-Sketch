@@ -1708,6 +1708,31 @@ public partial class MainWindow : Window
                 opcoesObjeto.Children.Add(quadro);
             }
         }
+        else if (Catalogo.EhPcb(peca.Tipo))
+        {
+            var (colunas, linhas) = Catalogo.TamanhoDaPcb(peca.Tipo)!.Value;
+            Numero(Idioma.T("Colunas"), Idioma.T("furos"), colunas, Catalogo.PcbMinimo, Catalogo.PcbMaximo,
+                   v => { editor.DefinirTamanhoDaPcb((int)Math.Round(v), linhas); AtualizarBarraObjeto(); });
+            Numero(Idioma.T("Linhas"), Idioma.T("furos"), linhas, Catalogo.PcbMinimo, Catalogo.PcbMaximo,
+                   v => { editor.DefinirTamanhoDaPcb(colunas, (int)Math.Round(v)); AtualizarBarraObjeto(); });
+            foreach (var (id, nome, hex) in EditorCircuito.CoresDePcb)
+            {
+                bool marcada = (peca.Cor ?? "verde") == id;
+                var quadro = new System.Windows.Shapes.Rectangle
+                {
+                    Width = 20, Height = 20, RadiusX = 3, RadiusY = 3, Margin = new Thickness(0, 0, 4, 0),
+                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex)),
+                    Stroke = marcada ? Brushes.White : new SolidColorBrush(Color.FromRgb(0x5A, 0x5A, 0x5E)),
+                    StrokeThickness = marcada ? 2.5 : 1, Cursor = Cursors.Hand, ToolTip = Idioma.T(nome), Tag = id,
+                };
+                quadro.MouseLeftButtonDown += (s2, _) =>
+                {
+                    editor.DefinirCorDaPcb((string)((System.Windows.Shapes.Rectangle)s2).Tag);
+                    AtualizarBarraObjeto();
+                };
+                opcoesObjeto.Children.Add(quadro);
+            }
+        }
         else if (Catalogo.EhProtoboard(peca.Tipo))
         {
             // As mini de 170 vem coloridas; deixa escolher a cor.

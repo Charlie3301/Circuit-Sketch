@@ -1106,7 +1106,8 @@ public partial class EditorCircuito : Border
         var def = Catalogo.Obter(peca.Tipo);
         if (def is null) return;
 
-        FrameworkElement visual = Catalogo.EhProtoboard(peca.Tipo)
+        FrameworkElement visual = Catalogo.EhPcb(peca.Tipo) ? DesenharPcb(peca, def)
+            : Catalogo.EhProtoboard(peca.Tipo)
             ? DesenharProtoboard(peca, def)
             : peca.Tipo == "texto"
                 ? DesenharTexto(peca)
@@ -2098,6 +2099,81 @@ public partial class EditorCircuito : Border
                 caixa.Children.Add(Rotulo((c + 1).ToString(), m + c * P - 2.2, y, corRotulo));
 
         return caixa;
+    }
+
+    // ---------------- PCB perfurada ----------------
+    /// <summary>As cores da mascara de solda (e a fenolite, a marrom sem mascara).</summary>
+    internal static readonly (string id, string nome, string hex)[] CoresDePcb =
+    [
+        ("verde", "Verde", "#1E6B3C"), ("azul", "Azul", "#1F4F9E"), ("preta", "Preta", "#1C1D20"),
+        ("vermelha", "Vermelha", "#A3242A"), ("roxa", "Roxa", "#5B2A86"), ("fenolite", "Fenolite", "#C8955A"),
+    ];
+
+    static FrameworkElement DesenharPcb(PecaNoCircuito peca, PecaDef def)
+    {
+        var (colunas, linhas) = Catalogo.TamanhoDaPcb(peca.Tipo)!.Value;
+        double P = Catalogo.Passo, m = P;
+        string hex = CoresDePcb.FirstOrDefault(c => c.id == peca.Cor).hex ?? CoresDePcb[0].hex;
+        var mascara = (Color)ColorConverter.ConvertFromString(hex);
+        bool fenolite = peca.Cor == "fenolite";
+        var caixa = new Canvas { Width = def.Largura, Height = def.Altura };
+
+        caixa.Children.Add(new Rectangle
+        {
+            Width = def.Largura, Height = def.Altura, RadiusX = 2, RadiusY = 2,
+            Fill = new SolidColorBrush(mascara),
+            Stroke = new SolidColorBrush(Puxar(mascara, Escura(mascara) ? 1.6 : 0.8)), StrokeThickness = 1,
+        });
+
+        // As ilhas de cobre (estanhadas, prateadas; na fenolite, o cobre
+        // nu) e o furo no meio de cada uma: dois Paths para a placa inteira.
+        var ilhas = new GeometryGroup();
+        var furos = new GeometryGroup();
+        foreach (var pino in def.Pinos)
+        {
+            ilhas.Children.Add(new EllipseGeometry(new Point(pino.X, pino.Y), 3.1, 3.1));
+            furos.Children.Add(new EllipseGeometry(new Point(pino.X, pino.Y), 1.15, 1.15));
+        }
+        caixa.Children.Add(new Path
+        {
+            Data = ilhas,
+            Fill = new SolidColorBrush(fenolite ? Color.FromRgb(0xD9, 0x8E, 0x4A) : Color.FromRgb(0xC9, 0xCC, 0xD1)),
+            Stroke = new SolidColorBrush(fenolite ? Color.FromRgb(0x8A, 0x52, 0x20) : Color.FromRgb(0x80, 0x85, 0x8C)),
+            StrokeThickness = 0.35,
+        });
+        caixa.Children.Add(new Path { Data = furos, Fill = new SolidColorBrush(Color.FromRgb(0x16, 0x16, 0x18)) });
+
+        // A serigrafia: a numeracao das colunas e das linhas, de 5 em 5.
+        var corDaSerigrafia = fenolite ? Color.FromRgb(0x5A, 0x34, 0x12) : Color.FromRgb(0xE6, 0xE8, 0xEA);
+        for (int c = 0; c < colunas; c += 5)
+            caixa.Children.Add(Rotulo((c + 1).ToString(), m + c * P - 2.2, 0.2, corDaSerigrafia));
+        for (int l = 4; l < linhas; l += 5)
+            caixa.Children.Add(Rotulo((l + 1).ToString(), 0.6, m + l * P - 3.2, corDaSerigrafia));
+        return caixa;
+    }
+
+    /// <summary>O tamanho da PCB selecionada, em furos: troca o tipo da peca (o tamanho e o tipo).</summary>
+    public void DefinirTamanhoDaPcb(int colunas, int linhas)
+    {
+        var peca = Selecionada;
+        if (peca is null || !Catalogo.EhPcb(peca.Tipo)) return;
+        string novo = Catalogo.IdDaPcb(colunas, linhas);
+        if (novo == peca.Tipo) return;
+        peca.Tipo = novo;
+        Redesenhar();
+        Selecionar(peca.Id, false);
+        Mudou?.Invoke();
+    }
+
+    /// <summary>A cor da mascara de solda da PCB selecionada.</summary>
+    public void DefinirCorDaPcb(string cor)
+    {
+        var peca = Selecionada;
+        if (peca is null || !Catalogo.EhPcb(peca.Tipo)) return;
+        peca.Cor = cor;
+        Redesenhar();
+        Selecionar(peca.Id, false);
+        Mudou?.Invoke();
     }
 
     static TextBlock Rotulo(string txt, double x, double y, Color cor)
