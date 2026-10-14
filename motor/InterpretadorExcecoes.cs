@@ -85,6 +85,7 @@ public partial class Interpretador
     {
         if (e is ExcecaoDoSketch x) return x.Tipo;
         string m = e.Message.ToLowerInvariant();
+        if (m.Contains("oserror")) return "OSError";   // o I2C e a UART do Python ja dizem
         if (m.Contains("divisao por zero") || m.Contains("dividir por zero") || m.Contains("modulo por zero")) return "ZeroDivisionError";
         if (m.Contains("indice") && (m.Contains("fora") || m.Contains("range"))) return "IndexError";
         if (m.Contains("chave") && (m.Contains("nao existe") || m.Contains("nao tem"))) return "KeyError";

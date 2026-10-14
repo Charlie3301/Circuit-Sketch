@@ -5746,6 +5746,10 @@ public partial class EditorCircuito : Border
         // grandeza solta, e vai para todas as maquinas.
         foreach (var (_, m) in bancada.Todas) ConferirParInfravermelho(m);
 
+        // As bordas dos pinos vigiados (attachInterrupt, Pin.irq), na hora em que
+        // o botao mudou -- e nao so quando o sketch acordar do delay.
+        foreach (var (_, m) in bancada.Todas) m.NotarEntradasVigiadas();
+
         AplicarLogica(bancada, rede);
         AplicarCartoes(bancada, rede);
         AplicarRadios(bancada, rede);

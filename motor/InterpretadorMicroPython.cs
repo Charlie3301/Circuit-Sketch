@@ -88,6 +88,13 @@ public partial class Interpretador
             case "machine.Pin.IRQ_RISING": return Valor.DeInt(1);
             case "machine.Pin.IRQ_FALLING": return Valor.DeInt(2);
 
+            case "machine.Pin.IRQ_LOW_LEVEL": return Valor.DeInt(4);
+            case "machine.Pin.IRQ_HIGH_LEVEL": return Valor.DeInt(5);
+            case "machine.Timer.ONE_SHOT": return Valor.DeInt(0);
+            case "machine.Timer.PERIODIC": return Valor.DeInt(1);
+            case "machine.SPI.MSB": case "machine.SoftSPI.MSB": return Valor.DeInt(0);
+            case "machine.SPI.LSB": case "machine.SoftSPI.LSB": return Valor.DeInt(1);
+
             case "machine.ADC.ATTN_0DB": return Valor.DeInt(0);
             case "machine.ADC.ATTN_2_5DB": return Valor.DeInt(1);
             case "machine.ADC.ATTN_6DB": return Valor.DeInt(2);
@@ -284,6 +291,9 @@ public partial class Interpretador
             case "PWM": return NovoPwm(args, nomeados, linha);
             case "I2C" or "SoftI2C": return NovoI2c(nome, args, nomeados, linha);
             case "UART": return NovaUartPy(args, nomeados, linha);
+            case "Timer": return NovoTimerPy(args, nomeados, linha);
+            case "RTC": return Valor.DeReferencia(new Objeto("RTC"));
+            case "SPI" or "SoftSPI": return NovoSpiPy(nome, args, nomeados, linha);
 
             case "reset":
                 throw new ExecucaoInterrompida();
@@ -526,7 +536,7 @@ public partial class Interpretador
 
             case "localtime":
             {
-                var agora = DateTime.Now;
+                var agora = HoraDoRtcPy();   // a hora do RTC (acertada pelo RTC.datetime, ou a do computador)
                 return Valor.DeReferencia(ListaPy.De(
                     Valor.DeInt(agora.Year), Valor.DeInt(agora.Month), Valor.DeInt(agora.Day),
                     Valor.DeInt(agora.Hour), Valor.DeInt(agora.Minute), Valor.DeInt(agora.Second),
@@ -539,8 +549,13 @@ public partial class Interpretador
 
     void Dormir(long ms)
     {
-        Maq.Avancar(ms);
-        AtenderInterrupcoes();
+        // Com Timer ligado, o sono anda de vencimento em vencimento.
+        if (timersPy.Count > 0) DormirComTimers(ms);
+        else
+        {
+            Maq.Avancar(ms);
+            AtenderInterrupcoes();
+        }
         passos = 0;
     }
 

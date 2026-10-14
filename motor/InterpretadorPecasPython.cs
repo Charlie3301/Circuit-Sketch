@@ -27,6 +27,11 @@ public partial class Interpretador
 
         switch (o.Classe)
         {
+            // ---------- Timer, RTC e SPI (InterpretadorMicroPythonTempo.cs) ----------
+            case "Timer": return ChamarTimerPy(o, metodo, nomeados, linha);
+            case "RTC": return ChamarRtcPy(args, metodo, linha);
+            case "SPI" or "SoftSPI": return ChamarSpiPy(o, metodo, args, nomeados, linha);
+
             // ---------- Pin ----------
             case "Pin":
                 switch (metodo)
@@ -50,10 +55,10 @@ public partial class Interpretador
                         Maq.PinMode(o.Pino, (int)A(0) is 3 or 7 ? PinoSaida : PinoEntrada);
                         return Valor.Vazio;
 
+                    // "botao.irq(trigger=Pin.IRQ_FALLING, handler=apertou)": o callback
+                    // roda na borda, com o Pin de argumento (InterpretadorMicroPythonTempo.cs).
                     case "irq":
-                        throw new ErroDeExecucao(
-                            "Pin.irq() ainda nao e suportado. Por enquanto, leia o pino "
-                            + "dentro do laco com pino.value().", linha);
+                        return IrqDoPino(o, args, nomeados, linha);
                 }
                 break;
 
@@ -531,9 +536,19 @@ public partial class Interpretador
                     && NomeDoTipo(primeiro) == args[1].Mostrar());
                 return true;
 
+            // bytes(4) / bytearray(4): quatro bytes zerados; de uma lista ou de
+            // um b'..', os bytes dela. O bytearray e mutavel (o readinto escreve
+            // nele): vira uma lista de numeros; o bytes, o texto de bytes.
             case "bytes" or "bytearray":
-                r = args.Count > 0 ? Valor.DeTexto(primeiro.Mostrar()) : Valor.DeTexto("");
+            {
+                byte[] conteudo = args.Count == 0 ? []
+                    : !primeiro.EhTexto && primeiro.Referencia is null ? new byte[Math.Clamp((int)primeiro.Num, 0, 1 << 20)]
+                    : BytesPy(primeiro);
+                r = nome == "bytearray"
+                    ? Valor.DeReferencia(ListaPy.De([.. conteudo.Select(x => Valor.DeInt(x))]))
+                    : Valor.DeTexto(TextoArduino.DeBytes(conteudo));
                 return true;
+            }
 
             case "input":
                 if (args.Count > 0) Escrever(args[0].Mostrar(), false);

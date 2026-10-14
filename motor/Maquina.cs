@@ -1040,6 +1040,34 @@ public class Maquina
             if (filaDeBordas.Count < TetoDaFila) filaDeBordas.Add(alvo.Funcao);
     }
 
+    /// <summary>
+    /// O editor chama a cada quadro, depois de mexer nas entradas (o botao, a
+    /// chave): a borda de um pino vigiado entra na fila NA HORA em que mudou.
+    /// Sem isto, com o sketch dormindo (delay, time.sleep) a placa so
+    /// comparava o nivel ao acordar -- e soltar e apertar de novo no mesmo
+    /// sono sumia com a borda. Na placa a interrupcao de hardware pega cada uma.
+    /// </summary>
+    public void NotarEntradasVigiadas()
+    {
+        if (Interrupcoes.Count == 0) return;
+        // A lista muda na linha do sketch (o attachInterrupt, o irq): uma copia,
+        // e se ela mudou no meio da copia, fica para o proximo quadro.
+        KeyValuePair<int, (string Funcao, int Borda)>[] vigiados;
+        try { vigiados = [.. Interrupcoes]; }
+        catch (InvalidOperationException) { return; }
+        catch (ArgumentException) { return; }
+        lock (filaDeBordas)
+            foreach (var (pino, alvo) in vigiados)
+            {
+                if (pino < 0 || pino >= NumPinos || SinaisExternos[pino] is not null) continue;
+                int agora = DigitalRead(pino), antes = nivelVisto[pino];
+                if (agora == antes) continue;
+                nivelVisto[pino] = agora;
+                if (InterrupcoesLigadas && Vence(alvo.Borda, antes, agora) && filaDeBordas.Count < TetoDaFila)
+                    filaDeBordas.Add(alvo.Funcao);
+            }
+    }
+
     static bool Vence(int borda, int antes, int agora) => borda switch
     {
         Subindo => antes == 0 && agora == 1,

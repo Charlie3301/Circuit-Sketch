@@ -55,6 +55,7 @@
     <Compile Include="..\motor\Projeto.cs" />
     <Compile Include="..\motor\Ast.cs" />
     <Compile Include="..\motor\InterpretadorExcecoes.cs" />
+    <Compile Include="..\motor\InterpretadorMicroPythonTempo.cs" />
     <Compile Include="..\motor\Parser.cs" />
     <Compile Include="..\motor\Compilador.cs" />
     <Compile Include="..\motor\LexerPython.cs" />

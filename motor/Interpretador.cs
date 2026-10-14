@@ -172,6 +172,14 @@ public partial class Interpretador(Programa prog, Maquina maq)
         // atendimento viraria pilha infinita com o botao segurado.
         if (atendendo) return;
 
+        // Os Timers do MicroPython vencidos (InterpretadorMicroPythonTempo.cs).
+        if (timersPy.Count > 0)
+        {
+            atendendo = true;
+            try { AtenderTimersPy(); }
+            finally { atendendo = false; }
+        }
+
         var externas = maq.InterrupcoesExternas();
         var vencidas = maq.InterrupcoesPendentes();
         if (vencidas.Count == 0 && externas.Count == 0) return;
@@ -229,6 +237,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
     /// </summary>
     void ChamarInterrupcao(string nome)
     {
+        if (ChamarIrqPy(nome)) return;   // o Pin.irq do MicroPython
         if (!funcoes.TryGetValue(nome, out var f)) return;
         long antes = passos;
         var escopo = new Ambiente(global);
@@ -272,7 +281,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
         //
         // Custa uma comparacao quando nao ha interrupcao registrada, que
         // e o caso de quase todo sketch.
-        if (maq.Interrupcoes.Count > 0) AtenderInterrupcoes();
+        if (TemAtendimento) AtenderInterrupcoes();
 
         // O limite de passos e so do tempo virtual (testes, diagnostico):
         // na placa um laco sem delay() nao e erro nenhum, e no tempo real
@@ -1129,7 +1138,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
         // Cortar aqui e seguro: o estado da conta pela metade mora na
         // pilha do C#, e a rotina roda num ambiente proprio, sem mexer
         // nele.
-        if (maq.Interrupcoes.Count > 0) AtenderInterrupcoes();
+        if (TemAtendimento) AtenderInterrupcoes();
 
         switch (e)
         {

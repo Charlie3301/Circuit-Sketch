@@ -186,3 +186,103 @@ public static partial class Autoteste
             erroSemPegar ?? "nao parou");
     }
 }
+
+public static partial class Autoteste
+{
+    /// <summary>
+    /// O machine.Timer (periodico e de uma vez, rodando durante o time.sleep),
+    /// o RTC (acertado, e o time.localtime junto), o SPI, o bytearray e o
+    /// Pin.irq com o botao do circuito.
+    /// </summary>
+    static void MicroPython_TimerRtcSpi()
+    {
+        saida.AppendLine("micropython: Timer, RTC, SPI e Pin.irq");
+
+        var (linhas, _, _, erro) = RodarComReinicios("""
+            from machine import Pin, Timer, RTC, SPI
+            import time
+            led = Pin(2, Pin.OUT)
+            voltas = 0
+            def piscar(t):
+                global voltas
+                voltas += 1
+                led.value(not led.value())
+            tim = Timer(0)
+            tim.init(period=250, mode=Timer.PERIODIC, callback=piscar)
+            uma = []
+            Timer(1).init(period=600, mode=Timer.ONE_SHOT, callback=lambda t: uma.append(1))
+            time.sleep(1)
+            print("voltas", voltas, len(uma))
+            tim.deinit()
+            time.sleep(1)
+            print("parado", voltas)
+            rtc = RTC()
+            rtc.datetime((2026, 10, 14, 2, 8, 30, 0, 0))
+            time.sleep(2)
+            d = rtc.datetime()
+            print("rtc", d[0], d[1], d[2], d[4], d[5], d[6], time.localtime()[3], time.localtime()[4])
+            spi = SPI(2, baudrate=1000000, polarity=0, phase=0)
+            buf = bytearray(4)
+            spi.readinto(buf, 0xFF)
+            spi.write(b'\x01\x02')
+            print("spi", len(buf), len(spi.read(3)))
+            print(list(bytearray(3)), list(bytearray([1, 2])))
+            """, "esp32-devkit-v1", 6000);
+        Conferir("micropython: Timer periodico de 250 ms dispara 4 vezes em 1 s (durante o sleep); o ONE_SHOT, uma vez",
+            erro is null && linhas.Contains("voltas 4 1"), erro ?? string.Join(" | ", linhas));
+        Conferir("micropython: Timer.deinit() para o callback", linhas.Contains("parado 4"), string.Join(" | ", linhas));
+        Conferir("micropython: RTC.datetime() acerta e anda com a placa, e o time.localtime() acompanha",
+            linhas.Contains("rtc 2026 10 14 8 30 2 8 30"), string.Join(" | ", linhas));
+        Conferir("micropython: SPI(2) com readinto, write e read", linhas.Contains("spi 4 3"), string.Join(" | ", linhas));
+        Conferir("micropython: bytearray(n) sao n bytes zerados; bytearray(lista) os bytes dela",
+            linhas.Contains("[0, 0, 0] [1, 2]"), string.Join(" | ", linhas));
+
+        // ---- o Pin.irq com o botao do circuito ----
+        {
+            var c = new Circuito();
+            var placa = new PecaNoCircuito { Id = "placa", Tipo = "esp32-devkit-v1", X = 0, Y = 0, Usb = true };
+            var botao = new PecaNoCircuito { Id = "botao", Tipo = "pushbutton", X = 400, Y = 0 };
+            c.Pecas.AddRange([placa, botao]);
+            c.Fios.Add(new Fio { DePeca = "botao", DePino = "1.l", ParaPeca = "placa", ParaPino = "D14" });
+            c.Fios.Add(new Fio { DePeca = "botao", DePino = "2.l", ParaPeca = "placa", ParaPino = "GND.1" });
+            var janela = new MainWindow();
+            try
+            {
+                janela.TesteAbrir(c, """
+                    from machine import Pin
+                    import time
+                    apertos = 0
+                    def apertou(pino):
+                        global apertos
+                        apertos += 1
+                        print("apertou", apertos, pino.value())
+                    botao = Pin(14, Pin.IN, Pin.PULL_UP)
+                    botao.irq(trigger=Pin.IRQ_FALLING, handler=apertou)
+                    print("pronto")
+                    while True:
+                        time.sleep(1)
+                    """);
+                janela.TesteRodar();
+                var maq = janela.TesteMaquinaDa("placa");
+                var ed = janela.TesteEditorCircuito;
+                EsperarPor(() => LinhasDoSerial(maq).Contains("pronto"), 4000);
+                for (int k = 0; k < 2; k++)
+                {
+                    ed.BotoesPressionados.Add("botao");
+                    EsperarPor(() => LinhasDoSerial(maq).Count(l => l.StartsWith("apertou")) > k, 2000);
+                    ed.BotoesPressionados.Remove("botao");
+                    EsperarPor(() => false, 300);
+                }
+                var vistas = LinhasDoSerial(maq);
+                Conferir("micropython: Pin.irq(IRQ_FALLING) chama o handler a cada aperto, com o Pin de argumento (em LOW)",
+                    vistas.Contains("apertou 1 0") && vistas.Contains("apertou 2 0") && !vistas.Any(l => l.StartsWith("apertou 3")),
+                    string.Join(" | ", vistas));
+            }
+            finally
+            {
+                janela.TesteParar();
+                try { janela.Close(); } catch (InvalidOperationException) { }
+            }
+        }
+    }
+}
