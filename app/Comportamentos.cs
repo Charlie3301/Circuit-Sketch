@@ -119,15 +119,17 @@ public record Comportamento
             Analogicos = ["AOUT"], Digitais = ["DOUT"],
             DigitalInvertido = true, Rotulo = "Chama"
         },
+        // O KY-037 e o KY-038 (os do kit da Joy-IT): o comparador poe o DOUT
+        // em HIGH com o som acima do limiar (a documentacao da Joy-IT).
         ["big-sound-sensor"] = new()
         {
             Analogicos = ["AOUT"], Digitais = ["DOUT"],
-            DigitalInvertido = true, Rotulo = "Som"
+            DigitalInvertido = false, Rotulo = "Som"
         },
         ["small-sound-sensor"] = new()
         {
             Analogicos = ["AOUT"], Digitais = ["DOUT"],
-            DigitalInvertido = true, Rotulo = "Som"
+            DigitalInvertido = false, Rotulo = "Som"
         },
 
         // ---- so analogico ----

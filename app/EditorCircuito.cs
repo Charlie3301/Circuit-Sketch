@@ -5573,10 +5573,17 @@ public partial class EditorCircuito : Border
                     break;
                 }
 
+                // A chave deslizante e um SPDT: o comum (2) vai ao 1 com a
+                // alavanca a esquerda e ao 3 a direita, e leva o nivel de um
+                // lado ao outro, como o contato do rele. Antes ela "apertava"
+                // o pino, sem olhar onde cada lado estava ligado.
                 case "slide-switch":
                 {
-                    int gpio = PrimeiroGpio(rede, peca.Id, "1", "2", "3");
-                    if (gpio >= 0) maq.Pressionado[gpio] = peca.Giro > 0.5;
+                    if (relesSegurando.TryGetValue(peca.Id, out var antigos))
+                        foreach (int g in antigos) maq.NivelExterno[g] = -1;
+                    var segura = new HashSet<int>();
+                    LevarNivel(peca, maq, rede, "2", peca.Giro > 0.5 ? "3" : "1", segura);
+                    relesSegurando[peca.Id] = segura;
                     break;
                 }
 
