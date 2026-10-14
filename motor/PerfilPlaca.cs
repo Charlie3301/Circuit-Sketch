@@ -159,6 +159,14 @@ public partial record PerfilPlaca(
     /// e 11 (os do "~" na placa). O analogWrite nos outros e o do core: abaixo
     /// de 128 vira LOW, a partir dele HIGH. ESP32, RP2040 e afins: todos.
     /// </summary>
+    /// <summary>
+    /// O pino so tem a entrada analogica, e nenhum digital: o A6 e o A7 do
+    /// Nano (vao direto no conversor do ATmega328P de 32 pinos) e o A0 da
+    /// ESP8266 (o TOUT). digitalWrite neles nao faz nada; digitalRead le 0.
+    /// </summary>
+    public bool SoAnalogico(int pino) => Id == "arduino-nano" ? pino is 20 or 21
+        : Processador == "ESP8266" && pino == 17;
+
     public bool TemPwm(int pino) => Processador switch
     {
         "ATmega328P" => pino is 3 or 5 or 6 or 9 or 10 or 11,

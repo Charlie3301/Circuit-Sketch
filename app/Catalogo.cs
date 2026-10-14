@@ -384,13 +384,13 @@ public static class Catalogo
             yield break;
         }
 
-        // Na placa, os pinos repetidos de alimentacao (5V e 5V.2, GND.1 e
-        // GND.2, 3V3 e 3V3.2) sao a mesma trilha de cobre: o receptor no 5V.2
-        // de um Nano alimentado pelo 5V recebe os mesmos 5 V.
+        // Na placa, os pinos repetidos (5V e 5V.2, GND.1 e GND.2, o 12 e o
+        // 12.2 do conector ICSP do Nano, RESET e RESET.2) sao a mesma trilha
+        // de cobre: o receptor no 5V.2 de um Nano alimentado pelo 5V recebe
+        // os mesmos 5 V.
         if (PerfilPlaca.De(idPeca) is not null && Obter(idPeca) is { } placa)
         {
             foreach (var grupo in placa.Pinos.Select(p => p.Nome)
-                         .Where(n => Netlist.EhPinoDeTerra(n) || Netlist.EhPinoDeAlimentacao(n))
                          .GroupBy(SemRepeticao).Where(g => g.Count() > 1))
             {
                 string primeiro = grupo.First();

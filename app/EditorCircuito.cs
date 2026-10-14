@@ -446,6 +446,10 @@ public partial class EditorCircuito : Border
         (121.4, 266, 17, "9", 0xFF52AD),
     ];
 
+    /// <summary>Para o teste: as teclas do controle infravermelho e o codigo de cada uma.</summary>
+    internal static IEnumerable<(string Nome, long Codigo)> TeclasDoControleParaTeste()
+        => BotoesDoControle.Select(b => (b.Nome, b.Codigo));
+
     /// <summary>A tecla do controle que esta apertada agora, por peca.</summary>
     readonly Dictionary<string, (string Nome, long Codigo)> teclaDoControle = [];
 
@@ -5496,8 +5500,24 @@ public partial class EditorCircuito : Border
                     // Uma perna costuma ir ao GND e a outra ao GPIO; nao da
                     // para saber qual de antemao, entao tenta as duas.
                     int gpio = PrimeiroGpio(rede, peca.Id, "1.l", "1.r", "2.l", "2.r");
-                    if (gpio >= 0)
-                        maq.Pressionado[gpio] = BotoesPressionados.Contains(peca.Id);
+                    if (gpio < 0) break;
+                    bool apertado = BotoesPressionados.Contains(peca.Id);
+                    maq.Pressionado[gpio] = apertado;
+
+                    // O outro lado do botao preso no GND ou na alimentacao: apertado,
+                    // o pino vai a esse nivel -- inclusive em INPUT com o pull-up de
+                    // fora (o botao no GND le LOW, e nao HIGH).
+                    bool ladoUm = rede.GpioDe(Atual, peca.Id, "1.l") == gpio || rede.GpioDe(Atual, peca.Id, "1.r") == gpio;
+                    int outro = ladoUm ? Math.Max(NivelFixo(peca, rede, "2.l"), NivelFixo(peca, rede, "2.r"))
+                                       : Math.Max(NivelFixo(peca, rede, "1.l"), NivelFixo(peca, rede, "1.r"));
+                    if (relesSegurando.TryGetValue(peca.Id, out var antes))
+                        foreach (int g in antes) maq.NivelExterno[g] = -1;
+                    if (apertado && outro >= 0)
+                    {
+                        maq.NivelExterno[gpio] = outro;
+                        relesSegurando[peca.Id] = [gpio];
+                    }
+                    else relesSegurando.Remove(peca.Id);
                     break;
                 }
 

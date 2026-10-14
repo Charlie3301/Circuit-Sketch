@@ -1692,6 +1692,12 @@ public class Maquina
     public void PinMode(int p, int modo)
     {
         if (!Valido(p)) return;
+        if (Perfil.SoAnalogico(p))
+        {
+            if (modo != 0) Avisar($"o pino {p} da {Perfil.Nome} e so analogico: nao tem saida nem pull-up (use analogRead).");
+            Modo[p] = 0;
+            return;
+        }
         if (modo == 1 && AvisoSoEntrada(p))
             Avisar($"GPIO {p} e somente entrada no ESP32: nao pode ser OUTPUT.");
         if (modo == 2 && AvisoSoEntrada(p))
@@ -1704,6 +1710,7 @@ public class Maquina
     public void DigitalWrite(int p, int v)
     {
         if (!Valido(p)) return;
+        if (Perfil.SoAnalogico(p)) { Avisar($"digitalWrite no pino {p} da {Perfil.Nome}, que e so analogico: nada acontece."); return; }
         if (AvisoSoEntrada(p))
         { Avisar($"digitalWrite em GPIO {p}, que e somente entrada."); return; }
         v = v != 0 ? 1 : 0;
@@ -1762,13 +1769,16 @@ public class Maquina
     public int DigitalRead(int p)
     {
         if (!Valido(p)) return 0;
+        if (Perfil.SoAnalogico(p)) return 0;      // o core le 0: o pino nao tem porta digital
 
         // Quem impoe nivel manda em tudo, inclusive no pull-up.
         if (NivelExterno[p] >= 0) return NivelExterno[p];
         // Um sinal de fora (o receptor de radio): o nivel deste instante.
         if (SinaisExternos[p] is { } sinal) return sinal.Nivel(TempoObservadoLido);
-        // Botao com INPUT_PULLUP: solto = HIGH, pressionado = LOW.
-        if (Modo[p] == 2) return Pressionado[p] ? 0 : 1;
+        // Botao com INPUT_PULLUP: solto = HIGH, pressionado = LOW. Os GPIO 34
+        // a 39 da ESP32 nao tem o pull-up: o INPUT_PULLUP neles e um INPUT.
+        if (Modo[p] == 2 && !AvisoSoEntrada(p)) return Pressionado[p] ? 0 : 1;
+        if (Modo[p] == 2) return Pressionado[p] ? 0 : Digital[p];
         if (Pressionado[p]) return 1;
         return Digital[p];
     }

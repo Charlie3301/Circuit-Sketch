@@ -90,14 +90,41 @@ public sealed partial class Energia
                                    IReadOnlySet<string> reguladoresDesligados = null,
                                    MemoriaDaEnergia memoria = null, double passo = 0)
     {
+        if (circuito is null) return new Energia();
+        var rede = semResistor ?? new Netlist(circuito, resistorConduz: false);
+
+        // Com PWM ligado em alguma coisa: uma conta por trecho do periodo, e a
+        // media (EnergiaPwm.cs). A carga do capacitor anda uma vez, pela media.
+        var emPwm = PinosEmPwm(circuito, bancada, rede);
+        if (emPwm.Count > 0)
+        {
+            var contatosFixos = contatos?.ToList();
+            var trechos = TrechosDoPeriodo(emPwm)
+                .Select(t => (Um(circuito, bancada, rede, contatosFixos, forcasDosMotores, cargasDinamicas, placasSemCabo,
+                                 reguladoresDesligados, memoria, passo, t.Altos, lembrar: false), t.Peso))
+                .ToList();
+            var media = Media(trechos);
+            media.Lembrar(circuito);
+            return media;
+        }
+        return Um(circuito, bancada, rede, contatos, forcasDosMotores, cargasDinamicas, placasSemCabo,
+                  reguladoresDesligados, memoria, passo, null, lembrar: true);
+    }
+
+    /// <summary>Uma conta, com o PWM de cada pino em HIGH ou em LOW (ou na media, sem trechos).</summary>
+    static Energia Um(Circuito circuito, Bancada bancada, Netlist rede, IEnumerable<Contato> contatos,
+                      IReadOnlyDictionary<string, double> forcasDosMotores, IReadOnlyDictionary<string, double> cargasDinamicas,
+                      IReadOnlySet<string> placasSemCabo, IReadOnlySet<string> reguladoresDesligados,
+                      MemoriaDaEnergia memoria, double passo, IReadOnlyDictionary<(string, int), bool> pwmNoTrecho, bool lembrar)
+    {
         var conta = new Energia();
-        if (circuito is null) return conta;
+        conta.pwmNoTrecho = pwmNoTrecho;
         conta.memoria = memoria;
         conta.passo = passo;
         conta.placasSemCabo = placasSemCabo;
         conta.reguladoresDesligados = reguladoresDesligados;
 
-        conta.rede = semResistor ?? new Netlist(circuito, resistorConduz: false);
+        conta.rede = rede;
         conta.circuitoDaConta = circuito;
         conta.bancada = bancada;
         conta.forcas = forcasDosMotores;
@@ -130,7 +157,7 @@ public sealed partial class Energia
 
         conta.Resolver();
         conta.Medir();
-        conta.Lembrar(circuito);
+        if (lembrar) conta.Lembrar(circuito);
         return conta;
     }
 
@@ -472,7 +499,8 @@ public sealed partial class Energia
                 if (maq.Modo[gpio] != 1) continue;
 
                 bool alto = maq.Pwm[gpio] > 0 || maq.Digital[gpio] == 1;
-                double nivel = alto ? perfil.TensaoDeOperacao * Math.Max(maq.Pwm[gpio], 1) / 255.0 : 0;
+                double nivel = TensaoDoPwm(peca.Id, gpio, maq, perfil.TensaoDeOperacao)
+                               ?? (alto ? perfil.TensaoDeOperacao * Math.Max(maq.Pwm[gpio], 1) / 255.0 : 0);
                 Fornecer(alto ? nivel : 0, 30);
             }
         }

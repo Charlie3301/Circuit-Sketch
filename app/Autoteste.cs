@@ -130,6 +130,9 @@ public static partial class Autoteste
         Bloco("Semicondutores_NoCircuito", Semicondutores_NoCircuito);
         Bloco("Pcb_Base", Pcb_Base);
         Bloco("ModulosDeRele_NoCircuito", ModulosDeRele_NoCircuito);
+        Bloco("Placas_PinoAPino", Placas_PinoAPino);
+        Bloco("Pecas_UmaAUma", Pecas_UmaAUma);
+        Bloco("SemFio_UmAUm", SemFio_UmAUm);
         Bloco("Idiomas_Base", Idiomas_Base);
         Bloco("Projetos_Testados", Projetos_Testados);
         Bloco("Programa_DesfazerERefazer", Programa_DesfazerERefazer);
