@@ -14,18 +14,19 @@ namespace Simulador.App;
 ///   CircuitSketch.exe --desenho &lt;tipo&gt; &lt;arquivo.png&gt; [--zoom N] [--cor id]
 ///                     [--recorte x,y,largura,altura]   (em pixels da peca)
 ///                     [--furos]                         (marca o centro de cada pino)
+///                     [--virada]                        (a PCB pelo lado de baixo)
 ///
 /// O --furos desenha um ponto vermelho no lugar de cada pino do catalogo:
 /// e o que mostra que o desenho novo nao tirou nenhum furo do lugar.
 /// </summary>
 internal static class FotoDePeca
 {
-    public static int Gravar(string tipo, string cor, double zoom, Rect? recorte, bool furos, string png)
+    public static int Gravar(string tipo, string cor, double zoom, Rect? recorte, bool furos, bool virada, string png)
     {
         var def = Catalogo.Obter(tipo);
         if (def is null) return 2;
 
-        var peca = new PecaNoCircuito { Id = "foto", Tipo = tipo, Cor = cor };
+        var peca = new PecaNoCircuito { Id = "foto", Tipo = tipo, Cor = cor, Virada = virada };
         var editor = new EditorCircuito();
         var desenho = editor.DesenhoDa(peca, def);
 
