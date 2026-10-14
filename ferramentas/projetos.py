@@ -280,7 +280,7 @@ def drone():
         confere('a controladora iniciou', 4, serial='Drone pronto'),
         esperar(3.5),
         mexer('controle', giro4=1.0),
-        confere('arma com o acelerador embaixo e o leme para a direita', 4, serial='ARMADO'),
+        confere('arma com o acelerador embaixo e o leme para a direita', 10, serial='ARMADO'),
         mexer('controle', giro4=0.5, giro=0.55),
         confere('com o acelerador em 55% os quatro motores giram', 6, rpm_min=['m1', 'm2', 'm3', 'm4'], valor=5000),
         confere('as quatro helices empurram', 3, empuxo_min=['m1', 'm2', 'm3', 'm4'], valor=50),
@@ -289,7 +289,7 @@ def drone():
         mexer('controle', giro3=0.5, giro=0.0),
         esperar(0.5),
         mexer('controle', giro4=0.0),
-        confere('desarma com o acelerador embaixo e o leme para a esquerda', 4, serial='DESARMADO'),
+        confere('desarma com o acelerador embaixo e o leme para a esquerda', 10, serial='DESARMADO'),
         mexer('controle', giro4=0.5),
     ]
     projeto('drone-quadricoptero', 'Drone quadricoptero (ESP32, ESC 4-em-1, radio FlySky)', [

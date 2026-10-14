@@ -36,7 +36,7 @@
      "nome": "arma com o acelerador embaixo e o leme para a direita",
      "serial": "ARMADO"
     },
-    "ate": 4
+    "ate": 10
    },
    {
     "peca": "controle",
@@ -106,7 +106,7 @@
      "nome": "desarma com o acelerador embaixo e o leme para a esquerda",
      "serial": "DESARMADO"
     },
-    "ate": 4
+    "ate": 10
    },
    {
     "peca": "controle",
