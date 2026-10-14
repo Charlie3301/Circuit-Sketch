@@ -172,6 +172,7 @@ static int ler_pacote(wma_t *w)
     uint8_t b = p[i++];
     if (b & 0x80) {               /* os dados de correcao de erro */
         i += b & 0x0F;
+        if (i + 2 > t) return 1;  /* pacote estragado: o seguinte */
         b = p[i++];
     }
     uint8_t bandeiras = b, propriedades = p[i++];

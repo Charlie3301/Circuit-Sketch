@@ -136,6 +136,7 @@ public static partial class Autoteste
         Bloco("SemFio_UmAUm", SemFio_UmAUm);
         Bloco("Comportamento_EntradasESensores", Comportamento_EntradasESensores);
         Bloco("Comportamento_SaidasEMotores", Comportamento_SaidasEMotores);
+        Bloco("Comportamento_LogicaEModulos", Comportamento_LogicaEModulos);
         Bloco("Idiomas_Base", Idiomas_Base);
         Bloco("Projetos_Testados", Projetos_Testados);
         Bloco("Programa_DesfazerERefazer", Programa_DesfazerERefazer);

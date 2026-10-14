@@ -854,6 +854,13 @@ public sealed partial class Energia
 
         var alimentacao = def.Pinos.FirstOrDefault(p => Netlist.EhPinoDeAlimentacao(p.Nome));
         var terra = def.Pinos.FirstOrDefault(p => Netlist.EhPinoDeTerra(p.Nome));
+        // O modulo I2C (PCF8574) e alimentado pelo conector de 4 pinos (VCC e
+        // GND); o VDD/VSS sao os do LCD, do outro lado.
+        if (peca.Tipo == "modulo-i2c")
+        {
+            alimentacao = def.Pinos.FirstOrDefault(p => p.Nome == "VCC");
+            terra = def.Pinos.FirstOrDefault(p => p.Nome == "GND");
+        }
 
         if (alimentacao is not null && terra is not null && !Netlist.EhFonte(peca.Tipo)
             && !PerfilPlaca.EhPlaca(peca.Tipo))

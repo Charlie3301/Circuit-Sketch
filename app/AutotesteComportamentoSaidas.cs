@@ -67,6 +67,8 @@ public static partial class Autoteste
             Ed.RefletirEstado(b, rede);
         }
         public double Corrente => Math.Abs(Ed.EnergiaDoQuadro.CorrenteDaPeca(P.Id));
+        /// <summary>Depois de um fio novo: o proximo quadro monta o netlist de novo.</summary>
+        public void Remontar() => rede = null;
         public void Ver(string situacao, string esperado, bool ok, string lido)
             => Conferir($"{P.Tipo}: {situacao} -> {esperado}", ok, lido);
     }
