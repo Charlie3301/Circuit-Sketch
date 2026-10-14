@@ -676,6 +676,21 @@ public sealed partial class Energia
                 yield break;
             }
 
+            // O display de 7 segmentos: oito LEDs (A a G e o ponto) com o comum;
+            // como no RGB, o comum no positivo e o de anodo comum.
+            case "7segment":
+            {
+                int comum = Liga("COM.1");
+                bool anodoComum = TemFontePositiva(comum) || NoPositivoDeBateria(circuitoDaConta, peca.Id, "COM.1");
+                foreach (string segmento in new[] { "A", "B", "C", "D", "E", "F", "G", "DP" })
+                {
+                    var r = anodoComum ? Entre("COM.1", segmento, 18, 2.0, 0.012, 0.030)
+                                       : Entre(segmento, "COM.1", 18, 2.0, 0.012, 0.030);
+                    if (r is not null) yield return r with { Rotulo = segmento };
+                }
+                yield break;
+            }
+
             case "led-bar-graph":
                 for (int k = 1; k <= 10; k++)
                 {
@@ -735,6 +750,17 @@ public sealed partial class Energia
                 {
                     var r = Entre(a, b, 50, 0, 0.12, 0.35);
                     if (r is not null) yield return r;
+                }
+                yield break;
+            }
+
+            // O biaxial sao dois motores de passo: quatro bobinas.
+            case "biaxial-stepper":
+            {
+                foreach (var (a, b) in new[] { ("A1+", "A1-"), ("B1+", "B1-"), ("A2+", "A2-"), ("B2+", "B2-") })
+                {
+                    var r = Entre(a, b, 50, 0, 0.12, 0.35);
+                    if (r is not null) yield return r with { Rotulo = a[..2] };
                 }
                 yield break;
             }
@@ -832,8 +858,10 @@ public sealed partial class Energia
         if (alimentacao is not null && terra is not null && !Netlist.EhFonte(peca.Tipo)
             && !PerfilPlaca.EhPlaca(peca.Tipo))
         {
-            var r = Entre(alimentacao.Nome, terra.Nome, ResistenciaDeModulo(peca.Tipo),
-                          0, 0.02, 0.15);
+            double ohms = ResistenciaDeModulo(peca.Tipo), maximo = 0.15;
+            if (peca.Tipo is "neopixel" or "led-ring" or "neopixel-matrix" && FitaDaPeca(peca) is { } fita)
+                (ohms, maximo) = CargaDaFita(fita);
+            var r = Entre(alimentacao.Nome, terra.Nome, ohms, 0, 0.02, maximo);
             if (r is not null) yield return r;
         }
     }
@@ -852,6 +880,44 @@ public sealed partial class Energia
         double maxima = Math.Max(1, peca.MiliAmperes);
         // 8% da tensao caindo na corrente maxima; uma LiPo de drone (100 A) fica em ~0,01 ohm.
         return Math.Clamp(peca.Volts / (maxima / 1000.0) * 0.08, 0.008, 50);
+    }
+
+    /// <summary>
+    /// A fita de LED (WS2812) que um GPIO comanda pelo DIN desta peca. Nula
+    /// sem GPIO no DIN (a fita encadeada no DOUT de outra, ou sem placa):
+    /// ai vale a carga tipica de <see cref="ResistenciaDeModulo"/>.
+    /// </summary>
+    Fita FitaDaPeca(PecaNoCircuito peca)
+    {
+        string raiz = rede.RaizDe(Netlist.No(peca.Id, "DIN"));
+        if (raiz is null) return null;
+        foreach (var placa in circuitoDaConta.Pecas)
+        {
+            var perfil = PerfilPlaca.De(placa.Tipo);
+            var maq = perfil is null ? null : bancada?.De(placa.Id);
+            if (maq is null || maq.Fitas.Count == 0) continue;
+            foreach (var p in Catalogo.Obter(placa.Tipo).Pinos)
+            {
+                int gpio = perfil.Numero(p.Nome);
+                if (gpio >= 0 && maq.Fitas.TryGetValue(gpio, out var fita) && rede.RaizDe(Netlist.No(placa.Id, p.Nome)) == raiz)
+                    return fita;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// A carga da fita pelas cores que ela mostra, em 5 V: cada WS2812B gasta
+    /// ~1 mA parado e ate 20 mA por cor acesa (o branco cheio passa de 60 mA,
+    /// a conta do guia da Adafruit), escalado pelo setBrightness. O maximo e
+    /// o da fita inteira em branco: quem nao aguenta e a fonte, nao ela.
+    /// </summary>
+    static (double Ohms, double Maximo) CargaDaFita(Fita fita)
+    {
+        double ma = fita.Quantidade * 1.0;
+        foreach (int c in fita.Cores)
+            ma += ((c >> 16 & 0xFF) + (c >> 8 & 0xFF) + (c & 0xFF)) / 255.0 * 20.0 * fita.Brilho / 255.0;
+        return (5.0 / (ma / 1000.0), fita.Quantidade * 0.065);
     }
 
     static double ResistenciaDeModulo(string tipo) => tipo switch

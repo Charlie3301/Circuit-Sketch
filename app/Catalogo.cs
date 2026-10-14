@@ -407,6 +407,8 @@ public static class Catalogo
         if (idPeca == "bts7960") yield return ("GND", "B-");
         // O fio vermelho do conector do motor e o + da placa do ULN2003.
         if (idPeca == "uln2003") yield return ("COM", "+");
+        // Os dois comuns do display de 7 segmentos (os pinos 3 e 8) sao um so.
+        if (idPeca == "7segment") { yield return ("COM.1", "COM.2"); yield break; }
         // O GND do cabo de servo do ESC e o - da bateria.
         if (idPeca is "esc" or "esc-4em1") { yield return ("GND", "BAT-"); yield break; }
         // Os modulos chaveados: o - da entrada e o da saida sao a mesma trilha.

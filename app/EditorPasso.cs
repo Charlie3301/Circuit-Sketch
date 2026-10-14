@@ -59,6 +59,21 @@ public partial class EditorCircuito
     double VoltsEntre(PecaNoCircuito peca, string a, string b)
         => EnergiaDoQuadro is { } conta ? conta.TensaoDoPino(peca.Id, a) - conta.TensaoDoPino(peca.Id, b) : 0;
 
+    /// <summary>
+    /// O motor de passo bipolar numa ponte H (o L298N ou o L293D da Stepper.h,
+    /// o TB6612, o DRV8833): as pontas das bobinas nao estao num GPIO, e o
+    /// sentido da corrente em cada bobina e o da tensao entre elas na conta de
+    /// energia. As pontas na ordem do EixoDePasso (A+, B+, A-, B-); nula sem
+    /// conta de energia.
+    /// </summary>
+    bool[] BobinasPelaTensao(PecaNoCircuito motor, string[] pontas)
+    {
+        if (EnergiaDoQuadro is null) return null;
+        const double limiar = 1.0;   // menos que isso nao vence o atrito do rotor
+        double a = VoltsEntre(motor, pontas[0], pontas[2]), b = VoltsEntre(motor, pontas[1], pontas[3]);
+        return [a > limiar, b > limiar, a < -limiar, b < -limiar];
+    }
+
     /// <summary>A4988/DRV8825: conta os passos deste quadro.</summary>
     void AplicarDriverDePasso(PecaNoCircuito peca, Bancada bancada, Netlist rede, double segundos)
     {

@@ -6246,11 +6246,15 @@ public partial class EditorCircuito : Border
         for (int eixo = 0; eixo < 2; eixo++)
         {
             var ligadas = new bool[4];
+            bool algumGpio = false;
             for (int k = 0; k < 4; k++)
             {
                 int gpio = rede.GpioDe(Atual, peca.Id, bobinas[eixo][k]);
+                algumGpio |= gpio >= 0;
                 ligadas[k] = gpio >= 0 && maq.Pwm[gpio] > 127;
             }
+            // Sem GPIO nas pontas: as bobinas numa ponte H (EditorPasso.cs).
+            if (!algumGpio && BobinasPelaTensao(peca, bobinas[eixo]) is { } pelaPonte) ligadas = pelaPonte;
             eixos[eixo].Atualizar(ligadas);
         }
 
@@ -6273,6 +6277,12 @@ public partial class EditorCircuito : Border
 
         string[] bobinas = ["A+", "B+", "A-", "B-"];
         int[] gpios = [.. bobinas.Select(b => rede.GpioDe(Atual, peca.Id, b))];
+        // Sem GPIO nas pontas: as bobinas numa ponte H (EditorPasso.cs).
+        if (gpios.All(g => g < 0))
+        {
+            if (BobinasPelaTensao(peca, bobinas) is { } pelaPonte) eixos[0].Atualizar(pelaPonte);
+            return;
+        }
         eixos[0].Seguir(maq, gpios);
     }
 
