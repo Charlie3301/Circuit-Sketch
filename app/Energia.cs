@@ -563,6 +563,20 @@ public sealed partial class Energia
                 yield break;
             }
 
+            // Os diodos: a queda direta e a resistencia que sobra; o zener tem
+            // o segundo ramo, ao contrario, a partir da tensao dele.
+            case "diodo":
+            case "diodo-zener":
+            case "diodo-schottky":
+            {
+                var ficha = Diodos.Da(peca);
+                var direto = Entre("A", "C", ficha.Resistencia, ficha.Queda, 0.001, ficha.CorrenteMaxima);
+                if (direto is not null) yield return direto with { Rotulo = "diodo" };
+                if (ficha.Zener > 0 && Entre("C", "A", ficha.ResistenciaZener, ficha.Zener, 0.001, ficha.Potencia / ficha.Zener) is { } zener)
+                    yield return zener with { Rotulo = "zener" };
+                yield break;
+            }
+
             case "led":
             {
                 var r = Entre("A", "C", 18, 2.0, 0.012, 0.030);

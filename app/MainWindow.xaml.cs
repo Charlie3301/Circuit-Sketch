@@ -1955,6 +1955,20 @@ public partial class MainWindow : Window
         {
             MontarBarraDoRegulador(peca);
         }
+        else if (Diodos.EhDiodo(peca.Tipo))
+        {
+            var modelos = Diodos.ModelosDe(peca.Tipo);
+            opcoesObjeto.Children.Add(new TextBlock
+            {
+                Text = Idioma.T("Modelo"), Foreground = Cinza, FontSize = 10,
+                VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
+            });
+            Escolha([.. modelos.Select(m => m.Resumo)], Array.IndexOf(modelos, Diodos.Da(peca)), i =>
+            {
+                editor.DefinirModeloSimples(modelos[i].Modelo);
+                AtualizarBarraObjeto();
+            });
+        }
         else if (peca.Tipo == "resistor")
         {
             opcoesObjeto.Children.Add(new TextBlock

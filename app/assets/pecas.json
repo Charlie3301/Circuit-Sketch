@@ -2088,6 +2088,75 @@
   "metades": false
  },
  {
+  "id": "diodo",
+  "largura": 59,
+  "altura": 11,
+  "pinos": [
+   {
+    "nome": "A",
+    "x": 0,
+    "y": 5.67,
+    "sinais": [],
+    "descricao": "Anodo (A): a corrente entra por aqui"
+   },
+   {
+    "nome": "C",
+    "x": 58.93,
+    "y": 5.67,
+    "sinais": [],
+    "descricao": "Catodo (C, o lado da faixa): a corrente sai por aqui"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "diodo-schottky",
+  "largura": 59,
+  "altura": 11,
+  "pinos": [
+   {
+    "nome": "A",
+    "x": 0,
+    "y": 5.67,
+    "sinais": [],
+    "descricao": "Anodo (A)"
+   },
+   {
+    "nome": "C",
+    "x": 58.93,
+    "y": 5.67,
+    "sinais": [],
+    "descricao": "Catodo (C, a faixa): cai so ~0,3 V (o diodo de protecao de bateria e de fonte)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "diodo-zener",
+  "largura": 59,
+  "altura": 11,
+  "pinos": [
+   {
+    "nome": "A",
+    "x": 0,
+    "y": 5.67,
+    "sinais": [],
+    "descricao": "Anodo (A): ligue no GND (no regulador de zener)"
+   },
+   {
+    "nome": "C",
+    "x": 58.93,
+    "y": 5.67,
+    "sinais": [],
+    "descricao": "Catodo (C, a faixa): o lado positivo -- de ponta-cabeca ele segura a tensao do zener"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "dip-switch-8",
   "largura": 83,
   "altura": 55,

@@ -486,6 +486,9 @@ public static class Catalogo
         "helice-1045" => "Helice 1045 (brushless)",
         "helice-5045" => "Helice 5045, 3 pas (drone de 5\")",
         "regulador-7805" => "Regulador de tensão 7805 (78xx)",
+        "diodo" => "Diodo (1N4007, 1N4148...)",
+        "diodo-zener" => "Diodo Zener",
+        "diodo-schottky" => "Diodo Schottky",
         "ams1117" => "Regulador AMS1117 (3,3 V)",
         "lm2596" => "Regulador step-down LM2596",
         "mt3608" => "Regulador step-up MT3608",
@@ -528,6 +531,7 @@ public static class Catalogo
             or "roda-tt" or "helice-130" or "helice-1045" or "helice-5045" => "Motores",
 
         "resistor" or "junction" or "ldr" => "Passivos",
+        "diodo" or "diodo-zener" or "diodo-schottky" => "Semicondutores",
         "vcc-symbol" or "gnd-symbol" or "bateria"
             or "regulador-7805" or "ams1117" or "lm2596" or "mt3608" => "Alimentacao",
 

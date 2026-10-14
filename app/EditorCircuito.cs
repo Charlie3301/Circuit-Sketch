@@ -2191,6 +2191,7 @@ public partial class EditorCircuito : Border
         if (peca.Tipo == "pushbutton") return ligado ? "pushbutton-pressionado" : "pushbutton-solto";
         if (EhEsc(peca.Tipo) && (peca.Amperes > 0 || peca.Acabamento is not null)) return NomeSvgDoEsc(peca);
         if (Reguladores.EhRegulador(peca.Tipo)) return NomeSvgDoRegulador(peca);
+        if (Diodos.EhDiodo(peca.Tipo)) return Diodos.Da(peca).Svg ?? peca.Tipo;
         return peca.Tipo;
     }
 
@@ -4723,6 +4724,17 @@ public partial class EditorCircuito : Border
         if (peca is null || !EhEsc(peca.Tipo)) return;
         if (amperes is { } a) peca.Amperes = a;
         if (cor is not null) peca.Acabamento = cor;
+        if (visuais.TryGetValue(peca.Id, out var v) && v is Image img)
+            img.Source = Pecas.Obter(NomeSvg(peca, false));
+        Mudou?.Invoke();
+    }
+
+    /// <summary>O modelo da peca selecionada (o diodo, o transistor): troca o desenho e a ficha.</summary>
+    public void DefinirModeloSimples(string modelo)
+    {
+        var peca = Selecionada;
+        if (peca is null) return;
+        peca.Modelo = modelo;
         if (visuais.TryGetValue(peca.Id, out var v) && v is Image img)
             img.Source = Pecas.Obter(NomeSvg(peca, false));
         Mudou?.Invoke();

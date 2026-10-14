@@ -423,6 +423,23 @@ public partial class EditorCircuito
                 case "led":
                     AvaliarLed(peca, conta.CorrenteDoRamo(peca.Id, "led"), "o LED");
                     break;
+                case "diodo":
+                case "diodo-zener":
+                case "diodo-schottky":
+                {
+                    // Acima do dobro da corrente da ficha, queima; acima dela, esquenta.
+                    var ficha = Diodos.Da(peca);
+                    double i = Math.Abs(conta.CorrenteDoRamo(peca.Id, "diodo"));
+                    if (i > ficha.CorrenteMaxima * 2)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("o {0} conduziu {1:0.##} A, e aguenta {2:0.##} A: queimou.", ficha.Nome, i, ficha.CorrenteMaxima)));
+                    else if (i > ficha.CorrenteMaxima * 1.05)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("o {0} está com {1:0.##} A, acima dos {2:0.##} A da ficha: esquenta.", ficha.Nome, i, ficha.CorrenteMaxima), Queimou: false));
+                    // O zener: o que passa ao contrario vezes a tensao dele vira calor.
+                    double pz = Math.Abs(conta.CorrenteDoRamo(peca.Id, "zener")) * ficha.Zener;
+                    if (ficha.Zener > 0 && pz > ficha.Potencia * 1.5)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("o {0} está dissipando {1:0.##} W, e aguenta {2:0.#} W: queimou. Ponha um resistor em série para limitar a corrente.", ficha.Nome, pz, ficha.Potencia)));
+                    break;
+                }
                 case "rgb-led":
                     foreach (string cor in new[] { "R", "G", "B" })
                         AvaliarLed(peca, conta.CorrenteDoRamo(peca.Id, cor), $"a cor {cor} do LED RGB");
