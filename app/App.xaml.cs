@@ -261,7 +261,7 @@ public partial class App : Application
             }
             int codigo;
             try { codigo = FotoDePeca.Gravar(e.Args[iDesenho + 1], Valor("--cor"), Valor("--braco"), zoom, recorte, Array.IndexOf(e.Args, "--furos") >= 0, Array.IndexOf(e.Args, "--virada") >= 0, e.Args[iDesenho + 2],
-                                               Valor("--modelo"), int.TryParse(Valor("--bits"), out int bits) ? bits : 0); }
+                                               Valor("--modelo"), int.TryParse(Valor("--bits"), out int bits) ? bits : 0, Valor("--svg")); }
             catch (Exception erro) { Registrar("--desenho", erro); codigo = 1; }
             Shutdown(codigo);
             return;

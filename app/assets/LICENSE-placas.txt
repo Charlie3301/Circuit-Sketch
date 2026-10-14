@@ -1,0 +1,21 @@
+Desenhos das placas (CircuitSketch, Alpha 25)
+=============================================
+
+Os desenhos abaixo foram feitos a partir dos arquivos de projeto publicados
+pelos autores das placas (a posicao de cada componente, as trilhas, as ilhas
+e a serigrafia). Por isso, estes desenhos derivados sao distribuidos sob a
+mesma licenca dos originais: Creative Commons Atribuicao-CompartilhaIgual 4.0
+Internacional (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0/
+
+  - arduino-uno.svg, arduino-mega.svg, arduino-nano.svg e
+    nano-rp2040-connect.svg: derivados dos arquivos de projeto do Arduino UNO
+    Rev3e, do Arduino MEGA 2560 Rev3e, do Arduino Nano V3.3 e do Arduino Nano
+    RP2040 Connect, (c) Arduino, CC BY-SA 4.0 (docs.arduino.cc).
+    Arduino e uma marca registrada da Arduino SA; o nome aparece so para
+    identificar as placas, e o logotipo nao e reproduzido.
+
+  - franzininho.svg: derivado do projeto da Franzininho DIY (Fabio Souza e a
+    comunidade Franzininho), CC BY-SA 4.0
+    (github.com/Franzininho/franzininho-diy-board).
+
+O restante do CircuitSketch nao e afetado por esta licenca.

@@ -1,0 +1,4 @@
+Franzininho.kicad_pcb: o projeto da placa Franzininho DIY (Fabio Souza e a
+comunidade Franzininho), de github.com/Franzininho/franzininho-diy-board,
+licenciado sob Creative Commons Atribuicao-CompartilhaIgual 4.0 Internacional
+(CC BY-SA 4.0): https://creativecommons.org/licenses/by-sa/4.0/

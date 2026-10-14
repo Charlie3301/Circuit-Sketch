@@ -192,7 +192,9 @@ public static partial class Autoteste
         double v = conta.TensaoDoPino("placa", n) - conta.TensaoDoPino("placa", gnd);
         string limpo = n.Split('.')[0];
         (double min, double max) faixa = EhTres(n) ? (3.1, 3.45)
-            : limpo is "5V" or "VBUS" or "VUSB" or "IOREF" ? (4.4, 5.2)
+            : limpo is "5V" or "VBUS" or "VUSB" ? (4.4, 5.2)
+            // o IOREF diz a tensao dos pinos: 5 V no Uno e na Mega, 3,3 V nas Nucleo
+            : limpo is "IOREF" ? (perfil.TensaoDeOperacao - 0.3, perfil.TensaoDeOperacao + 0.2)
             : limpo is "VIN" or "VSYS" ? (0, 5.2)          // na USB o VIN e uma entrada: pode ficar sem nada
             : (perfil.TensaoDeOperacao - 0.3, 5.2);           // VCC, VDD: o trilho do chip
         Conferir($"{perfil.Id} {n}: alimentacao na USB -- {faixa.min:0.0} a {faixa.max:0.0} V com 1 kohm",

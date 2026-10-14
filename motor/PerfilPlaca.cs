@@ -346,7 +346,9 @@ public partial record PerfilPlaca(
         SdaPadrao = 20, SclPadrao = 21,
         NomesDoCore = Core(Pares(("SDA", 20), ("SCL", 21),
                                  ("SS", 53), ("MOSI", 51), ("MISO", 50), ("SCK", 52))),
-        Numero = nome => SoDigitos(nome) is var d && d >= 0 ? d : Analogico(nome, 54)
+        // O SDA e o SCL de cima, ao lado do AREF (o lugar do Uno R3), sao o 20 e o 21.
+        Numero = nome => SoDigitos(nome) is var d && d >= 0 ? d
+                       : Base(nome) switch { "SDA" => 20, "SCL" => 21, _ => Analogico(nome, 54) }
     };
 
     public static readonly PerfilPlaca Nano = new(
@@ -376,7 +378,9 @@ public partial record PerfilPlaca(
         SdaPadrao = 18, SclPadrao = 19,   // A4 e A5
         NomesDoCore = Core(BarramentosDoUno()),
         NomePorRegra = nome => ComPrefixo(nome, "D"),
-        Numero = nome => ComPrefixo(nome, "D") is var d && d >= 0 ? d : Analogico(nome, 14)
+        // O TX e o RX da barra sao o D1 e o D0 (a Serial1).
+        Numero = nome => ComPrefixo(nome, "D") is var d && d >= 0 ? d
+                       : Base(nome) switch { "TX" => 1, "RX" => 0, _ => Analogico(nome, 14) }
     };
 
     public static readonly PerfilPlaca Franzininho = new(

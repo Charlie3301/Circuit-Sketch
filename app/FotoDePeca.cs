@@ -17,6 +17,7 @@ namespace Simulador.App;
 ///                     [--virada]                        (a PCB pelo lado de baixo)
 ///                     [--braco id]                      (o braco do servo: nenhum, simples, duplo...)
 ///                     [--modelo id] [--bits n]          (a pilha do suporte; os slots vazios, em bits)
+///                     [--svg arquivo.svg]               (um SVG de fora no lugar do da peca, para testar)
 ///
 /// O --furos desenha um ponto vermelho no lugar de cada pino do catalogo:
 /// e o que mostra que o desenho novo nao tirou nenhum furo do lugar.
@@ -24,10 +25,11 @@ namespace Simulador.App;
 internal static class FotoDePeca
 {
     public static int Gravar(string tipo, string cor, string braco, double zoom, Rect? recorte, bool furos, bool virada, string png,
-                             string modelo = null, int bits = 0)
+                             string modelo = null, int bits = 0, string svg = null)
     {
         var def = Catalogo.Obter(tipo);
         if (def is null) return 2;
+        if (svg is not null) Pecas.DefinirDesenho(tipo, File.ReadAllText(svg));
 
         var peca = new PecaNoCircuito { Id = "foto", Tipo = tipo, Cor = cor, Virada = virada, Braco = braco, Modelo = modelo, Bits = bits };
         var editor = new EditorCircuito();
@@ -46,7 +48,7 @@ internal static class FotoDePeca
                 tela.Children.Add(ponto);
             }
 
-        const double margem = 8;
+        const double margem = 16;
         var moldura = new Border
         {
             Background = new SolidColorBrush(Color.FromRgb(0x26, 0x27, 0x2B)),

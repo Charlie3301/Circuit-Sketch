@@ -875,7 +875,7 @@ public class Netlist
     /// <summary>Nome de pino de alimentacao ("5V", "3V3", "VIN", "V+"...).</summary>
     public static bool EhPinoDeAlimentacao(string pino)
         => SemSufixo(pino) is "3V3" or "3.3V" or "5V" or "VIN" or "VCC" or "VDD"
-                           or "VBUS" or "VUSB" or "V+";
+                           or "VBUS" or "VUSB" or "V+" or "IOREF";
 
     /// <summary>
     /// Tira so o sufixo de repeticao ("5V.2" -> "5V").

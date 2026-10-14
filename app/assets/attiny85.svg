@@ -1,39 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-     width="10.2mm" height="12.0mm" viewBox="0 0 10.2 12.0">
-
-  <rect x="0" y="0" width="10.2" height="12.0" rx="1.4" fill="#23272e"/>
-  <rect x="0" y="0" width="10.2" height="12.0" rx="1.4"
-        fill="none" stroke="#14171c" stroke-width="0.3"/>
-
-  <path d="M 3.50 0.3 A 1.6 1.6 0 0 0 6.70 0.3" fill="none" stroke="#3a3f48" stroke-width="0.3"/>
-  <circle cx="2.6" cy="2.0" r="0.5" fill="#3a3f48"/>
-
-  <rect x="0.50" y="1.60" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="1.50" cy="2.60" r="0.55" fill="#14181f"/>
-  <rect x="0.50" y="4.14" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="1.50" cy="5.14" r="0.55" fill="#14181f"/>
-  <rect x="0.50" y="6.68" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="1.50" cy="7.68" r="0.55" fill="#14181f"/>
-  <rect x="0.50" y="9.22" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="1.50" cy="10.22" r="0.55" fill="#14181f"/>
-  <rect x="7.70" y="9.22" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="8.70" cy="10.22" r="0.55" fill="#14181f"/>
-  <rect x="7.70" y="6.68" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="8.70" cy="7.68" r="0.55" fill="#14181f"/>
-  <rect x="7.70" y="4.14" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="8.70" cy="5.14" r="0.55" fill="#14181f"/>
-  <rect x="7.70" y="1.60" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="8.70" cy="2.60" r="0.55" fill="#14181f"/>
-  <text x="3.20" y="3.10" fill="#cfd8e3" font-size="1.2px" font-family="Verdana">PB5</text>
-  <text x="3.20" y="5.64" fill="#cfd8e3" font-size="1.2px" font-family="Verdana">PB3</text>
-  <text x="3.20" y="8.18" fill="#cfd8e3" font-size="1.2px" font-family="Verdana">PB4</text>
-  <text x="3.20" y="10.72" fill="#cfd8e3" font-size="1.2px" font-family="Verdana">GND</text>
-  <text x="7.00" y="10.72" fill="#cfd8e3" font-size="1.2px" text-anchor="end" font-family="Verdana">PB2</text>
-  <text x="7.00" y="8.18" fill="#cfd8e3" font-size="1.2px" text-anchor="end" font-family="Verdana">PB1</text>
-  <text x="7.00" y="5.64" fill="#cfd8e3" font-size="1.2px" text-anchor="end" font-family="Verdana">PB0</text>
-  <text x="7.00" y="3.10" fill="#cfd8e3" font-size="1.2px" text-anchor="end" font-family="Verdana">VCC</text>
-
-  <text x="5.10" y="7.37" fill="#cfd8e3"
-        font-size="2.2px" text-anchor="middle" font-family="Verdana"
-        opacity="0.85">ATtiny85</text>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="39px" height="45px" viewBox="0 0 39 45">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+</defs>
+<rect x="5.421" y="6.958" width="2.079" height="5.745" fill="url(#metal)"/>
+<rect x="3.777" y="8.885" width="1.644" height="1.89" fill="url(#metal)"/>
+<rect x="31.5" y="6.958" width="2.079" height="5.745" fill="url(#metal)"/>
+<rect x="33.579" y="8.885" width="1.644" height="1.89" fill="url(#metal)"/>
+<rect x="5.421" y="16.558" width="2.079" height="5.745" fill="url(#metal)"/>
+<rect x="3.777" y="18.485" width="1.644" height="1.89" fill="url(#metal)"/>
+<rect x="31.5" y="16.558" width="2.079" height="5.745" fill="url(#metal)"/>
+<rect x="33.579" y="18.485" width="1.644" height="1.89" fill="url(#metal)"/>
+<rect x="5.421" y="26.158" width="2.079" height="5.745" fill="url(#metal)"/>
+<rect x="3.777" y="28.085" width="1.644" height="1.89" fill="url(#metal)"/>
+<rect x="31.5" y="26.158" width="2.079" height="5.745" fill="url(#metal)"/>
+<rect x="33.579" y="28.085" width="1.644" height="1.89" fill="url(#metal)"/>
+<rect x="5.421" y="35.758" width="2.079" height="5.745" fill="url(#metal)"/>
+<rect x="3.777" y="37.685" width="1.644" height="1.89" fill="url(#metal)"/>
+<rect x="31.5" y="35.758" width="2.079" height="5.745" fill="url(#metal)"/>
+<rect x="33.579" y="37.685" width="1.644" height="1.89" fill="url(#metal)"/>
+<rect x="7.5" y="6.712" width="24" height="35.036" rx="1.323" fill="#1f2023"/>
+<rect x="7.5" y="6.712" width="24" height="35.036" rx="1.323" fill="url(#luz)"/>
+<rect x="8.539" y="7.657" width="21.921" height="33.146" rx="1.134" fill="none" stroke="#2c2e33" stroke-width="0.454"/>
+<path d="M16.098 6.712 A3.402 3.402 0 0 0 22.902 6.712 Z" fill="#121316"/>
+<circle cx="11.941" cy="11.625" r="1.436" fill="#2f3136"/>
+<text transform="translate(17.421 24.23) rotate(-90)" x="0" y="1.795" font-family="Arial" font-weight="normal" font-size="4.488" fill="#c3c6cb" text-anchor="middle">ATTINY85</text>
+<text transform="translate(22.335 24.23) rotate(-90)" x="0" y="1.417" font-family="Arial" font-weight="normal" font-size="3.543" fill="#c3c6cb" text-anchor="middle">20PU</text>
+<text transform="translate(26.492 24.23) rotate(-90)" x="0" y="1.134" font-family="Arial" font-weight="normal" font-size="2.835" fill="#c3c6cb" text-anchor="middle">1932</text>
 </svg>

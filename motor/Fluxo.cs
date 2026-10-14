@@ -29,7 +29,11 @@ public sealed class FluxoDeEntrada
         lock (trava)
             foreach (byte b in dados)
                 if (bytes.Count < Teto) bytes.Enqueue(b);
+        if (dados.Length > 0) UltimaChegadaMs = Environment.TickCount64;
     }
+
+    /// <summary>Quando chegou o ultimo byte (Environment.TickCount64): o LED RX da placa pisca por aqui.</summary>
+    public long UltimaChegadaMs { get; private set; } = long.MinValue / 2;
 
     public int Disponivel { get { lock (trava) return bytes.Count; } }
 

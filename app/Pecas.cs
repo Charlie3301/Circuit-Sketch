@@ -35,6 +35,29 @@ public static class Pecas
     /// </summary>
     static readonly Dictionary<string, Rect> tintas = [];
 
+    /// <summary>
+    /// A arte que passa da caixa da peca, por igual dos dois lados (o
+    /// data-sobra="x y" do SVG, em pixels): o USB-B da placa Arduino sai
+    /// 6,35 mm da placa. O editor desenha a imagem maior, com a sobra para
+    /// fora da caixa -- o centro (o giro) e os pinos ficam onde estavam.
+    /// </summary>
+    static readonly Dictionary<string, Vector> sobras = [];
+
+    static void LerSobra(string nome, string svg)
+    {
+        sobras.Remove(nome);
+        if (Atributo(svg[..Math.Max(0, svg.IndexOf('>'))], "data-sobra") is { } sobra
+            && sobra.Split(' ', StringSplitOptions.RemoveEmptyEntries) is { Length: 2 } partes
+            && Numero(partes[0], out double sx) && Numero(partes[1], out double sy))
+            sobras[nome] = new Vector(sx, sy);
+    }
+
+    public static Vector SobraDe(string nome)
+    {
+        if (!cache.ContainsKey(nome)) Obter(nome);
+        return sobras.GetValueOrDefault(nome);
+    }
+
     internal static Rect TintaDeParaTeste(string nome) => TintaDe(nome);
 
     internal static Rect TintaDe(string nome)
@@ -220,6 +243,7 @@ public static class Pecas
         {
             try
             {
+                LerSobra(nome, proprio);
                 var feito = Ler(proprio);
                 if (feito is null) { Falhou(nome, "SVG proprio nao pode ser lido"); return null; }
 
@@ -257,6 +281,7 @@ public static class Pecas
         original.CopyTo(memoria);
         string texto = System.Text.Encoding.UTF8.GetString(memoria.ToArray());
         memoria.Position = 0;
+        LerSobra(nome, texto);
 
         try
         {
@@ -357,10 +382,6 @@ public static class Pecas
     /// </summary>
     static readonly Dictionary<string, Vector> AjustesDeArte = new()
     {
-        // A placa comecava 25,7 px para dentro e vazava o mesmo tanto
-        // para fora da direita: o viewBox tem -4 de folga so na esquerda.
-        ["arduino-mega"] = new Vector(-25.7, 0),
-
         // O corpo do motor comecava abaixo do topo da caixa. O ajuste
         // e pequeno de proposito: a tinta medida inclui um elemento
         // invisivel que desce mais que o desenho, e corrigir por ela

@@ -178,8 +178,18 @@ public partial class MainWindow : Window
         editor.SelecaoMudou += AtualizarBarraObjeto;
         editor.SelecaoMudou += () => AtualizarComponentes();
         editor.MenuPedido += MontarMenuDoCircuito;
-        editor.ResetApertado += SegurarReset;
+        editor.ResetApertado += id => SegurarReset(id);
         editor.ResetSolto += SoltarReset;
+        // O RESET da barra ligado no GND (por fio ou por um botao): a placa
+        // fica parada enquanto ele estiver la. Parada a simulacao, a janela
+        // esquece e o editor pergunta de novo quando ela rodar.
+        editor.ResetPorFioMudou += (id, preso) =>
+        {
+            bool rodando = btParar.IsEnabled && programas.ContainsKey(id);
+            if (!rodando) { if (preso) editor.EsquecerResetPorFio(id); return; }
+            if (preso) SegurarReset(id, "o RESET está ligado no GND: a placa fica parada até ele sair.");
+            else SoltarReset(id);
+        };
         editor.PecaSolta += peca =>
             Aviso($"adicionado: {Catalogo.Obter(peca.Tipo)?.Nome}");
 
@@ -5058,7 +5068,7 @@ public partial class MainWindow : Window
     /// embaixo. As outras placas da bancada seguem rodando -- cada uma tem o
     /// seu botao, como na mesa do laboratorio.
     /// </summary>
-    void SegurarReset(string idDaPlaca)
+    void SegurarReset(string idDaPlaca, string motivo = null)
     {
         if (!btParar.IsEnabled)
         {
@@ -5081,7 +5091,7 @@ public partial class MainWindow : Window
 
         maquina.Desligar();
         if (rede is not null) editor.RefletirEstado(bancada, rede);
-        Aviso(NomeCurtoDaPlaca(idDaPlaca).Trim('[', ']') + ": RESET segurado, solte para reiniciar.");
+        Aviso(NomeCurtoDaPlaca(idDaPlaca).Trim('[', ']') + ": " + (motivo ?? "RESET segurado, solte para reiniciar."));
     }
 
     /// <summary>RESET solto: a placa recomeca do setup(), com o monitor seguindo.</summary>

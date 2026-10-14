@@ -350,13 +350,13 @@
  },
  {
   "id": "arduino-mega",
-  "largura": 388,
+  "largura": 399,
   "altura": 202,
   "pinos": [
    {
     "nome": "SCL",
-    "x": 90,
-    "y": 9.0,
+    "x": 86.25,
+    "y": 9.55,
     "sinais": [
      "i2c"
     ],
@@ -364,8 +364,8 @@
    },
    {
     "nome": "SDA",
-    "x": 100,
-    "y": 9.0,
+    "x": 95.85,
+    "y": 9.55,
     "sinais": [
      "i2c"
     ],
@@ -373,15 +373,15 @@
    },
    {
     "nome": "AREF",
-    "x": 109,
-    "y": 9.0,
+    "x": 105.45,
+    "y": 9.55,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "GND.1",
-    "x": 119,
-    "y": 9.0,
+    "x": 115.05,
+    "y": 9.55,
     "sinais": [
      "power"
     ],
@@ -389,8 +389,8 @@
    },
    {
     "nome": "13",
-    "x": 129,
-    "y": 9.0,
+    "x": 124.65,
+    "y": 9.55,
     "sinais": [
      "pwm"
     ],
@@ -398,8 +398,8 @@
    },
    {
     "nome": "12",
-    "x": 138,
-    "y": 9.0,
+    "x": 134.25,
+    "y": 9.55,
     "sinais": [
      "pwm"
     ],
@@ -407,8 +407,8 @@
    },
    {
     "nome": "11",
-    "x": 148,
-    "y": 9.0,
+    "x": 143.85,
+    "y": 9.55,
     "sinais": [
      "pwm"
     ],
@@ -416,8 +416,8 @@
    },
    {
     "nome": "10",
-    "x": 157.5,
-    "y": 9.0,
+    "x": 153.45,
+    "y": 9.55,
     "sinais": [
      "pwm"
     ],
@@ -425,8 +425,8 @@
    },
    {
     "nome": "9",
-    "x": 167.5,
-    "y": 9.0,
+    "x": 163.05,
+    "y": 9.55,
     "sinais": [
      "pwm"
     ],
@@ -434,8 +434,8 @@
    },
    {
     "nome": "8",
-    "x": 177,
-    "y": 9.0,
+    "x": 172.65,
+    "y": 9.55,
     "sinais": [
      "pwm"
     ],
@@ -443,8 +443,8 @@
    },
    {
     "nome": "7",
-    "x": 190,
-    "y": 9.0,
+    "x": 188.01,
+    "y": 9.55,
     "sinais": [
      "pwm"
     ],
@@ -452,8 +452,8 @@
    },
    {
     "nome": "6",
-    "x": 200,
-    "y": 9.0,
+    "x": 197.61,
+    "y": 9.55,
     "sinais": [
      "pwm"
     ],
@@ -461,8 +461,8 @@
    },
    {
     "nome": "5",
-    "x": 209.5,
-    "y": 9.0,
+    "x": 207.21,
+    "y": 9.55,
     "sinais": [
      "pwm"
     ],
@@ -470,8 +470,8 @@
    },
    {
     "nome": "4",
-    "x": 219,
-    "y": 9.0,
+    "x": 216.81,
+    "y": 9.55,
     "sinais": [
      "pwm"
     ],
@@ -479,8 +479,8 @@
    },
    {
     "nome": "3",
-    "x": 228.5,
-    "y": 9.0,
+    "x": 226.41,
+    "y": 9.55,
     "sinais": [
      "pwm"
     ],
@@ -488,8 +488,8 @@
    },
    {
     "nome": "2",
-    "x": 238,
-    "y": 9.0,
+    "x": 236.01,
+    "y": 9.55,
     "sinais": [
      "pwm"
     ],
@@ -497,8 +497,8 @@
    },
    {
     "nome": "1",
-    "x": 247.5,
-    "y": 9.0,
+    "x": 245.61,
+    "y": 9.55,
     "sinais": [
      "usart"
     ],
@@ -506,8 +506,8 @@
    },
    {
     "nome": "0",
-    "x": 257.5,
-    "y": 9.0,
+    "x": 255.21,
+    "y": 9.55,
     "sinais": [
      "usart"
     ],
@@ -515,8 +515,8 @@
    },
    {
     "nome": "14",
-    "x": 270.5,
-    "y": 9.0,
+    "x": 274.41,
+    "y": 9.55,
     "sinais": [
      "usart"
     ],
@@ -524,8 +524,8 @@
    },
    {
     "nome": "15",
-    "x": 280,
-    "y": 9.0,
+    "x": 284.01,
+    "y": 9.55,
     "sinais": [
      "usart"
     ],
@@ -533,8 +533,8 @@
    },
    {
     "nome": "16",
-    "x": 289.5,
-    "y": 9.0,
+    "x": 293.61,
+    "y": 9.55,
     "sinais": [
      "usart"
     ],
@@ -542,8 +542,8 @@
    },
    {
     "nome": "17",
-    "x": 299,
-    "y": 9.0,
+    "x": 303.21,
+    "y": 9.55,
     "sinais": [
      "usart"
     ],
@@ -551,8 +551,8 @@
    },
    {
     "nome": "18",
-    "x": 308.5,
-    "y": 9.0,
+    "x": 312.81,
+    "y": 9.55,
     "sinais": [
      "usart"
     ],
@@ -560,8 +560,8 @@
    },
    {
     "nome": "19",
-    "x": 318.5,
-    "y": 9.0,
+    "x": 322.41,
+    "y": 9.55,
     "sinais": [
      "usart"
     ],
@@ -569,8 +569,8 @@
    },
    {
     "nome": "20",
-    "x": 328,
-    "y": 9.0,
+    "x": 332.01,
+    "y": 9.55,
     "sinais": [
      "i2c"
     ],
@@ -578,8 +578,8 @@
    },
    {
     "nome": "21",
-    "x": 337.5,
-    "y": 9.0,
+    "x": 341.61,
+    "y": 9.55,
     "sinais": [
      "i2c"
     ],
@@ -587,8 +587,8 @@
    },
    {
     "nome": "5V.1",
-    "x": 361,
-    "y": 8.0,
+    "x": 370.41,
+    "y": 9.55,
     "sinais": [
      "power"
     ],
@@ -596,8 +596,8 @@
    },
    {
     "nome": "5V.2",
-    "x": 371,
-    "y": 8.0,
+    "x": 380.01,
+    "y": 9.55,
     "sinais": [
      "power"
     ],
@@ -605,162 +605,162 @@
    },
    {
     "nome": "22",
-    "x": 361,
-    "y": 17.5,
+    "x": 370.41,
+    "y": 19.15,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "23",
-    "x": 371,
-    "y": 17.5,
+    "x": 380.01,
+    "y": 19.15,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "24",
-    "x": 361,
-    "y": 27.25,
+    "x": 370.41,
+    "y": 28.75,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "25",
-    "x": 371,
-    "y": 27.25,
+    "x": 380.01,
+    "y": 28.75,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "26",
-    "x": 361,
-    "y": 36.75,
+    "x": 370.41,
+    "y": 38.35,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "27",
-    "x": 371,
-    "y": 36.75,
+    "x": 380.01,
+    "y": 38.35,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "28",
-    "x": 361,
-    "y": 46.24,
+    "x": 370.41,
+    "y": 47.95,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "29",
-    "x": 371,
-    "y": 46.24,
+    "x": 380.01,
+    "y": 47.95,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "30",
-    "x": 361,
-    "y": 56.0,
+    "x": 370.41,
+    "y": 57.55,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "31",
-    "x": 371,
-    "y": 56.0,
+    "x": 380.01,
+    "y": 57.55,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "32",
-    "x": 361,
-    "y": 65.5,
+    "x": 370.41,
+    "y": 67.15,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "33",
-    "x": 371,
-    "y": 65.5,
+    "x": 380.01,
+    "y": 67.15,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "34",
-    "x": 361,
-    "y": 75.0,
+    "x": 370.41,
+    "y": 76.75,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "35",
-    "x": 371,
-    "y": 75.0,
+    "x": 380.01,
+    "y": 76.75,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "36",
-    "x": 361,
-    "y": 84.5,
+    "x": 370.41,
+    "y": 86.35,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "37",
-    "x": 371,
-    "y": 84.5,
+    "x": 380.01,
+    "y": 86.35,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "38",
-    "x": 361,
-    "y": 94.25,
+    "x": 370.41,
+    "y": 95.95,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "39",
-    "x": 371,
-    "y": 94.25,
+    "x": 380.01,
+    "y": 95.95,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "40",
-    "x": 361,
-    "y": 103.75,
+    "x": 370.41,
+    "y": 105.55,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "41",
-    "x": 371,
-    "y": 103.75,
+    "x": 380.01,
+    "y": 105.55,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "42",
-    "x": 361,
-    "y": 113.5,
+    "x": 370.41,
+    "y": 115.15,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "43",
-    "x": 371,
-    "y": 113.5,
+    "x": 380.01,
+    "y": 115.15,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "44",
-    "x": 361,
-    "y": 123.0,
+    "x": 370.41,
+    "y": 124.75,
     "sinais": [
      "pwm"
     ],
@@ -768,8 +768,8 @@
    },
    {
     "nome": "45",
-    "x": 371,
-    "y": 123.0,
+    "x": 380.01,
+    "y": 124.75,
     "sinais": [
      "pwm"
     ],
@@ -777,8 +777,8 @@
    },
    {
     "nome": "46",
-    "x": 361,
-    "y": 132.74,
+    "x": 370.41,
+    "y": 134.35,
     "sinais": [
      "pwm"
     ],
@@ -786,29 +786,29 @@
    },
    {
     "nome": "47",
-    "x": 371,
-    "y": 132.74,
+    "x": 380.01,
+    "y": 134.35,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "48",
-    "x": 361,
-    "y": 142.24,
+    "x": 370.41,
+    "y": 143.95,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "49",
-    "x": 371,
-    "y": 142.24,
+    "x": 380.01,
+    "y": 143.95,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "50",
-    "x": 361,
-    "y": 152.0,
+    "x": 370.41,
+    "y": 153.55,
     "sinais": [
      "spi"
     ],
@@ -816,8 +816,8 @@
    },
    {
     "nome": "51",
-    "x": 371,
-    "y": 152.0,
+    "x": 380.01,
+    "y": 153.55,
     "sinais": [
      "spi"
     ],
@@ -825,8 +825,8 @@
    },
    {
     "nome": "52",
-    "x": 361,
-    "y": 161.5,
+    "x": 370.41,
+    "y": 163.15,
     "sinais": [
      "spi"
     ],
@@ -834,15 +834,15 @@
    },
    {
     "nome": "53",
-    "x": 371,
-    "y": 161.5,
+    "x": 380.01,
+    "y": 163.15,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "GND.4",
-    "x": 361,
-    "y": 171.25,
+    "x": 370.41,
+    "y": 172.75,
     "sinais": [
      "power"
     ],
@@ -850,8 +850,8 @@
    },
    {
     "nome": "GND.5",
-    "x": 371,
-    "y": 171.25,
+    "x": 380.01,
+    "y": 172.75,
     "sinais": [
      "power"
     ],
@@ -859,22 +859,22 @@
    },
    {
     "nome": "IOREF",
-    "x": 136,
-    "y": 191.53,
+    "x": 130.41,
+    "y": 191.95,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "RESET",
-    "x": 145.5,
-    "y": 191.53,
+    "x": 140.01,
+    "y": 191.95,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "3.3V",
-    "x": 155,
-    "y": 191.53,
+    "x": 149.61,
+    "y": 191.95,
     "sinais": [
      "power"
     ],
@@ -882,8 +882,8 @@
    },
    {
     "nome": "5V",
-    "x": 164.5,
-    "y": 191.53,
+    "x": 159.21,
+    "y": 191.95,
     "sinais": [
      "power"
     ],
@@ -891,8 +891,8 @@
    },
    {
     "nome": "GND.2",
-    "x": 174.25,
-    "y": 191.53,
+    "x": 168.81,
+    "y": 191.95,
     "sinais": [
      "power"
     ],
@@ -900,8 +900,8 @@
    },
    {
     "nome": "GND.3",
-    "x": 183.75,
-    "y": 191.53,
+    "x": 178.41,
+    "y": 191.95,
     "sinais": [
      "power"
     ],
@@ -909,8 +909,8 @@
    },
    {
     "nome": "VIN",
-    "x": 193.5,
-    "y": 191.53,
+    "x": 188.01,
+    "y": 191.95,
     "sinais": [
      "power"
     ],
@@ -918,8 +918,8 @@
    },
    {
     "nome": "A0",
-    "x": 208.5,
-    "y": 191.53,
+    "x": 207.21,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -927,8 +927,8 @@
    },
    {
     "nome": "A1",
-    "x": 218,
-    "y": 191.53,
+    "x": 216.81,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -936,8 +936,8 @@
    },
    {
     "nome": "A2",
-    "x": 227.5,
-    "y": 191.53,
+    "x": 226.41,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -945,8 +945,8 @@
    },
    {
     "nome": "A3",
-    "x": 237.25,
-    "y": 191.53,
+    "x": 236.01,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -954,8 +954,8 @@
    },
    {
     "nome": "A4",
-    "x": 246.75,
-    "y": 191.53,
+    "x": 245.61,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -963,8 +963,8 @@
    },
    {
     "nome": "A5",
-    "x": 256.25,
-    "y": 191.53,
+    "x": 255.21,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -972,8 +972,8 @@
    },
    {
     "nome": "A6",
-    "x": 266,
-    "y": 191.53,
+    "x": 264.81,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -981,8 +981,8 @@
    },
    {
     "nome": "A7",
-    "x": 275.5,
-    "y": 191.53,
+    "x": 274.41,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -990,8 +990,8 @@
    },
    {
     "nome": "A8",
-    "x": 290.25,
-    "y": 191.53,
+    "x": 293.61,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -999,8 +999,8 @@
    },
    {
     "nome": "A9",
-    "x": 300,
-    "y": 191.53,
+    "x": 303.21,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -1008,8 +1008,8 @@
    },
    {
     "nome": "A10",
-    "x": 309.5,
-    "y": 191.53,
+    "x": 312.81,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -1017,8 +1017,8 @@
    },
    {
     "nome": "A11",
-    "x": 319.25,
-    "y": 191.53,
+    "x": 322.41,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -1026,8 +1026,8 @@
    },
    {
     "nome": "A12",
-    "x": 328.75,
-    "y": 191.53,
+    "x": 332.01,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -1035,8 +1035,8 @@
    },
    {
     "nome": "A13",
-    "x": 338.5,
-    "y": 191.53,
+    "x": 341.61,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -1044,8 +1044,8 @@
    },
    {
     "nome": "A14",
-    "x": 348,
-    "y": 191.53,
+    "x": 351.21,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
@@ -1053,12 +1053,110 @@
    },
    {
     "nome": "A15",
-    "x": 357.75,
-    "y": 191.53,
+    "x": 360.81,
+    "y": 191.95,
     "sinais": [
      "analog"
     ],
     "descricao": ""
+   },
+   {
+    "nome": "50.2",
+    "x": 255.69,
+    "y": 86.35,
+    "sinais": [
+     "spi"
+    ],
+    "descricao": "ICSP: MISO (o mesmo pino 50 da barra)."
+   },
+   {
+    "nome": "5V.3",
+    "x": 265.29,
+    "y": 86.35,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "ICSP: 5V (o mesmo da barra)."
+   },
+   {
+    "nome": "52.2",
+    "x": 255.69,
+    "y": 95.95,
+    "sinais": [
+     "spi"
+    ],
+    "descricao": "ICSP: SCK (o mesmo pino 52 da barra)."
+   },
+   {
+    "nome": "51.2",
+    "x": 265.29,
+    "y": 95.95,
+    "sinais": [
+     "spi"
+    ],
+    "descricao": "ICSP: MOSI (o mesmo pino 51 da barra)."
+   },
+   {
+    "nome": "RESET.2",
+    "x": 255.69,
+    "y": 105.55,
+    "sinais": [],
+    "descricao": "ICSP: RESET (o mesmo pino RESET da barra)."
+   },
+   {
+    "nome": "GND.6",
+    "x": 265.29,
+    "y": 105.55,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "ICSP: GND (o mesmo da barra)."
+   },
+   {
+    "nome": "MISO2",
+    "x": 93.93,
+    "y": 22.03,
+    "sinais": [],
+    "descricao": "ICSP do ATmega16U2 (o chip do USB): MISO. Serve para regravar o 16U2; o sketch nao usa este pino."
+   },
+   {
+    "nome": "5V.4",
+    "x": 93.93,
+    "y": 31.63,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "ICSP: 5V (o mesmo da barra)."
+   },
+   {
+    "nome": "SCK2",
+    "x": 84.33,
+    "y": 22.03,
+    "sinais": [],
+    "descricao": "ICSP do ATmega16U2 (o chip do USB): SCK. Serve para regravar o 16U2; o sketch nao usa este pino."
+   },
+   {
+    "nome": "MOSI2",
+    "x": 84.33,
+    "y": 31.63,
+    "sinais": [],
+    "descricao": "ICSP do ATmega16U2 (o chip do USB): MOSI. Serve para regravar o 16U2; o sketch nao usa este pino."
+   },
+   {
+    "nome": "RESET2",
+    "x": 74.73,
+    "y": 22.03,
+    "sinais": [],
+    "descricao": "ICSP do ATmega16U2 (o chip do USB): RESET. Serve para regravar o 16U2; o sketch nao usa este pino."
+   },
+   {
+    "nome": "GND.7",
+    "x": 74.73,
+    "y": 31.63,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "ICSP: GND (o mesmo da barra)."
    }
   ],
   "variantes": [],
@@ -1661,6 +1759,105 @@
      "i2c"
     ],
     "descricao": ""
+   },
+   {
+    "nome": "12.2",
+    "x": 256.24,
+    "y": 85.84,
+    "sinais": [
+     "spi"
+    ],
+    "descricao": "ICSP: MISO (o mesmo pino 12 da barra)."
+   },
+   {
+    "nome": "5V.2",
+    "x": 265.85,
+    "y": 85.84,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "ICSP: 5V (o mesmo da barra)."
+   },
+   {
+    "nome": "13.2",
+    "x": 256.24,
+    "y": 95.45,
+    "sinais": [
+     "spi"
+    ],
+    "descricao": "ICSP: SCK (o mesmo pino 13 da barra)."
+   },
+   {
+    "nome": "11.2",
+    "x": 265.85,
+    "y": 95.45,
+    "sinais": [
+     "spi",
+     "pwm"
+    ],
+    "descricao": "ICSP: MOSI (o mesmo pino 11 da barra)."
+   },
+   {
+    "nome": "RESET.2",
+    "x": 256.24,
+    "y": 105.05,
+    "sinais": [],
+    "descricao": "ICSP: RESET (o mesmo pino RESET da barra)."
+   },
+   {
+    "nome": "GND.4",
+    "x": 265.85,
+    "y": 105.05,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "ICSP: GND (o mesmo da barra)."
+   },
+   {
+    "nome": "MISO2",
+    "x": 94.43,
+    "y": 21.5,
+    "sinais": [],
+    "descricao": "ICSP do ATmega16U2 (o chip do USB): MISO. Serve para regravar o 16U2; o sketch nao usa este pino."
+   },
+   {
+    "nome": "5V.3",
+    "x": 94.43,
+    "y": 31.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "ICSP: 5V (o mesmo da barra)."
+   },
+   {
+    "nome": "SCK2",
+    "x": 84.83,
+    "y": 21.5,
+    "sinais": [],
+    "descricao": "ICSP do ATmega16U2 (o chip do USB): SCK. Serve para regravar o 16U2; o sketch nao usa este pino."
+   },
+   {
+    "nome": "MOSI2",
+    "x": 84.83,
+    "y": 31.1,
+    "sinais": [],
+    "descricao": "ICSP do ATmega16U2 (o chip do USB): MOSI. Serve para regravar o 16U2; o sketch nao usa este pino."
+   },
+   {
+    "nome": "RESET2",
+    "x": 75.22,
+    "y": 21.5,
+    "sinais": [],
+    "descricao": "ICSP do ATmega16U2 (o chip do USB): RESET. Serve para regravar o 16U2; o sketch nao usa este pino."
+   },
+   {
+    "nome": "GND.5",
+    "x": 75.22,
+    "y": 31.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "ICSP: GND (o mesmo da barra)."
    }
   ],
   "variantes": [],
@@ -1673,28 +1870,28 @@
   "pinos": [
    {
     "nome": "PB5",
-    "x": 5.67,
+    "x": 5.1,
     "y": 9.83,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB3",
-    "x": 5.67,
+    "x": 5.1,
     "y": 19.43,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB4",
-    "x": 5.67,
+    "x": 5.1,
     "y": 29.03,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "GND",
-    "x": 5.67,
+    "x": 5.1,
     "y": 38.63,
     "sinais": [
      "power"
@@ -1703,7 +1900,7 @@
    },
    {
     "nome": "PB2",
-    "x": 32.88,
+    "x": 33.9,
     "y": 38.63,
     "sinais": [
      "i2c"
@@ -1712,14 +1909,14 @@
    },
    {
     "nome": "PB1",
-    "x": 32.88,
+    "x": 33.9,
     "y": 29.03,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB0",
-    "x": 32.88,
+    "x": 33.9,
     "y": 19.43,
     "sinais": [
      "i2c"
@@ -1728,7 +1925,7 @@
    },
    {
     "nome": "VCC",
-    "x": 32.88,
+    "x": 33.9,
     "y": 9.83,
     "sinais": [
      "power"
@@ -6567,8 +6764,8 @@
   "pinos": [
    {
     "nome": "GND.1",
-    "x": 218.5,
-    "y": 23.3,
+    "x": 221.53,
+    "y": 22.65,
     "sinais": [
      "power"
     ],
@@ -6576,8 +6773,8 @@
    },
    {
     "nome": "VCC.1",
-    "x": 218.5,
-    "y": 32.9,
+    "x": 221.53,
+    "y": 32.25,
     "sinais": [
      "power"
     ],
@@ -6585,8 +6782,8 @@
    },
    {
     "nome": "PB4",
-    "x": 218.5,
-    "y": 42.5,
+    "x": 221.53,
+    "y": 41.85,
     "sinais": [
      "analog",
      "pwm"
@@ -6595,8 +6792,8 @@
    },
    {
     "nome": "PB5",
-    "x": 218.5,
-    "y": 52.2,
+    "x": 221.53,
+    "y": 51.45,
     "sinais": [
      "analog"
     ],
@@ -6604,8 +6801,8 @@
    },
    {
     "nome": "PB3",
-    "x": 218.5,
-    "y": 61.7,
+    "x": 221.53,
+    "y": 61.05,
     "sinais": [
      "analog"
     ],
@@ -6613,8 +6810,8 @@
    },
    {
     "nome": "PB2",
-    "x": 218.5,
-    "y": 71.2,
+    "x": 221.53,
+    "y": 70.65,
     "sinais": [
      "spi",
      "i2c",
@@ -6624,8 +6821,8 @@
    },
    {
     "nome": "PB1",
-    "x": 218.5,
-    "y": 80.9,
+    "x": 221.53,
+    "y": 80.25,
     "sinais": [
      "spi",
      "pwm"
@@ -6634,8 +6831,8 @@
    },
    {
     "nome": "PB0",
-    "x": 218.5,
-    "y": 90.5,
+    "x": 221.53,
+    "y": 89.85,
     "sinais": [
      "spi",
      "i2c",
@@ -6645,8 +6842,8 @@
    },
    {
     "nome": "VIN",
-    "x": 132.7,
-    "y": 8.1,
+    "x": 126.78,
+    "y": 7.51,
     "sinais": [
      "power"
     ],
@@ -6654,8 +6851,8 @@
    },
    {
     "nome": "GND.2",
-    "x": 142.9,
-    "y": 8.1,
+    "x": 136.38,
+    "y": 7.51,
     "sinais": [
      "power"
     ],
@@ -6663,8 +6860,8 @@
    },
    {
     "nome": "VCC.2",
-    "x": 153,
-    "y": 8.1,
+    "x": 145.98,
+    "y": 7.51,
     "sinais": [
      "power"
     ],

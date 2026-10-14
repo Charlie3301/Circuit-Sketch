@@ -742,12 +742,45 @@ public class Maquina
     public int ResolucaoDoAdc { get; set; }
 
     /// <summary>
+    /// A referencia do conversor, pedida por analogReference(): DEFAULT (1)
+    /// e a alimentacao, EXTERNAL (0) e a tensao no pino AREF, INTERNAL (3) e
+    /// INTERNAL1V1 (2) sao os 1,1 V internos e INTERNAL2V56 (6) os 2,56 V
+    /// (Mega e ATtiny85). So os AVR tem; nos outros chips ela fica DEFAULT.
+    /// </summary>
+    public int ReferenciaAnalogica { get; set; } = ReferenciaPadrao;
+
+    public const int ReferenciaExterna = 0, ReferenciaPadrao = 1, ReferenciaInterna1V1 = 2,
+                     ReferenciaInterna = 3, ReferenciaInterna2V56 = 6;
+
+    /// <summary>A tensao no pino AREF agora (o editor mede a cada quadro); nulo com o AREF solto.</summary>
+    public double? TensaoNoAref { get; set; }
+
+    /// <summary>Em volts, a tensao que o conversor le como o valor maximo.</summary>
+    public double TensaoDeReferencia => ReferenciaAnalogica switch
+    {
+        ReferenciaExterna => TensaoNoAref ?? 0,
+        ReferenciaInterna1V1 or ReferenciaInterna => 1.1,
+        ReferenciaInterna2V56 => 2.56,
+        _ => Perfil.TensaoDeOperacao > 0 ? Perfil.TensaoDeOperacao : 5,
+    };
+
+    /// <summary>
     /// A leitura do analogRead() do Arduino: a do conversor, levada aos bits
-    /// que o core entrega -- deslocando, como os cores fazem.
+    /// que o core entrega -- deslocando, como os cores fazem. Com outra
+    /// referencia (analogReference), a mesma tensao vira outro numero: com
+    /// os 1,1 V internos, 0,55 V ja e meia escala.
     /// </summary>
     public int AnalogReadDoArduino(int p)
     {
         int cru = AnalogRead(p);
+        if (ReferenciaAnalogica != ReferenciaPadrao && Perfil.De8Bits)
+        {
+            double vcc = Perfil.TensaoDeOperacao > 0 ? Perfil.TensaoDeOperacao : 5;
+            double vref = TensaoDeReferencia;
+            // AREF solto com EXTERNAL: sem referencia, o conversor satura.
+            cru = vref <= 0.01 ? (cru > 0 ? Perfil.MaxAdc : 0)
+                : (int)Math.Round(Math.Clamp(cru * vcc / vref, 0, Perfil.MaxAdc));
+        }
         int nativos = Perfil.BitsDoConversor;
         int pedidos = ResolucaoDoAdc > 0 ? ResolucaoDoAdc : Perfil.BitsDoAnalogRead;
         return pedidos >= nativos ? cru << (pedidos - nativos) : cru >> (nativos - pedidos);
@@ -1468,6 +1501,9 @@ public class Maquina
     /// <summary>Quando a UART acaba de mandar o que esta na fila, no relogio do chip.</summary>
     double fimDaTransmissaoUs;
 
+    /// <summary>Quando a UART acaba de mandar o que esta na fila (us): o LED TX da placa pisca por aqui.</summary>
+    public double FimDaTransmissaoUs => fimDaTransmissaoUs;
+
     /// <summary>
     /// A fila de saida do Serial: 64 bytes no AVR e na STM32, os 128 da FIFO
     /// da UART na ESP32 e no ESP8266 (o core 3.x nao poe fila em RAM na
@@ -2037,6 +2073,7 @@ public class Maquina
         ResolucaoDoPwm = 8;
         MaximoDoPwm = 0;
         ResolucaoDoAdc = 0;
+        ReferenciaAnalogica = ReferenciaPadrao;
         FrequenciaDoPwmPedida = 0;
         Lcd = null;
         Oled = null;

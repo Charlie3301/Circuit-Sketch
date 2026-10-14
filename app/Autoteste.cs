@@ -191,6 +191,8 @@ public static partial class Autoteste
         Bloco("Servos_Fisicos", Servos_Fisicos);
         Bloco("Servos_Bracos", Servos_Bracos);
         Bloco("Baterias_Presets", Baterias_Presets);
+        Bloco("Placas_LedsDaPlaca", Placas_LedsDaPlaca);
+        Bloco("Placas_TodosOsPinos", Placas_TodosOsPinos);
         Bloco("Chave_FimDeCurso", Chave_FimDeCurso);
         Bloco("Esc_Brushless", Esc_Brushless);
         Bloco("Receptor_Radio", Receptor_Radio);
@@ -536,8 +538,10 @@ public static partial class Autoteste
             bool naOrigem = Math.Abs(b.X) < 0.6 && Math.Abs(b.Y) < 0.6;
 
             // E a proporcao tem que bater com a caixa do catalogo, senao
-            // o Uniform ainda letterboxa e desloca os pinos.
-            double propDesenho = b.Width / b.Height;
+            // o Uniform ainda letterboxa e desloca os pinos. A sobra
+            // declarada (o USB do Uno, igual dos dois lados) nao conta.
+            var sobra = Pecas.SobraDe(nome);
+            double propDesenho = (b.Width - 2 * sobra.X) / (b.Height - 2 * sobra.Y);
             double propCaixa = def.Largura / (double)def.Altura;
             bool proporcao = Math.Abs(propDesenho - propCaixa) < 0.03;
 
@@ -9275,10 +9279,13 @@ public static partial class Autoteste
             if (tinta.IsEmpty) continue;
 
             // Meio pixel de folga: o traco da borda desenha metade para
-            // fora e nao conta como vazamento.
+            // fora e nao conta como vazamento. A sobra declarada no SVG (o
+            // USB-B do Uno sai da placa) pode: ela e desenhada de proposito
+            // fora da caixa, igual dos dois lados.
+            var sobra = Pecas.SobraDe(id);
             bool cabe = tinta.X >= -1.5 && tinta.Y >= -1.5
-                        && tinta.Right <= def.Largura + 1.5
-                        && tinta.Bottom <= def.Altura + 1.5;
+                        && tinta.Right <= def.Largura + 2 * sobra.X + 1.5
+                        && tinta.Bottom <= def.Altura + 2 * sobra.Y + 1.5;
 
             saida.AppendLine($"        {id,-18} tinta ({tinta.X:0.0},{tinta.Y:0.0}) "
                              + $"{tinta.Width:0.0}x{tinta.Height:0.0} "

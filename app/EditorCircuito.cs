@@ -248,7 +248,9 @@ public partial class EditorCircuito : Border
             {
                 fontesOriginais[peca.Id] = fontesOriginais.GetValueOrDefault(peca.Id)
                                            ?? img.Source;
-                var cinza = Pecas.Cinza(img.Source, Geometria.Tamanho(peca, def).Largura, Geometria.Tamanho(peca, def).Altura);
+                // O tamanho da imagem, e nao o da caixa: a placa com sobra e mais larga.
+                var cinza = Pecas.Cinza(img.Source, double.IsNaN(img.Width) ? Geometria.Tamanho(peca, def).Largura : img.Width,
+                                        double.IsNaN(img.Height) ? Geometria.Tamanho(peca, def).Altura : img.Height);
                 if (!ReferenceEquals(img.Source, cinza)) img.Source = cinza;
             }
 
@@ -394,25 +396,18 @@ public partial class EditorCircuito : Border
         // em caixa 107x204, escala 1 e 1,5 de folga vertical.
         ["esp32-devkit-v1"] = [(23.25, 183.5, 8.0, "EN"), (83.15, 183.5, 8.0, "BOOT")],
 
-        // circle#reset-button cx=6,96 cy=4,53 r=1,54; viewBox -4 0 72,58 53,34
-        // em caixa 274x202 -> escala 3,775 e 0,32 de folga vertical.
-        ["arduino-uno"] = [(41.4, 17.4, 6.5, "RESET")],
+        // O TS42 do arquivo da placa (placas-arduino.py, Alpha 25): o botao
+        // vermelho de 2,5 mm no centro do RESET.
+        ["arduino-uno"] = [(39.7, 14.3, 5.5, "RESET")],
 
-        // o circulo tem rotate(269,81): cx=-24,9 cy=72,09 vai para (72,17; 24,66).
-        // viewBox -4 0 102,66 53,45 em caixa 388x202 -> escala 3,779.
-        ["arduino-mega"] = [(287.9, 93.2, 6.5, "RESET")],
+        // O TS42 do arquivo da placa (placas-arduino.py, Alpha 25).
+        ["arduino-mega"] = [(38.7, 17.2, 5.5, "RESET")],
 
-        // cx=24,8 cy=8,7 r=1; viewBox -1,4 0 44,9 17,8 em caixa 170x67 ->
-        // escala 3,764 e 0,5 de folga horizontal.
-        ["arduino-nano"] = [(99.1, 32.7, 5.5, "RESET")],
-
-        // circle cx=48,5 cy=37,7 r=3,48; viewBox 0 0 168 67,9 em caixa
-        // 168x68 -> escala 1 e 0,05 de folga vertical.
-        ["nano-rp2040-connect"] = [(48.5, 37.75, 5.5, "RESET")],
-
-        // circle#reset-button cx=49,7 cy=4,3 r=1,4; viewBox 0 0 64 30 em
-        // caixa 242x113 -> escala 3,767 e 0,47 de folga horizontal.
-        ["franzininho"] = [(187.7, 16.2, 6.0, "RESET")],
+        // Os botoes dos arquivos das placas (placas-arduino.py, Alpha 25): o
+        // SMD do Nano, o PTS820 branco do RP2040 e a chave de 6 mm da Franzininho.
+        ["arduino-nano"] = [(98.0, 33.5, 5.0, "RESET")],
+        ["nano-rp2040-connect"] = [(46.5, 34.1, 5.5, "RESET")],
+        ["franzininho"] = [(190.0, 16.0, 6.6, "RESET")],
     };
 
     /// <summary>
@@ -515,13 +510,75 @@ public partial class EditorCircuito : Border
     /// y=111 e x=69,5 y=110, de 3,8x5,3, num viewBox de 107x201 dentro de
     /// uma caixa de 107x204, o que deixa 1,5 de folga em cima.
     /// </summary>
-    static readonly (double X, double Y, double R, int Gpio, Color Cor)[] LedsDaPlaca =
-    [
-        // Vermelho de energia: acende so por estar ligada, sem GPIO.
-        (36.9, 115.2, 3.1, -1, Color.FromRgb(0xFF, 0x3B, 0x30)),
-        // Azul no GPIO 2, que e o LED_BUILTIN da placa.
-        (71.4, 114.2, 3.1, 2, Color.FromRgb(0x3B, 0x8C, 0xFF)),
-    ];
+    static readonly Dictionary<string, (double X, double Y, double R, int Gpio, Color Cor)[]> LedsPorPlaca = new()
+    {
+        ["esp32-devkit-v1"] =
+        [
+            // Vermelho de energia: acende so por estar ligada, sem GPIO.
+            (36.9, 115.2, 3.1, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)),
+            // Azul no GPIO 2, que e o LED_BUILTIN da placa.
+            (71.4, 114.2, 3.1, 2, Color.FromRgb(0x3B, 0x8C, 0xFF)),
+        ],
+
+        // Os quatro LEDs 0805 do Uno R3 (Alpha 25), no lugar do arquivo da
+        // placa (placas-arduino.py): o ON verde, e o L (pino 13), o TX e o
+        // RX amarelos. TX e RX piscam com a serial.
+        ["arduino-uno"] =
+        [
+            (236.6, 62.8, 3.4, LedDeEnergia, Color.FromRgb(0x5C, 0xFF, 0x5A)),
+            (121.3, 41.7, 3.4, 13, Color.FromRgb(0xFF, 0xC4, 0x2E)),
+            (121.3, 62.8, 3.4, LedTx, Color.FromRgb(0xFF, 0xC4, 0x2E)),
+            (121.3, 71.4, 3.4, LedRx, Color.FromRgb(0xFF, 0xC4, 0x2E)),
+        ],
+
+        // O Nano V3: PWR e TX verdes, RX vermelho e o L amarelo (os do arquivo da placa).
+        ["arduino-nano"] =
+        [
+            (114.8, 39.4, 3.4, LedDeEnergia, Color.FromRgb(0x5C, 0xFF, 0x5A)),
+            (114.8, 50.9, 3.4, 13, Color.FromRgb(0xFF, 0xC4, 0x2E)),
+            (114.8, 16.3, 3.4, LedTx, Color.FromRgb(0x5C, 0xFF, 0x5A)),
+            (114.8, 27.8, 3.4, LedRx, Color.FromRgb(0xFF, 0x4A, 0x3D)),
+        ],
+
+        // O Nano RP2040 Connect: o verde de energia e o laranja do LED_BUILTIN (D13).
+        ["nano-rp2040-connect"] =
+        [
+            (12.9, 55.4, 3.2, LedDeEnergia, Color.FromRgb(0x5C, 0xFF, 0x5A)),
+            (12.9, 13.1, 3.2, 13, Color.FromRgb(0xFF, 0x9A, 0x2E)),
+        ],
+
+        // A Franzininho DIY: os LEDs de 3 mm, o ON verde e o LED amarelo no PB1.
+        ["franzininho"] =
+        [
+            (128.5, 98.6, 6.2, LedDeEnergia, Color.FromRgb(0x5C, 0xFF, 0x5A)),
+            (147.7, 98.6, 6.2, 1, Color.FromRgb(0xFF, 0xE0, 0x3A)),
+        ],
+
+        // Os mesmos quatro na Mega 2560 R3: o ON fica la do outro lado, perto do chip.
+        ["arduino-mega"] =
+        [
+            (303.2, 62.4, 3.4, LedDeEnergia, Color.FromRgb(0x5C, 0xFF, 0x5A)),
+            (120.8, 42.2, 3.4, 13, Color.FromRgb(0xFF, 0xC4, 0x2E)),
+            (120.8, 63.3, 3.4, LedTx, Color.FromRgb(0xFF, 0xC4, 0x2E)),
+            (120.8, 72.0, 3.4, LedRx, Color.FromRgb(0xFF, 0xC4, 0x2E)),
+        ],
+    };
+
+    /// <summary>O LED da placa que acende so por ela estar ligada; o TX e o RX, que piscam com a serial.</summary>
+    const int LedDeEnergia = -1, LedTx = -2, LedRx = -3;
+
+    /// <summary>Quanto o TX e o RX ficam acesos depois de cada byte (o 16U2 da um pulso assim).</summary>
+    const double PiscadaDaSerialMs = 60;
+
+    /// <summary>A forca de um LED da placa agora (0 a 1).</summary>
+    static double ForcaDoLedDaPlaca(Maquina maq, int gpio) => gpio switch
+    {
+        LedDeEnergia => maq.Energizada ? 0.9 : 0,
+        LedTx => maq.Energizada && maq.FimDaTransmissaoUs > 0
+                 && maq.AgoraUs() - maq.FimDaTransmissaoUs < PiscadaDaSerialMs * 1000 ? 0.9 : 0,
+        LedRx => maq.Energizada && Environment.TickCount64 - maq.EntradaSerial.UltimaChegadaMs < PiscadaDaSerialMs ? 0.9 : 0,
+        _ => gpio < maq.Pwm.Length ? maq.Pwm[gpio] / 255.0 : 0,
+    };
 
     readonly Dictionary<string, List<Ellipse>> ledsDePlaca = [];
 
@@ -1124,13 +1181,27 @@ public partial class EditorCircuito : Border
                 ? DesenharTexto(peca)
             : peca.Tipo == "resistor"
                 ? DesenharResistor(peca, def)
-                : new Image
-                {
-                    Source = Pecas.Obter(NomeSvg(peca, false)),
-                    Width = Geometria.Tamanho(peca, def).Largura,
-                    Height = Geometria.Tamanho(peca, def).Altura,
-                    Stretch = Stretch.Uniform
-                };
+                : DesenharImagem(peca, def);
+
+    /// <summary>
+    /// A peca desenhada pelo SVG dela. Se a arte passa da caixa (a sobra do
+    /// SVG, igual dos dois lados), a imagem fica maior e a sobra vai para
+    /// fora pela margem negativa: o centro do giro e os pinos nao mudam.
+    /// </summary>
+    static Image DesenharImagem(PecaNoCircuito peca, PecaDef def)
+    {
+        string nome = NomeSvg(peca, false);
+        var (largura, altura) = Geometria.Tamanho(peca, def);
+        var sobra = Pecas.SobraDe(nome) * Geometria.Escala(peca);
+        return new Image
+        {
+            Source = Pecas.Obter(nome),
+            Width = largura + 2 * sobra.X,
+            Height = altura + 2 * sobra.Y,
+            Margin = new Thickness(-sobra.X, -sobra.Y, 0, 0),
+            Stretch = sobra.X > 0 || sobra.Y > 0 ? Stretch.Fill : Stretch.Uniform,
+        };
+    }
 
     void CriarVisual(PecaNoCircuito peca)
     {
@@ -1165,7 +1236,7 @@ public partial class EditorCircuito : Border
             PosicionarTft(peca, def);
         }
 
-        if (peca.Tipo == "esp32-devkit-v1") CriarLedsDaPlaca(peca, def);
+        if (LedsPorPlaca.ContainsKey(peca.Tipo)) CriarLedsDaPlaca(peca, def);
         CriarLuzesDeModulo(peca, def);
         if (Grades.TryGetValue(peca.Tipo, out var grade)) CriarTelaLcd(peca, grade);
         if (AreasDeTela.ContainsKey(peca.Tipo)) CriarTelaTft(peca, def);
@@ -1536,7 +1607,7 @@ public partial class EditorCircuito : Border
     void CriarLedsDaPlaca(PecaNoCircuito peca, PecaDef def)
     {
         var luzes = new List<Ellipse>();
-        foreach (var (lx, ly, raio, _, cor) in LedsDaPlaca)
+        foreach (var (lx, ly, raio, _, cor) in LedsPorPlaca[peca.Tipo])
         {
             var luz = new Ellipse
             {
@@ -1558,12 +1629,17 @@ public partial class EditorCircuito : Border
         PosicionarLedsDaPlaca(peca, def);
     }
 
+    /// <summary>Para o teste: o brilho de cada LED da placa (na ordem de LedsPorPlaca).</summary>
+    internal double[] LedsDaPlacaParaTeste(string idDaPeca)
+        => ledsDePlaca.TryGetValue(idDaPeca, out var luzes) ? [.. luzes.Select(l => l.Opacity)] : [];
+
     void PosicionarLedsDaPlaca(PecaNoCircuito peca, PecaDef def)
     {
         if (!ledsDePlaca.TryGetValue(peca.Id, out var luzes)) return;
-        for (int i = 0; i < luzes.Count && i < LedsDaPlaca.Length; i++)
+        var leds = LedsPorPlaca[peca.Tipo];
+        for (int i = 0; i < luzes.Count && i < leds.Length; i++)
         {
-            var (lx, ly, raio, _, _) = LedsDaPlaca[i];
+            var (lx, ly, raio, _, _) = leds[i];
             var p = Geometria.PosicaoLocal(peca, def, lx, ly);
             Canvas.SetLeft(luzes[i], p.X - raio);
             Canvas.SetTop(luzes[i], p.Y - raio);
@@ -4244,7 +4320,7 @@ public partial class EditorCircuito : Border
             PosicionarTft(peca, def);
         }
         if (def is not null && TemBraco(peca.Tipo)) PosicionarBracoServo(peca, def);
-        if (def is not null && peca.Tipo == "esp32-devkit-v1") PosicionarLedsDaPlaca(peca, def);
+        if (def is not null && LedsPorPlaca.ContainsKey(peca.Tipo)) PosicionarLedsDaPlaca(peca, def);
         if (def is not null) PosicionarLuzesDeModulo(peca, def);
         if (peca.Tipo == "radio-controle") AtualizarRadio(peca);
 
@@ -5417,6 +5493,7 @@ public partial class EditorCircuito : Border
 
         if (rede is null || bancada is null) return;
         analogicosDeControle.Clear();
+        AplicarPinosDaPlaca(bancada, rede);
 
         foreach (var peca in Atual.Pecas)
         {
@@ -5520,21 +5597,6 @@ public partial class EditorCircuito : Border
                 case "rotary-dialer":
                     AplicarDisco(peca, maq, rede);
                     break;
-
-                case "esp32-devkit-v1" when ledsDePlaca.TryGetValue(peca.Id, out var luzes):
-                {
-                    // Vermelho: so estar energizada. Azul: o GPIO 2.
-                    for (int k = 0; k < luzes.Count && k < LedsDaPlaca.Length; k++)
-                    {
-                        int gpio = LedsDaPlaca[k].Gpio;
-                        double forca = gpio < 0
-                            ? (maq.Energizada ? 0.9 : 0)
-                            : maq.Pwm[gpio] / 255.0;
-                        double alvo = 0.94 * Luminancia(forca);
-                        if (Math.Abs(luzes[k].Opacity - alvo) > 0.005) luzes[k].Opacity = alvo;
-                    }
-                    break;
-                }
 
                 case "esp32-devkit-v1":
                     // BOOT segurado leva o GPIO 0 a LOW.
@@ -6383,6 +6445,17 @@ public partial class EditorCircuito : Border
             {
                 AnimarParteMovel(peca, defAnimada);
                 if (peca.Tipo == "dip-switch-8") MostrarChavesDip(peca, defAnimada);
+            }
+
+            // Os LEDs soldados na placa: energia, LED_BUILTIN, TX e RX.
+            if (maq is not null && ledsDePlaca.TryGetValue(peca.Id, out var luzesDaPlaca)
+                && LedsPorPlaca.TryGetValue(peca.Tipo, out var ledsDaPlaca))
+            {
+                for (int k = 0; k < luzesDaPlaca.Count && k < ledsDaPlaca.Length; k++)
+                {
+                    double alvo = 0.94 * Luminancia(ForcaDoLedDaPlaca(maq, ledsDaPlaca[k].Gpio));
+                    if (Math.Abs(luzesDaPlaca[k].Opacity - alvo) > 0.005) luzesDaPlaca[k].Opacity = alvo;
+                }
             }
 
             switch (peca.Tipo)

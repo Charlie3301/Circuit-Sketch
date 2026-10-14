@@ -2136,6 +2136,13 @@ public partial class Interpretador(Programa prog, Maquina maq)
         ["HOLD"] = Valor.DeInt(2),
         ["RELEASED"] = Valor.DeInt(3),
         ["NO_KEY"] = Valor.DeCaractere(0),
+        // analogReference(): os numeros sao os da Maquina (o EXTERNAL e o 0 e o
+        // DEFAULT o 1, como no Uno; o INTERNAL2V56, o do ATtiny85).
+        ["DEFAULT"] = Valor.DeInt(Maquina.ReferenciaPadrao),
+        ["EXTERNAL"] = Valor.DeInt(Maquina.ReferenciaExterna),
+        ["INTERNAL"] = Valor.DeInt(Maquina.ReferenciaInterna),
+        ["INTERNAL1V1"] = Valor.DeInt(Maquina.ReferenciaInterna1V1),
+        ["INTERNAL2V56"] = Valor.DeInt(Maquina.ReferenciaInterna2V56),
         ["SERIAL_8N1"] = Valor.DeInt(0x06),
         ["SERIAL_8N2"] = Valor.DeInt(0x0E),
         ["SERIAL_8E1"] = Valor.DeInt(0x26),
@@ -2642,6 +2649,19 @@ public partial class Interpretador(Programa prog, Maquina maq)
             // analogWriteResolution(10): o analogWrite passa a ir de 0 a 1023
             // (ESP32, RP2040, STM32). analogWriteFrequency(f) ou (pino, f).
             case "analogWriteResolution": maq.ResolucaoDoPwm = (int)A(0); return Valor.Vazio;
+
+            // A referencia do conversor (o pino AREF). So existe nos AVR; o
+            // 2,56 V so no ATmega2560 e no ATtiny85.
+            case "analogReference":
+            {
+                int modo = (int)A(0);
+                if (!maq.Perfil.De8Bits) return Valor.Vazio;
+                if (modo == Maquina.ReferenciaInterna2V56 && maq.Perfil.Processador == "ATmega328P")
+                    throw new ErroDeExecucao("INTERNAL2V56 nao existe no ATmega328P (Uno, Nano): a referencia interna dele e "
+                        + "so a de 1,1 V (INTERNAL).", c.Linha);
+                maq.ReferenciaAnalogica = modo;
+                return Valor.Vazio;
+            }
             case "analogWriteFrequency":
                 maq.FrequenciaDoPwmPedida = args.Count > 1 ? A(1) : A(0);
                 return Valor.Vazio;

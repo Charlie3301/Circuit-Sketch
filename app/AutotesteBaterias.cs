@@ -10,6 +10,37 @@ namespace Simulador.App;
 /// </summary>
 public static partial class Autoteste
 {
+    /// <summary>
+    /// Os LEDs soldados nas placas da aba Arduino (Alpha 25): o de energia
+    /// acende com a placa ligada e o LED_BUILTIN segue o pino dele.
+    /// </summary>
+    static void Placas_LedsDaPlaca()
+    {
+        saida.AppendLine("placas: os LEDs soldados");
+        foreach (string tipo in new[] { "arduino-uno", "arduino-mega", "arduino-nano", "nano-rp2040-connect", "franzininho" })
+        {
+            var c = new Circuito();
+            c.Pecas.Add(new PecaNoCircuito { Id = "placa", Tipo = tipo, X = 0, Y = 0, Usb = true });
+            var ed = new EditorCircuito();
+            ed.Carregar(c);
+            var perfil = PerfilPlaca.De(tipo);
+            var maq = new Maquina { Perfil = perfil };
+            maq.Reiniciar();
+            var b = Simulador.App.Bancada.DeUmaSo(maq);
+            var rede = new Netlist(c);
+            int led = perfil.LedInterno;
+            maq.Pwm[led] = 0;
+            ed.RefletirEstado(b, rede);
+            var apagado = ed.LedsDaPlacaParaTeste("placa");
+            maq.Pwm[led] = 255;
+            ed.RefletirEstado(b, rede);
+            var aceso = ed.LedsDaPlacaParaTeste("placa");
+            Conferir($"{tipo}: o LED de energia acende ligada e o do LED_BUILTIN segue o pino {led}",
+                apagado.Length >= 2 && apagado[0] > 0.5 && apagado[1] < 0.05 && aceso[1] > 0.5,
+                string.Join("/", apagado.Select(v => v.ToString("0.00"))) + " -> " + string.Join("/", aceso.Select(v => v.ToString("0.00"))));
+        }
+    }
+
     static void Baterias_Presets()
     {
         saida.AppendLine("baterias: prontas e suportes de pilhas");
