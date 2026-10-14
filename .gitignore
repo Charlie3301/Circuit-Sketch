@@ -11,3 +11,6 @@ node_modules/
 
 # Saidas temporarias dos agentes (relatorios ficam em coordenacao/)
 *.tmp
+
+# As compilacoes de cada agente (dotnet build --artifacts-path .artefatos/<agente>)
+.artefatos/
