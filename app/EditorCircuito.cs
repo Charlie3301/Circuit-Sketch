@@ -1118,6 +1118,8 @@ public partial class EditorCircuito : Border
         => Catalogo.EhPcb(peca.Tipo) ? DesenharPcb(peca, def)
             : Catalogo.EhProtoboard(peca.Tipo)
             ? DesenharProtoboard(peca, def)
+            : Baterias.EhSuporte(peca.Tipo)
+            ? DesenharSuporteDePilhas(peca, def)
             : peca.Tipo == "texto"
                 ? DesenharTexto(peca)
             : peca.Tipo == "resistor"
@@ -3779,6 +3781,10 @@ public partial class EditorCircuito : Border
             return false;
         }
 
+        // O suporte de pilhas ja selecionado: o clique seco (sem arrastar)
+        // numa pilha tira ou poe a pilha. O primeiro clique so seleciona.
+        suporteDoClique = selecionadas.Contains(peca.Id) && Baterias.EhSuporte(peca.Tipo) ? peca.Id : null;
+
         // Clicar numa peca ja selecionada mantem o grupo: e assim que se
         // arrasta varias de uma vez.
         if (!selecionadas.Contains(peca.Id)) Selecionar(peca.Id, somar);
@@ -4366,10 +4372,68 @@ public partial class EditorCircuito : Border
         if (arrastando is not null)
         {
             ReleaseMouseCapture();
+            string pegou = arrastando;
             arrastando = null;
             carona.Clear();
             if (moveuDeVerdade) Mudou?.Invoke();
+            else if (pegou == suporteDoClique && Atual.Achar(pegou) is { } suporte && Catalogo.Obter(suporte.Tipo) is { } defSuporte)
+                AlternarPilha(suporte, Baterias.SlotNoPonto(suporte.Tipo, Geometria.PontoLocal(suporte, defSuporte, pegouEm)));
+            suporteDoClique = null;
         }
+    }
+
+    /// <summary>O suporte de pilhas que ja estava selecionado quando o clique comecou.</summary>
+    string suporteDoClique;
+
+    /// <summary>Tira a pilha do slot (ou poe de volta): o slot vazio abre o circuito do suporte.</summary>
+    public void AlternarPilha(PecaNoCircuito peca, int slot)
+    {
+        if (peca is null || Baterias.SuporteDe(peca.Tipo) is not { } s || slot < 0 || slot >= s.Slots) return;
+        peca.Bits ^= 1 << slot;
+        Redesenhar();
+        Selecionar(peca.Id, false);
+        Mudou?.Invoke();
+    }
+
+    /// <summary>
+    /// Troca a bateria selecionada por outra (a 9 V, uma LiPo, a
+    /// personalizada) ou o suporte por outro formato ou numero de slots. Os
+    /// fios continuam nos mesmos pinos ("+" e "-"). A bateria pronta vem com
+    /// os numeros de fabrica; o suporte guarda a pilha, se ela cabe no novo.
+    /// </summary>
+    public void DefinirTipoDaBateria(string tipo)
+    {
+        var peca = Selecionada;
+        if (peca is null || !Netlist.EhBateria(peca.Tipo) || !Netlist.EhBateria(tipo) || tipo == peca.Tipo) return;
+        bool eraSuporte = Baterias.EhSuporte(peca.Tipo);
+        peca.Tipo = tipo;
+        if (Baterias.SuporteDe(tipo) is { } s)
+        {
+            if (!s.Formato.Pilhas.Any(p => p.Id == peca.Modelo)) peca.Modelo = null;
+            peca.Bits &= (1 << s.Slots) - 1;
+            Baterias.Sincronizar(peca);
+        }
+        else
+        {
+            if (eraSuporte) { peca.Modelo = null; peca.Bits = 0; }
+            if (Baterias.DeFabrica(tipo) is { } fabrica)
+                (peca.Volts, peca.MiliAmperes, peca.MiliAmperesHora) = fabrica;
+        }
+        Redesenhar();
+        Selecionar(peca.Id, false);
+        Mudou?.Invoke();
+    }
+
+    /// <summary>A pilha do suporte selecionado (alcalina, NiMH...).</summary>
+    public void DefinirPilhaDoSuporte(string pilha)
+    {
+        var peca = Selecionada;
+        if (peca is null || Baterias.SuporteDe(peca.Tipo) is not { } s || !s.Formato.Pilhas.Any(p => p.Id == pilha)) return;
+        peca.Modelo = pilha;
+        Baterias.Sincronizar(peca);
+        Redesenhar();
+        Selecionar(peca.Id, false);
+        Mudou?.Invoke();
     }
 
     void EncaixarNosFuros(string idPeca)
@@ -4576,6 +4640,9 @@ public partial class EditorCircuito : Border
         };
         // O regulador com trimpot sai de fabrica nos 5 V.
         if (Reguladores.VoltsDeFabrica(tipo) is { } volts) peca.Volts = volts;
+        // A bateria pronta e o suporte de pilhas, com os numeros deles.
+        if (Baterias.DeFabrica(tipo) is { } bateria)
+            (peca.Volts, peca.MiliAmperes, peca.MiliAmperesHora) = bateria;
 
         Atual.Pecas.Add(peca);
         CriarVisual(peca);

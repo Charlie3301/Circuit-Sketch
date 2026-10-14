@@ -575,6 +575,18 @@ public sealed partial class Energia
                 : new Ramo(peca.Id, na, nb, Math.Max(resistencia, 0.001), queda, ideal, maximo);
         }
 
+        // Todas as baterias -- a personalizada, as prontas e os suportes de
+        // pilhas -- sao o mesmo ramo; o suporte com um slot vazio nao liga nada.
+        if (Netlist.EhBateria(peca.Tipo))
+        {
+            var ficha = Baterias.FichaDe(peca);
+            if (ficha.Aberta) yield break;
+            double maxima = Math.Max(1, ficha.MiliAmperes) / 1000.0;
+            var r = Entre("+", "-", ResistenciaDaBateria(ficha), 0, maxima * 0.05, maxima);
+            if (r is not null) yield return r with { Fem = ficha.Volts, Rotulo = "bateria" };
+            yield break;
+        }
+
         switch (peca.Tipo)
         {
             // A bateria e uma fonte de tensao FLUTUANTE: a forca
@@ -583,13 +595,7 @@ public sealed partial class Energia
             // saiam disso: o LED ligado so no "+" (sem fechar o circuito)
             // acendia, e duas baterias em serie brigavam em vez de somar.
             // Ramo do + para o -: descarregando, a corrente dele e negativa.
-            case "bateria":
-            {
-                double maxima = Math.Max(1, peca.MiliAmperes) / 1000.0;
-                var r = Entre("+", "-", ResistenciaDaBateria(peca), 0, maxima * 0.05, maxima);
-                if (r is not null) yield return r with { Fem = peca.Volts, Rotulo = "bateria" };
-                yield break;
-            }
+            // (O ramo de todas elas sai logo acima, antes do switch.)
 
             case "resistor":
             {
@@ -891,11 +897,11 @@ public sealed partial class Energia
     /// e grosseira de proposito: tensao dividida pela corrente maxima da
     /// o ponto em que ela nao entrega mais nada.
     /// </summary>
-    static double ResistenciaDaBateria(PecaNoCircuito peca)
+    static double ResistenciaDaBateria(Baterias.Ficha ficha)
     {
-        double maxima = Math.Max(1, peca.MiliAmperes);
+        double maxima = Math.Max(1, ficha.MiliAmperes);
         // 8% da tensao caindo na corrente maxima; uma LiPo de drone (100 A) fica em ~0,01 ohm.
-        return Math.Clamp(peca.Volts / (maxima / 1000.0) * 0.08, 0.008, 50);
+        return Math.Clamp(ficha.Volts / (maxima / 1000.0) * 0.08, 0.008, 50);
     }
 
     /// <summary>

@@ -247,9 +247,10 @@ public static class ImportarWokwi
         p.Giro3 = N("giro3", 0.5);
         p.Giro4 = N("giro4", 0.5);
         p.Bits = (int)N("bits", 0);
-        p.Volts = N("volts", Reguladores.VoltsDeFabrica(p.Tipo) ?? 9);
-        p.MiliAmperes = N("corrente", 500);
-        p.MiliAmperesHora = N("capacidade", 500);
+        var fabrica = Baterias.DeFabrica(p.Tipo);
+        p.Volts = N("volts", fabrica?.Volts ?? Reguladores.VoltsDeFabrica(p.Tipo) ?? 9);
+        p.MiliAmperes = N("corrente", fabrica?.MiliAmperes ?? 500);
+        p.MiliAmperesHora = N("capacidade", fabrica?.MiliAmperesHora ?? 500);
         p.Modelo = A("modelo");
         p.Ficha = p.Modelo == "personalizado"
             ? new FichaPersonalizada

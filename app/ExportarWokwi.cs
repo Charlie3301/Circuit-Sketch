@@ -147,9 +147,10 @@ public static class ExportarWokwi
         if (p.Giro3 != 0.5) Por("giro3", Exato(p.Giro3));
         if (p.Giro4 != 0.5) Por("giro4", Exato(p.Giro4));
         if (p.Bits != 0) Por("bits", p.Bits.ToString(CultureInfo.InvariantCulture));
-        if (p.Volts != (Reguladores.VoltsDeFabrica(p.Tipo) ?? 9)) Por("volts", Exato(p.Volts));
-        if (p.MiliAmperes != 500) Por("corrente", Exato(p.MiliAmperes));
-        if (p.MiliAmperesHora != 500) Por("capacidade", Exato(p.MiliAmperesHora));
+        var fabrica = Baterias.DeFabrica(p.Tipo);
+        if (p.Volts != (fabrica?.Volts ?? Reguladores.VoltsDeFabrica(p.Tipo) ?? 9)) Por("volts", Exato(p.Volts));
+        if (p.MiliAmperes != (fabrica?.MiliAmperes ?? 500)) Por("corrente", Exato(p.MiliAmperes));
+        if (p.MiliAmperesHora != (fabrica?.MiliAmperesHora ?? 500)) Por("capacidade", Exato(p.MiliAmperesHora));
         if (p.Modelo is not null) Por("modelo", p.Modelo);
         if (p.Modelo == "personalizado" && p.Ficha is { } f)
         {

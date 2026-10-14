@@ -541,19 +541,20 @@ public partial class EditorCircuito
                     for (int k = 1; k <= 10; k++)
                         AvaliarLed(peca, conta.CorrenteDoRamo(peca.Id, k.ToString()), $"o LED {k} da barra");
                     break;
-                case "bateria":
+                case var bateria when Netlist.EhBateria(bateria):
                 {
                     double i = conta.CorrenteDaBateria(peca.Id);
-                    double maxima = Math.Max(1, peca.MiliAmperes) / 1000.0;
+                    var ficha = Baterias.FichaDe(peca);
+                    double maxima = Math.Max(1, ficha.MiliAmperes) / 1000.0;
                     if (i > maxima * 5)
                         achados.Add(new Estouro(peca.Id,
-                            $"a bateria esta em curto: {i:0.0} A saindo de uma bateria de {peca.MiliAmperes:0} mA. "
+                            $"a bateria esta em curto: {i:0.0} A saindo de uma bateria de {ficha.MiliAmperes:0} mA. "
                             + "Na bancada ela esquenta e se esgota em minutos (a pilha de litio pode inchar). "
                             + "Confira se o + nao encosta no - por um fio ou por uma peca sem resistencia.",
                             Queimou: false));
                     else if (i > maxima * 1.2)
                         achados.Add(new Estouro(peca.Id,
-                            $"a bateria esta entregando {i * 1000:0} mA, acima dos {peca.MiliAmperes:0} mA que aguenta: "
+                            $"a bateria esta entregando {i * 1000:0} mA, acima dos {ficha.MiliAmperes:0} mA que aguenta: "
                             + "a tensao cai e ela esquenta. Use uma bateria maior ou pilhas em paralelo.",
                             Queimou: false));
                     break;
@@ -566,7 +567,7 @@ public partial class EditorCircuito
         {
             double ma = Math.Abs(amperes) * 1000;
             if (ma <= 30) return;
-            double volts = Atual.Pecas.Where(p => Netlist.EhBateria(p.Tipo)).Select(p => p.Volts).DefaultIfEmpty(0).Max();
+            double volts = Atual.Pecas.Where(p => Netlist.EhBateria(p.Tipo)).Select(p => Baterias.FichaDe(p).Volts).DefaultIfEmpty(0).Max();
             string resistor = volts > 2.5 ? $" Com {volts:0.#} V, uns {ResistorDoLed(volts)} Ω em série." : "";
             achados.Add(ma > 50
                 ? new Estouro(peca.Id,

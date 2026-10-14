@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="543px" height="132px" viewBox="0 0 543 132">
+<defs>
+  <linearGradient id="wrap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f6fd6"/><stop offset="0.5" stop-color="#2257b3"/><stop offset="1" stop-color="#173f86"/></linearGradient>
+  <linearGradient id="xt60" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd83a"/><stop offset="1" stop-color="#e6b400"/></linearGradient>
+</defs>
+<g transform="scale(3.779528)">
+  <!-- o termo-retratil, com as dobras nas pontas -->
+  <rect x="0.400" y="0.400" width="105.000" height="34.000" rx="2.0" fill="url(#wrap)" stroke="#060607" stroke-width="0.3"/>
+  <rect x="0.400" y="0.400" width="2.6" height="34.000" rx="1.6" fill="#000000" fill-opacity="0.28"/>
+  <rect x="102.800" y="0.400" width="2.6" height="34.000" rx="1.6" fill="#000000" fill-opacity="0.28"/>
+  <path d="M3.400 1.200 H102.400" stroke="#ffffff" stroke-opacity="0.22" stroke-width="0.5"/>
+  <rect x="8.800" y="0.400" width="13.650" height="34.000" fill="#f2f2f2"/>
+  <text x="15.625" y="17.400" fill="#1d2b4a" font-size="7.0px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal" transform="rotate(-90 15.625 17.400)">2S</text>
+  <text x="26.650" y="10.600" fill="#ffffff" font-size="8.5px" text-anchor="start" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="italic">LiPo</text>
+  <text x="26.650" y="20.800" fill="#ffffff" font-size="4.4px" text-anchor="start" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">7.4V  2200mAh</text>
+  <text x="26.650" y="27.600" fill="#ffffff" font-size="3.2px" text-anchor="start" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">25C  2S1P</text>
+  <rect x="87.400" y="27.400" width="13.0" height="4.8" rx="0.5" fill="#f2f2f2" fill-opacity="0.9"/>
+  <text x="93.900" y="29.800" fill="#222222" font-size="2.2px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">16.3Wh</text>
+  <path d="M104.800 8.400 C116.400 8.400 116.400 7.000 128.000 7.000" fill="none" stroke="#7d1714" stroke-width="3.400" stroke-linecap="round"/>
+  <path d="M104.800 8.400 C116.400 8.400 116.400 7.000 128.000 7.000" fill="none" stroke="#d0312d" stroke-width="2.652" stroke-linecap="round"/>
+  <path d="M104.800 8.400 C116.400 8.400 116.400 7.000 128.000 7.000" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.748" stroke-linecap="round" transform="translate(0 -0.680)"/>
+  <path d="M104.800 12.800 C116.400 12.800 116.400 14.200 128.000 14.200" fill="none" stroke="#0b0b0c" stroke-width="3.400" stroke-linecap="round"/>
+  <path d="M104.800 12.800 C116.400 12.800 116.400 14.200 128.000 14.200" fill="none" stroke="#2a2b2e" stroke-width="2.652" stroke-linecap="round"/>
+  <path d="M104.800 12.800 C116.400 12.800 116.400 14.200 128.000 14.200" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.748" stroke-linecap="round" transform="translate(0 -0.680)"/>
+  <!-- o XT60 -->
+  <path d="M127.400 3.650 Q127.400 2.850 128.200 2.850 H142.600 Q143.400 2.850 143.400 3.650 V15.750 L141.200 18.350 H129.600 L127.400 15.750 Z" fill="url(#xt60)" stroke="#8a6a00" stroke-width="0.25"/>
+  <rect x="128.300" y="3.750" width="7.200" height="12.300" rx="0.6" fill="#f2c200" stroke="#b38f00" stroke-width="0.18"/>
+  <path d="M136.200 3.850 V16.750" stroke="#c9a200" stroke-width="0.25"/>
+  <text x="139.560" y="7.000" fill="#7a5c00" font-size="2.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">+</text>
+  <text x="139.560" y="14.200" fill="#7a5c00" font-size="2.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">−</text>
+  <rect x="142.300" y="5.200" width="1.1" height="3.6" fill="#3a2e00"/>
+  <rect x="142.500" y="5.750" width="0.9" height="2.5" fill="#d8b04a"/>
+  <rect x="142.300" y="12.400" width="1.1" height="3.6" fill="#3a2e00"/>
+  <rect x="142.500" y="12.950" width="0.9" height="2.5" fill="#d8b04a"/>
+  <path d="M104.800 25.950 C110.300 25.950 110.300 25.950 115.800 25.950" fill="none" stroke="#0b0b0c" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M104.800 25.950 C110.300 25.950 110.300 25.950 115.800 25.950" fill="none" stroke="#2a2b2e" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M104.800 25.950 C110.300 25.950 110.300 25.950 115.800 25.950" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <path d="M104.800 28.450 C110.300 28.450 110.300 28.450 115.800 28.450" fill="none" stroke="#7d1714" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M104.800 28.450 C110.300 28.450 110.300 28.450 115.800 28.450" fill="none" stroke="#d0312d" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M104.800 28.450 C110.300 28.450 110.300 28.450 115.800 28.450" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <path d="M104.800 30.950 C110.300 30.950 110.300 30.950 115.800 30.950" fill="none" stroke="#7d1714" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M104.800 30.950 C110.300 30.950 110.300 30.950 115.800 30.950" fill="none" stroke="#d0312d" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M104.800 30.950 C110.300 30.950 110.300 30.950 115.800 30.950" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <rect x="115.400" y="23.500" width="5.800" height="9.900" rx="0.35" fill="#f3f1e8" stroke="#a8a395" stroke-width="0.18"/>
+  <rect x="118.590" y="23.900" width="2.320" height="9.100" rx="0.25" fill="none" stroke="#a8a395" stroke-width="0.15"/>
+  <rect x="120.700" y="25.500" width="0.5" height="0.9" fill="#6d6a60"/>
+  <rect x="120.700" y="28.000" width="0.5" height="0.9" fill="#6d6a60"/>
+  <rect x="120.700" y="30.500" width="0.5" height="0.9" fill="#6d6a60"/>
+</g>
+</svg>

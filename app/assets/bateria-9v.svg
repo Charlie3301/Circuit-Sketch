@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="283px" height="104px" viewBox="0 0 283 104">
+<defs>
+  <linearGradient id="jaqueta" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3c4a63"/><stop offset="0.45" stop-color="#26324a"/><stop offset="1" stop-color="#18213a"/></linearGradient>
+  <linearGradient id="banda" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9eef3"/><stop offset="0.5" stop-color="#aab3bd"/><stop offset="1" stop-color="#7d8792"/></linearGradient>
+  <linearGradient id="clip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c2d31"/><stop offset="1" stop-color="#121315"/></linearGradient>
+</defs>
+<g transform="scale(3.779528)">
+  <!-- o corpo: a jaqueta de metal pintada, com as bordas viradas -->
+  <rect x="0.500" y="0.500" width="48.500" height="26.500" rx="1.6" fill="url(#jaqueta)" stroke="#0d1220" stroke-width="0.3"/>
+  <rect x="40.000" y="0.500" width="7.6" height="26.500" fill="url(#banda)"/>
+  <path d="M1.500 1.200 H48.000" stroke="#ffffff" stroke-opacity="0.25" stroke-width="0.4"/>
+  <path d="M1.700 0.900 V26.600" stroke="#0a0f1c" stroke-width="0.5"/>
+  <text x="16.000" y="12.750" fill="#ffffff" font-size="11.0px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">9V</text>
+  <text x="16.000" y="21.350" fill="#c8d2e4" font-size="2.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">ALCALINA</text>
+  <text x="32.000" y="8.250" fill="#c8d2e4" font-size="2.4px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">6LR61</text>
+  <text x="32.000" y="11.550" fill="#8e9bb4" font-size="2.0px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">1604A</text>
+  <text x="43.800" y="7.750" fill="#1d2433" font-size="3.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">+</text>
+  <text x="43.800" y="19.750" fill="#1d2433" font-size="3.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">−</text>
+  <!-- o clip de pressao -->
+  <rect x="48.400" y="2.100" width="9.4" height="23.300" rx="1.4" fill="url(#clip)" stroke="#050506" stroke-width="0.25"/>
+  <rect x="49.600" y="3.500" width="5.6" height="20.500" rx="0.9" fill="none" stroke="#3a3b40" stroke-width="0.25"/>
+  <path d="M49.400 2.700 H57.000" stroke="#4a4b50" stroke-width="0.25"/>
+  <path d="M57.400 12.750 C64.400 12.750 64.400 12.480 71.400 12.480" fill="none" stroke="#7d1714" stroke-width="1.300" stroke-linecap="round"/>
+  <path d="M57.400 12.750 C64.400 12.750 64.400 12.480 71.400 12.480" fill="none" stroke="#d0312d" stroke-width="1.014" stroke-linecap="round"/>
+  <path d="M57.400 12.750 C64.400 12.750 64.400 12.480 71.400 12.480" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.286" stroke-linecap="round" transform="translate(0 -0.260)"/>
+  <path d="M57.400 14.750 C64.400 14.750 64.400 15.020 71.400 15.020" fill="none" stroke="#0b0b0c" stroke-width="1.300" stroke-linecap="round"/>
+  <path d="M57.400 14.750 C64.400 14.750 64.400 15.020 71.400 15.020" fill="none" stroke="#2a2b2e" stroke-width="1.014" stroke-linecap="round"/>
+  <path d="M57.400 14.750 C64.400 14.750 64.400 15.020 71.400 15.020" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.286" stroke-linecap="round" transform="translate(0 -0.260)"/>
+  <rect x="71.400" y="12.105" width="3.000" height="0.750" rx="0.375" fill="#b9bec5" stroke="#6f757d" stroke-width="0.12"/>
+  <path d="M71.700 12.345 H74.100" stroke="#eef1f4" stroke-width="0.188" stroke-linecap="round"/>
+  <rect x="71.400" y="14.645" width="3.000" height="0.750" rx="0.375" fill="#b9bec5" stroke="#6f757d" stroke-width="0.12"/>
+  <path d="M71.700 14.885 H74.100" stroke="#eef1f4" stroke-width="0.188" stroke-linecap="round"/>
+</g>
+</svg>

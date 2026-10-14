@@ -898,10 +898,10 @@ public class Netlist
     /// isso, tambem. O VCC de um sensor NAO: ali e por onde ele consome.
     /// </summary>
     public static bool EhFonte(string tipo)
-        => PerfilPlaca.EhPlaca(tipo) || tipo is "vcc-symbol" or "gnd-symbol" or "bateria";
+        => PerfilPlaca.EhPlaca(tipo) || tipo is "vcc-symbol" or "gnd-symbol" || EhBateria(tipo);
 
     /// <summary>O "+" e o "-" da bateria valem como alimentacao e terra.</summary>
-    public static bool EhBateria(string tipo) => tipo == "bateria";
+    public static bool EhBateria(string tipo) => Baterias.EhBateria(tipo);
 
     void Registrar(string no) => pai.TryAdd(no, no);
 

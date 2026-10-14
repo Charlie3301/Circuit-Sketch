@@ -131,12 +131,19 @@ public static class Catalogo
         porId[IdProtoboard830] = MontarProtoboard(IdProtoboard830, "Protoboard 830");
         porId[IdProtoboard170] = MontarProtoboard(IdProtoboard170, "Protoboard 170");
         porId[IdPcbPadrao] = MontarPcb(IdPcbPadrao);
+        // Os suportes de pilhas da lista; os de outro tamanho nascem quando pedidos.
+        foreach (string suporte in Baterias.SuportesNaPaleta) porId[suporte] = Baterias.DefDoSuporte(suporte);
     }
+
+    /// <summary>Os suportes de pilhas fora da lista (o 6x AA, o 1x 18650...): pedidos pela barra.</summary>
+    static readonly Dictionary<string, PecaDef> outrosSuportes = [];
 
     public static PecaDef Obter(string id)
     {
         if (id is null) return null;
         if (porId.TryGetValue(id, out var def)) return def;
+        if (Baterias.EhSuporte(id))
+            lock (outrosSuportes) return outrosSuportes.TryGetValue(id, out def) ? def : outrosSuportes[id] = Baterias.DefDoSuporte(id);
         // A PCB de qualquer tamanho nasce na primeira vez que alguem pede.
         if (!EhPcb(id)) return null;
         lock (porId) return porId.TryGetValue(id, out def) ? def : porId[id] = MontarPcb(id);
@@ -505,7 +512,8 @@ public static class Catalogo
         // ela que se chama so "Display OLED".
         "ssd1306" => "Display OLED SPI (8 pinos)",
         "ssd1306-i2c" => "Display OLED 128x64 (I2C)",
-        "bateria" => "Bateria",
+        "bateria" => "Bateria personalizada",
+        _ when Baterias.PacoteDe(id) is { } pacote => pacote.Nome,
         "arduino-uno" => "Arduino Uno",
         "arduino-mega" => "Arduino Mega",
         "arduino-nano" => "Arduino Nano",
@@ -627,7 +635,8 @@ public static class Catalogo
         "diodo" or "diodo-zener" or "diodo-schottky"
             or "transistor-npn" or "transistor-pnp" or "mosfet-n" or "optoacoplador" => "Semicondutores",
         "fusivel" or "varistor" => "Alimentacao",
-        "vcc-symbol" or "gnd-symbol" or "bateria"
+        _ when Baterias.EhBateria(id) => "Alimentacao",
+        "vcc-symbol" or "gnd-symbol"
             or "regulador-7805" or "ams1117" or "lm2596" or "mt3608" => "Alimentacao",
 
         "not-gate" or "and-gate" or "or-gate" or "xor-gate" or "nand-gate"

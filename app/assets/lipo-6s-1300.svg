@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="430px" height="155px" viewBox="0 0 430 155">
+<defs>
+  <linearGradient id="wrap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2c30"/><stop offset="0.5" stop-color="#1c1d20"/><stop offset="1" stop-color="#101113"/></linearGradient>
+  <linearGradient id="xt60" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd83a"/><stop offset="1" stop-color="#e6b400"/></linearGradient>
+</defs>
+<g transform="scale(3.779528)">
+  <!-- o termo-retratil, com as dobras nas pontas -->
+  <rect x="0.400" y="0.400" width="75.000" height="38.000" rx="2.0" fill="url(#wrap)" stroke="#060607" stroke-width="0.3"/>
+  <rect x="0.400" y="0.400" width="2.6" height="38.000" rx="1.6" fill="#000000" fill-opacity="0.28"/>
+  <rect x="72.800" y="0.400" width="2.6" height="38.000" rx="1.6" fill="#000000" fill-opacity="0.28"/>
+  <path d="M3.400 1.200 H72.400" stroke="#ffffff" stroke-opacity="0.22" stroke-width="0.5"/>
+  <rect x="6.400" y="0.400" width="9.750" height="38.000" fill="#c8262c"/>
+  <text x="11.275" y="19.400" fill="#ffffff" font-size="7.0px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal" transform="rotate(-90 11.275 19.400)">6S</text>
+  <text x="19.150" y="11.800" fill="#f2f2f2" font-size="8.5px" text-anchor="start" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="italic">LiPo</text>
+  <text x="19.150" y="23.200" fill="#f2f2f2" font-size="4.4px" text-anchor="start" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">22.2V  1300mAh</text>
+  <text x="19.150" y="30.800" fill="#f2f2f2" font-size="3.2px" text-anchor="start" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">100C  6S1P</text>
+  <rect x="57.400" y="31.400" width="13.0" height="4.8" rx="0.5" fill="#f2f2f2" fill-opacity="0.9"/>
+  <text x="63.900" y="33.800" fill="#222222" font-size="2.2px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">28.9Wh</text>
+  <path d="M74.800 9.600 C86.400 9.600 86.400 8.200 98.000 8.200" fill="none" stroke="#7d1714" stroke-width="3.400" stroke-linecap="round"/>
+  <path d="M74.800 9.600 C86.400 9.600 86.400 8.200 98.000 8.200" fill="none" stroke="#d0312d" stroke-width="2.652" stroke-linecap="round"/>
+  <path d="M74.800 9.600 C86.400 9.600 86.400 8.200 98.000 8.200" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.748" stroke-linecap="round" transform="translate(0 -0.680)"/>
+  <path d="M74.800 14.000 C86.400 14.000 86.400 15.400 98.000 15.400" fill="none" stroke="#0b0b0c" stroke-width="3.400" stroke-linecap="round"/>
+  <path d="M74.800 14.000 C86.400 14.000 86.400 15.400 98.000 15.400" fill="none" stroke="#2a2b2e" stroke-width="2.652" stroke-linecap="round"/>
+  <path d="M74.800 14.000 C86.400 14.000 86.400 15.400 98.000 15.400" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.748" stroke-linecap="round" transform="translate(0 -0.680)"/>
+  <!-- o XT60 -->
+  <path d="M97.400 4.850 Q97.400 4.050 98.200 4.050 H112.600 Q113.400 4.050 113.400 4.850 V16.950 L111.200 19.550 H99.600 L97.400 16.950 Z" fill="url(#xt60)" stroke="#8a6a00" stroke-width="0.25"/>
+  <rect x="98.300" y="4.950" width="7.200" height="12.300" rx="0.6" fill="#f2c200" stroke="#b38f00" stroke-width="0.18"/>
+  <path d="M106.200 5.050 V17.950" stroke="#c9a200" stroke-width="0.25"/>
+  <text x="109.560" y="8.200" fill="#7a5c00" font-size="2.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">+</text>
+  <text x="109.560" y="15.400" fill="#7a5c00" font-size="2.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">−</text>
+  <rect x="112.300" y="6.400" width="1.1" height="3.6" fill="#3a2e00"/>
+  <rect x="112.500" y="6.950" width="0.9" height="2.5" fill="#d8b04a"/>
+  <rect x="112.300" y="13.600" width="1.1" height="3.6" fill="#3a2e00"/>
+  <rect x="112.500" y="14.150" width="0.9" height="2.5" fill="#d8b04a"/>
+  <path d="M74.800 23.200 C80.300 23.200 80.300 23.200 85.800 23.200" fill="none" stroke="#0b0b0c" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M74.800 23.200 C80.300 23.200 80.300 23.200 85.800 23.200" fill="none" stroke="#2a2b2e" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M74.800 23.200 C80.300 23.200 80.300 23.200 85.800 23.200" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <path d="M74.800 25.700 C80.300 25.700 80.300 25.700 85.800 25.700" fill="none" stroke="#7d1714" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M74.800 25.700 C80.300 25.700 80.300 25.700 85.800 25.700" fill="none" stroke="#d0312d" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M74.800 25.700 C80.300 25.700 80.300 25.700 85.800 25.700" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <path d="M74.800 28.200 C80.300 28.200 80.300 28.200 85.800 28.200" fill="none" stroke="#7d1714" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M74.800 28.200 C80.300 28.200 80.300 28.200 85.800 28.200" fill="none" stroke="#d0312d" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M74.800 28.200 C80.300 28.200 80.300 28.200 85.800 28.200" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <path d="M74.800 30.700 C80.300 30.700 80.300 30.700 85.800 30.700" fill="none" stroke="#7d1714" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M74.800 30.700 C80.300 30.700 80.300 30.700 85.800 30.700" fill="none" stroke="#d0312d" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M74.800 30.700 C80.300 30.700 80.300 30.700 85.800 30.700" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <path d="M74.800 33.200 C80.300 33.200 80.300 33.200 85.800 33.200" fill="none" stroke="#7d1714" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M74.800 33.200 C80.300 33.200 80.300 33.200 85.800 33.200" fill="none" stroke="#d0312d" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M74.800 33.200 C80.300 33.200 80.300 33.200 85.800 33.200" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <path d="M74.800 35.700 C80.300 35.700 80.300 35.700 85.800 35.700" fill="none" stroke="#7d1714" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M74.800 35.700 C80.300 35.700 80.300 35.700 85.800 35.700" fill="none" stroke="#d0312d" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M74.800 35.700 C80.300 35.700 80.300 35.700 85.800 35.700" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <path d="M74.800 36.400 C80.300 36.400 80.300 38.200 85.800 38.200" fill="none" stroke="#7d1714" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M74.800 36.400 C80.300 36.400 80.300 38.200 85.800 38.200" fill="none" stroke="#d0312d" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M74.800 36.400 C80.300 36.400 80.300 38.200 85.800 38.200" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <rect x="85.400" y="20.750" width="5.800" height="19.900" rx="0.35" fill="#f3f1e8" stroke="#a8a395" stroke-width="0.18"/>
+  <rect x="88.590" y="21.150" width="2.320" height="19.100" rx="0.25" fill="none" stroke="#a8a395" stroke-width="0.15"/>
+  <rect x="90.700" y="22.750" width="0.5" height="0.9" fill="#6d6a60"/>
+  <rect x="90.700" y="25.250" width="0.5" height="0.9" fill="#6d6a60"/>
+  <rect x="90.700" y="27.750" width="0.5" height="0.9" fill="#6d6a60"/>
+  <rect x="90.700" y="30.250" width="0.5" height="0.9" fill="#6d6a60"/>
+  <rect x="90.700" y="32.750" width="0.5" height="0.9" fill="#6d6a60"/>
+  <rect x="90.700" y="35.250" width="0.5" height="0.9" fill="#6d6a60"/>
+  <rect x="90.700" y="37.750" width="0.5" height="0.9" fill="#6d6a60"/>
+</g>
+</svg>

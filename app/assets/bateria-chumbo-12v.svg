@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="574px" height="249px" viewBox="0 0 574 249">
+<defs>
+  <linearGradient id="caixa" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c41"/><stop offset="1" stop-color="#1f2024"/></linearGradient>
+  <linearGradient id="tampa" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34363b"/><stop offset="1" stop-color="#26282c"/></linearGradient>
+  <linearGradient id="faston" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#eef1f4"/><stop offset="1" stop-color="#8d949c"/></linearGradient>
+</defs>
+<g transform="scale(3.779528)">
+  <!-- a caixa de ABS e a tampa soldada -->
+  <rect x="0.400" y="0.400" width="151.000" height="65.000" rx="2.5" fill="url(#caixa)" stroke="#0c0c0e" stroke-width="0.4"/>
+  <rect x="2.600" y="2.600" width="146.600" height="60.600" rx="1.6" fill="url(#tampa)" stroke="#16171a" stroke-width="0.3"/>
+  <rect x="8.400" y="9.400" width="117.000" height="47.000" rx="1.2" fill="#2d2f34" stroke="#1b1c20" stroke-width="0.3"/>
+  <rect x="18.400" y="4.600" width="7.0" height="2.6" rx="1.3" fill="#1d1e22" stroke="#111215" stroke-width="0.2"/>
+  <rect x="37.900" y="4.600" width="7.0" height="2.6" rx="1.3" fill="#1d1e22" stroke="#111215" stroke-width="0.2"/>
+  <rect x="57.400" y="4.600" width="7.0" height="2.6" rx="1.3" fill="#1d1e22" stroke="#111215" stroke-width="0.2"/>
+  <rect x="76.900" y="4.600" width="7.0" height="2.6" rx="1.3" fill="#1d1e22" stroke="#111215" stroke-width="0.2"/>
+  <rect x="96.400" y="4.600" width="7.0" height="2.6" rx="1.3" fill="#1d1e22" stroke="#111215" stroke-width="0.2"/>
+  <rect x="115.900" y="4.600" width="7.0" height="2.6" rx="1.3" fill="#1d1e22" stroke="#111215" stroke-width="0.2"/>
+  <text x="67.300" y="26.900" fill="#f0f1f3" font-size="13.0px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">12V  7Ah</text>
+  <text x="67.300" y="38.900" fill="#c9cdd3" font-size="3.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">BATERIA SELADA  ·  VRLA</text>
+  <text x="67.300" y="44.900" fill="#9da2aa" font-size="2.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">Recarregável  ·  Não abrir  ·  Uso cíclico 14,5–14,9 V</text>
+  <text x="67.300" y="49.900" fill="#9da2aa" font-size="2.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">Uso em flutuação 13,6–13,8 V</text>
+  <rect x="133.900" y="6.900" width="11.0" height="11.0" rx="1.4" fill="#b3261e" stroke="#08080a" stroke-width="0.3"/>
+  <rect x="136.000" y="9.000" width="6.8" height="6.8" rx="0.6" fill="#5d636b"/>
+  <rect x="137.000" y="11.950" width="4.8" height="0.9" fill="url(#faston)" stroke="#5a6068" stroke-width="0.12"/>
+  <circle cx="139.400" cy="12.400" r="0.55" fill="#2a2d31"/>
+  <text x="129.400" y="12.400" fill="#ff6b5e" font-size="7.0px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">+</text>
+  <rect x="133.900" y="47.900" width="11.0" height="11.0" rx="1.4" fill="#141416" stroke="#08080a" stroke-width="0.3"/>
+  <rect x="136.000" y="50.000" width="6.8" height="6.8" rx="0.6" fill="#5d636b"/>
+  <rect x="137.000" y="52.950" width="4.8" height="0.9" fill="url(#faston)" stroke="#5a6068" stroke-width="0.12"/>
+  <circle cx="139.400" cy="53.400" r="0.55" fill="#2a2d31"/>
+  <text x="129.400" y="53.400" fill="#c9cdd3" font-size="7.0px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">−</text>
+</g>
+</svg>

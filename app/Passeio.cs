@@ -316,6 +316,31 @@ public static class Passeio
                 janela.TesteAbrir(c, "void setup() {}" + Environment.NewLine + "void loop() {}");
                 janela.TesteSelecionar(2);
             }));
+            // As baterias (Alpha 25): as prontas, os suportes com um slot
+            // vazio, e a barra de cada tipo.
+            passos.Add((1200, $"{23 + passos.Count - 22:00} baterias: suporte na barra", () =>
+            {
+                janela.TesteParar();
+                var c = new Circuito();
+                void Por(string tipo, double x, double y, string modelo = null, int bits = 0)
+                {
+                    var p = new PecaNoCircuito { Tipo = tipo, X = x, Y = y, Modelo = modelo, Bits = bits };
+                    if (Baterias.DeFabrica(tipo) is { } f) (p.Volts, p.MiliAmperes, p.MiliAmperesHora) = f;
+                    c.Pecas.Add(p);
+                }
+                Por("suporte-aa-4", 40, 60, null, 1 << 2);
+                Por("suporte-18650-2", 300, 60);
+                Por("suporte-cr2032", 640, 60);
+                Por("suporte-aaa-4", 40, 330, "nimh");
+                Por("bateria-9v", 300, 330);
+                Por("lipo-1s-500", 640, 330);
+                Por("lipo-3s-2200", 40, 520);
+                Por("power-bank", 640, 480);
+                janela.TesteAbrir(c, "void setup() {}" + Environment.NewLine + "void loop() {}");
+                janela.TesteSelecionar(0);
+            }));
+            passos.Add((1200, $"{23 + passos.Count - 22:00} baterias: LiPo na barra", () =>
+                janela.TesteSelecionar(janela.TesteCircuito.Pecas.FindIndex(p => p.Tipo == "lipo-3s-2200"))));
             passos.Add((1200, $"{23 + passos.Count - 22:00} componentes com MOTORES recolhida", () =>
             {
                 var paletaRecolhida = new JanelaPecas(janela);

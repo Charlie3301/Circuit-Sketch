@@ -1986,7 +1986,7 @@ public partial class MainWindow : Window
             Escolha([.. bracos.Select(b => Idioma.T(b.Nome))], Array.FindIndex(bracos, b => b.Id == montado),
                     i => { editor.DefinirBracoDoServo(bracos[i].Id); AtualizarBarraObjeto(); });
         }
-        else if (peca.Tipo == "bateria")
+        else if (Netlist.EhBateria(peca.Tipo))
         {
             MontarBarraDaBateria(peca);
         }
@@ -2509,6 +2509,23 @@ public partial class MainWindow : Window
     /// </summary>
     void MontarBarraDaBateria(PecaNoCircuito peca)
     {
+        if (Baterias.SuporteDe(peca.Tipo) is { } suporte)
+        {
+            MontarBarraDoSuporte(peca, suporte.Formato, suporte.Slots);
+            return;
+        }
+
+        // Qual bateria: as prontas (o desenho e os numeros de fabrica) e a
+        // personalizada, a de antes. Os numeros continuam editaveis.
+        (string Tipo, string Nome)[] tipos = [.. Baterias.Pacotes.Select(p => (p.Tipo, p.Curto)), ("bateria", "Personalizada")];
+        opcoesObjeto.Children.Add(new TextBlock
+        {
+            Text = Idioma.T("Bateria"), Foreground = Cinza, FontSize = 10,
+            VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
+        });
+        Escolha([.. tipos.Select(t => Idioma.T(t.Nome))], Array.FindIndex(tipos, t => t.Tipo == peca.Tipo),
+                i => { editor.DefinirTipoDaBateria(tipos[i].Tipo); AtualizarBarraObjeto(); DepoisDeMexerNaBateria(peca); });
+
         Numero("Tensão", "V", peca.Volts, 0.1, 30,
                v => { peca.Volts = v; DepoisDeMexerNaBateria(peca); });
 
@@ -2518,15 +2535,79 @@ public partial class MainWindow : Window
         Numero("Capacidade", "mAh", peca.MiliAmperesHora, 1, 100000,
                v => { peca.MiliAmperesHora = v; DepoisDeMexerNaBateria(peca); });
 
+        // Mexeu nos numeros de uma pronta: o desenho fica, e a barra avisa.
+        bool modificada = Baterias.DeFabrica(peca.Tipo) is { } fabrica
+            && (Math.Abs(fabrica.Volts - peca.Volts) > 1e-6 || Math.Abs(fabrica.MiliAmperes - peca.MiliAmperes) > 1e-6
+                || Math.Abs(fabrica.MiliAmperesHora - peca.MiliAmperesHora) > 1e-6);
         var duracao = new TextBlock
         {
             Foreground = Cinza,
             FontSize = 11,
             VerticalAlignment = VerticalAlignment.Center,
             Margin = new Thickness(6, 0, 0, 0),
-            Text = DuracaoDaBateria(peca),
+            Text = DuracaoDaBateria(peca) + (modificada ? " · " + Idioma.T("números mudados") : ""),
+            ToolTip = Baterias.PacoteDe(peca.Tipo)?.Sobre,
         };
         opcoesObjeto.Children.Add(duracao);
+    }
+
+    /// <summary>
+    /// O suporte de pilhas: o formato (AA, AAA, 18650, CR2032), quantos slots
+    /// e qual pilha; ao lado, o que ele entrega. A pilha de cada slot sai e
+    /// volta com um clique nela (com o suporte selecionado).
+    /// </summary>
+    void MontarBarraDoSuporte(PecaNoCircuito peca, Baterias.Formato formato, int slots)
+    {
+        void Rotulo(string texto) => opcoesObjeto.Children.Add(new TextBlock
+        {
+            Text = Idioma.T(texto), Foreground = Cinza, FontSize = 10,
+            VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
+        });
+
+        Rotulo("Pilha");
+        var formatos = Baterias.Formatos;
+        Escolha([.. formatos.Select(f => f.Nome)], Array.IndexOf(formatos, formato), i =>
+        {
+            var novo = formatos[i];
+            int quantos = novo.Slots.Contains(slots) ? slots : novo.SlotsPadrao;
+            editor.DefinirTipoDaBateria(Baterias.TipoDoSuporte(novo.Id, quantos));
+            AtualizarBarraObjeto();
+            DepoisDeMexerNaBateria(peca);
+        });
+        if (formato.Pilhas.Length > 1)
+        {
+            var pilha = Baterias.PilhaDe(peca);
+            Escolha([.. formato.Pilhas.Select(p => Idioma.T(p.Nome))], Array.IndexOf(formato.Pilhas, pilha), i =>
+            {
+                editor.DefinirPilhaDoSuporte(formato.Pilhas[i].Id);
+                AtualizarBarraObjeto();
+                DepoisDeMexerNaBateria(peca);
+            });
+        }
+        if (formato.Slots.Length > 1)
+        {
+            Rotulo("Slots");
+            Escolha([.. formato.Slots.Select(n => n.ToString(System.Globalization.CultureInfo.InvariantCulture))], Array.IndexOf(formato.Slots, slots), i =>
+            {
+                editor.DefinirTipoDaBateria(Baterias.TipoDoSuporte(formato.Id, formato.Slots[i]));
+                AtualizarBarraObjeto();
+                DepoisDeMexerNaBateria(peca);
+            });
+        }
+
+        var ficha = Baterias.FichaDe(peca);
+        int vazios = Enumerable.Range(0, slots).Count(k => !Baterias.TemPilha(peca, k));
+        opcoesObjeto.Children.Add(new TextBlock
+        {
+            Foreground = vazios > 0 ? new SolidColorBrush(Color.FromRgb(0xE0, 0xA0, 0x40)) : Cinza,
+            FontSize = 11,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(6, 0, 0, 0),
+            Text = vazios > 0
+                ? Idioma.T(vazios == 1 ? "um slot vazio: o circuito fica aberto" : $"{vazios} slots vazios: o circuito fica aberto")
+                : $"{ficha.Volts:0.0#} V · {ficha.MiliAmperesHora:0} mAh · {Idioma.T("até")} {ficha.MiliAmperes / 1000:0.###} A · {DuracaoDaBateria(peca)}",
+            ToolTip = Idioma.T("Clique numa pilha, com o suporte selecionado, para tirar ou pôr de volta."),
+        });
     }
 
     /// <summary>
@@ -2779,9 +2860,10 @@ public partial class MainWindow : Window
     /// </summary>
     static string DuracaoDaBateria(PecaNoCircuito peca)
     {
-        if (peca.MiliAmperes <= 0) return "";
+        var ficha = Baterias.FichaDe(peca);
+        if (ficha.MiliAmperes <= 0) return "";
 
-        double horas = peca.MiliAmperesHora / peca.MiliAmperes;
+        double horas = ficha.MiliAmperesHora / ficha.MiliAmperes;
         return horas >= 1
             ? $"dura ~{horas:0.#} h na corrente máxima"
             : $"dura ~{horas * 60:0} min na corrente máxima";

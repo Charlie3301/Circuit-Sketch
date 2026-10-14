@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="419px" height="135px" viewBox="0 0 419 135">
+<defs>
+  <linearGradient id="wrap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2c30"/><stop offset="0.5" stop-color="#1c1d20"/><stop offset="1" stop-color="#101113"/></linearGradient>
+  <linearGradient id="xt60" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd83a"/><stop offset="1" stop-color="#e6b400"/></linearGradient>
+</defs>
+<g transform="scale(3.779528)">
+  <!-- o termo-retratil, com as dobras nas pontas -->
+  <rect x="0.400" y="0.400" width="72.000" height="35.000" rx="2.0" fill="url(#wrap)" stroke="#060607" stroke-width="0.3"/>
+  <rect x="0.400" y="0.400" width="2.6" height="35.000" rx="1.6" fill="#000000" fill-opacity="0.28"/>
+  <rect x="69.800" y="0.400" width="2.6" height="35.000" rx="1.6" fill="#000000" fill-opacity="0.28"/>
+  <path d="M3.400 1.200 H69.400" stroke="#ffffff" stroke-opacity="0.22" stroke-width="0.5"/>
+  <rect x="6.160" y="0.400" width="9.360" height="35.000" fill="#2fa84f"/>
+  <text x="10.840" y="17.900" fill="#ffffff" font-size="7.0px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal" transform="rotate(-90 10.840 17.900)">4S</text>
+  <text x="18.400" y="10.900" fill="#f2f2f2" font-size="8.5px" text-anchor="start" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="italic">LiPo</text>
+  <text x="18.400" y="21.400" fill="#f2f2f2" font-size="4.4px" text-anchor="start" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">14.8V  1500mAh</text>
+  <text x="18.400" y="28.400" fill="#f2f2f2" font-size="3.2px" text-anchor="start" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">100C  4S1P</text>
+  <rect x="54.400" y="28.400" width="13.0" height="4.8" rx="0.5" fill="#f2f2f2" fill-opacity="0.9"/>
+  <text x="60.900" y="30.800" fill="#222222" font-size="2.2px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">22.2Wh</text>
+  <path d="M71.800 8.700 C83.400 8.700 83.400 7.300 95.000 7.300" fill="none" stroke="#7d1714" stroke-width="3.400" stroke-linecap="round"/>
+  <path d="M71.800 8.700 C83.400 8.700 83.400 7.300 95.000 7.300" fill="none" stroke="#d0312d" stroke-width="2.652" stroke-linecap="round"/>
+  <path d="M71.800 8.700 C83.400 8.700 83.400 7.300 95.000 7.300" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.748" stroke-linecap="round" transform="translate(0 -0.680)"/>
+  <path d="M71.800 13.100 C83.400 13.100 83.400 14.500 95.000 14.500" fill="none" stroke="#0b0b0c" stroke-width="3.400" stroke-linecap="round"/>
+  <path d="M71.800 13.100 C83.400 13.100 83.400 14.500 95.000 14.500" fill="none" stroke="#2a2b2e" stroke-width="2.652" stroke-linecap="round"/>
+  <path d="M71.800 13.100 C83.400 13.100 83.400 14.500 95.000 14.500" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.748" stroke-linecap="round" transform="translate(0 -0.680)"/>
+  <!-- o XT60 -->
+  <path d="M94.400 3.950 Q94.400 3.150 95.200 3.150 H109.600 Q110.400 3.150 110.400 3.950 V16.050 L108.200 18.650 H96.600 L94.400 16.050 Z" fill="url(#xt60)" stroke="#8a6a00" stroke-width="0.25"/>
+  <rect x="95.300" y="4.050" width="7.200" height="12.300" rx="0.6" fill="#f2c200" stroke="#b38f00" stroke-width="0.18"/>
+  <path d="M103.200 4.150 V17.050" stroke="#c9a200" stroke-width="0.25"/>
+  <text x="106.560" y="7.300" fill="#7a5c00" font-size="2.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">+</text>
+  <text x="106.560" y="14.500" fill="#7a5c00" font-size="2.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">−</text>
+  <rect x="109.300" y="5.500" width="1.1" height="3.6" fill="#3a2e00"/>
+  <rect x="109.500" y="6.050" width="0.9" height="2.5" fill="#d8b04a"/>
+  <rect x="109.300" y="12.700" width="1.1" height="3.6" fill="#3a2e00"/>
+  <rect x="109.500" y="13.250" width="0.9" height="2.5" fill="#d8b04a"/>
+  <path d="M71.800 22.300 C77.300 22.300 77.300 22.300 82.800 22.300" fill="none" stroke="#0b0b0c" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M71.800 22.300 C77.300 22.300 77.300 22.300 82.800 22.300" fill="none" stroke="#2a2b2e" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M71.800 22.300 C77.300 22.300 77.300 22.300 82.800 22.300" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <path d="M71.800 24.800 C77.300 24.800 77.300 24.800 82.800 24.800" fill="none" stroke="#7d1714" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M71.800 24.800 C77.300 24.800 77.300 24.800 82.800 24.800" fill="none" stroke="#d0312d" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M71.800 24.800 C77.300 24.800 77.300 24.800 82.800 24.800" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <path d="M71.800 27.300 C77.300 27.300 77.300 27.300 82.800 27.300" fill="none" stroke="#7d1714" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M71.800 27.300 C77.300 27.300 77.300 27.300 82.800 27.300" fill="none" stroke="#d0312d" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M71.800 27.300 C77.300 27.300 77.300 27.300 82.800 27.300" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <path d="M71.800 29.800 C77.300 29.800 77.300 29.800 82.800 29.800" fill="none" stroke="#7d1714" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M71.800 29.800 C77.300 29.800 77.300 29.800 82.800 29.800" fill="none" stroke="#d0312d" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M71.800 29.800 C77.300 29.800 77.300 29.800 82.800 29.800" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <path d="M71.800 32.300 C77.300 32.300 77.300 32.300 82.800 32.300" fill="none" stroke="#7d1714" stroke-width="1.050" stroke-linecap="round"/>
+  <path d="M71.800 32.300 C77.300 32.300 77.300 32.300 82.800 32.300" fill="none" stroke="#d0312d" stroke-width="0.819" stroke-linecap="round"/>
+  <path d="M71.800 32.300 C77.300 32.300 77.300 32.300 82.800 32.300" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.231" stroke-linecap="round" transform="translate(0 -0.210)"/>
+  <rect x="82.400" y="19.850" width="5.800" height="14.900" rx="0.35" fill="#f3f1e8" stroke="#a8a395" stroke-width="0.18"/>
+  <rect x="85.590" y="20.250" width="2.320" height="14.100" rx="0.25" fill="none" stroke="#a8a395" stroke-width="0.15"/>
+  <rect x="87.700" y="21.850" width="0.5" height="0.9" fill="#6d6a60"/>
+  <rect x="87.700" y="24.350" width="0.5" height="0.9" fill="#6d6a60"/>
+  <rect x="87.700" y="26.850" width="0.5" height="0.9" fill="#6d6a60"/>
+  <rect x="87.700" y="29.350" width="0.5" height="0.9" fill="#6d6a60"/>
+  <rect x="87.700" y="31.850" width="0.5" height="0.9" fill="#6d6a60"/>
+</g>
+</svg>

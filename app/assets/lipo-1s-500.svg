@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="219px" height="116px" viewBox="0 0 219 116">
+<defs>
+  <linearGradient id="bolsa" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4e7ea"/><stop offset="0.5" stop-color="#c3c8ce"/><stop offset="1" stop-color="#a6adb5"/></linearGradient>
+  <linearGradient id="kapton" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f0b400"/><stop offset="1" stop-color="#c98d00"/></linearGradient>
+</defs>
+<g transform="scale(3.779528)">
+  <!-- a bolsa de aluminio, com a dobra selada em volta -->
+  <rect x="0.400" y="0.400" width="35.000" height="30.000" rx="1.2" fill="url(#bolsa)" stroke="#7d848c" stroke-width="0.25"/>
+  <rect x="1.800" y="1.800" width="32.200" height="27.200" rx="0.8" fill="none" stroke="#9aa1a9" stroke-width="0.25"/>
+  <rect x="3.600" y="4.000" width="24.0" height="22.800" rx="0.6" fill="#f7f8f9" stroke="#c7ccd2" stroke-width="0.15"/>
+  <rect x="3.600" y="4.000" width="24.0" height="5.2" rx="0.6" fill="#1f5fae"/>
+  <text x="15.600" y="6.600" fill="#ffffff" font-size="2.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">Li-Polymer</text>
+  <text x="15.600" y="15.600" fill="#1a1c1f" font-size="3.0px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">3.7V 500mAh</text>
+  <text x="15.600" y="19.800" fill="#4a4e55" font-size="2.2px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">503035</text>
+  <text x="15.600" y="23.200" fill="#6a6f77" font-size="1.8px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">1S1P  1.85Wh</text>
+  <rect x="32.800" y="3.400" width="5.2" height="24.000" rx="0.5" fill="url(#kapton)" fill-opacity="0.92" stroke="#9a6c00" stroke-width="0.2"/>
+  <rect x="34.000" y="10.400" width="2.4" height="3.0" rx="0.2" fill="#7a5600" fill-opacity="0.45"/>
+  <rect x="34.000" y="17.400" width="2.4" height="3.0" rx="0.2" fill="#7a5600" fill-opacity="0.45"/>
+  <path d="M37.800 14.400 C45.450 14.400 45.450 14.400 53.100 14.400" fill="none" stroke="#7d1714" stroke-width="0.950" stroke-linecap="round"/>
+  <path d="M37.800 14.400 C45.450 14.400 45.450 14.400 53.100 14.400" fill="none" stroke="#d0312d" stroke-width="0.741" stroke-linecap="round"/>
+  <path d="M37.800 14.400 C45.450 14.400 45.450 14.400 53.100 14.400" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.209" stroke-linecap="round" transform="translate(0 -0.190)"/>
+  <path d="M37.800 16.400 C45.450 16.400 45.450 16.400 53.100 16.400" fill="none" stroke="#0b0b0c" stroke-width="0.950" stroke-linecap="round"/>
+  <path d="M37.800 16.400 C45.450 16.400 45.450 16.400 53.100 16.400" fill="none" stroke="#2a2b2e" stroke-width="0.741" stroke-linecap="round"/>
+  <path d="M37.800 16.400 C45.450 16.400 45.450 16.400 53.100 16.400" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.209" stroke-linecap="round" transform="translate(0 -0.190)"/>
+  <rect x="53.100" y="12.450" width="4.500" height="5.900" rx="0.35" fill="#f3f1e8" stroke="#a8a395" stroke-width="0.18"/>
+  <rect x="55.575" y="12.850" width="1.800" height="5.100" rx="0.25" fill="none" stroke="#a8a395" stroke-width="0.15"/>
+  <rect x="57.100" y="13.950" width="0.5" height="0.9" fill="#6d6a60"/>
+  <rect x="57.100" y="15.950" width="0.5" height="0.9" fill="#6d6a60"/>
+</g>
+</svg>

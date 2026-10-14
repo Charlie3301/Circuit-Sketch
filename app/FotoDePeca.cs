@@ -16,18 +16,20 @@ namespace Simulador.App;
 ///                     [--furos]                         (marca o centro de cada pino)
 ///                     [--virada]                        (a PCB pelo lado de baixo)
 ///                     [--braco id]                      (o braco do servo: nenhum, simples, duplo...)
+///                     [--modelo id] [--bits n]          (a pilha do suporte; os slots vazios, em bits)
 ///
 /// O --furos desenha um ponto vermelho no lugar de cada pino do catalogo:
 /// e o que mostra que o desenho novo nao tirou nenhum furo do lugar.
 /// </summary>
 internal static class FotoDePeca
 {
-    public static int Gravar(string tipo, string cor, string braco, double zoom, Rect? recorte, bool furos, bool virada, string png)
+    public static int Gravar(string tipo, string cor, string braco, double zoom, Rect? recorte, bool furos, bool virada, string png,
+                             string modelo = null, int bits = 0)
     {
         var def = Catalogo.Obter(tipo);
         if (def is null) return 2;
 
-        var peca = new PecaNoCircuito { Id = "foto", Tipo = tipo, Cor = cor, Virada = virada, Braco = braco };
+        var peca = new PecaNoCircuito { Id = "foto", Tipo = tipo, Cor = cor, Virada = virada, Braco = braco, Modelo = modelo, Bits = bits };
         var editor = new EditorCircuito();
         var desenho = editor.DesenhoDa(peca, def);
 
