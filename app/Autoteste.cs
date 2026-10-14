@@ -7412,6 +7412,7 @@ public static partial class Autoteste
             double codigo = maq.Leitura("ir:codigo");
 
             ed.Soltar();
+            maq.Leituras["ir:codigo"] = 0;           // o resume() do sketch: o receptor guarda ate ele
             ed.AplicarEntradas(bancadaUnica, rede);
             double depois = maq.Leitura("ir:codigo");
 

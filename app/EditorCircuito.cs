@@ -5853,8 +5853,10 @@ public partial class EditorCircuito : Border
 
             if (comp.PinoDaGrandeza is null)
             {
-                // De barramento: chave fixa, sem pino.
-                maq.Leituras[comp.Grandeza] = valor;
+                // De barramento: chave fixa, sem pino. O controle
+                // infravermelho na barra em zero nao apaga o codigo da tecla
+                // que o sketch ainda nao leu: quem o consome e o resume().
+                if (peca.Tipo != "ir-remote" || valor > 0) maq.Leituras[comp.Grandeza] = valor;
             }
             else
             {
@@ -5890,7 +5892,10 @@ public partial class EditorCircuito : Border
                 maq.Leituras["ir:codigo"] = tecla.Codigo;
                 irEntregue[peca.Id] = (tecla.Codigo, maq.Ms);
             }
-            else if (maq.Ms - entregue.Ms >= 108)
+            // O repeat so entra com o codigo de antes ja lido: o receptor guarda
+            // o que decodificou ate o resume() -- com o PC ocupado, o sketch
+            // pode demorar a ler, e o repeat nao pode passar por cima da tecla.
+            else if (maq.Ms - entregue.Ms >= 108 && maq.Leitura("ir:codigo") <= 0)
             {
                 maq.Leituras["ir:codigo"] = 0xFFFFFFFF;
                 irEntregue[peca.Id] = (tecla.Codigo, maq.Ms);

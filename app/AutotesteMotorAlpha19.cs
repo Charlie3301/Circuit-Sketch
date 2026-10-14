@@ -294,7 +294,8 @@ public static partial class Autoteste
             var chave = new PecaNoCircuito { Tipo = "slide-switch", X = 300, Y = 60 };
             c.Pecas.AddRange([placa, chave]);
             c.Fios.Add(new Fio { DePeca = chave.Id, DePino = "2", ParaPeca = placa.Id, ParaPino = "1" });
-            c.Fios.Add(new Fio { DePeca = chave.Id, DePino = "1", ParaPeca = placa.Id, ParaPino = "GND" });
+            // O lado da direita (3) no GND: alavanca a direita (o 2 no 3, como no Wokwi) = ligada.
+            c.Fios.Add(new Fio { DePeca = chave.Id, DePino = "3", ParaPeca = placa.Id, ParaPino = "GND" });
 
             var janela = new MainWindow();
             try
