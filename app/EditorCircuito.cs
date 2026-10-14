@@ -5786,7 +5786,7 @@ public partial class EditorCircuito : Border
     {
         if (DateTime.UtcNow < proximoDivisor) return;
         proximoDivisor = DateTime.UtcNow.AddMilliseconds(250);
-        if (!Atual.Pecas.Any(p => p.Tipo == "resistor")) return;
+        if (!Atual.Pecas.Any(p => p.Tipo is "resistor" or "ldr")) return;
 
         // Com motor no circuito a conta deste quadro ja foi feita.
         var conta = contaPronta ?? CalcularEnergia(bancada, rede);

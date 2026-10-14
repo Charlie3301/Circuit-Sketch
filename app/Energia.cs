@@ -510,7 +510,7 @@ public sealed partial class Energia
             var def = Catalogo.Obter(peca.Tipo);
             if (def is null) continue;
 
-            if (peca.Tipo == "resistor") resistores.Add(peca.Id);
+            if (peca.Tipo is "resistor" or "ldr") resistores.Add(peca.Id);
             foreach (var ramo in RamosDaPeca(peca, def, rede))
                 ramos.Add(ramo);
         }
@@ -629,6 +629,15 @@ public sealed partial class Energia
                 double v = Semicondutores.Protecao(peca).Valor;
                 if (Entre("1", "2", 2.0, v, 0.001, 5) is { } ida) yield return ida with { Rotulo = "varistor" };
                 if (Entre("2", "1", 2.0, v, 0.001, 5) is { } volta) yield return volta with { Rotulo = "varistor-volta" };
+                yield break;
+            }
+
+            // O LDR: um resistor que muda com a luz (Comportamento.ResistenciaDoLdr).
+            // Aguenta ~100 mW: passar de uns 20 mA ja o esquenta demais.
+            case "ldr":
+            {
+                var r = Entre("1", "2", Comportamento.ResistenciaDoLdr(peca.Giro), 0, 0.0001, 0.02);
+                if (r is not null) yield return r with { Rotulo = "ldr" };
                 yield break;
             }
 

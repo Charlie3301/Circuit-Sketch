@@ -54,7 +54,7 @@ public class JanelaAbertura : Window
 
         Title = "CircuitSketch";
         Width = 780;
-        Height = 600;
+        Height = 640;
         ResizeMode = ResizeMode.NoResize;
         WindowStartupLocation = dono is null
             ? WindowStartupLocation.CenterScreen : WindowStartupLocation.CenterOwner;
@@ -63,10 +63,17 @@ public class JanelaAbertura : Window
 
         var raiz = new Grid();
         raiz.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        raiz.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         raiz.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
         raiz.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
         raiz.Children.Add(Cabecalho());
+
+        if (AvisoDeTeste() is { } aviso)
+        {
+            Grid.SetRow(aviso, 1);
+            raiz.Children.Add(aviso);
+        }
 
         var meio = new Grid { Margin = new Thickness(20, 4, 20, 0) };
         meio.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -90,13 +97,13 @@ public class JanelaAbertura : Window
         Grid.SetColumn(direita, 2);
         meio.Children.Add(direita);
 
-        Grid.SetRow(meio, 1);
+        Grid.SetRow(meio, 2);
         raiz.Children.Add(meio);
 
         var rodape = Rodape();
         if (rodape is FrameworkElement caixaDoRodape)
             caixaDoRodape.Margin = new Thickness(20, 0, 20, 18);
-        Grid.SetRow(rodape, 2);
+        Grid.SetRow(rodape, 3);
         raiz.Children.Add(rodape);
 
         Content = raiz;
@@ -144,10 +151,16 @@ public class JanelaAbertura : Window
                 new Point(0.5, 0), new Point(0.5, 1)),
         });
 
+        // A faixa e escura em qualquer tema (a arte e o degrade sao fixos):
+        // o texto dela e claro sempre. Com a cor do tema, no tema claro o
+        // nome saia escuro sobre escuro.
+        var claro = new SolidColorBrush(Color.FromRgb(0xF2, 0xF6, 0xFA));
+        var claroFraco = new SolidColorBrush(Color.FromRgb(0xB4, 0xC2, 0xD0));
+
         var versao = new TextBlock
         {
             Text = Versao(),
-            Foreground = Texto,
+            Foreground = claro,
             FontSize = 12,
             Opacity = 0.75,
             Margin = new Thickness(0, 12, 16, 0),
@@ -155,6 +168,18 @@ public class JanelaAbertura : Window
             VerticalAlignment = VerticalAlignment.Top,
         };
         faixa.Children.Add(versao);
+
+        // O autor, no canto de baixo, do lado oposto ao nome do programa.
+        faixa.Children.Add(new TextBlock
+        {
+            Text = "por Emannuel Serafim Oliveira",
+            Foreground = claro,
+            FontSize = 12,
+            Opacity = 0.85,
+            Margin = new Thickness(0, 0, 18, 18),
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Bottom,
+        });
 
         var canto = new StackPanel
         {
@@ -179,14 +204,14 @@ public class JanelaAbertura : Window
         nomes.Children.Add(new TextBlock
         {
             Text = "CircuitSketch",
-            Foreground = Texto,
+            Foreground = claro,
             FontSize = 28,
             FontWeight = FontWeights.SemiBold,
         });
         nomes.Children.Add(new TextBlock
         {
             Text = Boasvindas[new Random().Next(Boasvindas.Length)],
-            Foreground = Fraco,
+            Foreground = claroFraco,
             FontSize = 12,
             FontStyle = FontStyles.Italic,
         });
@@ -361,6 +386,44 @@ public class JanelaAbertura : Window
 
         var v = Assembly.GetExecutingAssembly().GetName().Version;
         return v is null ? "1.0" : $"{v.Major}.{v.Minor}.{v.Build}";
+    }
+
+    /// <summary>
+    /// O aviso das versoes de teste: o programa esta em desenvolvimento e o
+    /// que se ve nao e a versao final. Sai sozinho quando o nome da versao
+    /// deixar de ser Alpha ou Beta.
+    /// </summary>
+    static UIElement AvisoDeTeste()
+    {
+        string versao = Versao();
+        if (!versao.Contains("Alpha", StringComparison.OrdinalIgnoreCase)
+            && !versao.Contains("Beta", StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        var fundo = Destaque.Clone();
+        fundo.Opacity = 0.14;
+
+        var texto = new TextBlock
+        {
+            Foreground = Texto,
+            FontSize = 12,
+            TextWrapping = TextWrapping.Wrap,
+        };
+        texto.Inlines.Add(new System.Windows.Documents.Run("⚠  ") { Foreground = Destaque });
+        texto.Inlines.Add(new System.Windows.Documents.Run($"Versão de teste ({versao}). ") { FontWeight = FontWeights.SemiBold });
+        texto.Inlines.Add(new System.Windows.Documents.Run(
+            "O CircuitSketch está em desenvolvimento: esta não é a versão final. Pode ter erros, "
+            + "e o que aparece aqui ainda vai mudar."));
+
+        return new Border
+        {
+            Background = fundo,
+            BorderBrush = Destaque,
+            BorderThickness = new Thickness(0, 0, 0, 1),
+            Padding = new Thickness(20, 8, 20, 8),
+            Margin = new Thickness(0, 0, 0, 8),
+            Child = texto,
+        };
     }
 
     static ImageSource Icone()
@@ -661,8 +724,7 @@ public class JanelaAbertura : Window
             Orientation = Orientation.Horizontal,
             HorizontalAlignment = HorizontalAlignment.Right,
         };
-        direita.Children.Add(Botao("O que mudou", MostrarChangelog));
-        direita.Children.Add(Botao("Apoiar o projeto", MostrarApoio));
+        direita.Children.Add(Botao("Roadmap", MostrarRoadmap));
         DockPanel.SetDock(direita, Dock.Right);
         linha.Children.Add(direita);
 
@@ -681,39 +743,60 @@ public class JanelaAbertura : Window
         return botao;
     }
 
-    void MostrarChangelog()
-        => MostrarTexto("O que mudou", TextoEmbutido("changelog.txt")
-            ?? "O arquivo de mudanças não veio junto nesta cópia.");
+    /// <summary>
+    /// O roadmap das proximas versoes, o mesmo que o autor publicou: a
+    /// Alpha 24 (esta), a 25 e a 26/Beta 1.
+    /// </summary>
+    internal const string TextoDoRoadmap =
+        """
+        ROADMAP DO CIRCUITSKETCH
 
-    void MostrarApoio()
-        => MostrarTexto("Apoiar o projeto",
-            """
-            O CircuitSketch é gratuito e foi escrito para uma turma.
+        ALPHA 24  —  esta versão (teste)
+          ✓ diagram.json no formato do Wokwi: abre e salva projetos de lá
+          ✓ bateria de verdade: a placa sem o cabo USB liga só pela bateria
+          ✓ correções de lógica e da energia dos circuitos
+          ✓ componentes novos: diodos (comum, Zener e Schottky),
+            capacitores, indutores, cristais, transistores NPN e PNP,
+            MOSFET, optoacoplador, fusível, varistor e os módulos de relé
+            de 1, 2 e 4 canais
+          ✓ PCB perfurada, com a opção de virar a placa para ligar por baixo
+          ✓ som estéreo (PCM5102A); no player DAP, AAC, WMA e APE
+          ✓ MicroPython com class, try/except, with, lambda, Timer, RTC,
+            SPI e Pin.irq
+          ✓ gerenciador de bibliotecas, que baixa as que faltam
+          ✓ testes de cada pino de cada placa e de cada componente
 
-            A melhor forma de ajudar não custa nada:
+        ALPHA 25
+          · o programa inteiro em 14 idiomas: português, inglês, espanhol,
+            italiano, alemão, francês, russo, norueguês, sueco, chinês
+            tradicional e simplificado, árabe, hindi e hebraico
+          · os desenhos dos componentes refeitos
 
-              · conte o que quebrou -- circuito, sketch e o que você
-                esperava. Erro descrito é erro consertado;
-              · mande o .sktch junto: metade dos problemas só aparece
-                com o circuito de quem achou;
-              · mostre para quem está começando.
+        ALPHA 26  /  BETA 1
+          · otimização e testes gerais
+          · versões para Linux e macOS
+          · lançamento público
 
-            Se você quiser apoiar de outra forma, fale com quem te
-            passou o programa -- o endereço para isso muda de turma
-            para turma, e inventar um aqui seria pior do que não ter.
-            """);
+        O que está aqui é o plano de agora: a ordem e o conteúdo de cada
+        versão ainda podem mudar.
+        """;
 
-    void MostrarTexto(string titulo, string texto)
+    void MostrarRoadmap() => MostrarTexto("Roadmap", TextoDoRoadmap);
+
+    void MostrarTexto(string titulo, string texto) => JanelaDeTexto(this, titulo, texto).ShowDialog();
+
+    /// <summary>A janela de um texto (o roadmap), sem mostrar: o passeio a abre sem prender o roteiro.</summary>
+    internal static Window JanelaDeTexto(Window dono, string titulo, string texto)
     {
         var janela = new Window
         {
-            Owner = this,
             Title = titulo,
-            Width = 560,
-            Height = 460,
+            Width = 600,
+            Height = 680,
             Background = Fundo,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
         };
+        try { janela.Owner = dono; } catch (InvalidOperationException) { }
 
         janela.Content = new ScrollViewer
         {
@@ -730,8 +813,7 @@ public class JanelaAbertura : Window
                 LineStackingStrategy = LineStackingStrategy.BlockLineHeight,
             },
         };
-
-        janela.ShowDialog();
+        return janela;
     }
 
     /// <summary>Texto que veio embutido no programa (assets/...).</summary>

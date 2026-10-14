@@ -137,6 +137,7 @@ public static partial class Autoteste
         Bloco("Comportamento_EntradasESensores", Comportamento_EntradasESensores);
         Bloco("Comportamento_SaidasEMotores", Comportamento_SaidasEMotores);
         Bloco("Comportamento_LogicaEModulos", Comportamento_LogicaEModulos);
+        Bloco("Comportamento_PassivosESemicondutores", Comportamento_PassivosESemicondutores);
         Bloco("Idiomas_Base", Idiomas_Base);
         Bloco("Projetos_Testados", Projetos_Testados);
         Bloco("Programa_DesfazerERefazer", Programa_DesfazerERefazer);
@@ -7995,6 +7996,31 @@ public static partial class Autoteste
             Conferir("abertura: abre sem escolher nada",
                 abertura.PlacaEscolhida is null && abertura.ProjetoEscolhido is null,
                 "ja veio escolhida");
+
+            // O teste fechado da Alpha 24: o autor na faixa, o aviso de versao
+            // em desenvolvimento e o Roadmap no lugar do "O que mudou" e do
+            // "Apoiar o projeto".
+            var textos = new List<string>();
+            void Varrer(object o)
+            {
+                if (o is System.Windows.Controls.TextBlock bloco)
+                    textos.Add(bloco.Inlines.Count > 0
+                        ? string.Concat(bloco.Inlines.OfType<System.Windows.Documents.Run>().Select(r => r.Text)) : bloco.Text);
+                if (o is System.Windows.Controls.Button { Content: string rotulo }) textos.Add(rotulo);
+                if (o is System.Windows.DependencyObject d)
+                    foreach (object filho in System.Windows.LogicalTreeHelper.GetChildren(d)) Varrer(filho);
+            }
+            Varrer(abertura);
+            Conferir("abertura: o autor no canto da faixa", textos.Contains("por Emannuel Serafim Oliveira"),
+                string.Join(" | ", textos.Take(8)));
+            Conferir("abertura: o aviso de que esta em desenvolvimento e nao e a versao final",
+                textos.Any(t => t.Contains("Versão de teste") && t.Contains("não é a versão final")), string.Join(" | ", textos.Take(8)));
+            Conferir("abertura: o botao Roadmap, sem o \"O que mudou\" e o \"Apoiar o projeto\"",
+                textos.Contains("Roadmap") && !textos.Contains("O que mudou") && !textos.Contains("Apoiar o projeto"),
+                string.Join(" | ", textos.Where(t => t.Length < 30)));
+            Conferir("abertura: o roadmap tem a Alpha 24, a 25 e a 26/Beta 1",
+                JanelaAbertura.TextoDoRoadmap.Contains("ALPHA 24") && JanelaAbertura.TextoDoRoadmap.Contains("ALPHA 25")
+                && JanelaAbertura.TextoDoRoadmap.Contains("ALPHA 26  /  BETA 1"), "faltou uma");
             Conferir("abertura: o changelog veio embutido no programa",
                 JanelaAbertura.TextoEmbutido("changelog.txt")?.Contains("CircuitSketch") == true,
                 "nao achei o changelog");

@@ -66,6 +66,15 @@ public record Comportamento
     static double Lux(double giro) => Math.Pow(10, Math.Clamp(giro, 0, 1) * 6 - 1);
 
     /// <summary>
+    /// A resistencia do LDR solto com a luz do controle: 50 kohm a 10 lux e
+    /// gama 0,7 (as constantes do fotorresistor do Wokwi, RL10 50 e GAMMA
+    /// 0.7, as mesmas do modulo abaixo) -- ~1,3 Mohm no escuro (0,1 lux) e
+    /// ~80 ohm no sol forte (100 mil lux).
+    /// </summary>
+    public static double ResistenciaDoLdr(double giro)
+        => 50_000 * Math.Pow(10, 0.7) / Math.Pow(Lux(giro), 0.7);
+
+    /// <summary>
     /// O divisor do modulo de LDR: o LDR (50 kohm a 10 lux, gama 0,7) contra
     /// 10 kohm. Sao as constantes do exemplo do Wokwi -- GAMMA 0.7 e RL10
     /// 50 --, entao a conta que a turma copia devolve a luz daqui.
@@ -102,12 +111,14 @@ public record Comportamento
             Escala = Lux, Saida = giro => FracaoDoLdr(Lux(giro)),
         },
 
-        // O LDR solto, de duas pernas. Qualquer uma das duas serve de
-        // saida: no divisor de tensao da aula o pino analogico fica de
-        // um lado e o resistor do outro, e quem monta escolhe o lado.
+        // O LDR solto, de duas pernas, e um RESISTOR que muda com a luz
+        // (ResistenciaDoLdr): a leitura sai do divisor que a pessoa montou,
+        // pela conta de energia -- com o LDR em cima, mais luz e leitura
+        // maior; embaixo, menor; sem o resistor do divisor, nada. Antes o pino
+        // ligado a qualquer perna lia a luz direto, montado como fosse.
         ["ldr"] = new()
         {
-            Analogicos = ["1", "2"], Rotulo = "Luz"
+            Grandeza = "ldr:luz", Rotulo = "Luz", Unidade = "lux", Escala = Lux,
         },
         ["gas-sensor"] = new()
         {

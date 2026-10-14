@@ -25,10 +25,10 @@
          Sao duas: o Windows exige numero em AssemblyVersion e
          FileVersion, e o nome que a pessoa ve fica em
          InformationalVersion. "Alpha 17" nao cabe num campo numerico. -->
-    <Version>0.19.0</Version>
-    <AssemblyVersion>0.18.0.0</AssemblyVersion>
-    <FileVersion>0.18.0.0</FileVersion>
-    <InformationalVersion>Alpha 19</InformationalVersion>
+    <Version>0.24.0</Version>
+    <AssemblyVersion>0.24.0.0</AssemblyVersion>
+    <FileVersion>0.24.0.0</FileVersion>
+    <InformationalVersion>Alpha 24</InformationalVersion>
     <Product>CircuitSketch</Product>
     <Company>CircuitSketch</Company>
     <Description>Simulador offline de ESP32 e Arduino</Description>

@@ -51,8 +51,12 @@ if (-not $SemPublicar) {
     $aberto = Get-Process CircuitSketch -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $exe }
     if ($aberto) { throw 'Feche o CircuitSketch publicado antes: o publish precisa sobrescrever o executavel.' }
 
+    # O PDB vai embutido (o erro relatado ainda diz a linha), e o PathMap
+    # troca a pasta do projeto por um caminho neutro: sem ele, o executavel
+    # levaria C:\Users\<quem gerou>\... nos caminhos de cada arquivo-fonte.
     Write-Host 'Publicando...'
-    & dotnet publish (Join-Path $raiz 'app') -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -v q --nologo
+    & dotnet publish (Join-Path $raiz 'app') -c Release -r win-x64 --self-contained -p:PublishSingleFile=true `
+        -p:DebugType=embedded "-p:PathMap=$raiz=C:\CircuitSketch" -v q --nologo
     if ($LASTEXITCODE -ne 0) { throw 'dotnet publish falhou' }
 }
 if (-not (Test-Path -LiteralPath $exe)) { throw "Nao achei $exe" }
@@ -110,6 +114,29 @@ $platformTxt = Join-Path $pacotePlugin 'platform.txt'
 $texto = [IO.File]::ReadAllText($platformTxt, $utf8SemBom)
 $texto = [regex]::Replace($texto, '(?m)^version=.*$', "version=$versao")
 [IO.File]::WriteAllText($platformTxt, $texto, $utf8SemBom)
+
+# ---------------- nada desta maquina no pacote ----------------
+# O instalador vai para outras pessoas: nenhum arquivo dele pode levar o
+# caminho da pasta de quem o gerou (C:\Users\<nome>\...) nem o da pasta do
+# projeto. Procura em ASCII e em UTF-16 (as strings do .NET), em tudo.
+$proibidos = @("\Users\$env:USERNAME\", "/Users/$env:USERNAME/", $raiz, $raiz.Replace('\', '/'))
+$latin1 = [Text.Encoding]::GetEncoding(28591)
+$achados = @()
+foreach ($arquivo in Get-ChildItem -LiteralPath $pacote -Recurse -File) {
+    $conteudo = $latin1.GetString([IO.File]::ReadAllBytes($arquivo.FullName))
+    foreach ($p in $proibidos) {
+        $largo = -join ($p.ToCharArray() | ForEach-Object { "$_`0" })
+        if ($conteudo.IndexOf($p, [StringComparison]::OrdinalIgnoreCase) -ge 0 -or
+            $conteudo.IndexOf($largo, [StringComparison]::OrdinalIgnoreCase) -ge 0) {
+            $achados += "$($arquivo.FullName.Substring($pacote.Length + 1)): $p"
+        }
+    }
+}
+if ($achados) {
+    $achados | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
+    throw 'O pacote leva caminhos desta maquina (acima): nao distribuir assim.'
+}
+Write-Host 'Pacote conferido: nenhum caminho desta maquina.'
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $zip = Join-Path $obj 'pacote.zip'

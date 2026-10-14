@@ -407,6 +407,7 @@ public static class Passeio
         foreach (var (rotulo, abrir) in new (string, Func<Window>)[]
                  {
                      ("tela de abertura", () => new JanelaAbertura(janela)),
+                     ("roadmap", () => JanelaAbertura.JanelaDeTexto(janela, "Roadmap", JanelaAbertura.TextoDoRoadmap)),
                      ("atalhos", () => new JanelaAtalhos(janela)),
                      ("bibliotecas", () => new JanelaBibliotecas(janela, janela.TesteCodigo)),
                      ("cartao com arquivo do computador", () => new JanelaCartao(janela,
