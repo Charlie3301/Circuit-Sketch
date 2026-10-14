@@ -88,3 +88,18 @@ teclado e o mouse no app enquanto eles rodam.
 - Geradores em `ferramentas/` (Python): `bateria.py` (bateria de testes em
   `bateria/`), `projetos.py` (projetos de teste em `projetos/`).
 - Fidelidade ao hardware real e prioridade: na duvida, o datasheet manda.
+
+## Textos e idiomas (base da Alpha 25)
+
+O portugues do codigo e a chave da traducao (`motor/Idioma.cs`).
+
+- Texto NOVO que o usuario le vai marcado: `Idioma.T("Salvar projeto")` no
+  C# e `Header="{local:T 'Salvar projeto'}"` no XAML. Sempre `Idioma.T` por
+  extenso (ha funcoes locais chamadas `T` no motor).
+- Numero ou nome dentro da frase vai como formato, nunca interpolado:
+  `Idioma.T("{0} peças, {1} fios", pecas, fios)` -- `$"..."` muda a chave a
+  cada valor e nunca acha a traducao.
+- Depois de marcar frases, rode `python ferramentas/idiomas.py`: ele poe as
+  frases novas nos catalogos (`motor/idiomas/*.json`) e mostra o que falta.
+- Nao traduza nada sem a tarefa pedir, e nao mude um texto em portugues so
+  para "melhorar": ele e a chave das traducoes que ja existem.

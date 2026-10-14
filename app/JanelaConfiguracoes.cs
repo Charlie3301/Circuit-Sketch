@@ -777,10 +777,21 @@ public class JanelaConfiguracoes : Window
 
     void MontarIdioma(StackPanel painel)
     {
-        var grupo = Grupo(painel, "Idioma");
-        Nota(grupo, "Português por enquanto. Os outros idiomas entram quando "
-                    + "estiverem prontos — caixa que não faz nada é pior do que "
-                    + "caixa nenhuma.");
+        var grupo = Grupo(painel, Idioma.T("Idioma"));
+
+        // So os idiomas com o catalogo completo: caixa que nao faz nada (ou
+        // que deixa metade da tela em cada lingua) e pior do que caixa nenhuma.
+        var idiomas = Idioma.Disponiveis(soCompletos: true);
+        if (idiomas.Count > 1)
+        {
+            EscolhaGuardada(grupo, Idioma.T("Idioma da interface"), Preferencias.Idioma, Idioma.Original,
+                [.. idiomas.Select(i => (i.Codigo, i.Nome))]);
+            Nota(grupo, Idioma.T("O idioma novo vale ao reabrir o CircuitSketch."));
+        }
+        else
+            Nota(grupo, "Português por enquanto. Os outros idiomas entram quando "
+                        + "estiverem prontos — caixa que não faz nada é pior do que "
+                        + "caixa nenhuma.");
 
         var bibliotecas = Grupo(painel, "Bibliotecas");
         Nota(bibliotecas, "Quais o simulador executa, quais o seu sketch pede, "

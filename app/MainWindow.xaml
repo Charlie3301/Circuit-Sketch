@@ -217,16 +217,16 @@
                              itens saiam claro sobre claro. Tudo plano, tudo
                              legivel, e salvar fica a um clique. -->
                         <!-- PROJETO -->
-                        <MenuItem Header="Novo projeto" InputGestureText="Ctrl+N"
+                        <MenuItem Header="{local:T 'Novo projeto'}" InputGestureText="Ctrl+N"
                                   Click="NovoCircuito"/>
-                        <MenuItem Header="Abrir projeto..." InputGestureText="Ctrl+O"
+                        <MenuItem Header="{local:T 'Abrir projeto...'}" InputGestureText="Ctrl+O"
                                   Click="AbrirCircuito"/>
-                        <MenuItem Header="Salvar projeto" InputGestureText="Ctrl+S"
+                        <MenuItem Header="{local:T 'Salvar projeto'}" InputGestureText="Ctrl+S"
                                   Click="SalvarCircuito"/>
-                        <MenuItem Header="Salvar projeto como..." InputGestureText="Ctrl+Shift+S"
+                        <MenuItem Header="{local:T 'Salvar projeto como...'}" InputGestureText="Ctrl+Shift+S"
                                   Click="SalvarComo"/>
-                        <MenuItem x:Name="miRecentes" Header="Projetos recentes"/>
-                        <MenuItem x:Name="miDemos" Header="Exemplos prontos"/>
+                        <MenuItem x:Name="miRecentes" Header="{local:T 'Projetos recentes'}"/>
+                        <MenuItem x:Name="miDemos" Header="{local:T 'Exemplos prontos'}"/>
                         <Separator Background="{DynamicResource Borda}"/>
 
                         <!-- CODIGO DA PLACA -->

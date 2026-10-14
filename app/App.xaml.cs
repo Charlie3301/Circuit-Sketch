@@ -184,6 +184,12 @@ public partial class App : Application
             Exit += (_, _) => Armazem.Descartar();
         }
 
+        // O idioma (Alpha 25): o escolhido nas configuracoes. Enquanto os
+        // catalogos estao pela metade, o padrao e o portugues original (e nao
+        // o do Windows, que daria metade da tela em cada lingua). Os testes
+        // conferem os textos em portugues: neles, sempre o original.
+        Idioma.Usar(Armazem.Isolado ? Idioma.Original : Preferencias.Texto(Preferencias.Idioma, Idioma.Original));
+
         DispatcherUnhandledException += (_, ev) =>
         {
             Registrar("DispatcherUnhandledException", ev.Exception);

@@ -1,0 +1,18 @@
+{
+ "codigo": "en",
+ "nome": "English",
+ "cultura": "en-US",
+ "completo": false,
+ "textos": {
+  "Abrir projeto...": "Open project...",
+  "Exemplos prontos": "Examples",
+  "Idioma": "Language",
+  "Idioma da interface": "",
+  "Novo projeto": "New project",
+  "O idioma novo vale ao reabrir o CircuitSketch.": "The new language takes effect when CircuitSketch is reopened.",
+  "Projetos recentes": "Recent projects",
+  "Salvar projeto": "Save project",
+  "Salvar projeto como...": "Save project as...",
+  "{0} peças, {1} fios": "{0} parts, {1} wires"
+ }
+}

@@ -125,6 +125,7 @@ public static partial class Autoteste
         Bloco("Diagrama_FormatoWokwi", Diagrama_FormatoWokwi);
         Bloco("Bateria_Alimentacao", Bateria_Alimentacao);
         Bloco("Reguladores_DeTensao", Reguladores_DeTensao);
+        Bloco("Idiomas_Base", Idiomas_Base);
         Bloco("Projetos_Testados", Projetos_Testados);
         Bloco("Programa_DesfazerERefazer", Programa_DesfazerERefazer);
         Bloco("Plugin_TodasAsPlacas", Plugin_TodasAsPlacas);

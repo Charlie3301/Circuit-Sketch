@@ -87,6 +87,9 @@ public static class Preferencias
     public const string Grade = "grade";
     /// <summary>O "author" dos diagram.json (vazio: o usuario do Windows).</summary>
     public const string Autor = "autor-dos-projetos";
+
+    /// <summary>O idioma da interface ("pt-BR", "en"...): vale ao reabrir o programa.</summary>
+    public const string Idioma = "idioma";
     public const string EstiloDoFio = "estilo-do-fio";
     public const string UsarInternet = "usar-internet";
     public const string MostrarAbertura = "mostrar-abertura";

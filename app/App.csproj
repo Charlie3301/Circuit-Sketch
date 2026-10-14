@@ -44,6 +44,8 @@
     Program.cs, que tem o entry point do runner.
   -->
   <ItemGroup>
+    <Compile Include="..\motor\Idioma.cs" />
+    <EmbeddedResource Include="..\motor\idiomas\*.json" LogicalName="idiomas/%(Filename)%(Extension)" />
     <Compile Include="..\motor\Lexer.cs" />
     <Compile Include="..\motor\Preprocessador.cs" />
     <Compile Include="..\motor\Projeto.cs" />

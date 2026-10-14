@@ -18,4 +18,8 @@
   <ItemGroup>
     <Content Include="..\nativo\**\*" LinkBase="nativo" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <!-- Os catalogos de idiomas (Alpha 25): "idiomas/<codigo>.json", lidos pelo Idioma.cs. -->
+  <ItemGroup>
+    <EmbeddedResource Include="idiomas\*.json" LogicalName="idiomas/%(Filename)%(Extension)" />
+  </ItemGroup>
 </Project>
