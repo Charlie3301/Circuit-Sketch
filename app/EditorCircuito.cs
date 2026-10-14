@@ -338,6 +338,13 @@ public partial class EditorCircuito : Border
     /// </summary>
     readonly Dictionary<string, string> teclaMatricial = [];
 
+    /// <summary>Para o teste: o dedo numa tecla do teclado matricial (vazio: solta).</summary>
+    internal void TeclaMatricialParaTeste(string idDoTeclado, string tecla)
+    {
+        if (string.IsNullOrEmpty(tecla)) teclaMatricial.Remove(idDoTeclado);
+        else teclaMatricial[idDoTeclado] = tecla;
+    }
+
     /// <summary>
     /// O manche do joystick que esta sendo arrastado agora, e se ele
     /// chegou a sair do centro.

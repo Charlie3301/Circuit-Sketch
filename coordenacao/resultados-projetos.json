@@ -1,0 +1,969 @@
+{
+  "data": "2026-10-13T22:51:51",
+  "projetos": {
+    "drone-quadricoptero": {
+      "titulo": "Drone quadricoptero (ESP32, ESC 4-em-1, radio FlySky)",
+      "funcionou": false,
+      "erro": null,
+      "segundos": 33.2,
+      "conferencias": [
+        {
+          "nome": "a ESP32 liga pelo LM2596 (sem o cabo USB)",
+          "ok": true,
+          "visto": "energizada=True (pela bateria, 5 V no VIN)"
+        },
+        {
+          "nome": "a controladora iniciou",
+          "ok": false,
+          "visto": "monitor: "
+        },
+        {
+          "nome": "arma com o acelerador embaixo e o leme para a direita",
+          "ok": false,
+          "visto": "monitor: "
+        },
+        {
+          "nome": "com o acelerador em 55% os quatro motores giram",
+          "ok": false,
+          "visto": "m1 0 rpm, m2 0 rpm, m3 0 rpm, m4 0 rpm"
+        },
+        {
+          "nome": "as quatro helices empurram",
+          "ok": false,
+          "visto": "m1 0 gf, m2 0 gf, m3 0 gf, m4 0 gf"
+        },
+        {
+          "nome": "aileron para a direita: os motores da esquerda aceleram",
+          "ok": false,
+          "visto": "m3 0 rpm vs m1 0 rpm, m4 0 rpm vs m2 0 rpm"
+        },
+        {
+          "nome": "desarma com o acelerador embaixo e o leme para a esquerda",
+          "ok": false,
+          "visto": "monitor: "
+        }
+      ]
+    },
+    "carrinho-rc-sem-placa": {
+      "titulo": "Carrinho de controle remoto (sem placa)",
+      "funcionou": false,
+      "erro": null,
+      "segundos": 10.3,
+      "conferencias": [
+        {
+          "nome": "com o manche no centro as rodas ficam retas (servo em ~90 graus)",
+          "ok": true,
+          "visto": "direcao em 93 graus"
+        },
+        {
+          "nome": "manche direito para a direita: o servo vira (~180 graus)",
+          "ok": false,
+          "visto": "direcao em 93 graus"
+        },
+        {
+          "nome": "manche direito para a esquerda: o servo vira (~0 grau)",
+          "ok": false,
+          "visto": "direcao em 93 graus"
+        },
+        {
+          "nome": "o acelerador em 40% gira o motor",
+          "ok": true,
+          "visto": "motor 8828 rpm"
+        },
+        {
+          "nome": "e nada esquenta nem queima",
+          "ok": true,
+          "visto": "nenhum aviso"
+        }
+      ]
+    },
+    "carrinho-rc-arduino": {
+      "titulo": "Carrinho de controle remoto com Arduino Nano",
+      "funcionou": false,
+      "erro": null,
+      "segundos": 17.4,
+      "conferencias": [
+        {
+          "nome": "o Nano liga pelo BEC do ESC (sem o cabo USB)",
+          "ok": true,
+          "visto": "energizada=True (pela bateria, 5 V no 5V)"
+        },
+        {
+          "nome": "o Nano le o receptor",
+          "ok": false,
+          "visto": "monitor: sem sinal do radio | sem sinal do radio | sem sinal do radio | sem sinal do radio"
+        },
+        {
+          "nome": "manche para a direita: a direcao vai a ~150 graus",
+          "ok": false,
+          "visto": "direcao em 90 graus"
+        },
+        {
+          "nome": "o acelerador gira o motor (limitado a 70%)",
+          "ok": false,
+          "visto": "motor 0 rpm"
+        },
+        {
+          "nome": "controle desligado: o Nano entra no failsafe",
+          "ok": true,
+          "visto": "monitor: sem sinal do radio | sem sinal do radio | sem sinal do radio | sem sinal do radio"
+        },
+        {
+          "nome": "e para o motor",
+          "ok": true,
+          "visto": "motor 0 rpm"
+        }
+      ]
+    },
+    "rover-4wd": {
+      "titulo": "Rover 4WD (L298N, 4 motores amarelos)",
+      "funcionou": false,
+      "erro": null,
+      "segundos": 5,
+      "conferencias": [
+        {
+          "nome": "o Uno liga pelo 5 V da ponte H (sem o cabo USB)",
+          "ok": true,
+          "visto": "energizada=True (pela bateria, 5 V no 5V)"
+        },
+        {
+          "nome": "frente",
+          "ok": true,
+          "visto": "monitor: parado | frente"
+        },
+        {
+          "nome": "para a frente os quatro motores giram no mesmo sentido",
+          "ok": true,
+          "visto": "m_fe 55 rpm, m_te 55 rpm, m_fd 55 rpm, m_td 55 rpm"
+        },
+        {
+          "nome": "re",
+          "ok": true,
+          "visto": "monitor: parado | frente"
+        },
+        {
+          "nome": "de re os quatro invertem",
+          "ok": false,
+          "visto": "m_fe 177 rpm, m_te 177 rpm, m_fd 177 rpm, m_td 177 rpm"
+        },
+        {
+          "nome": "girando para a esquerda",
+          "ok": true,
+          "visto": "monitor: frente | parado | re | girando para a esquerda"
+        },
+        {
+          "nome": "no giro, o lado esquerdo vai para tras e o direito para a frente",
+          "ok": true,
+          "visto": "m_fe -174 rpm, m_fd 35 rpm"
+        },
+        {
+          "nome": "e a ponte H nao reclama",
+          "ok": true,
+          "visto": "nenhum aviso"
+        }
+      ]
+    },
+    "rover-4wd-hc-sr04": {
+      "titulo": "Rover 4WD com HC-SR04 (o seu Rover_ponte_H)",
+      "funcionou": false,
+      "erro": null,
+      "segundos": 12,
+      "conferencias": [
+        {
+          "nome": "o Uno liga pelo 5 V da ponte H (sem o cabo USB)",
+          "ok": true,
+          "visto": "energizada=True (pela bateria, 5 V no 5V)"
+        },
+        {
+          "nome": "com 100 cm livres o sonar le ~100 cm",
+          "ok": false,
+          "visto": "monitor: Frente: 99 cm | Frente: 99 cm | Frente: 99 cm | Frente: 99 cm"
+        },
+        {
+          "nome": "e o rover anda para a frente (os quatro motores)",
+          "ok": true,
+          "visto": "m_fe 177 rpm, m_te 177 rpm, m_fd 177 rpm, m_td 177 rpm"
+        },
+        {
+          "nome": "ENA no pino 2 (sem PWM): o lado esquerdo vai no maximo, mais rapido que o direito (PWM 200)",
+          "ok": false,
+          "visto": "m_fe 177 rpm vs m_fd 177 rpm"
+        },
+        {
+          "nome": "obstaculo a 5 cm: o servo olha para a esquerda (150 graus)",
+          "ok": true,
+          "visto": "servo em 149 graus"
+        },
+        {
+          "nome": "e para a direita (30 graus)",
+          "ok": true,
+          "visto": "servo em 30 graus"
+        },
+        {
+          "nome": "os dois lados bloqueados: meia-volta",
+          "ok": true,
+          "visto": "monitor: Esquerda: 4 cm | Direita: 4 cm | Caminho bloqueado! | Fazendo meia-volta."
+        },
+        {
+          "nome": "a re (os quatro para tras)",
+          "ok": true,
+          "visto": "m_fe -37 rpm, m_te -37 rpm, m_fd -37 rpm, m_td -37 rpm"
+        },
+        {
+          "nome": "caminho livre de novo: volta a andar para a frente",
+          "ok": true,
+          "visto": "m_fe 147 rpm, m_te 147 rpm, m_fd 49 rpm, m_td 49 rpm"
+        }
+      ]
+    },
+    "rover-4wd-reles": {
+      "titulo": "Rover 4WD com reles (o seu Uno_DesvioObstaculos)",
+      "funcionou": false,
+      "erro": null,
+      "segundos": 14.6,
+      "conferencias": [
+        {
+          "nome": "o Uno liga pelas baterias no VIN (sem o cabo USB)",
+          "ok": true,
+          "visto": "energizada=True (pela bateria, 7,4 V no VIN)"
+        },
+        {
+          "nome": "com 100 cm livres o sonar le ~100 cm",
+          "ok": false,
+          "visto": "monitor: Frente: 99 cm | Frente: 99 cm | Frente: 99 cm | Frente: 99 cm"
+        },
+        {
+          "nome": "e o rover anda para a frente (os reles A ligados)",
+          "ok": false,
+          "visto": "m_fe -310 rpm, m_te -310 rpm, m_fd -310 rpm, m_td -310 rpm"
+        },
+        {
+          "nome": "obstaculo a 5 cm: meia-volta",
+          "ok": true,
+          "visto": "monitor: Frente: 4 cm | Esquerda: 4 cm | Direita: 4 cm | Caminho bloqueado! Re e meia-volta."
+        },
+        {
+          "nome": "a re (os reles B ligados)",
+          "ok": false,
+          "visto": "m_fe 0 rpm, m_te 0 rpm, m_fd 0 rpm, m_td 0 rpm"
+        },
+        {
+          "nome": "e os reles direto nos pinos nao queimam nada",
+          "ok": true,
+          "visto": "nenhum aviso"
+        }
+      ]
+    },
+    "fonte-7805-uno": {
+      "titulo": "Uno alimentado pelo 7805 (LiPo 3S)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.2,
+      "conferencias": [
+        {
+          "nome": "o 7805 liga o Uno (sem o cabo USB)",
+          "ok": true,
+          "visto": "energizada=True (pela bateria, 5 V no 5V)"
+        },
+        {
+          "nome": "o Uno mede a LiPo pelo divisor (~11 V)",
+          "ok": true,
+          "visto": "monitor: Uno ligado pelo 7805 | Bateria: 11.1 V"
+        },
+        {
+          "nome": "o LED pisca",
+          "ok": true,
+          "visto": "led com brilho 0,94"
+        },
+        {
+          "nome": "e o 7805 fica frio (so 0,3 W)",
+          "ok": true,
+          "visto": "nenhum aviso"
+        }
+      ]
+    },
+    "7805-esquenta-com-servos": {
+      "titulo": "7805 com dois servos: esquenta e desliga",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 12.7,
+      "conferencias": [
+        {
+          "nome": "o 7805 liga o Uno",
+          "ok": true,
+          "visto": "energizada=True (pela bateria, 5 V no 5V)"
+        },
+        {
+          "nome": "os servos varrem",
+          "ok": true,
+          "visto": "servo1 em 127 graus"
+        },
+        {
+          "nome": "o 7805 esquenta e a protecao termica desliga a saida (o aviso explica)",
+          "ok": true,
+          "visto": "reg: o 7805 chegou a 150 °C e a proteção térmica desligou a saída: ele estava esquentando 10,1 W (11,9 V na entrada, 4,9 V e 1,43 A na saída). Sem dissipador ele aguenta ~1,5 W. Use um dissipador, uma entrada mais baixa, ou um regulador chaveado (LM2596)."
+        },
+        {
+          "nome": "e o Uno apaga junto (o classico \"o Arduino fica reiniciando\")",
+          "ok": true,
+          "visto": "energizada=False (sem energia: sem o cabo USB (há bateria no circuito), e nenhuma bateria chega no VIN ou 5V dela (com o − no GND))"
+        }
+      ]
+    },
+    "lm2596-esp32-medidor": {
+      "titulo": "ESP32 no LM2596, medindo a LiPo",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.6,
+      "conferencias": [
+        {
+          "nome": "o LM2596 liga a ESP32 pelo VIN (sem o cabo USB)",
+          "ok": true,
+          "visto": "energizada=True (pela bateria, 5 V no VIN)"
+        },
+        {
+          "nome": "a ESP32 mede ~11 V na LiPo",
+          "ok": true,
+          "visto": "monitor: ESP32 ligada pelo LM2596 | Bateria: 11.1 V"
+        },
+        {
+          "nome": "o LED de bateria boa acende",
+          "ok": true,
+          "visto": "led com brilho 0,94"
+        },
+        {
+          "nome": "com a LiPo em 9,8 V o LED de bateria boa apaga",
+          "ok": true,
+          "visto": "led com brilho 0,00"
+        },
+        {
+          "nome": "sem aviso nenhum",
+          "ok": true,
+          "visto": "nenhum aviso"
+        }
+      ]
+    },
+    "mt3608-18650-uno": {
+      "titulo": "Uno numa 18650 com o MT3608 (step-up)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.5,
+      "conferencias": [
+        {
+          "nome": "o MT3608 sobe os 3,7 V e liga o Uno (sem o cabo USB)",
+          "ok": true,
+          "visto": "energizada=True (pela bateria, 5 V no 5V)"
+        },
+        {
+          "nome": "o Uno bipa",
+          "ok": true,
+          "visto": "monitor: Uno ligado pelo MT3608 | bip"
+        },
+        {
+          "nome": "o buzzer toca",
+          "ok": true,
+          "visto": "pino 8: 880 Hz"
+        },
+        {
+          "nome": "sem aviso nenhum",
+          "ok": true,
+          "visto": "nenhum aviso"
+        }
+      ]
+    },
+    "ams1117-lipo-1s-esp32": {
+      "titulo": "ESP32 numa LiPo 1S pelo AMS1117 (o limite da folga)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.2,
+      "conferencias": [
+        {
+          "nome": "com a LiPo cheia (4,2 V) a ESP32 liga, no limite (~3,1 V no 3V3)",
+          "ok": true,
+          "visto": "energizada=True (pela bateria, 3,1 V no 3V3)"
+        },
+        {
+          "nome": "e o aviso explica a folga que falta",
+          "ok": true,
+          "visto": "reg: o AMS1117-3.3 precisa de ~1,1 V a mais na entrada: com 4,2 V ele só dá 3,1 V (e não 3,3 V)."
+        },
+        {
+          "nome": "com a LiPo em 3,7 V o AMS1117 da ~2,6 V e a ESP32 apaga",
+          "ok": true,
+          "visto": "energizada=False (sem energia: 2,6 V no pino 3V3 não bastam: ela precisa de 3 V ali para ligar)"
+        }
+      ]
+    },
+    "semaforo": {
+      "titulo": "Semaforo (Uno, 3 LEDs)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 6.2,
+      "conferencias": [
+        {
+          "nome": "vermelho primeiro",
+          "ok": true,
+          "visto": "vermelho com brilho 0,94"
+        },
+        {
+          "nome": "depois o verde",
+          "ok": true,
+          "visto": "verde com brilho 0,94"
+        },
+        {
+          "nome": "depois o amarelo",
+          "ok": true,
+          "visto": "amarelo com brilho 0,94"
+        }
+      ]
+    },
+    "semaforo-pedestre": {
+      "titulo": "Semaforo com botao de pedestre (Uno)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 6.3,
+      "conferencias": [
+        {
+          "nome": "o carro fica no verde",
+          "ok": true,
+          "visto": "c_verde com brilho 0,94"
+        },
+        {
+          "nome": "o botao chama o pedestre",
+          "ok": true,
+          "visto": "monitor: pedestre pediu para atravessar"
+        },
+        {
+          "nome": "amarelo para o carro",
+          "ok": true,
+          "visto": "c_amarelo com brilho 0,94"
+        },
+        {
+          "nome": "e verde para o pedestre",
+          "ok": true,
+          "visto": "p_verde com brilho 0,94"
+        },
+        {
+          "nome": "depois o carro volta ao verde",
+          "ok": true,
+          "visto": "c_verde com brilho 0,94"
+        }
+      ]
+    },
+    "botao-liga-desliga-esp32": {
+      "titulo": "Botao liga/desliga (ESP32)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 1.3,
+      "conferencias": [
+        {
+          "nome": "comeca apagado",
+          "ok": true,
+          "visto": "led com brilho 0,00"
+        },
+        {
+          "nome": "um toque acende",
+          "ok": true,
+          "visto": "led com brilho 0,94"
+        },
+        {
+          "nome": "outro toque apaga",
+          "ok": true,
+          "visto": "led com brilho 0,00"
+        }
+      ]
+    },
+    "dimmer-potenciometro": {
+      "titulo": "Dimmer com potenciometro (Uno, PWM)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.3,
+      "conferencias": [
+        {
+          "nome": "o potenciometro baixo deixa o LED fraco",
+          "ok": true,
+          "visto": "led com brilho 0,23"
+        },
+        {
+          "nome": "no alto, o LED forte",
+          "ok": true,
+          "visto": "led com brilho 0,91"
+        }
+      ]
+    },
+    "servo-potenciometro": {
+      "titulo": "Servo controlado por potenciometro (Uno)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.9,
+      "conferencias": [
+        {
+          "nome": "potenciometro no zero: servo em ~0 grau",
+          "ok": true,
+          "visto": "servo em 0 graus"
+        },
+        {
+          "nome": "potenciometro no maximo: servo em ~180 graus",
+          "ok": true,
+          "visto": "servo em 180 graus"
+        }
+      ]
+    },
+    "sensor-de-re": {
+      "titulo": "Sensor de re (HC-SR04 e buzzer)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.7,
+      "conferencias": [
+        {
+          "nome": "o sensor le 20 cm",
+          "ok": true,
+          "visto": "monitor: 20 cm | 20 cm"
+        },
+        {
+          "nome": "e o buzzer bipa",
+          "ok": true,
+          "visto": "pino 8: 1500 Hz"
+        },
+        {
+          "nome": "a 200 cm ele le 200 cm",
+          "ok": true,
+          "visto": "monitor: 20 cm | 20 cm | 20 cm | 200 cm"
+        },
+        {
+          "nome": "e fica quieto",
+          "ok": true,
+          "visto": "nenhum pino tocando"
+        }
+      ]
+    },
+    "termometro-dht22-lcd": {
+      "titulo": "Termometro com DHT22 e LCD 16x2 I2C (Uno)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 4.2,
+      "conferencias": [
+        {
+          "nome": "o LCD mostra a temperatura do DHT22 (25 C)",
+          "ok": true,
+          "visto": "LCD: Temp: 25.0 C / Umid: 55 %"
+        },
+        {
+          "nome": "a 50 C o LCD acompanha",
+          "ok": true,
+          "visto": "LCD: Temp: 50.0 C / Umid: 55"
+        }
+      ]
+    },
+    "alarme-pir": {
+      "titulo": "Alarme com sensor de presenca PIR (Uno)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.4,
+      "conferencias": [
+        {
+          "nome": "o alarme arma",
+          "ok": true,
+          "visto": "monitor: alarme armado"
+        },
+        {
+          "nome": "quieto sem movimento",
+          "ok": true,
+          "visto": "nenhum pino tocando"
+        },
+        {
+          "nome": "o PIR ve movimento",
+          "ok": true,
+          "visto": "monitor: alarme armado | MOVIMENTO!"
+        },
+        {
+          "nome": "e a sirene toca",
+          "ok": true,
+          "visto": "pino 8: 2000 Hz"
+        }
+      ]
+    },
+    "luz-noturna-ldr": {
+      "titulo": "Luz noturna com LDR (ESP32)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.6,
+      "conferencias": [
+        {
+          "nome": "no claro o LED fica apagado",
+          "ok": true,
+          "visto": "led com brilho 0,00"
+        },
+        {
+          "nome": "no escuro o LED acende",
+          "ok": true,
+          "visto": "led com brilho 0,94"
+        }
+      ]
+    },
+    "contador-7-segmentos": {
+      "titulo": "Contador no display de 7 segmentos (Uno)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 1.9,
+      "conferencias": [
+        {
+          "nome": "tres toques: o display mostra 3 (a, b, c, d, g acesos; e, f apagados)",
+          "ok": true,
+          "visto": "2=1, 3=1, 4=1, 5=1, 6=0, 7=0, 8=1"
+        },
+        {
+          "nome": "e o monitor conta",
+          "ok": true,
+          "visto": "monitor: 1 | 2 | 3"
+        }
+      ]
+    },
+    "relogio-ds1307-lcd": {
+      "titulo": "Relogio com RTC DS1307 e LCD I2C (Uno)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.2,
+      "conferencias": [
+        {
+          "nome": "o LCD mostra a hora do RTC",
+          "ok": true,
+          "visto": "LCD: Hora 22:51:00 / 13/10/2026"
+        },
+        {
+          "nome": "e a data",
+          "ok": true,
+          "visto": "LCD: Hora 22:51:00 / 13/10/2026"
+        }
+      ]
+    },
+    "fechadura-teclado-servo": {
+      "titulo": "Fechadura com senha (teclado 4x4 e servo)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 2.6,
+      "conferencias": [
+        {
+          "nome": "a senha certa libera",
+          "ok": true,
+          "visto": "monitor: Digite a senha e aperte # | Liberado!"
+        },
+        {
+          "nome": "o servo destranca (90 graus)",
+          "ok": true,
+          "visto": "trava em 90 graus"
+        },
+        {
+          "nome": "e o LED verde acende",
+          "ok": true,
+          "visto": "led com brilho 0,94"
+        }
+      ]
+    },
+    "controle-ir-leds": {
+      "titulo": "Controle remoto infravermelho (IRremote, Uno)",
+      "funcionou": false,
+      "erro": null,
+      "segundos": 9.1,
+      "conferencias": [
+        {
+          "nome": "a tecla 1 chega (0xFF30CF)",
+          "ok": false,
+          "visto": "monitor: \uD83D\uDCA5 Arduino Uno queimou: curto: o pino 3 está em LOW e ligado direto na alimentação"
+        },
+        {
+          "nome": "e acende o LED 1",
+          "ok": false,
+          "visto": "led1 com brilho 0,00"
+        },
+        {
+          "nome": "a tecla 3 acende o LED 3",
+          "ok": false,
+          "visto": "led3 com brilho 0,00"
+        }
+      ]
+    },
+    "joystick-pan-tilt": {
+      "titulo": "Pan/tilt com joystick e dois servos (Uno)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.7,
+      "conferencias": [
+        {
+          "nome": "com o joystick no centro, os dois servos em ~90 graus",
+          "ok": true,
+          "visto": "pan em 90 graus"
+        },
+        {
+          "nome": "joystick para um lado: o pan vai ao extremo",
+          "ok": true,
+          "visto": "pan em 180 graus"
+        },
+        {
+          "nome": "para baixo: o tilt vai ao outro extremo",
+          "ok": true,
+          "visto": "tilt em 5 graus"
+        }
+      ]
+    },
+    "anel-neopixel-esp32": {
+      "titulo": "Anel NeoPixel arco-iris (ESP32)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.3,
+      "conferencias": [
+        {
+          "nome": "o anel acende (arco-iris)",
+          "ok": true,
+          "visto": "16 LEDs acesos na fita do pino 5"
+        }
+      ]
+    },
+    "oled-barra-potenciometro": {
+      "titulo": "Barra no OLED SSD1306 (ESP32)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.3,
+      "conferencias": [
+        {
+          "nome": "o OLED desenha o texto e a barra",
+          "ok": true,
+          "visto": "1695 pontos acesos em oled"
+        }
+      ]
+    },
+    "nivel-mpu6050": {
+      "titulo": "Nivel eletronico com MPU6050 (ESP32)",
+      "funcionou": false,
+      "erro": null,
+      "segundos": 4.2,
+      "conferencias": [
+        {
+          "nome": "na horizontal o LED fica apagado",
+          "ok": true,
+          "visto": "led com brilho 0,00"
+        },
+        {
+          "nome": "inclinado o LED acende",
+          "ok": false,
+          "visto": "led com brilho 0,00"
+        },
+        {
+          "nome": "e o monitor mostra a inclinacao",
+          "ok": false,
+          "visto": "monitor: "
+        }
+      ]
+    },
+    "motor-de-passo-28byj48": {
+      "titulo": "Motor de passo 28BYJ-48 com ULN2003 (Uno)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 3.7,
+      "conferencias": [
+        {
+          "nome": "o motor gira (mais de 90 graus)",
+          "ok": true,
+          "visto": "motor em -91 graus"
+        },
+        {
+          "nome": "e volta",
+          "ok": true,
+          "visto": "monitor: meia volta no sentido horario | meia volta no anti-horario"
+        }
+      ]
+    },
+    "ventilador-l298n": {
+      "titulo": "Ventilador com controle de velocidade (L298N, Uno)",
+      "funcionou": false,
+      "erro": null,
+      "segundos": 8.3,
+      "conferencias": [
+        {
+          "nome": "com o potenciometro baixo o ventilador gira devagar",
+          "ok": false,
+          "visto": "motor 0 rpm"
+        },
+        {
+          "nome": "no maximo, bem mais rapido",
+          "ok": false,
+          "visto": "motor 4453 rpm"
+        },
+        {
+          "nome": "e a helice empurra",
+          "ok": true,
+          "visto": "motor 14 gf"
+        }
+      ]
+    },
+    "balanca-hx711-lcd": {
+      "titulo": "Balanca com HX711 e LCD I2C (Uno)",
+      "funcionou": false,
+      "erro": null,
+      "segundos": 10.4,
+      "conferencias": [
+        {
+          "nome": "o LCD mostra os 500 g",
+          "ok": false,
+          "visto": "LCD: Peso: 701 g / "
+        },
+        {
+          "nome": "com 1250 g na celula, o LCD acompanha",
+          "ok": false,
+          "visto": "LCD: Peso: 1451 g / "
+        }
+      ]
+    },
+    "bluetooth-led-esp32": {
+      "titulo": "LED pelo Bluetooth do celular (ESP32)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 1.1,
+      "conferencias": [
+        {
+          "nome": "o Bluetooth anuncia",
+          "ok": true,
+          "visto": "monitor: Bluetooth pronto: conecte em RoboESP32"
+        },
+        {
+          "nome": "o celular manda \"liga\"",
+          "ok": true,
+          "visto": "monitor: Bluetooth pronto: conecte em RoboESP32 | recebi: liga"
+        },
+        {
+          "nome": "e o LED acende",
+          "ok": true,
+          "visto": "led com brilho 0,94"
+        }
+      ]
+    },
+    "espnow-botao-led": {
+      "titulo": "Botao numa ESP32, LED na outra (ESP-NOW)",
+      "funcionou": false,
+      "erro": null,
+      "segundos": 3.8,
+      "conferencias": [
+        {
+          "nome": "as duas placas iniciam",
+          "ok": true,
+          "visto": "monitor: receptor pronto"
+        },
+        {
+          "nome": "o botao de uma placa chega na outra pelo ESP-NOW",
+          "ok": true,
+          "visto": "monitor: receptor pronto | recebi: apertado"
+        },
+        {
+          "nome": "e acende o LED dela",
+          "ok": true,
+          "visto": "led com brilho 0,94"
+        },
+        {
+          "nome": "soltou: apaga",
+          "ok": false,
+          "visto": "led com brilho 0,94"
+        }
+      ]
+    },
+    "servidor-web-led": {
+      "titulo": "Servidor web com LED (ESP32)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 1.5,
+      "conferencias": [
+        {
+          "nome": "a ESP32 conecta no WiFi",
+          "ok": true,
+          "visto": "monitor: IP da placa: 10.0.0.2"
+        },
+        {
+          "nome": "e o servidor abre",
+          "ok": true,
+          "visto": "monitor: IP da placa: 10.0.0.2 | servidor pronto"
+        }
+      ]
+    },
+    "sono-profundo-botao": {
+      "titulo": "Sono profundo acordado por botao (ESP32)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 2,
+      "conferencias": [
+        {
+          "nome": "a ESP32 vai dormir",
+          "ok": true,
+          "visto": "monitor: ligou 1 vez(es) | dormindo..."
+        },
+        {
+          "nome": "o botao acorda",
+          "ok": true,
+          "visto": "monitor: acordou pelo botao | ligou 2 vez(es)"
+        },
+        {
+          "nome": "e a memoria RTC lembra quantas vezes ligou",
+          "ok": true,
+          "visto": "monitor: acordou pelo botao | ligou 2 vez(es)"
+        }
+      ]
+    },
+    "nrf24l01-duas-placas": {
+      "titulo": "Dois Unos conversando por nRF24L01",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.3,
+      "conferencias": [
+        {
+          "nome": "o emissor manda",
+          "ok": true,
+          "visto": "monitor: enviei 1"
+        },
+        {
+          "nome": "o receptor recebe pelo radio de 2,4 GHz",
+          "ok": true,
+          "visto": "monitor: recebido 1"
+        }
+      ]
+    },
+    "lcd-paralelo": {
+      "titulo": "LCD 16x2 sem I2C (LiquidCrystal, Uno)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 2.3,
+      "conferencias": [
+        {
+          "nome": "o LCD escreve",
+          "ok": true,
+          "visto": "LCD: Ola, mundo! / 0 s"
+        },
+        {
+          "nome": "e conta os segundos",
+          "ok": true,
+          "visto": "LCD: Ola, mundo! / 2 s"
+        }
+      ]
+    },
+    "pico-micropython-botao": {
+      "titulo": "Botao e LED em MicroPython (Raspberry Pi Pico)",
+      "funcionou": true,
+      "erro": null,
+      "segundos": 0.5,
+      "conferencias": [
+        {
+          "nome": "a Pico roda o MicroPython",
+          "ok": true,
+          "visto": "monitor: Pico pronta"
+        },
+        {
+          "nome": "com o botao apertado o LED acende",
+          "ok": true,
+          "visto": "led com brilho 0,94"
+        },
+        {
+          "nome": "solto, apaga",
+          "ok": true,
+          "visto": "led com brilho 0,00"
+        }
+      ]
+    }
+  }
+}
