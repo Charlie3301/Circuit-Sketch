@@ -10,13 +10,17 @@
   "Idioma da interface": "",
   "Modelo": "",
   "Novo projeto": "New project",
+  "o capacitor de {0} recebeu {1:0.#} V, e aguenta {2:0} V: estourou.": "",
+  "o eletrolítico está ao contrário ({0:0.#} V no -): ele esquenta, incha e estoura. O - vai no lado de menor tensão (o GND).": "",
   "O idioma novo vale ao reabrir o CircuitSketch.": "The new language takes effect when CircuitSketch is reopened.",
+  "o indutor de {0} está com {1:0.##} A, acima dos {2:0.##} A em que ele satura: vira quase um fio, e esquenta.": "",
   "o {0} conduziu {1:0.##} A, e aguenta {2:0.##} A: queimou.": "",
   "o {0} está com {1:0.##} A, acima dos {2:0.##} A da ficha: esquenta.": "",
   "o {0} está dissipando {1:0.##} W, e aguenta {2:0.#} W: queimou. Ponha um resistor em série para limitar a corrente.": "",
   "Projetos recentes": "Recent projects",
   "Salvar projeto": "Save project",
   "Salvar projeto como...": "Save project as...",
+  "Valor": "",
   "{0} peças, {1} fios": "{0} parts, {1} wires"
  }
 }

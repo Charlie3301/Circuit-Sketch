@@ -126,6 +126,7 @@ public static partial class Autoteste
         Bloco("Bateria_Alimentacao", Bateria_Alimentacao);
         Bloco("Reguladores_DeTensao", Reguladores_DeTensao);
         Bloco("Diodos_NoCircuito", Diodos_NoCircuito);
+        Bloco("Passivos_NoTempo", Passivos_NoTempo);
         Bloco("Idiomas_Base", Idiomas_Base);
         Bloco("Projetos_Testados", Projetos_Testados);
         Bloco("Programa_DesfazerERefazer", Programa_DesfazerERefazer);

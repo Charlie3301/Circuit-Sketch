@@ -96,7 +96,7 @@ public partial class EditorCircuito
 
         return Energia.Calcular(Atual, bancada, redeDaEnergia,
                                 rede is null ? null : ContatosFechados(bancada, rede), forcas, CargasDinamicas(),
-                                PlacasSemCabo(), ReguladoresDesligados());
+                                PlacasSemCabo(), ReguladoresDesligados(), memoriaDaEnergia, passoTransitorio);
     }
 
     // =====================================================================
@@ -269,6 +269,15 @@ public partial class EditorCircuito
     /// </summary>
     internal Energia EnergiaDoQuadro { get; private set; }
 
+    /// <summary>A carga dos capacitores e a corrente dos indutores, de um quadro para o outro.</summary>
+    readonly Energia.MemoriaDaEnergia memoriaDaEnergia = new();
+
+    /// <summary>O tempo do quadro que esta sendo calculado (0 fora do quadro: a conta de regime).</summary>
+    double passoTransitorio;
+
+    /// <summary>Para o teste: a tensao em que um capacitor ficou.</summary>
+    internal double TensaoDoCapacitorParaTeste(string id) => memoriaDaEnergia.TensaoDo(id);
+
     /// <summary>Para o teste: cada quadro anda este tempo, e nao o do relogio de parede.</summary>
     internal double? PassoFixoParaTeste { get; set; }
 
@@ -290,6 +299,7 @@ public partial class EditorCircuito
     {
         bool motores = Atual.Pecas.Any(p => EhMotorDc(p.Tipo));
         bool energia = motores || PlacasSemCabo().Count > 0 || Atual.Pecas.Any(p => Netlist.EhBateria(p.Tipo) || DriverDeMotor.De(p.Tipo) is not null
+                                                       || Passivos.EhPassivoComValor(p.Tipo)
                                                        || DriverDePasso.De(p.Tipo) is not null || p.Tipo == "motor-28byj48"
                                                        || ModeloDeServo.De(p.Tipo) is not null || EhEsc(p.Tipo) || p.Tipo == "receptor-rc"
                                                        || Reguladores.EhRegulador(p.Tipo));
@@ -308,9 +318,14 @@ public partial class EditorCircuito
         // fisica: no maximo um decimo de segundo por quadro.
         tempoDaEnergia += Math.Min(segundos, 0.1);
         segundosDoQuadro = Math.Min(segundos, 0.1);
-        EnergiaDoQuadro = motores
-            ? AvancarMotores(bancada, rede, Math.Min(segundos, 0.1))
-            : CalcularEnergia(bancada, rede);
+        passoTransitorio = segundosDoQuadro;
+        try
+        {
+            EnergiaDoQuadro = motores
+                ? AvancarMotores(bancada, rede, Math.Min(segundos, 0.1))
+                : CalcularEnergia(bancada, rede);
+        }
+        finally { passoTransitorio = 0; }
         AquecerReguladores(EnergiaDoQuadro, segundosDoQuadro);
         AcenderLuzesDeModulo();
         return EnergiaDoQuadro;
@@ -321,9 +336,14 @@ public partial class EditorCircuito
     {
         tempoDaEnergia += segundos;
         segundosDoQuadro = segundos;
-        EnergiaDoQuadro = Atual.Pecas.Any(p => EhMotorDc(p.Tipo))
-            ? AvancarMotores(bancada, rede, segundos)
-            : CalcularEnergia(bancada, rede);
+        passoTransitorio = segundos;
+        try
+        {
+            EnergiaDoQuadro = Atual.Pecas.Any(p => EhMotorDc(p.Tipo))
+                ? AvancarMotores(bancada, rede, segundos)
+                : CalcularEnergia(bancada, rede);
+        }
+        finally { passoTransitorio = 0; }
         AquecerReguladores(EnergiaDoQuadro, segundos);
         AcenderLuzesDeModulo();
         return EnergiaDoQuadro;
@@ -423,6 +443,26 @@ public partial class EditorCircuito
                 case "led":
                     AvaliarLed(peca, conta.CorrenteDoRamo(peca.Id, "led"), "o LED");
                     break;
+                case "capacitor":
+                case "capacitor-eletrolitico":
+                {
+                    var ficha = Passivos.Da(peca);
+                    var (pa, pb) = Passivos.Pinos(peca.Tipo);
+                    double v = conta.TensaoDoPino(peca.Id, pa) - conta.TensaoDoPino(peca.Id, pb);
+                    if (peca.Tipo == "capacitor-eletrolitico" && v < -1.0)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("o eletrolítico está ao contrário ({0:0.#} V no -): ele esquenta, incha e estoura. O - vai no lado de menor tensão (o GND).", -v)));
+                    else if (Math.Abs(v) > ficha.Volts * 1.2)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("o capacitor de {0} recebeu {1:0.#} V, e aguenta {2:0} V: estourou.", ficha.Nome, Math.Abs(v), ficha.Volts)));
+                    break;
+                }
+                case "indutor":
+                {
+                    var ficha = Passivos.Da(peca);
+                    double i = Math.Abs(conta.CorrenteDoRamo(peca.Id, "indutor"));
+                    if (i > ficha.Corrente * 1.1)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("o indutor de {0} está com {1:0.##} A, acima dos {2:0.##} A em que ele satura: vira quase um fio, e esquenta.", ficha.Nome, i, ficha.Corrente), Queimou: false));
+                    break;
+                }
                 case "diodo":
                 case "diodo-zener":
                 case "diodo-schottky":

@@ -87,10 +87,13 @@ public sealed partial class Energia
                                    IReadOnlyDictionary<string, double> forcasDosMotores,
                                    IReadOnlyDictionary<string, double> cargasDinamicas = null,
                                    IReadOnlySet<string> placasSemCabo = null,
-                                   IReadOnlySet<string> reguladoresDesligados = null)
+                                   IReadOnlySet<string> reguladoresDesligados = null,
+                                   MemoriaDaEnergia memoria = null, double passo = 0)
     {
         var conta = new Energia();
         if (circuito is null) return conta;
+        conta.memoria = memoria;
+        conta.passo = passo;
         conta.placasSemCabo = placasSemCabo;
         conta.reguladoresDesligados = reguladoresDesligados;
 
@@ -127,6 +130,7 @@ public sealed partial class Energia
 
         conta.Resolver();
         conta.Medir();
+        conta.Lembrar(circuito);
         return conta;
     }
 
@@ -562,6 +566,14 @@ public sealed partial class Energia
                 if (r is not null) yield return r;
                 yield break;
             }
+
+            // O capacitor e o indutor dependem do quadro anterior (EnergiaTransitoria.cs).
+            case "capacitor":
+            case "capacitor-eletrolitico":
+            case "indutor":
+            case "cristal":
+                foreach (var r in RamosQueGuardamEnergia(peca, rede)) yield return r;
+                yield break;
 
             // Os diodos: a queda direta e a resistencia que sobra; o zener tem
             // o segundo ramo, ao contrario, a partir da tensao dele.

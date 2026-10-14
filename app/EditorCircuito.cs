@@ -78,6 +78,7 @@ public partial class EditorCircuito : Border
         estouros.Clear();
         queimadasPelaAlimentacao.Clear();
         EsfriarReguladores();
+        memoriaDaEnergia.Esquecer();
     }
 
     void PosicionarEstouro(PecaNoCircuito peca, PecaDef def)

@@ -1997,6 +1997,52 @@
   "metades": false
  },
  {
+  "id": "capacitor",
+  "largura": 23,
+  "altura": 38,
+  "pinos": [
+   {
+    "nome": "1",
+    "x": 6.54,
+    "y": 36.66,
+    "sinais": [],
+    "descricao": "Terminal (o ceramico nao tem polaridade)"
+   },
+   {
+    "nome": "2",
+    "x": 16.14,
+    "y": 36.66,
+    "sinais": [],
+    "descricao": "Terminal"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "capacitor-eletrolitico",
+  "largura": 25,
+  "altura": 57,
+  "pinos": [
+   {
+    "nome": "+",
+    "x": 7.67,
+    "y": 55.56,
+    "sinais": [],
+    "descricao": "Positivo (a perna comprida): no lado de maior tensao"
+   },
+   {
+    "nome": "-",
+    "x": 17.27,
+    "y": 55.56,
+    "sinais": [],
+    "descricao": "Negativo (o lado da faixa): no GND. Ao contrario ele esquenta e estoura"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "clock-generator",
   "largura": 67,
   "altura": 38,
@@ -2007,6 +2053,29 @@
     "y": 14.4,
     "sinais": [],
     "descricao": ""
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "cristal",
+  "largura": 42,
+  "altura": 38,
+  "pinos": [
+   {
+    "nome": "1",
+    "x": 11.57,
+    "y": 36.66,
+    "sinais": [],
+    "descricao": "Terminal (vai num pino XTAL do microcontrolador, com um capacitor de 22 pF ao GND)"
+   },
+   {
+    "nome": "2",
+    "x": 30.01,
+    "y": 36.66,
+    "sinais": [],
+    "descricao": "Terminal"
    }
   ],
   "variantes": [],
@@ -6829,6 +6898,29 @@
      "spi"
     ],
     "descricao": ""
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "indutor",
+  "largura": 30,
+  "altura": 45,
+  "pinos": [
+   {
+    "nome": "1",
+    "x": 5.52,
+    "y": 44.22,
+    "sinais": [],
+    "descricao": "Terminal"
+   },
+   {
+    "nome": "2",
+    "x": 24.72,
+    "y": 44.22,
+    "sinais": [],
+    "descricao": "Terminal"
    }
   ],
   "variantes": [],
