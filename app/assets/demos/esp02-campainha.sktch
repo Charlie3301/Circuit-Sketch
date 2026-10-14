@@ -1,0 +1,125 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Campainha musical, num ESP-02.",
+  "",
+  "O que esta demo mostra:",
+  "- melodia com tone() e vetores de notas e duracoes;",
+  "- o \"espera soltar\", que impede o botao segurado de tocar sem parar.",
+  "",
+  "Aperte F5 e o botao. A cada quinta visita a musica muda."
+ ],
+ "codigo": [
+  "// Campainha musical, num ESP-02.",
+  "//",
+  "// Aperte o botao e ela toca \"ding-dong\" -- ou, a cada quinta visita, o",
+  "// comeco da Ode a Alegria, de Beethoven. O monitor serial conta as visitas.",
+  "//",
+  "// O buzzer e passivo: e o tone() que faz cada nota, na frequencia dela.",
+  "",
+  "const int BOTAO = 0;    // GPIO0",
+  "const int BUZZER = 2;   // GPIO2",
+  "",
+  "// Ode a Alegria: notas (Hz) e duracoes (ms).",
+  "const int NOTAS[] = {330, 330, 349, 392, 392, 349, 330, 294,",
+  "                     262, 262, 294, 330, 330, 294, 294};",
+  "const int TEMPOS[] = {300, 300, 300, 300, 300, 300, 300, 300,",
+  "                      300, 300, 300, 300, 450, 150, 600};",
+  "const int QUANTAS = 15;",
+  "",
+  "int visitas = 0;",
+  "",
+  "void dingDong() {",
+  "  tone(BUZZER, 659, 300);   // mi",
+  "  delay(350);",
+  "  tone(BUZZER, 523, 500);   // do",
+  "  delay(600);",
+  "}",
+  "",
+  "void odeAAlegria() {",
+  "  for (int i = 0; i < QUANTAS; i++) {",
+  "    tone(BUZZER, NOTAS[i], TEMPOS[i] * 9 / 10);",
+  "    delay(TEMPOS[i]);",
+  "  }",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(BOTAO, INPUT_PULLUP);",
+  "  Serial.println(\"Campainha pronta: aperte o botao\");",
+  "}",
+  "",
+  "void loop() {",
+  "  if (digitalRead(BOTAO) == LOW) {",
+  "    visitas++;",
+  "    Serial.print(\"Visita numero \");",
+  "    Serial.println(visitas);",
+  "",
+  "    if (visitas % 5 == 0) odeAAlegria();",
+  "    else dingDong();",
+  "",
+  "    // Segurar o botao nao toca de novo: espera soltar.",
+  "    while (digitalRead(BOTAO) == LOW) delay(10);",
+  "  }",
+  "  delay(20);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp-02",
+    "X": 80,
+    "Y": 100
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 300,
+    "Y": 60
+   },
+   {
+    "Id": "buzzer",
+    "Tipo": "buzzer",
+    "X": 320,
+    "Y": 170
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO0",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO2",
+    "ParaPeca": "buzzer",
+    "ParaPino": "1",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "buzzer",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

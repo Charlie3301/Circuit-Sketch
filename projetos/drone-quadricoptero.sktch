@@ -1,0 +1,452 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Drone quadricoptero (ESP32, ESC 4-em-1, radio FlySky)",
+  "",
+  "O drone de 5 polegadas: quatro motores 2205 2300KV com helices 5045 de",
+  "tres pas, uma ESC 4-em-1, a LiPo 4S de 1500 mAh e a ESP32 como",
+  "controladora de voo, com o MPU6050 medindo a rotacao.",
+  "",
+  "Energia: a LiPo vai na ESC (os motores) e no LM2596, que baixa para 5 V",
+  "e alimenta a ESP32 (pelo VIN) e o receptor -- sem o cabo USB.",
+  "",
+  "O radio: o receptor FS-iA6B manda os canais por iBUS no RX2. Ligue o",
+  "controle (a chave dele), deixe o acelerador embaixo e leve o leme",
+  "(manche esquerdo) toda para a direita por 1 s: ARMADO. Suba o",
+  "acelerador e as helices giram; o manche direito inclina o drone",
+  "(acelera os motores de um lado). Para desarmar: acelerador embaixo e",
+  "leme toda para a esquerda.",
+  "",
+  "O rotulo de cada helice mostra o empuxo, em gramas-forca."
+ ],
+ "codigo": [
+  "// Drone quadricoptero: a ESP32 e a controladora de voo.",
+  "//",
+  "// O receptor FS-iA6B manda os 14 canais por iBUS no RX2 (GPIO16).",
+  "// O MPU6050 mede a rotacao (o giroscopio); a controladora compara",
+  "// com o que o manche pede e corrige cada motor (o \"modo acro\").",
+  "// A ESC 4-em-1 recebe um pulso de servo por motor (1000 a 2000 us).",
+  "//",
+  "// Armar: acelerador embaixo e leme todo para a DIREITA por 1 s.",
+  "// Desarmar: acelerador embaixo e leme todo para a ESQUERDA por 1 s.",
+  "// Sem sinal do radio por meio segundo: desarma (failsafe).",
+  "",
+  "#include <Wire.h>",
+  "#include <Adafruit_MPU6050.h>",
+  "#include <ESP32Servo.h>",
+  "",
+  "Adafruit_MPU6050 mpu;",
+  "Servo motor[4];",
+  "const int PINOS[4] = {13, 12, 14, 27};   // M1 traseiro dir., M2 dianteiro dir., M3 traseiro esq., M4 dianteiro esq.",
+  "",
+  "uint8_t quadro[32];",
+  "int posicao = 0;",
+  "int canal[14];",
+  "unsigned long ultimoQuadro = 0;",
+  "",
+  "bool armado = false;",
+  "int gesto = 0;",
+  "unsigned long desdeGesto = 0;",
+  "unsigned long ultimoRelato = 0;",
+  "const float GANHO = 0.8;   // o P do controle de rotacao",
+  "",
+  "// Um quadro iBUS: 0x20 0x40, 14 canais de 16 bits e a soma de conferencia.",
+  "void lerIbus() {",
+  "  while (Serial2.available()) {",
+  "    uint8_t b = Serial2.read();",
+  "    if (posicao == 0 && b != 0x20) continue;",
+  "    if (posicao == 1 && b != 0x40) { posicao = 0; continue; }",
+  "    quadro[posicao++] = b;",
+  "    if (posicao < 32) continue;",
+  "    posicao = 0;",
+  "    uint16_t soma = 0xFFFF;",
+  "    for (int i = 0; i < 30; i++) soma -= quadro[i];",
+  "    if (soma != (quadro[30] | (quadro[31] << 8))) continue;",
+  "    for (int c = 0; c < 14; c++) canal[c] = quadro[2 + c * 2] | (quadro[3 + c * 2] << 8);",
+  "    ultimoQuadro = millis();",
+  "  }",
+  "}",
+  "",
+  "void todos(int us) {",
+  "  for (int i = 0; i < 4; i++) motor[i].writeMicroseconds(us);",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  Serial2.begin(115200, SERIAL_8N1, 16, 17);",
+  "  for (int i = 0; i < 4; i++) motor[i].attach(PINOS[i], 1000, 2000);",
+  "  todos(1000);   // a ESC so arma com o acelerador no minimo",
+  "  if (!mpu.begin()) Serial.println(\"MPU6050 nao encontrado!\");",
+  "  mpu.setGyroRange(MPU6050_RANGE_500_DEG);",
+  "  Serial.println(\"Drone pronto: acelerador embaixo e leme para a direita para armar\");",
+  "}",
+  "",
+  "void loop() {",
+  "  lerIbus();",
+  "  bool comSinal = millis() - ultimoQuadro < 500;",
+  "  int aileron = canal[0], profundor = canal[1], acelerador = canal[2], leme = canal[3];",
+  "",
+  "  if (!comSinal) {",
+  "    if (armado) Serial.println(\"SEM SINAL do radio: desarmado (failsafe)\");",
+  "    armado = false;",
+  "    gesto = 0;",
+  "  } else if (acelerador < 1050 && leme > 1900) {",
+  "    if (gesto != 1) { gesto = 1; desdeGesto = millis(); }",
+  "    if (!armado && millis() - desdeGesto > 1000) { armado = true; Serial.println(\"ARMADO\"); }",
+  "  } else if (acelerador < 1050 && leme < 1100) {",
+  "    if (gesto != 2) { gesto = 2; desdeGesto = millis(); }",
+  "    if (armado && millis() - desdeGesto > 1000) { armado = false; Serial.println(\"DESARMADO\"); }",
+  "  } else {",
+  "    gesto = 0;",
+  "  }",
+  "",
+  "  if (!armado) {",
+  "    todos(1000);",
+  "  } else {",
+  "    sensors_event_t a, g, temp;",
+  "    mpu.getEvent(&a, &g, &temp);",
+  "    float gx = g.gyro.x * 57.3, gy = g.gyro.y * 57.3, gz = g.gyro.z * 57.3;   // graus/s",
+  "    float roll = GANHO * ((aileron - 1500) * 0.4 - gx);",
+  "    float pitch = GANHO * ((profundor - 1500) * 0.4 - gy);",
+  "    float yaw = GANHO * ((leme - 1500) * 0.4 - gz);",
+  "    int base = constrain(acelerador, 1100, 1800);",
+  "    int m[4];",
+  "    m[0] = base - roll + pitch + yaw;   // M1: traseiro direito (anti-horario)",
+  "    m[1] = base - roll - pitch - yaw;   // M2: dianteiro direito (horario)",
+  "    m[2] = base + roll + pitch - yaw;   // M3: traseiro esquerdo (horario)",
+  "    m[3] = base + roll - pitch + yaw;   // M4: dianteiro esquerdo (anti-horario)",
+  "    for (int i = 0; i < 4; i++) motor[i].writeMicroseconds(constrain(m[i], 1100, 2000));",
+  "    if (millis() - ultimoRelato > 500) {",
+  "      ultimoRelato = millis();",
+  "      Serial.print(\"acelerador \");",
+  "      Serial.print(acelerador);",
+  "      Serial.print(\"  motores \");",
+  "      for (int i = 0; i < 4; i++) { Serial.print(constrain(m[i], 1100, 2000)); Serial.print(\" \"); }",
+  "      Serial.println();",
+  "    }",
+  "  }",
+  "  delay(4);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "m1",
+    "Tipo": "motor-brushless",
+    "X": 1000,
+    "Y": 1000,
+    "Modelo": "2205-2300"
+   },
+   {
+    "Id": "h1",
+    "Tipo": "helice-5045",
+    "X": 826.14,
+    "Y": 826.14
+   },
+   {
+    "Id": "m2",
+    "Tipo": "motor-brushless",
+    "X": 1000,
+    "Y": 100,
+    "Modelo": "2205-2300"
+   },
+   {
+    "Id": "h2",
+    "Tipo": "helice-5045",
+    "X": 826.14,
+    "Y": -73.86
+   },
+   {
+    "Id": "m3",
+    "Tipo": "motor-brushless",
+    "X": 100,
+    "Y": 1000,
+    "Modelo": "2205-2300"
+   },
+   {
+    "Id": "h3",
+    "Tipo": "helice-5045",
+    "X": -73.86,
+    "Y": 826.14
+   },
+   {
+    "Id": "m4",
+    "Tipo": "motor-brushless",
+    "X": 100,
+    "Y": 100,
+    "Modelo": "2205-2300"
+   },
+   {
+    "Id": "h4",
+    "Tipo": "helice-5045",
+    "X": -73.86,
+    "Y": -73.86
+   },
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 360,
+    "Y": 380
+   },
+   {
+    "Id": "rx",
+    "Tipo": "receptor-rc",
+    "X": 560,
+    "Y": 350
+   },
+   {
+    "Id": "esc",
+    "Tipo": "esc-4em1",
+    "X": 520,
+    "Y": 490
+   },
+   {
+    "Id": "mpu",
+    "Tipo": "mpu6050",
+    "X": 370,
+    "Y": 610
+   },
+   {
+    "Id": "reg",
+    "Tipo": "lm2596",
+    "X": 520,
+    "Y": 660,
+    "Volts": 5.0
+   },
+   {
+    "Id": "lipo",
+    "Tipo": "bateria",
+    "X": 360,
+    "Y": 700,
+    "Volts": 14.8,
+    "MiliAmperes": 120000,
+    "MiliAmperesHora": 1500,
+    "Nome": "LiPo 4S 1500 mAh (14,8 V)"
+   },
+   {
+    "Id": "controle",
+    "Tipo": "radio-controle",
+    "X": 1300,
+    "Y": 420,
+    "Giro": 0.0,
+    "Giro2": 0.5,
+    "Giro3": 0.5,
+    "Giro4": 0.5
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "lipo",
+    "DePino": "+",
+    "ParaPeca": "esc",
+    "ParaPino": "BAT+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "lipo",
+    "DePino": "-",
+    "ParaPeca": "esc",
+    "ParaPino": "BAT-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "lipo",
+    "DePino": "+",
+    "ParaPeca": "reg",
+    "ParaPino": "IN+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "lipo",
+    "DePino": "-",
+    "ParaPeca": "reg",
+    "ParaPino": "IN-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "OUT+",
+    "ParaPeca": "placa",
+    "ParaPino": "VIN",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "OUT-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "OUT+",
+    "ParaPeca": "rx",
+    "ParaPino": "VCC",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "OUT-",
+    "ParaPeca": "rx",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "rx",
+    "DePino": "IBUS",
+    "ParaPeca": "placa",
+    "ParaPino": "RX2",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D13",
+    "ParaPeca": "esc",
+    "ParaPino": "S1",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D12",
+    "ParaPeca": "esc",
+    "ParaPino": "S2",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D14",
+    "ParaPeca": "esc",
+    "ParaPino": "S3",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D27",
+    "ParaPeca": "esc",
+    "ParaPino": "S4",
+    "Cor": "#8E44AD"
+   },
+   {
+    "DePeca": "mpu",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "mpu",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "mpu",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "D21",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "mpu",
+    "DePino": "SCL",
+    "ParaPeca": "placa",
+    "ParaPino": "D22",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "M1A",
+    "ParaPeca": "m1",
+    "ParaPino": "A",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "M1B",
+    "ParaPeca": "m1",
+    "ParaPino": "B",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "M1C",
+    "ParaPeca": "m1",
+    "ParaPino": "C",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "M2A",
+    "ParaPeca": "m2",
+    "ParaPino": "A",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "M2B",
+    "ParaPeca": "m2",
+    "ParaPino": "B",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "M2C",
+    "ParaPeca": "m2",
+    "ParaPino": "C",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "M3A",
+    "ParaPeca": "m3",
+    "ParaPino": "A",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "M3B",
+    "ParaPeca": "m3",
+    "ParaPino": "B",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "M3C",
+    "ParaPeca": "m3",
+    "ParaPino": "C",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "M4A",
+    "ParaPeca": "m4",
+    "ParaPino": "A",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "M4B",
+    "ParaPeca": "m4",
+    "ParaPino": "B",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "M4C",
+    "ParaPeca": "m4",
+    "ParaPino": "C",
+    "Cor": "#D23B33"
+   }
+  ]
+ }
+}

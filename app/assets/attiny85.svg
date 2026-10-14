@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="10.2mm" height="12.0mm" viewBox="0 0 10.2 12.0">
+
+  <rect x="0" y="0" width="10.2" height="12.0" rx="1.4" fill="#23272e"/>
+  <rect x="0" y="0" width="10.2" height="12.0" rx="1.4"
+        fill="none" stroke="#14171c" stroke-width="0.3"/>
+
+  <path d="M 3.50 0.3 A 1.6 1.6 0 0 0 6.70 0.3" fill="none" stroke="#3a3f48" stroke-width="0.3"/>
+  <circle cx="2.6" cy="2.0" r="0.5" fill="#3a3f48"/>
+
+  <rect x="0.50" y="1.60" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.50" cy="2.60" r="0.55" fill="#14181f"/>
+  <rect x="0.50" y="4.14" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.50" cy="5.14" r="0.55" fill="#14181f"/>
+  <rect x="0.50" y="6.68" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.50" cy="7.68" r="0.55" fill="#14181f"/>
+  <rect x="0.50" y="9.22" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.50" cy="10.22" r="0.55" fill="#14181f"/>
+  <rect x="7.70" y="9.22" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="8.70" cy="10.22" r="0.55" fill="#14181f"/>
+  <rect x="7.70" y="6.68" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="8.70" cy="7.68" r="0.55" fill="#14181f"/>
+  <rect x="7.70" y="4.14" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="8.70" cy="5.14" r="0.55" fill="#14181f"/>
+  <rect x="7.70" y="1.60" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="8.70" cy="2.60" r="0.55" fill="#14181f"/>
+  <text x="3.20" y="3.10" fill="#cfd8e3" font-size="1.2px" font-family="Verdana">PB5</text>
+  <text x="3.20" y="5.64" fill="#cfd8e3" font-size="1.2px" font-family="Verdana">PB3</text>
+  <text x="3.20" y="8.18" fill="#cfd8e3" font-size="1.2px" font-family="Verdana">PB4</text>
+  <text x="3.20" y="10.72" fill="#cfd8e3" font-size="1.2px" font-family="Verdana">GND</text>
+  <text x="7.00" y="10.72" fill="#cfd8e3" font-size="1.2px" text-anchor="end" font-family="Verdana">PB2</text>
+  <text x="7.00" y="8.18" fill="#cfd8e3" font-size="1.2px" text-anchor="end" font-family="Verdana">PB1</text>
+  <text x="7.00" y="5.64" fill="#cfd8e3" font-size="1.2px" text-anchor="end" font-family="Verdana">PB0</text>
+  <text x="7.00" y="3.10" fill="#cfd8e3" font-size="1.2px" text-anchor="end" font-family="Verdana">VCC</text>
+
+  <text x="5.10" y="7.37" fill="#cfd8e3"
+        font-size="2.2px" text-anchor="middle" font-family="Verdana"
+        opacity="0.85">ATtiny85</text>
+</svg>

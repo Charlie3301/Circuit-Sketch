@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="72.0mm" height="26.0mm" viewBox="0 0 72.0 26.0">
+  <path d="M18.00 12.10 C12.00 12.10 6.0 10.46 1.5 10.46" fill="none" stroke="#3d2515" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M18.00 12.10 C12.00 12.10 6.0 10.46 1.5 10.46" fill="none" stroke="#7a4a2a" stroke-width="0.7" stroke-linecap="round"/>
+  <path d="M18.00 13.00 C12.00 13.00 6.0 13.00 1.5 13.00" fill="none" stroke="#7d1f1a" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M18.00 13.00 C12.00 13.00 6.0 13.00 1.5 13.00" fill="none" stroke="#d23b33" stroke-width="0.7" stroke-linecap="round"/>
+  <path d="M18.00 13.90 C12.00 13.90 6.0 15.54 1.5 15.54" fill="none" stroke="#8a4a10" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M18.00 13.90 C12.00 13.90 6.0 15.54 1.5 15.54" fill="none" stroke="#f08a24" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="1.5" cy="10.46" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="1.5" cy="10.46" r="0.32" fill="#2a2a2a"/>
+  <circle cx="1.5" cy="13.00" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="1.5" cy="13.00" r="0.32" fill="#2a2a2a"/>
+  <circle cx="1.5" cy="15.54" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="1.5" cy="15.54" r="0.32" fill="#2a2a2a"/>
+  <!-- as orelhas de fixacao -->
+  <rect x="11.20" y="8.2" width="54.20" height="9.6" rx="1.0" fill="#1e1f22" stroke="#0b0b0c" stroke-width="0.3"/>
+  <circle cx="14.00" cy="10.6" r="1.0" fill="#3a3c41"/><circle cx="14.00" cy="15.4" r="1.0" fill="#3a3c41"/>
+  <circle cx="62.60" cy="10.6" r="1.0" fill="#3a3c41"/><circle cx="62.60" cy="15.4" r="1.0" fill="#3a3c41"/>
+  <!-- o corpo -->
+  <rect x="18.0" y="3.0" width="40.60" height="20.0" rx="1.2" fill="#2a2b2f" stroke="#0b0b0c" stroke-width="0.35"/>
+  <rect x="19.20" y="4.20" width="38.20" height="17.60" rx="0.8" fill="#323338"/>
+  <text x="29.50" y="13.90" fill="#e6e6e6" font-size="2.6px" text-anchor="middle" font-family="Verdana" font-weight="bold">MG996R</text>
+  <text x="29.50" y="16.60" fill="#9aa0a8" font-size="1.4px" text-anchor="middle" font-family="Verdana">metal gear</text>
+  <!-- a saida do eixo: o ressalto e o estriado -->
+  <circle cx="48.0" cy="13.0" r="5.4" fill="#1e1f22" stroke="#0b0b0c" stroke-width="0.3"/>
+  <circle cx="48.0" cy="13.0" r="2.6" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.3"/>
+  <circle cx="48.0" cy="13.0" r="1.0" fill="#6d737c"/>
+</svg>

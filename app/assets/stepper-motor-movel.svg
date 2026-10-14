@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="58.3mm" height="62.3mm" viewBox="0 0 220.37399999999997 235.49399999999997">
+      <defs>
+        <linearGradient id="frame-gradient" gradientUnits="userSpaceOnUse" x1="-11.46" x2="114.6" y1="57.3" y2="57.3">
+          <stop stop-color="#666" offset="0" />
+          <stop stop-color="#fff" offset="1" />
+        </linearGradient>
+        <linearGradient id="shaft-gradient" x1="0" x2="0" y1="-5" y2="5" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#9d9d9d" offset="0" />
+          <stop stop-color="#9d9d9d" stop-opacity="0" offset="1" />
+        </linearGradient>
+        <linearGradient id="body-gradient" gradientUnits="userSpaceOnUse" x1="5.73" x2="40.10999999999999" y1="57.3" y2="57.3">
+          <stop stop-color="#9d9d9d" offset="0" />
+          <stop stop-color="#fdfafa" offset=".29501" />
+          <stop offset="1" stop-color="#2a2a2a" />
+        </linearGradient>
+      </defs>
+      
+      <g transform="translate(1,1)">
+        <g transform="scale(3.78)">
+          
+          <g>
+            <path id="arrow-path" transform="&#10;                rotate(0, 28.65,28.65) &#10;                translate(28.65 28.65)" fill="transparent" d="m 0 0 l -6.35 0 l 6.35 &#10;                -25.65 l 6.35 25.65 z" />
+            <path id="shaft-path" fill="#4d4d4d" stroke="url(#shaft-gradient)" stroke-width=".57968" transform="&#10;                translate(28.65, 28.65) &#10;                rotate(0) &#10;                translate(0, 0)" d="m -3.175 -5.499261314031186 a 6.35 6.35 0 1 0 6.35 0 z" />
+          </g>
+
+          
+          </g>
+      </g>
+    </svg>

@@ -1,0 +1,339 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Analisador logico no Arduino Uno: cinco sinais de verdade, lado a lado.",
+  "",
+  "O que esta demo mostra:",
+  "- PWM de 976 Hz, tone(), o pulso de 50 Hz do servo, o shiftOut e a",
+  "  serial saindo pelo TX -- cada um num canal do analisador;",
+  "- a janela grande do analisador: zoom, pausa, medida e .vcd.",
+  "",
+  "Aperte F5, selecione o analisador e clique em \"Abrir o analisador\"."
+ ],
+ "codigo": [
+  "// Analisador logico: cinco sinais de verdade, lado a lado.",
+  "//",
+  "// Selecione o analisador no circuito e clique em \"Abrir o analisador\":",
+  "//   D0  pino 5   PWM de 25% a 976 Hz (Timer0) - o LED fraco",
+  "//   D1  pino 6   PWM de 75% a 976 Hz - o LED forte",
+  "//   D2  pino 8   tone() de 1 kHz, em rajadas de 60 ms",
+  "//   D3  pino 9   o pulso do servo, 50 Hz: gire o potenciometro e a",
+  "//                largura muda de 0,5 a 2,4 ms",
+  "//   D4  pino 11  DADO do shiftOut",
+  "//   D5  pino 12  RELOGIO do shiftOut",
+  "//   D6  pino 13  TRAVA (latch)",
+  "//   D7  pino 1   a serial saindo pelo TX, a 9600 baud - com a letra",
+  "//                escrita em cima de cada byte",
+  "//",
+  "// Pare a captura (Espaco), aproxime com a roda do mouse e passe o mouse",
+  "// num canal: o analisador mede a largura, o periodo e a frequencia. O",
+  "// \"Salvar .vcd\" leva a captura para o PulseView.",
+  "//",
+  "// Na placa de verdade os pinos foram escolhidos para nao brigarem: o",
+  "// Servo usa o Timer1 (e desliga o PWM dos pinos 9 e 10), e o tone() usa",
+  "// o Timer2 (e desliga o PWM dos pinos 3 e 11). Por isso o PWM esta no 5",
+  "// e no 6, que sao do Timer0.",
+  "",
+  "#include <Servo.h>",
+  "",
+  "const int LED_FRACO = 5;",
+  "const int LED_FORTE = 6;",
+  "const int BUZZER = 8;",
+  "const int SERVO = 9;",
+  "const int DADO = 11;",
+  "const int RELOGIO = 12;",
+  "const int TRAVA = 13;",
+  "const int POT = A0;",
+  "",
+  "Servo ponteiro;",
+  "byte contador = 0;",
+  "unsigned long ultimoBip = 0;",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  pinMode(DADO, OUTPUT);",
+  "  pinMode(RELOGIO, OUTPUT);",
+  "  pinMode(TRAVA, OUTPUT);",
+  "",
+  "  analogWrite(LED_FRACO, 64);    // 25% do tempo alto",
+  "  analogWrite(LED_FORTE, 192);   // 75%",
+  "  ponteiro.attach(SERVO);",
+  "}",
+  "",
+  "void loop() {",
+  "  // O servo segue o potenciometro.",
+  "  int angulo = map(analogRead(POT), 0, 1023, 0, 180);",
+  "  ponteiro.write(angulo);",
+  "",
+  "  // Um byte pelo shiftOut, com a trava em volta: e o que um 74HC595",
+  "  // receberia para acender oito LEDs.",
+  "  digitalWrite(TRAVA, LOW);",
+  "  shiftOut(DADO, RELOGIO, MSBFIRST, contador);",
+  "  digitalWrite(TRAVA, HIGH);",
+  "",
+  "  // A cada meio segundo, um bip e uma linha na serial.",
+  "  if (millis() - ultimoBip >= 500) {",
+  "    ultimoBip = millis();",
+  "    tone(BUZZER, 1000, 60);",
+  "    Serial.print(\"n=\");",
+  "    Serial.println(contador);",
+  "  }",
+  "",
+  "  contador++;",
+  "  delay(20);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 300,
+    "Y": 220
+   },
+   {
+    "Id": "la",
+    "Tipo": "logic-analyzer",
+    "X": 330,
+    "Y": 20,
+    "Nome": "analisador",
+    "JanelaUs": 50000
+   },
+   {
+    "Id": "led1",
+    "Tipo": "led",
+    "X": 150,
+    "Y": 70,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r1",
+    "Tipo": "resistor",
+    "X": 125,
+    "Y": 150,
+    "Ohms": 220
+   },
+   {
+    "Id": "led2",
+    "Tipo": "led",
+    "X": 220,
+    "Y": 70,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r2",
+    "Tipo": "resistor",
+    "X": 195,
+    "Y": 170,
+    "Ohms": 220
+   },
+   {
+    "Id": "buzzer",
+    "Tipo": "buzzer",
+    "X": 640,
+    "Y": 60
+   },
+   {
+    "Id": "servo",
+    "Tipo": "servo",
+    "X": 640,
+    "Y": 260
+   },
+   {
+    "Id": "pot",
+    "Tipo": "potentiometer",
+    "X": 360,
+    "Y": 470,
+    "Giro": 0.5
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "5",
+    "ParaPeca": "led1",
+    "ParaPino": "A",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "led1",
+    "DePino": "C",
+    "ParaPeca": "r1",
+    "ParaPino": "1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r1",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "6",
+    "ParaPeca": "led2",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "led2",
+    "DePino": "C",
+    "ParaPeca": "r2",
+    "ParaPino": "1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r2",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "buzzer",
+    "ParaPino": "1",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "buzzer",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "servo",
+    "DePino": "PWM",
+    "ParaPeca": "placa",
+    "ParaPino": "9",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "servo",
+    "DePino": "V+",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "servo",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "SIG",
+    "ParaPeca": "placa",
+    "ParaPino": "A0",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "5",
+    "ParaPeca": "la",
+    "ParaPino": "D0",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "6",
+    "ParaPeca": "la",
+    "ParaPino": "D1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "la",
+    "ParaPino": "D2",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "la",
+    "ParaPino": "D3",
+    "Cor": "#8E44AD",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "11",
+    "ParaPeca": "la",
+    "ParaPino": "D4",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "12",
+    "ParaPeca": "la",
+    "ParaPino": "D5",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "13",
+    "ParaPeca": "la",
+    "ParaPino": "D6",
+    "Cor": "#E8E8E8",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "1",
+    "ParaPeca": "la",
+    "ParaPino": "D7",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "la",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

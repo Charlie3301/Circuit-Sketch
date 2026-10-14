@@ -1,0 +1,249 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Alarme com sensor de presenca, na ESP32-C6.",
+  "",
+  "O que esta demo mostra:",
+  "- uma maquina de estados (enum): desarmado, saindo, armado, disparado;",
+  "- o sensor PIR, uma sirene de duas notas com tone() e o tempo medido com",
+  "  millis(), sem travar o loop.",
+  "",
+  "Aperte F5, arme no botao, espere 5 s e clique no sensor PIR para simular",
+  "alguem passando. O botao desarma."
+ ],
+ "codigo": [
+  "// Alarme com sensor de presenca, na ESP32-C6.",
+  "//",
+  "// O botao arma e desarma. Armado (LED verde aceso), qualquer movimento no",
+  "// sensor PIR dispara a sirene e pisca o LED vermelho, ate alguem",
+  "// desarmar. Depois de armar ha 5 s para sair -- como nos alarmes de",
+  "// verdade.",
+  "",
+  "const int PIR = 2;",
+  "const int SIRENE = 3;",
+  "const int LED_ALARME = 4;",
+  "const int LED_ARMADO = 5;",
+  "const int BOTAO = 6;",
+  "",
+  "const unsigned long TEMPO_PARA_SAIR = 5000;",
+  "",
+  "enum Estado { DESARMADO, SAINDO, ARMADO, DISPARADO };",
+  "Estado estado = DESARMADO;",
+  "unsigned long desde = 0;",
+  "int botaoAntes = HIGH;",
+  "",
+  "void mudarPara(Estado novo) {",
+  "  estado = novo;",
+  "  desde = millis();",
+  "  noTone(SIRENE);",
+  "  digitalWrite(LED_ALARME, LOW);",
+  "  digitalWrite(LED_ARMADO, novo == ARMADO || novo == SAINDO);",
+  "",
+  "  if (novo == DESARMADO) Serial.println(\"desarmado\");",
+  "  if (novo == SAINDO) Serial.println(\"armando: 5 s para sair...\");",
+  "  if (novo == ARMADO) Serial.println(\"ARMADO\");",
+  "  if (novo == DISPARADO) Serial.println(\"*** INVASAO! ***\");",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(PIR, INPUT);",
+  "  pinMode(LED_ALARME, OUTPUT);",
+  "  pinMode(LED_ARMADO, OUTPUT);",
+  "  pinMode(BOTAO, INPUT_PULLUP);",
+  "  mudarPara(DESARMADO);",
+  "}",
+  "",
+  "void loop() {",
+  "  int botao = digitalRead(BOTAO);",
+  "  if (botaoAntes == HIGH && botao == LOW) {",
+  "    if (estado == DESARMADO) mudarPara(SAINDO);",
+  "    else mudarPara(DESARMADO);",
+  "  }",
+  "  botaoAntes = botao;",
+  "",
+  "  if (estado == SAINDO) {",
+  "    // Pisca o verde enquanto da tempo de sair.",
+  "    digitalWrite(LED_ARMADO, (millis() / 250) % 2);",
+  "    if (millis() - desde > TEMPO_PARA_SAIR) mudarPara(ARMADO);",
+  "  }",
+  "",
+  "  if (estado == ARMADO && digitalRead(PIR) == HIGH) {",
+  "    mudarPara(DISPARADO);",
+  "  }",
+  "",
+  "  if (estado == DISPARADO) {",
+  "    // Sirene de duas notas e o LED vermelho piscando junto.",
+  "    bool alto = (millis() / 300) % 2;",
+  "    tone(SIRENE, alto ? 1200 : 800);",
+  "    digitalWrite(LED_ALARME, alto);",
+  "  }",
+  "",
+  "  delay(20);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-c6-devkit",
+    "X": 60,
+    "Y": 60
+   },
+   {
+    "Id": "pir",
+    "Tipo": "pir-motion-sensor",
+    "X": 300,
+    "Y": 20
+   },
+   {
+    "Id": "sirene",
+    "Tipo": "buzzer",
+    "X": 430,
+    "Y": 30
+   },
+   {
+    "Id": "alarme",
+    "Tipo": "led",
+    "X": 380,
+    "Y": 190,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_alarme",
+    "Tipo": "resistor",
+    "X": 308,
+    "Y": 236,
+    "Ohms": 220
+   },
+   {
+    "Id": "armado",
+    "Tipo": "led",
+    "X": 480,
+    "Y": 190,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_armado",
+    "Tipo": "resistor",
+    "X": 408,
+    "Y": 236,
+    "Ohms": 220
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 320,
+    "Y": 300
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pir",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pir",
+    "DePino": "OUT",
+    "ParaPeca": "placa",
+    "ParaPino": "2",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pir",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "3",
+    "ParaPeca": "sirene",
+    "ParaPino": "1",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "sirene",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "4",
+    "ParaPeca": "r_alarme",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_alarme",
+    "DePino": "2",
+    "ParaPeca": "alarme",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "alarme",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "5",
+    "ParaPeca": "r_armado",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_armado",
+    "DePino": "2",
+    "ParaPeca": "armado",
+    "ParaPino": "A",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "armado",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "6",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

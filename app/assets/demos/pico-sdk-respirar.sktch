@@ -1,0 +1,127 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "LED respirando com o PWM de hardware, na Raspberry Pi Pico (SDK em C).",
+  "",
+  "O que esta demo mostra:",
+  "- o SDK da Raspberry: main() em vez de setup/loop, gpio_set_function, a",
+  "  fatia de PWM configurada por struct e o nivel com correcao de gama;",
+  "- o analisador logico mostrando o ciclo do PWM subir e descer.",
+  "",
+  "Aperte F5 e abra o analisador (selecione-o e clique em \"Abrir o",
+  "analisador\")."
+ ],
+ "codigo": [
+  "// LED respirando na Raspberry Pi Pico, com o SDK em C.",
+  "//",
+  "// O PWM de hardware do RP2040 faz o brilho: o pino passa para o PWM com",
+  "// gpio_set_function, o contador da fatia conta ate 65535 e o nivel sobe e",
+  "// desce. O nivel vai ao quadrado -- a correcao de gama --, porque o olho",
+  "// percebe o brilho assim, e a respiracao fica suave.",
+  "//",
+  "// O analisador logico esta no GP15: abra-o para ver a largura do pulso",
+  "// mudar.",
+  "",
+  "#include \"pico/stdlib.h\"",
+  "#include \"hardware/pwm.h\"",
+  "",
+  "#define LED 15",
+  "",
+  "int main() {",
+  "    stdio_init_all();",
+  "",
+  "    gpio_set_function(LED, GPIO_FUNC_PWM);",
+  "    uint fatia = pwm_gpio_to_slice_num(LED);",
+  "",
+  "    pwm_config config = pwm_get_default_config();",
+  "    pwm_config_set_clkdiv(&config, 16.f);   // 125 MHz / 16",
+  "    pwm_config_set_wrap(&config, 65535);     // ~119 Hz",
+  "    pwm_init(fatia, &config, true);",
+  "",
+  "    int nivel = 0;",
+  "    int passo = 1;",
+  "    while (true) {",
+  "        pwm_set_gpio_level(LED, nivel * nivel);   // 0 a 65025",
+  "        nivel += passo;",
+  "        if (nivel == 255 || nivel == 0) passo = -passo;",
+  "        sleep_ms(8);",
+  "    }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "pi-pico",
+    "X": 60,
+    "Y": 60
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 320,
+    "Y": 200,
+    "Cor": "azul"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 248,
+    "Y": 246,
+    "Ohms": 220
+   },
+   {
+    "Id": "la",
+    "Tipo": "logic-analyzer",
+    "X": 300,
+    "Y": 20,
+    "Nome": "pwm",
+    "JanelaUs": 50000
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "GP15",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.4",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GP15",
+    "ParaPeca": "la",
+    "ParaPino": "D0",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "la",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.4",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

@@ -1,0 +1,87 @@
+{
+  "formato": "sktch",
+  "versao": 1,
+  "gerado": "2026-09-10 06:50",
+  "codigo": [
+    "// Pisca-pisca de tres LEDs no semaforo.",
+    "const int VERMELHO = 14;",
+    "const int AMARELO  = 13;",
+    "const int VERDE    = 12;",
+    "",
+    "void setup() {",
+    "  Serial.begin(115200);",
+    "  pinMode(VERMELHO, OUTPUT);",
+    "  pinMode(AMARELO, OUTPUT);",
+    "  pinMode(VERDE, OUTPUT);",
+    "}",
+    "",
+    "void loop() {",
+    "  digitalWrite(VERMELHO, HIGH); delay(3000); digitalWrite(VERMELHO, LOW);",
+    "  digitalWrite(VERDE, HIGH);    delay(3000); digitalWrite(VERDE, LOW);",
+    "  digitalWrite(AMARELO, HIGH);  delay(1000); digitalWrite(AMARELO, LOW);",
+    "}"
+  ],
+  "circuito": {
+    "Pecas": [
+      {
+        "Id": "bb",
+        "Tipo": "protoboard-830",
+        "X": 40.0,
+        "Y": 300.0
+      },
+      {
+        "Id": "esp",
+        "Tipo": "esp32-devkit-v1",
+        "X": 60.0,
+        "Y": 20.0
+      },
+      {
+        "Id": "led0",
+        "Tipo": "led",
+        "Cor": "vermelho",
+        "X": 82.2,
+        "Y": 315.6
+      },
+      {
+        "Id": "led1",
+        "Tipo": "led",
+        "Cor": "amarelo",
+        "X": 139.8,
+        "Y": 315.6
+      },
+      {
+        "Id": "led2",
+        "Tipo": "led",
+        "Cor": "verde",
+        "X": 197.4,
+        "Y": 315.6
+      }
+    ],
+    "Fios": [
+      {
+        "DePeca": "esp",
+        "DePino": "D14",
+        "ParaPeca": "bb",
+        "ParaPino": "A6",
+        "Cor": "#D6202A",
+        "Estilo": "solto"
+      },
+      {
+        "DePeca": "esp",
+        "DePino": "D13",
+        "ParaPeca": "bb",
+        "ParaPino": "A12",
+        "Cor": "#F2C300",
+        "Estilo": "solto"
+      },
+      {
+        "DePeca": "esp",
+        "DePino": "D12",
+        "ParaPeca": "bb",
+        "ParaPino": "A18",
+        "Cor": "#00A651",
+        "Estilo": "solto"
+      }
+    ]
+  }
+}

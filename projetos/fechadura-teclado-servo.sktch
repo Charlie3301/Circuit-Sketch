@@ -1,0 +1,197 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Fechadura com senha (teclado 4x4 e servo)",
+  "",
+  "O teclado matricial 4x4 (biblioteca Keypad) le a senha; com \"1234\" e #",
+  "o servo destranca por 3 segundos e o LED verde acende. * apaga o que",
+  "foi digitado. Clique nas teclas do teclado."
+ ],
+ "codigo": [
+  "// Fechadura com senha: teclado 4x4, servo de trava e LED.",
+  "#include <Keypad.h>",
+  "#include <Servo.h>",
+  "",
+  "const byte LINHAS = 4, COLUNAS = 4;",
+  "char teclas[LINHAS][COLUNAS] = {",
+  "  {'1', '2', '3', 'A'},",
+  "  {'4', '5', '6', 'B'},",
+  "  {'7', '8', '9', 'C'},",
+  "  {'*', '0', '#', 'D'},",
+  "};",
+  "byte pinosLinhas[LINHAS] = {9, 8, 7, 6};",
+  "byte pinosColunas[COLUNAS] = {5, 4, 3, 2};",
+  "Keypad teclado = Keypad(makeKeymap(teclas), pinosLinhas, pinosColunas, LINHAS, COLUNAS);",
+  "Servo trava;",
+  "const String SENHA = \"1234\";",
+  "String digitado = \"\";",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  pinMode(13, OUTPUT);",
+  "  trava.attach(10);",
+  "  trava.write(0);   // trancada",
+  "  Serial.println(\"Digite a senha e aperte #\");",
+  "}",
+  "",
+  "void loop() {",
+  "  char tecla = teclado.getKey();",
+  "  if (!tecla) return;",
+  "  if (tecla == '#') {",
+  "    if (digitado == SENHA) {",
+  "      Serial.println(\"Liberado!\");",
+  "      digitalWrite(13, HIGH);",
+  "      trava.write(90);",
+  "      delay(3000);",
+  "      trava.write(0);",
+  "      digitalWrite(13, LOW);",
+  "    } else {",
+  "      Serial.println(\"Senha errada\");",
+  "    }",
+  "    digitado = \"\";",
+  "  } else if (tecla == '*') {",
+  "    digitado = \"\";",
+  "  } else {",
+  "    digitado += tecla;",
+  "  }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 360
+   },
+   {
+    "Id": "teclado",
+    "Tipo": "membrane-keypad",
+    "X": 380,
+    "Y": 20
+   },
+   {
+    "Id": "trava",
+    "Tipo": "servo",
+    "X": 700,
+    "Y": 400
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 720,
+    "Y": 220,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 650,
+    "Y": 280,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "teclado",
+    "DePino": "R1",
+    "ParaPeca": "placa",
+    "ParaPino": "9",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "teclado",
+    "DePino": "R2",
+    "ParaPeca": "placa",
+    "ParaPino": "8",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "teclado",
+    "DePino": "R3",
+    "ParaPeca": "placa",
+    "ParaPino": "7",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "teclado",
+    "DePino": "R4",
+    "ParaPeca": "placa",
+    "ParaPino": "6",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "teclado",
+    "DePino": "C1",
+    "ParaPeca": "placa",
+    "ParaPino": "5",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "teclado",
+    "DePino": "C2",
+    "ParaPeca": "placa",
+    "ParaPino": "4",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "teclado",
+    "DePino": "C3",
+    "ParaPeca": "placa",
+    "ParaPino": "3",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "teclado",
+    "DePino": "C4",
+    "ParaPeca": "placa",
+    "ParaPino": "2",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "13",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "10",
+    "ParaPeca": "trava",
+    "ParaPino": "PWM",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "5V",
+    "ParaPeca": "trava",
+    "ParaPino": "V+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.2",
+    "ParaPeca": "trava",
+    "ParaPino": "GND",
+    "Cor": "#7A4A2A"
+   }
+  ]
+ }
+}

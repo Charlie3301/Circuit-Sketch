@@ -1,0 +1,17 @@
+<svg role="slider" width="20mm" height="20mm" version="1.1" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="--knob-angle:-135deg;">
+      <defs>
+        <filter id="outline">
+          <fedropshadow id="glow" dx="0" dy="0" stdDeviation="0.5" flood-color="cyan"/>
+        </filter>
+      </defs>
+      
+      
+      
+      
+      
+      
+      
+      
+      <rect id="rotating" x="10" y="2" width=".42" height="3.1" stroke-width=".15"/>
+      
+    </svg>

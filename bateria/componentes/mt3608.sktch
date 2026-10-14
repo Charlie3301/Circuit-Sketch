@@ -1,0 +1,87 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente mt3608.",
+  "",
+  "O MT3608 (step-up, 5 V no trimpot) sobe a 18650 de 3,7 V e liga o Uno pelo pino 5V.",
+  "",
+  "Ligado numa ESP32 DevKit V1, com o que ele precisa para funcionar",
+  "de verdade: o driver, o motor e a bateria de cada um."
+ ],
+ "codigo": [
+  "// Esta placa e alimentada pelo regulador de tensao, sem o cabo USB.",
+  "const int LED = 13;",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  pinMode(LED, OUTPUT);",
+  "  Serial.println(\"ligou pelo regulador\");",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(LED, HIGH);",
+  "  delay(300);",
+  "  digitalWrite(LED, LOW);",
+  "  delay(300);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "peca",
+    "Tipo": "mt3608",
+    "X": 300,
+    "Y": 200,
+    "Volts": 5.0
+   },
+   {
+    "Id": "pilhas",
+    "Tipo": "bateria",
+    "X": 560,
+    "Y": 200,
+    "Volts": 3.7,
+    "MiliAmperes": 5000,
+    "MiliAmperesHora": 2600,
+    "Nome": "Bateria 18650 (3,7 V)"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pilhas",
+    "DePino": "+",
+    "ParaPeca": "peca",
+    "ParaPino": "VIN+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pilhas",
+    "DePino": "-",
+    "ParaPeca": "peca",
+    "ParaPino": "VIN-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "VOUT+",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "VOUT-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

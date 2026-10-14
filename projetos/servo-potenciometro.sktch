@@ -1,0 +1,92 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Servo controlado por potenciometro (Uno)",
+  "",
+  "O map() leva a leitura do potenciometro (0 a 1023) para o angulo do",
+  "servo (0 a 180 graus). Gire o potenciometro na barra dele."
+ ],
+ "codigo": [
+  "// O servo segue o potenciometro.",
+  "#include <Servo.h>",
+  "Servo servo;",
+  "",
+  "void setup() {",
+  "  servo.attach(9);",
+  "}",
+  "",
+  "void loop() {",
+  "  servo.write(map(analogRead(A0), 0, 1023, 0, 180));",
+  "  delay(15);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 200
+   },
+   {
+    "Id": "pot",
+    "Tipo": "potentiometer",
+    "X": 380,
+    "Y": 330,
+    "Giro": 0.0
+   },
+   {
+    "Id": "servo",
+    "Tipo": "servo",
+    "X": 380,
+    "Y": 40
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pot",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "SIG",
+    "ParaPeca": "placa",
+    "ParaPino": "A0",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "servo",
+    "ParaPino": "PWM",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "5V",
+    "ParaPeca": "servo",
+    "ParaPino": "V+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.1",
+    "ParaPeca": "servo",
+    "ParaPino": "GND",
+    "Cor": "#7A4A2A"
+   }
+  ]
+ }
+}

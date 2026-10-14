@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" height="29mm" version="1.1" width="55mm" viewBox="0 0 55 29">
+      <defs>
+        <filter id="outline">
+          <fedropshadow dx="0" dy="0" stdDeviation="1" flood-color="#4faaff" />
+        </filter>
+        <linearGradient id="tipGradient" x1="36.482" x2="50.447" y1="91.25" y2="91.25" gradientTransform="matrix(.8593 0 0 1.1151 -14.849 -92.256)" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#1a1a1a" offset="0" />
+          <stop stop-color="#595959" offset=".4" />
+          <stop stop-color="#595959" offset=".6" />
+          <stop stop-color="#1a1a1a" offset="1" />
+        </linearGradient>
+        <radialGradient id="bodyGradient" cx="62.59" cy="65.437" r="22.5" gradientTransform="matrix(1.9295 3.7154e-8 0 .49697 -98.268 -23.02)" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#d2d2d2" offset="0" />
+          <stop stop-color="#7a7a7a" offset="1" />
+        </radialGradient>
+        <g id="screw">
+          <circle cx="0" cy="0" r="1" fill="#858585" stroke="#000" stroke-width=".05" />
+          <path d="m0 1 0-2" fill="none" stroke="#000" stroke-width=".151" />
+        </g>
+      </defs>
+      
+      <g transform="translate(5 5)">
+        
+        <g id="tip" transform="translate(-15 0)">
+          <rect x="19.75" y="8.6" width="5.5" height="1.8" />
+          <rect x="16.5" y="0" width="12" height="19" fill="url(#tipGradient)" stroke-width="2.6518" rx=".1" ry=".1" />
+          <rect x="22.2" y="0" width=".6" height="19" fill="#efefef" />
+        </g>
+      </g>
+      </svg>

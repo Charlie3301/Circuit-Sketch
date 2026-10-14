@@ -1,0 +1,57 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente xor-gate.",
+  "",
+  "Ligado numa ESP32 DevKit V1, que tem pino para tudo — assim o",
+  "que muda de um teste para o outro é só a peça.",
+  "",
+  "Pinos ligados: A → D2"
+ ],
+ "codigo": [
+  "// A peça entra no circuito e o netlist a enxerga.",
+  "// O sketch mexe no pino em que ela está ligada.",
+  "",
+  "const int PINO = 2;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(PINO, OUTPUT);",
+  "  Serial.println(\"peca no circuito\");",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(PINO, HIGH);",
+  "  delay(150);",
+  "  digitalWrite(PINO, LOW);",
+  "  delay(150);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 100,
+    "Y": 60
+   },
+   {
+    "Id": "peca",
+    "Tipo": "xor-gate",
+    "X": 520,
+    "Y": 160
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "peca",
+    "DePino": "A",
+    "ParaPeca": "placa",
+    "ParaPino": "D2",
+    "Cor": "#00A651"
+   }
+  ]
+ }
+}

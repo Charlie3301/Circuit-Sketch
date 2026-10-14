@@ -1,0 +1,263 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Piano de oito teclas, na Raspberry Pi Pico (Arduino).",
+  "",
+  "O que esta demo mostra:",
+  "- a Pico programada com o core do Arduino (o numero do pino e o do GP);",
+  "- tone() e noTone() seguindo a tecla segurada.",
+  "",
+  "Aperte F5 e clique nas teclas (segure para a nota durar)."
+ ],
+ "codigo": [
+  "// Piano de oito teclas, na Raspberry Pi Pico (Arduino).",
+  "//",
+  "// Cada botao e uma nota da escala de do maior. Segure para a nota durar;",
+  "// solte e ela para. O monitor serial mostra o nome da nota.",
+  "",
+  "const int TECLAS[] = {2, 3, 4, 5, 6, 7, 8, 9};",
+  "const int NOTAS[] = {262, 294, 330, 349, 392, 440, 494, 523};",
+  "const char* NOMES[] = {\"do\", \"re\", \"mi\", \"fa\", \"sol\", \"la\", \"si\", \"do agudo\"};",
+  "const int BUZZER = 15;",
+  "",
+  "int tocando = -1;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  for (int i = 0; i < 8; i++) pinMode(TECLAS[i], INPUT_PULLUP);",
+  "}",
+  "",
+  "void loop() {",
+  "  int apertada = -1;",
+  "  for (int i = 0; i < 8; i++) {",
+  "    if (digitalRead(TECLAS[i]) == LOW) {",
+  "      apertada = i;",
+  "      break;",
+  "    }",
+  "  }",
+  "",
+  "  if (apertada != tocando) {",
+  "    if (apertada < 0) {",
+  "      noTone(BUZZER);",
+  "    } else {",
+  "      tone(BUZZER, NOTAS[apertada]);",
+  "      Serial.println(NOMES[apertada]);",
+  "    }",
+  "    tocando = apertada;",
+  "  }",
+  "  delay(10);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "pi-pico",
+    "X": 60,
+    "Y": 60
+   },
+   {
+    "Id": "tecla1",
+    "Tipo": "pushbutton",
+    "X": 260,
+    "Y": 40
+   },
+   {
+    "Id": "tecla2",
+    "Tipo": "pushbutton",
+    "X": 350,
+    "Y": 40
+   },
+   {
+    "Id": "tecla3",
+    "Tipo": "pushbutton",
+    "X": 440,
+    "Y": 40
+   },
+   {
+    "Id": "tecla4",
+    "Tipo": "pushbutton",
+    "X": 530,
+    "Y": 40
+   },
+   {
+    "Id": "tecla5",
+    "Tipo": "pushbutton",
+    "X": 260,
+    "Y": 130
+   },
+   {
+    "Id": "tecla6",
+    "Tipo": "pushbutton",
+    "X": 350,
+    "Y": 130
+   },
+   {
+    "Id": "tecla7",
+    "Tipo": "pushbutton",
+    "X": 440,
+    "Y": 130
+   },
+   {
+    "Id": "tecla8",
+    "Tipo": "pushbutton",
+    "X": 530,
+    "Y": 130
+   },
+   {
+    "Id": "buzzer",
+    "Tipo": "buzzer",
+    "X": 420,
+    "Y": 240
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "GP2",
+    "ParaPeca": "tecla1",
+    "ParaPino": "1.l",
+    "Cor": "#E8E8E8",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tecla1",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GP3",
+    "ParaPeca": "tecla2",
+    "ParaPino": "1.l",
+    "Cor": "#E8E8E8",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tecla2",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GP4",
+    "ParaPeca": "tecla3",
+    "ParaPino": "1.l",
+    "Cor": "#E8E8E8",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tecla3",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GP5",
+    "ParaPeca": "tecla4",
+    "ParaPino": "1.l",
+    "Cor": "#E8E8E8",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tecla4",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GP6",
+    "ParaPeca": "tecla5",
+    "ParaPino": "1.l",
+    "Cor": "#E8E8E8",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tecla5",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GP7",
+    "ParaPeca": "tecla6",
+    "ParaPino": "1.l",
+    "Cor": "#E8E8E8",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tecla6",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GP8",
+    "ParaPeca": "tecla7",
+    "ParaPino": "1.l",
+    "Cor": "#E8E8E8",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tecla7",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GP9",
+    "ParaPeca": "tecla8",
+    "ParaPino": "1.l",
+    "Cor": "#E8E8E8",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tecla8",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GP15",
+    "ParaPeca": "buzzer",
+    "ParaPino": "1",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "buzzer",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.4",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

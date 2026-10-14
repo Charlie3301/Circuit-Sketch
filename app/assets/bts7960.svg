@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="50.0mm" height="50.0mm" viewBox="0 0 50.0 50.0">
+  <rect x="0.3" y="0.3" width="49.4" height="49.4" rx="1.2" fill="#1d5c3a" stroke="#0d2e1c" stroke-width="0.3"/>
+  <!-- o dissipador de aluminio, quase a placa toda -->
+  <rect x="8.0" y="3.0" width="31.0" height="44.0" rx="1.0" fill="#b9bec6" stroke="#7d838c" stroke-width="0.35"/>
+  <path d="M10.00 4.0 V46.0" stroke="#8e949c" stroke-width="1.0"/>
+  <path d="M12.25 4.0 V46.0" stroke="#8e949c" stroke-width="1.0"/>
+  <path d="M14.50 4.0 V46.0" stroke="#8e949c" stroke-width="1.0"/>
+  <path d="M16.75 4.0 V46.0" stroke="#8e949c" stroke-width="1.0"/>
+  <path d="M19.00 4.0 V46.0" stroke="#8e949c" stroke-width="1.0"/>
+  <path d="M21.25 4.0 V46.0" stroke="#8e949c" stroke-width="1.0"/>
+  <path d="M23.50 4.0 V46.0" stroke="#8e949c" stroke-width="1.0"/>
+  <path d="M25.75 4.0 V46.0" stroke="#8e949c" stroke-width="1.0"/>
+  <path d="M28.00 4.0 V46.0" stroke="#8e949c" stroke-width="1.0"/>
+  <path d="M30.25 4.0 V46.0" stroke="#8e949c" stroke-width="1.0"/>
+  <path d="M32.50 4.0 V46.0" stroke="#8e949c" stroke-width="1.0"/>
+  <path d="M34.75 4.0 V46.0" stroke="#8e949c" stroke-width="1.0"/>
+  <path d="M37.00 4.0 V46.0" stroke="#8e949c" stroke-width="1.0"/>
+  <text x="23.50" y="26.00" fill="#3a3e45" font-size="2.2px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">BTS7960</text>
+  <text x="23.50" y="29.00" fill="#3a3e45" font-size="1.6px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">43 A</text>
+  <rect x="42.60" y="7.10" width="6.0" height="10.76" rx="0.5" fill="#2b8a3e" stroke="#0f2f5c" stroke-width="0.25"/>
+  <circle cx="45.60" cy="9.94" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M44.50 9.94 H46.70" stroke="#5a6068" stroke-width="0.45"/>
+  <circle cx="45.60" cy="15.02" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M44.50 15.02 H46.70" stroke="#5a6068" stroke-width="0.45"/>
+  <rect x="42.60" y="27.42" width="6.0" height="10.76" rx="0.5" fill="#2b8a3e" stroke="#0f2f5c" stroke-width="0.25"/>
+  <circle cx="45.60" cy="30.26" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M44.50 30.26 H46.70" stroke="#5a6068" stroke-width="0.45"/>
+  <circle cx="45.60" cy="35.34" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <path d="M44.50 35.34 H46.70" stroke="#5a6068" stroke-width="0.45"/>
+  <rect x="0.40" y="13.80" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="1.22" y="14.62" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="3.40" y="15.40" fill="#f2f2f2" font-size="0.85px" text-anchor="start"
+        font-family="Verdana" font-weight="bold">RPWM</text>
+  <rect x="0.40" y="16.34" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="1.22" y="17.16" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="3.40" y="17.94" fill="#f2f2f2" font-size="0.85px" text-anchor="start"
+        font-family="Verdana" font-weight="bold">LPWM</text>
+  <rect x="0.40" y="18.88" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="1.22" y="19.70" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="3.40" y="20.48" fill="#f2f2f2" font-size="0.85px" text-anchor="start"
+        font-family="Verdana" font-weight="bold">R_EN</text>
+  <rect x="0.40" y="21.42" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="1.22" y="22.24" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="3.40" y="23.02" fill="#f2f2f2" font-size="0.85px" text-anchor="start"
+        font-family="Verdana" font-weight="bold">L_EN</text>
+  <rect x="0.40" y="23.96" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="1.22" y="24.78" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="3.40" y="25.56" fill="#f2f2f2" font-size="0.85px" text-anchor="start"
+        font-family="Verdana" font-weight="bold">R_IS</text>
+  <rect x="0.40" y="26.50" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="1.22" y="27.32" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="3.40" y="28.10" fill="#f2f2f2" font-size="0.85px" text-anchor="start"
+        font-family="Verdana" font-weight="bold">L_IS</text>
+  <rect x="0.40" y="29.04" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="1.22" y="29.86" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="3.40" y="30.64" fill="#f2f2f2" font-size="0.85px" text-anchor="start"
+        font-family="Verdana" font-weight="bold">VCC</text>
+  <rect x="0.40" y="31.58" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="1.22" y="32.40" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="3.40" y="33.18" fill="#f2f2f2" font-size="0.85px" text-anchor="start"
+        font-family="Verdana" font-weight="bold">GND</text>
+  <text x="41.80" y="10.34" fill="#f2f2f2" font-size="1.2px" text-anchor="end"
+        font-family="Verdana" font-weight="bold">B+</text>
+  <text x="41.80" y="15.42" fill="#f2f2f2" font-size="1.2px" text-anchor="end"
+        font-family="Verdana" font-weight="bold">B-</text>
+  <text x="41.80" y="30.66" fill="#f2f2f2" font-size="1.2px" text-anchor="end"
+        font-family="Verdana" font-weight="bold">M+</text>
+  <text x="41.80" y="35.74" fill="#f2f2f2" font-size="1.2px" text-anchor="end"
+        font-family="Verdana" font-weight="bold">M-</text>
+
+</svg>

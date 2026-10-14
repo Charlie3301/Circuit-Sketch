@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="28.0mm" height="30.0mm" viewBox="0 0 28.0 30.0">
+  <defs>
+    <linearGradient id="lata130" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e3e6ea"/>
+      <stop offset="1" stop-color="#9da3ab"/>
+    </linearGradient>
+  </defs>
+
+  <!-- os fios saem de tras da lata -->
+  <path d="M12.73 17.50 V28.80" fill="none" stroke="#7d1f1a" stroke-width="1.15" stroke-linecap="round"/>
+  <path d="M12.73 17.50 V28.80" fill="none" stroke="#d23b33" stroke-width="0.8" stroke-linecap="round"/>
+  <path d="M15.27 17.50 V28.80" fill="none" stroke="#7a808a" stroke-width="1.15" stroke-linecap="round"/>
+  <path d="M15.27 17.50 V28.80" fill="none" stroke="#34373d" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="12.73" cy="28.80" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="12.73" cy="28.80" r="0.32" fill="#2a2a2a"/>
+  <circle cx="15.27" cy="28.80" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="15.27" cy="28.80" r="0.32" fill="#2a2a2a"/>
+  <text x="11.43" y="27.20" fill="#d23b33" font-size="2.2px" text-anchor="end"
+        font-family="Verdana" font-weight="bold">+</text>
+  <text x="16.57" y="27.20" fill="#9aa0a8" font-size="2.6px"
+        font-family="Verdana" font-weight="bold">-</text>
+  <!-- o fundo e a lateral da lata -->
+  <path d="M9.786 2.600 H23.014 A10.0 10.0 0 0 1 23.014 17.600 H9.786 A10.0 10.0 0 0 1 9.786 2.600 Z" fill="#868c94" stroke="#5f656d" stroke-width="0.3"/>
+  <path d="M21.071 19.571 L23.471 17.171 L9.329 3.029 L6.929 5.429 Z" fill="#9aa0a8"/>
+  <!-- a frente: a tampa com o mancal, os dois furos de fixacao -->
+  <path d="M7.386 5.000 H20.614 A10.0 10.0 0 0 1 20.614 20.000 H7.386 A10.0 10.0 0 0 1 7.386 5.000 Z" fill="url(#lata130)" stroke="#6d737c" stroke-width="0.35"/>
+  <path d="M7.386 5.000 H20.614 A10.0 10.0 0 0 1 20.614 20.000 H7.386 A10.0 10.0 0 0 1 7.386 5.000 Z" fill="none" stroke="#f4f6f8" stroke-width="0.25" transform="translate(0.560 0.500) scale(0.96)"/>
+  <circle cx="7.40" cy="12.50" r="0.65" fill="#4b5058"/>
+  <circle cx="20.60" cy="12.50" r="0.65" fill="#4b5058"/>
+  <circle cx="14.00" cy="12.50" r="3.0" fill="#b08d57" stroke="#7d6236" stroke-width="0.25"/>
+  <text x="14.00" y="7.50" fill="#5d636c" font-size="1.6px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">RS-550</text>
+</svg>

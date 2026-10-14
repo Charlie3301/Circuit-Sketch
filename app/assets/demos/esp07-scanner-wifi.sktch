@@ -1,0 +1,240 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Scanner de redes WiFi, num ESP-07.",
+  "",
+  "O que esta demo mostra:",
+  "- WiFi.scanNetworks() com nome, sinal e tipo de seguranca de cada rede;",
+  "- map() e constrain() transformando dBm em LEDs acesos.",
+  "",
+  "Aperte F5. As redes listadas sao as que o WiFi deste computador enxerga."
+ ],
+ "codigo": [
+  "// Scanner de redes WiFi, num ESP-07 -- o modulo com conector de antena.",
+  "//",
+  "// A cada 5 s a placa procura as redes em volta e lista no monitor serial:",
+  "// o nome, o sinal (RSSI, em dBm) e se e aberta ou com senha. A barra de",
+  "// LEDs mostra a forca da MELHOR rede: quanto mais perto de 0 dBm, mais LEDs.",
+  "//",
+  "// No simulador as redes sao as que o WiFi deste computador enxerga.",
+  "",
+  "#include <ESP8266WiFi.h>",
+  "",
+  "const int BARRA[] = {16, 14, 12, 13, 5};",
+  "",
+  "void mostrarSinal(int rssi) {",
+  "  // De -90 dBm (quase nada) a -40 dBm (otimo): de 0 a 5 LEDs.",
+  "  int acesos = constrain(map(rssi, -90, -40, 0, 5), 0, 5);",
+  "  for (int i = 0; i < 5; i++) digitalWrite(BARRA[i], i < acesos);",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  for (int i = 0; i < 5; i++) pinMode(BARRA[i], OUTPUT);",
+  "  WiFi.mode(WIFI_STA);",
+  "  WiFi.disconnect();",
+  "  delay(100);",
+  "}",
+  "",
+  "void loop() {",
+  "  Serial.println(\"procurando redes...\");",
+  "  int quantas = WiFi.scanNetworks();",
+  "",
+  "  if (quantas <= 0) {",
+  "    Serial.println(\"nenhuma rede encontrada\");",
+  "    mostrarSinal(-100);",
+  "  } else {",
+  "    int melhor = -100;",
+  "    for (int i = 0; i < quantas; i++) {",
+  "      Serial.print(i + 1);",
+  "      Serial.print(\". \");",
+  "      Serial.print(WiFi.SSID(i));",
+  "      Serial.print(\"  \");",
+  "      Serial.print(WiFi.RSSI(i));",
+  "      Serial.print(\" dBm  \");",
+  "      Serial.println(WiFi.encryptionType(i) == ENC_TYPE_NONE ? \"aberta\" : \"com senha\");",
+  "      if (WiFi.RSSI(i) > melhor) melhor = WiFi.RSSI(i);",
+  "    }",
+  "    mostrarSinal(melhor);",
+  "  }",
+  "",
+  "  WiFi.scanDelete();",
+  "  delay(5000);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp-07",
+    "X": 80,
+    "Y": 100
+   },
+   {
+    "Id": "barra",
+    "Tipo": "led-bar-graph",
+    "X": 420,
+    "Y": 40
+   },
+   {
+    "Id": "r1",
+    "Tipo": "resistor",
+    "X": 300,
+    "Y": 36,
+    "Ohms": 220
+   },
+   {
+    "Id": "r2",
+    "Tipo": "resistor",
+    "X": 300,
+    "Y": 60,
+    "Ohms": 220
+   },
+   {
+    "Id": "r3",
+    "Tipo": "resistor",
+    "X": 300,
+    "Y": 84,
+    "Ohms": 220
+   },
+   {
+    "Id": "r4",
+    "Tipo": "resistor",
+    "X": 300,
+    "Y": 108,
+    "Ohms": 220
+   },
+   {
+    "Id": "r5",
+    "Tipo": "resistor",
+    "X": 300,
+    "Y": 132,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO16",
+    "ParaPeca": "r1",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r1",
+    "DePino": "2",
+    "ParaPeca": "barra",
+    "ParaPino": "A1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "barra",
+    "DePino": "C1",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO14",
+    "ParaPeca": "r2",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r2",
+    "DePino": "2",
+    "ParaPeca": "barra",
+    "ParaPino": "A2",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "barra",
+    "DePino": "C2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO12",
+    "ParaPeca": "r3",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r3",
+    "DePino": "2",
+    "ParaPeca": "barra",
+    "ParaPino": "A3",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "barra",
+    "DePino": "C3",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO13",
+    "ParaPeca": "r4",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r4",
+    "DePino": "2",
+    "ParaPeca": "barra",
+    "ParaPino": "A4",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "barra",
+    "DePino": "C4",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO5",
+    "ParaPeca": "r5",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r5",
+    "DePino": "2",
+    "ParaPeca": "barra",
+    "ParaPino": "A5",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "barra",
+    "DePino": "C5",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

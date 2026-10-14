@@ -1,0 +1,515 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "ESP32-DOOM: o DOOM de verdade (motor PrBoom 2.5.0) numa ESP32-S3.",
+  "",
+  "O jogo e a biblioteca ESP32-DOOM, em C, com o codigo junto (GPL). No",
+  "simulador ela roda no modo nativo: o C e compilado de verdade, com o",
+  "ESP-IDF do simulador por baixo -- tarefas do FreeRTOS, o SPI do display e",
+  "do cartao, o I2S do som e o servidor HTTP do ESP-IDF.",
+  "",
+  "ANTES DE RODAR: o cartao precisa do DOOM1.WAD (o shareware serve). Clique",
+  "duas vezes no cartao e use \"Carregar do computador\". O WAD nao vem junto:",
+  "e da id Software. DOOM e marca da id Software.",
+  "",
+  "Aperte F5 e clique no circuito. Setas andam, Ctrl atira (e e o OK dos",
+  "menus), Espaco abre as portas, Esc abre o menu e o Caps Lock liga o",
+  "correr. Um controle de video game tambem vale. A tela tambem vai para o",
+  "navegador: o painel Rede mostra o endereco.",
+  "",
+  "Na placa de verdade: ESP32-S3 N8R8, PSRAM \"OPI PSRAM\", particao \"Huge",
+  "APP\", e a biblioteca de bibliotecas/ESP32-DOOM na pasta libraries da",
+  "Arduino IDE."
+ ],
+ "codigo": [
+  "// ESP32-DOOM no CircuitSketch: o DOOM de verdade -- o motor PrBoom 2.5.0,",
+  "// do projeto ESP32-DOOM -- numa ESP32-S3 com PSRAM, display ILI9341, cartao",
+  "// microSD, amplificador I2S MAX98357A e alto-falante.",
+  "//",
+  "// O jogo e a biblioteca ESP32-DOOM, escrita em C (GPL, com o codigo junto):",
+  "// no simulador ela roda no modo nativo, compilada de verdade, como na placa.",
+  "//",
+  "// ANTES DE RODAR: o cartao precisa do DOOM1.WAD (o shareware serve). Pare a",
+  "// simulacao, clique duas vezes no cartao do circuito e use \"Carregar do",
+  "// computador\". O WAD nao vem junto: e da id Software.",
+  "//",
+  "// NA PLACA DE VERDADE (Arduino IDE, core esp32 3.x):",
+  "//   - copie a pasta bibliotecas/ESP32-DOOM do CircuitSketch para",
+  "//     Documentos/Arduino/libraries;",
+  "//   - Placa: \"ESP32S3 Dev Module\" (um N8R8: 8 MB de flash e 8 de PSRAM);",
+  "//   - Ferramentas > PSRAM: \"OPI PSRAM\";",
+  "//   - Ferramentas > Partition Scheme: \"Huge APP (3MB No OTA/1MB SPIFFS)\";",
+  "//   - o DOOM1.WAD na raiz de um cartao microSD formatado em FAT32.",
+  "//",
+  "// Controles: os botoes do circuito (ou o teclado, ou um controle de video",
+  "// game). O \"atirar\" tambem e o OK dos menus; a chave liga o correr.",
+  "",
+  "#include <WiFi.h>",
+  "#include <doom_esp32.h>",
+  "",
+  "// A tela tambem vai para o navegador, se a placa entrar numa rede. Na placa",
+  "// de verdade, ponha aqui a sua; no simulador, qualquer nome conecta.",
+  "const char *REDE = \"CircuitSketch-WiFi\";",
+  "const char *SENHA = \"\";",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "",
+  "  // Os pinos do circuito -- os mesmos da BASE ZERO.",
+  "  doom_barramento(11, 13, 12);           // MOSI, MISO, SCK (o display e o cartao dividem)",
+  "  doom_tela(10, 9, 8, 7);                // CS, DC, RST, luz de fundo",
+  "  doom_cartao(14);                       // CS do cartao",
+  "  doom_botoes(4, 5, 6, 15, 16, 17, 18);  // cima, baixo, esquerda, direita, menu, atirar, usar",
+  "  doom_chave_correr(1);",
+  "  doom_som(40, 41, 42);                  // BCLK, LRC, DIN do MAX98357A",
+  "",
+  "  WiFi.begin(REDE, SENHA);",
+  "  for (int i = 0; i < 50 && WiFi.status() != WL_CONNECTED; i++) delay(100);",
+  "  if (WiFi.status() == WL_CONNECTED) {",
+  "    Serial.print(\"A tela no navegador: http://\");",
+  "    Serial.println(WiFi.localIP());",
+  "    doom_web(80);",
+  "  } else {",
+  "    Serial.println(\"Sem rede: o jogo fica so no display.\");",
+  "  }",
+  "",
+  "  doom_iniciar();",
+  "}",
+  "",
+  "void loop() {",
+  "  // O jogo roda nas tarefas do FreeRTOS que o doom_iniciar() criou.",
+  "  delay(1000);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-s3-devkit",
+    "X": 400,
+    "Y": 60
+   },
+   {
+    "Id": "tela",
+    "Tipo": "ili9341",
+    "X": 107.5,
+    "Y": 46.5,
+    "Rotacao": 270,
+    "Nome": "display 320x240 (ILI9341)"
+   },
+   {
+    "Id": "cartao",
+    "Tipo": "microsd-card",
+    "X": 262,
+    "Y": 305,
+    "Nome": "cartão: DOOM1.WAD",
+    "Arquivos": {
+     "LEIAME.TXT": "ESP32-DOOM no CircuitSketch\n===========================\n\nEste cartao ainda nao tem o jogo: falta o DOOM1.WAD.\n\n1. Pare a simulacao, clique duas vezes neste cartao e use\n   \"Carregar do computador\" para escolher o seu DOOM1.WAD. O\n   shareware serve; o DOOM.WAD e o DOOM2.WAD completos tambem.\n2. Rode de novo (F5).\n\nO WAD fica no seu computador: o projeto guarda so o caminho dele.\nEle nao vem junto com o CircuitSketch porque e da id Software.\n\nControles (os botoes do circuito, o teclado ou um controle de video game)\n  setas ........ andar e virar\n  Ctrl (A) ..... atirar; nos menus, escolher\n  Espaco (B) ... usar: abrir portas, apertar interruptores\n  Esc .......... menu\n  chave (R) .... correr\n\nA tela tambem aparece no navegador: o painel Rede mostra o endereco.\n"
+    }
+   },
+   {
+    "Id": "cima",
+    "Tipo": "pushbutton",
+    "X": 112,
+    "Y": 322,
+    "Nome": "↑ andar",
+    "Teclas": {
+     "apertar": "t:Up|g:Cima"
+    }
+   },
+   {
+    "Id": "esquerda",
+    "Tipo": "pushbutton",
+    "X": 40,
+    "Y": 368,
+    "Nome": "← virar",
+    "Teclas": {
+     "apertar": "t:Left|g:Esquerda"
+    }
+   },
+   {
+    "Id": "direita",
+    "Tipo": "pushbutton",
+    "X": 184,
+    "Y": 368,
+    "Nome": "→ virar",
+    "Teclas": {
+     "apertar": "t:Right|g:Direita"
+    }
+   },
+   {
+    "Id": "baixo",
+    "Tipo": "pushbutton",
+    "X": 112,
+    "Y": 414,
+    "Nome": "↓ voltar",
+    "Teclas": {
+     "apertar": "t:Down|g:Baixo"
+    }
+   },
+   {
+    "Id": "menu",
+    "Tipo": "pushbutton",
+    "X": 262,
+    "Y": 420,
+    "Nome": "MENU (Esc)",
+    "Teclas": {
+     "apertar": "t:Escape|g:Start"
+    }
+   },
+   {
+    "Id": "atirar",
+    "Tipo": "pushbutton",
+    "X": 540,
+    "Y": 80,
+    "Nome": "A: atirar / OK (Ctrl)",
+    "Teclas": {
+     "apertar": "t:LeftCtrl|g:A"
+    }
+   },
+   {
+    "Id": "usar",
+    "Tipo": "pushbutton",
+    "X": 540,
+    "Y": 150,
+    "Nome": "B: usar (Espaço)",
+    "Teclas": {
+     "apertar": "t:Space|g:B"
+    }
+   },
+   {
+    "Id": "amplificador",
+    "Tipo": "max98357a",
+    "X": 548,
+    "Y": 218,
+    "Nome": "amplificador I2S"
+   },
+   {
+    "Id": "falante",
+    "Tipo": "alto-falante",
+    "X": 640,
+    "Y": 180,
+    "Nome": "alto-falante 8 Ω"
+   },
+   {
+    "Id": "chave",
+    "Tipo": "slide-switch",
+    "X": 330,
+    "Y": 16,
+    "Giro": 0,
+    "Nome": "correr (Caps Lock)",
+    "Teclas": {
+     "alternar": "t:CapsLock|g:Back"
+    }
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "tela",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "CS",
+    "ParaPeca": "placa",
+    "ParaPino": "10",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "RST",
+    "ParaPeca": "placa",
+    "ParaPino": "8",
+    "Cor": "#E8E8E8",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "D/C",
+    "ParaPeca": "placa",
+    "ParaPino": "9",
+    "Cor": "#8E44AD",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "MOSI",
+    "ParaPeca": "placa",
+    "ParaPino": "11",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "SCK",
+    "ParaPeca": "placa",
+    "ParaPino": "12",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "LED",
+    "ParaPeca": "placa",
+    "ParaPino": "7",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "MISO",
+    "ParaPeca": "placa",
+    "ParaPino": "13",
+    "Cor": "#8A8A8A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "cartao",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "cartao",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "cartao",
+    "DePino": "CS",
+    "ParaPeca": "placa",
+    "ParaPino": "14",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "cartao",
+    "DePino": "SCK",
+    "ParaPeca": "placa",
+    "ParaPino": "12",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "cartao",
+    "DePino": "DI",
+    "ParaPeca": "placa",
+    "ParaPino": "11",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "cartao",
+    "DePino": "DO",
+    "ParaPeca": "placa",
+    "ParaPino": "13",
+    "Cor": "#8A8A8A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "4",
+    "ParaPeca": "cima",
+    "ParaPino": "1.r",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "cima",
+    "DePino": "2.r",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "6",
+    "ParaPeca": "esquerda",
+    "ParaPino": "1.r",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "esquerda",
+    "DePino": "2.r",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "15",
+    "ParaPeca": "direita",
+    "ParaPino": "1.r",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "direita",
+    "DePino": "2.r",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "5",
+    "ParaPeca": "baixo",
+    "ParaPino": "1.r",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "baixo",
+    "DePino": "2.r",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "16",
+    "ParaPeca": "menu",
+    "ParaPino": "1.r",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "menu",
+    "DePino": "2.r",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "17",
+    "ParaPeca": "atirar",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "atirar",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "18",
+    "ParaPeca": "usar",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "usar",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "BCLK",
+    "ParaPeca": "placa",
+    "ParaPino": "40",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "LRC",
+    "ParaPeca": "placa",
+    "ParaPino": "41",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "DIN",
+    "ParaPeca": "placa",
+    "ParaPino": "42",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "VIN",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "OUT+",
+    "ParaPeca": "falante",
+    "ParaPino": "+",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "OUT-",
+    "ParaPeca": "falante",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "chave",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "chave",
+    "DePino": "1",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

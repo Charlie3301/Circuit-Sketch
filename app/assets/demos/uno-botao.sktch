@@ -1,0 +1,108 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Botao e LED, no Arduino Uno.",
+  "",
+  "O que esta demo mostra:",
+  "- o botao com INPUT_PULLUP: solto le HIGH, apertado le LOW -- por isso o",
+  "  teste e \"== LOW\";",
+  "- o circuito montado na protoboard, com o LED e o resistor espetados.",
+  "",
+  "Aperte F5 e segure o botao."
+ ],
+ "codigo": [
+  "// Botão acende o LED.",
+  "// O botão usa o resistor de pull-up interno: solto lê HIGH,",
+  "// apertado lê LOW. Por isso o teste é \"== LOW\".",
+  "",
+  "const int BOTAO = 2;",
+  "const int LED   = 13;",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  pinMode(BOTAO, INPUT_PULLUP);",
+  "  pinMode(LED, OUTPUT);",
+  "}",
+  "",
+  "void loop() {",
+  "  if (digitalRead(BOTAO) == LOW) {",
+  "    digitalWrite(LED, HIGH);",
+  "  } else {",
+  "    digitalWrite(LED, LOW);",
+  "  }",
+  "  delay(20);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "bb",
+    "Tipo": "protoboard-830",
+    "X": 40,
+    "Y": 300
+   },
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 20
+   },
+   {
+    "Id": "bt",
+    "Tipo": "pushbutton",
+    "X": 126.4,
+    "Y": 354.2
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 216.6,
+    "Y": 315.6,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r",
+    "Tipo": "resistor",
+    "X": 232.0,
+    "Y": 371.15,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "2",
+    "ParaPeca": "bb",
+    "ParaPino": "A8",
+    "Cor": "#2B59BF",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bb",
+    "DePino": "H8",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "13",
+    "ParaPeca": "bb",
+    "ParaPino": "A20",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bb",
+    "DePino": "D25",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

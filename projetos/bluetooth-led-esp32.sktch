@@ -1,0 +1,81 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "LED pelo Bluetooth do celular (ESP32)",
+  "",
+  "A ESP32 abre uma porta serial Bluetooth (BluetoothSerial) chamada",
+  "RoboESP32. No celular do simulador (aba BLUETOOTH), conecte e mande",
+  "\"liga\" ou \"desliga\"."
+ ],
+ "codigo": [
+  "// O celular manda \"liga\" ou \"desliga\" pelo Bluetooth classico.",
+  "#include <BluetoothSerial.h>",
+  "BluetoothSerial SerialBT;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(2, OUTPUT);",
+  "  SerialBT.begin(\"RoboESP32\");",
+  "  Serial.println(\"Bluetooth pronto: conecte em RoboESP32\");",
+  "}",
+  "",
+  "void loop() {",
+  "  if (SerialBT.available()) {",
+  "    String comando = SerialBT.readStringUntil('\\n');",
+  "    comando.trim();",
+  "    if (comando == \"liga\") { digitalWrite(2, HIGH); SerialBT.println(\"LED aceso\"); }",
+  "    else if (comando == \"desliga\") { digitalWrite(2, LOW); SerialBT.println(\"LED apagado\"); }",
+  "    Serial.println(\"recebi: \" + comando);",
+  "  }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 280,
+    "Y": 40,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 210,
+    "Y": 100,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D2",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

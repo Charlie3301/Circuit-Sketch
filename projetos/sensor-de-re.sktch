@@ -1,0 +1,115 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Sensor de re (HC-SR04 e buzzer)",
+  "",
+  "O sensor de estacionamento: o HC-SR04 mede a distancia e o buzzer bipa",
+  "mais rapido conforme o obstaculo chega perto (abaixo de 10 cm, som",
+  "continuo). Mude a distancia na barra do sensor."
+ ],
+ "codigo": [
+  "// Sensor de re: o bipe acelera conforme o obstaculo chega perto.",
+  "const int TRIG = 9, ECHO = 10, BUZZER = 8;",
+  "",
+  "long distancia() {",
+  "  digitalWrite(TRIG, LOW);",
+  "  delayMicroseconds(2);",
+  "  digitalWrite(TRIG, HIGH);",
+  "  delayMicroseconds(10);",
+  "  digitalWrite(TRIG, LOW);",
+  "  long tempo = pulseIn(ECHO, HIGH, 30000);",
+  "  return tempo == 0 ? 400 : tempo / 58;",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  pinMode(TRIG, OUTPUT);",
+  "  pinMode(ECHO, INPUT);",
+  "}",
+  "",
+  "void loop() {",
+  "  long cm = distancia();",
+  "  Serial.print(cm);",
+  "  Serial.println(\" cm\");",
+  "  if (cm < 10) {",
+  "    tone(BUZZER, 1500);          // muito perto: som continuo",
+  "    delay(100);",
+  "  } else if (cm < 100) {",
+  "    tone(BUZZER, 1500, 60);",
+  "    delay(cm * 5);               // mais perto, mais rapido",
+  "  } else {",
+  "    noTone(BUZZER);",
+  "    delay(200);",
+  "  }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 200
+   },
+   {
+    "Id": "sonar",
+    "Tipo": "hc-sr04",
+    "X": 380,
+    "Y": 40,
+    "Giro": 0.05
+   },
+   {
+    "Id": "buzzer",
+    "Tipo": "buzzer",
+    "X": 600,
+    "Y": 300
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "sonar",
+    "ParaPino": "TRIG",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "10",
+    "ParaPeca": "sonar",
+    "ParaPino": "ECHO",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "5V",
+    "ParaPeca": "sonar",
+    "ParaPino": "VCC",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.2",
+    "ParaPeca": "sonar",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "buzzer",
+    "ParaPino": "1",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "buzzer",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

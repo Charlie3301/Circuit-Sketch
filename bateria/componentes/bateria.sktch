@@ -1,0 +1,68 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente bateria.",
+  "",
+  "A bateria de 9 V no VIN da ESP32: sem o cabo USB, e ela que liga a placa (o regulador faz os 3,3 V).",
+  "",
+  "Ligado numa ESP32 DevKit V1, com o que ele precisa para funcionar",
+  "de verdade: o driver, o motor e a bateria de cada um."
+ ],
+ "codigo": [
+  "// A peça entra no circuito e o netlist a enxerga.",
+  "// O sketch mexe no pino em que ela está ligada.",
+  "",
+  "const int PINO = 2;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(PINO, OUTPUT);",
+  "  Serial.println(\"peca no circuito\");",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(PINO, HIGH);",
+  "  delay(150);",
+  "  digitalWrite(PINO, LOW);",
+  "  delay(150);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 60,
+    "Y": 60
+   },
+   {
+    "Id": "peca",
+    "Tipo": "bateria",
+    "X": 300,
+    "Y": 220,
+    "Volts": 9,
+    "MiliAmperes": 500,
+    "MiliAmperesHora": 500,
+    "Nome": "Bateria 9 V"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "peca",
+    "DePino": "+",
+    "ParaPeca": "placa",
+    "ParaPino": "VIN",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

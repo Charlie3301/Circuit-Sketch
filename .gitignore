@@ -1,0 +1,13 @@
+# O que a compilacao gera (recria-se com dotnet build): fica fora do historico.
+bin/
+obj/
+.vs/
+*.user
+
+# Python e Node
+__pycache__/
+*.pyc
+node_modules/
+
+# Saidas temporarias dos agentes (relatorios ficam em coordenacao/)
+*.tmp

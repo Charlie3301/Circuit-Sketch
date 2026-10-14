@@ -1,0 +1,61 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente alto-falante.",
+  "",
+  "Ligado numa ESP32 DevKit V1, que tem pino para tudo — assim o",
+  "que muda de um teste para o outro é só a peça.",
+  "",
+  "Pinos ligados: + → D18, - → GND.1"
+ ],
+ "codigo": [
+  "const int BUZZER = 18;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(BUZZER, OUTPUT);",
+  "  Serial.println(\"buzzer pronto\");",
+  "}",
+  "",
+  "void loop() {",
+  "  tone(BUZZER, 440);",
+  "  delay(200);",
+  "  noTone(BUZZER);",
+  "  delay(200);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 100,
+    "Y": 60
+   },
+   {
+    "Id": "peca",
+    "Tipo": "alto-falante",
+    "X": 520,
+    "Y": 160
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "peca",
+    "DePino": "+",
+    "ParaPeca": "placa",
+    "ParaPino": "D18",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

@@ -1,0 +1,100 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Tres pilhas AA (4,5 V) direto no 3V3: a ESP32 queima.",
+  "",
+  "O 3V3 e a saida do regulador, ligada direto no chip: aceita de 3,0 a",
+  "3,6 V. Com 4,5 V ali ela queima ao ligar. Ponha a bateria no VIN",
+  "(que passa pelo regulador) e rode de novo."
+ ],
+ "codigo": [
+  "// Sem o cabo USB: esta placa so roda se a bateria a alimentar.",
+  "const int LED = 2;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(LED, OUTPUT);",
+  "  Serial.println(\"ligou pela bateria\");",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(LED, HIGH);",
+  "  delay(300);",
+  "  digitalWrite(LED, LOW);",
+  "  delay(300);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 60,
+    "Y": 40
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 360,
+    "Y": 60,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r",
+    "Tipo": "resistor",
+    "X": 340,
+    "Y": 180,
+    "Ohms": 330
+   },
+   {
+    "Id": "bateria",
+    "Tipo": "bateria",
+    "X": 380,
+    "Y": 300,
+    "Volts": 4.5,
+    "MiliAmperes": 2000,
+    "MiliAmperesHora": 2500,
+    "Nome": "3 pilhas AA (4,5 V)"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D2",
+    "ParaPeca": "r",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "bateria",
+    "DePino": "+",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "bateria",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="44.0mm" height="46.0mm" viewBox="0 0 44.0 46.0">
+  <path d="M17.97 33.00 C17.97 38.00 16.92 37.00 16.92 42.70" fill="none" stroke="#00000066" stroke-width="1.0"/>
+  <path d="M17.97 33.00 C17.97 38.00 16.92 37.00 16.92 42.70" fill="none" stroke="#2d6cdf" stroke-width="0.7"/>
+  <path d="M18.98 33.00 C18.98 38.00 19.46 37.00 19.46 42.70" fill="none" stroke="#00000066" stroke-width="1.0"/>
+  <path d="M18.98 33.00 C18.98 38.00 19.46 37.00 19.46 42.70" fill="none" stroke="#ef7fb4" stroke-width="0.7"/>
+  <path d="M20.00 33.00 C20.00 38.00 22.00 37.00 22.00 42.70" fill="none" stroke="#00000066" stroke-width="1.0"/>
+  <path d="M20.00 33.00 C20.00 38.00 22.00 37.00 22.00 42.70" fill="none" stroke="#f2c230" stroke-width="0.7"/>
+  <path d="M21.02 33.00 C21.02 38.00 24.54 37.00 24.54 42.70" fill="none" stroke="#00000066" stroke-width="1.0"/>
+  <path d="M21.02 33.00 C21.02 38.00 24.54 37.00 24.54 42.70" fill="none" stroke="#f08a24" stroke-width="0.7"/>
+  <path d="M22.03 33.00 C22.03 38.00 27.08 37.00 27.08 42.70" fill="none" stroke="#00000066" stroke-width="1.0"/>
+  <path d="M22.03 33.00 C22.03 38.00 27.08 37.00 27.08 42.70" fill="none" stroke="#d23b33" stroke-width="0.7"/>
+  <rect x="15.12" y="42.10" width="13.76" height="3.6" rx="0.3" fill="#f1efe6" stroke="#b9b6aa" stroke-width="0.25"/>
+  <rect x="16.52" y="44.30" width="0.8" height="0.8" fill="#d9b44a"/>
+  <rect x="19.06" y="44.30" width="0.8" height="0.8" fill="#d9b44a"/>
+  <rect x="21.60" y="44.30" width="0.8" height="0.8" fill="#d9b44a"/>
+  <rect x="24.14" y="44.30" width="0.8" height="0.8" fill="#d9b44a"/>
+  <rect x="26.68" y="44.30" width="0.8" height="0.8" fill="#d9b44a"/>
+  <path d="M1.00 20.00 A3.5 3.5 0 0 1 4.50 16.50 H39.50 A3.5 3.5 0 0 1 43.00 20.00 A3.5 3.5 0 0 1 39.50 23.50 H4.50 A3.5 3.5 0 0 1 1.00 20.00 Z" fill="#b9bec6" stroke="#6d737c" stroke-width="0.3"/>
+  <circle cx="4.50" cy="20.00" r="2.1" fill="#2a2a2e"/>
+  <circle cx="39.50" cy="20.00" r="2.1" fill="#2a2a2e"/>
+  <circle cx="22.00" cy="20.00" r="14.0" fill="#cfd3d9" stroke="#7d838c" stroke-width="0.35"/>
+  <circle cx="22.00" cy="20.00" r="12.6" fill="#1f5fb4" stroke="#123e7a" stroke-width="0.3"/>
+  <!-- o ressalto do eixo -->
+  <circle cx="22.00" cy="12.00" r="4.6" fill="#e3e6ea" stroke="#7d838c" stroke-width="0.3"/>
+  <text x="22.00" y="26.50" fill="#dfe9ff" font-size="1.6px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">28BYJ-48</text>
+  <text x="22.00" y="28.60" fill="#dfe9ff" font-size="1.2px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">5V DC</text>
+
+  <!-- o ponteiro branco preso no eixo (aponta para cima parado) -->
+  <path d="M21.00 13.60 L21.45 2.50 L22.00 1.40 L22.55 2.50 L23.00 13.60 Z" fill="#f7f7f4" stroke="#8f8f8a" stroke-width="0.2"/>
+  <path d="M20.50 11.10 H23.50 V12.90 H20.50 Z" fill="#c9cdd3" stroke="#5a6068" stroke-width="0.15"/>
+  <circle cx="22.00" cy="2.60" r="0.45" fill="#d23b33"/>
+</svg>

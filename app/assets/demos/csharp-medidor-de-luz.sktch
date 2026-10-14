@@ -1,0 +1,211 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Medidor de luz em C#.",
+  "",
+  "O que esta demo mostra:",
+  "- o estilo do .NET nanoFramework na ESP32: uma classe, um Main e o",
+  "  Console.WriteLine com texto interpolado ($\"...{valor}...\");",
+  "- um vetor do C# (int[]) e o nivel de luz virando LEDs acesos.",
+  "",
+  "Aperte F5 e clique no modulo de LDR para mudar a luz."
+ ],
+ "codigo": [
+  "// Medidor de luz em C#.",
+  "//",
+  "// E o jeito do .NET nanoFramework, que roda na ESP32: uma classe com um",
+  "// Main, e o Console.WriteLine indo para o monitor serial. O modulo de LDR",
+  "// mede a luz, e tres LEDs mostram o nivel: nenhum no escuro, tres no sol.",
+  "//",
+  "// Como o modulo de verdade: MAIS luz, MENOR a leitura.",
+  "",
+  "using System;",
+  "",
+  "public class Program",
+  "{",
+  "    public static void Main()",
+  "    {",
+  "        int sensor = 34;",
+  "        int[] leds = { 25, 26, 27 };",
+  "",
+  "        for (int i = 0; i < 3; i++) PinMode(leds[i], OUTPUT);",
+  "        Console.WriteLine(\"Medidor de luz\");",
+  "",
+  "        while (true)",
+  "        {",
+  "            int leitura = AnalogRead(sensor);       // perto de 0 no sol, de 4095 no escuro",
+  "            int acesos = 3 - leitura * 4 / 4096;",
+  "            if (acesos < 0) acesos = 0;",
+  "",
+  "            for (int i = 0; i < 3; i++)",
+  "            {",
+  "                if (i < acesos) DigitalWrite(leds[i], HIGH);",
+  "                else DigitalWrite(leds[i], LOW);",
+  "            }",
+  "",
+  "            Console.WriteLine($\"leitura {leitura}, LEDs acesos: {acesos}\");",
+  "            Delay(300);",
+  "        }",
+  "    }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 60,
+    "Y": 60
+   },
+   {
+    "Id": "ldr",
+    "Tipo": "photoresistor-sensor",
+    "X": 260,
+    "Y": 10,
+    "Giro": 0.5
+   },
+   {
+    "Id": "nivel1",
+    "Tipo": "led",
+    "X": 330,
+    "Y": 140,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r_nivel1",
+    "Tipo": "resistor",
+    "X": 258,
+    "Y": 186,
+    "Ohms": 220
+   },
+   {
+    "Id": "nivel2",
+    "Tipo": "led",
+    "X": 420,
+    "Y": 140,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r_nivel2",
+    "Tipo": "resistor",
+    "X": 348,
+    "Y": 186,
+    "Ohms": 220
+   },
+   {
+    "Id": "nivel3",
+    "Tipo": "led",
+    "X": 510,
+    "Y": 140,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r_nivel3",
+    "Tipo": "resistor",
+    "X": 438,
+    "Y": 186,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "ldr",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "ldr",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "ldr",
+    "DePino": "AO",
+    "ParaPeca": "placa",
+    "ParaPino": "D34",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D25",
+    "ParaPeca": "r_nivel1",
+    "ParaPino": "1",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_nivel1",
+    "DePino": "2",
+    "ParaPeca": "nivel1",
+    "ParaPino": "A",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "nivel1",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D26",
+    "ParaPeca": "r_nivel2",
+    "ParaPino": "1",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_nivel2",
+    "DePino": "2",
+    "ParaPeca": "nivel2",
+    "ParaPino": "A",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "nivel2",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D27",
+    "ParaPeca": "r_nivel3",
+    "ParaPino": "1",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_nivel3",
+    "DePino": "2",
+    "ParaPeca": "nivel3",
+    "ParaPino": "A",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "nivel3",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

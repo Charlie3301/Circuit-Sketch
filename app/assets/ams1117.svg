@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="16.5mm" height="12.0mm" viewBox="0 0 16.5 12.0">
+  <rect x="0.2" y="0.2" width="16.10" height="11.60" rx="1.0" fill="#1f5fb4" stroke="#123e7a" stroke-width="0.35"/>
+  <rect x="0.9" y="0.9" width="14.70" height="10.20" rx="0.7" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="0.3"/>
+  <rect x="6.65" y="1.0" width="3.2" height="1.3" fill="#cfd3d8" stroke="#80858c" stroke-width="0.12"/>
+  <rect x="4.95" y="2.2" width="6.6" height="3.6" rx="0.25" fill="#1d1e22" stroke="#0a0a0b" stroke-width="0.2"/>
+  <rect x="5.60" y="5.8" width="0.7" height="0.9" fill="#cfd3d8" stroke="#80858c" stroke-width="0.1"/>
+  <rect x="7.90" y="5.8" width="0.7" height="0.9" fill="#cfd3d8" stroke="#80858c" stroke-width="0.1"/>
+  <rect x="10.20" y="5.8" width="0.7" height="0.9" fill="#cfd3d8" stroke="#80858c" stroke-width="0.1"/>
+  <text x="8.25" y="3.90" fill="#d9dce0" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">AMS1117</text>
+  <text x="8.25" y="5.25" fill="#b9bec6" font-size="0.95px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">3.3</text>
+  <rect x="1.60" y="2.00" width="2.20" height="3.20" rx="0.15" fill="#e0b43a" stroke="#4a3622" stroke-width="0.12"/>
+  <rect x="1.6" y="2.0" width="2.2" height="0.7" fill="#8a6a16"/>
+  <rect x="12.70" y="2.00" width="2.20" height="3.20" rx="0.15" fill="#e0b43a" stroke="#4a3622" stroke-width="0.12"/>
+  <rect x="12.70" y="2.0" width="2.2" height="0.7" fill="#8a6a16"/>
+  <rect x="1.70" y="6.30" width="1.60" height="0.90" rx="0.15" fill="#f2f2ee" stroke="#4a3622" stroke-width="0.12"/>
+  <rect x="2.05" y="6.38" width="0.9" height="0.74" fill="#7a1414"/>
+  <rect x="13.10" y="6.30" width="1.60" height="0.90" rx="0.15" fill="#2a2a2a" stroke="#4a3622" stroke-width="0.12"/>
+  <text x="5.71" y="9.25" fill="#e6ecf5" font-size="0.7px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">VIN</text>
+  <circle cx="5.71" cy="10.60" r="0.62" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="5.71" cy="10.60" r="0.28" fill="#2a2a2a"/>
+  <text x="8.25" y="9.25" fill="#e6ecf5" font-size="0.7px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">GND</text>
+  <circle cx="8.25" cy="10.60" r="0.62" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="8.25" cy="10.60" r="0.28" fill="#2a2a2a"/>
+  <text x="10.79" y="9.25" fill="#e6ecf5" font-size="0.7px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">VOUT</text>
+  <circle cx="10.79" cy="10.60" r="0.62" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="10.79" cy="10.60" r="0.28" fill="#2a2a2a"/>
+
+</svg>

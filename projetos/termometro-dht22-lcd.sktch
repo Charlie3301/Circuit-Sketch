@@ -1,0 +1,116 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Termometro com DHT22 e LCD 16x2 I2C (Uno)",
+  "",
+  "O DHT22 mede temperatura e umidade; o LCD 16x2 com modulo I2C mostra as",
+  "duas a cada 2 segundos. Mude a temperatura na barra do sensor."
+ ],
+ "codigo": [
+  "// Termometro: o DHT22 no pino 2 e o LCD 16x2 I2C (endereco 0x27).",
+  "#include <DHT.h>",
+  "#include <Wire.h>",
+  "#include <LiquidCrystal_I2C.h>",
+  "",
+  "DHT dht(2, DHT22);",
+  "LiquidCrystal_I2C lcd(0x27, 16, 2);",
+  "",
+  "void setup() {",
+  "  dht.begin();",
+  "  lcd.init();",
+  "  lcd.backlight();",
+  "  lcd.print(\"Termometro\");",
+  "}",
+  "",
+  "void loop() {",
+  "  delay(2000);",
+  "  float t = dht.readTemperature();",
+  "  float u = dht.readHumidity();",
+  "  lcd.clear();",
+  "  lcd.setCursor(0, 0);",
+  "  lcd.print(\"Temp: \");",
+  "  lcd.print(t, 1);",
+  "  lcd.print(\" C\");",
+  "  lcd.setCursor(0, 1);",
+  "  lcd.print(\"Umid: \");",
+  "  lcd.print(u, 0);",
+  "  lcd.print(\" %\");",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 220
+   },
+   {
+    "Id": "dht",
+    "Tipo": "dht22",
+    "X": 380,
+    "Y": 60,
+    "Giro": 0.5417
+   },
+   {
+    "Id": "lcd",
+    "Tipo": "lcd1602-i2c",
+    "X": 520,
+    "Y": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "dht",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "dht",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "dht",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "2",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "A4",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "SCL",
+    "ParaPeca": "placa",
+    "ParaPino": "A5",
+    "Cor": "#00A651"
+   }
+  ]
+ }
+}

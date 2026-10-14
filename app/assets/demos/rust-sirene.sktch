@@ -1,0 +1,176 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Sirene com giroflex, em Rust.",
+  "",
+  "O que esta demo mostra:",
+  "- funcao com parametro bool, if/else e while do Rust;",
+  "- tone() varrendo a frequencia e o println! com \"{}\".",
+  "",
+  "Aperte F5 e escute a sirene."
+ ],
+ "codigo": [
+  "// Sirene em Rust.",
+  "//",
+  "// O buzzer sobe e desce de frequencia como a sirene de uma ambulancia, e",
+  "// os dois LEDs piscam alternados, como o giroflex.",
+  "//",
+  "// \"#![no_std]\" diz que nao ha sistema operacional embaixo -- a situacao de",
+  "// todo microcontrolador. \"let mut\" declara uma variavel que pode mudar;",
+  "// sem o \"mut\" ela e so leitura.",
+  "",
+  "#![no_std]",
+  "#![no_main]",
+  "",
+  "const BUZZER: u8 = 8;",
+  "const LED_A: u8 = 12;",
+  "const LED_B: u8 = 13;",
+  "",
+  "fn giroflex(lado: bool) {",
+  "    if lado {",
+  "        digital_write(LED_A, HIGH);",
+  "        digital_write(LED_B, LOW);",
+  "    } else {",
+  "        digital_write(LED_A, LOW);",
+  "        digital_write(LED_B, HIGH);",
+  "    }",
+  "}",
+  "",
+  "fn main() {",
+  "    pin_mode(LED_A, OUTPUT);",
+  "    pin_mode(LED_B, OUTPUT);",
+  "    println!(\"Sirene ligada\");",
+  "",
+  "    let mut voltas: u32 = 0;",
+  "    loop {",
+  "        let mut f: u32 = 400;",
+  "        while f < 1200 {",
+  "            tone(BUZZER, f);",
+  "            giroflex(f % 200 < 100);",
+  "            delay_ms(10);",
+  "            f += 20;",
+  "        }",
+  "        while f > 400 {",
+  "            tone(BUZZER, f);",
+  "            giroflex(f % 200 < 100);",
+  "            delay_ms(10);",
+  "            f -= 20;",
+  "        }",
+  "        voltas += 1;",
+  "        println!(\"voltas da sirene: {}\", voltas);",
+  "    }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 60,
+    "Y": 160
+   },
+   {
+    "Id": "buzzer",
+    "Tipo": "buzzer",
+    "X": 440,
+    "Y": 20
+   },
+   {
+    "Id": "giro_a",
+    "Tipo": "led",
+    "X": 560,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_giro_a",
+    "Tipo": "resistor",
+    "X": 488,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "giro_b",
+    "Tipo": "led",
+    "X": 640,
+    "Y": 20,
+    "Cor": "azul"
+   },
+   {
+    "Id": "r_giro_b",
+    "Tipo": "resistor",
+    "X": 568,
+    "Y": 66,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "buzzer",
+    "ParaPino": "1",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "buzzer",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "12",
+    "ParaPeca": "r_giro_a",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_giro_a",
+    "DePino": "2",
+    "ParaPeca": "giro_a",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "giro_a",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "13",
+    "ParaPeca": "r_giro_b",
+    "ParaPino": "1",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_giro_b",
+    "DePino": "2",
+    "ParaPeca": "giro_b",
+    "ParaPino": "A",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "giro_b",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

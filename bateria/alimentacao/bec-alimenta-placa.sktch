@@ -1,0 +1,130 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "O BEC do ESC alimenta a placa: o aeromodelo de verdade.",
+  "",
+  "O ESC tira 5 V da LiPo (o BEC, no fio vermelho do cabo de servo) e eles",
+  "vao no VIN da ESP32. Sem o cabo USB: a LiPo liga o ESC, o ESC liga a",
+  "placa, e a placa arma e acelera o motor."
+ ],
+ "codigo": [
+  "#include <ESP32Servo.h>",
+  "",
+  "// O ESC le um pulso de servo: 1000 us e o acelerador no minimo,",
+  "// 2000 us e o maximo. Ele so arma (os bipes) com o minimo primeiro.",
+  "Servo esc;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  esc.attach(13, 1000, 2000);",
+  "  esc.writeMicroseconds(1000);",
+  "  Serial.println(\"armando o ESC (acelerador no minimo)...\");",
+  "  delay(3000);",
+  "  Serial.println(\"armado\");",
+  "}",
+  "",
+  "void loop() {",
+  "  Serial.println(\"acelerador em 30%\");",
+  "  esc.writeMicroseconds(1300);",
+  "  delay(3000);",
+  "  Serial.println(\"acelerador em 60%\");",
+  "  esc.writeMicroseconds(1600);",
+  "  delay(3000);",
+  "  Serial.println(\"parado\");",
+  "  esc.writeMicroseconds(1000);",
+  "  delay(3000);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "motor",
+    "Tipo": "motor-brushless",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "esc",
+    "Tipo": "esc",
+    "X": 240,
+    "Y": 120
+   },
+   {
+    "Id": "bateria",
+    "Tipo": "bateria",
+    "X": 560,
+    "Y": 20,
+    "Volts": 11.1,
+    "MiliAmperes": 20000,
+    "MiliAmperesHora": 2200,
+    "Nome": "LiPo 3S 2200 mAh (11,1 V)"
+   },
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 620,
+    "Y": 150
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "bateria",
+    "DePino": "+",
+    "ParaPeca": "esc",
+    "ParaPino": "BAT+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "bateria",
+    "DePino": "-",
+    "ParaPeca": "esc",
+    "ParaPino": "BAT-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "5V",
+    "ParaPeca": "placa",
+    "ParaPino": "VIN",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D13",
+    "ParaPeca": "esc",
+    "ParaPino": "SINAL",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "A",
+    "ParaPeca": "motor",
+    "ParaPino": "A",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "B",
+    "ParaPeca": "motor",
+    "ParaPino": "B",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "C",
+    "ParaPeca": "motor",
+    "ParaPino": "C",
+    "Cor": "#D23B33"
+   }
+  ]
+ }
+}

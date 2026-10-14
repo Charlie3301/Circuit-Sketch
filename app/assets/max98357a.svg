@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="20.32mm" height="19.4mm" viewBox="0 0 20.32 19.4">
+
+  <!-- placa -->
+  <rect x="0.2" y="2.6" width="19.92" height="16.60" rx="1.2" fill="#233a73"/>
+  <rect x="0.2" y="2.6" width="19.92" height="16.60" rx="1.2"
+        fill="none" stroke="#162552" stroke-width="0.3"/>
+
+  <!-- borne do alto-falante -->
+  <rect x="6.56" y="0.3" width="7.2" height="6.4" rx="0.5" fill="#2f8f5a"/>
+  <rect x="6.56" y="0.3" width="7.2" height="1.6" rx="0.5" fill="#37a668"/>
+  <circle cx="8.41" cy="4.2" r="1.2" fill="#c9ced6"/>
+  <circle cx="11.91" cy="4.2" r="1.2" fill="#c9ced6"/>
+  <path d="M7.61 4.2 H9.21 M11.11 4.2 H12.71"
+        stroke="#6d737c" stroke-width="0.3"/>
+  <text x="5.51" y="6.2" fill="#e6ecf5" font-size="1.4px" text-anchor="middle" font-family="Verdana">+</text>
+  <text x="14.81" y="6.2" fill="#e6ecf5" font-size="1.6px" text-anchor="middle" font-family="Verdana">-</text>
+
+  <!-- o chip -->
+  <rect x="8.56" y="7.4" width="3.2" height="2.6" rx="0.3" fill="#15171b"/>
+  <circle cx="9.06" cy="7.85" r="0.16" fill="#4c5058"/>
+  <text x="10.16" y="11.3" fill="#e6ecf5" font-size="1.15px"
+        text-anchor="middle" font-family="Verdana">MAX98357A</text>
+
+  <rect x="1.59" y="16.85" width="1.9" height="1.9" rx="0.35" fill="#d8b24a"/>
+  <rect x="4.13" y="16.85" width="1.9" height="1.9" rx="0.35" fill="#d8b24a"/>
+  <rect x="6.67" y="16.85" width="1.9" height="1.9" rx="0.35" fill="#d8b24a"/>
+  <rect x="9.21" y="16.85" width="1.9" height="1.9" rx="0.35" fill="#d8b24a"/>
+  <rect x="11.75" y="16.85" width="1.9" height="1.9" rx="0.35" fill="#d8b24a"/>
+  <rect x="14.29" y="16.85" width="1.9" height="1.9" rx="0.35" fill="#d8b24a"/>
+  <rect x="16.83" y="16.85" width="1.9" height="1.9" rx="0.35" fill="#d8b24a"/>
+  <circle cx="2.54" cy="17.80" r="0.62" fill="#101418"/>
+  <circle cx="5.08" cy="17.80" r="0.62" fill="#101418"/>
+  <circle cx="7.62" cy="17.80" r="0.62" fill="#101418"/>
+  <circle cx="10.16" cy="17.80" r="0.62" fill="#101418"/>
+  <circle cx="12.70" cy="17.80" r="0.62" fill="#101418"/>
+  <circle cx="15.24" cy="17.80" r="0.62" fill="#101418"/>
+  <circle cx="17.78" cy="17.80" r="0.62" fill="#101418"/>
+  <text x="2.92" y="16.30" transform="rotate(-90 2.92 16.30)" fill="#e6ecf5" font-size="1.05px" text-anchor="start" font-family="Verdana">LRC</text>
+  <text x="5.46" y="16.30" transform="rotate(-90 5.46 16.30)" fill="#e6ecf5" font-size="1.05px" text-anchor="start" font-family="Verdana">BCLK</text>
+  <text x="8.00" y="16.30" transform="rotate(-90 8.00 16.30)" fill="#e6ecf5" font-size="1.05px" text-anchor="start" font-family="Verdana">DIN</text>
+  <text x="10.54" y="16.30" transform="rotate(-90 10.54 16.30)" fill="#e6ecf5" font-size="1.05px" text-anchor="start" font-family="Verdana">GAIN</text>
+  <text x="13.08" y="16.30" transform="rotate(-90 13.08 16.30)" fill="#e6ecf5" font-size="1.05px" text-anchor="start" font-family="Verdana">SD</text>
+  <text x="15.62" y="16.30" transform="rotate(-90 15.62 16.30)" fill="#e6ecf5" font-size="1.05px" text-anchor="start" font-family="Verdana">GND</text>
+  <text x="18.16" y="16.30" transform="rotate(-90 18.16 16.30)" fill="#e6ecf5" font-size="1.05px" text-anchor="start" font-family="Verdana">VIN</text>
+</svg>

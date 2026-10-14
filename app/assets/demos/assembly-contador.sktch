@@ -1,0 +1,293 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Contador binario em Assembly AVR.",
+  "",
+  "O que esta demo mostra:",
+  "- o registrador PORTB inteiro de uma vez: seis pinos mudam num OUT so;",
+  "- INC, ANDI e o laco de espera contado em ciclos do ATmega328P.",
+  "",
+  "Aperte F5 e veja os seis LEDs contarem de 0 a 63."
+ ],
+ "codigo": [
+  "; Contador binario em Assembly AVR.",
+  ";",
+  "; Seis LEDs nos pinos 8 a 13 -- que no ATmega328P sao os bits 0 a 5 do",
+  "; PORTB -- mostram um numero que sobe de 0 a 63, um a cada quarto de",
+  "; segundo. O LED da direita e o bit 0.",
+  ";",
+  ";   DDRB  diz quais pinos sao saida (aqui, os seis de baixo)",
+  ";   PORTB recebe o numero inteiro de uma vez: um OUT acende todos juntos",
+  ";   INC   soma um, e o ANDI corta o que passa de seis bits",
+  "",
+  "    ldi r16, 0x3F         ; 0011 1111: PB0 a PB5 sao saida",
+  "    out DDRB, r16",
+  "    clr r17               ; o contador comeca em zero",
+  "",
+  "principal:",
+  "    out PORTB, r17        ; o numero aparece nos LEDs",
+  "    rcall espera",
+  "    inc r17",
+  "    andi r17, 0x3F        ; depois do 63 volta para 0",
+  "    rjmp principal",
+  "",
+  "; Espera por contagem, a mesma do pisca-pisca: tres lacos, um dentro do",
+  "; outro, que a 16 MHz somam perto de um quarto de segundo.",
+  "espera:",
+  "    ldi r20, 20",
+  "nivel3:",
+  "    ldi r18, 255",
+  "nivel2:",
+  "    ldi r19, 255",
+  "nivel1:",
+  "    dec r19",
+  "    brne nivel1",
+  "    dec r18",
+  "    brne nivel2",
+  "    dec r20",
+  "    brne nivel3",
+  "    ret"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 60,
+    "Y": 160
+   },
+   {
+    "Id": "bit0",
+    "Tipo": "led",
+    "X": 730,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_bit0",
+    "Tipo": "resistor",
+    "X": 658,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "bit1",
+    "Tipo": "led",
+    "X": 660,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_bit1",
+    "Tipo": "resistor",
+    "X": 588,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "bit2",
+    "Tipo": "led",
+    "X": 590,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_bit2",
+    "Tipo": "resistor",
+    "X": 518,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "bit3",
+    "Tipo": "led",
+    "X": 520,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_bit3",
+    "Tipo": "resistor",
+    "X": 448,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "bit4",
+    "Tipo": "led",
+    "X": 450,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_bit4",
+    "Tipo": "resistor",
+    "X": 378,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "bit5",
+    "Tipo": "led",
+    "X": 380,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_bit5",
+    "Tipo": "resistor",
+    "X": 308,
+    "Y": 66,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "r_bit0",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_bit0",
+    "DePino": "2",
+    "ParaPeca": "bit0",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bit0",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "r_bit1",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_bit1",
+    "DePino": "2",
+    "ParaPeca": "bit1",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bit1",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "10",
+    "ParaPeca": "r_bit2",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_bit2",
+    "DePino": "2",
+    "ParaPeca": "bit2",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bit2",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "11",
+    "ParaPeca": "r_bit3",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_bit3",
+    "DePino": "2",
+    "ParaPeca": "bit3",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bit3",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "12",
+    "ParaPeca": "r_bit4",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_bit4",
+    "DePino": "2",
+    "ParaPeca": "bit4",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bit4",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "13",
+    "ParaPeca": "r_bit5",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_bit5",
+    "DePino": "2",
+    "ParaPeca": "bit5",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bit5",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

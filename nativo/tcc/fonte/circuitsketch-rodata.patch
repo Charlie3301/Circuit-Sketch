@@ -1,0 +1,98 @@
+--- orig/tcc.h	2026-09-30 04:48:21.643927100 -0300
++++ rodata/tcc.h	2026-09-30 04:50:11.509728800 -0300
+@@ -1,3 +1,5 @@
++/* Modificado para o CircuitSketch em 30/09/2026: dados constantes, textos e
++   constantes de ponto flutuante vao para a secao .rodata (ver LICENCAS.txt). */
+ /*
+  *  TCC - Tiny C Compiler
+  *
+@@ -1368,6 +1370,8 @@
+ } Stab_Sym;
+ 
+ ST_DATA Section *text_section, *data_section, *bss_section; /* predefined sections */
++/* const data, string literals and float constants (in flash on the board) */
++ST_DATA Section *rodata_section;
+ ST_DATA Section *common_section;
+ ST_DATA Section *cur_text_section; /* current section where function code is generated */
+ #ifdef CONFIG_TCC_ASM
+--- orig/tccelf.c	2026-09-30 04:48:20.848594800 -0300
++++ rodata/tccelf.c	2026-09-30 04:50:11.512325500 -0300
+@@ -1,3 +1,5 @@
++/* Modificado para o CircuitSketch em 30/09/2026: dados constantes, textos e
++   constantes de ponto flutuante vao para a secao .rodata (ver LICENCAS.txt). */
+ /*
+  *  ELF file handling for TCC
+  *
+@@ -27,6 +29,7 @@
+ /* global variables */
+ 
+ ST_DATA Section *text_section, *data_section, *bss_section; /* predefined sections */
++ST_DATA Section *rodata_section;
+ ST_DATA Section *common_section;
+ ST_DATA Section *cur_text_section; /* current section where function code is generated */
+ #ifdef CONFIG_TCC_ASM
+@@ -61,6 +64,8 @@
+     text_section = new_section(s, ".text", SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR);
+     data_section = new_section(s, ".data", SHT_PROGBITS, SHF_ALLOC | SHF_WRITE);
+     bss_section = new_section(s, ".bss", SHT_NOBITS, SHF_ALLOC | SHF_WRITE);
++    /* writable, so that PE output keeps treating it as data */
++    rodata_section = new_section(s, ".rodata", SHT_PROGBITS, SHF_ALLOC | SHF_WRITE);
+     common_section = new_section(s, ".common", SHT_NOBITS, SHF_PRIVATE);
+     common_section->sh_num = SHN_COMMON;
+ 
+--- orig/tccgen.c	2026-09-30 04:48:22.032446200 -0300
++++ rodata/tccgen.c	2026-09-30 04:50:11.513462500 -0300
+@@ -1,3 +1,5 @@
++/* Modificado para o CircuitSketch em 30/09/2026: dados constantes, textos e
++   constantes de ponto flutuante vao para a secao .rodata (ver LICENCAS.txt). */
+ /*
+  *  TCC - Tiny C Compiler
+  * 
+@@ -1298,10 +1300,10 @@
+             size = type_size(&vtop->type, &align);
+             if (NODATA_WANTED)
+                 size = 0, align = 1;
+-            offset = section_add(data_section, size, align);
+-            vpush_ref(&vtop->type, data_section, offset, size);
++            offset = section_add(rodata_section, size, align);
++            vpush_ref(&vtop->type, rodata_section, offset, size);
+ 	    vswap();
+-	    init_putv(&vtop->type, data_section, offset);
++	    init_putv(&vtop->type, rodata_section, offset);
+ 	    vtop->r |= VT_LVAL;
+         }
+ #ifdef CONFIG_TCC_BCHECK
+@@ -4660,9 +4662,9 @@
+             mk_pointer(&type);
+             type.t |= VT_ARRAY;
+             type.ref->c = len;
+-            vpush_ref(&type, data_section, data_section->data_offset, len);
++            vpush_ref(&type, rodata_section, rodata_section->data_offset, len);
+             if (!NODATA_WANTED) {
+-                ptr = section_ptr_add(data_section, len);
++                ptr = section_ptr_add(rodata_section, len);
+                 memcpy(ptr, funcname, len);
+             }
+             next();
+@@ -4687,6 +4689,7 @@
+         mk_pointer(&type);
+         type.t |= VT_ARRAY;
+         memset(&ad, 0, sizeof(AttributeDef));
++        ad.section = rodata_section;
+         decl_initializer_alloc(&type, &ad, VT_CONST, 2, 0, 0);
+         break;
+     case '(':
+@@ -6952,7 +6955,12 @@
+         /* allocate symbol in corresponding section */
+         sec = ad->section;
+         if (!sec) {
+-            if (has_init)
++            CType *tp = type;
++            while ((tp->t & (VT_BTYPE|VT_ARRAY)) == (VT_PTR|VT_ARRAY))
++                tp = &tp->ref->type;
++            if (has_init && (tp->t & VT_CONSTANT))
++                sec = rodata_section;
++            else if (has_init)
+                 sec = data_section;
+             else if (tcc_state->nocommon)
+                 sec = bss_section;

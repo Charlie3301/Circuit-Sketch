@@ -1,0 +1,80 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste da linguagem c.",
+  "",
+  "Todas as dez fazem exatamente a mesma coisa — piscar um LED e",
+  "contar — para que a comparação entre elas fique limpa."
+ ],
+ "codigo": [
+  "// Bateria — C, com o SDK da Raspberry.",
+  "//",
+  "// Comeca no main(), e nao em setup/loop.",
+  "",
+  "#include \"pico/stdlib.h\"",
+  "",
+  "#define LED 15",
+  "",
+  "int main() {",
+  "    stdio_init_all();",
+  "    gpio_init(LED);",
+  "    gpio_set_dir(LED, GPIO_OUT);",
+  "",
+  "    while (true) {",
+  "        gpio_put(LED, 1);",
+  "        sleep_ms(250);",
+  "        gpio_put(LED, 0);",
+  "        sleep_ms(250);",
+  "    }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "pi-pico",
+    "X": 120,
+    "Y": 60
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 520,
+    "Y": 120,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r",
+    "Tipo": "resistor",
+    "X": 520,
+    "Y": 280,
+    "Ohms": 330
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "GP15",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "r",
+    "ParaPino": "1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "r",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

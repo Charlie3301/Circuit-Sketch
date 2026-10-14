@@ -1,0 +1,203 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "MQTT na ESP32: publica uma contagem e obedece a um comando.",
+  "",
+  "O que esta demo mostra:",
+  "- a PubSubClient conectando, assinando \"aula/led\" e publicando em",
+  "  \"aula/sensor\" a cada 3 s;",
+  "- sem internet, o broker do proprio CircuitSketch faz o papel do",
+  "  broker.hivemq.com.",
+  "",
+  "Aperte F5 e, no painel REDE, publique \"on\" ou \"off\" em aula/led."
+ ],
+ "codigo": [
+  "// MQTT na ESP32: publica um valor e obedece a um comando.",
+  "//",
+  "// Sem internet, o CircuitSketch usa o broker dele mesmo. No painel REDE,",
+  "// publique em \"aula/led\" a mensagem \"on\" ou \"off\" e veja o LED.",
+  "#include <WiFi.h>",
+  "#include <PubSubClient.h>",
+  "",
+  "const int LED = 14;",
+  "",
+  "WiFiClient espClient;",
+  "PubSubClient client(espClient);",
+  "",
+  "unsigned long ultimoEnvio = 0;",
+  "int contador = 0;",
+  "",
+  "void chegou(char* topico, byte* dados, unsigned int tamanho) {",
+  "  String mensagem;",
+  "  for (int i = 0; i < tamanho; i++) {",
+  "    mensagem += (char)dados[i];",
+  "  }",
+  "  Serial.println(String(topico) + \" -> \" + mensagem);",
+  "",
+  "  if (mensagem == \"on\")  digitalWrite(LED, HIGH);",
+  "  if (mensagem == \"off\") digitalWrite(LED, LOW);",
+  "}",
+  "",
+  "void conectarNoBroker() {",
+  "  // Um id por placa: no broker publico, duas placas com o mesmo id se",
+  "  // derrubam uma a outra -- e a turma inteira roda este mesmo sketch.",
+  "  // O MAC da placa e diferente em cada uma.",
+  "  String id = \"circuitsketch-\" + WiFi.macAddress();",
+  "  id.replace(\":\", \"\");",
+  "",
+  "  while (!client.connected()) {",
+  "    Serial.print(\"conectando no broker... \");",
+  "    if (client.connect(id.c_str())) {",
+  "      Serial.println(\"ok\");",
+  "      client.subscribe(\"aula/led\");",
+  "    } else {",
+  "      Serial.print(\"falhou, state=\");",
+  "      Serial.println(client.state());",
+  "      delay(2000);",
+  "    }",
+  "  }",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(LED, OUTPUT);",
+  "",
+  "  WiFi.begin(\"CircuitSketch-WiFi\", \"12345678\");",
+  "  while (WiFi.status() != WL_CONNECTED) {",
+  "    delay(300);",
+  "  }",
+  "  Serial.print(\"IP da placa: \");",
+  "  Serial.println(WiFi.localIP());",
+  "",
+  "  client.setServer(\"broker.hivemq.com\", 1883);",
+  "  client.setCallback(chegou);",
+  "}",
+  "",
+  "void loop() {",
+  "  if (!client.connected()) conectarNoBroker();",
+  "  client.loop();",
+  "",
+  "  if (millis() - ultimoEnvio > 3000) {",
+  "    ultimoEnvio = millis();",
+  "    contador++;",
+  "",
+  "    char carga[40];",
+  "    snprintf(carga, 40, \"contagem=%d\", contador);",
+  "    client.publish(\"aula/sensor\", carga);",
+  "    Serial.println(carga);",
+  "  }",
+  "  delay(10);",
+  "}",
+  ""
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "bb",
+    "Tipo": "protoboard-830",
+    "X": 40,
+    "Y": 300
+   },
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 60,
+    "Y": 20
+   },
+   {
+    "Id": "led0",
+    "Tipo": "led",
+    "X": 82.2,
+    "Y": 315.6,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r0",
+    "Tipo": "resistor",
+    "X": 97.6,
+    "Y": 371.15,
+    "Ohms": 220
+   },
+   {
+    "Id": "led1",
+    "Tipo": "led",
+    "X": 139.8,
+    "Y": 315.6,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r1",
+    "Tipo": "resistor",
+    "X": 155.2,
+    "Y": 371.15,
+    "Ohms": 220
+   },
+   {
+    "Id": "led2",
+    "Tipo": "led",
+    "X": 197.4,
+    "Y": 315.6,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r2",
+    "Tipo": "resistor",
+    "X": 212.8,
+    "Y": 371.15,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D14",
+    "ParaPeca": "bb",
+    "ParaPino": "A6",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bb",
+    "DePino": "D11",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D13",
+    "ParaPeca": "bb",
+    "ParaPino": "A12",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bb",
+    "DePino": "D17",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D12",
+    "ParaPeca": "bb",
+    "ParaPino": "A18",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bb",
+    "DePino": "D23",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

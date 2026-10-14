@@ -1,0 +1,105 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente radio-controle.",
+  "",
+  "O controle FS-i6 e o receptor: ligue a chave do controle e mexa os manches.",
+  "",
+  "Ligado numa ESP32 DevKit V1, com o que ele precisa para funcionar",
+  "de verdade: o driver, o motor e a bateria de cada um."
+ ],
+ "codigo": [
+  "// Cada canal do receptor e um pulso de servo: 1000 a 2000 us.",
+  "// Ligue o controle (a chave dele) e mexa os manches.",
+  "const int CANAL_1 = 34;  // manche direito, para os lados",
+  "const int CANAL_2 = 35;  // manche direito, para frente e para tras",
+  "const int CANAL_3 = 32;  // acelerador (manche esquerdo)",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(CANAL_1, INPUT);",
+  "  pinMode(CANAL_2, INPUT);",
+  "  pinMode(CANAL_3, INPUT);",
+  "  Serial.println(\"receptor pronto: ligue o controle e mexa os manches\");",
+  "}",
+  "",
+  "void loop() {",
+  "  unsigned long c1 = pulseIn(CANAL_1, HIGH, 30000);",
+  "  unsigned long c2 = pulseIn(CANAL_2, HIGH, 30000);",
+  "  unsigned long c3 = pulseIn(CANAL_3, HIGH, 30000);",
+  "  if (c1 == 0) {",
+  "    Serial.println(\"sem sinal (o controle esta desligado?)\");",
+  "  } else {",
+  "    Serial.print(\"CH1 \");",
+  "    Serial.print(c1);",
+  "    Serial.print(\" us   CH2 \");",
+  "    Serial.print(c2);",
+  "    Serial.print(\" us   CH3 \");",
+  "    Serial.print(c3);",
+  "    Serial.println(\" us\");",
+  "  }",
+  "  delay(200);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 60,
+    "Y": 60
+   },
+   {
+    "Id": "rx",
+    "Tipo": "receptor-rc",
+    "X": 300,
+    "Y": 60
+   },
+   {
+    "Id": "peca",
+    "Tipo": "radio-controle",
+    "X": 300,
+    "Y": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "VIN",
+    "ParaPeca": "rx",
+    "ParaPino": "VCC",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.2",
+    "ParaPeca": "rx",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "rx",
+    "DePino": "CH1",
+    "ParaPeca": "placa",
+    "ParaPino": "D34",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "rx",
+    "DePino": "CH2",
+    "ParaPeca": "placa",
+    "ParaPino": "D35",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "rx",
+    "DePino": "CH3",
+    "ParaPeca": "placa",
+    "ParaPino": "D32",
+    "Cor": "#1F6FD1"
+   }
+  ]
+ }
+}

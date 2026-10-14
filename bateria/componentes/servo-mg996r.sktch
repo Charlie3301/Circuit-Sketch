@@ -1,0 +1,92 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente servo-mg996r.",
+  "",
+  "O MG996R nas 4 pilhas AA (ele puxa ~1 A travado: a USB nao da conta), GND em comum.",
+  "",
+  "Ligado numa ESP32 DevKit V1, com o que ele precisa para funcionar",
+  "de verdade: o driver, o motor e a bateria de cada um.",
+  "",
+  "A placa esta no cabo USB (na barra dela: USB -> cabo ligado); a bateria e so do motor."
+ ],
+ "codigo": [
+  "#include <ESP32Servo.h>",
+  "",
+  "Servo servo;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  servo.attach(13, 500, 2500);",
+  "  Serial.println(\"servo pronto\");",
+  "}",
+  "",
+  "void loop() {",
+  "  servo.write(0);",
+  "  delay(800);",
+  "  servo.write(90);",
+  "  delay(800);",
+  "  servo.write(180);",
+  "  delay(800);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 60,
+    "Y": 60,
+    "Usb": true
+   },
+   {
+    "Id": "peca",
+    "Tipo": "servo-mg996r",
+    "X": 300,
+    "Y": 60
+   },
+   {
+    "Id": "pilhas",
+    "Tipo": "bateria",
+    "X": 300,
+    "Y": 300,
+    "Volts": 6,
+    "MiliAmperes": 2000,
+    "MiliAmperesHora": 2500,
+    "Nome": "4 pilhas AA (6 V)"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pilhas",
+    "DePino": "+",
+    "ParaPeca": "peca",
+    "ParaPino": "V+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pilhas",
+    "DePino": "-",
+    "ParaPeca": "peca",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.2",
+    "ParaPeca": "peca",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D13",
+    "ParaPeca": "peca",
+    "ParaPino": "PWM",
+    "Cor": "#F07F1A"
+   }
+  ]
+ }
+}

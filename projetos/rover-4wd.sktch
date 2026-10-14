@@ -1,0 +1,272 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Rover 4WD (L298N, 4 motores amarelos)",
+  "",
+  "O chassi 4WD dos kits: quatro motores amarelos com rodas de 65 mm, os",
+  "dois de cada lado ligados em paralelo na ponte H L298N, e duas 18650",
+  "(7,4 V) alimentando tudo.",
+  "",
+  "Energia: as baterias vao no 12V da ponte H; o regulador dela (com 7 V",
+  "ou mais na entrada) faz os 5 V que ligam o Uno pelo pino 5V -- sem o",
+  "cabo USB.",
+  "",
+  "O sketch anda para a frente, da re e gira no proprio eixo para os dois",
+  "lados, em ciclo. O rotulo de cada roda mostra a velocidade."
+ ],
+ "codigo": [
+  "// Rover 4WD: a ponte H L298N com os dois motores de cada lado em paralelo.",
+  "// ENA e ENB nos pinos 5 e 6 (com PWM): a velocidade de cada lado.",
+  "",
+  "const int ENA = 5;    // lado esquerdo",
+  "const int IN1 = 7;",
+  "const int IN2 = 8;",
+  "const int IN3 = 9;",
+  "const int IN4 = 11;",
+  "const int ENB = 6;    // lado direito",
+  "const int VELOCIDADE = 200;",
+  "",
+  "void lado(int en, int a, int b, int sentido) {",
+  "  digitalWrite(a, sentido > 0 ? HIGH : LOW);",
+  "  digitalWrite(b, sentido < 0 ? HIGH : LOW);",
+  "  analogWrite(en, sentido == 0 ? 0 : VELOCIDADE);",
+  "}",
+  "",
+  "void mover(int esquerdo, int direito, String nome) {",
+  "  lado(ENA, IN1, IN2, esquerdo);",
+  "  lado(ENB, IN3, IN4, direito);",
+  "  Serial.println(nome);",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  pinMode(ENA, OUTPUT); pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);",
+  "  pinMode(ENB, OUTPUT); pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);",
+  "  mover(0, 0, \"parado\");",
+  "  delay(500);",
+  "}",
+  "",
+  "void loop() {",
+  "  mover(1, 1, \"frente\");",
+  "  delay(2000);",
+  "  mover(0, 0, \"parado\");",
+  "  delay(500);",
+  "  mover(-1, -1, \"re\");",
+  "  delay(1500);",
+  "  mover(-1, 1, \"girando para a esquerda\");",
+  "  delay(1000);",
+  "  mover(1, -1, \"girando para a direita\");",
+  "  delay(1000);",
+  "  mover(0, 0, \"parado\");",
+  "  delay(1000);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "m_fe",
+    "Tipo": "motor-tt",
+    "X": 180,
+    "Y": 120,
+    "Espelhada": false
+   },
+   {
+    "Id": "roda_fe",
+    "Tipo": "roda-tt",
+    "X": 100.63,
+    "Y": 44.41
+   },
+   {
+    "Id": "m_te",
+    "Tipo": "motor-tt",
+    "X": 180,
+    "Y": 620,
+    "Espelhada": false
+   },
+   {
+    "Id": "roda_te",
+    "Tipo": "roda-tt",
+    "X": 100.63,
+    "Y": 544.41
+   },
+   {
+    "Id": "m_fd",
+    "Tipo": "motor-tt",
+    "X": 760,
+    "Y": 120,
+    "Espelhada": true
+   },
+   {
+    "Id": "roda_fd",
+    "Tipo": "roda-tt",
+    "X": 869.92,
+    "Y": 44.41
+   },
+   {
+    "Id": "m_td",
+    "Tipo": "motor-tt",
+    "X": 760,
+    "Y": 620,
+    "Espelhada": true
+   },
+   {
+    "Id": "roda_td",
+    "Tipo": "roda-tt",
+    "X": 869.92,
+    "Y": 544.41
+   },
+   {
+    "Id": "ponte",
+    "Tipo": "l298n",
+    "X": 500,
+    "Y": 520
+   },
+   {
+    "Id": "baterias",
+    "Tipo": "bateria",
+    "X": 520,
+    "Y": 720,
+    "Volts": 7.4,
+    "MiliAmperes": 5000,
+    "MiliAmperesHora": 2600,
+    "Nome": "2 x 18650 (7,4 V)"
+   },
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 470,
+    "Y": 300
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "baterias",
+    "DePino": "+",
+    "ParaPeca": "ponte",
+    "ParaPino": "12V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "baterias",
+    "DePino": "-",
+    "ParaPeca": "ponte",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "ponte",
+    "DePino": "OUT1",
+    "ParaPeca": "m_fe",
+    "ParaPino": "+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "ponte",
+    "DePino": "OUT2",
+    "ParaPeca": "m_fe",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "ponte",
+    "DePino": "OUT1",
+    "ParaPeca": "m_te",
+    "ParaPino": "+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "ponte",
+    "DePino": "OUT2",
+    "ParaPeca": "m_te",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "ponte",
+    "DePino": "OUT3",
+    "ParaPeca": "m_fd",
+    "ParaPino": "+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "ponte",
+    "DePino": "OUT4",
+    "ParaPeca": "m_fd",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "ponte",
+    "DePino": "OUT3",
+    "ParaPeca": "m_td",
+    "ParaPino": "+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "ponte",
+    "DePino": "OUT4",
+    "ParaPeca": "m_td",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "ponte",
+    "DePino": "5V",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "ponte",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "5",
+    "ParaPeca": "ponte",
+    "ParaPino": "ENA",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "7",
+    "ParaPeca": "ponte",
+    "ParaPino": "IN1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "ponte",
+    "ParaPino": "IN2",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "ponte",
+    "ParaPino": "IN3",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "11",
+    "ParaPeca": "ponte",
+    "ParaPino": "IN4",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "6",
+    "ParaPeca": "ponte",
+    "ParaPino": "ENB",
+    "Cor": "#E8B400"
+   }
+  ]
+ }
+}

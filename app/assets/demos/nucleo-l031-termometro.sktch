@@ -1,0 +1,197 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Termometro com NTC e alarme, na ST Nucleo-L031K6.",
+  "",
+  "O que esta demo mostra:",
+  "- o termistor NTC e a formula beta que todo tutorial usa -- a leitura",
+  "  daqui segue a curva de verdade do sensor;",
+  "- analogReadResolution(12) na STM32, cujo core entrega 10 bits de fabrica.",
+  "",
+  "Aperte F5 e clique no sensor NTC para mudar a temperatura (acima de 30 C",
+  "dispara o alarme)."
+ ],
+ "codigo": [
+  "// Termometro com NTC e alarme, na ST Nucleo-L031K6.",
+  "//",
+  "// O NTC do modulo fica num divisor de tensao; a formula abaixo (a do",
+  "// exemplo do modulo, com beta 3950) transforma a leitura em graus. Acima",
+  "// de 30 C o LED vermelho acende e o buzzer apita; abaixo, fica o verde.",
+  "//",
+  "// O ADC da STM32 tem 12 bits, mas o core do Arduino entrega 10 de fabrica.",
+  "// O analogReadResolution(12) pede os 12 -- e a formula usa 4095.",
+  "",
+  "const float BETA = 3950;",
+  "const float LIMITE = 30.0;",
+  "",
+  "const int SENSOR = A0;",
+  "const int VERDE = 4;           // D4",
+  "const int VERMELHO = 5;        // D5",
+  "const int BUZZER = 3;          // D3",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(VERDE, OUTPUT);",
+  "  pinMode(VERMELHO, OUTPUT);",
+  "  analogReadResolution(12);",
+  "}",
+  "",
+  "void loop() {",
+  "  int leitura = analogRead(SENSOR);",
+  "  float celsius = 1 / (log(1 / (4095.0 / leitura - 1)) / BETA + 1.0 / 298.15) - 273.15;",
+  "",
+  "  bool quente = celsius > LIMITE;",
+  "  digitalWrite(VERDE, !quente);",
+  "  digitalWrite(VERMELHO, quente);",
+  "  if (quente) tone(BUZZER, 2200, 150);",
+  "",
+  "  Serial.print(\"temperatura: \");",
+  "  Serial.print(celsius, 1);",
+  "  Serial.println(quente ? \" C  <- ALARME\" : \" C\");",
+  "  delay(1000);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "st-nucleo-l031k6",
+    "X": 60,
+    "Y": 40
+   },
+   {
+    "Id": "ntc",
+    "Tipo": "ntc-temperature-sensor",
+    "X": 230,
+    "Y": 60,
+    "Giro": 0.4807692307692308
+   },
+   {
+    "Id": "ok",
+    "Tipo": "led",
+    "X": 330,
+    "Y": 180,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_ok",
+    "Tipo": "resistor",
+    "X": 258,
+    "Y": 226,
+    "Ohms": 220
+   },
+   {
+    "Id": "quente",
+    "Tipo": "led",
+    "X": 430,
+    "Y": 180,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_quente",
+    "Tipo": "resistor",
+    "X": 358,
+    "Y": 226,
+    "Ohms": 220
+   },
+   {
+    "Id": "buzzer",
+    "Tipo": "buzzer",
+    "X": 520,
+    "Y": 170
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "ntc",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "ntc",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "ntc",
+    "DePino": "OUT",
+    "ParaPeca": "placa",
+    "ParaPino": "A0",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D4",
+    "ParaPeca": "r_ok",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_ok",
+    "DePino": "2",
+    "ParaPeca": "ok",
+    "ParaPino": "A",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "ok",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D5",
+    "ParaPeca": "r_quente",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_quente",
+    "DePino": "2",
+    "ParaPeca": "quente",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "quente",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D3",
+    "ParaPeca": "buzzer",
+    "ParaPino": "1",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "buzzer",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

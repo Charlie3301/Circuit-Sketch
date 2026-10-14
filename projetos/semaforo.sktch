@@ -1,0 +1,151 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Semaforo (Uno, 3 LEDs)",
+  "",
+  "O primeiro projeto de todo mundo: tres LEDs com resistor de 220 ohms,",
+  "vermelho 3 s, verde 3 s, amarelo 1 s."
+ ],
+ "codigo": [
+  "// Semaforo: vermelho 3 s, verde 3 s, amarelo 1 s.",
+  "const int VERMELHO = 13, AMARELO = 12, VERDE = 11;",
+  "",
+  "void acender(int pino, int ms) {",
+  "  digitalWrite(VERMELHO, pino == VERMELHO);",
+  "  digitalWrite(AMARELO, pino == AMARELO);",
+  "  digitalWrite(VERDE, pino == VERDE);",
+  "  delay(ms);",
+  "}",
+  "",
+  "void setup() {",
+  "  pinMode(VERMELHO, OUTPUT);",
+  "  pinMode(AMARELO, OUTPUT);",
+  "  pinMode(VERDE, OUTPUT);",
+  "}",
+  "",
+  "void loop() {",
+  "  acender(VERMELHO, 3000);",
+  "  acender(VERDE, 3000);",
+  "  acender(AMARELO, 1000);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 200
+   },
+   {
+    "Id": "vermelho",
+    "Tipo": "led",
+    "X": 360,
+    "Y": 40,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_vermelho",
+    "Tipo": "resistor",
+    "X": 290,
+    "Y": 100,
+    "Ohms": 220
+   },
+   {
+    "Id": "amarelo",
+    "Tipo": "led",
+    "X": 440,
+    "Y": 40,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r_amarelo",
+    "Tipo": "resistor",
+    "X": 370,
+    "Y": 100,
+    "Ohms": 220
+   },
+   {
+    "Id": "verde",
+    "Tipo": "led",
+    "X": 520,
+    "Y": 40,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_verde",
+    "Tipo": "resistor",
+    "X": 450,
+    "Y": 100,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "13",
+    "ParaPeca": "r_vermelho",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_vermelho",
+    "DePino": "2",
+    "ParaPeca": "vermelho",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "vermelho",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "12",
+    "ParaPeca": "r_amarelo",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_amarelo",
+    "DePino": "2",
+    "ParaPeca": "amarelo",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "amarelo",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "11",
+    "ParaPeca": "r_verde",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_verde",
+    "DePino": "2",
+    "ParaPeca": "verde",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "verde",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="40.0mm" height="38.5mm" viewBox="0 0 40.0 38.5"
+     font-family="monospace" text-anchor="middle">
+
+  <rect x="0" y="0" width="40.0" height="38.5" rx="1.2" fill="#16406b"/>
+  <rect x="0.4" y="0.4" width="39.2" height="37.7" rx="1"
+        fill="none" stroke="#10304f" stroke-width="0.7"/>
+
+  <!-- conector de 8 vias -->
+  <g fill="#e0bb3c" stroke="#a98a1e" stroke-width="0.12">
+    <rect x="10.26" y="0.55" width="1.7" height="2.4" rx="0.25"/>
+    <rect x="12.80" y="0.55" width="1.7" height="2.4" rx="0.25"/>
+    <rect x="15.34" y="0.55" width="1.7" height="2.4" rx="0.25"/>
+    <rect x="17.88" y="0.55" width="1.7" height="2.4" rx="0.25"/>
+    <rect x="20.42" y="0.55" width="1.7" height="2.4" rx="0.25"/>
+    <rect x="22.96" y="0.55" width="1.7" height="2.4" rx="0.25"/>
+    <rect x="25.50" y="0.55" width="1.7" height="2.4" rx="0.25"/>
+    <rect x="28.04" y="0.55" width="1.7" height="2.4" rx="0.25"/>
+  </g>
+  <text fill="#bcd0e4" font-size="1.45px">
+    <tspan x="11.11" y="4.6">GND</tspan>
+    <tspan x="13.65" y="4.6">VCC</tspan>
+    <tspan x="16.19" y="4.6">SCL</tspan>
+    <tspan x="18.73" y="4.6">SDA</tspan>
+    <tspan x="21.27" y="4.6">RES</tspan>
+    <tspan x="23.81" y="4.6">DC</tspan>
+    <tspan x="26.35" y="4.6">CS</tspan>
+    <tspan x="28.89" y="4.6">BLK</tspan>
+  </text>
+
+  <!-- moldura e vidro: a area util e o que o editor pinta por cima -->
+  <rect x="5.60" y="7.60"
+        width="28.80" height="28.80" rx="0.5" fill="#0b0d10"/>
+  <rect x="6.50" y="8.50" width="27.00" height="27.00"
+        fill="#05070a"/>
+
+  <text x="34.50" y="37.30" fill="#8fa8c0" font-size="1.5px">240</text>
+</svg>

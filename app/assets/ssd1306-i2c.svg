@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="27.3mm" height="27.8mm" viewBox="0 0 27.3 27.8">
+
+  <!-- placa -->
+  <rect x="0" y="0" width="27.3" height="27.8" rx="0.9" fill="#0e4a8a"/>
+  <rect x="0.15" y="0.15" width="27.0" height="27.5" rx="0.8"
+        fill="none" stroke="#0a3868" stroke-width="0.2"/>
+  <rect x="0" y="0" width="27.3" height="27.8" rx="0.9"
+        fill="none" stroke="#0a3868" stroke-width="0.3"/>
+
+  <!-- furos de fixacao -->
+  <g fill="#0a3868">
+    <circle cx="1.5" cy="26.30" r="0.85"/>
+    <circle cx="25.80" cy="26.30" r="0.85"/>
+  </g>
+
+  <!-- barra de pinos -->
+  <g>
+    <rect x="8.84" y="0.55" width="2.0" height="2.7" rx="0.45" fill="#d8b24a"/>
+    <rect x="11.38" y="0.55" width="2.0" height="2.7" rx="0.45" fill="#d8b24a"/>
+    <rect x="13.92" y="0.55" width="2.0" height="2.7" rx="0.45" fill="#d8b24a"/>
+    <rect x="16.46" y="0.55" width="2.0" height="2.7" rx="0.45" fill="#d8b24a"/>
+  </g>
+  <g>
+    <circle cx="9.84" cy="1.9" r="0.62" fill="#12161c"/>
+    <circle cx="12.38" cy="1.9" r="0.62" fill="#12161c"/>
+    <circle cx="14.92" cy="1.9" r="0.62" fill="#12161c"/>
+    <circle cx="17.46" cy="1.9" r="0.62" fill="#12161c"/>
+  </g>
+    <text x="9.84" y="5.1" fill="#8fa3bd" font-size="1.55px" text-anchor="middle" font-family="Verdana">GND</text>
+    <text x="12.38" y="5.1" fill="#8fa3bd" font-size="1.55px" text-anchor="middle" font-family="Verdana">VCC</text>
+    <text x="14.92" y="5.1" fill="#8fa3bd" font-size="1.55px" text-anchor="middle" font-family="Verdana">SCL</text>
+    <text x="17.46" y="5.1" fill="#8fa3bd" font-size="1.55px" text-anchor="middle" font-family="Verdana">SDA</text>
+
+  <!-- vidro do display: a area preta e maior que a acesa, como no modulo -->
+  <rect x="1.4" y="6.4" width="24.5" height="17.4" rx="0.5" fill="#0a0d12"/>
+  <rect x="1.4" y="6.4" width="24.5" height="17.4" rx="0.5"
+        fill="none" stroke="#050709" stroke-width="0.25"/>
+
+  <!-- a area que realmente acende: 128x64 em 21,7 x 10,9 mm -->
+  <rect x="2.8" y="9.7" width="21.7" height="10.9" fill="#05070a"/>
+
+  <!-- brilho de vidro, bem discreto -->
+  <path d="M1.9 7.0 h23.50 v1.5 h-23.50 z"
+        fill="#ffffff" opacity="0.05"/>
+
+  <text x="13.65" y="26.6" fill="#7e93ad" font-size="1.5px"
+        text-anchor="middle" font-family="Verdana">OLED 128x64 I2C</text>
+</svg>

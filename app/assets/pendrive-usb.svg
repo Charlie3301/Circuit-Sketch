@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="34.0mm" height="15.0mm" viewBox="0 0 34.0 15.0">
+
+  <!-- a placa -->
+  <rect x="0.4" y="0.4" width="24.20" height="14.20" rx="1.1" fill="#1d4f91" stroke="#123461" stroke-width="0.3"/>
+  <!-- a carcaca de metal do USB-A femea, com a boca para a direita -->
+  <rect x="9.8" y="1.6" width="13.6" height="11.80" rx="0.6" fill="#aeb4bd" stroke="#6d737c" stroke-width="0.3"/>
+  <rect x="22.20" y="1.6" width="1.2" height="11.80" fill="#8b919a"/>
+  <path d="M11.00 3.2 H21.00 M11.00 11.80 H21.00" stroke="#c9cfd7" stroke-width="0.35"/>
+  <text x="16.00" y="8.05" fill="#5d636c" font-size="1.6px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">USB</text>
+  <circle cx="2.4" cy="3.69" r="0.85" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="2.4" cy="3.69" r="0.4" fill="#2a2a2a"/>
+  <circle cx="2.4" cy="6.23" r="0.85" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="2.4" cy="6.23" r="0.4" fill="#2a2a2a"/>
+  <circle cx="2.4" cy="8.77" r="0.85" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="2.4" cy="8.77" r="0.4" fill="#2a2a2a"/>
+  <circle cx="2.4" cy="11.31" r="0.85" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="2.4" cy="11.31" r="0.4" fill="#2a2a2a"/>
+  <text x="3.80" y="4.14" fill="#e6ecf5" font-size="1.25px"
+        font-family="Verdana">VBUS</text>
+  <text x="3.80" y="6.68" fill="#e6ecf5" font-size="1.25px"
+        font-family="Verdana">D-</text>
+  <text x="3.80" y="9.22" fill="#e6ecf5" font-size="1.25px"
+        font-family="Verdana">D+</text>
+  <text x="3.80" y="11.76" fill="#e6ecf5" font-size="1.25px"
+        font-family="Verdana">GND</text>
+
+  <!-- a lingueta de metal: encaixado, ela fica dentro da carcaca -->
+  <rect x="13.80" y="3.0" width="8.0" height="9.0" rx="0.4" fill="#c4cad2" stroke="#7d838c" stroke-width="0.25"/>
+  <rect x="16.80" y="5.0" width="1.6" height="1.4" fill="#4d535c"/>
+  <rect x="16.80" y="8.6" width="1.6" height="1.4" fill="#4d535c"/>
+  <!-- o corpo -->
+  <rect x="21.20" y="2.2" width="12.4" height="10.6" rx="1.8" fill="#23262c" stroke="#0f1013" stroke-width="0.3"/>
+  <rect x="22.20" y="3.2" width="10.4" height="8.6" rx="1.2" fill="#2e3239"/>
+  <circle cx="32.40" cy="7.5" r="0.55" fill="#3b8cff"/>
+  <text x="26.80" y="8.0" fill="#e6ecf5" font-size="1.7px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">16 GB</text>
+</svg>

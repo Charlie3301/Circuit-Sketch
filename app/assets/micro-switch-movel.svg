@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="28.0mm" height="19.0mm" viewBox="0 0 28.0 19.0">
+  <!-- a alavanca de metal, presa na dobradica, e a roldana na ponta -->
+  <path d="M5.00 6.75 L23.6 4.30 L23.8 5.10 L5.00 7.65 Z" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <circle cx="5.00" cy="7.20" r="0.75" fill="#7d838c"/>
+  <circle cx="24.2" cy="2.80" r="2.1" fill="#e8e8e2" stroke="#8f8f8a" stroke-width="0.3"/>
+  <circle cx="24.2" cy="2.80" r="0.55" fill="#7d838c"/>
+</svg>

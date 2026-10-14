@@ -1,0 +1,146 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "MQTT em MicroPython, na Raspberry Pi Pico W.",
+  "",
+  "O que esta demo mostra:",
+  "- WiFi com network.WLAN e MQTT com umqtt.simple, o jeito do MicroPython;",
+  "- publicar uma leitura e obedecer a um topico no mesmo laco, com",
+  "  check_msg() e ticks_diff().",
+  "",
+  "Aperte F5 e, no painel REDE, publique \"on\" ou \"off\" em pico/led. Gire o",
+  "potenciometro e veja pico/pot mudar."
+ ],
+ "codigo": [
+  "# MQTT em MicroPython, na Raspberry Pi Pico W.",
+  "#",
+  "# A cada 2 s a placa publica a posicao do potenciometro (0 a 100 %) em",
+  "# \"pico/pot\", e obedece ao topico \"pico/led\": \"on\" acende, \"off\" apaga.",
+  "",
+  "import network",
+  "import time",
+  "import machine",
+  "import ubinascii",
+  "from machine import Pin, ADC",
+  "from umqtt.simple import MQTTClient",
+  "",
+  "led = Pin(15, Pin.OUT)",
+  "pot = ADC(0)              # GP26",
+  "",
+  "wlan = network.WLAN(network.STA_IF)",
+  "wlan.active(True)",
+  "wlan.connect(\"Wokwi-GUEST\", \"\")",
+  "while not wlan.isconnected():",
+  "    time.sleep_ms(250)",
+  "print(\"conectado:\", wlan.ifconfig()[0])",
+  "",
+  "def chegou(topico, mensagem):",
+  "    texto = mensagem.decode()",
+  "    print(\"recebi\", topico.decode(), texto)",
+  "    if texto == \"on\":",
+  "        led.value(1)",
+  "    elif texto == \"off\":",
+  "        led.value(0)",
+  "",
+  "# Um id por placa: no broker publico, duas com o mesmo id se derrubam uma",
+  "# a outra -- e a turma inteira roda este mesmo codigo.",
+  "cliente = MQTTClient(b\"pico-w-\" + ubinascii.hexlify(machine.unique_id()), \"broker.hivemq.com\")",
+  "cliente.set_callback(chegou)",
+  "cliente.connect()",
+  "cliente.subscribe(b\"pico/led\")",
+  "print(\"pronto: publique on ou off em pico/led\")",
+  "",
+  "ultimo = 0",
+  "while True:",
+  "    cliente.check_msg()",
+  "    if time.ticks_diff(time.ticks_ms(), ultimo) > 2000:",
+  "        ultimo = time.ticks_ms()",
+  "        porcento = pot.read_u16() * 100 // 65535",
+  "        cliente.publish(b\"pico/pot\", str(porcento))",
+  "        print(\"pot:\", porcento, \"%\")",
+  "    time.sleep_ms(20)"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "pi-pico-w",
+    "X": 60,
+    "Y": 60
+   },
+   {
+    "Id": "pot",
+    "Tipo": "potentiometer",
+    "X": 300,
+    "Y": 60,
+    "Giro": 0.4
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 330,
+    "Y": 200,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 258,
+    "Y": 246,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pot",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "SIG",
+    "ParaPeca": "placa",
+    "ParaPino": "GP26",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "AGND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GP15",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.4",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="18.0mm" height="15.1mm" viewBox="0 0 18.0 15.1">
+
+  <rect x="0" y="0" width="18.0" height="15.1" rx="1.4" fill="#0d6b6f"/>
+  <rect x="0" y="0" width="18.0" height="15.1" rx="1.4"
+        fill="none" stroke="#084a4d" stroke-width="0.3"/>
+
+  <line x1="1.0" y1="6.00" x2="17.00" y2="6.00" stroke="#084a4d" stroke-width="0.25"/>
+  <rect x="7.10" y="6.80" width="3.8" height="6.28" rx="0.5" fill="#9aa3ad" opacity="0.55"/>
+
+  <rect x="0.60" y="6.40" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="7.40" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="8.94" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="9.94" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="11.48" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="12.48" r="0.55" fill="#14181f"/>
+  <rect x="15.40" y="6.40" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="16.40" cy="7.40" r="0.55" fill="#14181f"/>
+  <rect x="15.40" y="8.94" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="16.40" cy="9.94" r="0.55" fill="#14181f"/>
+  <text x="3.30" y="7.90" fill="#e6eef2" font-size="1.15px" font-family="Verdana">RST</text>
+  <text x="3.30" y="10.44" fill="#e6eef2" font-size="1.15px" font-family="Verdana">VCC</text>
+  <text x="3.30" y="12.98" fill="#e6eef2" font-size="1.15px" font-family="Verdana">GND</text>
+  <text x="14.70" y="7.90" fill="#e6eef2" font-size="1.15px" text-anchor="end" font-family="Verdana">TXD</text>
+  <text x="14.70" y="10.44" fill="#e6eef2" font-size="1.15px" text-anchor="end" font-family="Verdana">RXD</text>
+
+  <text x="9.00" y="10.50" fill="#e6eef2"
+        font-size="1.6px" text-anchor="middle" font-family="Verdana"
+        opacity="0.85" transform="rotate(-90 9.00 9.94)">ESP-10</text>
+</svg>

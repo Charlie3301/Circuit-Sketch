@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="15.24mm" height="17.78mm" viewBox="0 0 15.24 17.78">
+  <rect x="0.15" y="0.15" width="14.94" height="17.48" rx="0.8" fill="#3b2f8f" stroke="#00000055" stroke-width="0.3"/>
+  <rect x="4.42" y="6.29" width="6.4" height="5.2" rx="0.3" fill="#1b1b1d"/>
+  <text x="7.62" y="9.29" fill="#bbbbbb" font-size="0.85px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">DRV8833</text>
+  <rect x="0.07" y="0.07" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="0.89" y="0.89" width="0.76" height="0.76" fill="#d9b44a"/>
+  <rect x="0.07" y="15.31" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="0.89" y="16.13" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="1.27" y="4.67" fill="#f2f2f2" font-size="0.72px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">AO1</text>
+  <text x="1.27" y="14.31" fill="#f2f2f2" font-size="0.72px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold" transform="rotate(-90 1.27 14.31)">AIN1</text>
+  <rect x="2.61" y="0.07" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="3.43" y="0.89" width="0.76" height="0.76" fill="#d9b44a"/>
+  <rect x="2.61" y="15.31" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="3.43" y="16.13" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="3.81" y="4.67" fill="#f2f2f2" font-size="0.72px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">AO2</text>
+  <text x="3.81" y="14.31" fill="#f2f2f2" font-size="0.72px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold" transform="rotate(-90 3.81 14.31)">AIN2</text>
+  <rect x="5.15" y="0.07" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="5.97" y="0.89" width="0.76" height="0.76" fill="#d9b44a"/>
+  <rect x="5.15" y="15.31" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="5.97" y="16.13" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="6.35" y="4.67" fill="#f2f2f2" font-size="0.72px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">BO1</text>
+  <text x="6.35" y="14.31" fill="#f2f2f2" font-size="0.72px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold" transform="rotate(-90 6.35 14.31)">BIN1</text>
+  <rect x="7.69" y="0.07" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="8.51" y="0.89" width="0.76" height="0.76" fill="#d9b44a"/>
+  <rect x="7.69" y="15.31" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="8.51" y="16.13" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="8.89" y="4.67" fill="#f2f2f2" font-size="0.72px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">BO2</text>
+  <text x="8.89" y="14.31" fill="#f2f2f2" font-size="0.72px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold" transform="rotate(-90 8.89 14.31)">BIN2</text>
+  <rect x="10.23" y="0.07" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="11.05" y="0.89" width="0.76" height="0.76" fill="#d9b44a"/>
+  <rect x="10.23" y="15.31" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="11.05" y="16.13" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="11.43" y="4.67" fill="#f2f2f2" font-size="0.72px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">VM</text>
+  <text x="11.43" y="14.31" fill="#f2f2f2" font-size="0.72px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">SLP</text>
+  <rect x="12.77" y="0.07" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="13.59" y="0.89" width="0.76" height="0.76" fill="#d9b44a"/>
+  <rect x="12.77" y="15.31" width="2.4" height="2.4" fill="#1b1b1d"/>
+  <rect x="13.59" y="16.13" width="0.76" height="0.76" fill="#d9b44a"/>
+  <text x="13.97" y="4.67" fill="#f2f2f2" font-size="0.72px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">GND</text>
+  <text x="13.97" y="14.31" fill="#f2f2f2" font-size="0.72px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">FLT</text>
+
+</svg>

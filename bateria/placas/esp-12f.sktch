@@ -1,0 +1,85 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste da placa esp-12f.",
+  "",
+  "O pino GPIO4 da serigrafia é o GPIO 4. O LED tem que",
+  "piscar e o monitor tem que contar as piscadas."
+ ],
+ "codigo": [
+  "// Bateria de testes — esp-12f.",
+  "//",
+  "// Pisca o LED externo e conta as piscadas no monitor serial.",
+  "// O pino GPIO4 da serigrafia é o GPIO 4: se essa",
+  "// tradução estiver errada, o LED fica apagado sem dar erro.",
+  "",
+  "const int LED = 4;",
+  "int piscadas = 0;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(LED, OUTPUT);",
+  "  Serial.println(\"esp-12f acordou\");",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(LED, HIGH);",
+  "  delay(200);",
+  "  digitalWrite(LED, LOW);",
+  "  delay(200);",
+  "",
+  "  piscadas++;",
+  "  Serial.print(\"piscadas: \");",
+  "  Serial.println(piscadas);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp-12f",
+    "X": 120,
+    "Y": 60
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 520,
+    "Y": 120,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r",
+    "Tipo": "resistor",
+    "X": 520,
+    "Y": 280,
+    "Ohms": 330
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO4",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "r",
+    "ParaPino": "1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "r",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

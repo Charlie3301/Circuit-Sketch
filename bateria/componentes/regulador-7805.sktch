@@ -1,0 +1,86 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente regulador-7805.",
+  "",
+  "O 7805 faz 5 V da bateria de 9 V e liga o Uno pelo pino 5V (sem o cabo USB).",
+  "",
+  "Ligado numa ESP32 DevKit V1, com o que ele precisa para funcionar",
+  "de verdade: o driver, o motor e a bateria de cada um."
+ ],
+ "codigo": [
+  "// Esta placa e alimentada pelo regulador de tensao, sem o cabo USB.",
+  "const int LED = 13;",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  pinMode(LED, OUTPUT);",
+  "  Serial.println(\"ligou pelo regulador\");",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(LED, HIGH);",
+  "  delay(300);",
+  "  digitalWrite(LED, LOW);",
+  "  delay(300);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "peca",
+    "Tipo": "regulador-7805",
+    "X": 300,
+    "Y": 200
+   },
+   {
+    "Id": "pilhas",
+    "Tipo": "bateria",
+    "X": 560,
+    "Y": 200,
+    "Volts": 9,
+    "MiliAmperes": 500,
+    "MiliAmperesHora": 500,
+    "Nome": "Bateria 9 V"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pilhas",
+    "DePino": "+",
+    "ParaPeca": "peca",
+    "ParaPino": "IN",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pilhas",
+    "DePino": "-",
+    "ParaPeca": "peca",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "OUT",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

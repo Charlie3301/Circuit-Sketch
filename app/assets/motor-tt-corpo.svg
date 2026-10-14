@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="74.0mm" height="26.0mm" viewBox="0 0 74.0 26.0">
+  <defs>
+    <linearGradient id="lataTT" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9dde2"/>
+      <stop offset="0.45" stop-color="#f2f4f6"/>
+      <stop offset="1" stop-color="#8e949c"/>
+    </linearGradient>
+  </defs>
+
+  <!-- os fios: dos terminais da tampa ate as pontas -->
+  <path d="M68.4 8.8 C71 8.8 70.4 11.73 72.70 11.73" fill="none" stroke="#7d1f1a" stroke-width="1.15" stroke-linecap="round"/>
+  <path d="M68.4 8.8 C71 8.8 70.4 11.73 72.70 11.73" fill="none" stroke="#d23b33" stroke-width="0.8" stroke-linecap="round"/>
+  <path d="M68.4 17.2 C71 17.2 70.4 14.27 72.70 14.27" fill="none" stroke="#7a808a" stroke-width="1.15" stroke-linecap="round"/>
+  <path d="M68.4 17.2 C71 17.2 70.4 14.27 72.70 14.27" fill="none" stroke="#34373d" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="72.70" cy="11.73" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="72.70" cy="11.73" r="0.32" fill="#2a2a2a"/>
+  <circle cx="72.70" cy="14.27" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="72.70" cy="14.27" r="0.32" fill="#2a2a2a"/>
+  <!-- o motor (a lata prateada), a tampa branca e os terminais -->
+  <rect x="42.5" y="3.0" width="21.0" height="20.0" rx="1.2" fill="url(#lataTT)" stroke="#6d737c" stroke-width="0.3"/>
+  <path d="M46 6.2 H62 M46 19.8 H62" stroke="#ffffff" stroke-opacity="0.5" stroke-width="0.35"/>
+  <rect x="63.2" y="6.0" width="3.6" height="14.0" rx="1.0" fill="#efefea" stroke="#b1b1aa" stroke-width="0.3"/>
+  <rect x="66.6" y="8.2" width="2.2" height="1.2" fill="#c9a24a" stroke="#8a6d1f" stroke-width="0.15"/>
+  <rect x="66.6" y="16.6" width="2.2" height="1.2" fill="#c9a24a" stroke="#8a6d1f" stroke-width="0.15"/>
+  <circle cx="65.0" cy="8.0" r="0.55" fill="#d23b33"/>
+  <!-- a caixa amarela: frente redonda em volta do eixo -->
+  <path d="M12.0 2 H44.0 V24 H12.0 A11 11 0 0 1 12.0 2 Z" fill="#f2c230" stroke="#b8901a" stroke-width="0.35"/>
+  <rect x="19.5" y="4.2" width="22.5" height="17.6" rx="1.6" fill="#f6cf4f" stroke="#d9a923" stroke-width="0.25"/>
+  <rect x="42.4" y="1.2" width="3.0" height="23.6" rx="0.8" fill="#eab826" stroke="#b8901a" stroke-width="0.3"/>
+  <circle cx="30.5" cy="5.6" r="1.35" fill="#5a4a1c" stroke="#b8901a" stroke-width="0.25"/>
+  <circle cx="30.5" cy="20.4" r="1.35" fill="#5a4a1c" stroke="#b8901a" stroke-width="0.25"/>
+  <circle cx="22.6" cy="13.0" r="1.5" fill="#e5b322" stroke="#b8901a" stroke-width="0.25"/>
+  <text x="34.6" y="13.8" fill="#8a6a10" font-size="2.3px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">1:48</text>
+  <!-- o ressalto do eixo -->
+  <circle cx="12.0" cy="13.0" r="5.4" fill="#e9b827" stroke="#b8901a" stroke-width="0.3"/>
+  <circle cx="12.0" cy="13.0" r="3.7" fill="#c99a1b"/>
+</svg>

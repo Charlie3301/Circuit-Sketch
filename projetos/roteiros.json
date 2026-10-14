@@ -1,0 +1,1814 @@
+{
+ "drone-quadricoptero": {
+  "titulo": "Drone quadricoptero (ESP32, ESC 4-em-1, radio FlySky)",
+  "passos": [
+   {
+    "peca": "controle",
+    "bits": 0,
+    "giro": 0.0,
+    "giro2": 0.5,
+    "giro3": 0.5,
+    "giro4": 0.5
+   },
+   {
+    "confere": {
+     "nome": "a ESP32 liga pelo LM2596 (sem o cabo USB)",
+     "energizada": true
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "a controladora iniciou",
+     "serial": "Drone pronto"
+    },
+    "ate": 4
+   },
+   {
+    "esperar": 3.5
+   },
+   {
+    "peca": "controle",
+    "giro4": 1.0
+   },
+   {
+    "confere": {
+     "nome": "arma com o acelerador embaixo e o leme para a direita",
+     "serial": "ARMADO"
+    },
+    "ate": 4
+   },
+   {
+    "peca": "controle",
+    "giro4": 0.5,
+    "giro": 0.55
+   },
+   {
+    "confere": {
+     "nome": "com o acelerador em 55% os quatro motores giram",
+     "rpm_min": [
+      "m1",
+      "m2",
+      "m3",
+      "m4"
+     ],
+     "valor": 5000
+    },
+    "ate": 6
+   },
+   {
+    "confere": {
+     "nome": "as quatro helices empurram",
+     "empuxo_min": [
+      "m1",
+      "m2",
+      "m3",
+      "m4"
+     ],
+     "valor": 50
+    },
+    "ate": 3
+   },
+   {
+    "peca": "controle",
+    "giro3": 0.85
+   },
+   {
+    "confere": {
+     "nome": "aileron para a direita: os motores da esquerda aceleram",
+     "rpm_maior": [
+      [
+       "m3",
+       "m1"
+      ],
+      [
+       "m4",
+       "m2"
+      ]
+     ]
+    },
+    "ate": 4
+   },
+   {
+    "peca": "controle",
+    "giro3": 0.5,
+    "giro": 0.0
+   },
+   {
+    "esperar": 0.5
+   },
+   {
+    "peca": "controle",
+    "giro4": 0.0
+   },
+   {
+    "confere": {
+     "nome": "desarma com o acelerador embaixo e o leme para a esquerda",
+     "serial": "DESARMADO"
+    },
+    "ate": 4
+   },
+   {
+    "peca": "controle",
+    "giro4": 0.5
+   }
+  ]
+ },
+ "carrinho-rc-sem-placa": {
+  "titulo": "Carrinho de controle remoto (sem placa)",
+  "passos": [
+   {
+    "peca": "controle",
+    "bits": 0,
+    "giro": 0.0,
+    "giro2": 0.5,
+    "giro3": 0.5,
+    "giro4": 0.5
+   },
+   {
+    "esperar": 4.0
+   },
+   {
+    "confere": {
+     "nome": "com o manche no centro as rodas ficam retas (servo em ~90 graus)",
+     "servo": {
+      "peca": "direcao",
+      "min": 80,
+      "max": 100
+     }
+    },
+    "ate": 3
+   },
+   {
+    "peca": "controle",
+    "giro3": 1.0
+   },
+   {
+    "confere": {
+     "nome": "manche direito para a direita: o servo vira (~180 graus)",
+     "servo": {
+      "peca": "direcao",
+      "min": 160,
+      "max": 181
+     }
+    },
+    "ate": 3
+   },
+   {
+    "peca": "controle",
+    "giro3": 0.0
+   },
+   {
+    "confere": {
+     "nome": "manche direito para a esquerda: o servo vira (~0 grau)",
+     "servo": {
+      "peca": "direcao",
+      "min": -1,
+      "max": 20
+     }
+    },
+    "ate": 3
+   },
+   {
+    "peca": "controle",
+    "giro3": 0.5,
+    "giro": 0.4
+   },
+   {
+    "confere": {
+     "nome": "o acelerador em 40% gira o motor",
+     "rpm_min": [
+      "motor"
+     ],
+     "valor": 3000
+    },
+    "ate": 6
+   },
+   {
+    "confere": {
+     "nome": "e nada esquenta nem queima",
+     "sem_avisos": true
+    },
+    "ate": 1
+   },
+   {
+    "peca": "controle",
+    "giro": 0.0
+   }
+  ]
+ },
+ "carrinho-rc-arduino": {
+  "titulo": "Carrinho de controle remoto com Arduino Nano",
+  "passos": [
+   {
+    "peca": "controle",
+    "bits": 0,
+    "giro": 0.0,
+    "giro2": 0.5,
+    "giro3": 0.5,
+    "giro4": 0.5
+   },
+   {
+    "confere": {
+     "nome": "o Nano liga pelo BEC do ESC (sem o cabo USB)",
+     "energizada": true
+    },
+    "ate": 4
+   },
+   {
+    "esperar": 4.0
+   },
+   {
+    "confere": {
+     "nome": "o Nano le o receptor",
+     "serial": "acelerador"
+    },
+    "ate": 4
+   },
+   {
+    "peca": "controle",
+    "giro3": 1.0
+   },
+   {
+    "confere": {
+     "nome": "manche para a direita: a direcao vai a ~150 graus",
+     "servo": {
+      "peca": "direcao",
+      "min": 140,
+      "max": 160
+     }
+    },
+    "ate": 3
+   },
+   {
+    "peca": "controle",
+    "giro3": 0.5,
+    "giro": 0.6
+   },
+   {
+    "confere": {
+     "nome": "o acelerador gira o motor (limitado a 70%)",
+     "rpm_min": [
+      "motor"
+     ],
+     "valor": 3000
+    },
+    "ate": 6
+   },
+   {
+    "peca": "controle",
+    "bits": 4
+   },
+   {
+    "confere": {
+     "nome": "controle desligado: o Nano entra no failsafe",
+     "serial": "sem sinal do radio"
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "e para o motor",
+     "rpm_max": [
+      "motor"
+     ],
+     "valor": 500
+    },
+    "ate": 8
+   }
+  ]
+ },
+ "rover-4wd": {
+  "titulo": "Rover 4WD (L298N, 4 motores amarelos)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o Uno liga pelo 5 V da ponte H (sem o cabo USB)",
+     "energizada": true
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "frente",
+     "serial": "frente"
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "para a frente os quatro motores giram no mesmo sentido",
+     "rpm_sinal": [
+      {
+       "peca": "m_fe",
+       "sinal": 1,
+       "min": 40
+      },
+      {
+       "peca": "m_te",
+       "sinal": 1,
+       "min": 40
+      },
+      {
+       "peca": "m_fd",
+       "sinal": 1,
+       "min": 40
+      },
+      {
+       "peca": "m_td",
+       "sinal": 1,
+       "min": 40
+      }
+     ]
+    },
+    "ate": 2.5
+   },
+   {
+    "confere": {
+     "nome": "re",
+     "serial": "re"
+    },
+    "ate": 5
+   },
+   {
+    "confere": {
+     "nome": "de re os quatro invertem",
+     "rpm_sinal": [
+      {
+       "peca": "m_fe",
+       "sinal": -1,
+       "min": 40
+      },
+      {
+       "peca": "m_te",
+       "sinal": -1,
+       "min": 40
+      },
+      {
+       "peca": "m_fd",
+       "sinal": -1,
+       "min": 40
+      },
+      {
+       "peca": "m_td",
+       "sinal": -1,
+       "min": 40
+      }
+     ]
+    },
+    "ate": 1.5
+   },
+   {
+    "confere": {
+     "nome": "girando para a esquerda",
+     "serial": "girando para a esquerda"
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "no giro, o lado esquerdo vai para tras e o direito para a frente",
+     "rpm_sinal": [
+      {
+       "peca": "m_fe",
+       "sinal": -1,
+       "min": 20
+      },
+      {
+       "peca": "m_fd",
+       "sinal": 1,
+       "min": 20
+      }
+     ]
+    },
+    "ate": 1.0
+   },
+   {
+    "confere": {
+     "nome": "e a ponte H nao reclama",
+     "sem_avisos": true
+    },
+    "ate": 1
+   }
+  ]
+ },
+ "rover-4wd-hc-sr04": {
+  "titulo": "Rover 4WD com HC-SR04 (o seu Rover_ponte_H)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o Uno liga pelo 5 V da ponte H (sem o cabo USB)",
+     "energizada": true
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "com 100 cm livres o sonar le ~100 cm",
+     "serial": "Frente: 100"
+    },
+    "ate": 6
+   },
+   {
+    "confere": {
+     "nome": "e o rover anda para a frente (os quatro motores)",
+     "rpm_sinal": [
+      {
+       "peca": "m_fe",
+       "sinal": 1,
+       "min": 40
+      },
+      {
+       "peca": "m_te",
+       "sinal": 1,
+       "min": 40
+      },
+      {
+       "peca": "m_fd",
+       "sinal": 1,
+       "min": 40
+      },
+      {
+       "peca": "m_td",
+       "sinal": 1,
+       "min": 40
+      }
+     ]
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "ENA no pino 2 (sem PWM): o lado esquerdo vai no maximo, mais rapido que o direito (PWM 200)",
+     "rpm_maior": [
+      [
+       "m_fe",
+       "m_fd"
+      ]
+     ]
+    },
+    "ate": 2
+   },
+   {
+    "peca": "sonar",
+    "giro": 0.0125
+   },
+   {
+    "confere": {
+     "nome": "obstaculo a 5 cm: o servo olha para a esquerda (150 graus)",
+     "servo": {
+      "peca": "servo",
+      "min": 140,
+      "max": 160
+     }
+    },
+    "ate": 5
+   },
+   {
+    "confere": {
+     "nome": "e para a direita (30 graus)",
+     "servo": {
+      "peca": "servo",
+      "min": 20,
+      "max": 40
+     }
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "os dois lados bloqueados: meia-volta",
+     "serial": "Caminho bloqueado"
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "a re (os quatro para tras)",
+     "rpm_sinal": [
+      {
+       "peca": "m_fe",
+       "sinal": -1,
+       "min": 20
+      },
+      {
+       "peca": "m_te",
+       "sinal": -1,
+       "min": 20
+      },
+      {
+       "peca": "m_fd",
+       "sinal": -1,
+       "min": 20
+      },
+      {
+       "peca": "m_td",
+       "sinal": -1,
+       "min": 20
+      }
+     ]
+    },
+    "ate": 3
+   },
+   {
+    "peca": "sonar",
+    "giro": 0.25
+   },
+   {
+    "confere": {
+     "nome": "caminho livre de novo: volta a andar para a frente",
+     "rpm_sinal": [
+      {
+       "peca": "m_fe",
+       "sinal": 1,
+       "min": 40
+      },
+      {
+       "peca": "m_te",
+       "sinal": 1,
+       "min": 40
+      },
+      {
+       "peca": "m_fd",
+       "sinal": 1,
+       "min": 40
+      },
+      {
+       "peca": "m_td",
+       "sinal": 1,
+       "min": 40
+      }
+     ]
+    },
+    "ate": 8
+   }
+  ]
+ },
+ "rover-4wd-reles": {
+  "titulo": "Rover 4WD com reles (o seu Uno_DesvioObstaculos)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o Uno liga pelas baterias no VIN (sem o cabo USB)",
+     "energizada": true
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "com 100 cm livres o sonar le ~100 cm",
+     "serial": "Frente: 100"
+    },
+    "ate": 6
+   },
+   {
+    "confere": {
+     "nome": "e o rover anda para a frente (os reles A ligados)",
+     "rpm_sinal": [
+      {
+       "peca": "m_fe",
+       "sinal": 1,
+       "min": 40
+      },
+      {
+       "peca": "m_te",
+       "sinal": 1,
+       "min": 40
+      },
+      {
+       "peca": "m_fd",
+       "sinal": 1,
+       "min": 40
+      },
+      {
+       "peca": "m_td",
+       "sinal": 1,
+       "min": 40
+      }
+     ]
+    },
+    "ate": 3
+   },
+   {
+    "peca": "sonar",
+    "giro": 0.0125
+   },
+   {
+    "confere": {
+     "nome": "obstaculo a 5 cm: meia-volta",
+     "serial": "Caminho bloqueado"
+    },
+    "ate": 8
+   },
+   {
+    "confere": {
+     "nome": "a re (os reles B ligados)",
+     "rpm_sinal": [
+      {
+       "peca": "m_fe",
+       "sinal": -1,
+       "min": 20
+      },
+      {
+       "peca": "m_te",
+       "sinal": -1,
+       "min": 20
+      },
+      {
+       "peca": "m_fd",
+       "sinal": -1,
+       "min": 20
+      },
+      {
+       "peca": "m_td",
+       "sinal": -1,
+       "min": 20
+      }
+     ]
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "e os reles direto nos pinos nao queimam nada",
+     "sem_avisos": true
+    },
+    "ate": 1
+   }
+  ]
+ },
+ "fonte-7805-uno": {
+  "titulo": "Uno alimentado pelo 7805 (LiPo 3S)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o 7805 liga o Uno (sem o cabo USB)",
+     "energizada": true
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "o Uno mede a LiPo pelo divisor (~11 V)",
+     "serial": "Bateria: 11."
+    },
+    "ate": 5
+   },
+   {
+    "confere": {
+     "nome": "o LED pisca",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "e o 7805 fica frio (so 0,3 W)",
+     "sem_avisos": true
+    },
+    "ate": 1
+   }
+  ]
+ },
+ "7805-esquenta-com-servos": {
+  "titulo": "7805 com dois servos: esquenta e desliga",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o 7805 liga o Uno",
+     "energizada": true
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "os servos varrem",
+     "servo": {
+      "peca": "servo1",
+      "min": 120,
+      "max": 181
+     }
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "o 7805 esquenta e a protecao termica desliga a saida (o aviso explica)",
+     "aviso": "térmica"
+    },
+    "ate": 60
+   },
+   {
+    "confere": {
+     "nome": "e o Uno apaga junto (o classico \"o Arduino fica reiniciando\")",
+     "energizada": false
+    },
+    "ate": 5
+   }
+  ]
+ },
+ "lm2596-esp32-medidor": {
+  "titulo": "ESP32 no LM2596, medindo a LiPo",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o LM2596 liga a ESP32 pelo VIN (sem o cabo USB)",
+     "energizada": true
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "a ESP32 mede ~11 V na LiPo",
+     "serial": "Bateria: 11."
+    },
+    "ate": 5
+   },
+   {
+    "confere": {
+     "nome": "o LED de bateria boa acende",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 3
+   },
+   {
+    "peca": "bat",
+    "volts": 9.8
+   },
+   {
+    "confere": {
+     "nome": "com a LiPo em 9,8 V o LED de bateria boa apaga",
+     "led": {
+      "peca": "led",
+      "aceso": false
+     }
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "sem aviso nenhum",
+     "sem_avisos": true
+    },
+    "ate": 1
+   }
+  ]
+ },
+ "mt3608-18650-uno": {
+  "titulo": "Uno numa 18650 com o MT3608 (step-up)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o MT3608 sobe os 3,7 V e liga o Uno (sem o cabo USB)",
+     "energizada": true
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "o Uno bipa",
+     "serial": "bip"
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "o buzzer toca",
+     "tom": true
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "sem aviso nenhum",
+     "sem_avisos": true
+    },
+    "ate": 1
+   }
+  ]
+ },
+ "ams1117-lipo-1s-esp32": {
+  "titulo": "ESP32 numa LiPo 1S pelo AMS1117 (o limite da folga)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "com a LiPo cheia (4,2 V) a ESP32 liga, no limite (~3,1 V no 3V3)",
+     "energizada": true
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "e o aviso explica a folga que falta",
+     "aviso": "precisa de"
+    },
+    "ate": 3
+   },
+   {
+    "peca": "bat",
+    "volts": 3.7
+   },
+   {
+    "confere": {
+     "nome": "com a LiPo em 3,7 V o AMS1117 da ~2,6 V e a ESP32 apaga",
+     "energizada": false
+    },
+    "ate": 4
+   }
+  ]
+ },
+ "semaforo": {
+  "titulo": "Semaforo (Uno, 3 LEDs)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "vermelho primeiro",
+     "led": {
+      "peca": "vermelho",
+      "aceso": true
+     }
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "depois o verde",
+     "led": {
+      "peca": "verde",
+      "aceso": true
+     }
+    },
+    "ate": 5
+   },
+   {
+    "confere": {
+     "nome": "depois o amarelo",
+     "led": {
+      "peca": "amarelo",
+      "aceso": true
+     }
+    },
+    "ate": 5
+   }
+  ]
+ },
+ "semaforo-pedestre": {
+  "titulo": "Semaforo com botao de pedestre (Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o carro fica no verde",
+     "led": {
+      "peca": "c_verde",
+      "aceso": true
+     }
+    },
+    "ate": 3
+   },
+   {
+    "apertar": "botao"
+   },
+   {
+    "esperar": 0.3
+   },
+   {
+    "soltar": "botao"
+   },
+   {
+    "esperar": 0.25
+   },
+   {
+    "confere": {
+     "nome": "o botao chama o pedestre",
+     "serial": "pedestre pediu"
+    },
+    "ate": 2
+   },
+   {
+    "confere": {
+     "nome": "amarelo para o carro",
+     "led": {
+      "peca": "c_amarelo",
+      "aceso": true
+     }
+    },
+    "ate": 2
+   },
+   {
+    "confere": {
+     "nome": "e verde para o pedestre",
+     "led": {
+      "peca": "p_verde",
+      "aceso": true
+     }
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "depois o carro volta ao verde",
+     "led": {
+      "peca": "c_verde",
+      "aceso": true
+     }
+    },
+    "ate": 6
+   }
+  ]
+ },
+ "botao-liga-desliga-esp32": {
+  "titulo": "Botao liga/desliga (ESP32)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "comeca apagado",
+     "led": {
+      "peca": "led",
+      "aceso": false
+     }
+    },
+    "ate": 2
+   },
+   {
+    "apertar": "botao"
+   },
+   {
+    "esperar": 0.3
+   },
+   {
+    "soltar": "botao"
+   },
+   {
+    "esperar": 0.25
+   },
+   {
+    "confere": {
+     "nome": "um toque acende",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 2
+   },
+   {
+    "apertar": "botao"
+   },
+   {
+    "esperar": 0.3
+   },
+   {
+    "soltar": "botao"
+   },
+   {
+    "esperar": 0.25
+   },
+   {
+    "confere": {
+     "nome": "outro toque apaga",
+     "led": {
+      "peca": "led",
+      "aceso": false
+     }
+    },
+    "ate": 2
+   }
+  ]
+ },
+ "dimmer-potenciometro": {
+  "titulo": "Dimmer com potenciometro (Uno, PWM)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o potenciometro baixo deixa o LED fraco",
+     "brilho": {
+      "peca": "led",
+      "max": 0.35
+     }
+    },
+    "ate": 3
+   },
+   {
+    "peca": "pot",
+    "giro": 0.95
+   },
+   {
+    "confere": {
+     "nome": "no alto, o LED forte",
+     "brilho": {
+      "peca": "led",
+      "min": 0.7
+     }
+    },
+    "ate": 3
+   }
+  ]
+ },
+ "servo-potenciometro": {
+  "titulo": "Servo controlado por potenciometro (Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "potenciometro no zero: servo em ~0 grau",
+     "servo": {
+      "peca": "servo",
+      "min": -1,
+      "max": 8
+     }
+    },
+    "ate": 3
+   },
+   {
+    "peca": "pot",
+    "giro": 1.0
+   },
+   {
+    "confere": {
+     "nome": "potenciometro no maximo: servo em ~180 graus",
+     "servo": {
+      "peca": "servo",
+      "min": 172,
+      "max": 181
+     }
+    },
+    "ate": 3
+   }
+  ]
+ },
+ "sensor-de-re": {
+  "titulo": "Sensor de re (HC-SR04 e buzzer)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o sensor le 20 cm",
+     "serial": "20 cm"
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "e o buzzer bipa",
+     "tom": true
+    },
+    "ate": 3
+   },
+   {
+    "peca": "sonar",
+    "giro": 0.5
+   },
+   {
+    "confere": {
+     "nome": "a 200 cm ele le 200 cm",
+     "serial": "200 cm"
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "e fica quieto",
+     "tom": false
+    },
+    "ate": 3
+   }
+  ]
+ },
+ "termometro-dht22-lcd": {
+  "titulo": "Termometro com DHT22 e LCD 16x2 I2C (Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o LCD mostra a temperatura do DHT22 (25 C)",
+     "lcd": "Temp: 25.0"
+    },
+    "ate": 6
+   },
+   {
+    "peca": "dht",
+    "giro": 0.75
+   },
+   {
+    "confere": {
+     "nome": "a 50 C o LCD acompanha",
+     "lcd": "Temp: 50.0"
+    },
+    "ate": 6
+   }
+  ]
+ },
+ "alarme-pir": {
+  "titulo": "Alarme com sensor de presenca PIR (Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o alarme arma",
+     "serial": "alarme armado"
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "quieto sem movimento",
+     "tom": false
+    },
+    "ate": 2
+   },
+   {
+    "peca": "pir",
+    "giro": 1.0
+   },
+   {
+    "confere": {
+     "nome": "o PIR ve movimento",
+     "serial": "MOVIMENTO"
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "e a sirene toca",
+     "tom": true
+    },
+    "ate": 2
+   },
+   {
+    "peca": "pir",
+    "giro": 0.0
+   }
+  ]
+ },
+ "luz-noturna-ldr": {
+  "titulo": "Luz noturna com LDR (ESP32)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "no claro o LED fica apagado",
+     "led": {
+      "peca": "led",
+      "aceso": false
+     }
+    },
+    "ate": 3
+   },
+   {
+    "peca": "ldr",
+    "giro": 0.05
+   },
+   {
+    "confere": {
+     "nome": "no escuro o LED acende",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 3
+   }
+  ]
+ },
+ "contador-7-segmentos": {
+  "titulo": "Contador no display de 7 segmentos (Uno)",
+  "passos": [
+   {
+    "apertar": "botao"
+   },
+   {
+    "esperar": 0.3
+   },
+   {
+    "soltar": "botao"
+   },
+   {
+    "esperar": 0.25
+   },
+   {
+    "apertar": "botao"
+   },
+   {
+    "esperar": 0.3
+   },
+   {
+    "soltar": "botao"
+   },
+   {
+    "esperar": 0.25
+   },
+   {
+    "apertar": "botao"
+   },
+   {
+    "esperar": 0.3
+   },
+   {
+    "soltar": "botao"
+   },
+   {
+    "esperar": 0.25
+   },
+   {
+    "confere": {
+     "nome": "tres toques: o display mostra 3 (a, b, c, d, g acesos; e, f apagados)",
+     "pinos": {
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "5": 1,
+      "6": 0,
+      "7": 0,
+      "8": 1
+     }
+    },
+    "ate": 2
+   },
+   {
+    "confere": {
+     "nome": "e o monitor conta",
+     "serial": "3"
+    },
+    "ate": 1
+   }
+  ]
+ },
+ "relogio-ds1307-lcd": {
+  "titulo": "Relogio com RTC DS1307 e LCD I2C (Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o LCD mostra a hora do RTC",
+     "lcd": "Hora "
+    },
+    "ate": 5
+   },
+   {
+    "confere": {
+     "nome": "e a data",
+     "lcd": "/20"
+    },
+    "ate": 2
+   }
+  ]
+ },
+ "fechadura-teclado-servo": {
+  "titulo": "Fechadura com senha (teclado 4x4 e servo)",
+  "passos": [
+   {
+    "tecla": "teclado",
+    "valor": "1"
+   },
+   {
+    "esperar": 0.25
+   },
+   {
+    "tecla": "teclado",
+    "valor": ""
+   },
+   {
+    "esperar": 0.2
+   },
+   {
+    "tecla": "teclado",
+    "valor": "2"
+   },
+   {
+    "esperar": 0.25
+   },
+   {
+    "tecla": "teclado",
+    "valor": ""
+   },
+   {
+    "esperar": 0.2
+   },
+   {
+    "tecla": "teclado",
+    "valor": "3"
+   },
+   {
+    "esperar": 0.25
+   },
+   {
+    "tecla": "teclado",
+    "valor": ""
+   },
+   {
+    "esperar": 0.2
+   },
+   {
+    "tecla": "teclado",
+    "valor": "4"
+   },
+   {
+    "esperar": 0.25
+   },
+   {
+    "tecla": "teclado",
+    "valor": ""
+   },
+   {
+    "esperar": 0.2
+   },
+   {
+    "tecla": "teclado",
+    "valor": "#"
+   },
+   {
+    "esperar": 0.25
+   },
+   {
+    "tecla": "teclado",
+    "valor": ""
+   },
+   {
+    "esperar": 0.2
+   },
+   {
+    "confere": {
+     "nome": "a senha certa libera",
+     "serial": "Liberado"
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "o servo destranca (90 graus)",
+     "servo": {
+      "peca": "trava",
+      "min": 80,
+      "max": 100
+     }
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "e o LED verde acende",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 2
+   }
+  ]
+ },
+ "controle-ir-leds": {
+  "titulo": "Controle remoto infravermelho (IRremote, Uno)",
+  "passos": [
+   {
+    "controle_ir": "controle",
+    "botao": "1"
+   },
+   {
+    "confere": {
+     "nome": "a tecla 1 chega (0xFF30CF)",
+     "serial": "FF30CF"
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "e acende o LED 1",
+     "led": {
+      "peca": "led1",
+      "aceso": true
+     }
+    },
+    "ate": 2
+   },
+   {
+    "controle_ir": "controle",
+    "botao": "3"
+   },
+   {
+    "confere": {
+     "nome": "a tecla 3 acende o LED 3",
+     "led": {
+      "peca": "led3",
+      "aceso": true
+     }
+    },
+    "ate": 3
+   }
+  ]
+ },
+ "joystick-pan-tilt": {
+  "titulo": "Pan/tilt com joystick e dois servos (Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "com o joystick no centro, os dois servos em ~90 graus",
+     "servo": {
+      "peca": "pan",
+      "min": 80,
+      "max": 100
+     }
+    },
+    "ate": 3
+   },
+   {
+    "peca": "joy",
+    "giro": 1.0
+   },
+   {
+    "confere": {
+     "nome": "joystick para um lado: o pan vai ao extremo",
+     "servo": {
+      "peca": "pan",
+      "min": 170,
+      "max": 181
+     }
+    },
+    "ate": 3
+   },
+   {
+    "peca": "joy",
+    "giro2": 0.0
+   },
+   {
+    "confere": {
+     "nome": "para baixo: o tilt vai ao outro extremo",
+     "servo": {
+      "peca": "tilt",
+      "min": -1,
+      "max": 10
+     }
+    },
+    "ate": 3
+   }
+  ]
+ },
+ "anel-neopixel-esp32": {
+  "titulo": "Anel NeoPixel arco-iris (ESP32)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o anel acende (arco-iris)",
+     "fita_acesa": {
+      "gpio": 5,
+      "min": 12
+     }
+    },
+    "ate": 4
+   }
+  ]
+ },
+ "oled-barra-potenciometro": {
+  "titulo": "Barra no OLED SSD1306 (ESP32)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o OLED desenha o texto e a barra",
+     "tela_min": {
+      "peca": "oled",
+      "valor": 300
+     }
+    },
+    "ate": 4
+   }
+  ]
+ },
+ "nivel-mpu6050": {
+  "titulo": "Nivel eletronico com MPU6050 (ESP32)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "na horizontal o LED fica apagado",
+     "led": {
+      "peca": "led",
+      "aceso": false
+     }
+    },
+    "ate": 3
+   },
+   {
+    "peca": "mpu",
+    "giro": 0.85
+   },
+   {
+    "confere": {
+     "nome": "inclinado o LED acende",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "e o monitor mostra a inclinacao",
+     "serial": "inclinacao"
+    },
+    "ate": 1
+   }
+  ]
+ },
+ "motor-de-passo-28byj48": {
+  "titulo": "Motor de passo 28BYJ-48 com ULN2003 (Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o motor gira (mais de 90 graus)",
+     "passo_min": {
+      "peca": "motor",
+      "valor": 90
+     }
+    },
+    "ate": 6
+   },
+   {
+    "confere": {
+     "nome": "e volta",
+     "serial": "anti-horario"
+    },
+    "ate": 6
+   }
+  ]
+ },
+ "ventilador-l298n": {
+  "titulo": "Ventilador com controle de velocidade (L298N, Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "com o potenciometro baixo o ventilador gira devagar",
+     "rpm_min": [
+      "motor"
+     ],
+     "valor": 500
+    },
+    "ate": 4
+   },
+   {
+    "peca": "pot",
+    "giro": 1.0
+   },
+   {
+    "confere": {
+     "nome": "no maximo, bem mais rapido",
+     "rpm_min": [
+      "motor"
+     ],
+     "valor": 5000
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "e a helice empurra",
+     "empuxo_min": [
+      "motor"
+     ],
+     "valor": 1
+    },
+    "ate": 2
+   }
+  ]
+ },
+ "balanca-hx711-lcd": {
+  "titulo": "Balanca com HX711 e LCD I2C (Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o LCD mostra os 500 g",
+     "lcd": "Peso: 500 g"
+    },
+    "ate": 5
+   },
+   {
+    "peca": "celula",
+    "giro": 0.25
+   },
+   {
+    "confere": {
+     "nome": "com 1250 g na celula, o LCD acompanha",
+     "lcd": "Peso: 1250 g"
+    },
+    "ate": 5
+   }
+  ]
+ },
+ "bluetooth-led-esp32": {
+  "titulo": "LED pelo Bluetooth do celular (ESP32)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o Bluetooth anuncia",
+     "serial": "Bluetooth pronto"
+    },
+    "ate": 4
+   },
+   {
+    "celular_conectar": "RoboESP32"
+   },
+   {
+    "esperar": 0.8
+   },
+   {
+    "celular_enviar": "liga"
+   },
+   {
+    "confere": {
+     "nome": "o celular manda \"liga\"",
+     "serial": "recebi: liga"
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "e o LED acende",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 2
+   }
+  ]
+ },
+ "espnow-botao-led": {
+  "titulo": "Botao numa ESP32, LED na outra (ESP-NOW)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "as duas placas iniciam",
+     "serial": "receptor pronto",
+     "placa": "placa2"
+    },
+    "ate": 4
+   },
+   {
+    "esperar": 0.5
+   },
+   {
+    "apertar": "botao"
+   },
+   {
+    "confere": {
+     "nome": "o botao de uma placa chega na outra pelo ESP-NOW",
+     "serial": "recebi: apertado",
+     "placa": "placa2"
+    },
+    "ate": 3
+   },
+   {
+    "confere": {
+     "nome": "e acende o LED dela",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 2
+   },
+   {
+    "soltar": "botao"
+   },
+   {
+    "confere": {
+     "nome": "soltou: apaga",
+     "led": {
+      "peca": "led",
+      "aceso": false
+     }
+    },
+    "ate": 3
+   }
+  ]
+ },
+ "servidor-web-led": {
+  "titulo": "Servidor web com LED (ESP32)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "a ESP32 conecta no WiFi",
+     "serial": "IP da placa"
+    },
+    "ate": 8
+   },
+   {
+    "confere": {
+     "nome": "e o servidor abre",
+     "serial": "servidor pronto"
+    },
+    "ate": 3
+   }
+  ]
+ },
+ "sono-profundo-botao": {
+  "titulo": "Sono profundo acordado por botao (ESP32)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "a ESP32 vai dormir",
+     "serial": "dormindo"
+    },
+    "ate": 4
+   },
+   {
+    "esperar": 0.5
+   },
+   {
+    "apertar": "botao"
+   },
+   {
+    "confere": {
+     "nome": "o botao acorda",
+     "serial": "acordou pelo botao"
+    },
+    "ate": 4
+   },
+   {
+    "soltar": "botao"
+   },
+   {
+    "confere": {
+     "nome": "e a memoria RTC lembra quantas vezes ligou",
+     "serial": "ligou 2 vez"
+    },
+    "ate": 2
+   }
+  ]
+ },
+ "nrf24l01-duas-placas": {
+  "titulo": "Dois Unos conversando por nRF24L01",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o emissor manda",
+     "serial": "enviei"
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "o receptor recebe pelo radio de 2,4 GHz",
+     "serial": "recebido",
+     "placa": "placa2"
+    },
+    "ate": 5
+   }
+  ]
+ },
+ "lcd-paralelo": {
+  "titulo": "LCD 16x2 sem I2C (LiquidCrystal, Uno)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "o LCD escreve",
+     "lcd": "Ola, mundo!"
+    },
+    "ate": 4
+   },
+   {
+    "confere": {
+     "nome": "e conta os segundos",
+     "lcd": "2 s"
+    },
+    "ate": 4
+   }
+  ]
+ },
+ "pico-micropython-botao": {
+  "titulo": "Botao e LED em MicroPython (Raspberry Pi Pico)",
+  "passos": [
+   {
+    "confere": {
+     "nome": "a Pico roda o MicroPython",
+     "serial": "Pico pronta"
+    },
+    "ate": 4
+   },
+   {
+    "apertar": "botao"
+   },
+   {
+    "confere": {
+     "nome": "com o botao apertado o LED acende",
+     "led": {
+      "peca": "led",
+      "aceso": true
+     }
+    },
+    "ate": 2
+   },
+   {
+    "soltar": "botao"
+   },
+   {
+    "confere": {
+     "nome": "solto, apaga",
+     "led": {
+      "peca": "led",
+      "aceso": false
+     }
+    },
+    "ate": 2
+   }
+  ]
+ }
+}

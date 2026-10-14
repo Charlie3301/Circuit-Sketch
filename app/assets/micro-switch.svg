@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="28.0mm" height="19.0mm" viewBox="0 0 28.0 19.0">
+  <rect x="5.30" y="15.5" width="2.2" height="3.10" fill="#c9a24a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="6.40" cy="16.90" r="0.55" fill="#2a2a2e"/>
+  <rect x="12.92" y="15.5" width="2.2" height="3.10" fill="#c9a24a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="14.02" cy="16.90" r="0.55" fill="#2a2a2e"/>
+  <rect x="20.54" y="15.5" width="2.2" height="3.10" fill="#c9a24a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="21.64" cy="16.90" r="0.55" fill="#2a2a2e"/>
+  <rect x="2.6" y="8.0" width="22.8" height="8.6" rx="0.6" fill="#232428" stroke="#0e0f11" stroke-width="0.3"/>
+  <circle cx="7.4" cy="12.3" r="1.25" fill="#0e0f11" stroke="#3a3c41" stroke-width="0.25"/>
+  <circle cx="20.6" cy="12.3" r="1.25" fill="#0e0f11" stroke="#3a3c41" stroke-width="0.25"/>
+  <!-- o pino do botao, que a alavanca empurra -->
+  <rect x="15.6" y="6.6" width="2.6" height="1.6" rx="0.4" fill="#d23b33"/>
+  <!-- a dobradica -->
+  <rect x="3.2" y="6.4" width="3.6" height="1.8" rx="0.4" fill="#9aa0a8" stroke="#5a6068" stroke-width="0.2"/>
+  <text x="6.40" y="15.4" fill="#d9d9d9" font-size="1.4px" text-anchor="middle" font-family="Verdana" font-weight="bold">C</text>
+  <text x="14.02" y="15.4" fill="#d9d9d9" font-size="1.4px" text-anchor="middle" font-family="Verdana" font-weight="bold">NC</text>
+  <text x="21.64" y="15.4" fill="#d9d9d9" font-size="1.4px" text-anchor="middle" font-family="Verdana" font-weight="bold">NO</text>
+  <!-- a alavanca de metal, presa na dobradica, e a roldana na ponta -->
+  <path d="M5.00 6.75 L23.6 4.30 L23.8 5.10 L5.00 7.65 Z" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+  <circle cx="5.00" cy="7.20" r="0.75" fill="#7d838c"/>
+  <circle cx="24.2" cy="2.80" r="2.1" fill="#e8e8e2" stroke="#8f8f8a" stroke-width="0.3"/>
+  <circle cx="24.2" cy="2.80" r="0.55" fill="#7d838c"/>
+</svg>

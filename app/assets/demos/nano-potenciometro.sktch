@@ -1,0 +1,118 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Potenciometro controlando o brilho de um LED, no Arduino Nano.",
+  "",
+  "O que esta demo mostra:",
+  "- analogRead (0 a 1023) virando analogWrite (0 a 255) com map();",
+  "- PWM no pino 9, que e um dos que tem PWM no Nano.",
+  "",
+  "Aperte F5 e gire o potenciometro."
+ ],
+ "codigo": [
+  "// O potenciômetro controla o brilho do LED.",
+  "// analogRead devolve 0..1023 e analogWrite espera 0..255,",
+  "// por isso o map.",
+  "",
+  "const int POT = A0;",
+  "const int LED = 9;   // pino com PWM",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  pinMode(LED, OUTPUT);",
+  "}",
+  "",
+  "void loop() {",
+  "  int leitura = analogRead(POT);",
+  "  int brilho = map(leitura, 0, 1023, 0, 255);",
+  "  analogWrite(LED, brilho);",
+  "",
+  "  Serial.print(\"pot=\");",
+  "  Serial.print(leitura);",
+  "  Serial.print(\"  brilho=\");",
+  "  Serial.println(brilho);",
+  "  delay(200);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "bb",
+    "Tipo": "protoboard-830",
+    "X": 40,
+    "Y": 300
+   },
+   {
+    "Id": "placa",
+    "Tipo": "arduino-nano",
+    "X": 60,
+    "Y": 20
+   },
+   {
+    "Id": "pot",
+    "Tipo": "potentiometer",
+    "X": 520,
+    "Y": 40,
+    "Giro": 0.35
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 159.0,
+    "Y": 315.6,
+    "Cor": "azul"
+   },
+   {
+    "Id": "r",
+    "Tipo": "resistor",
+    "X": 174.4,
+    "Y": 371.15,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "5V",
+    "ParaPeca": "pot",
+    "ParaPino": "VCC",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "SIG",
+    "ParaPeca": "placa",
+    "ParaPino": "A0",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "bb",
+    "ParaPino": "A14",
+    "Cor": "#2B59BF",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bb",
+    "DePino": "D19",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

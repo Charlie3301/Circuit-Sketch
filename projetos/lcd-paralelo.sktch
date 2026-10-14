@@ -1,0 +1,124 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "LCD 16x2 sem I2C (LiquidCrystal, Uno)",
+  "",
+  "O LCD 16x2 ligado direto (RS, E e D4 a D7), como no exemplo HelloWorld",
+  "da Arduino IDE: escreve e conta os segundos."
+ ],
+ "codigo": [
+  "// O LCD 16x2 sem modulo I2C: 6 fios de dados (o exemplo HelloWorld).",
+  "#include <LiquidCrystal.h>",
+  "",
+  "LiquidCrystal lcd(12, 11, 5, 4, 3, 2);",
+  "",
+  "void setup() {",
+  "  lcd.begin(16, 2);",
+  "  lcd.print(\"Ola, mundo!\");",
+  "}",
+  "",
+  "void loop() {",
+  "  lcd.setCursor(0, 1);",
+  "  lcd.print(millis() / 1000);",
+  "  lcd.print(\" s\");",
+  "  delay(200);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 260
+   },
+   {
+    "Id": "lcd",
+    "Tipo": "lcd1602",
+    "X": 380,
+    "Y": 40
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "lcd",
+    "DePino": "VSS",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "VDD",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "RS",
+    "ParaPeca": "placa",
+    "ParaPino": "12",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "RW",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "E",
+    "ParaPeca": "placa",
+    "ParaPino": "11",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "D4",
+    "ParaPeca": "placa",
+    "ParaPino": "5",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "D5",
+    "ParaPeca": "placa",
+    "ParaPino": "4",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "D6",
+    "ParaPeca": "placa",
+    "ParaPino": "3",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "D7",
+    "ParaPeca": "placa",
+    "ParaPino": "2",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "A",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "K",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

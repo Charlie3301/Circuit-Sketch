@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="44.0mm" height="46.0mm" viewBox="0 0 44.0 46.0">
+  <!-- o ponteiro branco preso no eixo (aponta para cima parado) -->
+  <path d="M21.00 13.60 L21.45 2.50 L22.00 1.40 L22.55 2.50 L23.00 13.60 Z" fill="#f7f7f4" stroke="#8f8f8a" stroke-width="0.2"/>
+  <path d="M20.50 11.10 H23.50 V12.90 H20.50 Z" fill="#c9cdd3" stroke="#5a6068" stroke-width="0.15"/>
+  <circle cx="22.00" cy="2.60" r="0.45" fill="#d23b33"/>
+</svg>

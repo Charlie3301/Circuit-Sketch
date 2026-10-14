@@ -1,0 +1,119 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Nivel eletronico com MPU6050 (ESP32)",
+  "",
+  "O acelerometro do MPU6050 mede a gravidade nos eixos: o atan2 da a",
+  "inclinacao, e o LED acende acima de 20 graus. Mude a inclinacao na",
+  "barra do sensor."
+ ],
+ "codigo": [
+  "// Nivel eletronico: o acelerometro do MPU6050 diz a inclinacao; o LED",
+  "// acende quando passa de 20 graus.",
+  "#include <Wire.h>",
+  "#include <Adafruit_MPU6050.h>",
+  "",
+  "Adafruit_MPU6050 mpu;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(2, OUTPUT);",
+  "  if (!mpu.begin()) Serial.println(\"MPU6050 nao encontrado\");",
+  "}",
+  "",
+  "void loop() {",
+  "  sensors_event_t a, g, temp;",
+  "  mpu.getEvent(&a, &g, &temp);",
+  "  float graus = atan2(a.acceleration.x, a.acceleration.z) * 57.3;",
+  "  Serial.print(\"inclinacao: \");",
+  "  Serial.print(graus, 0);",
+  "  Serial.println(\" graus\");",
+  "  digitalWrite(2, abs(graus) > 20);",
+  "  delay(200);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "mpu",
+    "Tipo": "mpu6050",
+    "X": 300,
+    "Y": 60,
+    "Giro": 0.5
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 300,
+    "Y": 220,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 230,
+    "Y": 280,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "mpu",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "mpu",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "mpu",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "D21",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "mpu",
+    "DePino": "SCL",
+    "ParaPeca": "placa",
+    "ParaPino": "D22",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D2",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

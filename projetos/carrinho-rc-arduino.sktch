@@ -1,0 +1,235 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Carrinho de controle remoto com Arduino Nano",
+  "",
+  "O carrinho RC com um Arduino Nano entre o receptor e os motores: ele le",
+  "os pulsos do receptor (pulseIn), limita a velocidade a 70% (o \"modo",
+  "iniciante\" dos carrinhos de loja) e, sem sinal do radio, para o motor",
+  "e endireita as rodas (o failsafe).",
+  "",
+  "Energia: a LiPo 2S vai no ESC, e o BEC dele (5 V) alimenta o Nano, o",
+  "receptor e o servo -- sem o cabo USB.",
+  "",
+  "Para usar: ligue o controle com o acelerador embaixo e espere o ESC",
+  "armar. Desligue o controle com o carrinho andando: ele para."
+ ],
+ "codigo": [
+  "// Carrinho RC com um Arduino Nano no meio: ele le o receptor, limita a",
+  "// velocidade (modo iniciante: no maximo 70%) e para tudo se o radio sumir.",
+  "",
+  "#include <Servo.h>",
+  "",
+  "const int CANAL_DIRECAO = 2;      // CH1 do receptor",
+  "const int CANAL_ACELERADOR = 3;   // CH3 do receptor",
+  "const int PINO_SERVO = 9;",
+  "const int PINO_ESC = 10;",
+  "const int LIMITE = 1700;          // 70% do acelerador",
+  "",
+  "Servo direcao;",
+  "Servo esc;",
+  "unsigned long ultimoRelato = 0;",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  pinMode(CANAL_DIRECAO, INPUT);",
+  "  pinMode(CANAL_ACELERADOR, INPUT);",
+  "  direcao.attach(PINO_SERVO);",
+  "  esc.attach(PINO_ESC, 1000, 2000);",
+  "  esc.writeMicroseconds(1000);   // o ESC arma com o acelerador no minimo",
+  "  Serial.println(\"Carrinho RC com Arduino: ligue o controle\");",
+  "}",
+  "",
+  "void loop() {",
+  "  unsigned long d = pulseIn(CANAL_DIRECAO, HIGH, 30000);",
+  "  unsigned long a = pulseIn(CANAL_ACELERADOR, HIGH, 30000);",
+  "",
+  "  if (d == 0 || a == 0) {",
+  "    // failsafe: sem sinal, motor parado e rodas retas",
+  "    esc.writeMicroseconds(1000);",
+  "    direcao.write(90);",
+  "    Serial.println(\"sem sinal do radio\");",
+  "    delay(200);",
+  "    return;",
+  "  }",
+  "",
+  "  int angulo = map(constrain(d, 1000, 2000), 1000, 2000, 30, 150);",
+  "  direcao.write(angulo);",
+  "  esc.writeMicroseconds(constrain(a, 1000, LIMITE));",
+  "",
+  "  if (millis() - ultimoRelato > 500) {",
+  "    ultimoRelato = millis();",
+  "    Serial.print(\"direcao \");",
+  "    Serial.print(angulo);",
+  "    Serial.print(\" graus, acelerador \");",
+  "    Serial.print(a);",
+  "    Serial.println(\" us\");",
+  "  }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "controle",
+    "Tipo": "radio-controle",
+    "X": 760,
+    "Y": 20,
+    "Giro": 0.0,
+    "Giro2": 0.5,
+    "Giro3": 0.5,
+    "Giro4": 0.5
+   },
+   {
+    "Id": "rx",
+    "Tipo": "receptor-rc",
+    "X": 440,
+    "Y": 60
+   },
+   {
+    "Id": "placa",
+    "Tipo": "arduino-nano",
+    "X": 420,
+    "Y": 260
+   },
+   {
+    "Id": "esc",
+    "Tipo": "esc",
+    "X": 100,
+    "Y": 360,
+    "Amperes": 60
+   },
+   {
+    "Id": "motor",
+    "Tipo": "motor-brushless",
+    "X": 10,
+    "Y": 520,
+    "Modelo": "3650-3100"
+   },
+   {
+    "Id": "direcao",
+    "Tipo": "servo-mg996r",
+    "X": 470,
+    "Y": 400
+   },
+   {
+    "Id": "lipo",
+    "Tipo": "bateria",
+    "X": 470,
+    "Y": 580,
+    "Volts": 7.4,
+    "MiliAmperes": 100000,
+    "MiliAmperesHora": 5200,
+    "Nome": "LiPo 2S 5200 mAh (7,4 V)"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "lipo",
+    "DePino": "+",
+    "ParaPeca": "esc",
+    "ParaPino": "BAT+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "lipo",
+    "DePino": "-",
+    "ParaPeca": "esc",
+    "ParaPino": "BAT-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "5V",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "5V.2",
+    "ParaPeca": "rx",
+    "ParaPino": "VCC",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.2",
+    "ParaPeca": "rx",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "rx",
+    "DePino": "CH1",
+    "ParaPeca": "placa",
+    "ParaPino": "2",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "rx",
+    "DePino": "CH3",
+    "ParaPeca": "placa",
+    "ParaPino": "3",
+    "Cor": "#F2F2F2"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "direcao",
+    "ParaPino": "PWM",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "5V",
+    "ParaPeca": "direcao",
+    "ParaPino": "V+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "GND",
+    "ParaPeca": "direcao",
+    "ParaPino": "GND",
+    "Cor": "#7A4A2A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "10",
+    "ParaPeca": "esc",
+    "ParaPino": "SINAL",
+    "Cor": "#F2F2F2"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "A",
+    "ParaPeca": "motor",
+    "ParaPino": "A",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "B",
+    "ParaPeca": "motor",
+    "ParaPino": "B",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "C",
+    "ParaPeca": "motor",
+    "ParaPino": "C",
+    "Cor": "#D23B33"
+   }
+  ]
+ }
+}

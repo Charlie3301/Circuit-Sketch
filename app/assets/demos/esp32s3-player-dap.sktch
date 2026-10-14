@@ -1,0 +1,667 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "PLAYER DE MUSICA (DAP): um tocador no estilo do Surfans F20, numa ESP32-S3.",
+  "",
+  "A biblioteca PlayerDAP, em C, roda no modo nativo: toca MP3, FLAC, WAV,",
+  "AIFF, OGG Vorbis, Opus, ALAC, WavPack e DSD, le as etiquetas e separa por artista, album,",
+  "genero, artista do album, ano, compositor e pasta. Faz playlists, guarda",
+  "favoritas, tem equalizador de cinco faixas e cinco modos de musica (todas,",
+  "repetir uma vez, repetir sempre, aleatorio, aleatorio da lista).",
+  "",
+  "ANTES DE RODAR: as musicas nao vem junto. Clique duas vezes no cartao e",
+  "use \"Usar uma pasta do computador...\" para escolher a sua pasta de musica",
+  "(nada e copiado). O pendrive tambem aceita uma pasta; clique nele para",
+  "tirar e por de volta com o player ligado.",
+  "",
+  "Aperte F5 e clique no circuito. Setas sobem e descem (a roda), Enter e o",
+  "OK (o clique da roda), Backspace volta (segurado: repetir), M e o MODE",
+  "(segurado: favoritar), Espaco pausa, Page Up e Page Down mudam o volume.",
+  "F2 e a chave de liga/desliga e F3 tira e poe o pendrive. Mude a tensao da",
+  "bateria para ver a carga mudar (abaixo de 3,3 V o player desliga).",
+  "",
+  "Na placa de verdade: ESP32-S3 N8R8 ou N16R8, \"OPI PSRAM\", particao com 3 MB",
+  "de app, e a biblioteca de bibliotecas/PlayerDAP na pasta libraries da",
+  "Arduino IDE. O pendrive precisa do componente usb_host_msc da Espressif e",
+  "de 5 V no VBUS; a bateria alimenta a placa por um carregador com regulador."
+ ],
+ "codigo": [
+  "// Player de musica (DAP) com a ESP32-S3: cartao microSD e pendrive USB,",
+  "// tela ILI9341 em pe, roda com clique (KY-040), cinco botoes, chave de",
+  "// liga/desliga, bateria medida pelo ADC e som I2S no MAX98357A.",
+  "//",
+  "// Toca MP3, FLAC, WAV, AIFF, OGG Vorbis, Opus, ALAC (M4A), WavPack e DSD",
+  "// (DSF e DFF); AAC, WMA e APE aparecem na lista, mas nao tocam. Le as",
+  "// etiquetas e separa as musicas por artista, album, genero, artista do",
+  "// album, ano, compositor e pasta; faz playlists (.m3u8 na pasta /Playlists",
+  "// do cartao) e guarda as favoritas.",
+  "//",
+  "// A roda anda pelas listas, e o clique dela e o OK. VOLTAR volta uma tela",
+  "// (segurado: troca a repeticao). MODO abre favoritar, equalizador e modo de",
+  "// musica (segurado: favorita a que esta tocando). PAUSA toca e pausa",
+  "// (segurado: para). Na tela \"Tocando\", a roda troca de musica; um clique",
+  "// nela faz a roda avancar e voltar dentro da musica.",
+  "#include <player_dap.h>",
+  "#include \"esp_sleep.h\"",
+  "",
+  "const int CHAVE = 1;      // liga/desliga: LOW e ligado (10k para o 3V3)",
+  "const int BATERIA = 2;    // o meio do divisor de 100k + 100k da bateria",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(CHAVE, INPUT_PULLUP);",
+  "  if (digitalRead(CHAVE) == HIGH) dormir(0);    // acordou com a chave desligada",
+  "",
+  "  int mv = bateria();",
+  "  if (vazia(mv)) {",
+  "    Serial.println(\"Bateria vazia: carregue, desligue e ligue a chave.\");",
+  "    dormir(1);",
+  "  }",
+  "",
+  "  dap_barramento(11, 13, 12);       // MOSI, MISO e SCK: a tela e o cartao",
+  "  dap_tela(10, 9, 8, 7);            // CS, DC, RST e a luz da tela",
+  "  dap_cartao(14);                   // CS do microSD",
+  "  dap_usb(1);                       // o pendrive no USB da S3 (GPIO 19 e 20)",
+  "  dap_som(40, 41, 42, 96000);       // BCLK, LRC, DIN e a maior taxa do DAC",
+  "  dap_botoes(17, 18, 21, 38, 39);   // volume +, volume -, voltar, modo, pausa",
+  "  dap_roda(4, 5, 6);                // CLK, DT e o clique da roda",
+  "  dap_bateria(mv);",
+  "  dap_iniciar();",
+  "}",
+  "",
+  "void loop() {",
+  "  int mv = bateria();",
+  "  dap_bateria(mv);",
+  "  if (digitalRead(CHAVE) == HIGH) {",
+  "    dap_desligar();                 // guarda onde parou e apaga a tela",
+  "    dormir(0);",
+  "  }",
+  "  if (vazia(mv)) {",
+  "    Serial.println(\"Bateria vazia.\");",
+  "    dap_desligar();",
+  "    dormir(1);",
+  "  }",
+  "  delay(250);",
+  "}",
+  "",
+  "// O divisor corta a tensao da bateria pela metade (4,2 V viram 2,1 V).",
+  "int bateria() {",
+  "  return analogReadMilliVolts(BATERIA) * 2;",
+  "}",
+  "",
+  "// Abaixo de 3,3 V a pilha de litio se estraga. Sem bateria ligada a",
+  "// leitura e zero, e ai quem alimenta e o USB.",
+  "bool vazia(int mv) {",
+  "  return mv > 1000 && mv < 3300;",
+  "}",
+  "",
+  "// Dorme ate a chave ir para o nivel pedido: 0 para ligar, ou 1 (bateria",
+  "// vazia) para so religar depois de desligar a chave.",
+  "void dormir(int nivel) {",
+  "  Serial.println(nivel == 0 ? \"Desligado: a placa dorme ate a chave ligar de novo.\"",
+  "                            : \"A placa dorme ate a chave desligar.\");",
+  "  esp_sleep_enable_ext0_wakeup(GPIO_NUM_1, nivel);",
+  "  esp_deep_sleep_start();",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-s3-devkit",
+    "X": 520,
+    "Y": 160,
+    "Usb": true
+   },
+   {
+    "Id": "tela",
+    "Tipo": "ili9341",
+    "X": 40,
+    "Y": 110,
+    "Nome": "tela 240x320 (ILI9341)"
+   },
+   {
+    "Id": "cartao",
+    "Tipo": "microsd-card",
+    "X": 380,
+    "Y": 420,
+    "Nome": "cartão microSD",
+    "Arquivos": {
+     "LEIAME.TXT": "PLAYER DE MUSICA: onde ficam as musicas\n\nEste cartao ainda nao tem musica. Clique duas vezes nele e use \"Usar uma\npasta do computador...\" para escolher a sua pasta de musica: tudo o que\nesta nela, com as subpastas, aparece no cartao. Nada e copiado, e a pasta\nnunca muda: o que o player grava (playlists, favoritas, onde parou) fica\nno cartao do projeto.\n\nO pendrive tambem aceita uma pasta. Clique no pendrive para tirar e por de\nvolta com o player ligado: a biblioteca e lida de novo.\n\nToca MP3, FLAC, WAV, AIFF, OGG Vorbis, Opus, ALAC (.m4a), WavPack, DSF e\nDFF. As playlists sao os arquivos .m3u e .m3u8 da pasta /Playlists (as do\ncomputador servem).\n"
+    }
+   },
+   {
+    "Id": "roda",
+    "Tipo": "ky-040",
+    "X": 310,
+    "Y": 230,
+    "Nome": "roda (KY-040)",
+    "Teclas": {
+     "mais": "t:Down|g:Baixo",
+     "menos": "t:Up|g:Cima",
+     "apertar": "t:Return|g:A"
+    }
+   },
+   {
+    "Id": "chave",
+    "Tipo": "slide-switch",
+    "X": 420,
+    "Y": 40,
+    "Giro": 1,
+    "Nome": "liga / desliga",
+    "Teclas": {
+     "alternar": "t:F2"
+    }
+   },
+   {
+    "Id": "r_chave",
+    "Tipo": "resistor",
+    "X": 430,
+    "Y": 120,
+    "Ohms": 10000
+   },
+   {
+    "Id": "bateria",
+    "Tipo": "bateria",
+    "X": 160,
+    "Y": 10,
+    "Volts": 3.9,
+    "MiliAmperes": 2000,
+    "MiliAmperesHora": 2000,
+    "Nome": "bateria de litio (3,7 V)"
+   },
+   {
+    "Id": "r_bat1",
+    "Tipo": "resistor",
+    "X": 250,
+    "Y": 110,
+    "Ohms": 100000
+   },
+   {
+    "Id": "r_bat2",
+    "Tipo": "resistor",
+    "X": 330,
+    "Y": 150,
+    "Ohms": 100000
+   },
+   {
+    "Id": "pendrive",
+    "Tipo": "pendrive-usb",
+    "X": 660,
+    "Y": 204,
+    "Nome": "pendrive (USB)",
+    "Teclas": {
+     "alternar": "t:F3"
+    }
+   },
+   {
+    "Id": "vol_mais",
+    "Tipo": "pushbutton",
+    "X": 680,
+    "Y": 40,
+    "Nome": "volume +",
+    "Teclas": {
+     "apertar": "t:PageUp|g:RB"
+    }
+   },
+   {
+    "Id": "vol_menos",
+    "Tipo": "pushbutton",
+    "X": 680,
+    "Y": 110,
+    "Nome": "volume −",
+    "Teclas": {
+     "apertar": "t:PageDown|g:LB"
+    }
+   },
+   {
+    "Id": "voltar",
+    "Tipo": "pushbutton",
+    "X": 680,
+    "Y": 290,
+    "Nome": "voltar / repetir",
+    "Teclas": {
+     "apertar": "t:Back|g:B"
+    }
+   },
+   {
+    "Id": "modo",
+    "Tipo": "pushbutton",
+    "X": 680,
+    "Y": 350,
+    "Nome": "MODE",
+    "Teclas": {
+     "apertar": "t:M|g:Y"
+    }
+   },
+   {
+    "Id": "pausa",
+    "Tipo": "pushbutton",
+    "X": 680,
+    "Y": 410,
+    "Nome": "pausa ▶❚❚",
+    "Teclas": {
+     "apertar": "t:Space|g:Start"
+    }
+   },
+   {
+    "Id": "amplificador",
+    "Tipo": "max98357a",
+    "X": 560,
+    "Y": 500,
+    "Nome": "amplificador I2S"
+   },
+   {
+    "Id": "falante",
+    "Tipo": "alto-falante",
+    "X": 680,
+    "Y": 470,
+    "Nome": "alto-falante 8 Ω"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "tela",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "CS",
+    "ParaPeca": "placa",
+    "ParaPino": "10",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "RST",
+    "ParaPeca": "placa",
+    "ParaPino": "8",
+    "Cor": "#E8E8E8",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "D/C",
+    "ParaPeca": "placa",
+    "ParaPino": "9",
+    "Cor": "#8E44AD",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "MOSI",
+    "ParaPeca": "placa",
+    "ParaPino": "11",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "SCK",
+    "ParaPeca": "placa",
+    "ParaPino": "12",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "LED",
+    "ParaPeca": "placa",
+    "ParaPino": "7",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "tela",
+    "DePino": "MISO",
+    "ParaPeca": "placa",
+    "ParaPino": "13",
+    "Cor": "#8A8A8A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "cartao",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "cartao",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "cartao",
+    "DePino": "CS",
+    "ParaPeca": "placa",
+    "ParaPino": "14",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "cartao",
+    "DePino": "SCK",
+    "ParaPeca": "placa",
+    "ParaPino": "12",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "cartao",
+    "DePino": "DI",
+    "ParaPeca": "placa",
+    "ParaPino": "11",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "cartao",
+    "DePino": "DO",
+    "ParaPeca": "placa",
+    "ParaPino": "13",
+    "Cor": "#8A8A8A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "roda",
+    "DePino": "CLK",
+    "ParaPeca": "placa",
+    "ParaPino": "4",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "roda",
+    "DePino": "DT",
+    "ParaPeca": "placa",
+    "ParaPino": "5",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "roda",
+    "DePino": "SW",
+    "ParaPeca": "placa",
+    "ParaPino": "6",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "roda",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "roda",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "chave",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "chave",
+    "DePino": "1",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_chave",
+    "DePino": "1",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_chave",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bateria",
+    "DePino": "+",
+    "ParaPeca": "r_bat1",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_bat1",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "2",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_bat2",
+    "DePino": "1",
+    "ParaPeca": "placa",
+    "ParaPino": "2",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_bat2",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bateria",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pendrive",
+    "DePino": "VBUS",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pendrive",
+    "DePino": "D-",
+    "ParaPeca": "placa",
+    "ParaPino": "19",
+    "Cor": "#E8E8E8",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pendrive",
+    "DePino": "D+",
+    "ParaPeca": "placa",
+    "ParaPino": "20",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pendrive",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "17",
+    "ParaPeca": "vol_mais",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "vol_mais",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "18",
+    "ParaPeca": "vol_menos",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "vol_menos",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "21",
+    "ParaPeca": "voltar",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "voltar",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "38",
+    "ParaPeca": "modo",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "modo",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "39",
+    "ParaPeca": "pausa",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pausa",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "BCLK",
+    "ParaPeca": "placa",
+    "ParaPino": "40",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "LRC",
+    "ParaPeca": "placa",
+    "ParaPino": "41",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "DIN",
+    "ParaPeca": "placa",
+    "ParaPino": "42",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "VIN",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "OUT+",
+    "ParaPeca": "falante",
+    "ParaPino": "+",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amplificador",
+    "DePino": "OUT-",
+    "ParaPeca": "falante",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

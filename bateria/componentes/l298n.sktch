@@ -1,0 +1,146 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente l298n.",
+  "",
+  "O L298N com 4 pilhas AA no 12V e a logica nos 5 V da USB (o regulador dele pede 7 V).",
+  "",
+  "Ligado numa ESP32 DevKit V1, com o que ele precisa para funcionar",
+  "de verdade: o driver, o motor e a bateria de cada um.",
+  "",
+  "A placa esta no cabo USB (na barra dela: USB -> cabo ligado); a bateria e so do motor."
+ ],
+ "codigo": [
+  "// O sentido nas duas entradas; a velocidade no PWM do enable.",
+  "const int ENTRADA_1 = 13;",
+  "const int ENTRADA_2 = 12;",
+  "const int VELOCIDADE = 14;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(ENTRADA_1, OUTPUT);",
+  "  pinMode(ENTRADA_2, OUTPUT);",
+  "  pinMode(VELOCIDADE, OUTPUT);",
+  "  Serial.println(\"ponte H pronta\");",
+  "}",
+  "",
+  "void loop() {",
+  "  Serial.println(\"para frente, acelerando\");",
+  "  digitalWrite(ENTRADA_1, HIGH);",
+  "  digitalWrite(ENTRADA_2, LOW);",
+  "  for (int v = 0; v <= 255; v += 51) {",
+  "    analogWrite(VELOCIDADE, v);",
+  "    delay(400);",
+  "  }",
+  "",
+  "  Serial.println(\"para tras\");",
+  "  digitalWrite(ENTRADA_1, LOW);",
+  "  digitalWrite(ENTRADA_2, HIGH);",
+  "  delay(1500);",
+  "",
+  "  Serial.println(\"freio: as duas entradas iguais\");",
+  "  digitalWrite(ENTRADA_1, HIGH);",
+  "  delay(1000);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 60,
+    "Y": 60,
+    "Usb": true
+   },
+   {
+    "Id": "peca",
+    "Tipo": "l298n",
+    "X": 300,
+    "Y": 60
+   },
+   {
+    "Id": "motor",
+    "Tipo": "motor-tt",
+    "X": 520,
+    "Y": 60
+   },
+   {
+    "Id": "pilhas",
+    "Tipo": "bateria",
+    "X": 300,
+    "Y": 300,
+    "Volts": 6,
+    "MiliAmperes": 2000,
+    "MiliAmperesHora": 2500,
+    "Nome": "4 pilhas AA (6 V)"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pilhas",
+    "DePino": "+",
+    "ParaPeca": "peca",
+    "ParaPino": "12V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pilhas",
+    "DePino": "-",
+    "ParaPeca": "peca",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.2",
+    "ParaPeca": "peca",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "VIN",
+    "ParaPeca": "peca",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D13",
+    "ParaPeca": "peca",
+    "ParaPino": "IN1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D12",
+    "ParaPeca": "peca",
+    "ParaPino": "IN2",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D14",
+    "ParaPeca": "peca",
+    "ParaPino": "ENA",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "OUT1",
+    "ParaPeca": "motor",
+    "ParaPino": "+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "OUT2",
+    "ParaPeca": "motor",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

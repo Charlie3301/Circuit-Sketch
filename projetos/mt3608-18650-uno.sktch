@@ -1,0 +1,108 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Uno numa 18650 com o MT3608 (step-up)",
+  "",
+  "Uma celula 18650 (3,7 V) nao liga o Uno sozinha: o MT3608 (step-up,",
+  "o trimpot em 5 V) sobe a tensao e entra pelo pino 5V. O Uno bipa uma",
+  "vez por segundo.",
+  "",
+  "Clique no MT3608: da bateria sai mais corrente do que entra no Uno",
+  "(a potencia se conserva: 5 V x I = 3,7 V x I x eficiencia)."
+ ],
+ "codigo": [
+  "// Uma 18650 (3,7 V) e o MT3608 (step-up) ligando o Uno pelo pino 5V.",
+  "",
+  "const int BUZZER = 8;",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  Serial.println(\"Uno ligado pelo MT3608\");",
+  "}",
+  "",
+  "void loop() {",
+  "  tone(BUZZER, 880, 150);",
+  "  Serial.println(\"bip\");",
+  "  delay(1000);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "reg",
+    "Tipo": "mt3608",
+    "X": 340,
+    "Y": 300,
+    "Volts": 5.0
+   },
+   {
+    "Id": "bat",
+    "Tipo": "bateria",
+    "X": 540,
+    "Y": 320,
+    "Volts": 3.7,
+    "MiliAmperes": 5000,
+    "MiliAmperesHora": 2600,
+    "Nome": "Bateria 18650 (3,7 V)"
+   },
+   {
+    "Id": "buzzer",
+    "Tipo": "buzzer",
+    "X": 380,
+    "Y": 40
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "bat",
+    "DePino": "+",
+    "ParaPeca": "reg",
+    "ParaPino": "VIN+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "bat",
+    "DePino": "-",
+    "ParaPeca": "reg",
+    "ParaPino": "VIN-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "VOUT+",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "VOUT-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "buzzer",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "buzzer",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

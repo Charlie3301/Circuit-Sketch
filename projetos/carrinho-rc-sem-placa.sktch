@@ -1,0 +1,152 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Carrinho de controle remoto (sem placa)",
+  "",
+  "O carrinho RC de verdade, sem microcontrolador: o receptor FS-iA6B manda",
+  "o canal 1 (manche direito, para os lados) no servo da direcao e o",
+  "canal 3 (acelerador, manche esquerdo) no ESC do motor brushless 3650",
+  "3100KV. O BEC do ESC (5 V) alimenta o receptor e o servo.",
+  "",
+  "Para usar: ligue o controle com o acelerador embaixo e espere os bipes",
+  "do ESC (ele arma). Depois o manche esquerdo acelera e o direito vira.",
+  "",
+  "O ESC deste simulador e de aeromodelo: so gira para a frente (o de",
+  "carrinho tem re)."
+ ],
+ "codigo": [
+  "// Sem placa: o receptor manda direto no ESC e no servo, como no",
+  "// carrinho de controle remoto de verdade. Nao ha nada para rodar."
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "controle",
+    "Tipo": "radio-controle",
+    "X": 760,
+    "Y": 20,
+    "Giro": 0.0,
+    "Giro2": 0.5,
+    "Giro3": 0.5,
+    "Giro4": 0.5
+   },
+   {
+    "Id": "rx",
+    "Tipo": "receptor-rc",
+    "X": 440,
+    "Y": 80
+   },
+   {
+    "Id": "esc",
+    "Tipo": "esc",
+    "X": 140,
+    "Y": 300,
+    "Amperes": 60
+   },
+   {
+    "Id": "motor",
+    "Tipo": "motor-brushless",
+    "X": 20,
+    "Y": 470,
+    "Modelo": "3650-3100"
+   },
+   {
+    "Id": "direcao",
+    "Tipo": "servo-mg996r",
+    "X": 470,
+    "Y": 330
+   },
+   {
+    "Id": "lipo",
+    "Tipo": "bateria",
+    "X": 470,
+    "Y": 520,
+    "Volts": 7.4,
+    "MiliAmperes": 100000,
+    "MiliAmperesHora": 5200,
+    "Nome": "LiPo 2S 5200 mAh (7,4 V)"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "lipo",
+    "DePino": "+",
+    "ParaPeca": "esc",
+    "ParaPino": "BAT+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "lipo",
+    "DePino": "-",
+    "ParaPeca": "esc",
+    "ParaPino": "BAT-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "5V",
+    "ParaPeca": "rx",
+    "ParaPino": "VCC",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "GND",
+    "ParaPeca": "rx",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "rx",
+    "DePino": "CH3",
+    "ParaPeca": "esc",
+    "ParaPino": "SINAL",
+    "Cor": "#F2F2F2"
+   },
+   {
+    "DePeca": "rx",
+    "DePino": "CH1",
+    "ParaPeca": "direcao",
+    "ParaPino": "PWM",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "5V",
+    "ParaPeca": "direcao",
+    "ParaPino": "V+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "GND",
+    "ParaPeca": "direcao",
+    "ParaPino": "GND",
+    "Cor": "#7A4A2A"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "A",
+    "ParaPeca": "motor",
+    "ParaPino": "A",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "B",
+    "ParaPeca": "motor",
+    "ParaPino": "B",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "esc",
+    "DePino": "C",
+    "ParaPeca": "motor",
+    "ParaPino": "C",
+    "Cor": "#D23B33"
+   }
+  ]
+ }
+}

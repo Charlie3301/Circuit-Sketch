@@ -1,0 +1,391 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Dado eletronico, num ESP-09.",
+  "",
+  "O que esta demo mostra:",
+  "- sete LEDs em quatro pinos: os pontos que acendem juntos ficam em",
+  "  paralelo, cada um com o seu resistor;",
+  "- random(1, 7) com semente nova a cada jogada.",
+  "",
+  "Aperte F5 e o botao para rolar o dado."
+ ],
+ "codigo": [
+  "// Dado eletronico, num ESP-09.",
+  "//",
+  "// Aperte o botao: o dado \"rola\" (os pontos mudam cada vez mais devagar e o",
+  "// buzzer faz o tec-tec) e para num numero de 1 a 6, desenhado como no",
+  "// dado de verdade.",
+  "//",
+  "// Sao sete LEDs e so quatro pinos: os pontos que acendem sempre juntos",
+  "// dividem o pino. No 6, por exemplo, as duas colunas acendem inteiras.",
+  "",
+  "const int CENTRO = 16;      // o do meio",
+  "const int DIAGONAL1 = 14;   // canto de cima a esquerda e de baixo a direita",
+  "const int DIAGONAL2 = 12;   // os outros dois cantos",
+  "const int MEIO = 13;        // meio da esquerda e meio da direita",
+  "const int BOTAO = 5;",
+  "const int BUZZER = 4;",
+  "",
+  "void mostrar(int n) {",
+  "  digitalWrite(CENTRO, n == 1 || n == 3 || n == 5);",
+  "  digitalWrite(DIAGONAL1, n >= 2);",
+  "  digitalWrite(DIAGONAL2, n >= 4);",
+  "  digitalWrite(MEIO, n == 6);",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(CENTRO, OUTPUT);",
+  "  pinMode(DIAGONAL1, OUTPUT);",
+  "  pinMode(DIAGONAL2, OUTPUT);",
+  "  pinMode(MEIO, OUTPUT);",
+  "  pinMode(BOTAO, INPUT_PULLUP);",
+  "  mostrar(6);",
+  "  Serial.println(\"Dado eletronico: aperte o botao para rolar\");",
+  "}",
+  "",
+  "void loop() {",
+  "  if (digitalRead(BOTAO) == LOW) {",
+  "    randomSeed(micros());",
+  "    // Rola desacelerando, como um dado de verdade parando.",
+  "    for (int espera = 30; espera < 250; espera += 20) {",
+  "      mostrar(random(1, 7));",
+  "      tone(BUZZER, 1800, 8);",
+  "      delay(espera);",
+  "    }",
+  "    int resultado = random(1, 7);",
+  "    mostrar(resultado);",
+  "    tone(BUZZER, 988, 120);",
+  "    Serial.print(\"Saiu \");",
+  "    Serial.println(resultado);",
+  "    while (digitalRead(BOTAO) == LOW) delay(10);",
+  "  }",
+  "  delay(20);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp-09",
+    "X": 80,
+    "Y": 100
+   },
+   {
+    "Id": "d_sup_esq",
+    "Tipo": "led",
+    "X": 330,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_d_sup_esq",
+    "Tipo": "resistor",
+    "X": 258,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "d_sup_dir",
+    "Tipo": "led",
+    "X": 470,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_d_sup_dir",
+    "Tipo": "resistor",
+    "X": 398,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "d_meio_esq",
+    "Tipo": "led",
+    "X": 330,
+    "Y": 110,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_d_meio_esq",
+    "Tipo": "resistor",
+    "X": 258,
+    "Y": 156,
+    "Ohms": 220
+   },
+   {
+    "Id": "d_centro",
+    "Tipo": "led",
+    "X": 400,
+    "Y": 110,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_d_centro",
+    "Tipo": "resistor",
+    "X": 328,
+    "Y": 156,
+    "Ohms": 220
+   },
+   {
+    "Id": "d_meio_dir",
+    "Tipo": "led",
+    "X": 470,
+    "Y": 110,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_d_meio_dir",
+    "Tipo": "resistor",
+    "X": 398,
+    "Y": 156,
+    "Ohms": 220
+   },
+   {
+    "Id": "d_inf_esq",
+    "Tipo": "led",
+    "X": 330,
+    "Y": 200,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_d_inf_esq",
+    "Tipo": "resistor",
+    "X": 258,
+    "Y": 246,
+    "Ohms": 220
+   },
+   {
+    "Id": "d_inf_dir",
+    "Tipo": "led",
+    "X": 470,
+    "Y": 200,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_d_inf_dir",
+    "Tipo": "resistor",
+    "X": 398,
+    "Y": 246,
+    "Ohms": 220
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 320,
+    "Y": 300
+   },
+   {
+    "Id": "buzzer",
+    "Tipo": "buzzer",
+    "X": 470,
+    "Y": 290
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO14",
+    "ParaPeca": "r_d_sup_esq",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_d_sup_esq",
+    "DePino": "2",
+    "ParaPeca": "d_sup_esq",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "d_sup_esq",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO12",
+    "ParaPeca": "r_d_sup_dir",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_d_sup_dir",
+    "DePino": "2",
+    "ParaPeca": "d_sup_dir",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "d_sup_dir",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO13",
+    "ParaPeca": "r_d_meio_esq",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_d_meio_esq",
+    "DePino": "2",
+    "ParaPeca": "d_meio_esq",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "d_meio_esq",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO16",
+    "ParaPeca": "r_d_centro",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_d_centro",
+    "DePino": "2",
+    "ParaPeca": "d_centro",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "d_centro",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO13",
+    "ParaPeca": "r_d_meio_dir",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_d_meio_dir",
+    "DePino": "2",
+    "ParaPeca": "d_meio_dir",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "d_meio_dir",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO12",
+    "ParaPeca": "r_d_inf_esq",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_d_inf_esq",
+    "DePino": "2",
+    "ParaPeca": "d_inf_esq",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "d_inf_esq",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO14",
+    "ParaPeca": "r_d_inf_dir",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_d_inf_dir",
+    "DePino": "2",
+    "ParaPeca": "d_inf_dir",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "d_inf_dir",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO5",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO4",
+    "ParaPeca": "buzzer",
+    "ParaPino": "1",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "buzzer",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

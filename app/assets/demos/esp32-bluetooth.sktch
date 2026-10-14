@@ -1,0 +1,309 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Controle por Bluetooth, na ESP32.",
+  "",
+  "O que esta demo mostra:",
+  "- o BluetoothSerial: o celular manda comandos e a placa responde;",
+  "- LED RGB, buzzer, DHT22 e LCD obedecendo ao que chegou.",
+  "",
+  "Aperte F5, abra a aba BLUETOOTH, conecte na \"ESP32-Sala\" e mande",
+  "\"ajuda\". Um celular de verdade tambem conecta (veja o painel)."
+ ],
+ "codigo": [
+  "// Controle por Bluetooth, na ESP32.",
+  "//",
+  "// Na aba BLUETOOTH, clique em Conectar e mande um comando:",
+  "//   vermelho, verde, azul, branco, apagar  -> cor do LED RGB",
+  "//   bip                                    -> toca o buzzer",
+  "//   temp                                   -> responde temperatura e umidade",
+  "//   ajuda                                  -> lista os comandos",
+  "//",
+  "// Um celular de verdade tambem serve: com o sketch rodando, a placa abre",
+  "// uma porta em 127.0.0.1 (o painel diz qual). Um terminal TCP qualquer",
+  "// faz o papel do app \"Serial Bluetooth Terminal\", byte a byte.",
+  "",
+  "#include <BluetoothSerial.h>",
+  "#include <DHT.h>",
+  "#include <Wire.h>",
+  "#include <LiquidCrystal_I2C.h>",
+  "",
+  "BluetoothSerial SerialBT;",
+  "DHT dht(4, DHT22);",
+  "LiquidCrystal_I2C lcd(0x27, 16, 2);",
+  "",
+  "const int PINO_R = 25;",
+  "const int PINO_G = 26;",
+  "const int PINO_B = 27;",
+  "const int BUZZER = 14;",
+  "",
+  "unsigned long ultimoAviso = 0;",
+  "",
+  "void cor(int r, int g, int b) {",
+  "  analogWrite(PINO_R, r);",
+  "  analogWrite(PINO_G, g);",
+  "  analogWrite(PINO_B, b);",
+  "}",
+  "",
+  "void mostrar(String linha1, String linha2) {",
+  "  lcd.clear();",
+  "  lcd.setCursor(0, 0);",
+  "  lcd.print(linha1);",
+  "  lcd.setCursor(0, 1);",
+  "  lcd.print(linha2);",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  SerialBT.begin(\"ESP32-Sala\");   // o nome que aparece no celular",
+  "  dht.begin();",
+  "  lcd.init();",
+  "  lcd.backlight();",
+  "  pinMode(BUZZER, OUTPUT);",
+  "  cor(0, 0, 0);",
+  "  mostrar(\"Bluetooth pronto\", \"ESP32-Sala\");",
+  "  Serial.println(\"Esperando o celular: aba BLUETOOTH > Conectar\");",
+  "}",
+  "",
+  "void loop() {",
+  "  if (SerialBT.available()) {",
+  "    String comando = SerialBT.readStringUntil('\\n');",
+  "    comando.trim();",
+  "    comando.toLowerCase();",
+  "    Serial.println(\"recebi: \" + comando);",
+  "",
+  "    if (comando == \"vermelho\") {",
+  "      cor(255, 0, 0);",
+  "      SerialBT.println(\"LED vermelho\");",
+  "    } else if (comando == \"verde\") {",
+  "      cor(0, 255, 0);",
+  "      SerialBT.println(\"LED verde\");",
+  "    } else if (comando == \"azul\") {",
+  "      cor(0, 0, 255);",
+  "      SerialBT.println(\"LED azul\");",
+  "    } else if (comando == \"branco\") {",
+  "      cor(255, 255, 255);",
+  "      SerialBT.println(\"LED branco\");",
+  "    } else if (comando == \"apagar\") {",
+  "      cor(0, 0, 0);",
+  "      SerialBT.println(\"LED apagado\");",
+  "    } else if (comando == \"bip\") {",
+  "      tone(BUZZER, 880, 200);",
+  "      SerialBT.println(\"bip!\");",
+  "    } else if (comando == \"temp\") {",
+  "      SerialBT.print(\"temperatura: \");",
+  "      SerialBT.print(dht.readTemperature(), 1);",
+  "      SerialBT.println(\" C\");",
+  "      SerialBT.print(\"umidade: \");",
+  "      SerialBT.print(dht.readHumidity(), 0);",
+  "      SerialBT.println(\" %\");",
+  "    } else if (comando == \"ajuda\") {",
+  "      SerialBT.println(\"comandos: vermelho, verde, azul, branco, apagar, bip, temp\");",
+  "    } else {",
+  "      SerialBT.println(\"nao conheco '\" + comando + \"'. Mande: ajuda\");",
+  "    }",
+  "",
+  "    mostrar(\"Ultimo comando:\", comando);",
+  "  }",
+  "",
+  "  // A cada 5 s a placa manda a temperatura sozinha, como um sensor",
+  "  // faria -- mas so se tiver alguem conectado para ouvir.",
+  "  if (millis() - ultimoAviso > 5000) {",
+  "    ultimoAviso = millis();",
+  "    if (SerialBT.hasClient()) {",
+  "      SerialBT.print(\"[auto] \");",
+  "      SerialBT.print(dht.readTemperature(), 1);",
+  "      SerialBT.println(\" C\");",
+  "    }",
+  "  }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 330,
+    "Y": 90
+   },
+   {
+    "Id": "rgb",
+    "Tipo": "rgb-led",
+    "X": 110,
+    "Y": 110
+   },
+   {
+    "Id": "rr",
+    "Tipo": "resistor",
+    "X": 190,
+    "Y": 150,
+    "Ohms": 220
+   },
+   {
+    "Id": "rg",
+    "Tipo": "resistor",
+    "X": 190,
+    "Y": 175,
+    "Ohms": 220
+   },
+   {
+    "Id": "rb",
+    "Tipo": "resistor",
+    "X": 190,
+    "Y": 200,
+    "Ohms": 220
+   },
+   {
+    "Id": "buzzer",
+    "Tipo": "buzzer",
+    "X": 150,
+    "Y": 250
+   },
+   {
+    "Id": "dht",
+    "Tipo": "dht22",
+    "X": 520,
+    "Y": 110,
+    "Giro": 0.5333333333333333
+   },
+   {
+    "Id": "lcd",
+    "Tipo": "lcd1602-i2c",
+    "X": 480,
+    "Y": 290
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D25",
+    "ParaPeca": "rr",
+    "ParaPino": "2",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "rr",
+    "DePino": "1",
+    "ParaPeca": "rgb",
+    "ParaPino": "R",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D26",
+    "ParaPeca": "rg",
+    "ParaPino": "2",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "rg",
+    "DePino": "1",
+    "ParaPeca": "rgb",
+    "ParaPino": "G",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D27",
+    "ParaPeca": "rb",
+    "ParaPino": "2",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "rb",
+    "DePino": "1",
+    "ParaPeca": "rgb",
+    "ParaPino": "B",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "rgb",
+    "DePino": "COM",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D14",
+    "ParaPeca": "buzzer",
+    "ParaPino": "1",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "buzzer",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "dht",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "dht",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "D4",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "dht",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "VIN",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "D21",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "SCL",
+    "ParaPeca": "placa",
+    "ParaPino": "D22",
+    "Cor": "#8E44AD",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

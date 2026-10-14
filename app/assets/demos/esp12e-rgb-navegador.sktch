@@ -1,0 +1,168 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Cor do LED RGB pelo navegador, num ESP-12E.",
+  "",
+  "O que esta demo mostra:",
+  "- um seletor de cor HTML mandando \"#rrggbb\" para a placa;",
+  "- strtol() e deslocamento de bits separando o vermelho, o verde e o azul.",
+  "",
+  "Aperte F5, abra o endereco do painel REDE e escolha uma cor."
+ ],
+ "codigo": [
+  "// Cor do LED RGB pelo navegador, num ESP-12E.",
+  "//",
+  "// A pagina tem um seletor de cor: escolha e clique em Aplicar. A placa",
+  "// recebe \"#rrggbb\", separa o vermelho, o verde e o azul e manda cada um",
+  "// para o seu pino com PWM.",
+  "",
+  "#include <ESP8266WiFi.h>",
+  "#include <ESP8266WebServer.h>",
+  "",
+  "const int PINO_R = 14;",
+  "const int PINO_G = 12;",
+  "const int PINO_B = 13;",
+  "",
+  "ESP8266WebServer servidor(80);",
+  "String corAtual = \"#000000\";",
+  "",
+  "void aplicarCor(String hex) {",
+  "  long valor = strtol(hex.substring(1).c_str(), NULL, 16);",
+  "  int r = (valor >> 16) & 0xFF;",
+  "  int g = (valor >> 8) & 0xFF;",
+  "  int b = valor & 0xFF;",
+  "  analogWrite(PINO_R, r);",
+  "  analogWrite(PINO_G, g);",
+  "  analogWrite(PINO_B, b);",
+  "  corAtual = hex;",
+  "  Serial.printf(\"cor %s -> R=%d G=%d B=%d\\n\", hex.c_str(), r, g, b);",
+  "}",
+  "",
+  "void pagina() {",
+  "  if (servidor.hasArg(\"cor\")) aplicarCor(servidor.arg(\"cor\"));",
+  "",
+  "  String html = \"<!DOCTYPE html><html><head><meta charset='utf-8'>\";",
+  "  html += \"<title>LED RGB</title></head><body style='font-family:sans-serif'>\";",
+  "  html += \"<h2>LED RGB pelo navegador</h2>\";",
+  "  html += \"<form action='/'><input type='color' name='cor' value='\" + corAtual + \"'> \";",
+  "  html += \"<button>Aplicar</button></form>\";",
+  "  html += \"<p>Cor atual: \" + corAtual + \"</p></body></html>\";",
+  "  servidor.send(200, \"text/html\", html);",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  analogWriteRange(255);    // o PWM de 0 a 255, como no Arduino",
+  "  WiFi.begin(\"Wokwi-GUEST\", \"\");",
+  "  while (WiFi.status() != WL_CONNECTED) delay(250);",
+  "  Serial.print(\"abra http://\");",
+  "  Serial.println(WiFi.localIP());",
+  "",
+  "  servidor.on(\"/\", pagina);",
+  "  servidor.begin();",
+  "  aplicarCor(\"#ff6a00\");    // comeca laranja",
+  "}",
+  "",
+  "void loop() {",
+  "  servidor.handleClient();",
+  "  delay(2);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp-12e",
+    "X": 80,
+    "Y": 100
+   },
+   {
+    "Id": "rgb",
+    "Tipo": "rgb-led",
+    "X": 440,
+    "Y": 60
+   },
+   {
+    "Id": "r_r",
+    "Tipo": "resistor",
+    "X": 330,
+    "Y": 60,
+    "Ohms": 220
+   },
+   {
+    "Id": "r_g",
+    "Tipo": "resistor",
+    "X": 330,
+    "Y": 90,
+    "Ohms": 220
+   },
+   {
+    "Id": "r_b",
+    "Tipo": "resistor",
+    "X": 330,
+    "Y": 120,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO14",
+    "ParaPeca": "r_r",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_r",
+    "DePino": "2",
+    "ParaPeca": "rgb",
+    "ParaPino": "R",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO12",
+    "ParaPeca": "r_g",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_g",
+    "DePino": "2",
+    "ParaPeca": "rgb",
+    "ParaPino": "G",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO13",
+    "ParaPeca": "r_b",
+    "ParaPino": "1",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_b",
+    "DePino": "2",
+    "ParaPeca": "rgb",
+    "ParaPino": "B",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "rgb",
+    "DePino": "COM",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

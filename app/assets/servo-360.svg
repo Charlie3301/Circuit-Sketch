@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="48.0mm" height="24.0mm" viewBox="0 0 48.0 24.0">
+  <path d="M16.00 11.10 C10.00 11.10 6.0 9.46 1.5 9.46" fill="none" stroke="#3d2515" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M16.00 11.10 C10.00 11.10 6.0 9.46 1.5 9.46" fill="none" stroke="#7a4a2a" stroke-width="0.7" stroke-linecap="round"/>
+  <path d="M16.00 12.00 C10.00 12.00 6.0 12.00 1.5 12.00" fill="none" stroke="#7d1f1a" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M16.00 12.00 C10.00 12.00 6.0 12.00 1.5 12.00" fill="none" stroke="#d23b33" stroke-width="0.7" stroke-linecap="round"/>
+  <path d="M16.00 12.90 C10.00 12.90 6.0 14.54 1.5 14.54" fill="none" stroke="#8a4a10" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M16.00 12.90 C10.00 12.90 6.0 14.54 1.5 14.54" fill="none" stroke="#f08a24" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="1.5" cy="9.46" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="1.5" cy="9.46" r="0.32" fill="#2a2a2a"/>
+  <circle cx="1.5" cy="12.00" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="1.5" cy="12.00" r="0.32" fill="#2a2a2a"/>
+  <circle cx="1.5" cy="14.54" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="1.5" cy="14.54" r="0.32" fill="#2a2a2a"/>
+  <rect x="11.50" y="8.6" width="32.00" height="6.8" rx="0.8" fill="#1f5fb4" stroke="#123e7a" stroke-width="0.3"/>
+  <circle cx="13.60" cy="12.0" r="0.85" fill="#123e7a"/><circle cx="41.40" cy="12.0" r="0.85" fill="#123e7a"/>
+  <rect x="16.0" y="5.9" width="23.0" height="12.2" rx="0.9" fill="#2468c8" stroke="#123e7a" stroke-width="0.35"/>
+  <text x="23.00" y="12.6" fill="#e6efff" font-size="2.0px" text-anchor="middle" font-family="Verdana" font-weight="bold">360°</text>
+  <text x="23.00" y="15.0" fill="#bcd2f5" font-size="1.2px" text-anchor="middle" font-family="Verdana">FS90R</text>
+  <!-- o disco de tres furos no eixo (gira sem parar) -->
+  <circle cx="33.0" cy="12.0" r="7.2" fill="#f2f2ee" stroke="#8f8f8a" stroke-width="0.3"/>
+  <circle cx="33.0" cy="7.40" r="0.9" fill="#b9b9b2"/>
+  <circle cx="37.00" cy="14.30" r="0.9" fill="#b9b9b2"/>
+  <circle cx="29.00" cy="14.30" r="0.9" fill="#b9b9b2"/>
+  <path d="M33.0 12.0 L33.0 5.20" stroke="#d23b33" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="33.0" cy="12.0" r="1.6" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
+</svg>

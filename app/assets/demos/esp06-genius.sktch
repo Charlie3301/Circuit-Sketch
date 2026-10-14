@@ -1,0 +1,319 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Jogo Genius, num ESP-06.",
+  "",
+  "O que esta demo mostra:",
+  "- vetores (a sequencia e as tabelas de pinos e notas) e funcoes que",
+  "  devolvem valor;",
+  "- random() com semente tirada do primeiro aperto -- cada partida sai",
+  "  diferente, como na placa.",
+  "",
+  "Aperte F5 e qualquer botao para comecar. Repita as cores."
+ ],
+ "codigo": [
+  "// Genius, num ESP-06.",
+  "//",
+  "// A placa acende uma sequencia de cores, cada uma com a sua nota. Repita",
+  "// apertando os botoes na mesma ordem. Acertou, a sequencia cresce; errou,",
+  "// o jogo diz quantas voce acertou e recomeca.",
+  "//",
+  "// Aperte qualquer botao para comecar.",
+  "",
+  "const int LEDS[] = {16, 14, 12};       // vermelho, verde, azul",
+  "const int BOTOES[] = {13, 5, 0};",
+  "const int NOTAS[] = {262, 330, 392};   // do, mi, sol",
+  "const int BUZZER = 4;",
+  "const int MAXIMO = 20;",
+  "",
+  "int sequencia[MAXIMO];",
+  "int tamanho = 0;",
+  "",
+  "void mostrar(int cor, int ms) {",
+  "  digitalWrite(LEDS[cor], HIGH);",
+  "  tone(BUZZER, NOTAS[cor], ms);",
+  "  delay(ms);",
+  "  digitalWrite(LEDS[cor], LOW);",
+  "  delay(150);",
+  "}",
+  "",
+  "// Espera um botao e devolve qual foi (0, 1 ou 2).",
+  "int esperarBotao() {",
+  "  while (true) {",
+  "    for (int i = 0; i < 3; i++) {",
+  "      if (digitalRead(BOTOES[i]) == LOW) {",
+  "        mostrar(i, 250);",
+  "        while (digitalRead(BOTOES[i]) == LOW) delay(5);   // espera soltar",
+  "        return i;",
+  "      }",
+  "    }",
+  "    delay(5);",
+  "  }",
+  "}",
+  "",
+  "void perdeu() {",
+  "  Serial.print(\"Errou! Voce acertou \");",
+  "  Serial.print(tamanho - 1);",
+  "  Serial.println(\" rodada(s).\");",
+  "  tone(BUZZER, 110, 800);",
+  "  for (int k = 0; k < 3; k++) {",
+  "    for (int i = 0; i < 3; i++) digitalWrite(LEDS[i], HIGH);",
+  "    delay(200);",
+  "    for (int i = 0; i < 3; i++) digitalWrite(LEDS[i], LOW);",
+  "    delay(200);",
+  "  }",
+  "  tamanho = 0;",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  for (int i = 0; i < 3; i++) {",
+  "    pinMode(LEDS[i], OUTPUT);",
+  "    pinMode(BOTOES[i], INPUT_PULLUP);",
+  "  }",
+  "  Serial.println(\"Genius: aperte qualquer botao para comecar\");",
+  "  esperarBotao();",
+  "  randomSeed(micros());   // a hora do primeiro aperto vira a semente",
+  "}",
+  "",
+  "void loop() {",
+  "  if (tamanho == MAXIMO) {",
+  "    Serial.println(\"Voce venceu o Genius!\");",
+  "    tamanho = 0;",
+  "  }",
+  "",
+  "  sequencia[tamanho] = random(3);",
+  "  tamanho++;",
+  "  Serial.print(\"Rodada \");",
+  "  Serial.println(tamanho);",
+  "  delay(600);",
+  "",
+  "  for (int i = 0; i < tamanho; i++) mostrar(sequencia[i], 400);",
+  "",
+  "  for (int i = 0; i < tamanho; i++) {",
+  "    if (esperarBotao() != sequencia[i]) {",
+  "      perdeu();",
+  "      delay(1000);",
+  "      return;",
+  "    }",
+  "  }",
+  "  delay(400);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp-06",
+    "X": 80,
+    "Y": 100
+   },
+   {
+    "Id": "vermelho",
+    "Tipo": "led",
+    "X": 330,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_vermelho",
+    "Tipo": "resistor",
+    "X": 258,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "verde",
+    "Tipo": "led",
+    "X": 430,
+    "Y": 20,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_verde",
+    "Tipo": "resistor",
+    "X": 358,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "azul",
+    "Tipo": "led",
+    "X": 530,
+    "Y": 20,
+    "Cor": "azul"
+   },
+   {
+    "Id": "r_azul",
+    "Tipo": "resistor",
+    "X": 458,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "b_vermelho",
+    "Tipo": "pushbutton",
+    "X": 300,
+    "Y": 150
+   },
+   {
+    "Id": "b_verde",
+    "Tipo": "pushbutton",
+    "X": 400,
+    "Y": 150
+   },
+   {
+    "Id": "b_azul",
+    "Tipo": "pushbutton",
+    "X": 500,
+    "Y": 150
+   },
+   {
+    "Id": "buzzer",
+    "Tipo": "buzzer",
+    "X": 420,
+    "Y": 240
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO16",
+    "ParaPeca": "r_vermelho",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_vermelho",
+    "DePino": "2",
+    "ParaPeca": "vermelho",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "vermelho",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO14",
+    "ParaPeca": "r_verde",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_verde",
+    "DePino": "2",
+    "ParaPeca": "verde",
+    "ParaPino": "A",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "verde",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO12",
+    "ParaPeca": "r_azul",
+    "ParaPino": "1",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_azul",
+    "DePino": "2",
+    "ParaPeca": "azul",
+    "ParaPino": "A",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "azul",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO13",
+    "ParaPeca": "b_vermelho",
+    "ParaPino": "1.l",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "b_vermelho",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO5",
+    "ParaPeca": "b_verde",
+    "ParaPino": "1.l",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "b_verde",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO0",
+    "ParaPeca": "b_azul",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "b_azul",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO4",
+    "ParaPeca": "buzzer",
+    "ParaPino": "1",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "buzzer",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

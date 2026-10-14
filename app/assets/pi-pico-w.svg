@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="21.0mm" height="51.0mm" viewBox="0 0 21.0 51.0">
+
+  <rect x="0" y="0" width="21.0" height="51.0" rx="1.4" fill="#0f6b4f"/>
+  <rect x="0" y="0" width="21.0" height="51.0" rx="1.4"
+        fill="none" stroke="#0a4c38" stroke-width="0.3"/>
+
+  <rect x="6.0" y="18.0" width="9.0" height="9.0" rx="0.8" fill="#1b1f27"/>
+  <rect x="6.0" y="18.0" width="9.0" height="9.0" rx="0.8" fill="none" stroke="#0f1218" stroke-width="0.25"/>
+  <rect x="7.4" y="2.0" width="6.2" height="5.4" rx="0.7" fill="#c9ccd1"/>
+  <rect x="6.6" y="30.0" width="7.8" height="7.0" rx="0.6" fill="#2a2f38"/>
+  <rect x="8.2" y="8.6" width="4.0" height="5.0" rx="0.5" fill="#b9bec6"/>
+  <rect x="8.2" y="8.6" width="4.0" height="5.0" rx="0.5" fill="none" stroke="#7d848e" stroke-width="0.25"/>
+  <ellipse cx="9.69" cy="41.70" rx="0.85" ry="0.47" fill="#43b02a" transform="rotate(-35 9.69 41.70)"/>
+  <ellipse cx="11.31" cy="41.70" rx="0.85" ry="0.47" fill="#43b02a" transform="rotate(35 11.31 41.70)"/>
+  <circle cx="10.50" cy="42.73" r="0.53" fill="#c7053d"/>
+  <circle cx="9.56" cy="43.36" r="0.53" fill="#c7053d"/>
+  <circle cx="11.44" cy="43.36" r="0.53" fill="#c7053d"/>
+  <circle cx="8.97" cy="44.17" r="0.53" fill="#c7053d"/>
+  <circle cx="10.50" cy="44.09" r="0.53" fill="#c7053d"/>
+  <circle cx="12.03" cy="44.17" r="0.53" fill="#c7053d"/>
+  <circle cx="9.56" cy="44.89" r="0.53" fill="#c7053d"/>
+  <circle cx="11.44" cy="44.89" r="0.53" fill="#c7053d"/>
+  <circle cx="10.50" cy="45.45" r="0.53" fill="#c7053d"/>
+
+  <rect x="0.60" y="0.70" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="1.70" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="3.24" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="4.24" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="5.78" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="6.78" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="8.32" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="9.32" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="10.86" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="11.86" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="13.40" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="14.40" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="15.94" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="16.94" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="18.48" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="19.48" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="21.02" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="22.02" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="23.56" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="24.56" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="26.10" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="27.10" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="28.64" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="29.64" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="31.18" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="32.18" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="33.72" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="34.72" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="36.26" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="37.26" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="38.80" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="39.80" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="41.34" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="42.34" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="43.88" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="44.88" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="46.42" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="47.42" r="0.55" fill="#14181f"/>
+  <rect x="0.60" y="48.96" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.60" cy="49.96" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="0.70" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="1.70" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="3.24" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="4.24" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="5.78" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="6.78" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="8.32" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="9.32" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="10.86" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="11.86" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="13.40" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="14.40" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="15.94" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="16.94" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="18.48" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="19.48" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="21.02" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="22.02" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="23.56" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="24.56" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="26.10" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="27.10" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="28.64" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="29.64" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="31.18" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="32.18" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="33.72" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="34.72" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="36.26" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="37.26" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="38.80" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="39.80" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="41.34" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="42.34" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="43.88" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="44.88" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="46.42" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="47.42" r="0.55" fill="#14181f"/>
+  <rect x="18.40" y="48.96" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="19.40" cy="49.96" r="0.55" fill="#14181f"/>
+  <text x="3.30" y="2.20" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP0</text>
+  <text x="3.30" y="4.74" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP1</text>
+  <text x="3.30" y="7.28" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GND</text>
+  <text x="3.30" y="9.82" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP2</text>
+  <text x="3.30" y="12.36" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP3</text>
+  <text x="3.30" y="14.90" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP4</text>
+  <text x="3.30" y="17.44" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP5</text>
+  <text x="3.30" y="19.98" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GND</text>
+  <text x="3.30" y="22.52" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP6</text>
+  <text x="3.30" y="25.06" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP7</text>
+  <text x="3.30" y="27.60" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP8</text>
+  <text x="3.30" y="30.14" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP9</text>
+  <text x="3.30" y="32.68" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GND</text>
+  <text x="3.30" y="35.22" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP10</text>
+  <text x="3.30" y="37.76" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP11</text>
+  <text x="3.30" y="40.30" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP12</text>
+  <text x="3.30" y="42.84" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP13</text>
+  <text x="3.30" y="45.38" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GND</text>
+  <text x="3.30" y="47.92" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP14</text>
+  <text x="3.30" y="50.46" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GP15</text>
+  <text x="17.70" y="2.20" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">VBUS</text>
+  <text x="17.70" y="4.74" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">VSYS</text>
+  <text x="17.70" y="7.28" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GND</text>
+  <text x="17.70" y="9.82" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">3V3_EN</text>
+  <text x="17.70" y="12.36" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">3V3</text>
+  <text x="17.70" y="14.90" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">ADC_VREF</text>
+  <text x="17.70" y="17.44" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GP28</text>
+  <text x="17.70" y="19.98" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">AGND</text>
+  <text x="17.70" y="22.52" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GP27</text>
+  <text x="17.70" y="25.06" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GP26</text>
+  <text x="17.70" y="27.60" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">RUN</text>
+  <text x="17.70" y="30.14" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GP22</text>
+  <text x="17.70" y="32.68" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GND</text>
+  <text x="17.70" y="35.22" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GP21</text>
+  <text x="17.70" y="37.76" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GP20</text>
+  <text x="17.70" y="40.30" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GP19</text>
+  <text x="17.70" y="42.84" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GP18</text>
+  <text x="17.70" y="45.38" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GND</text>
+  <text x="17.70" y="47.92" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GP17</text>
+  <text x="17.70" y="50.46" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GP16</text>
+
+  <text x="10.50" y="22.99" fill="#cfd8e3"
+        font-size="1.4px" text-anchor="middle" font-family="Verdana"
+        opacity="0.85">Pi Pico W</text>
+</svg>

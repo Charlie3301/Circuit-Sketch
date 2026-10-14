@@ -1,0 +1,116 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Servo comandado por potenciometro, na Arduino Nano RP2040 Connect.",
+  "",
+  "O que esta demo mostra:",
+  "- a Servo.h: o angulo do servo segue a leitura do potenciometro;",
+  "- o RP2040 programado pelo core da Arduino.",
+  "",
+  "Aperte F5 e gire o potenciometro."
+ ],
+ "codigo": [
+  "// O potenciômetro comanda o ângulo do servo.",
+  "",
+  "#include <Servo.h>",
+  "",
+  "Servo braco;",
+  "const int POT = A0;",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  braco.attach(9);",
+  "}",
+  "",
+  "void loop() {",
+  "  int leitura = analogRead(POT);",
+  "  int angulo = map(leitura, 0, 1023, 0, 180);",
+  "  braco.write(angulo);",
+  "",
+  "  Serial.print(\"angulo=\");",
+  "  Serial.println(angulo);",
+  "  delay(100);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "bb",
+    "Tipo": "protoboard-830",
+    "X": 40,
+    "Y": 320
+   },
+   {
+    "Id": "placa",
+    "Tipo": "nano-rp2040-connect",
+    "X": 60,
+    "Y": 20
+   },
+   {
+    "Id": "servo",
+    "Tipo": "servo",
+    "X": 520,
+    "Y": 60
+   },
+   {
+    "Id": "pot",
+    "Tipo": "potentiometer",
+    "X": 520,
+    "Y": 260,
+    "Giro": 0.5
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D9",
+    "ParaPeca": "servo",
+    "ParaPino": "PWM",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "5V",
+    "ParaPeca": "servo",
+    "ParaPino": "V+",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "servo",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "3.3V",
+    "ParaPeca": "pot",
+    "ParaPino": "VCC",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "SIG",
+    "ParaPeca": "placa",
+    "ParaPino": "A0",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

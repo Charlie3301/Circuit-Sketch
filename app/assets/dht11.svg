@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="12.0mm" height="18.0mm" viewBox="0 0 12.0 18.0"
+     font-family="monospace" text-anchor="middle">
+
+  <g stroke="#b9bec4" stroke-width="0.45" stroke-linecap="round" fill="none">
+    <path d="M3.46 13.4 V17.60"/>
+    <path d="M6.00 13.4 V17.60"/>
+    <path d="M8.54 13.4 V17.60"/>
+  </g>
+
+  <rect x="0.5" y="0.5" width="11.0" height="12.6" rx="0.7" fill="#2f74c0"/>
+  <rect x="0.5" y="0.5" width="11.0" height="12.6" rx="0.7"
+        fill="none" stroke="#215a97" stroke-width="0.35"/>
+  <rect x="1.1" y="1.1" width="9.8" height="8.6" rx="0.4" fill="#2a68ad"/>
+
+  <g fill="#1d4a7d">
+    <circle cx="2.10" cy="2.40" r="0.62"/>
+    <circle cx="4.70" cy="2.40" r="0.62"/>
+    <circle cx="7.30" cy="2.40" r="0.62"/>
+    <circle cx="9.90" cy="2.40" r="0.62"/>
+    <circle cx="2.10" cy="4.90" r="0.62"/>
+    <circle cx="4.70" cy="4.90" r="0.62"/>
+    <circle cx="7.30" cy="4.90" r="0.62"/>
+    <circle cx="9.90" cy="4.90" r="0.62"/>
+    <circle cx="2.10" cy="7.40" r="0.62"/>
+    <circle cx="4.70" cy="7.40" r="0.62"/>
+    <circle cx="7.30" cy="7.40" r="0.62"/>
+    <circle cx="9.90" cy="7.40" r="0.62"/>
+    <circle cx="2.10" cy="9.90" r="0.62"/>
+    <circle cx="4.70" cy="9.90" r="0.62"/>
+    <circle cx="7.30" cy="9.90" r="0.62"/>
+    <circle cx="9.90" cy="9.90" r="0.62"/>
+  </g>
+
+  <rect x="1.1" y="10.3" width="9.8" height="2.2" rx="0.3" fill="#2a68ad"/>
+  <text x="6.00" y="12.0" fill="#cfe0f2" font-size="1.5px">DHT11</text>
+</svg>

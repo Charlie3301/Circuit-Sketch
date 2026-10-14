@@ -1,0 +1,159 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente a4988.",
+  "",
+  "O A4988 com o NEMA 17: 12 V no VMOT, 3,3 V no VDD, RST ligado no SLP.",
+  "",
+  "Ligado numa ESP32 DevKit V1, com o que ele precisa para funcionar",
+  "de verdade: o driver, o motor e a bateria de cada um.",
+  "",
+  "A placa esta no cabo USB (na barra dela: USB -> cabo ligado); a bateria e so do motor."
+ ],
+ "codigo": [
+  "// Um pulso no STEP e um passo do motor; o DIR escolhe o sentido.",
+  "// Com MS1..MS3 (ou M0..M2) soltos, o passo e inteiro: 200 = uma volta.",
+  "const int PINO_STEP = 13;",
+  "const int PINO_DIR = 12;",
+  "",
+  "void girar(int passos, int sentido) {",
+  "  digitalWrite(PINO_DIR, sentido);",
+  "  for (int i = 0; i < passos; i++) {",
+  "    digitalWrite(PINO_STEP, HIGH);",
+  "    delayMicroseconds(1000);",
+  "    digitalWrite(PINO_STEP, LOW);",
+  "    delayMicroseconds(1000);",
+  "  }",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(PINO_STEP, OUTPUT);",
+  "  pinMode(PINO_DIR, OUTPUT);",
+  "  Serial.println(\"driver de passo pronto\");",
+  "}",
+  "",
+  "void loop() {",
+  "  Serial.println(\"uma volta para um lado\");",
+  "  girar(200, HIGH);",
+  "  delay(500);",
+  "  Serial.println(\"e de volta\");",
+  "  girar(200, LOW);",
+  "  delay(500);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 60,
+    "Y": 60,
+    "Usb": true
+   },
+   {
+    "Id": "pilhas",
+    "Tipo": "bateria",
+    "X": 300,
+    "Y": 300,
+    "Volts": 12,
+    "MiliAmperes": 3000,
+    "MiliAmperesHora": 100000,
+    "Nome": "fonte de 12 V"
+   },
+   {
+    "Id": "peca",
+    "Tipo": "a4988",
+    "X": 300,
+    "Y": 60
+   },
+   {
+    "Id": "motor",
+    "Tipo": "stepper-motor",
+    "X": 480,
+    "Y": 20
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pilhas",
+    "DePino": "+",
+    "ParaPeca": "peca",
+    "ParaPino": "VMOT",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pilhas",
+    "DePino": "-",
+    "ParaPeca": "peca",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.2",
+    "ParaPeca": "peca",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "3V3",
+    "ParaPeca": "peca",
+    "ParaPino": "VDD",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "RST",
+    "ParaPeca": "peca",
+    "ParaPino": "SLP",
+    "Cor": "#8E44AD"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D13",
+    "ParaPeca": "peca",
+    "ParaPino": "STEP",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D12",
+    "ParaPeca": "peca",
+    "ParaPino": "DIR",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "1A",
+    "ParaPeca": "motor",
+    "ParaPino": "A+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "1B",
+    "ParaPeca": "motor",
+    "ParaPino": "A-",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "2A",
+    "ParaPeca": "motor",
+    "ParaPino": "B+",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "2B",
+    "ParaPeca": "motor",
+    "ParaPino": "B-",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

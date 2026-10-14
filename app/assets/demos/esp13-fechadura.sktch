@@ -1,0 +1,239 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Fechadura com teclado e senha, num ESP-13.",
+  "",
+  "O que esta demo mostra:",
+  "- o teclado matricial com a biblioteca Keypad (4 linhas e 3 colunas);",
+  "- senha montada letra a letra numa String, e o bloqueio depois de tres",
+  "  erros.",
+  "",
+  "Aperte F5 e clique nas teclas: 1, 2, 3, 4 e #."
+ ],
+ "codigo": [
+  "// Fechadura com senha, num ESP-13.",
+  "//",
+  "// Digite a senha no teclado e aperte # para confirmar (* apaga). Certa, a",
+  "// fechadura abre por 5 s (LED verde) com um bipe duplo. Errada, bipe",
+  "// grave -- e tres erros seguidos travam o teclado por 30 s.",
+  "//",
+  "// A senha e 1234. So as tres primeiras colunas do teclado sao usadas.",
+  "",
+  "#include <Keypad.h>",
+  "",
+  "const byte LINHAS = 4;",
+  "const byte COLUNAS = 3;",
+  "char teclas[LINHAS][COLUNAS] = {",
+  "  {'1', '2', '3'},",
+  "  {'4', '5', '6'},",
+  "  {'7', '8', '9'},",
+  "  {'*', '0', '#'},",
+  "};",
+  "byte pinosLinhas[LINHAS] = {14, 12, 13, 5};",
+  "byte pinosColunas[COLUNAS] = {4, 0, 2};",
+  "",
+  "Keypad teclado = Keypad(makeKeymap(teclas), pinosLinhas, pinosColunas, LINHAS, COLUNAS);",
+  "",
+  "const int ABERTA = 16;   // LED verde: fechadura aberta",
+  "const int BUZZER = 15;",
+  "const String SENHA = \"1234\";",
+  "",
+  "String digitado = \"\";",
+  "int erros = 0;",
+  "",
+  "void bipe(int nota, int ms) {",
+  "  tone(BUZZER, nota, ms);",
+  "  delay(ms + 40);",
+  "}",
+  "",
+  "void conferir() {",
+  "  if (digitado == SENHA) {",
+  "    Serial.println(\"SENHA CERTA: aberta por 5 s\");",
+  "    erros = 0;",
+  "    digitalWrite(ABERTA, HIGH);",
+  "    bipe(1319, 100);",
+  "    bipe(1760, 150);",
+  "    delay(5000);",
+  "    digitalWrite(ABERTA, LOW);",
+  "    Serial.println(\"trancada de novo\");",
+  "    return;",
+  "  }",
+  "",
+  "  erros++;",
+  "  Serial.print(\"senha errada (\");",
+  "  Serial.print(erros);",
+  "  Serial.println(\" de 3)\");",
+  "  bipe(150, 500);",
+  "  if (erros >= 3) {",
+  "    Serial.println(\"teclado travado por 30 s\");",
+  "    delay(30000);",
+  "    erros = 0;",
+  "  }",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(ABERTA, OUTPUT);",
+  "  Serial.println(\"Fechadura: digite a senha e aperte #\");",
+  "}",
+  "",
+  "void loop() {",
+  "  char tecla = teclado.getKey();",
+  "  if (!tecla) {",
+  "    delay(10);",
+  "    return;",
+  "  }",
+  "",
+  "  bipe(2000, 30);   // o clique de cada tecla",
+  "",
+  "  if (tecla == '*') {",
+  "    digitado = \"\";",
+  "    Serial.println(\"apagado\");",
+  "  } else if (tecla == '#') {",
+  "    conferir();",
+  "    digitado = \"\";",
+  "  } else {",
+  "    digitado += tecla;",
+  "    Serial.print(\"digitado: \");",
+  "    for (unsigned int i = 0; i < digitado.length(); i++) Serial.print('*');",
+  "    Serial.println();",
+  "  }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp-13",
+    "X": 60,
+    "Y": 60
+   },
+   {
+    "Id": "teclado",
+    "Tipo": "membrane-keypad",
+    "X": 300,
+    "Y": 10
+   },
+   {
+    "Id": "aberta",
+    "Tipo": "led",
+    "X": 170,
+    "Y": 260,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_aberta",
+    "Tipo": "resistor",
+    "X": 98,
+    "Y": 306,
+    "Ohms": 220
+   },
+   {
+    "Id": "buzzer",
+    "Tipo": "buzzer",
+    "X": 60,
+    "Y": 260
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO14",
+    "ParaPeca": "teclado",
+    "ParaPino": "R1",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO12",
+    "ParaPeca": "teclado",
+    "ParaPino": "R2",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO13",
+    "ParaPeca": "teclado",
+    "ParaPino": "R3",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO5",
+    "ParaPeca": "teclado",
+    "ParaPino": "R4",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO4",
+    "ParaPeca": "teclado",
+    "ParaPino": "C1",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO0",
+    "ParaPeca": "teclado",
+    "ParaPino": "C2",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO2",
+    "ParaPeca": "teclado",
+    "ParaPino": "C3",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO16",
+    "ParaPeca": "r_aberta",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_aberta",
+    "DePino": "2",
+    "ParaPeca": "aberta",
+    "ParaPino": "A",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "aberta",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO15",
+    "ParaPeca": "buzzer",
+    "ParaPino": "1",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "buzzer",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

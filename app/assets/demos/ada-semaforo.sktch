@@ -1,0 +1,181 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Semaforo em Ada.",
+  "",
+  "O que esta demo mostra:",
+  "- uma sub-rotina (procedure) com parametros, declarada dentro do programa;",
+  "- variavel e constante com tipo, e o laco infinito do firmware.",
+  "",
+  "O simulador descobre a linguagem pelo proprio codigo, e mostra qual",
+  "entendeu no canto do editor."
+ ],
+ "codigo": [
+  "--  Semaforo em Ada.",
+  "--",
+  "--  Tres LEDs e uma sub-rotina que acende um so de cada vez. O \":=\" atribui",
+  "--  e o \"=\" compara; o laco \"loop ... end loop\" roda para sempre, que e o",
+  "--  que todo firmware faz.",
+  "",
+  "with Ada.Text_IO; use Ada.Text_IO;",
+  "",
+  "procedure Semaforo is",
+  "   Vermelho : constant Integer := 10;",
+  "   Amarelo  : constant Integer := 9;",
+  "   Verde    : constant Integer := 8;",
+  "   Ciclos   : Integer := 0;",
+  "",
+  "   procedure Acender (Pino : Integer; Tempo : Integer) is",
+  "   begin",
+  "      Digital_Write (Vermelho, Low);",
+  "      Digital_Write (Amarelo, Low);",
+  "      Digital_Write (Verde, Low);",
+  "      Digital_Write (Pino, High);",
+  "      Delay_Ms (Tempo);",
+  "   end Acender;",
+  "",
+  "begin",
+  "   Pin_Mode (Vermelho, Output);",
+  "   Pin_Mode (Amarelo, Output);",
+  "   Pin_Mode (Verde, Output);",
+  "   Put_Line (\"Semaforo em Ada\");",
+  "",
+  "   loop",
+  "      Acender (Vermelho, 3000);",
+  "      Acender (Verde, 3000);",
+  "      Acender (Amarelo, 1000);",
+  "      Ciclos := Ciclos + 1;",
+  "      Put (\"ciclos completos: \");",
+  "      Put_Line (Ciclos);",
+  "   end loop;",
+  "end Semaforo;"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 60,
+    "Y": 160
+   },
+   {
+    "Id": "vermelho",
+    "Tipo": "led",
+    "X": 420,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_vermelho",
+    "Tipo": "resistor",
+    "X": 348,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "amarelo",
+    "Tipo": "led",
+    "X": 500,
+    "Y": 20,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r_amarelo",
+    "Tipo": "resistor",
+    "X": 428,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "verde",
+    "Tipo": "led",
+    "X": 580,
+    "Y": 20,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_verde",
+    "Tipo": "resistor",
+    "X": 508,
+    "Y": 66,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "10",
+    "ParaPeca": "r_vermelho",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_vermelho",
+    "DePino": "2",
+    "ParaPeca": "vermelho",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "vermelho",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "r_amarelo",
+    "ParaPino": "1",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_amarelo",
+    "DePino": "2",
+    "ParaPeca": "amarelo",
+    "ParaPino": "A",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "amarelo",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "r_verde",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_verde",
+    "DePino": "2",
+    "ParaPeca": "verde",
+    "ParaPino": "A",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "verde",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

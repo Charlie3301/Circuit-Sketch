@@ -1,0 +1,172 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Simulador.App</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- O modo nativo desvia uma tarefa do C que falhou (ou travou) de volta
+         para o comeco dela, pelo contexto da thread. Com a pilha-sombra do
+         processador (CET) ligada, o Windows recusa esse desvio e fecha o
+         programa: o executavel sai sem a marca de compativel com CET. -->
+    <CETCompat>false</CETCompat>
+    <AssemblyName>CircuitSketch</AssemblyName>
+
+    <!-- A versao do programa. O instalador (ferramentas\instalador\gerar.ps1)
+         le daqui: para um update, e so trocar estes numeros.
+
+         Sao duas: o Windows exige numero em AssemblyVersion e
+         FileVersion, e o nome que a pessoa ve fica em
+         InformationalVersion. "Alpha 17" nao cabe num campo numerico. -->
+    <Version>0.19.0</Version>
+    <AssemblyVersion>0.18.0.0</AssemblyVersion>
+    <FileVersion>0.18.0.0</FileVersion>
+    <InformationalVersion>Alpha 19</InformationalVersion>
+    <Product>CircuitSketch</Product>
+    <Company>CircuitSketch</Company>
+    <Description>Simulador offline de ESP32 e Arduino</Description>
+
+    <!-- Desenhado por ferramentas\icone\gerar-icone.ps1. -->
+    <ApplicationIcon>assets\CircuitSketch.ico</ApplicationIcon>
+    <!--
+      NAO ligar InvariantGlobalization aqui. O WPF precisa de culturas
+      reais para o cache de fontes: com invariant, todo TextBlock estoura
+      com CultureNotFoundException ao renderizar.
+    -->
+  </PropertyGroup>
+
+  <!--
+    O motor mora em ..\motor e continua sendo um executavel proprio
+    (o runner de testes). Aqui compilamos os mesmos fontes, menos o
+    Program.cs, que tem o entry point do runner.
+  -->
+  <ItemGroup>
+    <Compile Include="..\motor\Lexer.cs" />
+    <Compile Include="..\motor\Preprocessador.cs" />
+    <Compile Include="..\motor\Projeto.cs" />
+    <Compile Include="..\motor\Ast.cs" />
+    <Compile Include="..\motor\Parser.cs" />
+    <Compile Include="..\motor\Compilador.cs" />
+    <Compile Include="..\motor\LexerPython.cs" />
+    <Compile Include="..\motor\ParserPython.cs" />
+    <Compile Include="..\motor\ValoresPython.cs" />
+    <Compile Include="..\motor\Vocabulario.cs" />
+    <Compile Include="..\motor\LexerPascal.cs" />
+    <Compile Include="..\motor\ParserPascal.cs" />
+    <Compile Include="..\motor\LexerRust.cs" />
+    <Compile Include="..\motor\ParserRust.cs" />
+    <Compile Include="..\motor\AvrIsa.cs" />
+    <Compile Include="..\motor\Montador.cs" />
+    <Compile Include="..\motor\Avr.cs" />
+    <Compile Include="..\motor\PerfilPlaca.cs" />
+    <Compile Include="..\motor\Orcamento.cs" />
+    <Compile Include="..\motor\PerfisAlpha18.cs" />
+    <Compile Include="..\motor\Bibliotecas.cs" />
+    <Compile Include="..\motor\Maquina.cs" />
+    <Compile Include="..\motor\LinhaDoTempo.cs" />
+    <Compile Include="..\motor\SinalExterno.cs" />
+    <Compile Include="..\motor\I2c.cs" />
+    <Compile Include="..\motor\CartaoSd.cs" />
+    <Compile Include="..\motor\TelaGrafica.cs" />
+    <Compile Include="..\motor\Depurador.cs" />
+    <Compile Include="..\motor\Fluxo.cs" />
+    <Compile Include="..\motor\Mqtt.cs" />
+    <Compile Include="..\motor\Rede.cs" />
+    <Compile Include="..\motor\Ble.cs" />
+    <Compile Include="..\motor\TiposC.cs" />
+    <Compile Include="..\motor\InterpretadorC.cs" />
+    <Compile Include="..\motor\CustosDaCpu.cs" />
+    <Compile Include="..\motor\InterpretadorCiclos.cs" />
+    <Compile Include="..\motor\MemoriaDaPlaca.cs" />
+    <Compile Include="..\motor\InterpretadorMemoria.cs" />
+    <Compile Include="..\motor\InterpretadorSpi.cs" />
+    <Compile Include="..\motor\InterpretadorBleCliente.cs" />
+    <Compile Include="..\motor\InterpretadorArduinoBle.cs" />
+    <Compile Include="..\motor\SplashDoOled.cs" />
+    <Compile Include="..\motor\InterpretadorOled.cs" />
+    <Compile Include="..\motor\InterpretadorTeclado.cs" />
+    <Compile Include="..\motor\InterpretadorMotorDePasso.cs" />
+    <Compile Include="..\motor\InterpretadorPortas.cs" />
+    <Compile Include="..\motor\InterpretadorRegistros.cs" />
+    <Compile Include="..\motor\InterpretadorDimensoes.cs" />
+    <Compile Include="..\motor\InterpretadorEeprom.cs" />
+    <Compile Include="..\motor\InterpretadorMicroPythonPerifericos.cs" />
+    <Compile Include="..\motor\FonteDoFramebuf.cs" />
+    <Compile Include="..\motor\PortaSerial.cs" />
+    <Compile Include="..\motor\RadioDoComputador.cs" />
+    <Compile Include="..\motor\Radio.cs" />
+    <Compile Include="..\motor\PortaBluetooth.cs" />
+    <Compile Include="..\motor\RadioNaRede.cs" />
+    <Compile Include="..\motor\Interpretador.cs" />
+    <Compile Include="..\motor\InterpretadorTexto.cs" />
+    <Compile Include="..\motor\InterpretadorClasses.cs" />
+    <Compile Include="..\motor\Sono.cs" />
+    <Compile Include="..\motor\InterpretadorTft.cs" />
+    <Compile Include="..\motor\Cabecalhos.cs" />
+    <Compile Include="..\motor\InterpretadorRede.cs" />
+    <Compile Include="..\motor\InterpretadorBle.cs" />
+    <Compile Include="..\motor\InterpretadorI2c.cs" />
+    <Compile Include="..\motor\InterpretadorRadio.cs" />
+    <Compile Include="..\motor\InterpretadorChip.cs" />
+    <Compile Include="..\motor\InterpretadorTempo.cs" />
+    <Compile Include="..\motor\InterpretadorPicoSdk.cs" />
+    <Compile Include="..\motor\InterpretadorTelegram.cs" />
+    <Compile Include="..\motor\InterpretadorPython.cs" />
+    <Compile Include="..\motor\InterpretadorMicroPython.cs" />
+    <Compile Include="..\motor\InterpretadorPecasPython.cs" />
+    <Compile Include="..\motor\Nativo\*.cs" />
+  </ItemGroup>
+
+  <!--
+    O runtime do modo nativo: o TinyCC (libtcc.dll), os cabecalhos do
+    ESP-IDF do simulador e o C do runtime. Fica em arquivos ao lado do
+    executavel (fora do single-file): o compilador os le do disco.
+  -->
+  <ItemGroup>
+    <Content Include="..\nativo\**\*" LinkBase="nativo" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+
+  <!--
+    As bibliotecas em codigo que vem com o simulador (a ESP32-DOOM, GPL, vai
+    com o codigo-fonte junto): o motor as compila como uma instalada.
+  -->
+  <ItemGroup>
+    <Content Include="..\bibliotecas\**\*" LinkBase="bibliotecas" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+
+  <!--
+    As licencas do que o programa usa de fora (a fonte do display da
+    Adafruit, os desenhos do wokwi-elements, a fonte do framebuf do
+    MicroPython): vao ao lado do executavel, como elas pedem.
+  -->
+  <ItemGroup>
+    <Content Include="assets\LICENSE-*.txt" Link="licencas\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
+    <PackageReference Include="SharpVectors.Wpf" Version="1.8.6" />
+  </ItemGroup>
+
+  <!--
+    Os SVGs vao EMBUTIDOS no assembly, nao como arquivos soltos:
+    o publish e single-file e o executavel precisa continuar sendo um
+    arquivo so. Regenerar com: ferramentas/extrair-svg (npm run build).
+  -->
+  <ItemGroup>
+    <EmbeddedResource Include="assets\*.svg" />
+    <EmbeddedResource Include="assets\pecas.json" />
+    <EmbeddedResource Include="assets\changelog.txt" />
+    <EmbeddedResource Include="assets\demos\*.sktch" />
+    <!-- Tons de teste (nao e musica) em ALAC, Opus e WavPack, para o autoteste do player. -->
+    <EmbeddedResource Include="assets\testes\*" LogicalName="testes/%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <!-- O icone tambem como recurso do WPF, para a barra de titulo e a de tarefas. -->
+  <ItemGroup>
+    <Resource Include="assets\CircuitSketch.ico" />
+  </ItemGroup>
+
+</Project>

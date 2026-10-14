@@ -1,0 +1,239 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente esc-4em1.",
+  "",
+  "A ESC 4-em-1 de drone (45 A por motor, 3S a 6S) com quatro A2212 numa LiPo 4S.",
+  "",
+  "Ligado numa ESP32 DevKit V1, com o que ele precisa para funcionar",
+  "de verdade: o driver, o motor e a bateria de cada um.",
+  "",
+  "A placa esta no cabo USB (na barra dela: USB -> cabo ligado); a bateria e so do motor."
+ ],
+ "codigo": [
+  "#include <ESP32Servo.h>",
+  "",
+  "// Os quatro motores de um drone na ESC 4-em-1: um sinal para cada.",
+  "// Como na ESC simples, eles so armam com o acelerador no minimo.",
+  "Servo m1, m2, m3, m4;",
+  "",
+  "void todos(int us) {",
+  "  m1.writeMicroseconds(us);",
+  "  m2.writeMicroseconds(us);",
+  "  m3.writeMicroseconds(us);",
+  "  m4.writeMicroseconds(us);",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  m1.attach(13, 1000, 2000);",
+  "  m2.attach(12, 1000, 2000);",
+  "  m3.attach(14, 1000, 2000);",
+  "  m4.attach(27, 1000, 2000);",
+  "  todos(1000);",
+  "  Serial.println(\"armando os quatro (acelerador no minimo)...\");",
+  "  delay(3000);",
+  "  Serial.println(\"armados\");",
+  "}",
+  "",
+  "void loop() {",
+  "  Serial.println(\"os quatro em 30%\");",
+  "  todos(1300);",
+  "  delay(3000);",
+  "  Serial.println(\"o motor 1 acelera\");",
+  "  m1.writeMicroseconds(1600);",
+  "  delay(1500);",
+  "  Serial.println(\"parados\");",
+  "  todos(1000);",
+  "  delay(2000);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 420,
+    "Y": -80,
+    "Usb": true
+   },
+   {
+    "Id": "peca",
+    "Tipo": "esc-4em1",
+    "X": 420,
+    "Y": 250
+   },
+   {
+    "Id": "pilhas",
+    "Tipo": "bateria",
+    "X": 430,
+    "Y": 470,
+    "Volts": 14.8,
+    "MiliAmperes": 60000,
+    "MiliAmperesHora": 1500,
+    "Nome": "LiPo 4S 1500 mAh (14,8 V)"
+   },
+   {
+    "Id": "m1",
+    "Tipo": "motor-brushless",
+    "X": 160,
+    "Y": 60
+   },
+   {
+    "Id": "m2",
+    "Tipo": "motor-brushless",
+    "X": 700,
+    "Y": 60
+   },
+   {
+    "Id": "m3",
+    "Tipo": "motor-brushless",
+    "X": 700,
+    "Y": 420
+   },
+   {
+    "Id": "m4",
+    "Tipo": "motor-brushless",
+    "X": 160,
+    "Y": 420
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pilhas",
+    "DePino": "+",
+    "ParaPeca": "peca",
+    "ParaPino": "BAT+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pilhas",
+    "DePino": "-",
+    "ParaPeca": "peca",
+    "ParaPino": "BAT-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.2",
+    "ParaPeca": "peca",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D13",
+    "ParaPeca": "peca",
+    "ParaPino": "S1",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D12",
+    "ParaPeca": "peca",
+    "ParaPino": "S2",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D14",
+    "ParaPeca": "peca",
+    "ParaPino": "S3",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D27",
+    "ParaPeca": "peca",
+    "ParaPino": "S4",
+    "Cor": "#8E44AD"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M1A",
+    "ParaPeca": "m1",
+    "ParaPino": "A",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M1B",
+    "ParaPeca": "m1",
+    "ParaPino": "B",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M1C",
+    "ParaPeca": "m1",
+    "ParaPino": "C",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M2A",
+    "ParaPeca": "m2",
+    "ParaPino": "A",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M2B",
+    "ParaPeca": "m2",
+    "ParaPino": "B",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M2C",
+    "ParaPeca": "m2",
+    "ParaPino": "C",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M3A",
+    "ParaPeca": "m3",
+    "ParaPino": "A",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M3B",
+    "ParaPeca": "m3",
+    "ParaPino": "B",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M3C",
+    "ParaPeca": "m3",
+    "ParaPino": "C",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M4A",
+    "ParaPeca": "m4",
+    "ParaPino": "A",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M4B",
+    "ParaPeca": "m4",
+    "ParaPino": "B",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M4C",
+    "ParaPeca": "m4",
+    "ParaPino": "C",
+    "Cor": "#D23B33"
+   }
+  ]
+ }
+}

@@ -1,0 +1,64 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Sono profundo acordado por botao (ESP32)",
+  "",
+  "A ESP32 conta quantas vezes ligou (RTC_DATA_ATTR guarda o numero no",
+  "sono) e dorme; o botao no GPIO4 (ext0) acorda."
+ ],
+ "codigo": [
+  "// Sono profundo: a ESP32 dorme e acorda pelo botao no GPIO4.",
+  "RTC_DATA_ATTR int vezes = 0;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  vezes++;",
+  "  if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT0) Serial.println(\"acordou pelo botao\");",
+  "  Serial.print(\"ligou \");",
+  "  Serial.print(vezes);",
+  "  Serial.println(\" vez(es)\");",
+  "  pinMode(4, INPUT_PULLUP);",
+  "  esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 0);",
+  "  delay(1000);",
+  "  Serial.println(\"dormindo...\");",
+  "  esp_deep_sleep_start();",
+  "}",
+  "",
+  "void loop() {",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 260,
+    "Y": 120
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D4",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

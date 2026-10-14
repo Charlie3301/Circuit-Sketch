@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="66.0mm" height="30.0mm" viewBox="0 0 66.0 30.0">
+  <path d="M14.00 13.48 C8.00 13.48 6.50 9.92 1.50 9.92" fill="none" stroke="#7a808a" stroke-width="1.55" stroke-linecap="round"/>
+  <path d="M14.00 13.48 C8.00 13.48 6.50 9.92 1.50 9.92" fill="none" stroke="#2b2d31" stroke-width="1.20" stroke-linecap="round"/>
+  <path d="M14.00 15.00 C8.00 15.00 6.50 15.00 1.50 15.00" fill="none" stroke="#7a808a" stroke-width="1.55" stroke-linecap="round"/>
+  <path d="M14.00 15.00 C8.00 15.00 6.50 15.00 1.50 15.00" fill="none" stroke="#2b2d31" stroke-width="1.20" stroke-linecap="round"/>
+  <path d="M14.00 16.52 C8.00 16.52 6.50 20.08 1.50 20.08" fill="none" stroke="#7a808a" stroke-width="1.55" stroke-linecap="round"/>
+  <path d="M14.00 16.52 C8.00 16.52 6.50 20.08 1.50 20.08" fill="none" stroke="#2b2d31" stroke-width="1.20" stroke-linecap="round"/>
+  <path d="M52.00 9.00 C58.00 9.00 59.50 6.00 64.50 6.00" fill="none" stroke="#7d1f1a" stroke-width="1.65" stroke-linecap="round"/>
+  <path d="M52.00 9.00 C58.00 9.00 59.50 6.00 64.50 6.00" fill="none" stroke="#d23b33" stroke-width="1.30" stroke-linecap="round"/>
+  <path d="M52.00 11.03 C58.00 11.03 59.50 11.08 64.50 11.08" fill="none" stroke="#7a808a" stroke-width="1.65" stroke-linecap="round"/>
+  <path d="M52.00 11.03 C58.00 11.03 59.50 11.08 64.50 11.08" fill="none" stroke="#2b2d31" stroke-width="1.30" stroke-linecap="round"/>
+  <path d="M52.00 20.00 C58.00 20.00 59.50 18.70 64.50 18.70" fill="none" stroke="#8f8f8a" stroke-width="1.05" stroke-linecap="round"/>
+  <path d="M52.00 20.00 C58.00 20.00 59.50 18.70 64.50 18.70" fill="none" stroke="#f2f2ee" stroke-width="0.70" stroke-linecap="round"/>
+  <path d="M52.00 21.02 C58.00 21.02 59.50 21.24 64.50 21.24" fill="none" stroke="#7d1f1a" stroke-width="1.05" stroke-linecap="round"/>
+  <path d="M52.00 21.02 C58.00 21.02 59.50 21.24 64.50 21.24" fill="none" stroke="#d23b33" stroke-width="0.70" stroke-linecap="round"/>
+  <path d="M52.00 22.03 C58.00 22.03 59.50 23.78 64.50 23.78" fill="none" stroke="#3d2515" stroke-width="1.05" stroke-linecap="round"/>
+  <path d="M52.00 22.03 C58.00 22.03 59.50 23.78 64.50 23.78" fill="none" stroke="#7a4a2a" stroke-width="0.70" stroke-linecap="round"/>
+  <circle cx="1.50" cy="9.92" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="1.50" cy="9.92" r="0.32" fill="#2a2a2a"/>
+  <circle cx="1.50" cy="15.00" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="1.50" cy="15.00" r="0.32" fill="#2a2a2a"/>
+  <circle cx="1.50" cy="20.08" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="1.50" cy="20.08" r="0.32" fill="#2a2a2a"/>
+  <circle cx="64.50" cy="6.00" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="64.50" cy="6.00" r="0.32" fill="#2a2a2a"/>
+  <circle cx="64.50" cy="11.08" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="64.50" cy="11.08" r="0.32" fill="#2a2a2a"/>
+  <circle cx="64.50" cy="18.70" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="64.50" cy="18.70" r="0.32" fill="#2a2a2a"/>
+  <circle cx="64.50" cy="21.24" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="64.50" cy="21.24" r="0.32" fill="#2a2a2a"/>
+  <circle cx="64.50" cy="23.78" r="0.75" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="64.50" cy="23.78" r="0.32" fill="#2a2a2a"/>
+  <rect x="14.0" y="6.0" width="38.0" height="18.0" rx="2.4" fill="#6c3483" stroke="#40204e" stroke-width="0.35"/>
+  <rect x="15.20" y="7.00" width="35.60" height="2.0" rx="1.0" fill="#ffffff" fill-opacity="0.12"/>
+  <rect x="20.00" y="10.20" width="26.00" height="9.6" rx="0.8" fill="#f2f2ee"/>
+  <text x="33.00" y="15.60" fill="#6c3483" font-size="3.4px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">12A</text>
+  <text x="33.00" y="18.60" fill="#6c3483" font-size="1.25px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">BRUSHLESS ESC</text>
+  <text x="16.40" y="8.40" fill="#e8d6f0" font-size="1.0px" text-anchor="start"
+        font-family="Verdana" font-weight="bold">A B C</text>
+  <text x="51.00" y="4.60" fill="#e8d6f0" font-size="1.1px" text-anchor="end"
+        font-family="Verdana" font-weight="bold">BAT</text>
+  <text x="51.00" y="27.40" fill="#e8d6f0" font-size="1.1px" text-anchor="end"
+        font-family="Verdana" font-weight="bold">SERVO</text>
+  <text x="3.10" y="8.92" fill="#e6ecf5" font-size="1.1px" text-anchor="start"
+        font-family="Verdana" font-weight="bold">A</text>
+  <text x="3.10" y="14.00" fill="#e6ecf5" font-size="1.1px" text-anchor="start"
+        font-family="Verdana" font-weight="bold">B</text>
+  <text x="3.10" y="19.08" fill="#e6ecf5" font-size="1.1px" text-anchor="start"
+        font-family="Verdana" font-weight="bold">C</text>
+  <text x="62.70" y="5.10" fill="#e6ecf5" font-size="1.5px" text-anchor="end"
+        font-family="Verdana" font-weight="bold">+</text>
+  <text x="62.70" y="10.18" fill="#e6ecf5" font-size="1.5px" text-anchor="end"
+        font-family="Verdana" font-weight="bold">-</text>
+  <text x="62.70" y="19.10" fill="#e6ecf5" font-size="0.9px" text-anchor="end"
+        font-family="Verdana" font-weight="bold">S</text>
+  <text x="62.70" y="21.64" fill="#e6ecf5" font-size="0.9px" text-anchor="end"
+        font-family="Verdana" font-weight="bold">5V</text>
+  <text x="62.70" y="24.18" fill="#e6ecf5" font-size="0.9px" text-anchor="end"
+        font-family="Verdana" font-weight="bold">G</text>
+
+</svg>

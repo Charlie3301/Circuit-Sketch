@@ -1,0 +1,154 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Minuteria de escada, num ESP-11.",
+  "",
+  "O que esta demo mostra:",
+  "- toque curto e toque longo no mesmo botao, medidos com millis();",
+  "- um temporizador que nao trava o loop, com aviso antes de apagar.",
+  "",
+  "Aperte F5 e o botao (clique rapido: 10 s de luz; segure 2 s: luz fixa)."
+ ],
+ "codigo": [
+  "// Minuteria de escada, num ESP-11.",
+  "//",
+  "// Um toque no botao acende a luz por 10 s -- e ela da uma piscada antes de",
+  "// apagar, avisando quem ainda esta na escada. Segurar o botao por 2 s",
+  "// deixa a luz fixa (modo faxina); outro toque volta ao normal.",
+  "//",
+  "// Como no ESP-01: o GPIO2 precisa estar em HIGH na partida, entao a",
+  "// lampada (o LED) vai entre o 3,3 V e o pino, e acende com LOW.",
+  "",
+  "const int BOTAO = 0;   // GPIO0",
+  "const int LUZ = 2;     // GPIO2, acende com LOW",
+  "",
+  "const unsigned long TEMPO_ACESA = 10000;",
+  "const unsigned long TOQUE_LONGO = 2000;",
+  "",
+  "bool fixa = false;",
+  "bool acesa = false;",
+  "unsigned long acendeuEm = 0;",
+  "",
+  "void luz(bool ligar) {",
+  "  acesa = ligar;",
+  "  digitalWrite(LUZ, ligar ? LOW : HIGH);",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(BOTAO, INPUT_PULLUP);",
+  "  pinMode(LUZ, OUTPUT);",
+  "  luz(false);",
+  "  Serial.println(\"Minuteria pronta\");",
+  "}",
+  "",
+  "void loop() {",
+  "  if (digitalRead(BOTAO) == LOW) {",
+  "    unsigned long apertou = millis();",
+  "    while (digitalRead(BOTAO) == LOW && millis() - apertou < TOQUE_LONGO) delay(10);",
+  "",
+  "    if (millis() - apertou >= TOQUE_LONGO) {",
+  "      fixa = true;",
+  "      luz(true);",
+  "      Serial.println(\"luz fixa (modo faxina)\");",
+  "      while (digitalRead(BOTAO) == LOW) delay(10);   // espera soltar",
+  "    } else if (fixa) {",
+  "      fixa = false;",
+  "      luz(false);",
+  "      Serial.println(\"de volta ao modo normal\");",
+  "    } else {",
+  "      luz(true);",
+  "      acendeuEm = millis();",
+  "      Serial.println(\"acendeu por 10 s\");",
+  "    }",
+  "  }",
+  "",
+  "  if (acesa && !fixa) {",
+  "    unsigned long passou = millis() - acendeuEm;",
+  "    if (passou > TEMPO_ACESA) {",
+  "      luz(false);",
+  "      Serial.println(\"apagou\");",
+  "    } else if (passou > TEMPO_ACESA - 1000 && passou < TEMPO_ACESA - 700) {",
+  "      digitalWrite(LUZ, HIGH);   // a piscada de aviso",
+  "    } else {",
+  "      digitalWrite(LUZ, LOW);",
+  "    }",
+  "  }",
+  "  delay(20);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp-11",
+    "X": 80,
+    "Y": 100
+   },
+   {
+    "Id": "luz",
+    "Tipo": "led",
+    "X": 330,
+    "Y": 50,
+    "Cor": "branco"
+   },
+   {
+    "Id": "r_luz",
+    "Tipo": "resistor",
+    "X": 258,
+    "Y": 96,
+    "Ohms": 330
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 300,
+    "Y": 170
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "VCC",
+    "ParaPeca": "r_luz",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_luz",
+    "DePino": "2",
+    "ParaPeca": "luz",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "luz",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GPIO2",
+    "Cor": "#E8E8E8",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO0",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

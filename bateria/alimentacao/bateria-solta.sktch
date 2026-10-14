@@ -1,0 +1,89 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "A bateria na mesa, mas nao ligada na placa.",
+  "",
+  "Com bateria no circuito a placa esta SEM o cabo USB: aperte F5 e ela",
+  "nao liga (\"sem energia\"). Ligue o + da bateria no VIN e o - no GND",
+  "com a simulacao rodando: a placa liga sozinha, do boot, e o LED pisca.",
+  "",
+  "Para testar so o programa, sem a bateria: na barra da placa,",
+  "USB -> cabo ligado."
+ ],
+ "codigo": [
+  "// Sem o cabo USB: esta placa so roda se a bateria a alimentar.",
+  "const int LED = 2;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(LED, OUTPUT);",
+  "  Serial.println(\"ligou pela bateria\");",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(LED, HIGH);",
+  "  delay(300);",
+  "  digitalWrite(LED, LOW);",
+  "  delay(300);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 60,
+    "Y": 40
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 360,
+    "Y": 60,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r",
+    "Tipo": "resistor",
+    "X": 340,
+    "Y": 180,
+    "Ohms": 330
+   },
+   {
+    "Id": "bateria",
+    "Tipo": "bateria",
+    "X": 380,
+    "Y": 300,
+    "Volts": 7.4,
+    "MiliAmperes": 20000,
+    "MiliAmperesHora": 1000,
+    "Nome": "LiPo 2S 1000 mAh (7,4 V)"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D2",
+    "ParaPeca": "r",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

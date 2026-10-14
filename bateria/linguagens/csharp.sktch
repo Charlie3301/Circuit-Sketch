@@ -1,0 +1,81 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste da linguagem csharp.",
+  "",
+  "Todas as dez fazem exatamente a mesma coisa — piscar um LED e",
+  "contar — para que a comparação entre elas fique limpa."
+ ],
+ "codigo": [
+  "// Bateria — C#.",
+  "",
+  "using System;",
+  "",
+  "public class Program",
+  "{",
+  "    public static void Main()",
+  "    {",
+  "        int led = 2;",
+  "        PinMode(led, OUTPUT);",
+  "        Console.WriteLine(\"csharp acordou\");",
+  "",
+  "        while (true)",
+  "        {",
+  "            DigitalWrite(led, HIGH);",
+  "            Delay(250);",
+  "            DigitalWrite(led, LOW);",
+  "            Delay(250);",
+  "        }",
+  "    }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 120,
+    "Y": 60
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 520,
+    "Y": 120,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r",
+    "Tipo": "resistor",
+    "X": 520,
+    "Y": 280,
+    "Ohms": 330
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "r",
+    "ParaPino": "1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "r",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

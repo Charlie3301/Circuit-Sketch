@@ -1,0 +1,245 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Contador de apertos em Cowgol.",
+  "",
+  "O que esta demo mostra:",
+  "- variaveis com o tamanho no tipo (uint8), while e if do Cowgol;",
+  "- um numero virando binario nos LEDs, bit a bit, com o resto da divisao.",
+  "",
+  "Aperte F5 e o botao: os LEDs contam de 0 a 15 em binario."
+ ],
+ "codigo": [
+  "# Contador de apertos em Cowgol.",
+  "#",
+  "# Cada aperto do botao soma um, e os quatro LEDs mostram a contagem em",
+  "# binario (de 0 a 15). O monitor serial mostra o numero.",
+  "#",
+  "# Cowgol e uma linguagem de sistemas com jeito de Ada: \"sub\" no lugar de",
+  "# \"procedure\", tipos com o tamanho escrito no nome (uint8 sao oito bits)",
+  "# e comentario com cerquilha.",
+  "",
+  "sub main() is",
+  "    var botao: uint8 := 2;",
+  "    var contagem: uint8 := 0;",
+  "    var antes: uint8 := 1;",
+  "    var agora: uint8 := 1;",
+  "    var resto: uint8 := 0;",
+  "    var i: uint8 := 0;",
+  "",
+  "    pin_mode(botao, INPUT_PULLUP);",
+  "    while i < 4 loop",
+  "        pin_mode(8 + i, OUTPUT);",
+  "        i := i + 1;",
+  "    end loop;",
+  "",
+  "    loop",
+  "        agora := digital_read(botao);",
+  "        if antes == 1 and agora == 0 then",
+  "            contagem := (contagem + 1) % 16;",
+  "            print(\"contagem: \");",
+  "            println(contagem);",
+  "",
+  "            # Um bit por LED: o resto da divisao por 2 e o bit de baixo.",
+  "            resto := contagem;",
+  "            i := 0;",
+  "            while i < 4 loop",
+  "                digital_write(8 + i, resto % 2);",
+  "                resto := resto / 2;",
+  "                i := i + 1;",
+  "            end loop;",
+  "        end if;",
+  "        antes := agora;",
+  "        delay_ms(20);",
+  "    end loop;",
+  "end sub;"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 60,
+    "Y": 160
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 440,
+    "Y": 150
+   },
+   {
+    "Id": "bit0",
+    "Tipo": "led",
+    "X": 420,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_bit0",
+    "Tipo": "resistor",
+    "X": 348,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "bit1",
+    "Tipo": "led",
+    "X": 500,
+    "Y": 20,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r_bit1",
+    "Tipo": "resistor",
+    "X": 428,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "bit2",
+    "Tipo": "led",
+    "X": 580,
+    "Y": 20,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_bit2",
+    "Tipo": "resistor",
+    "X": 508,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "bit3",
+    "Tipo": "led",
+    "X": 660,
+    "Y": 20,
+    "Cor": "azul"
+   },
+   {
+    "Id": "r_bit3",
+    "Tipo": "resistor",
+    "X": 588,
+    "Y": 66,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "2",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "r_bit0",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_bit0",
+    "DePino": "2",
+    "ParaPeca": "bit0",
+    "ParaPino": "A",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bit0",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "r_bit1",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_bit1",
+    "DePino": "2",
+    "ParaPeca": "bit1",
+    "ParaPino": "A",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bit1",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "10",
+    "ParaPeca": "r_bit2",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_bit2",
+    "DePino": "2",
+    "ParaPeca": "bit2",
+    "ParaPino": "A",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bit2",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "11",
+    "ParaPeca": "r_bit3",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_bit3",
+    "DePino": "2",
+    "ParaPeca": "bit3",
+    "ParaPino": "A",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bit3",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

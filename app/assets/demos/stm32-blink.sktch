@@ -1,0 +1,83 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "codigo": [
+  "// Blue Pill: o LED da placa e um botao.",
+  "//",
+  "// Duas coisas que pegam quem chega na STM32 vindo do Arduino:",
+  "//",
+  "//  1. O pino nao se chama \"13\", e sim PC13. No core do Arduino",
+  "//     para STM32 as portas sao numeradas em sequencia, e PC13",
+  "//     vira o 45 -- que e o que LED_BUILTIN vale aqui.",
+  "//  2. O LED da placa acende com LOW, e nao com HIGH.",
+  "",
+  "const int BOTAO = 16;   // PB0",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(LED_BUILTIN, OUTPUT);",
+  "  pinMode(BOTAO, INPUT_PULLUP);",
+  "}",
+  "",
+  "void loop() {",
+  "  bool apertado = digitalRead(BOTAO) == LOW;",
+  "",
+  "  // Invertido de proposito: na Blue Pill o LED acende em LOW.",
+  "  digitalWrite(LED_BUILTIN, apertado ? LOW : HIGH);",
+  "",
+  "  Serial.println(apertado ? \"apertado\" : \"solto\");",
+  "  delay(200);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "bb",
+    "Tipo": "protoboard-830",
+    "X": 40,
+    "Y": 260
+   },
+   {
+    "Id": "placa",
+    "Tipo": "stm32-bluepill",
+    "X": 70,
+    "Y": 30
+   },
+   {
+    "Id": "bt",
+    "Tipo": "pushbutton",
+    "X": 320,
+    "Y": 300
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "PB0",
+    "ParaPeca": "bt",
+    "ParaPino": "1.l",
+    "Cor": "#2E6BD0",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bt",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#111111",
+    "Estilo": "solto"
+   }
+  ]
+ },
+ "descricao": [
+  "STM32F103 \"Blue Pill\" com o LED da placa e um botao.",
+  "",
+  "O que este exemplo mostra:",
+  "",
+  "1. Na STM32 o pino tem nome de porta: PC13, PB0, PA5. O core do Arduino os numera em sequencia (PA0..PA15 = 0..15, PB0 = 16, PC13 = 45), e e esse numero que o digitalWrite aceita.",
+  "2. O LED da placa acende com LOW. Por isso o codigo escreve o valor invertido — e por isso todo mundo acha que a placa veio queimada na primeira vez.",
+  "",
+  "Aperte F5 e segure o botao."
+ ]
+}

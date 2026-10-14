@@ -1,0 +1,14 @@
+BASE ZERO - como fazer uma fase
+
+Cada fase e um arquivo /E1Mn.TXT neste cartao. A primeira linha e o
+nome da fase; as 16 de baixo sao o mapa, com 16 letras cada:
+
+  #  parede de concreto     B  tijolo     M  metal
+  D  porta (o botao B abre)
+  X  saida: o painel verde que o B aperta
+  .  chao
+  P  onde voce comeca
+  R  robo       V  kit de vida       A  municao
+
+A beirada do mapa tem que ser parede (o jogo fecha o que ficar aberto).
+Crie /E1M3.TXT e ela vira a fase 3. O recorde fica em /RECORDE.TXT.

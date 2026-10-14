@@ -1,0 +1,149 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "7805 com dois servos: esquenta e desliga",
+  "",
+  "O problema classico: dois servos MG996R e o Uno, todos no mesmo 7805,",
+  "com 12 V na entrada. Os servos puxam corrente; o 7805 transforma a",
+  "diferenca (12 - 5 = 7 V) vezes a corrente em calor, e sem dissipador a",
+  "protecao termica dele corta a saida em segundos. O Uno apaga, o 7805",
+  "esfria e volta -- e o Arduino \"fica reiniciando sozinho\".",
+  "",
+  "Clique no 7805 para ver a temperatura subir na barra. A solucao de",
+  "verdade: um regulador chaveado (LM2596) para os servos."
+ ],
+ "codigo": [
+  "// Dois servos MG996R e o Uno, todos no 7805 de 12 V -- o erro classico.",
+  "// Os servos puxam corrente, o 7805 transforma (12 - 5) V x a corrente em",
+  "// calor, e sem dissipador a protecao termica dele desliga a saida.",
+  "",
+  "#include <Servo.h>",
+  "",
+  "Servo s1;",
+  "Servo s2;",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  s1.attach(9);",
+  "  s2.attach(10);",
+  "  Serial.println(\"Uno ligou\");",
+  "}",
+  "",
+  "void loop() {",
+  "  for (int a = 0; a <= 180; a += 10) { s1.write(a); s2.write(180 - a); delay(40); }",
+  "  for (int a = 180; a >= 0; a -= 10) { s1.write(a); s2.write(180 - a); delay(40); }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "reg",
+    "Tipo": "regulador-7805",
+    "X": 420,
+    "Y": 330
+   },
+   {
+    "Id": "bat",
+    "Tipo": "bateria",
+    "X": 560,
+    "Y": 380,
+    "Volts": 12,
+    "MiliAmperes": 20000,
+    "MiliAmperesHora": 2200,
+    "Nome": "Bateria 12 V"
+   },
+   {
+    "Id": "servo1",
+    "Tipo": "servo-mg996r",
+    "X": 360,
+    "Y": 40
+   },
+   {
+    "Id": "servo2",
+    "Tipo": "servo-mg996r",
+    "X": 360,
+    "Y": 170
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "bat",
+    "DePino": "+",
+    "ParaPeca": "reg",
+    "ParaPino": "IN",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "bat",
+    "DePino": "-",
+    "ParaPeca": "reg",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "OUT",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "OUT",
+    "ParaPeca": "servo1",
+    "ParaPino": "V+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "GND",
+    "ParaPeca": "servo1",
+    "ParaPino": "GND",
+    "Cor": "#7A4A2A"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "OUT",
+    "ParaPeca": "servo2",
+    "ParaPino": "V+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "GND",
+    "ParaPeca": "servo2",
+    "ParaPino": "GND",
+    "Cor": "#7A4A2A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "servo1",
+    "ParaPino": "PWM",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "10",
+    "ParaPeca": "servo2",
+    "ParaPino": "PWM",
+    "Cor": "#F07F1A"
+   }
+  ]
+ }
+}

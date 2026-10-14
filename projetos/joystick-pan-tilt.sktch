@@ -1,0 +1,129 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Pan/tilt com joystick e dois servos (Uno)",
+  "",
+  "Os dois eixos do joystick analogico (A0 e A1) movem dois servos -- o",
+  "suporte pan/tilt de camera. Mexa o joystick na barra dele."
+ ],
+ "codigo": [
+  "// Pan/tilt: o joystick move dois servos.",
+  "#include <Servo.h>",
+  "Servo pan, tilt;",
+  "",
+  "void setup() {",
+  "  pan.attach(9);",
+  "  tilt.attach(10);",
+  "}",
+  "",
+  "void loop() {",
+  "  pan.write(map(analogRead(A0), 0, 1023, 0, 180));",
+  "  tilt.write(map(analogRead(A1), 0, 1023, 0, 180));",
+  "  delay(15);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 220
+   },
+   {
+    "Id": "joy",
+    "Tipo": "analog-joystick",
+    "X": 380,
+    "Y": 260,
+    "Giro": 0.5,
+    "Giro2": 0.5
+   },
+   {
+    "Id": "pan",
+    "Tipo": "servo",
+    "X": 380,
+    "Y": 20
+   },
+   {
+    "Id": "tilt",
+    "Tipo": "servo",
+    "X": 600,
+    "Y": 20
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "joy",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "joy",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "joy",
+    "DePino": "HORZ",
+    "ParaPeca": "placa",
+    "ParaPino": "A0",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "joy",
+    "DePino": "VERT",
+    "ParaPeca": "placa",
+    "ParaPino": "A1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "pan",
+    "ParaPino": "PWM",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "5V",
+    "ParaPeca": "pan",
+    "ParaPino": "V+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.1",
+    "ParaPeca": "pan",
+    "ParaPino": "GND",
+    "Cor": "#7A4A2A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "10",
+    "ParaPeca": "tilt",
+    "ParaPino": "PWM",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "5V",
+    "ParaPeca": "tilt",
+    "ParaPino": "V+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.3",
+    "ParaPeca": "tilt",
+    "ParaPino": "GND",
+    "Cor": "#7A4A2A"
+   }
+  ]
+ }
+}

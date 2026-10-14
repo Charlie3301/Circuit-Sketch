@@ -1,0 +1,370 @@
+==========================================================================
+  CircuitSketch {VERSAO}
+  Simulador offline de ESP32 e Arduino
+==========================================================================
+
+O QUE TEM NESTA PASTA
+---------------------
+
+  Instalar CircuitSketch {VERSAO}.exe
+      O instalador do programa. Também instala o plugin da Arduino IDE.
+
+  LEIA-ME.txt
+      Este arquivo.
+
+  Plugin Arduino IDE\
+      Os arquivos do plugin, para instalar sem o instalador (seção 3).
+
+
+REQUISITOS
+----------
+
+  - Windows 10 ou 11, 64 bits.
+  - Uns 200 MB livres.
+  - Não precisa de internet, nem de senha de administrador.
+  - A Arduino IDE só é necessária para usar o plugin, que é opcional.
+    O CircuitSketch funciona sozinho.
+
+
+==========================================================================
+ 1. INSTALAR O CIRCUITSKETCH
+==========================================================================
+
+  1) Dê dois cliques em "Instalar CircuitSketch {VERSAO}.exe".
+
+  2) Se aparecer "O Windows protegeu o computador", clique em
+     "Mais informações" e depois em "Executar assim mesmo".
+     O aviso aparece porque o instalador não tem assinatura digital
+     (ela é paga). O instalador não usa internet e não pede
+     administrador.
+
+  3) Confira as opções:
+
+       Instalar em
+           Padrão: %LOCALAPPDATA%\Programs\CircuitSketch
+           Pode deixar como está.
+
+       Criar atalho na Área de Trabalho
+           O atalho no Menu Iniciar é criado sempre.
+
+       Instalar o plugin da Arduino IDE
+           Deixe marcado se for usar a Arduino IDE. Feche a IDE antes.
+           O campo de baixo é a pasta de sketches da IDE; o instalador
+           acha sozinho, e só precisa trocar se ela estiver em outro
+           lugar (veja "Conferir a pasta de sketches", na seção 2).
+
+  4) Clique em "Instalar". No fim, "Abrir o CircuitSketch".
+
+  ATUALIZAR: rode o instalador da versão nova, sem desinstalar antes.
+  Ele troca o programa e o plugin no mesmo lugar.
+
+
+==========================================================================
+ 2. O PLUGIN DA ARDUINO IDE
+==========================================================================
+
+  O plugin põe as placas do CircuitSketch na Arduino IDE. Com ele, você
+  escreve o código na IDE e o botão Verificar (✓) abre o sketch direto
+  no simulador.
+
+  Placas que aparecem: as 34 do simulador, com "(CircuitSketch)" no
+  nome, nesta ordem.
+      Arduino ........ Uno, Mega 2560, Nano, Nano RP2040 Connect,
+                       Franzininho DIY e ATtiny85
+      ESP ............ ESP32, ESP32-S2, S3, C3, C6 e H2, NodeMCU (ESP8266)
+                       e os módulos ESP-01 ao ESP-14
+      Raspberry Pi ... Pico e Pico W
+      STM32 .......... Blue Pill (STM32F103), Nucleo-L031K6 e
+                       Nucleo-C031C6
+
+  A IDE manda para o simulador o sketch em C/C++. As outras linguagens
+  (seção 10) se escrevem direto no editor do CircuitSketch.
+
+  Conferir a pasta de sketches
+      Na Arduino IDE: Arquivo > Preferências > "Local do Sketchbook".
+      Normalmente é Documentos\Arduino. Se o OneDrive estiver ligado,
+      costuma ser OneDrive\Documentos\Arduino.
+
+
+==========================================================================
+ 3. COMO INSTALAR O PLUGIN
+==========================================================================
+
+  Escolha UM dos três jeitos. Em todos: FECHE A ARDUINO IDE ANTES.
+
+  --- Jeito 1: pelo instalador (o mais fácil) ---------------------------
+
+  Deixe marcada a opção "Instalar o plugin da Arduino IDE" ao instalar
+  o CircuitSketch (seção 1). Pronto.
+
+  --- Jeito 2: com o script ---------------------------------------------
+
+  Use quando a Arduino IDE foi instalada DEPOIS do CircuitSketch, quando
+  a pasta de sketches mudou, ou quando o plugin sumiu.
+
+  1) Instale o CircuitSketch primeiro (seção 1).
+  2) Feche a Arduino IDE.
+  3) Abra a pasta "Plugin Arduino IDE" e dê dois cliques em
+     "Instalar plugin.bat".
+  4) A janela mostra onde o plugin foi instalado. Aperte uma tecla
+     para fechar.
+
+  --- Jeito 3: copiando à mão -------------------------------------------
+
+  1) Instale o CircuitSketch primeiro (seção 1).
+  2) Feche a Arduino IDE.
+  3) Descubra a pasta de sketches (veja "Conferir a pasta de sketches",
+     na seção 2).
+  4) Copie a pasta "hardware", que está dentro de "Plugin Arduino IDE",
+     para dentro da pasta de sketches. Se já existir uma pasta
+     "hardware" lá, deixe o Windows juntar as duas.
+
+     No fim, este arquivo tem que existir:
+
+        <pasta de sketches>\hardware\circuitsketch\esp32\boards.txt
+
+     Por exemplo:
+
+        C:\Users\SeuNome\Documents\Arduino\hardware\circuitsketch\esp32\boards.txt
+
+     ATENÇÃO: "hardware" fica direto dentro da pasta de sketches, e não
+     dentro da pasta "libraries".
+
+  5) Só se você instalou o CircuitSketch numa pasta diferente da
+     padrão: crie o arquivo
+
+        <pasta de sketches>\hardware\circuitsketch\esp32\tools\caminho.txt
+
+     contendo, numa linha só, o caminho completo do CircuitSketch.exe.
+     Na pasta padrão o plugin acha o programa sozinho.
+
+  --- Conferir se deu certo ---------------------------------------------
+
+  1) Abra a Arduino IDE.
+  2) Ferramentas > Placa > CircuitSketch.
+     As placas da lista acima têm que aparecer.
+
+  Se não aparecerem: feche a IDE por completo (inclusive da bandeja do
+  Windows, perto do relógio) e abra de novo. Depois, confira o caminho
+  do boards.txt do jeito 3.
+
+
+==========================================================================
+ 4. USAR COM A ARDUINO IDE
+==========================================================================
+
+  1) Ferramentas > Placa > CircuitSketch > escolha a placa
+     (por exemplo, "ESP32 (CircuitSketch)").
+  2) Escreva o sketch e clique em Verificar (✓).
+     A IDE mostra o uso de memória como numa placa de verdade, e o
+     CircuitSketch abre com o seu código.
+  3) O Carregar (→) também funciona: mostra uma gravação simulada e
+     abre o CircuitSketch. Se a IDE mostrar "Not connected" ou nenhuma
+     porta, pode ignorar: o Carregar funciona mesmo assim.
+
+  MONITOR SERIAL: o Monitor Serial da própria Arduino IDE não mostra a
+  saída do simulador (limitação da IDE, ver seção 8). Use o monitor
+  serial do CircuitSketch, embaixo do código (Ctrl+M).
+
+
+==========================================================================
+ 5. ATALHOS DO CIRCUITSKETCH
+==========================================================================
+
+  Simulação
+      F5              rodar / parar
+
+  Depurador
+      F9              marcar ou tirar ponto de parada na linha do cursor
+                      (ou clique à esquerda do número da linha)
+      F6              pausar / continuar
+      F10             andar uma linha
+      Com o sketch pausado, o painel PAUSADO mostra as variáveis.
+
+  Placa
+      Clique no RESET da placa (ou no EN da ESP32) para reiniciá-la.
+      Segure o botão e ela fica parada; solte e ela começa do setup().
+      Na ESP32, o BOOT leva o GPIO 0 a LOW enquanto está apertado.
+
+  Circuito
+      A               adicionar componente (ou arraste da paleta)
+      Delete          apagar o selecionado
+      Ctrl+C / Ctrl+V copiar / colar
+      Ctrl+Z / Ctrl+Y desfazer / refazer
+      F               enquadrar o circuito
+      G               grade liga/desliga
+      + / -           aproximar / afastar
+      Alt+Enter       tela cheia
+
+  Arquivos
+      Ctrl+S          salvar o projeto (.sktch)
+      Ctrl+O          abrir projeto
+      Ctrl+I          importar diagram.json do Wokwi
+      Menu ⋮          exportar diagram.json para o Wokwi, demos e mais
+
+  Painel de baixo (quatro abas)
+      CONSOLE         o que o PROGRAMA diz: o que compilou, quanto de
+                      memória o sketch ocupa, o que queimou, o que parou
+      MONITOR SERIAL  o que o sketch imprime; o campo embaixo MANDA
+                      texto para o sketch (Serial.read)
+      REDE            WiFi, HTTP e MQTT: o que cada placa fez, o link do
+                      servidor para abrir no navegador, e um campo para
+                      publicar no MQTT
+      BLUETOOTH       faz o papel do celular: escolhe a placa, conecta e
+                      troca mensagens
+      ↗               ao lado de cada aba: solta só aquela numa janela;
+                      arraste a janela de volta para encaixar
+
+      Ctrl+M          ir para o monitor serial
+
+
+==========================================================================
+ 6. REDE E BLUETOOTH
+==========================================================================
+
+  O simulador tem uma rede própria. O sketch usa as bibliotecas de
+  sempre: WiFi.h, WebServer.h, HTTPClient.h, PubSubClient.h e
+  BluetoothSerial.h.
+
+  WiFi
+      WiFi.begin("qualquer-rede", "qualquer-senha") conecta em cerca de
+      um segundo. Cada placa ganha um IP: 10.0.0.2, 10.0.0.3, ...
+      Têm WiFi: ESP32, ESP32-S2, S3, C3 e C6, NodeMCU e os módulos
+      ESP-01 ao ESP-14, Nano RP2040 Connect e Pico W. Nas outras —
+      inclusive a ESP32-H2, que não tem rádio WiFi — a chamada é
+      recusada com essa explicação.
+
+  Servidor web na placa
+      Com server.begin(), o painel REDE mostra um endereço como
+      http://localhost:8080 . Clique nele e a página servida pela placa
+      abre no navegador deste computador.
+      Outra placa da bancada também alcança, pelo IP 10.0.0.x.
+
+  MQTT
+      O CircuitSketch tem um broker próprio, que funciona sem internet.
+      Se o broker da aula (broker.hivemq.com, por exemplo) não responder,
+      a placa usa o interno e o painel avisa. As placas da bancada
+      conversam entre si por ele.
+      O broker interno também fica em localhost:1883, então um app de
+      MQTT deste computador conecta nele.
+      No painel REDE dá para publicar num tópico, como faria um celular.
+
+  Internet
+      Menu ⋮ > "Rede: usar a internet do computador" liga e desliga a
+      saída para a internet. Desligado, tudo continua funcionando entre
+      as placas e o computador.
+
+  Bluetooth
+      SerialBT.begin("nome") deixa a placa visível. Na aba BLUETOOTH,
+      escolha a placa, clique em Conectar e troque mensagens — é o papel
+      que o celular faria. Duas placas também pareiam entre si
+      (SerialBT.begin("mestre", true) e SerialBT.connect("nome")).
+      É o Bluetooth clássico, que só a ESP32 original tem: as S3, C3,
+      C6 e H2 e a Nano RP2040 Connect só têm BLE, que ainda não é
+      simulado.
+
+      Um programa do computador também conversa com a placa: enquanto
+      o sketch roda, o SerialBT fica aberto numa porta em 127.0.0.1 (a
+      primeira livre a partir da 9000; o painel diz qual). Um terminal
+      TCP qualquer faz o papel do celular, byte a byte.
+
+==========================================================================
+ 7. DESINSTALAR
+==========================================================================
+
+  Configurações > Aplicativos > Aplicativos instalados > CircuitSketch >
+  Desinstalar.
+
+  Ou: "Desinstalar CircuitSketch.exe", na pasta onde o programa foi
+  instalado.
+
+  Sai o programa, os atalhos e o plugin da Arduino IDE. Os projetos
+  (.sktch) e sketches (.ino) que você salvou NÃO são apagados.
+
+
+==========================================================================
+ 8. LIMITES DESTA VERSÃO
+==========================================================================
+
+  Ficam para um próximo update:
+
+  - Bluetooth LE (BLE) não é simulado, só o clássico.
+  - ArduinoJson (deserializeJson) não existe; use http.getString() com
+    os métodos de String.
+  - Assembly só do ATmega328P (Uno e Nano). O das outras placas —
+    Xtensa, RISC-V, ARM — fica para depois.
+  - A Arduino IDE não lista a porta do CircuitSketch, e por isso o
+    Monitor Serial da IDE fica desconectado. Use o monitor do próprio
+    CircuitSketch.
+  - O depurador não muda o valor de variáveis e não passa por cima de
+    funções (o passo sempre entra nelas).
+
+
+==========================================================================
+ 9. PROBLEMAS COMUNS
+==========================================================================
+
+  "O Windows protegeu o computador"
+      Mais informações > Executar assim mesmo (seção 1).
+
+  O instalador diz que o CircuitSketch está aberto
+      Feche o CircuitSketch e clique em "Repetir".
+
+  As placas não aparecem na Arduino IDE
+      - Feche a IDE por completo e abra de novo.
+      - Confira se o boards.txt está no lugar certo (seção 3, jeito 3).
+      - Confira a pasta de sketches nas Preferências da IDE e rode o
+        "Instalar plugin.bat" de novo.
+
+  O Verificar funciona, mas o CircuitSketch não abre
+      Rode o "Instalar plugin.bat" de novo: ele reencontra o programa.
+      Se instalou numa pasta diferente da padrão, veja o passo 5 do
+      jeito 3.
+
+  O antivírus bloqueou o instalador
+      O instalador não é assinado. Libere o arquivo no antivírus ou peça
+      ao responsável pelo laboratório.
+
+  A página da placa não abre no navegador
+      Confira se a simulação está rodando e se o loop() chama
+      server.handleClient(). O endereço certo é o que aparece na aba
+      REDE; ele muda se a porta 8080 estiver ocupada.
+
+  O MQTT não conecta no broker da internet
+      Veja se ⋮ > "Rede: usar a internet do computador" está marcado. Sem
+      internet, o CircuitSketch usa o broker dele mesmo e avisa no painel
+      REDE; as placas da bancada continuam conversando.
+
+  Registros para quem for ajudar
+      Instalador:       %TEMP%\circuitsketch-instalador.log
+      Erros do programa: %USERPROFILE%\circuitsketch-erros.log
+
+
+==========================================================================
+ 10. LINGUAGENS E ASSEMBLY
+==========================================================================
+
+  O editor aceita dez linguagens e descobre qual é pelo próprio código
+  — não há opção para marcar: Arduino (C++), C, MicroPython, C#, Rust,
+  Ada, SPARK, Cowgol, Millipascal e Assembly AVR. Tem um exemplo de
+  cada em ⋮ > Exemplos prontos > Linguagens.
+
+  Assembly
+      É o Assembly de verdade do ATmega328P, e não uma imitação: o
+      código é montado nos opcodes do chip e roda contando os ciclos
+      do datasheet, no ritmo dos 16 MHz, com os temporizadores e as
+      interrupções. Por isso só roda no Arduino Uno e no Nano, que são
+      as placas desse chip.
+
+  Gravar na placa de verdade
+      Com um programa em Assembly aberto, ⋮ > "Exportar programa
+      gravável (.hex)" salva exatamente o programa que rodou no
+      simulador. Para gravar com o avrdude (troque COM3 pela porta da
+      placa):
+
+        avrdude -c arduino -p m328p -P COM3 -b 115200 -U flash:w:programa.hex:i
+
+      No Nano com o bootloader antigo, use -b 57600.
+
+      As outras linguagens rodam interpretadas e não geram .hex: um
+      sketch em C++ se grava pela Arduino IDE, como sempre.

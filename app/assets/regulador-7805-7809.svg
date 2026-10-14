@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="10.0mm" height="27.0mm" viewBox="0 0 10.0 27.0">
+  <!-- a aba de metal (o dissipador do chip), com o furo do parafuso -->
+  <path d="M0.2 1.2 Q0.2 0.2 1.2 0.2 H8.80 Q9.80 0.2 9.80 1.2 V6.4 H0.2 Z" fill="#c4c9d0" stroke="#7b8088" stroke-width="0.25"/>
+  <rect x="0.7" y="0.7" width="8.60" height="1.2" rx="0.4" fill="#e4e7eb" opacity="0.8"/>
+  <circle cx="5.00" cy="3.2" r="1.8" fill="#2a2c30" stroke="#7b8088" stroke-width="0.3"/>
+  <!-- as pernas: IN, GND, OUT -->
+  <rect x="2.01" y="15.0" width="0.9" height="11.80" fill="#cfd3d8" stroke="#80858c" stroke-width="0.15"/>
+  <rect x="1.71" y="15.0" width="1.5" height="2.0" fill="#cfd3d8" stroke="#80858c" stroke-width="0.15"/>
+  <rect x="4.55" y="15.0" width="0.9" height="11.80" fill="#cfd3d8" stroke="#80858c" stroke-width="0.15"/>
+  <rect x="4.25" y="15.0" width="1.5" height="2.0" fill="#cfd3d8" stroke="#80858c" stroke-width="0.15"/>
+  <rect x="7.09" y="15.0" width="0.9" height="11.80" fill="#cfd3d8" stroke="#80858c" stroke-width="0.15"/>
+  <rect x="6.79" y="15.0" width="1.5" height="2.0" fill="#cfd3d8" stroke="#80858c" stroke-width="0.15"/>
+  <!-- o corpo de epoxi -->
+  <rect x="0.4" y="6.0" width="9.20" height="9.4" rx="0.4" fill="#1d1e22" stroke="#0a0a0b" stroke-width="0.25"/>
+  <rect x="0.9" y="6.5" width="8.20" height="0.8" rx="0.3" fill="#ffffff" opacity="0.08"/>
+  <text x="5.00" y="9.40" fill="#d9dce0" font-size="1.75px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">L7809</text>
+  <text x="5.00" y="11.50" fill="#b9bec6" font-size="1.2px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">CV</text>
+  <text x="5.00" y="13.10" fill="#8e949c" font-size="0.85px" text-anchor="middle"
+        font-family="Verdana" font-weight="normal">9 V  1,5 A</text>
+  <text x="2.46" y="14.95" fill="#c9ccd1" font-size="0.68px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">IN</text>
+  <text x="5.00" y="14.95" fill="#c9ccd1" font-size="0.68px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">GND</text>
+  <text x="7.54" y="14.95" fill="#c9ccd1" font-size="0.68px" text-anchor="middle"
+        font-family="Verdana" font-weight="bold">OUT</text>
+  <circle cx="2.46" cy="26.40" r="0.62" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="2.46" cy="26.40" r="0.28" fill="#2a2a2a"/>
+  <circle cx="5.00" cy="26.40" r="0.62" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="5.00" cy="26.40" r="0.28" fill="#2a2a2a"/>
+  <circle cx="7.54" cy="26.40" r="0.62" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
+  <circle cx="7.54" cy="26.40" r="0.28" fill="#2a2a2a"/>
+
+</svg>

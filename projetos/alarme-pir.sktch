@@ -1,0 +1,131 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Alarme com sensor de presenca PIR (Uno)",
+  "",
+  "O sensor PIR poe HIGH na saida quando ve movimento: a sirene (buzzer)",
+  "toca e o LED pisca. Na barra do PIR, ligue o \"movimento\"."
+ ],
+ "codigo": [
+  "// Alarme: o sensor PIR ve movimento, a sirene toca e o LED pisca.",
+  "const int PIR = 2, BUZZER = 8, LED = 13;",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  pinMode(PIR, INPUT);",
+  "  pinMode(LED, OUTPUT);",
+  "  Serial.println(\"alarme armado\");",
+  "}",
+  "",
+  "void loop() {",
+  "  if (digitalRead(PIR) == HIGH) {",
+  "    Serial.println(\"MOVIMENTO!\");",
+  "    for (int i = 0; i < 6; i++) {",
+  "      digitalWrite(LED, HIGH);",
+  "      tone(BUZZER, 2000);",
+  "      delay(150);",
+  "      digitalWrite(LED, LOW);",
+  "      tone(BUZZER, 1200);",
+  "      delay(150);",
+  "    }",
+  "    noTone(BUZZER);",
+  "  }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 220
+   },
+   {
+    "Id": "pir",
+    "Tipo": "pir-motion-sensor",
+    "X": 380,
+    "Y": 60
+   },
+   {
+    "Id": "buzzer",
+    "Tipo": "buzzer",
+    "X": 560,
+    "Y": 60
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 700,
+    "Y": 60,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 630,
+    "Y": 120,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "13",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "pir",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pir",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "pir",
+    "DePino": "OUT",
+    "ParaPeca": "placa",
+    "ParaPino": "2",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "buzzer",
+    "ParaPino": "1",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "buzzer",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

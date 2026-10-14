@@ -1,0 +1,492 @@
+CircuitSketch — o que mudou
+
+Alpha 19
+  · ESP32 e ESP8266 separadas: cada uma tem a sua aba na janela de
+    componentes, o seu grupo nos menus e o seu lugar no plugin da IDE.
+    Juntas, a ESP-01 aparecia no meio das ESP32 e parecia uma delas.
+  · Trocar de projeto zera tudo o que era do anterior: a simulação
+    para, e o monitor serial, o console, os painéis Rede e Bluetooth,
+    as pausas do depurador, as marcas de queimado e as mensagens retidas
+    do broker começam do zero. Abrir uma demo nem parava a simulação — o
+    circuito novo aparecia com as placas do anterior rodando por baixo.
+  · Duas demos novas na ESP32. "Controle por Bluetooth": o celular manda
+    comandos, o LED RGB muda de cor, o buzzer toca, a placa responde a
+    temperatura do DHT22 e o LCD mostra o último comando. "ESP-NOW: duas
+    placas conversando": uma lê sensor, potenciômetro e botão; a outra
+    mostra no LCD, move o servo e acende o LED — e o botão dela acende o
+    LED da primeira.
+  · ESP-NOW como na placa: o código dos tutoriais (esp_now_peer_info_t,
+    callbacks do pacote 3.x) roda como está; mandar para quem não foi
+    adicionado com esp_now_add_peer() falha com ESP_ERR_ESPNOW_NOT_FOUND,
+    como na bancada; e a difusão sempre dá sucesso no callback, porque
+    não tem confirmação de ninguém.
+  · Código de biblioteca que antes parava na primeira linha: parâmetros
+    com tipo de biblioteca (WiFiClient &c, BLEServer *s, WiFiEvent_t),
+    nomes com :: (BLEDevice::init, ESP32PWM::allocateTimer) e std::.
+  · ESP32Servo.h reconhecida — é o servo da ESP32, onde a Servo.h da
+    Arduino não roda. O pulso segue a conta da biblioteca (544 a 2400 µs
+    ou os limites do attach), e write(1500) é pulso, não ângulo.
+  · lcd.print(valor, casas) respeita as casas decimais.
+  · O analisador lógico virou de verdade. Antes ele olhava o pino 25
+    vezes por segundo, e tudo o que acontecia no meio sumia. Agora cada
+    borda fica gravada em microssegundos, no ritmo do chip: o PWM com a
+    frequência de cada placa (976 Hz nos pinos 5 e 6 do Uno, 490 Hz nos
+    outros), o tone(), o pulso do servo, o shiftOut e a serial saindo
+    pelo TX, bit a bit. A peça ganhou escala e disparo na subida; e
+    "Abrir o analisador" abre a janela grande: zoom na roda do mouse,
+    pausa, medida de largura, período, frequência e ciclo embaixo do
+    mouse, a letra de cada byte da serial escrita em cima do fio e
+    "Salvar .vcd" para abrir no PulseView. Tem demo: "Analisador
+    lógico", no Uno.
+  · Tempo como no chip: delayMicroseconds() espera de verdade (antes
+    virava milissegundo e delayMicroseconds(500) não esperava nada),
+    micros() tem microssegundo de verdade (antes era millis() vezes
+    mil), tone(pino, f, ms) para sozinho (antes tocava para sempre), e
+    o ledc da ESP32 respeita a frequência e os bits, como o
+    analogWriteResolution e o analogWriteFrequency.
+  · Treze temas no lugar de dois. Das placas: Arduino IDE (combina com
+    a IDE 2), Arduino (azul e preto), STM32 (branco e azul), Raspberry
+    Pi (verde e vermelho) e ESP32 (preto e branco). Cores: Azul,
+    Vermelho, Verde, Amarelo, Laranja e Rosa. Em Configurações >
+    Aparência cada tema aparece como uma amostra, e a troca vale na
+    hora, inclusive na janela aberta. O autoteste mede o contraste de
+    cada um pela conta da WCAG — tema com letra ilegível não passa.
+  · A janela de componentes, a tela de abertura, os menus, o console e
+    os campos de texto passaram a seguir o tema: a janela de
+    componentes ficava escura até no tema claro, e o aviso amarelo do
+    console sumia no fundo branco.
+  · Uma demo por placa, e nenhuma repetida. As vinte e seis placas que
+    abriam com o mesmo pisca-pisca ganharam um projeto cada: relógio
+    pela internet no OLED (S2), anel NeoPixel com três efeitos (S3),
+    estufa com DHT22, servo e LCD (C3), alarme com sensor de presença
+    (C6), sensor de estacionamento (H2), servidor web (NodeMCU), tomada
+    inteligente por MQTT (ESP-01), campainha musical, termo-higrômetro,
+    semáforo com botão de pedestre, calculadora pela serial com o
+    analisador no TX, Genius, scanner de redes WiFi, jogo de reflexo,
+    dado eletrônico, ponte entre a serial e a web, minuteria de escada,
+    balança com HX711, cor do LED RGB pelo navegador, luminária NeoPixel
+    por MQTT, fechadura com teclado e placar no OLED (ESP-02 ao ESP-14),
+    vela eletrônica (Franzininho), luz noturna (ATtiny85), piano,
+    joystick com OLED e LED respirando no SDK (Pico), estação do tempo
+    na web, MQTT em MicroPython e voltímetro no SDK (Pico W), termômetro
+    com NTC (Nucleo-L031K6) e relógio com RTC (Nucleo-C031C6). As sete
+    de linguagem também deixaram de ser pisca-pisca: semáforo em Ada,
+    termostato com contratos em SPARK, contador em Cowgol, LED
+    respirando em Millipascal, sirene em Rust, medidor de luz em C# e
+    contador binário em Assembly. Toda demo abre com a descrição do que
+    mostra e do que fazer, e o autoteste roda cada uma pela janela e
+    confere se ela faz o que a descrição promete.
+  · "Exemplos prontos" por família e por placa: a placa com várias demos
+    (ESP32, Uno, Pico, Pico W) tem o seu submenu, e a com uma só aparece
+    direto, com o nome da placa.
+  · Os nomes de pino do core de cada placa: A0 a A19, SDA, SCL, TX, RX,
+    SS, MOSI, MISO, SCK, T0 a T9, DAC1 e DAC2 na ESP32 e nas variantes;
+    D0 a D10 na NodeMCU; PC13 e os outros na Blue Pill; PB0 a PB5 no
+    ATtiny85; D0 a D29 na Pico. "analogRead(A0)" parava em "variável não
+    declarada" em quase toda placa que não fosse Arduino. Só entram os
+    nomes que o core de verdade define: D5 continua sendo erro na ESP32,
+    como na IDE.
+  · I2C de fábrica certo na ESP32-C6 (23 e 22) e na ESP32-H2 (12 e 22), e
+    o TX de cada variante da ESP32 no pino dele (o analisador lógico vê
+    a serial saindo).
+  · analogRead() nos bits que o core entrega: 10 bits (0 a 1023) na Pico
+    e nas STM32, como o core do Arduino faz, e 12 só com
+    analogReadResolution(12). Na ESP32 continua 12. No AVR e no ESP8266 o
+    analogReadResolution() dá erro, porque lá ele não existe.
+  · SDK da Pico mais completo: printf, o tipo uint, o PWM de verdade
+    (fatia, wrap, divisor, gpio_set_function e pwm_config), sleep_us em
+    microssegundos, o absolute_time e o sensor de temperatura do chip. No
+    MicroPython, ADC(0) a ADC(4) da Pico são os canais (o 4 é a
+    temperatura), Pin("LED") acende o LED da placa, e o PWM aceita freq e
+    duty_u16. No Arduino, analogReadTemp().
+  · NeoPixel como a biblioteca: nada acende sem show() (ou write() no
+    MicroPython) — antes acendia, e o sketch sem show() funcionava aqui e
+    ficava apagado na bancada. Entraram ColorHSV, gamma32, sine8, rainbow
+    e fill com faixa, com as mesmas contas da Adafruit.
+  · Sensores com a física de verdade: o módulo de LDR dá leitura MENOR
+    com mais luz (era o contrário), com a mesma curva do Wokwi; o NTC
+    segue a curva beta 3950, e a fórmula de todo tutorial devolve a
+    temperatura do controle. O controle do sensor mostra a grandeza (°C,
+    lux, cm, g) em vez da leitura crua do conversor.
+  · RTClib com DateTime: now(), adjust(), a hora e o dia da semana, e
+    DateTime(F(__DATE__), F(__TIME__)) — o relógio anda sozinho e vira o
+    dia. HX711 como a biblioteca: a leitura crua não é grama, e são o
+    tare() e o set_scale() que a transformam. Teclado matricial: o
+    getKey() devolve a tecla uma vez por aperto (antes, segurar o "1"
+    digitava "1111").
+  · Mais do C e do core: isnan(), strtol(), atoi() lendo o começo do
+    texto, printf fora do Serial, randomSeed() mudando a sequência de
+    verdade, analogWriteRange() do ESP8266, o "&Wire" do construtor do
+    display da Adafruit, e ESP.getChipModel(), getChipCores() e
+    getEfuseMac() com os números da placa que está rodando. Um laço que
+    espera com delay() — "while (!Serial.available()) delay(10);" — não é
+    mais confundido com laço preso.
+  · O MAC das placas muda de um computador para o outro: com o mesmo MAC
+    na sala inteira, trinta alunos no broker público viravam o mesmo
+    cliente MQTT e um derrubava o outro.
+  · Cowgol com ==, !=, %, << e >>; Millipascal com "var a:i32, b:i32";
+    C# com vetores (int[] x = {...}) e texto interpolado ($"...{x}...").
+  · Configurações bem mais completas, e todas valendo na hora, sem
+    reiniciar. Editor de código: fonte, tamanho da letra (e Ctrl + roda
+    do mouse), número das linhas, destaque da linha do cursor, quebra
+    de linha, espaços visíveis, recuo de 2, 4 ou 8, e fechar ( [ { e
+    aspas sozinho, como na Arduino IDE 2. Monitor serial: fim de linha
+    ao enviar (nenhum, \n, \r ou \r\n, como a caixa da IDE), a hora de
+    cada linha, rolar sozinho, quantas linhas guardar, tamanho da letra,
+    limpar ou não a cada Rodar, e os avisos de ligação no monitor ou só
+    no console. Simulação: rodar o projeto e a demo ao abrir, queimar ou
+    não o componente ligado errado, som do buzzer e volume. Arquivos:
+    salvar sozinho a cada 1 a 10 minutos, cópia .bak da versão anterior,
+    quantos projetos na lista de recentes, a placa com que o circuito
+    novo começa e reabrir o último projeto no lugar da tela de abertura.
+    Aparência: o tamanho da interface inteira, de 75% a 175%. Circuito:
+    fio fino, normal ou grosso (para o projetor). E "Voltar tudo ao
+    padrão", na Ajuda.
+  · Ctrl+S grava no arquivo do projeto aberto, sem perguntar o nome de
+    novo — antes todo salvar abria o diálogo. Entrou o "Salvar projeto
+    como..." (Ctrl+Shift+S).
+  · Fechar o programa depois de só abrir uma demo não pergunta mais se
+    quer salvar.
+  · Correção: o som do buzzer podia derrubar o programa ao parar e voltar
+    a tocar (o fio de áudio que saía fechava o dispositivo que o próximo
+    tone() tinha acabado de abrir).
+  · Correções: abrir uma demo pelo menu às vezes rodava um sketch vazio
+    (o código ficava na tela sem chegar na placa); o mesmo acontecia
+    depois de importar um diagram.json; e com duas placas o cabeçalho do
+    código cortava o nome da linguagem.
+  · Bibliotecas de fora rodam de verdade. Instalar uma biblioteca — a
+    pasta ou o .zip do GitHub, como o "Adicionar biblioteca .ZIP" da
+    Arduino IDE — faz o #include dela trazer os .h e compilar os .cpp
+    junto, e o simulador executa o C++ que vem dentro: classe com
+    construtor e lista de inicialização, método escrito no .cpp, herança
+    e virtual, static, ponteiro e ->, new e delete, referência (int &x),
+    sobrecarga, operadores, callback por ponteiro de função e por lambda,
+    typedef, namespace e template. A Stepper e a LiquidCrystal da própria
+    Arduino IDE rodam como estão. Biblioteca que mexe direto nos
+    registradores do chip para dizendo o registrador e o arquivo. As que
+    o simulador executa por dentro (Servo, WiFi, DHT...) continuam
+    vencendo a cópia instalada: são elas que mexem no circuito.
+  · O pré-processador virou o do compilador. #if, #ifdef, #elif e #else
+    escolhem um lado só, com as macros que o core de cada placa define
+    (ESP32, ARDUINO_ARCH_AVR, CONFIG_IDF_TARGET_ESP32S3, a versão do
+    core...); #error para a compilação com a mensagem; #define com
+    parâmetros, #x, a##b e __VA_ARGS__ funcionam. Antes os dois lados de
+    todo #if rodavam juntos. Entraram as macros do Arduino.h que
+    faltavam: bitRead, bitSet, bitClear, bitWrite, bit, lowByte,
+    highByte, _BV, pgm_read_byte e companhia, DEG_TO_RAD, cli() e sei().
+  · Protótipo de função ("void piscar(int vezes = 2);" antes do setup)
+    não dá mais erro, e o valor padrão escrito nele vale.
+  · O erro diz o arquivo: "BotaoSimples/BotaoSimples.cpp, linha 12". E a
+    linha do sketch não anda mais por causa de um #include "config.h":
+    antes as abas eram coladas na frente do sketch, e todo erro depois
+    delas apontava a linha errada.
+  · Recursão sem fim para com "a pilha estourou", em vez de derrubar o
+    programa.
+  · Um laço que espera olhando o micros() — o step() da Stepper, o tempo
+    limite de um sensor — não é mais confundido com laço preso, e no
+    tempo virtual o relógio anda enquanto ele espera.
+  · MQTT pronto para a aula. Duas placas com o mesmo client id: o broker
+    derruba a mais velha, como o de verdade faz, e o painel explica e
+    sugere o id pelo MAC ("ESP32-" + WiFi.macAddress()) — é o tropeço de
+    toda turma que roda o mesmo sketch no broker público. A conexão que
+    cai logo depois de conectar ganha a mesma dica. Na rede da escola que
+    bloqueia a porta, o broker que não respondeu fica lembrado por dois
+    minutos: o próximo connect() cai direto no broker interno, em vez de
+    esperar cinco segundos de novo.
+  · Senha errada no broker não fica mais escondida: connect() devolve
+    false e o state() diz 4, como na placa. Antes o simulador caía no
+    broker interno e o sketch "conectava".
+  · O buffer de 256 bytes do PubSubClient: a mensagem maior não sai
+    (publish() devolve false) e a que chega maior é jogada fora, como na
+    placa, com o aviso de que client.setBufferSize() resolve.
+  · MQTT com TLS: o PubSubClient montado com um WiFiClientSecure fala TLS
+    com o broker (a porta 8883 do HiveMQ Cloud e do EMQX), com usuário e
+    senha; o painel Rede publica nele também. O connect() com last will
+    manda o testamento, e o broker o publica quando a placa some sem
+    desconectar (parou, resetou). Entraram beginPublish(), print() e
+    endPublish(); publish(tópico, bytes, 1) manda um byte, e não uma
+    mensagem retida. No MicroPython: ssl=True, set_last_will() e o
+    wait_msg() que espera a mensagem chegar.
+  · As demos de MQTT da ESP32 e da Pico W usam um id por placa: com o id
+    fixo, a turma inteira se derrubava no broker público.
+  · Bluetooth: o register_callback() do SerialBT funciona — o "Client
+    Connected" (ESP_SPP_SRV_OPEN_EVT) e o ESP_SPP_CLOSE_EVT dos tutoriais
+    chegam quando o celular do painel, um programa do computador ou outra
+    placa conecta e sai.
+  · Celular de verdade no Bluetooth: com o Bluetooth do computador ligado,
+    a placa que chama SerialBT.begin("nome") aparece no rádio do PC como
+    o serviço "CircuitSketch nome". Pareie o celular com o computador,
+    conecte pelo app de terminal Bluetooth, e o que ele manda chega no
+    SerialBT.read() do sketch. Sem rádio, ou com ele desligado, o painel
+    diz por quê, e o celular do painel continua funcionando. Pode ser
+    desligado em Configurações > Bluetooth.
+  · Verificar e Mandar para a placa, no canto direito da barra, com o
+    visto e a seta da Arduino IDE (Ctrl+R e Ctrl+U). O visto confere o
+    código no simulador e, com a Arduino IDE 2 instalada, no compilador
+    do Arduino de verdade — o erro que o simulador só veria rodando (uma
+    variável que não existe) aparece na hora, com a linha. A seta compila
+    e grava na placa ligada na USB: a aba PLACA mostra as portas (o Uno
+    aparece pelo nome; a ESP32, pelo conversor CP210x ou CH340), pergunta
+    antes de gravar e avisa quando a placa da porta parece outra. Usa o
+    compilador, os núcleos e as bibliotecas que já estão na IDE, mais as
+    instaladas no simulador; o que faltar, ele oferece para instalar. E os
+    tropeços de sempre vêm explicados: a porta ocupada pelo monitor da IDE,
+    o botão BOOT da ESP32, o "not in sync" do Nano.
+  · BASE ZERO, a demo nova da ESP32-S3: um tiro em primeira pessoa no
+    estilo do DOOM (1993), feito com raycasting — 160 raios por quadro
+    num display ILI9341 de 320x240, robôs que andam e atiram, portas,
+    kits de vida, munição, a arma, o rosto e o painel embaixo. Sete
+    botões (setas, A, B e START, também pelo teclado e por um controle
+    de video game), buzzer, e as fases no cartão microSD: dá para abrir
+    o cartão, mudar as paredes de /E1M1.TXT e jogar a fase nova. E uma
+    chave liga/desliga de verdade: desligada, a ESP32 apaga a tela e
+    entra em sono profundo; ligada, ela acorda e volta para a fase. O
+    sketch compila no núcleo da ESP32 de verdade, sem mudar nada.
+  · Sono profundo da ESP32: esp_deep_sleep_start() com timer, ext0 (um
+    pino), ext1 (vários) e o GPIO das C3, C6 e H2; a placa dorme com os
+    pinos soltos e o WiFi desligado, e acorda do setup(), com
+    esp_sleep_get_wakeup_cause() e esp_reset_reason() dizendo por quê.
+    As variáveis RTC_DATA_ATTR voltam com o valor de antes, e as
+    RTC_NOINIT_ATTR sobrevivem até ao ESP.restart() — que agora reinicia
+    a placa de verdade, em vez de pedir para apertar o RESET. O sono
+    leve (esp_light_sleep_start) continua da linha seguinte. Os erros
+    são os do chip: ext0 na C3 não existe, e pino fora do RTC não acorda
+    ninguém. No ESP8266, ESP.deepSleep() só acorda com o fio do D0 no
+    RST, como na bancada.
+  · O texto do display TFT virou pixel, com a fonte 5x7 da própria
+    Adafruit_GFX. Era um letreiro por cima da imagem, e o jeito normal
+    de atualizar um número — setTextColor(branco, preto) e print por
+    cima — empilhava os letreiros até virar borrão. Agora vale tudo o
+    que vale no vidro: o fundo apaga o número de antes, o fillRect
+    apaga o texto, a linha comprida quebra no fim da tela.
+  · Mais Adafruit_GFX no display: color565, printf, triângulos,
+    retângulos arredondados, drawRGBBitmap e drawBitmap, setAddrWindow
+    com writePixels, getTextBounds, invertDisplay e os comandos de
+    desligar e dormir. As cores ILI9341_RED e ST77XX_BLUE existem depois
+    do #include, como no compilador (antes, o próprio exemplo da
+    Adafruit parava na primeira linha). O pino LED do display, ligado
+    num GPIO, acende e apaga a luz de fundo — com PWM, meia luz. E um
+    drawFastVLine de altura zero não pinta mais dois pontos soltos.
+  · sizeof conta bytes, como o compilador de cada placa: o int tem 2
+    bytes no Uno e 4 na ESP32, a struct ganha o preenchimento de
+    alinhamento nas placas de 32 bits, e sizeof(int), sizeof(unsigned
+    long) e sizeof(struct X) funcionam. Antes ele contava itens, e
+    sizeof(pinos) / sizeof(pinos[0]) — a conta que todo tutorial usa
+    para percorrer um vetor — dava zero.
+  · C++ que parava ou fazia outra coisa: o vetor de duas dimensões sem
+    valor inicial (int m[3][2] tinha só três lugares), o mapa escrito
+    como char m[16][17] = {"#..#", ...}, linhas[y][x] num vetor de
+    textos, o nome do vetor como ponteiro (int* p = leituras), a
+    referência local (Robo &r = robos[i] mexia numa cópia), a struct
+    preenchida de uma vez (robos[i] = {x, y, 3}), os tipos do ESP-IDF
+    nos casts ((gpio_num_t)PINO), String.toCharArray(), sinf/cosf/
+    atan2f e companhia, e abs() e constrain() de número com vírgula,
+    que perdiam a vírgula.
+  · Cartão microSD como em cada placa: na ESP32 o caminho começa com
+    "/" (sem a barra o arquivo não abre, e o aviso diz o porquê) e o
+    FILE_WRITE começa o arquivo do zero — quem quer continuar escrevendo
+    usa FILE_APPEND; no Uno o FILE_WRITE escreve no fim. O
+    "if (!arquivo)" funciona (o File era sempre verdadeiro), e reiniciar
+    a placa não apaga mais o cartão — ele é outro chip.
+  · O DOOM de verdade: a demo "ESP32-DOOM", na ESP32-S3, roda o motor
+    PrBoom 2.5.0 do projeto ESP32-DOOM, com o display ILI9341, o WAD no
+    cartão microSD, os sete botões, a chave do correr, o som pelo
+    amplificador I2S e a tela também no navegador, onde o teclado joga
+    junto. O WAD não vem com o programa (é da id Software): o DOOM1.WAD
+    do shareware entra pelo cartão.
+  · Modo nativo: numa ESP32, os arquivos .c do projeto e das bibliotecas
+    são compilados de verdade e rodam com o ESP-IDF da placa por baixo:
+    tarefas e filas do FreeRTOS, GPIO com interrupção, SPI, I2S, o cartão
+    pelo esp_vfs_fat, as partições (e o partitions.csv do projeto), NVS,
+    WiFi e o servidor HTTP do ESP-IDF. O sketch chama as funções do C
+    pelo nome, como na placa. Erro no C aparece com arquivo e linha, e
+    um ponteiro nulo dá Guru Meditation e reinicia a placa, como na
+    bancada.
+  · O C enxerga o chip como na placa: os sdkconfig.h do core 3.3.11, as
+    capacidades e os pinos de cada ESP32 (o GPIO 22 não existe no S3, o
+    34 só lê na ESP32, e o GPIO_NUM_34 nem compila na C3), o char sem
+    sinal, o long de 32 bits, os cabeçalhos que trazem outros junto como
+    no ESP-IDF, e o MD5 que fica na ROM.
+  · Duas peças de som: o alto-falante de 8 Ω e o amplificador I2S
+    MAX98357A. O que a placa manda pelo I2S sai de verdade na caixa de
+    som do computador, e o alto-falante pulsa com o volume. Ligado direto
+    num pino, ele dá aviso (a porta segura a corrente no limite dela e o
+    som sai fraco); direto no 5 V, a bobina queima.
+  · O cartão microSD aceita arquivos do computador que não são texto (um
+    WAD, uma imagem, um som): eles entram em bytes a cada simulação, e o
+    .sktch guarda só o caminho.
+  · Bibliotecas em C que vêm com o programa, como a ESP32-DOOM (com o
+    código junto, GPL), aparecem no acervo e compilam como uma instalada.
+  · O broker MQTT de verdade (o broker.hivemq.com e companhia) voltou a
+    conectar. O simulador tentava primeiro o endereço IPv6 do broker, que
+    em muitas redes abre a conexão e não passa nada, e desistia depois de
+    5 segundos. Agora vai pelo IPv4 primeiro; e o broker público, que às
+    vezes aceita a conexão e não responde, ganha outra tentativa na hora,
+    como o reconnect do sketch faria. O HTTPClient e o WiFiClient conectam
+    do mesmo jeito, e publicar pelo painel Rede não trava mais a janela
+    enquanto o broker de fora demora.
+  · BLE na ESP32: a biblioteca BLE do core 3.x (BLEDevice, BLEServer,
+    BLEService, BLECharacteristic, BLE2902, os callbacks de conectar,
+    escrever e ler) roda como na placa, com as duas pilhas: o Bluedroid da
+    ESP32 e o NimBLE da S3, da C3, da C6 e da H2, que mudam os bits das
+    propriedades e o que o notify() exige. Os exemplos Server, Notify, UART
+    e Write do próprio core rodam sem mudar nada.
+  · O celular simulado: uma janela de 1280×720 que abre sozinha quando a
+    placa liga o Bluetooth. Ela procura as placas; conversa pelo Bluetooth
+    clássico como o app "Serial Bluetooth Terminal" (com o fim de linha e
+    as macros); e no BLE mostra os serviços e as características para ler,
+    escrever e ligar as notificações, como o nRF Connect, com a conversa do
+    UART quando a placa tem o serviço Nordic UART. O painel Bluetooth
+    ganhou o botão "Abrir o celular".
+  · Demo nova na ESP32-C3, "Lâmpada BLE": o celular acende o LED RGB pelo
+    UART e recebe a temperatura do DHT22 na característica padrão do
+    Bluetooth (0x2A6E), com notificação a cada 2 segundos.
+
+Alpha 18
+  · Dez linguagens no lugar de duas. Além do Arduino (C++) e do
+    MicroPython, entraram C, C#, Rust, Ada, SPARK, Cowgol, Millipascal
+    e Assembly AVR. Todas rodam no mesmo interpretador e no mesmo
+    circuito — duas placas em linguagens diferentes conversam pelo
+    mesmo barramento. A linguagem é descoberta pelo próprio código, e
+    o editor diz qual entendeu antes de rodar. Há uma demo de cada.
+  · Assembly de verdade, e não imitação: o código é montado nos opcodes
+    do ATmega328P e executado instrução por instrução, com os ciclos do
+    datasheet, os temporizadores, as interrupções e o SREG bit a bit,
+    no ritmo dos 16 MHz do chip. O mesmo programa sai num .hex que se
+    grava na placa (⋮ > Exportar programa gravável). Só no Uno e no
+    Nano, que são as placas desse chip.
+  · Vinte e seis placas novas: ESP32-S2, S3, C3, C6 e H2; NodeMCU e os
+    módulos ESP-01 ao ESP-14, na pinagem padrão da Espressif; ATtiny85
+    em DIP-8, separado do Franzininho; as duas ST Nucleo, brancas; e a
+    Raspberry Pi Pico W. As Pico ganharam a logomarca. Cada placa abre
+    com uma demo que funciona.
+  · Limitadores de placa. Cada uma tem a RAM, a flash, o processador,
+    os núcleos e o relógio de verdade. Depois de compilar, o console
+    imprime a conta que a IDE do Arduino imprime — e o que não cabe é
+    recusado antes de rodar, com o número na frente.
+  · CONSOLE, ao lado do monitor serial. O monitor é do SKETCH; o
+    console é do PROGRAMA: o que compilou, o que queimou e o que
+    parou. A linha de status guardava uma mensagem só e perdia a
+    anterior, que é justamente a que costuma interessar.
+  · Janelas separadas: o vão que ficava para trás sumiu, dá para
+    arrastar a janela de volta para reacoplar sem fechar, e o serial,
+    o console, a rede e o Bluetooth soltam um a um — dá para ter o
+    Bluetooth acoplado e o serial fora.
+  · O Bluetooth virou real, como o servidor WiFi já era: a placa abre
+    uma porta em 127.0.0.1 e qualquer programa do computador conversa
+    com o SerialBT byte a byte. Tem sketch de teste.
+  · A aba Componentes virou controle: o botão direito numa ligação
+    troca o pino da placa, a cor e o traçado do fio, e apaga. As
+    ligações saem coloridas — verde piscando no play, amarelo no que
+    não chega em placa nenhuma, vermelho no que queimou.
+  · A janela de componentes ganhou subabas por família: Arduino, ESP,
+    Raspberry Pi, STM32.
+  · O plugin da Arduino IDE lista as 34 placas — tinha seis —, com a
+    mesma flash e RAM que o limitador do simulador usa. A RAM do RP2040
+    era contada como 258 KB; são 264 KB.
+  · "Exemplos prontos" e o "Mais placas" da tela de abertura viraram
+    grupos por família: com as placas novas, a lista passava da borda
+    de baixo da tela.
+  · Correções: o Ctrl+Z depois de abrir um projeto trazia de volta o
+    circuito do projeto anterior; os menus abertos fora da janela
+    principal saíam claro sobre claro; o botão direito no circuito
+    mostrava "2:C" no lugar de "Ctrl+C"; as teclas da janela de atalhos
+    saíam desalinhadas; e o painel de rede dizia "localhost:0" com a
+    simulação parada.
+
+Alpha 17
+  · MicroPython. O simulador roda as duas linguagens, e descobre qual é
+    pelo próprio código do sketch — não há opção para marcar. Listas,
+    dicionários, fatias, for-in, f-string, .format() e os módulos
+    machine, time, network, dht, neopixel, ssd1306, ujson, umqtt,
+    math e random. O editor troca de cores e a aba vira .py sozinha.
+  · O diagram.json virou editável: o desenho segue o que está escrito.
+    JSON quebrado avisa na barra e não apaga nada.
+  · Aviso de biblioteca que falta, antes de a simulação começar, com o
+    tamanho em disco — e procurando a biblioteca onde a Arduino IDE já
+    a instalou nesta máquina.
+  · O WiFi.scanNetworks() passa a listar as redes que este computador
+    enxerga de verdade. Sem rádio, ele avisa na interface e volta às
+    redes simuladas. O Bluetooth lista os aparelhos que a máquina
+    conhece.
+  · Um servidor que sobe na placa abre a página no navegador sozinho, e
+    o painel mostra o endereço da placa ao lado do que o navegador
+    alcança.
+  · A área de clique gira junto com a peça. Era o retângulo alinhado aos
+    eixos que ficava para trás quando a peça deitava.
+  · A fileira que sobra debaixo da placa espetada na protoboard voltou a
+    aceitar fio: eram 142 furos dos 830 sem alcance nenhum.
+  · Aba Componentes: o circuito em árvore, agrupado por protoboard, com
+    os pinos par a par e um aviso para quem ficou de fora.
+  · Menu de botão direito no circuito, com o que cabe em cada lugar.
+  · Divisória entre o código e o monitor, e qualquer painel — código,
+    componentes, monitor serial — abre numa janela separada.
+  · Animação ao girar a peça.
+  · Raspberry Pi Pico e STM32F103 "Blue Pill", com demo para cada uma.
+  · Display OLED de quatro pinos (I2C), que é o que a turma compra. O de
+    oito pinos continua no catálogo como "Display OLED SPI".
+  · Bateria com tensão, corrente e capacidade configuráveis.
+  · No motor: vetor de duas dimensões, struct tm com getLocalTime e
+    strftime, round() e a família de math.h, IrReceiver da IRremote.hpp,
+    UriBraces nas rotas do servidor, e os #include "arquivo.h" do
+    projeto entrando na compilação.
+  · Serial.print(")") voltou a funcionar: o parser lia o texto de um
+    literal como se fosse símbolo.
+  · Código colado da web com traço longo ou aspas curvas agora diz o que
+    está errado, em vez de "caractere inesperado".
+  · Projeto de vários arquivos: a IDE compila todo .cpp da pasta, e agora
+    o simulador também. Com isso um "extern" no .h e a definição no .cpp
+    voltam a se encontrar.
+  · constexpr, extern e inline; struct como tipo de variável e de campo
+    ("GeoLine { GeoPoint a; }"), com escrita em campo aninhado.
+  · O código do controle remoto sai no formato da IRremote.hpp
+    (0x5DA2FF00), e não no da biblioteca antiga (0x00FFA25D).
+  · Em Python, "if" e "for" deixaram de criar escopo: variável escrita
+    dentro deles continua existindo depois, como na linguagem de verdade.
+  · Um diagram.json do Wokwi guardado na descrição do projeto é
+    reconhecido, e o simulador oferece montar o circuito a partir dele.
+  · Fita de LEDs, display de toque, Pi Pico e Blue Pill passaram a ter
+    equivalente na importação do Wokwi.
+  · UniversalTelegramBot e Preferences.
+  · #include com aspas é arquivo DO PROJETO, e o aviso agora oferece
+    criar a aba em vez de mandar procurar biblioteca.
+
+1.5 (em desenvolvimento)
+  · Botões embutidos das placas: EN e BOOT da ESP32, RESET do Uno, do
+    Mega, do Nano, do Nano RP2040 e do Franzininho.
+  · Rede de verdade: WiFi, HTTP, servidor web, MQTT (com broker próprio
+    em localhost) e Bluetooth serial, com painel para acompanhar.
+  · I²C: o Wire do sketch, o módulo PCF8574 como peça separada e os LCD
+    16x2 e 20x4 na versão de quatro fios.
+  · Circuito novo (Ctrl+N), grade infinita que acompanha o zoom, fio que
+    desmarca ao clicar fora e canto de fio que encaixa na grade das peças.
+  · Nome embaixo de cada peça.
+  · Animação nas peças que se mexem: chave deslizante, chave DIP, disco
+    de telefone, encoder, joystick, potenciômetro deslizante, sensor de
+    inclinação e o eixo do motor de passo.
+  · As vinte teclas do controle infravermelho respondem ao clique.
+  · Queima revisada: pino que não tem corrente para queimar avisa em vez
+    de estourar; peça ligada ao contrário, atuador pendurado no pino de
+    dados e conflito entre duas saídas passaram a ser detectados.
+  · Teclado e controle de vídeo game acionando botões e joysticks do
+    circuito, com os atalhos do programa calados durante a simulação.
+  · Peças de esquema: junção, símbolo de VCC, símbolo de GND e o display
+    colorido de 240x240.
+  · Descrição do projeto guardada junto no .sktch.
+  · Configurações que sobrevivem a fechar o programa.
+
+1.4
+  · Depurador: ponto de parada, passo a passo, continuar e o relógio da
+    placa congelado enquanto está parado.
+  · Ícone próprio, instalador para Windows e os arquivos da placa falsa
+    que aparece na Arduino IDE.
+
+1.0 a 1.3 — as bases
+  · Motor que executa o .ino de verdade, sem compilar: lexer, parser e
+    interpretador próprios, com relógio virtual.
+  · Editor de circuito com peças dos wokwi-elements, protoboard, fios
+    que conduzem de verdade (netlist) e importação do diagram.json.
+  · Monitor serial, buzzer com som, LCD, displays, motores, sensores e
+    o cartão SD.
+  · Queima de componente ligado errado -- porque simulador que só mostra
+    o certo ensina o errado.

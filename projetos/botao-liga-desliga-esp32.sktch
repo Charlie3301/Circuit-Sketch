@@ -1,0 +1,102 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Botao liga/desliga (ESP32)",
+  "",
+  "O botao com INPUT_PULLUP alterna o LED a cada toque, detectando a borda",
+  "(o momento em que ele vai de solto para apertado)."
+ ],
+ "codigo": [
+  "// Liga e desliga o LED a cada toque no botao (com o \"debounce\").",
+  "const int LED = 2;",
+  "const int BOTAO = 4;",
+  "bool aceso = false;",
+  "int antes = HIGH;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(LED, OUTPUT);",
+  "  pinMode(BOTAO, INPUT_PULLUP);",
+  "}",
+  "",
+  "void loop() {",
+  "  int agora = digitalRead(BOTAO);",
+  "  if (antes == HIGH && agora == LOW) {",
+  "    aceso = !aceso;",
+  "    digitalWrite(LED, aceso);",
+  "    Serial.println(aceso ? \"LED aceso\" : \"LED apagado\");",
+  "    delay(50);",
+  "  }",
+  "  antes = agora;",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 280,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 210,
+    "Y": 80,
+    "Ohms": 220
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 260,
+    "Y": 230
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D2",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D4",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

@@ -1,0 +1,136 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente motor-28byj48.",
+  "",
+  "O 28BYJ-48 pelo ULN2003: o fio vermelho e o comum, nos 5 V.",
+  "",
+  "Ligado numa ESP32 DevKit V1, com o que ele precisa para funcionar",
+  "de verdade: o driver, o motor e a bateria de cada um."
+ ],
+ "codigo": [
+  "#include <Stepper.h>",
+  "",
+  "// 2048 passos por volta (32 no rotor x reducao de ~64).",
+  "// Os pinos na ordem IN1, IN3, IN2, IN4: e assim que a Stepper gira o 28BYJ-48.",
+  "Stepper motor(2048, 14, 26, 27, 25);",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  motor.setSpeed(10);",
+  "  Serial.println(\"28BYJ-48 pronto\");",
+  "}",
+  "",
+  "void loop() {",
+  "  Serial.println(\"um quarto de volta\");",
+  "  motor.step(512);",
+  "  delay(300);",
+  "  Serial.println(\"e de volta\");",
+  "  motor.step(-512);",
+  "  delay(300);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 60,
+    "Y": 60
+   },
+   {
+    "Id": "driver",
+    "Tipo": "uln2003",
+    "X": 300,
+    "Y": 40
+   },
+   {
+    "Id": "peca",
+    "Tipo": "motor-28byj48",
+    "X": 500,
+    "Y": 40
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "VIN",
+    "ParaPeca": "driver",
+    "ParaPino": "+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.2",
+    "ParaPeca": "driver",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D14",
+    "ParaPeca": "driver",
+    "ParaPino": "IN1",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D27",
+    "ParaPeca": "driver",
+    "ParaPino": "IN2",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D26",
+    "ParaPeca": "driver",
+    "ParaPino": "IN3",
+    "Cor": "#8E44AD"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D25",
+    "ParaPeca": "driver",
+    "ParaPino": "IN4",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "laranja",
+    "ParaPeca": "driver",
+    "ParaPino": "A",
+    "Cor": "#F07F1A"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "amarelo",
+    "ParaPeca": "driver",
+    "ParaPino": "B",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "rosa",
+    "ParaPeca": "driver",
+    "ParaPino": "C",
+    "Cor": "#8E44AD"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "azul",
+    "ParaPeca": "driver",
+    "ParaPino": "D",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "vermelho",
+    "ParaPeca": "driver",
+    "ParaPino": "COM",
+    "Cor": "#D23B33"
+   }
+  ]
+ }
+}

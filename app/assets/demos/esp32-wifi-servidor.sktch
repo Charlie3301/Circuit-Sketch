@@ -1,0 +1,193 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Servidor web na ESP32: a pagina liga e desliga os LEDs.",
+  "",
+  "O que esta demo mostra:",
+  "- a placa no WiFi servindo uma pagina com links, cada um numa rota",
+  "  (server.on) que acende um LED;",
+  "- o endereco da placa e a ponte para o navegador deste computador.",
+  "",
+  "Aperte F5 e abra o endereco que aparece no painel REDE."
+ ],
+ "codigo": [
+  "// Servidor web na ESP32: a pagina liga e desliga os LEDs.",
+  "//",
+  "// Com a simulacao rodando, o painel REDE mostra o endereco",
+  "// (http://localhost:8080) para abrir no navegador deste computador.",
+  "#include <WiFi.h>",
+  "#include <WebServer.h>",
+  "",
+  "const int VERMELHO = 14;",
+  "const int AMARELO  = 13;",
+  "const int VERDE    = 12;",
+  "",
+  "WebServer server(80);",
+  "",
+  "String pagina() {",
+  "  String html = \"<!DOCTYPE html><html><head><meta charset='utf-8'>\";",
+  "  html += \"<title>CircuitSketch</title></head><body>\";",
+  "  html += \"<h2>Semaforo pela rede</h2>\";",
+  "  html += \"<p><a href='/vermelho'>vermelho</a> | \";",
+  "  html += \"<a href='/amarelo'>amarelo</a> | \";",
+  "  html += \"<a href='/verde'>verde</a> | \";",
+  "  html += \"<a href='/apagar'>apagar</a></p>\";",
+  "  html += \"</body></html>\";",
+  "  return html;",
+  "}",
+  "",
+  "void apagarTudo() {",
+  "  digitalWrite(VERMELHO, LOW);",
+  "  digitalWrite(AMARELO, LOW);",
+  "  digitalWrite(VERDE, LOW);",
+  "}",
+  "",
+  "void acender(int pino) {",
+  "  apagarTudo();",
+  "  digitalWrite(pino, HIGH);",
+  "  server.send(200, \"text/html\", pagina());",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(VERMELHO, OUTPUT);",
+  "  pinMode(AMARELO, OUTPUT);",
+  "  pinMode(VERDE, OUTPUT);",
+  "",
+  "  WiFi.begin(\"CircuitSketch-WiFi\", \"12345678\");",
+  "  Serial.print(\"conectando\");",
+  "  while (WiFi.status() != WL_CONNECTED) {",
+  "    delay(300);",
+  "    Serial.print(\".\");",
+  "  }",
+  "  Serial.println();",
+  "  Serial.print(\"IP da placa: \");",
+  "  Serial.println(WiFi.localIP());",
+  "",
+  "  server.on(\"/\", []() { server.send(200, \"text/html\", pagina()); });",
+  "  server.on(\"/vermelho\", []() { acender(VERMELHO); });",
+  "  server.on(\"/amarelo\", []() { acender(AMARELO); });",
+  "  server.on(\"/verde\", []() { acender(VERDE); });",
+  "  server.on(\"/apagar\", []() { apagarTudo(); server.send(200, \"text/html\", pagina()); });",
+  "  server.begin();",
+  "",
+  "  Serial.println(\"abra o endereco que aparece no painel REDE\");",
+  "}",
+  "",
+  "void loop() {",
+  "  server.handleClient();",
+  "  delay(2);",
+  "}",
+  ""
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "bb",
+    "Tipo": "protoboard-830",
+    "X": 40,
+    "Y": 300
+   },
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 60,
+    "Y": 20
+   },
+   {
+    "Id": "led0",
+    "Tipo": "led",
+    "X": 82.2,
+    "Y": 315.6,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r0",
+    "Tipo": "resistor",
+    "X": 97.6,
+    "Y": 371.15,
+    "Ohms": 220
+   },
+   {
+    "Id": "led1",
+    "Tipo": "led",
+    "X": 139.8,
+    "Y": 315.6,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r1",
+    "Tipo": "resistor",
+    "X": 155.2,
+    "Y": 371.15,
+    "Ohms": 220
+   },
+   {
+    "Id": "led2",
+    "Tipo": "led",
+    "X": 197.4,
+    "Y": 315.6,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r2",
+    "Tipo": "resistor",
+    "X": 212.8,
+    "Y": 371.15,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D14",
+    "ParaPeca": "bb",
+    "ParaPino": "A6",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bb",
+    "DePino": "D11",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D13",
+    "ParaPeca": "bb",
+    "ParaPino": "A12",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bb",
+    "DePino": "D17",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D12",
+    "ParaPeca": "bb",
+    "ParaPino": "A18",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bb",
+    "DePino": "D23",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

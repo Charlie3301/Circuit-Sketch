@@ -1,0 +1,135 @@
+<svg version="1.1" font-family="sans-serif" font-size="8.2px" text-anchor="middle" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="70.336mm" height="89.436mm" viewBox="0 0 70.336 89.436">
+        <defs>
+          <pattern id="wires" width="2.54" height="8" patternUnits="userSpaceOnUse">
+            <rect width="2.54" height="8" fill="#eee"/>
+            <rect x="0.77" width="1" height="6" fill="#d9d5bc"/>
+            <circle cx="1.27" cy="6" r="0.75" fill="#d9d5bc"/>
+            <rect x="0.52" y="6" width="1.5" height="2" fill="#d9d5bc"/>
+          </pattern>
+          <pattern id="wires-marks" width="2.54" height="8" patternUnits="userSpaceOnUse">
+            <rect x="0.52" y="6" width="1.5" height="2" fill="#746d41"/>
+          </pattern>
+          <!--?lit$688897438$-->
+  <pattern id="pins-female" width="2.54" height="2.54" patternUnits="userSpaceOnUse">
+    <rect x="0" y="0" width="2.54" height="2.54" fill="#333"/>
+    <rect x="1.079" y="0.896" width="0.762" height="0.762" style="fill: #191919"/>
+    <path transform="translate(1.079, 1.658) rotate(180 0 0)" d="m 0 0 v 0.762 l 0.433,0.433 c 0.046,-0.046 0.074,-0.109 0.074,-0.179 v -1.27 c 0,-0.070 -0.028,-0.133 -0.074,-0.179 z" style="opacity: 0.25"/>
+    <path transform="translate(1.841, 1.658) rotate(90 0 0)" d="m 0 0 v 0.762 l 0.433,0.433 c 0.046,-0.046 0.074,-0.109 0.074,-0.179 v -1.27 c 0,-0.070 -0.028,-0.133 -0.074,-0.179 z" style="opacity: 0.3; fill: #fff"/>
+    <path transform="translate(1.841, 0.896)" d="m 0 0 v 0.762 l 0.433,0.433 c 0.046,-0.046 0.074,-0.109 0.074,-0.179 v -1.27 c 0,-0.070 -0.028,-0.133 -0.074,-0.179 z" style="opacity: 0.15; fill: #fff"/>
+    <path transform="translate(1.079, 0.896) rotate(270 0 0)" d="m 0 0 v 0.762 l 0.433,0.433 c 0.046,-0.046 0.074,-0.109 0.074,-0.179 v -1.27 c 0,-0.070 -0.028,-0.133 -0.074,-0.179 z" style="opacity: 0.35"/>
+  </pattern>
+
+          <filter id="shadow">
+            <fedropshadow dx="0" dy="0" stdDeviation="0.5" flood-color="#ffff99"/>
+          </filter>
+        </defs>
+
+        <!-- Keypad outline -->
+        <rect x="0" y="0" height="76" rx="5" ry="5" fill="#454449" width="70.336"/>
+        <rect x="2.78" y="3.25" height="68.6" rx="3.5" ry="3.5" fill="none" stroke="#b1b5b9" stroke-width="1" width="65"/>
+
+
+        <!-- Conector: a fita de 8 vias.
+             O Wokwi so desenha a fita quando o conector esta ligado, e o
+             extrator pegou a peca sem ele: o desenho acabava em 76 mm e
+             os oito pinos ficavam 13 mm abaixo, no vazio. Nenhum deles
+             aceitava fio. -->
+        <g>
+          <rect x="24.858" y="74" width="21.06" height="15.629"
+                rx="0.6" fill="#efeade" stroke="#c9c3ae" stroke-width=".3"/>
+          <g fill="#c9a227">
+            <rect x="25.908" y="75.2" width="1.1" height="11.6"/>
+            <rect x="28.554" y="75.2" width="1.1" height="11.6"/>
+            <rect x="31.068" y="75.2" width="1.1" height="11.6"/>
+            <rect x="33.581" y="75.2" width="1.1" height="11.6"/>
+            <rect x="36.095" y="75.2" width="1.1" height="11.6"/>
+            <rect x="38.608" y="75.2" width="1.1" height="11.6"/>
+            <rect x="41.188" y="75.2" width="1.1" height="11.6"/>
+            <rect x="43.768" y="75.2" width="1.1" height="11.6"/>
+          </g>
+          <g fill="#e0bb3c" stroke="#a98a1e" stroke-width=".12">
+            <rect x="25.508" y="85.6" width="1.9" height="4.029" rx="0.3"/>
+            <rect x="28.154" y="85.6" width="1.9" height="4.029" rx="0.3"/>
+            <rect x="30.668" y="85.6" width="1.9" height="4.029" rx="0.3"/>
+            <rect x="33.181" y="85.6" width="1.9" height="4.029" rx="0.3"/>
+            <rect x="35.695" y="85.6" width="1.9" height="4.029" rx="0.3"/>
+            <rect x="38.208" y="85.6" width="1.9" height="4.029" rx="0.3"/>
+            <rect x="40.788" y="85.6" width="1.9" height="4.029" rx="0.3"/>
+            <rect x="43.368" y="85.6" width="1.9" height="4.029" rx="0.3"/>
+          </g>
+        </g>
+
+        <!-- Blue keys -->
+        <g fill="#4e90d7">
+          <g><!--?lit$688897438$--><g tabindex="0" transform="translate(7 10.7)" class="blue-key" data-key-name="1">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->1</text>
+    </g></g>
+          <g><!--?lit$688897438$--><g tabindex="0" transform="translate(22 10.7)" class="blue-key" data-key-name="2">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->2</text>
+    </g></g>
+          <g><!--?lit$688897438$--><g tabindex="0" transform="translate(37 10.7)" class="blue-key" data-key-name="3">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->3</text>
+    </g></g>
+          <g><!--?lit$688897438$--><g tabindex="0" transform="translate(7 25)" class="blue-key" data-key-name="4">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->4</text>
+    </g></g>
+          <g><!--?lit$688897438$--><g tabindex="0" transform="translate(22 25)" class="blue-key" data-key-name="5">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->5</text>
+    </g></g>
+          <g><!--?lit$688897438$--><g tabindex="0" transform="translate(37 25)" class="blue-key" data-key-name="6">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->6</text>
+    </g></g>
+          <g><!--?lit$688897438$--><g tabindex="0" transform="translate(7 39.3)" class="blue-key" data-key-name="7">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->7</text>
+    </g></g>
+          <g><!--?lit$688897438$--><g tabindex="0" transform="translate(22 39.3)" class="blue-key" data-key-name="8">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->8</text>
+    </g></g>
+          <g><!--?lit$688897438$--><g tabindex="0" transform="translate(37 39.3)" class="blue-key" data-key-name="9">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->9</text>
+    </g></g>
+          <g><!--?lit$688897438$--><g tabindex="0" transform="translate(22 53.6)" class="blue-key" data-key-name="0">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->0</text>
+    </g></g>
+        </g>
+
+        <!-- Red keys -->
+        <g fill="#e94541">
+          <g><!--?lit$688897438$--><g tabindex="0" transform="translate(7 53.6)" class="red-key" data-key-name="*">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->*</text>
+    </g></g>
+          <g><!--?lit$688897438$--><g tabindex="0" transform="translate(37 53.6)" class="red-key" data-key-name="#">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->#</text>
+    </g></g>
+          <!--?lit$688897438$-->
+              <g><!--?lit$688897438$--><g tabindex="0" transform="translate(52 10.7)" class="red-key" data-key-name="A">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->A</text>
+    </g></g>
+              <g><!--?lit$688897438$--><g tabindex="0" transform="translate(52 25)" class="red-key" data-key-name="B">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->B</text>
+    </g></g>
+              <g><!--?lit$688897438$--><g tabindex="0" transform="translate(52 39.3)" class="red-key" data-key-name="C">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->C</text>
+    </g></g>
+              <g><!--?lit$688897438$--><g tabindex="0" transform="translate(52 53.6)" class="red-key" data-key-name="D">
+      <rect width="11.2" height="11" rx="1.4" ry="1.4" stroke="#b1b5b9" stroke-width=".75"/>
+      <text x="5.6" y="8.1" fill="#dfe2e5"><!--?lit$688897438$-->D</text>
+    </g></g>
+          
+        </g>
+      </svg>

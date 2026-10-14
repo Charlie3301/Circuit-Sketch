@@ -1,0 +1,38 @@
+Terceiros no modo nativo do CircuitSketch
+=========================================
+
+tcc/libtcc.dll e tcc/lib/libtcc1-64.a
+    TinyCC (Tiny C Compiler) 0.9.27, de Fabrice Bellard e colaboradores, sob a
+    GNU Lesser General Public License versao 2.1: o texto completo esta em
+    tcc/COPYING, tirado da propria release. O tcc/tcc-win32.txt e o texto
+    da distribuicao para Windows. O codigo-fonte vai junto, em
+    tcc/fonte/tcc-0.9.27.tar.bz2 (o mesmo de
+    https://download.savannah.gnu.org/releases/tinycc/).
+
+    A libtcc.dll e MODIFICADA (30/09/2026): os dados const, os textos entre
+    aspas e as constantes de ponto flutuante vao para uma secao .rodata, e
+    nao para a .data -- como o GCC faz na placa, onde isso fica na flash e
+    nao conta na RAM. A mudanca inteira esta em
+    tcc/fonte/circuitsketch-rodata.patch (tcc.h, tccelf.c e tccgen.c, cada
+    um com o aviso da modificacao no topo). Para refazer a DLL: extrair o
+    tar.bz2, aplicar o patch, criar o config.h como o win32/build-tcc.bat
+    cria, e, na pasta win32, com o GCC do mingw-w64 (MSYS2 mingw64):
+        gcc -Os -s -static -fno-strict-aliasing -o libtcc.dll -shared
+            ../libtcc.c -DTCC_TARGET_PE -DTCC_TARGET_X86_64 -DLIBTCC_AS_DLL
+    O libtcc1-64.a e o da distribuicao oficial, sem modificacao. O
+    CircuitSketch ainda troca, na memoria do proprio processo, o _setjmp e o
+    longjmp que a DLL chama (motor/Nativo/Tcc.cs explica por que).
+
+include/sdkconfig/*.h
+    Gerados pelo ESP-IDF 5.5.5 para o core ESP32 do Arduino 3.3.11
+    (Espressif Systems), sob a Apache License 2.0
+    (https://www.apache.org/licenses/LICENSE-2.0).
+
+include/chip/*/soc/soc_caps.h e include/chip/*/soc/gpio_num.h
+    Do ESP-IDF (Espressif Systems), sob a Apache License 2.0. O soc_caps.h do
+    esp32 e o do esp32h2 foram modificados: o bloco do __has_include, que o
+    TinyCC nao tem (o comentario no proprio arquivo diz o que mudou).
+
+O resto de include/ e de runtime/ foi escrito para o CircuitSketch, imitando
+as interfaces do ESP-IDF, da newlib e do FreeRTOS -- os nomes e os valores
+que o codigo C usa, para o mesmo codigo compilar aqui e na placa.

@@ -1,0 +1,73 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste da linguagem micropython.",
+  "",
+  "Todas as dez fazem exatamente a mesma coisa — piscar um LED e",
+  "contar — para que a comparação entre elas fique limpa."
+ ],
+ "codigo": [
+  "# Bateria — MicroPython.",
+  "",
+  "from machine import Pin",
+  "import time",
+  "",
+  "led = Pin(2, Pin.OUT)",
+  "print(\"micropython acordou\")",
+  "",
+  "while True:",
+  "    led.value(1)",
+  "    time.sleep(0.25)",
+  "    led.value(0)",
+  "    time.sleep(0.25)"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 120,
+    "Y": 60
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 520,
+    "Y": 120,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r",
+    "Tipo": "resistor",
+    "X": 520,
+    "Y": 280,
+    "Ohms": 330
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "r",
+    "ParaPino": "1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "r",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

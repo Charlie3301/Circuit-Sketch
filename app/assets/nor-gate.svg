@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="67.20000000000002" height="48.00000000000001" viewBox="0 0 67.20000000000002 48.00000000000001"
+     font-family="sans-serif" text-anchor="middle">
+  
+  <path d="M9.600000000000001 6 q 10 18.000000000000004 0 36.00000000000001 q 18 0 38.400000000000006 -18.000000000000004 q -20.400000000000006 -18.000000000000004 -18 -18.000000000000004 Z" fill="#243447" stroke="#4E6274" stroke-width="1.6"/>
+  <path d="M0 14.400000000000002 H9.600000000000001" stroke="#C8D4DE" stroke-width="2"/>
+  <path d="M0 33.60000000000001 H9.600000000000001" stroke="#C8D4DE" stroke-width="2"/>
+  <path d="M53.00000000000001 24.000000000000004 H67.20000000000002" stroke="#C8D4DE" stroke-width="2"/>
+  <circle cx="50.60000000000001" cy="24.000000000000004" r="2.8" fill="#243447" stroke="#C8D4DE" stroke-width="1.6"/>
+  
+  <text x="28.8" y="44.00000000000001" fill="#E6EDF3" font-size="9">NOR</text>
+</svg>

@@ -1,0 +1,171 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Uno alimentado pelo 7805 (LiPo 3S)",
+  "",
+  "O regulador linear 7805 baixa a LiPo 3S (11,1 V) para os 5 V do Uno, que",
+  "entram pelo pino 5V -- sem o cabo USB. O Uno mede a propria bateria",
+  "por um divisor de resistores no A0 e pisca o LED.",
+  "",
+  "Clique no 7805: a barra mostra a entrada, a saida, a corrente e a",
+  "temperatura. Com so o Uno (~50 mA) ele esquenta pouco: (11,1 - 5) x",
+  "0,05 = 0,3 W."
+ ],
+ "codigo": [
+  "// O Uno ligado pelo 7805 (5 V da LiPo 3S), medindo a propria bateria.",
+  "// O divisor de 10k + 4k7 leva os 11,1 V da LiPo para ~3,5 V no A0.",
+  "",
+  "const int LED = 13;",
+  "const float DIVISOR = (10000.0 + 4700.0) / 4700.0;",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  pinMode(LED, OUTPUT);",
+  "  Serial.println(\"Uno ligado pelo 7805\");",
+  "}",
+  "",
+  "void loop() {",
+  "  float volts = analogRead(A0) * 5.0 / 1023.0 * DIVISOR;",
+  "  Serial.print(\"Bateria: \");",
+  "  Serial.print(volts, 1);",
+  "  Serial.println(\" V\");",
+  "  digitalWrite(LED, !digitalRead(LED));",
+  "  delay(500);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "reg",
+    "Tipo": "regulador-7805",
+    "X": 420,
+    "Y": 300
+   },
+   {
+    "Id": "bat",
+    "Tipo": "bateria",
+    "X": 560,
+    "Y": 330,
+    "Volts": 11.1,
+    "MiliAmperes": 20000,
+    "MiliAmperesHora": 2200,
+    "Nome": "LiPo 3S 2200 mAh (11,1 V)"
+   },
+   {
+    "Id": "r1",
+    "Tipo": "resistor",
+    "X": 380,
+    "Y": 470,
+    "Ohms": 10000
+   },
+   {
+    "Id": "r2",
+    "Tipo": "resistor",
+    "X": 380,
+    "Y": 540,
+    "Ohms": 4700
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 360,
+    "Y": 40,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 290,
+    "Y": 100,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "13",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "bat",
+    "DePino": "+",
+    "ParaPeca": "reg",
+    "ParaPino": "IN",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "bat",
+    "DePino": "-",
+    "ParaPeca": "reg",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "OUT",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "bat",
+    "DePino": "+",
+    "ParaPeca": "r1",
+    "ParaPino": "1",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "r1",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "A0",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "r2",
+    "DePino": "1",
+    "ParaPeca": "placa",
+    "ParaPino": "A0",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "r2",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

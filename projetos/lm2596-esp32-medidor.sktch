@@ -1,0 +1,174 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "ESP32 no LM2596, medindo a LiPo",
+  "",
+  "O step-down LM2596 (o trimpot em 5 V) baixa a LiPo 3S e liga a ESP32",
+  "pelo VIN -- sem o cabo USB. A ESP32 mede a bateria por um divisor de",
+  "100k + 22k no GPIO34 (o 11,1 V vira 2 V) e acende o LED enquanto ela",
+  "estiver acima de 10,5 V.",
+  "",
+  "Mude a tensao da bateria na barra dela e veja a leitura e o LED. O",
+  "LM2596 e chaveado: da LiPo sai bem menos corrente do que a ESP32",
+  "puxa dos 5 V (clique nele)."
+ ],
+ "codigo": [
+  "// A ESP32 ligada pelo LM2596 (step-down: 11,1 V -> 5 V no VIN),",
+  "// medindo a LiPo por um divisor de 100k + 22k no GPIO34.",
+  "",
+  "const int LED = 2;",
+  "const float DIVISOR = (100000.0 + 22000.0) / 22000.0;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(LED, OUTPUT);",
+  "  analogReadResolution(12);",
+  "  Serial.println(\"ESP32 ligada pelo LM2596\");",
+  "}",
+  "",
+  "void loop() {",
+  "  float volts = analogRead(34) * 3.3 / 4095.0 * DIVISOR;",
+  "  Serial.print(\"Bateria: \");",
+  "  Serial.print(volts, 1);",
+  "  Serial.println(\" V\");",
+  "  digitalWrite(LED, volts > 10.5);   // aceso: bateria boa",
+  "  delay(500);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "reg",
+    "Tipo": "lm2596",
+    "X": 300,
+    "Y": 300,
+    "Volts": 5.0
+   },
+   {
+    "Id": "bat",
+    "Tipo": "bateria",
+    "X": 520,
+    "Y": 320,
+    "Volts": 11.1,
+    "MiliAmperes": 20000,
+    "MiliAmperesHora": 2200,
+    "Nome": "LiPo 3S 2200 mAh (11,1 V)"
+   },
+   {
+    "Id": "r1",
+    "Tipo": "resistor",
+    "X": 200,
+    "Y": 120,
+    "Ohms": 100000
+   },
+   {
+    "Id": "r2",
+    "Tipo": "resistor",
+    "X": 200,
+    "Y": 190,
+    "Ohms": 22000
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 260,
+    "Y": 0,
+    "Cor": "azul"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 190,
+    "Y": 60,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D2",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "bat",
+    "DePino": "+",
+    "ParaPeca": "reg",
+    "ParaPino": "IN+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "bat",
+    "DePino": "-",
+    "ParaPeca": "reg",
+    "ParaPino": "IN-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "OUT+",
+    "ParaPeca": "placa",
+    "ParaPino": "VIN",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "reg",
+    "DePino": "OUT-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "bat",
+    "DePino": "+",
+    "ParaPeca": "r1",
+    "ParaPino": "1",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "r1",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "D34",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "r2",
+    "DePino": "1",
+    "ParaPeca": "placa",
+    "ParaPino": "D34",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "r2",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

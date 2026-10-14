@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="230.40000000000003" height="105.60000000000002" viewBox="0 0 230.40000000000003 105.60000000000002"
+     font-family="sans-serif" text-anchor="middle">
+  <rect x="0" y="0" width="230.40000000000003" height="105.60000000000002" rx="4" fill="#1B2430" stroke="#4E6274" stroke-width="1.6"/>
+  <rect x="48.00000000000001" y="11.520000000000001" width="172.80000000000004" height="82.56000000000002" rx="2" fill="#0A0E14" stroke="#2E3B4A" stroke-width="1"/>
+  <path d="M0 11.520000000000001 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
+  <text x="32.64" y="14.720000000000002" fill="#E6EDF3" font-size="8">D0</text>
+  <path d="M0 21.120000000000005 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
+  <text x="32.64" y="24.320000000000004" fill="#E6EDF3" font-size="8">D1</text>
+  <path d="M0 30.720000000000006 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
+  <text x="32.64" y="33.92000000000001" fill="#E6EDF3" font-size="8">D2</text>
+  <path d="M0 40.32000000000001 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
+  <text x="32.64" y="43.52000000000001" fill="#E6EDF3" font-size="8">D3</text>
+  <path d="M0 49.92000000000001 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
+  <text x="32.64" y="53.12000000000001" fill="#E6EDF3" font-size="8">D4</text>
+  <path d="M0 59.52000000000001 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
+  <text x="32.64" y="62.72000000000001" fill="#E6EDF3" font-size="8">D5</text>
+  <path d="M0 69.12000000000002 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
+  <text x="32.64" y="72.32000000000002" fill="#E6EDF3" font-size="8">D6</text>
+  <path d="M0 78.72 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
+  <text x="32.64" y="81.92" fill="#E6EDF3" font-size="8">D7</text>
+  <path d="M0 88.32000000000001 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
+  <text x="32.64" y="91.52000000000001" fill="#E6EDF3" font-size="8">GND</text>
+  <text x="115.20000000000002" y="102.60000000000002" fill="#7C8B9A" font-size="8">ANALISADOR LOGICO</text>
+</svg>

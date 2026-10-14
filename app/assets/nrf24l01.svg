@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="17.0mm" height="29.0mm" viewBox="0 0 17.0 29.0"
+     font-family="monospace" text-anchor="start">
+
+  <rect x="0" y="0" width="17.0" height="29.0" rx="0.8" fill="#1d4f8c"/>
+  <rect x="0.35" y="0.35" width="16.3" height="28.3" rx="0.6"
+        fill="none" stroke="#153b69" stroke-width="0.3"/>
+
+  <g fill="#e0bb3c" stroke="#a98a1e" stroke-width="0.1">
+    <circle cx="2.40" cy="3.20" r="0.82"/>
+    <circle cx="4.94" cy="3.20" r="0.82"/>
+    <circle cx="2.40" cy="5.74" r="0.82"/>
+    <circle cx="4.94" cy="5.74" r="0.82"/>
+    <circle cx="2.40" cy="8.28" r="0.82"/>
+    <circle cx="4.94" cy="8.28" r="0.82"/>
+    <circle cx="2.40" cy="10.82" r="0.82"/>
+    <circle cx="4.94" cy="10.82" r="0.82"/>
+  </g>
+  <g fill="#123a66">
+    <circle cx="2.40" cy="3.20" r="0.38"/>
+    <circle cx="4.94" cy="3.20" r="0.38"/>
+    <circle cx="2.40" cy="5.74" r="0.38"/>
+    <circle cx="4.94" cy="5.74" r="0.38"/>
+    <circle cx="2.40" cy="8.28" r="0.38"/>
+    <circle cx="4.94" cy="8.28" r="0.38"/>
+    <circle cx="2.40" cy="10.82" r="0.38"/>
+    <circle cx="4.94" cy="10.82" r="0.38"/>
+  </g>
+  <text fill="#cfe0f2" font-size="0.95px">
+    <tspan x="6.44" y="3.58">GND/VCC</tspan>
+    <tspan x="6.44" y="6.12">CE/CSN</tspan>
+    <tspan x="6.44" y="8.66">SCK/MOSI</tspan>
+    <tspan x="6.44" y="11.20">MISO/IRQ</tspan>
+  </text>
+
+  <rect x="3.0" y="14.0" width="7.6" height="7.6" rx="0.5" fill="#8e99a6"/>
+  <rect x="3.0" y="14.0" width="7.6" height="7.6" rx="0.5"
+        fill="none" stroke="#5f6a76" stroke-width="0.25"/>
+  <circle cx="4.0" cy="15.0" r="0.35" fill="#5f6a76"/>
+  <text x="3.7" y="18.4" fill="#3d4650" font-size="1.5px">nRF24</text>
+
+  <rect x="12.0" y="14.4" width="2.4" height="1.5" rx="0.25" fill="#c8ccd2"/>
+  <rect x="12.0" y="17.0" width="2.4" height="1.5" rx="0.25" fill="#c8ccd2"/>
+  <circle cx="13.2" cy="20.4" r="0.85" fill="#2b2f36"/>
+
+  <path d="M11.0 26.6 h3.4 v-1.3 h-3.4 v-1.3 h3.4 v-1.3 h-3.4 v-1.3 h3.4 v-1.3 h-3.4 v-1.3 h3.4" fill="none" stroke="#d7b94a" stroke-width="0.55"
+        stroke-linecap="square"/>
+
+  <text x="2.4" y="27.2" fill="#9dbbd9" font-size="1.3px">NRF24L01</text>
+</svg>

@@ -1,0 +1,113 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Barra no OLED SSD1306 (ESP32)",
+  "",
+  "O OLED de 128x64 (I2C, 0x3C) mostra a leitura do potenciometro e uma",
+  "barra que cresce com ela. Gire o potenciometro."
+ ],
+ "codigo": [
+  "// O potenciometro numa barra no OLED 128x64 (SSD1306 I2C).",
+  "#include <Wire.h>",
+  "#include <Adafruit_GFX.h>",
+  "#include <Adafruit_SSD1306.h>",
+  "",
+  "Adafruit_SSD1306 tela(128, 64, &Wire, -1);",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  tela.begin(SSD1306_SWITCHCAPVCC, 0x3C);",
+  "  tela.setTextColor(SSD1306_WHITE);",
+  "}",
+  "",
+  "void loop() {",
+  "  int leitura = analogRead(34);",
+  "  int largura = map(leitura, 0, 4095, 0, 124);",
+  "  tela.clearDisplay();",
+  "  tela.setTextSize(1);",
+  "  tela.setCursor(0, 0);",
+  "  tela.print(\"Potenciometro: \");",
+  "  tela.print(leitura);",
+  "  tela.drawRect(0, 20, 128, 20, SSD1306_WHITE);",
+  "  tela.fillRect(2, 22, largura, 16, SSD1306_WHITE);",
+  "  tela.display();",
+  "  delay(50);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "oled",
+    "Tipo": "ssd1306-i2c",
+    "X": 300,
+    "Y": 40
+   },
+   {
+    "Id": "pot",
+    "Tipo": "potentiometer",
+    "X": 300,
+    "Y": 230,
+    "Giro": 0.6
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "oled",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "oled",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "oled",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "D21",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "oled",
+    "DePino": "SCL",
+    "ParaPeca": "placa",
+    "ParaPino": "D22",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "SIG",
+    "ParaPeca": "placa",
+    "ParaPino": "D34",
+    "Cor": "#E8B400"
+   }
+  ]
+ }
+}

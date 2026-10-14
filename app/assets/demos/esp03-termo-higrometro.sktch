@@ -1,0 +1,259 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Termo-higrometro com DHT11, num ESP-03.",
+  "",
+  "O que esta demo mostra:",
+  "- temperatura e umidade do DHT11 decidindo quatro LEDs;",
+  "- comparacao escrita direto no digitalWrite (\"t < 20\" ja e HIGH ou LOW).",
+  "",
+  "Aperte F5 e clique no DHT11 para mudar a temperatura e a umidade (o ar",
+  "comeca seco, com o LED amarelo aceso)."
+ ],
+ "codigo": [
+  "// Termo-higrometro com DHT11, num ESP-03.",
+  "//",
+  "// Tres LEDs dizem como esta a sala: azul (frio, abaixo de 20 C), verde",
+  "// (confortavel) e vermelho (quente, acima de 27 C). O amarelo acende com o",
+  "// ar seco, abaixo de 40 % de umidade.",
+  "",
+  "#include <DHT.h>",
+  "",
+  "const int PINO_DHT = 14;",
+  "const int FRIO = 12;",
+  "const int CONFORTO = 13;",
+  "const int QUENTE = 5;",
+  "const int SECO = 4;",
+  "",
+  "DHT dht(PINO_DHT, DHT11);",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(FRIO, OUTPUT);",
+  "  pinMode(CONFORTO, OUTPUT);",
+  "  pinMode(QUENTE, OUTPUT);",
+  "  pinMode(SECO, OUTPUT);",
+  "  dht.begin();",
+  "}",
+  "",
+  "void loop() {",
+  "  delay(1000);   // o DHT11 le no maximo uma vez por segundo",
+  "",
+  "  float t = dht.readTemperature();",
+  "  float u = dht.readHumidity();",
+  "  if (isnan(t) || isnan(u)) {",
+  "    Serial.println(\"falha ao ler o DHT11\");",
+  "    return;",
+  "  }",
+  "",
+  "  digitalWrite(FRIO, t < 20);",
+  "  digitalWrite(CONFORTO, t >= 20 && t <= 27);",
+  "  digitalWrite(QUENTE, t > 27);",
+  "  digitalWrite(SECO, u < 40);",
+  "",
+  "  Serial.print(\"temperatura: \");",
+  "  Serial.print(t, 0);",
+  "  Serial.print(\" C   umidade: \");",
+  "  Serial.print(u, 0);",
+  "  Serial.println(\" %\");",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp-03",
+    "X": 80,
+    "Y": 100
+   },
+   {
+    "Id": "dht",
+    "Tipo": "dht11",
+    "X": 300,
+    "Y": 20,
+    "Giro": 0.48,
+    "Giro2": 0.1
+   },
+   {
+    "Id": "frio",
+    "Tipo": "led",
+    "X": 330,
+    "Y": 150,
+    "Cor": "azul"
+   },
+   {
+    "Id": "r_frio",
+    "Tipo": "resistor",
+    "X": 258,
+    "Y": 196,
+    "Ohms": 220
+   },
+   {
+    "Id": "conforto",
+    "Tipo": "led",
+    "X": 420,
+    "Y": 150,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_conforto",
+    "Tipo": "resistor",
+    "X": 348,
+    "Y": 196,
+    "Ohms": 220
+   },
+   {
+    "Id": "quente",
+    "Tipo": "led",
+    "X": 510,
+    "Y": 150,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_quente",
+    "Tipo": "resistor",
+    "X": 438,
+    "Y": 196,
+    "Ohms": 220
+   },
+   {
+    "Id": "seco",
+    "Tipo": "led",
+    "X": 600,
+    "Y": 150,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r_seco",
+    "Tipo": "resistor",
+    "X": 528,
+    "Y": 196,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "dht",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "VCC",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "dht",
+    "DePino": "DATA",
+    "ParaPeca": "placa",
+    "ParaPino": "GPIO14",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "dht",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO12",
+    "ParaPeca": "r_frio",
+    "ParaPino": "1",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_frio",
+    "DePino": "2",
+    "ParaPeca": "frio",
+    "ParaPino": "A",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "frio",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO13",
+    "ParaPeca": "r_conforto",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_conforto",
+    "DePino": "2",
+    "ParaPeca": "conforto",
+    "ParaPino": "A",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "conforto",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO5",
+    "ParaPeca": "r_quente",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_quente",
+    "DePino": "2",
+    "ParaPeca": "quente",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "quente",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO4",
+    "ParaPeca": "r_seco",
+    "ParaPino": "1",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_seco",
+    "DePino": "2",
+    "ParaPeca": "seco",
+    "ParaPino": "A",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "seco",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

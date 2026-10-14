@@ -1,0 +1,195 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Relogio com RTC e LCD, na ST Nucleo-C031C6.",
+  "",
+  "O que esta demo mostra:",
+  "- o RTC DS1307 com a RTClib: DateTime, now() e adjust();",
+  "- dois aparelhos no mesmo I2C (RTC e LCD, D14 e D15 no cabecalho do Uno).",
+  "",
+  "Aperte F5. O botao troca entre 24 h e 12 h."
+ ],
+ "codigo": [
+  "// Relogio com RTC e LCD, na ST Nucleo-C031C6.",
+  "//",
+  "// O DS1307 guarda a hora mesmo com a placa desligada (a bateria dele",
+  "// segura). O LCD mostra a hora e a data, e o botao troca entre 24 h e",
+  "// 12 h. O RTC e o LCD dividem o mesmo I2C -- D14 e D15, como no Uno.",
+  "//",
+  "// Na primeira vez, o RTC e acertado com a hora em que o sketch foi",
+  "// compilado (__DATE__ e __TIME__).",
+  "",
+  "#include <Wire.h>",
+  "#include <RTClib.h>",
+  "#include <LiquidCrystal_I2C.h>",
+  "",
+  "RTC_DS1307 rtc;",
+  "LiquidCrystal_I2C lcd(0x27, 16, 2);",
+  "",
+  "const int BOTAO = 7;   // D7",
+  "const char* DIAS[] = {\"Dom\", \"Seg\", \"Ter\", \"Qua\", \"Qui\", \"Sex\", \"Sab\"};",
+  "",
+  "bool dozeHoras = false;",
+  "int botaoAntes = HIGH;",
+  "",
+  "void doisDigitos(int n) {",
+  "  if (n < 10) lcd.print('0');",
+  "  lcd.print(n);",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(BOTAO, INPUT_PULLUP);",
+  "  lcd.init();",
+  "  lcd.backlight();",
+  "",
+  "  if (!rtc.begin()) {",
+  "    lcd.print(\"RTC nao achado\");",
+  "    while (true) delay(1000);",
+  "  }",
+  "  if (!rtc.isrunning()) {",
+  "    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));",
+  "  }",
+  "}",
+  "",
+  "void loop() {",
+  "  int botao = digitalRead(BOTAO);",
+  "  if (botaoAntes == HIGH && botao == LOW) dozeHoras = !dozeHoras;",
+  "  botaoAntes = botao;",
+  "",
+  "  DateTime agora = rtc.now();",
+  "",
+  "  lcd.setCursor(0, 0);",
+  "  if (dozeHoras) doisDigitos(agora.twelveHour());",
+  "  else doisDigitos(agora.hour());",
+  "  lcd.print(':');",
+  "  doisDigitos(agora.minute());",
+  "  lcd.print(':');",
+  "  doisDigitos(agora.second());",
+  "  lcd.print(dozeHoras ? (agora.isPM() ? \" PM   \" : \" AM   \") : \"      \");",
+  "",
+  "  lcd.setCursor(0, 1);",
+  "  lcd.print(DIAS[agora.dayOfTheWeek()]);",
+  "  lcd.print(' ');",
+  "  doisDigitos(agora.day());",
+  "  lcd.print('/');",
+  "  doisDigitos(agora.month());",
+  "  lcd.print('/');",
+  "  lcd.print(agora.year());",
+  "",
+  "  delay(200);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "st-nucleo-c031c6",
+    "X": 60,
+    "Y": 40
+   },
+   {
+    "Id": "rtc",
+    "Tipo": "ds1307",
+    "X": 260,
+    "Y": 20
+   },
+   {
+    "Id": "lcd",
+    "Tipo": "lcd1602-i2c",
+    "X": 240,
+    "Y": 150
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 400,
+    "Y": 20
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "rtc",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "rtc",
+    "DePino": "5V",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "rtc",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "D14",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "rtc",
+    "DePino": "SCL",
+    "ParaPeca": "placa",
+    "ParaPino": "D15",
+    "Cor": "#8E44AD",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "D14",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "SCL",
+    "ParaPeca": "placa",
+    "ParaPino": "D15",
+    "Cor": "#8E44AD",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D7",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

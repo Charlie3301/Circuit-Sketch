@@ -1,0 +1,778 @@
+# ============================================================
+#  CircuitSketch - as placas que o simulador entende
+#
+#  Uma entrada por perfil de PerfilPlaca.cs. Os limites de memoria
+#  sao os das placas reais: e com eles que a Arduino IDE calcula a
+#  porcentagem do "Sketch uses ...", entao errar aqui faz o aluno
+#  ver um numero que nao bate com o da bancada.
+#
+#  As propriedades "simulador.*" alimentam tools/tamanho.ps1. Como
+#  aqui nao ha compilacao de verdade, o tamanho sai do fonte: um
+#  piso (o que um sketch vazio ja ocupa naquela placa) mais um
+#  fator por byte de codigo. Sao estimativas, e por isso o
+#  cabecalho da gravacao diz que o alvo e simulado.
+#
+#  simulador.gravador escolhe a cara da gravacao: as placas AVR
+#  mostram avrdude, as de 32 bits mostram esptool. E a saida que o
+#  aluno ja conhece de cada uma.
+# ============================================================
+
+# ---------------- ESP32 DevKit V1 ----------------
+simesp32.name=ESP32 (CircuitSketch)
+simesp32.build.core=simulador
+simesp32.build.mcu=esp32
+simesp32.build.f_cpu=240000000L
+simesp32.build.board=SIMULADOR_ESP32
+simesp32.upload.tool=enviar
+simesp32.upload.tool.default=enviar
+simesp32.upload.tool.serial=enviar
+simesp32.upload.tool.circuitsketch=enviar
+simesp32.upload.wait_for_upload_port=false
+simesp32.upload.use_1200bps_touch=false
+simesp32.upload.maximum_size=1310720
+simesp32.upload.maximum_data_size=327680
+simesp32.simulador.rotulo=ESP32 DevKit V1
+simesp32.simulador.peca=esp32-devkit-v1
+simesp32.simulador.gravador=esptool
+simesp32.simulador.piso_flash=197000
+simesp32.simulador.piso_ram=13400
+simesp32.simulador.fator_flash=6.4
+simesp32.simulador.fator_ram=0.42
+
+# ---------------- Arduino Uno ----------------
+simuno.name=Arduino Uno (CircuitSketch)
+simuno.build.core=simulador
+simuno.build.mcu=atmega328p
+simuno.build.f_cpu=16000000L
+simuno.build.board=SIMULADOR_UNO
+simuno.upload.tool=enviar
+simuno.upload.tool.default=enviar
+simuno.upload.tool.serial=enviar
+simuno.upload.tool.circuitsketch=enviar
+simuno.upload.wait_for_upload_port=false
+simuno.upload.use_1200bps_touch=false
+simuno.upload.maximum_size=32256
+simuno.upload.maximum_data_size=2048
+simuno.simulador.rotulo=Arduino Uno
+simuno.simulador.peca=arduino-uno
+simuno.simulador.gravador=avrdude
+simuno.simulador.assinatura=0x1e950f (probably m328p)
+simuno.simulador.piso_flash=444
+simuno.simulador.piso_ram=9
+simuno.simulador.fator_flash=0.9
+simuno.simulador.fator_ram=0.05
+
+# ---------------- Arduino Mega 2560 ----------------
+simmega.name=Arduino Mega 2560 (CircuitSketch)
+simmega.build.core=simulador
+simmega.build.mcu=atmega2560
+simmega.build.f_cpu=16000000L
+simmega.build.board=SIMULADOR_MEGA
+simmega.upload.tool=enviar
+simmega.upload.tool.default=enviar
+simmega.upload.tool.serial=enviar
+simmega.upload.tool.circuitsketch=enviar
+simmega.upload.wait_for_upload_port=false
+simmega.upload.use_1200bps_touch=false
+simmega.upload.maximum_size=253952
+simmega.upload.maximum_data_size=8192
+simmega.simulador.rotulo=Arduino Mega 2560
+simmega.simulador.peca=arduino-mega
+simmega.simulador.gravador=avrdude
+simmega.simulador.assinatura=0x1e9801 (probably m2560)
+simmega.simulador.piso_flash=656
+simmega.simulador.piso_ram=9
+simmega.simulador.fator_flash=0.9
+simmega.simulador.fator_ram=0.05
+
+# ---------------- Arduino Nano ----------------
+simnano.name=Arduino Nano (CircuitSketch)
+simnano.build.core=simulador
+simnano.build.mcu=atmega328p
+simnano.build.f_cpu=16000000L
+simnano.build.board=SIMULADOR_NANO
+simnano.upload.tool=enviar
+simnano.upload.tool.default=enviar
+simnano.upload.tool.serial=enviar
+simnano.upload.tool.circuitsketch=enviar
+simnano.upload.wait_for_upload_port=false
+simnano.upload.use_1200bps_touch=false
+# A Nano perde um pouco de flash para o bootloader antigo.
+simnano.upload.maximum_size=30720
+simnano.upload.maximum_data_size=2048
+simnano.simulador.rotulo=Arduino Nano
+simnano.simulador.peca=arduino-nano
+simnano.simulador.gravador=avrdude
+simnano.simulador.assinatura=0x1e950f (probably m328p)
+simnano.simulador.piso_flash=444
+simnano.simulador.piso_ram=9
+simnano.simulador.fator_flash=0.9
+simnano.simulador.fator_ram=0.05
+
+# ---------------- Nano RP2040 Connect ----------------
+simrp2040.name=Nano RP2040 Connect (CircuitSketch)
+simrp2040.build.core=simulador
+simrp2040.build.mcu=rp2040
+simrp2040.build.f_cpu=133000000L
+simrp2040.build.board=SIMULADOR_RP2040
+simrp2040.upload.tool=enviar
+simrp2040.upload.tool.default=enviar
+simrp2040.upload.tool.serial=enviar
+simrp2040.upload.tool.circuitsketch=enviar
+simrp2040.upload.wait_for_upload_port=false
+simrp2040.upload.use_1200bps_touch=false
+simrp2040.upload.maximum_size=16777216
+simrp2040.upload.maximum_data_size=270336
+simrp2040.simulador.rotulo=Nano RP2040 Connect
+simrp2040.simulador.peca=nano-rp2040-connect
+simrp2040.simulador.gravador=esptool
+simrp2040.simulador.piso_flash=80000
+simrp2040.simulador.piso_ram=11000
+simrp2040.simulador.fator_flash=3.0
+simrp2040.simulador.fator_ram=0.30
+
+# ---------------- Franzininho DIY (ATtiny85) ----------------
+simfranzininho.name=Franzininho DIY (CircuitSketch)
+simfranzininho.build.core=simulador
+simfranzininho.build.mcu=attiny85
+simfranzininho.build.f_cpu=16500000L
+simfranzininho.build.board=SIMULADOR_FRANZININHO
+simfranzininho.upload.tool=enviar
+simfranzininho.upload.tool.default=enviar
+simfranzininho.upload.tool.serial=enviar
+simfranzininho.upload.tool.circuitsketch=enviar
+simfranzininho.upload.wait_for_upload_port=false
+simfranzininho.upload.use_1200bps_touch=false
+# 8 KB menos o micronucleus.
+simfranzininho.upload.maximum_size=6586
+simfranzininho.upload.maximum_data_size=512
+simfranzininho.simulador.rotulo=Franzininho DIY (ATtiny85)
+simfranzininho.simulador.peca=franzininho
+simfranzininho.simulador.gravador=avrdude
+simfranzininho.simulador.assinatura=0x1e930b (probably t85)
+simfranzininho.simulador.piso_flash=50
+simfranzininho.simulador.piso_ram=0
+simfranzininho.simulador.fator_flash=0.8
+simfranzininho.simulador.fator_ram=0.04
+
+# ============================================================
+#  Daqui para baixo: geradas de PerfilPlaca.cs
+#  (CircuitSketch.exe --placas-da-ide plataforma\boards.txt)
+# ============================================================
+
+# ---------------- ATtiny85 ----------------
+simattiny85.name=ATtiny85 (CircuitSketch)
+simattiny85.build.core=simulador
+simattiny85.build.mcu=attiny85
+simattiny85.build.f_cpu=8000000L
+simattiny85.build.board=SIMULADOR_ATTINY85
+simattiny85.upload.tool=enviar
+simattiny85.upload.tool.default=enviar
+simattiny85.upload.tool.serial=enviar
+simattiny85.upload.tool.circuitsketch=enviar
+simattiny85.upload.wait_for_upload_port=false
+simattiny85.upload.use_1200bps_touch=false
+simattiny85.upload.maximum_size=8192
+simattiny85.upload.maximum_data_size=512
+simattiny85.simulador.rotulo=ATtiny85
+simattiny85.simulador.peca=attiny85
+simattiny85.simulador.gravador=avrdude
+simattiny85.simulador.assinatura=0x1e930b (probably t85)
+simattiny85.simulador.piso_flash=200
+simattiny85.simulador.piso_ram=15
+simattiny85.simulador.fator_flash=0.8
+simattiny85.simulador.fator_ram=0.04
+
+# ---------------- ESP32-S2 DevKit ----------------
+simesp32s2devkit.name=ESP32-S2 DevKit (CircuitSketch)
+simesp32s2devkit.build.core=simulador
+simesp32s2devkit.build.mcu=esp32s2
+simesp32s2devkit.build.f_cpu=240000000L
+simesp32s2devkit.build.board=SIMULADOR_ESP32S2DEVKIT
+simesp32s2devkit.upload.tool=enviar
+simesp32s2devkit.upload.tool.default=enviar
+simesp32s2devkit.upload.tool.serial=enviar
+simesp32s2devkit.upload.tool.circuitsketch=enviar
+simesp32s2devkit.upload.wait_for_upload_port=false
+simesp32s2devkit.upload.use_1200bps_touch=false
+simesp32s2devkit.upload.maximum_size=1310720
+simesp32s2devkit.upload.maximum_data_size=327680
+simesp32s2devkit.simulador.rotulo=ESP32-S2 DevKit
+simesp32s2devkit.simulador.peca=esp32-s2-devkit
+simesp32s2devkit.simulador.gravador=esptool
+simesp32s2devkit.simulador.piso_flash=200000
+simesp32s2devkit.simulador.piso_ram=20000
+simesp32s2devkit.simulador.fator_flash=6.4
+simesp32s2devkit.simulador.fator_ram=0.42
+
+# ---------------- ESP32-S3 DevKit ----------------
+simesp32s3devkit.name=ESP32-S3 DevKit (CircuitSketch)
+simesp32s3devkit.build.core=simulador
+simesp32s3devkit.build.mcu=esp32s3
+simesp32s3devkit.build.f_cpu=240000000L
+simesp32s3devkit.build.board=SIMULADOR_ESP32S3DEVKIT
+simesp32s3devkit.upload.tool=enviar
+simesp32s3devkit.upload.tool.default=enviar
+simesp32s3devkit.upload.tool.serial=enviar
+simesp32s3devkit.upload.tool.circuitsketch=enviar
+simesp32s3devkit.upload.wait_for_upload_port=false
+simesp32s3devkit.upload.use_1200bps_touch=false
+simesp32s3devkit.upload.maximum_size=1310720
+simesp32s3devkit.upload.maximum_data_size=327680
+simesp32s3devkit.simulador.rotulo=ESP32-S3 DevKit
+simesp32s3devkit.simulador.peca=esp32-s3-devkit
+simesp32s3devkit.simulador.gravador=esptool
+simesp32s3devkit.simulador.piso_flash=200000
+simesp32s3devkit.simulador.piso_ram=20000
+simesp32s3devkit.simulador.fator_flash=6.4
+simesp32s3devkit.simulador.fator_ram=0.42
+
+# ---------------- ESP32-C3 DevKit ----------------
+simesp32c3devkit.name=ESP32-C3 DevKit (CircuitSketch)
+simesp32c3devkit.build.core=simulador
+simesp32c3devkit.build.mcu=esp32c3
+simesp32c3devkit.build.f_cpu=160000000L
+simesp32c3devkit.build.board=SIMULADOR_ESP32C3DEVKIT
+simesp32c3devkit.upload.tool=enviar
+simesp32c3devkit.upload.tool.default=enviar
+simesp32c3devkit.upload.tool.serial=enviar
+simesp32c3devkit.upload.tool.circuitsketch=enviar
+simesp32c3devkit.upload.wait_for_upload_port=false
+simesp32c3devkit.upload.use_1200bps_touch=false
+simesp32c3devkit.upload.maximum_size=1310720
+simesp32c3devkit.upload.maximum_data_size=327680
+simesp32c3devkit.simulador.rotulo=ESP32-C3 DevKit
+simesp32c3devkit.simulador.peca=esp32-c3-devkit
+simesp32c3devkit.simulador.gravador=esptool
+simesp32c3devkit.simulador.piso_flash=200000
+simesp32c3devkit.simulador.piso_ram=20000
+simesp32c3devkit.simulador.fator_flash=6.4
+simesp32c3devkit.simulador.fator_ram=0.42
+
+# ---------------- ESP32-C6 DevKit ----------------
+simesp32c6devkit.name=ESP32-C6 DevKit (CircuitSketch)
+simesp32c6devkit.build.core=simulador
+simesp32c6devkit.build.mcu=esp32c6
+simesp32c6devkit.build.f_cpu=160000000L
+simesp32c6devkit.build.board=SIMULADOR_ESP32C6DEVKIT
+simesp32c6devkit.upload.tool=enviar
+simesp32c6devkit.upload.tool.default=enviar
+simesp32c6devkit.upload.tool.serial=enviar
+simesp32c6devkit.upload.tool.circuitsketch=enviar
+simesp32c6devkit.upload.wait_for_upload_port=false
+simesp32c6devkit.upload.use_1200bps_touch=false
+simesp32c6devkit.upload.maximum_size=1310720
+simesp32c6devkit.upload.maximum_data_size=327680
+simesp32c6devkit.simulador.rotulo=ESP32-C6 DevKit
+simesp32c6devkit.simulador.peca=esp32-c6-devkit
+simesp32c6devkit.simulador.gravador=esptool
+simesp32c6devkit.simulador.piso_flash=200000
+simesp32c6devkit.simulador.piso_ram=20000
+simesp32c6devkit.simulador.fator_flash=6.4
+simesp32c6devkit.simulador.fator_ram=0.42
+
+# ---------------- ESP32-H2 DevKit ----------------
+simesp32h2devkit.name=ESP32-H2 DevKit (CircuitSketch)
+simesp32h2devkit.build.core=simulador
+simesp32h2devkit.build.mcu=esp32h2
+simesp32h2devkit.build.f_cpu=96000000L
+simesp32h2devkit.build.board=SIMULADOR_ESP32H2DEVKIT
+simesp32h2devkit.upload.tool=enviar
+simesp32h2devkit.upload.tool.default=enviar
+simesp32h2devkit.upload.tool.serial=enviar
+simesp32h2devkit.upload.tool.circuitsketch=enviar
+simesp32h2devkit.upload.wait_for_upload_port=false
+simesp32h2devkit.upload.use_1200bps_touch=false
+simesp32h2devkit.upload.maximum_size=1310720
+simesp32h2devkit.upload.maximum_data_size=327680
+simesp32h2devkit.simulador.rotulo=ESP32-H2 DevKit
+simesp32h2devkit.simulador.peca=esp32-h2-devkit
+simesp32h2devkit.simulador.gravador=esptool
+simesp32h2devkit.simulador.piso_flash=200000
+simesp32h2devkit.simulador.piso_ram=20000
+simesp32h2devkit.simulador.fator_flash=6.4
+simesp32h2devkit.simulador.fator_ram=0.42
+
+# ---------------- NodeMCU (ESP8266) ----------------
+simesp8266nodemcu.name=NodeMCU ESP8266 (CircuitSketch)
+simesp8266nodemcu.build.core=simulador
+simesp8266nodemcu.build.mcu=esp8266
+simesp8266nodemcu.build.f_cpu=80000000L
+simesp8266nodemcu.build.board=SIMULADOR_ESP8266NODEMCU
+simesp8266nodemcu.upload.tool=enviar
+simesp8266nodemcu.upload.tool.default=enviar
+simesp8266nodemcu.upload.tool.serial=enviar
+simesp8266nodemcu.upload.tool.circuitsketch=enviar
+simesp8266nodemcu.upload.wait_for_upload_port=false
+simesp8266nodemcu.upload.use_1200bps_touch=false
+simesp8266nodemcu.upload.maximum_size=1044464
+simesp8266nodemcu.upload.maximum_data_size=81920
+simesp8266nodemcu.simulador.rotulo=NodeMCU (ESP8266)
+simesp8266nodemcu.simulador.peca=esp8266-nodemcu
+simesp8266nodemcu.simulador.gravador=esptool
+simesp8266nodemcu.simulador.piso_flash=257000
+simesp8266nodemcu.simulador.piso_ram=28000
+simesp8266nodemcu.simulador.fator_flash=6.4
+simesp8266nodemcu.simulador.fator_ram=0.42
+
+# ---------------- ESP-01 ----------------
+simesp01.name=ESP-01 (CircuitSketch)
+simesp01.build.core=simulador
+simesp01.build.mcu=esp8266
+simesp01.build.f_cpu=80000000L
+simesp01.build.board=SIMULADOR_ESP01
+simesp01.upload.tool=enviar
+simesp01.upload.tool.default=enviar
+simesp01.upload.tool.serial=enviar
+simesp01.upload.tool.circuitsketch=enviar
+simesp01.upload.wait_for_upload_port=false
+simesp01.upload.use_1200bps_touch=false
+simesp01.upload.maximum_size=1044464
+simesp01.upload.maximum_data_size=81920
+simesp01.simulador.rotulo=ESP-01
+simesp01.simulador.peca=esp-01
+simesp01.simulador.gravador=esptool
+simesp01.simulador.piso_flash=257000
+simesp01.simulador.piso_ram=28000
+simesp01.simulador.fator_flash=6.4
+simesp01.simulador.fator_ram=0.42
+
+# ---------------- ESP-02 ----------------
+simesp02.name=ESP-02 (CircuitSketch)
+simesp02.build.core=simulador
+simesp02.build.mcu=esp8266
+simesp02.build.f_cpu=80000000L
+simesp02.build.board=SIMULADOR_ESP02
+simesp02.upload.tool=enviar
+simesp02.upload.tool.default=enviar
+simesp02.upload.tool.serial=enviar
+simesp02.upload.tool.circuitsketch=enviar
+simesp02.upload.wait_for_upload_port=false
+simesp02.upload.use_1200bps_touch=false
+simesp02.upload.maximum_size=1044464
+simesp02.upload.maximum_data_size=81920
+simesp02.simulador.rotulo=ESP-02
+simesp02.simulador.peca=esp-02
+simesp02.simulador.gravador=esptool
+simesp02.simulador.piso_flash=257000
+simesp02.simulador.piso_ram=28000
+simesp02.simulador.fator_flash=6.4
+simesp02.simulador.fator_ram=0.42
+
+# ---------------- ESP-03 ----------------
+simesp03.name=ESP-03 (CircuitSketch)
+simesp03.build.core=simulador
+simesp03.build.mcu=esp8266
+simesp03.build.f_cpu=80000000L
+simesp03.build.board=SIMULADOR_ESP03
+simesp03.upload.tool=enviar
+simesp03.upload.tool.default=enviar
+simesp03.upload.tool.serial=enviar
+simesp03.upload.tool.circuitsketch=enviar
+simesp03.upload.wait_for_upload_port=false
+simesp03.upload.use_1200bps_touch=false
+simesp03.upload.maximum_size=1044464
+simesp03.upload.maximum_data_size=81920
+simesp03.simulador.rotulo=ESP-03
+simesp03.simulador.peca=esp-03
+simesp03.simulador.gravador=esptool
+simesp03.simulador.piso_flash=257000
+simesp03.simulador.piso_ram=28000
+simesp03.simulador.fator_flash=6.4
+simesp03.simulador.fator_ram=0.42
+
+# ---------------- ESP-04 ----------------
+simesp04.name=ESP-04 (CircuitSketch)
+simesp04.build.core=simulador
+simesp04.build.mcu=esp8266
+simesp04.build.f_cpu=80000000L
+simesp04.build.board=SIMULADOR_ESP04
+simesp04.upload.tool=enviar
+simesp04.upload.tool.default=enviar
+simesp04.upload.tool.serial=enviar
+simesp04.upload.tool.circuitsketch=enviar
+simesp04.upload.wait_for_upload_port=false
+simesp04.upload.use_1200bps_touch=false
+simesp04.upload.maximum_size=1044464
+simesp04.upload.maximum_data_size=81920
+simesp04.simulador.rotulo=ESP-04
+simesp04.simulador.peca=esp-04
+simesp04.simulador.gravador=esptool
+simesp04.simulador.piso_flash=257000
+simesp04.simulador.piso_ram=28000
+simesp04.simulador.fator_flash=6.4
+simesp04.simulador.fator_ram=0.42
+
+# ---------------- ESP-05 ----------------
+simesp05.name=ESP-05 (CircuitSketch)
+simesp05.build.core=simulador
+simesp05.build.mcu=esp8266
+simesp05.build.f_cpu=80000000L
+simesp05.build.board=SIMULADOR_ESP05
+simesp05.upload.tool=enviar
+simesp05.upload.tool.default=enviar
+simesp05.upload.tool.serial=enviar
+simesp05.upload.tool.circuitsketch=enviar
+simesp05.upload.wait_for_upload_port=false
+simesp05.upload.use_1200bps_touch=false
+simesp05.upload.maximum_size=1044464
+simesp05.upload.maximum_data_size=81920
+simesp05.simulador.rotulo=ESP-05
+simesp05.simulador.peca=esp-05
+simesp05.simulador.gravador=esptool
+simesp05.simulador.piso_flash=257000
+simesp05.simulador.piso_ram=28000
+simesp05.simulador.fator_flash=6.4
+simesp05.simulador.fator_ram=0.42
+
+# ---------------- ESP-06 ----------------
+simesp06.name=ESP-06 (CircuitSketch)
+simesp06.build.core=simulador
+simesp06.build.mcu=esp8266
+simesp06.build.f_cpu=80000000L
+simesp06.build.board=SIMULADOR_ESP06
+simesp06.upload.tool=enviar
+simesp06.upload.tool.default=enviar
+simesp06.upload.tool.serial=enviar
+simesp06.upload.tool.circuitsketch=enviar
+simesp06.upload.wait_for_upload_port=false
+simesp06.upload.use_1200bps_touch=false
+simesp06.upload.maximum_size=1044464
+simesp06.upload.maximum_data_size=81920
+simesp06.simulador.rotulo=ESP-06
+simesp06.simulador.peca=esp-06
+simesp06.simulador.gravador=esptool
+simesp06.simulador.piso_flash=257000
+simesp06.simulador.piso_ram=28000
+simesp06.simulador.fator_flash=6.4
+simesp06.simulador.fator_ram=0.42
+
+# ---------------- ESP-07 ----------------
+simesp07.name=ESP-07 (CircuitSketch)
+simesp07.build.core=simulador
+simesp07.build.mcu=esp8266
+simesp07.build.f_cpu=80000000L
+simesp07.build.board=SIMULADOR_ESP07
+simesp07.upload.tool=enviar
+simesp07.upload.tool.default=enviar
+simesp07.upload.tool.serial=enviar
+simesp07.upload.tool.circuitsketch=enviar
+simesp07.upload.wait_for_upload_port=false
+simesp07.upload.use_1200bps_touch=false
+simesp07.upload.maximum_size=1044464
+simesp07.upload.maximum_data_size=81920
+simesp07.simulador.rotulo=ESP-07
+simesp07.simulador.peca=esp-07
+simesp07.simulador.gravador=esptool
+simesp07.simulador.piso_flash=257000
+simesp07.simulador.piso_ram=28000
+simesp07.simulador.fator_flash=6.4
+simesp07.simulador.fator_ram=0.42
+
+# ---------------- ESP-08 ----------------
+simesp08.name=ESP-08 (CircuitSketch)
+simesp08.build.core=simulador
+simesp08.build.mcu=esp8266
+simesp08.build.f_cpu=80000000L
+simesp08.build.board=SIMULADOR_ESP08
+simesp08.upload.tool=enviar
+simesp08.upload.tool.default=enviar
+simesp08.upload.tool.serial=enviar
+simesp08.upload.tool.circuitsketch=enviar
+simesp08.upload.wait_for_upload_port=false
+simesp08.upload.use_1200bps_touch=false
+simesp08.upload.maximum_size=1044464
+simesp08.upload.maximum_data_size=81920
+simesp08.simulador.rotulo=ESP-08
+simesp08.simulador.peca=esp-08
+simesp08.simulador.gravador=esptool
+simesp08.simulador.piso_flash=257000
+simesp08.simulador.piso_ram=28000
+simesp08.simulador.fator_flash=6.4
+simesp08.simulador.fator_ram=0.42
+
+# ---------------- ESP-09 ----------------
+simesp09.name=ESP-09 (CircuitSketch)
+simesp09.build.core=simulador
+simesp09.build.mcu=esp8266
+simesp09.build.f_cpu=80000000L
+simesp09.build.board=SIMULADOR_ESP09
+simesp09.upload.tool=enviar
+simesp09.upload.tool.default=enviar
+simesp09.upload.tool.serial=enviar
+simesp09.upload.tool.circuitsketch=enviar
+simesp09.upload.wait_for_upload_port=false
+simesp09.upload.use_1200bps_touch=false
+simesp09.upload.maximum_size=1044464
+simesp09.upload.maximum_data_size=81920
+simesp09.simulador.rotulo=ESP-09
+simesp09.simulador.peca=esp-09
+simesp09.simulador.gravador=esptool
+simesp09.simulador.piso_flash=257000
+simesp09.simulador.piso_ram=28000
+simesp09.simulador.fator_flash=6.4
+simesp09.simulador.fator_ram=0.42
+
+# ---------------- ESP-10 ----------------
+simesp10.name=ESP-10 (CircuitSketch)
+simesp10.build.core=simulador
+simesp10.build.mcu=esp8266
+simesp10.build.f_cpu=80000000L
+simesp10.build.board=SIMULADOR_ESP10
+simesp10.upload.tool=enviar
+simesp10.upload.tool.default=enviar
+simesp10.upload.tool.serial=enviar
+simesp10.upload.tool.circuitsketch=enviar
+simesp10.upload.wait_for_upload_port=false
+simesp10.upload.use_1200bps_touch=false
+simesp10.upload.maximum_size=1044464
+simesp10.upload.maximum_data_size=81920
+simesp10.simulador.rotulo=ESP-10
+simesp10.simulador.peca=esp-10
+simesp10.simulador.gravador=esptool
+simesp10.simulador.piso_flash=257000
+simesp10.simulador.piso_ram=28000
+simesp10.simulador.fator_flash=6.4
+simesp10.simulador.fator_ram=0.42
+
+# ---------------- ESP-11 ----------------
+simesp11.name=ESP-11 (CircuitSketch)
+simesp11.build.core=simulador
+simesp11.build.mcu=esp8266
+simesp11.build.f_cpu=80000000L
+simesp11.build.board=SIMULADOR_ESP11
+simesp11.upload.tool=enviar
+simesp11.upload.tool.default=enviar
+simesp11.upload.tool.serial=enviar
+simesp11.upload.tool.circuitsketch=enviar
+simesp11.upload.wait_for_upload_port=false
+simesp11.upload.use_1200bps_touch=false
+simesp11.upload.maximum_size=1044464
+simesp11.upload.maximum_data_size=81920
+simesp11.simulador.rotulo=ESP-11
+simesp11.simulador.peca=esp-11
+simesp11.simulador.gravador=esptool
+simesp11.simulador.piso_flash=257000
+simesp11.simulador.piso_ram=28000
+simesp11.simulador.fator_flash=6.4
+simesp11.simulador.fator_ram=0.42
+
+# ---------------- ESP-12 ----------------
+simesp12.name=ESP-12 (CircuitSketch)
+simesp12.build.core=simulador
+simesp12.build.mcu=esp8266
+simesp12.build.f_cpu=80000000L
+simesp12.build.board=SIMULADOR_ESP12
+simesp12.upload.tool=enviar
+simesp12.upload.tool.default=enviar
+simesp12.upload.tool.serial=enviar
+simesp12.upload.tool.circuitsketch=enviar
+simesp12.upload.wait_for_upload_port=false
+simesp12.upload.use_1200bps_touch=false
+simesp12.upload.maximum_size=1044464
+simesp12.upload.maximum_data_size=81920
+simesp12.simulador.rotulo=ESP-12
+simesp12.simulador.peca=esp-12
+simesp12.simulador.gravador=esptool
+simesp12.simulador.piso_flash=257000
+simesp12.simulador.piso_ram=28000
+simesp12.simulador.fator_flash=6.4
+simesp12.simulador.fator_ram=0.42
+
+# ---------------- ESP-12E ----------------
+simesp12e.name=ESP-12E (CircuitSketch)
+simesp12e.build.core=simulador
+simesp12e.build.mcu=esp8266
+simesp12e.build.f_cpu=80000000L
+simesp12e.build.board=SIMULADOR_ESP12E
+simesp12e.upload.tool=enviar
+simesp12e.upload.tool.default=enviar
+simesp12e.upload.tool.serial=enviar
+simesp12e.upload.tool.circuitsketch=enviar
+simesp12e.upload.wait_for_upload_port=false
+simesp12e.upload.use_1200bps_touch=false
+simesp12e.upload.maximum_size=1044464
+simesp12e.upload.maximum_data_size=81920
+simesp12e.simulador.rotulo=ESP-12E
+simesp12e.simulador.peca=esp-12e
+simesp12e.simulador.gravador=esptool
+simesp12e.simulador.piso_flash=257000
+simesp12e.simulador.piso_ram=28000
+simesp12e.simulador.fator_flash=6.4
+simesp12e.simulador.fator_ram=0.42
+
+# ---------------- ESP-12F ----------------
+simesp12f.name=ESP-12F (CircuitSketch)
+simesp12f.build.core=simulador
+simesp12f.build.mcu=esp8266
+simesp12f.build.f_cpu=80000000L
+simesp12f.build.board=SIMULADOR_ESP12F
+simesp12f.upload.tool=enviar
+simesp12f.upload.tool.default=enviar
+simesp12f.upload.tool.serial=enviar
+simesp12f.upload.tool.circuitsketch=enviar
+simesp12f.upload.wait_for_upload_port=false
+simesp12f.upload.use_1200bps_touch=false
+simesp12f.upload.maximum_size=1044464
+simesp12f.upload.maximum_data_size=81920
+simesp12f.simulador.rotulo=ESP-12F
+simesp12f.simulador.peca=esp-12f
+simesp12f.simulador.gravador=esptool
+simesp12f.simulador.piso_flash=257000
+simesp12f.simulador.piso_ram=28000
+simesp12f.simulador.fator_flash=6.4
+simesp12f.simulador.fator_ram=0.42
+
+# ---------------- ESP-13 ----------------
+simesp13.name=ESP-13 (CircuitSketch)
+simesp13.build.core=simulador
+simesp13.build.mcu=esp8266
+simesp13.build.f_cpu=80000000L
+simesp13.build.board=SIMULADOR_ESP13
+simesp13.upload.tool=enviar
+simesp13.upload.tool.default=enviar
+simesp13.upload.tool.serial=enviar
+simesp13.upload.tool.circuitsketch=enviar
+simesp13.upload.wait_for_upload_port=false
+simesp13.upload.use_1200bps_touch=false
+simesp13.upload.maximum_size=1044464
+simesp13.upload.maximum_data_size=81920
+simesp13.simulador.rotulo=ESP-13
+simesp13.simulador.peca=esp-13
+simesp13.simulador.gravador=esptool
+simesp13.simulador.piso_flash=257000
+simesp13.simulador.piso_ram=28000
+simesp13.simulador.fator_flash=6.4
+simesp13.simulador.fator_ram=0.42
+
+# ---------------- ESP-14 ----------------
+simesp14.name=ESP-14 (CircuitSketch)
+simesp14.build.core=simulador
+simesp14.build.mcu=esp8266
+simesp14.build.f_cpu=80000000L
+simesp14.build.board=SIMULADOR_ESP14
+simesp14.upload.tool=enviar
+simesp14.upload.tool.default=enviar
+simesp14.upload.tool.serial=enviar
+simesp14.upload.tool.circuitsketch=enviar
+simesp14.upload.wait_for_upload_port=false
+simesp14.upload.use_1200bps_touch=false
+simesp14.upload.maximum_size=1044464
+simesp14.upload.maximum_data_size=81920
+simesp14.simulador.rotulo=ESP-14
+simesp14.simulador.peca=esp-14
+simesp14.simulador.gravador=esptool
+simesp14.simulador.piso_flash=257000
+simesp14.simulador.piso_ram=28000
+simesp14.simulador.fator_flash=6.4
+simesp14.simulador.fator_ram=0.42
+
+# ---------------- Raspberry Pi Pico ----------------
+simpipico.name=Raspberry Pi Pico (CircuitSketch)
+simpipico.build.core=simulador
+simpipico.build.mcu=rp2040
+simpipico.build.f_cpu=133000000L
+simpipico.build.board=SIMULADOR_PIPICO
+simpipico.upload.tool=enviar
+simpipico.upload.tool.default=enviar
+simpipico.upload.tool.serial=enviar
+simpipico.upload.tool.circuitsketch=enviar
+simpipico.upload.wait_for_upload_port=false
+simpipico.upload.use_1200bps_touch=false
+simpipico.upload.maximum_size=2093056
+simpipico.upload.maximum_data_size=270336
+simpipico.simulador.rotulo=Raspberry Pi Pico
+simpipico.simulador.peca=pi-pico
+simpipico.simulador.gravador=esptool
+simpipico.simulador.piso_flash=50000
+simpipico.simulador.piso_ram=8000
+simpipico.simulador.fator_flash=3
+simpipico.simulador.fator_ram=0.3
+
+# ---------------- Raspberry Pi Pico W ----------------
+simpipicow.name=Raspberry Pi Pico W (CircuitSketch)
+simpipicow.build.core=simulador
+simpipicow.build.mcu=rp2040
+simpipicow.build.f_cpu=133000000L
+simpipicow.build.board=SIMULADOR_PIPICOW
+simpipicow.upload.tool=enviar
+simpipicow.upload.tool.default=enviar
+simpipicow.upload.tool.serial=enviar
+simpipicow.upload.tool.circuitsketch=enviar
+simpipicow.upload.wait_for_upload_port=false
+simpipicow.upload.use_1200bps_touch=false
+simpipicow.upload.maximum_size=2093056
+simpipicow.upload.maximum_data_size=270336
+simpipicow.simulador.rotulo=Raspberry Pi Pico W
+simpipicow.simulador.peca=pi-pico-w
+simpipicow.simulador.gravador=esptool
+simpipicow.simulador.piso_flash=50000
+simpipicow.simulador.piso_ram=8000
+simpipicow.simulador.fator_flash=3
+simpipicow.simulador.fator_ram=0.3
+
+# ---------------- STM32F103 (Blue Pill) ----------------
+simstm32bluepill.name=STM32F103 Blue Pill (CircuitSketch)
+simstm32bluepill.build.core=simulador
+simstm32bluepill.build.mcu=stm32f103c8
+simstm32bluepill.build.f_cpu=72000000L
+simstm32bluepill.build.board=SIMULADOR_STM32BLUEPILL
+simstm32bluepill.upload.tool=enviar
+simstm32bluepill.upload.tool.default=enviar
+simstm32bluepill.upload.tool.serial=enviar
+simstm32bluepill.upload.tool.circuitsketch=enviar
+simstm32bluepill.upload.wait_for_upload_port=false
+simstm32bluepill.upload.use_1200bps_touch=false
+simstm32bluepill.upload.maximum_size=65536
+simstm32bluepill.upload.maximum_data_size=20480
+simstm32bluepill.simulador.rotulo=STM32F103 (Blue Pill)
+simstm32bluepill.simulador.peca=stm32-bluepill
+simstm32bluepill.simulador.gravador=esptool
+simstm32bluepill.simulador.piso_flash=11000
+simstm32bluepill.simulador.piso_ram=3000
+simstm32bluepill.simulador.fator_flash=1.6
+simstm32bluepill.simulador.fator_ram=0.1
+
+# ---------------- ST Nucleo-L031K6 ----------------
+simstnucleol031k6.name=ST Nucleo-L031K6 (CircuitSketch)
+simstnucleol031k6.build.core=simulador
+simstnucleol031k6.build.mcu=stm32l031k6
+simstnucleol031k6.build.f_cpu=32000000L
+simstnucleol031k6.build.board=SIMULADOR_STNUCLEOL031K6
+simstnucleol031k6.upload.tool=enviar
+simstnucleol031k6.upload.tool.default=enviar
+simstnucleol031k6.upload.tool.serial=enviar
+simstnucleol031k6.upload.tool.circuitsketch=enviar
+simstnucleol031k6.upload.wait_for_upload_port=false
+simstnucleol031k6.upload.use_1200bps_touch=false
+simstnucleol031k6.upload.maximum_size=32768
+simstnucleol031k6.upload.maximum_data_size=8192
+simstnucleol031k6.simulador.rotulo=ST Nucleo-L031K6
+simstnucleol031k6.simulador.peca=st-nucleo-l031k6
+simstnucleol031k6.simulador.gravador=esptool
+simstnucleol031k6.simulador.piso_flash=10000
+simstnucleol031k6.simulador.piso_ram=2000
+simstnucleol031k6.simulador.fator_flash=1.6
+simstnucleol031k6.simulador.fator_ram=0.1
+
+# ---------------- ST Nucleo-C031C6 ----------------
+simstnucleoc031c6.name=ST Nucleo-C031C6 (CircuitSketch)
+simstnucleoc031c6.build.core=simulador
+simstnucleoc031c6.build.mcu=stm32c031c6
+simstnucleoc031c6.build.f_cpu=48000000L
+simstnucleoc031c6.build.board=SIMULADOR_STNUCLEOC031C6
+simstnucleoc031c6.upload.tool=enviar
+simstnucleoc031c6.upload.tool.default=enviar
+simstnucleoc031c6.upload.tool.serial=enviar
+simstnucleoc031c6.upload.tool.circuitsketch=enviar
+simstnucleoc031c6.upload.wait_for_upload_port=false
+simstnucleoc031c6.upload.use_1200bps_touch=false
+simstnucleoc031c6.upload.maximum_size=32768
+simstnucleoc031c6.upload.maximum_data_size=12288
+simstnucleoc031c6.simulador.rotulo=ST Nucleo-C031C6
+simstnucleoc031c6.simulador.peca=st-nucleo-c031c6
+simstnucleoc031c6.simulador.gravador=esptool
+simstnucleoc031c6.simulador.piso_flash=10000
+simstnucleoc031c6.simulador.piso_ram=2400
+simstnucleoc031c6.simulador.fator_flash=1.6
+simstnucleoc031c6.simulador.fator_ram=0.1

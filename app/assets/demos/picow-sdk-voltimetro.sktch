@@ -1,0 +1,138 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Voltimetro com o ADC, na Raspberry Pi Pico W (SDK em C).",
+  "",
+  "O que esta demo mostra:",
+  "- o conversor de 12 bits pelo SDK: adc_select_input e adc_read, com a",
+  "  conta que transforma a leitura em volts;",
+  "- o sensor de temperatura de dentro do RP2040, no canal 4.",
+  "",
+  "Aperte F5 e gire o potenciometro. Acima de 2,5 V o LED acende."
+ ],
+ "codigo": [
+  "// Voltimetro na Raspberry Pi Pico W, com o SDK em C.",
+  "//",
+  "// O ADC le a tensao do potenciometro no GP26 (canal 0), em 12 bits, e o",
+  "// printf mostra em volts. Acima de 2,5 V o LED de alerta acende. A cada",
+  "// 2 s, a temperatura de dentro do chip (canal 4) aparece tambem.",
+  "",
+  "#include <stdio.h>",
+  "#include \"pico/stdlib.h\"",
+  "#include \"hardware/adc.h\"",
+  "",
+  "#define ALERTA 15",
+  "#define LIMITE 2.5f",
+  "",
+  "int main() {",
+  "    stdio_init_all();",
+  "",
+  "    gpio_init(ALERTA);",
+  "    gpio_set_dir(ALERTA, GPIO_OUT);",
+  "",
+  "    adc_init();",
+  "    adc_gpio_init(26);",
+  "    adc_set_temp_sensor_enabled(true);",
+  "",
+  "    int voltas = 0;",
+  "    while (true) {",
+  "        adc_select_input(0);",
+  "        uint16_t bruto = adc_read();",
+  "        float volts = bruto * 3.3f / 4096;",
+  "        gpio_put(ALERTA, volts > LIMITE);",
+  "        printf(\"%.2f V (leitura %d)%s\\n\", volts, bruto, volts > LIMITE ? \"  ALERTA\" : \"\");",
+  "",
+  "        voltas++;",
+  "        if (voltas % 8 == 0) {",
+  "            adc_select_input(4);",
+  "            float graus = 27 - (adc_read() * 3.3f / 4096 - 0.706f) / 0.001721f;",
+  "            printf(\"temperatura do chip: %.1f C\\n\", graus);",
+  "        }",
+  "        sleep_ms(250);",
+  "    }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "pi-pico-w",
+    "X": 60,
+    "Y": 60
+   },
+   {
+    "Id": "pot",
+    "Tipo": "potentiometer",
+    "X": 300,
+    "Y": 60,
+    "Giro": 0.6
+   },
+   {
+    "Id": "alerta",
+    "Tipo": "led",
+    "X": 330,
+    "Y": 200,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_alerta",
+    "Tipo": "resistor",
+    "X": 258,
+    "Y": 246,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pot",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "SIG",
+    "ParaPeca": "placa",
+    "ParaPino": "GP26",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "AGND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GP15",
+    "ParaPeca": "r_alerta",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_alerta",
+    "DePino": "2",
+    "ParaPeca": "alerta",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "alerta",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.4",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

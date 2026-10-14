@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Simulador</RootNamespace>
+    <AssemblyName>motor</AssemblyName>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- O modo nativo desvia uma tarefa do C que falhou (ou travou) de volta
+         para o comeco dela, pelo contexto da thread. Com a pilha-sombra do
+         processador (CET) ligada, o Windows recusa esse desvio e fecha o
+         programa: o executavel sai sem a marca de compativel com CET. -->
+    <CETCompat>false</CETCompat>
+  </PropertyGroup>
+  <!-- O runtime do modo nativo (TinyCC, cabecalhos e o C do simulador) vai ao lado do executavel. -->
+  <ItemGroup>
+    <Content Include="..\nativo\**\*" LinkBase="nativo" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,329 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Semaforo com botao de pedestre, num ESP-04.",
+  "",
+  "O que esta demo mostra:",
+  "- dois semaforos coordenados (carros e pedestres) numa sequencia de tempos;",
+  "- o bipe de acessibilidade e o vermelho piscando no fim da travessia.",
+  "",
+  "Aperte F5 e o botao para pedir a travessia."
+ ],
+ "codigo": [
+  "// Semaforo com botao de pedestre, num ESP-04.",
+  "//",
+  "// O carro fica no verde ate alguem apertar o botao. Ai o semaforo dos",
+  "// carros passa pelo amarelo e fecha, o do pedestre abre com um bipe",
+  "// ritmado (o sinal sonoro para quem nao enxerga) e, no fim, o vermelho do",
+  "// pedestre pisca avisando que vai fechar.",
+  "",
+  "const int CARRO_VERMELHO = 14;",
+  "const int CARRO_AMARELO = 12;",
+  "const int CARRO_VERDE = 13;",
+  "const int PEDESTRE_VERMELHO = 5;",
+  "const int PEDESTRE_VERDE = 4;",
+  "const int BOTAO = 0;",
+  "const int BUZZER = 16;",
+  "",
+  "void carros(int vermelho, int amarelo, int verde) {",
+  "  digitalWrite(CARRO_VERMELHO, vermelho);",
+  "  digitalWrite(CARRO_AMARELO, amarelo);",
+  "  digitalWrite(CARRO_VERDE, verde);",
+  "}",
+  "",
+  "void pedestres(int vermelho, int verde) {",
+  "  digitalWrite(PEDESTRE_VERMELHO, vermelho);",
+  "  digitalWrite(PEDESTRE_VERDE, verde);",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(CARRO_VERMELHO, OUTPUT);",
+  "  pinMode(CARRO_AMARELO, OUTPUT);",
+  "  pinMode(CARRO_VERDE, OUTPUT);",
+  "  pinMode(PEDESTRE_VERMELHO, OUTPUT);",
+  "  pinMode(PEDESTRE_VERDE, OUTPUT);",
+  "  pinMode(BOTAO, INPUT_PULLUP);",
+  "",
+  "  carros(LOW, LOW, HIGH);",
+  "  pedestres(HIGH, LOW);",
+  "  Serial.println(\"Verde para os carros. Aperte o botao para atravessar.\");",
+  "}",
+  "",
+  "void loop() {",
+  "  if (digitalRead(BOTAO) == LOW) {",
+  "    Serial.println(\"pedido de travessia!\");",
+  "    delay(1000);                   // o carro nao para na hora",
+  "    carros(LOW, HIGH, LOW);",
+  "    delay(2000);",
+  "    carros(HIGH, LOW, LOW);",
+  "    delay(1000);",
+  "",
+  "    pedestres(LOW, HIGH);",
+  "    Serial.println(\"pedestre: pode atravessar\");",
+  "    for (int i = 0; i < 10; i++) { // 5 s com bipe",
+  "      tone(BUZZER, 880, 100);",
+  "      delay(500);",
+  "    }",
+  "",
+  "    for (int i = 0; i < 6; i++) {  // o vermelho pisca: vai fechar",
+  "      pedestres(i % 2 == 0, LOW);",
+  "      delay(300);",
+  "    }",
+  "    pedestres(HIGH, LOW);",
+  "    delay(1000);",
+  "    carros(LOW, LOW, HIGH);",
+  "    Serial.println(\"verde para os carros\");",
+  "  }",
+  "  delay(20);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp-04",
+    "X": 80,
+    "Y": 100
+   },
+   {
+    "Id": "carro_vermelho",
+    "Tipo": "led",
+    "X": 330,
+    "Y": 20,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_carro_vermelho",
+    "Tipo": "resistor",
+    "X": 258,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "carro_amarelo",
+    "Tipo": "led",
+    "X": 330,
+    "Y": 110,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r_carro_amarelo",
+    "Tipo": "resistor",
+    "X": 258,
+    "Y": 156,
+    "Ohms": 220
+   },
+   {
+    "Id": "carro_verde",
+    "Tipo": "led",
+    "X": 330,
+    "Y": 200,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_carro_verde",
+    "Tipo": "resistor",
+    "X": 258,
+    "Y": 246,
+    "Ohms": 220
+   },
+   {
+    "Id": "pedestre_vermelho",
+    "Tipo": "led",
+    "X": 470,
+    "Y": 60,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_pedestre_vermelho",
+    "Tipo": "resistor",
+    "X": 398,
+    "Y": 106,
+    "Ohms": 220
+   },
+   {
+    "Id": "pedestre_verde",
+    "Tipo": "led",
+    "X": 470,
+    "Y": 150,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_pedestre_verde",
+    "Tipo": "resistor",
+    "X": 398,
+    "Y": 196,
+    "Ohms": 220
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 440,
+    "Y": 250
+   },
+   {
+    "Id": "buzzer",
+    "Tipo": "buzzer",
+    "X": 560,
+    "Y": 230
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO14",
+    "ParaPeca": "r_carro_vermelho",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_carro_vermelho",
+    "DePino": "2",
+    "ParaPeca": "carro_vermelho",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "carro_vermelho",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO12",
+    "ParaPeca": "r_carro_amarelo",
+    "ParaPino": "1",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_carro_amarelo",
+    "DePino": "2",
+    "ParaPeca": "carro_amarelo",
+    "ParaPino": "A",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "carro_amarelo",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO13",
+    "ParaPeca": "r_carro_verde",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_carro_verde",
+    "DePino": "2",
+    "ParaPeca": "carro_verde",
+    "ParaPino": "A",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "carro_verde",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO5",
+    "ParaPeca": "r_pedestre_vermelho",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_pedestre_vermelho",
+    "DePino": "2",
+    "ParaPeca": "pedestre_vermelho",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pedestre_vermelho",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO4",
+    "ParaPeca": "r_pedestre_verde",
+    "ParaPino": "1",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_pedestre_verde",
+    "DePino": "2",
+    "ParaPeca": "pedestre_verde",
+    "ParaPino": "A",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pedestre_verde",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO0",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO16",
+    "ParaPeca": "buzzer",
+    "ParaPino": "1",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "buzzer",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

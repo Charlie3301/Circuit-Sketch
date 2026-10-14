@@ -1,0 +1,172 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Botao numa ESP32, LED na outra (ESP-NOW)",
+  "",
+  "Duas ESP32 sem roteador nenhum: a da esquerda manda o estado do botao",
+  "pelo ESP-NOW (para todas, FF:FF:FF:FF:FF:FF), a da direita acende o",
+  "LED. Cada placa tem o proprio sketch (clique nela para ver)."
+ ],
+ "codigo": [
+  "// ESP-NOW, quem manda: o botao no GPIO4.",
+  "#include <esp_now.h>",
+  "#include <WiFi.h>",
+  "",
+  "uint8_t paraTodos[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};",
+  "esp_now_peer_info_t par;",
+  "int antes = HIGH;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(4, INPUT_PULLUP);",
+  "  WiFi.mode(WIFI_STA);",
+  "  esp_now_init();",
+  "  memcpy(par.peer_addr, paraTodos, 6);",
+  "  par.channel = 0;",
+  "  par.encrypt = false;",
+  "  esp_now_add_peer(&par);",
+  "  Serial.println(\"emissor pronto\");",
+  "}",
+  "",
+  "void loop() {",
+  "  int agora = digitalRead(4);",
+  "  if (agora != antes) {",
+  "    uint8_t apertado = agora == LOW;",
+  "    esp_now_send(paraTodos, &apertado, 1);",
+  "    Serial.println(apertado ? \"mandei: apertado\" : \"mandei: solto\");",
+  "    antes = agora;",
+  "  }",
+  "  delay(10);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 40,
+    "Y": 40,
+    "Codigo": [
+     "// ESP-NOW, quem manda: o botao no GPIO4.",
+     "#include <esp_now.h>",
+     "#include <WiFi.h>",
+     "",
+     "uint8_t paraTodos[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};",
+     "esp_now_peer_info_t par;",
+     "int antes = HIGH;",
+     "",
+     "void setup() {",
+     "  Serial.begin(115200);",
+     "  pinMode(4, INPUT_PULLUP);",
+     "  WiFi.mode(WIFI_STA);",
+     "  esp_now_init();",
+     "  memcpy(par.peer_addr, paraTodos, 6);",
+     "  par.channel = 0;",
+     "  par.encrypt = false;",
+     "  esp_now_add_peer(&par);",
+     "  Serial.println(\"emissor pronto\");",
+     "}",
+     "",
+     "void loop() {",
+     "  int agora = digitalRead(4);",
+     "  if (agora != antes) {",
+     "    uint8_t apertado = agora == LOW;",
+     "    esp_now_send(paraTodos, &apertado, 1);",
+     "    Serial.println(apertado ? \"mandei: apertado\" : \"mandei: solto\");",
+     "    antes = agora;",
+     "  }",
+     "  delay(10);",
+     "}"
+    ]
+   },
+   {
+    "Id": "placa2",
+    "Tipo": "esp32-devkit-v1",
+    "X": 520,
+    "Y": 40,
+    "Codigo": [
+     "// ESP-NOW, quem recebe: o LED no GPIO2 segue o botao da outra placa.",
+     "#include <esp_now.h>",
+     "#include <WiFi.h>",
+     "",
+     "void aoReceber(const esp_now_recv_info_t *info, const uint8_t *dados, int tamanho) {",
+     "  digitalWrite(2, dados[0] ? HIGH : LOW);",
+     "  Serial.println(dados[0] ? \"recebi: apertado\" : \"recebi: solto\");",
+     "}",
+     "",
+     "void setup() {",
+     "  Serial.begin(115200);",
+     "  pinMode(2, OUTPUT);",
+     "  WiFi.mode(WIFI_STA);",
+     "  esp_now_init();",
+     "  esp_now_register_recv_cb(aoReceber);",
+     "  Serial.println(\"receptor pronto\");",
+     "}",
+     "",
+     "void loop() {",
+     "  delay(100);",
+     "}"
+    ]
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 260,
+    "Y": 120
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 760,
+    "Y": 60,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 690,
+    "Y": 120,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D4",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa2",
+    "DePino": "D2",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa2",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

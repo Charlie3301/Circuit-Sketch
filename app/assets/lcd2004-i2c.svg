@@ -1,0 +1,43 @@
+<svg version="1.1" style="font-size: 1.5px; font-family: monospace" xmlns="http://www.w3.org/2000/svg" width="94.05mm" height="47.5mm" viewBox="0 0 94.05 47.5">
+        <defs>
+          <pattern id="characters" width="3.55" height="5.95" patternUnits="userSpaceOnUse" x="12.45" y="12.55">
+            <rect width="2.95" height="5.55" fill-opacity="0.05"/>
+          </pattern>
+          <pattern id="pins" width="2.54" height="3.255" patternUnits="userSpaceOnUse" y="1.1">
+            <path fill="#92926d" d="M0,0.55c0,0 0.21,-0.52 0.87,-0.52 0.67,0 0.81,0.51 0.81,0.51v1.81h-1.869z"/>
+            <circle r="0.45" cx="0.827" cy="0.9" color="black"/>
+          </pattern>
+        </defs>
+        <rect fill="#087f45" width="94.05" height="47.5"/>
+        <rect x="4.95" y="5.7" width="85.25" height="36.7"/>
+        <rect x="7.55" y="10.3" rx="1.5" ry="1.5" width="80.05" height="27.5" fill="#6cb201"/>
+        <rect x="7.55" y="10.3" rx="1.5" ry="1.5" width="80.05" height="27.5" opacity="0"/>
+        <!--?lit$688897438$-->
+        <!--?lit$688897438$-->
+            <!-- Conector do modulo de I2C (PCF8574), soldado atras da placa.
+           Quatro fios no lugar de dezesseis: e assim que o LCD aparece
+           em quase toda bancada, e e o que o diagrama do Wokwi traz
+           quando a peca esta com pins="i2c". -->
+      <g>
+        <rect x="6.80" y="41.90" width="12.02" height="4.6"
+              rx="0.5" fill="#11161c" stroke="#070a0d" stroke-width=".2"/>
+        <rect x="7.50" y="43.00" width="10.62" height="1.5" fill="#2b3038"/>
+        <g fill="#e0bb3c" stroke="#a98a1e" stroke-width=".1">
+          <rect x="8.200" y="43.20" width="1.6" height="2.9" rx="0.2"/>
+          <rect x="10.740" y="43.20" width="1.6" height="2.9" rx="0.2"/>
+          <rect x="13.280" y="43.20" width="1.6" height="2.9" rx="0.2"/>
+          <rect x="15.820" y="43.20" width="1.6" height="2.9" rx="0.2"/>
+        </g>
+        <text fill="#cfd3d8" font-size="1.15px" font-family="monospace" text-anchor="middle">
+          <tspan x="9.000" y="42.60">GND</tspan>
+          <tspan x="11.540" y="42.60">VCC</tspan>
+          <tspan x="14.080" y="42.60">SDA</tspan>
+          <tspan x="16.620" y="42.60">SCL</tspan>
+        </text>
+      </g>
+
+    
+        <rect fill="url(#characters)" x="12.45" y="12.55" width="70.25" height="23"/>
+        <path d="" transform="translate(12.45, 12.55)" fill="black"/>
+        <!--?lit$688897438$-->
+      </svg>

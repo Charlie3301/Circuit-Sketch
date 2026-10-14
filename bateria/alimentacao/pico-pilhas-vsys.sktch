@@ -1,0 +1,99 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "O Raspberry Pi Pico com 3 pilhas AA no VSYS.",
+  "",
+  "O VSYS e a entrada do regulador do Pico: aceita de 1,8 a 5,5 V, e e por",
+  "ali que se liga uma bateria nele (o VBUS e o 5 V da USB)."
+ ],
+ "codigo": [
+  "// Sem o cabo USB: o Pico roda pelas pilhas no VSYS.",
+  "const int LED = 15;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(LED, OUTPUT);",
+  "  Serial.println(\"ligou pela bateria\");",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(LED, HIGH);",
+  "  delay(300);",
+  "  digitalWrite(LED, LOW);",
+  "  delay(300);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "pi-pico",
+    "X": 60,
+    "Y": 40
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 360,
+    "Y": 60,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r",
+    "Tipo": "resistor",
+    "X": 340,
+    "Y": 180,
+    "Ohms": 330
+   },
+   {
+    "Id": "bateria",
+    "Tipo": "bateria",
+    "X": 420,
+    "Y": 300,
+    "Volts": 4.5,
+    "MiliAmperes": 2000,
+    "MiliAmperesHora": 2500,
+    "Nome": "3 pilhas AA (4,5 V)"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "GP15",
+    "ParaPeca": "r",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.4",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "bateria",
+    "DePino": "+",
+    "ParaPeca": "placa",
+    "ParaPino": "VSYS",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "bateria",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.5",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

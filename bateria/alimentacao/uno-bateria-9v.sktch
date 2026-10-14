@@ -1,0 +1,100 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "O Arduino Uno na bateria de 9 V, pelo VIN.",
+  "",
+  "O VIN do Uno pede 7 a 12 V: o regulador dele precisa de folga sobre os",
+  "5 V. Com a bateria de 9 V ele liga, e o pino 5V passa a dar 5 V para",
+  "os sensores. Baixe a bateria para 6 V (na barra dela) e ele apaga."
+ ],
+ "codigo": [
+  "// Sem o cabo USB: esta placa so roda se a bateria a alimentar.",
+  "const int LED = 13;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(LED, OUTPUT);",
+  "  Serial.println(\"ligou pela bateria\");",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(LED, HIGH);",
+  "  delay(300);",
+  "  digitalWrite(LED, LOW);",
+  "  delay(300);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 60,
+    "Y": 40
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 360,
+    "Y": 60,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r",
+    "Tipo": "resistor",
+    "X": 340,
+    "Y": 180,
+    "Ohms": 330
+   },
+   {
+    "Id": "bateria",
+    "Tipo": "bateria",
+    "X": 420,
+    "Y": 300,
+    "Volts": 9,
+    "MiliAmperes": 500,
+    "MiliAmperesHora": 500,
+    "Nome": "Bateria 9 V"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "13",
+    "ParaPeca": "r",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "bateria",
+    "DePino": "+",
+    "ParaPeca": "placa",
+    "ParaPino": "VIN",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "bateria",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

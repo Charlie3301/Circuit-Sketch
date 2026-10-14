@@ -1,0 +1,21 @@
+ESP32-DOOM no CircuitSketch
+===========================
+
+Este cartao ainda nao tem o jogo: falta o DOOM1.WAD.
+
+1. Pare a simulacao, clique duas vezes neste cartao e use
+   "Carregar do computador" para escolher o seu DOOM1.WAD. O
+   shareware serve; o DOOM.WAD e o DOOM2.WAD completos tambem.
+2. Rode de novo (F5).
+
+O WAD fica no seu computador: o projeto guarda so o caminho dele.
+Ele nao vem junto com o CircuitSketch porque e da id Software.
+
+Controles (os botoes do circuito, o teclado ou um controle de video game)
+  setas ........ andar e virar
+  Ctrl (A) ..... atirar; nos menus, escolher
+  Espaco (B) ... usar: abrir portas, apertar interruptores
+  Esc .......... menu
+  chave (R) .... correr
+
+A tela tambem aparece no navegador: o painel Rede mostra o endereco.

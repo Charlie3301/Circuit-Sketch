@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="54.0mm" height="19.0mm" viewBox="0 0 54.0 19.0"
+     font-family="monospace" text-anchor="middle">
+
+  <!-- placa -->
+  <rect x="0" y="0" width="54.0" height="19.0" rx="1.1" fill="#123a5e"/>
+  <rect x="0.35" y="0.35" width="53.3" height="18.3" rx="0.9"
+        fill="none" stroke="#0d2c47" stroke-width="0.7"/>
+
+  <!-- 16 vias que vao soldadas no LCD -->
+  <g fill="#e0bb3c" stroke="#a98a1e" stroke-width="0.12">
+    <rect x="2.15" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="4.69" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="7.23" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="9.77" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="12.31" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="14.85" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="17.39" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="19.93" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="22.47" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="25.01" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="27.55" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="30.09" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="32.63" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="35.17" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="37.71" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+    <rect x="40.25" y="0.7" width="1.7" height="2.6" rx="0.25"/>
+  </g>
+  <text fill="#9fb6cc" font-size="1.5px">
+    <tspan x="3.00" y="5.1">1</tspan>
+    <tspan x="10.62" y="5.1">4</tspan>
+    <tspan x="18.24" y="5.1">7</tspan>
+    <tspan x="25.86" y="5.1">10</tspan>
+    <tspan x="33.48" y="5.1">13</tspan>
+    <tspan x="41.10" y="5.1">16</tspan>
+  </text>
+
+  <!-- expansor PCF8574 -->
+  <g fill="#8f9aa6">
+    <rect x="22.40" y="6.00" width="0.6" height="1.1"/>
+    <rect x="22.40" y="12.40" width="0.6" height="1.1"/>
+    <rect x="23.67" y="6.00" width="0.6" height="1.1"/>
+    <rect x="23.67" y="12.40" width="0.6" height="1.1"/>
+    <rect x="24.94" y="6.00" width="0.6" height="1.1"/>
+    <rect x="24.94" y="12.40" width="0.6" height="1.1"/>
+    <rect x="26.21" y="6.00" width="0.6" height="1.1"/>
+    <rect x="26.21" y="12.40" width="0.6" height="1.1"/>
+    <rect x="27.48" y="6.00" width="0.6" height="1.1"/>
+    <rect x="27.48" y="12.40" width="0.6" height="1.1"/>
+    <rect x="28.75" y="6.00" width="0.6" height="1.1"/>
+    <rect x="28.75" y="12.40" width="0.6" height="1.1"/>
+    <rect x="30.02" y="6.00" width="0.6" height="1.1"/>
+    <rect x="30.02" y="12.40" width="0.6" height="1.1"/>
+    <rect x="31.29" y="6.00" width="0.6" height="1.1"/>
+    <rect x="31.29" y="12.40" width="0.6" height="1.1"/>
+  </g>
+  <rect x="21.6" y="7.0" width="10.5" height="5.4" rx="0.5" fill="#191c20"/>
+  <circle cx="23.1" cy="8.4" r="0.55" fill="#33373d"/>
+  <text x="26.9" y="10.5" fill="#6f7681" font-size="1.7px">PCF8574</text>
+
+  <!-- trimpot do contraste -->
+  <rect x="35.5" y="5.6" width="7.4" height="7.4" rx="0.6" fill="#1f57b5"/>
+  <circle cx="39.2" cy="9.3" r="2.5" fill="#dfe3e8"/>
+  <rect x="38.9" y="6.9" width="0.6" height="4.8" fill="#8a8f96"/>
+
+  <!-- jumper da luz de fundo -->
+  <rect x="45.4" y="6.4" width="5.2" height="2.6" rx="0.3" fill="#12161b"/>
+  <g fill="#e0bb3c">
+    <rect x="46.2" y="7.0" width="1.3" height="1.4"/>
+    <rect x="48.5" y="7.0" width="1.3" height="1.4"/>
+  </g>
+  <text x="48.0" y="11.6" fill="#9fb6cc" font-size="1.5px">LED</text>
+
+  <!-- conector de 4 vias: e a razao da peca existir -->
+  <rect x="4.00" y="14.70"
+        width="11.62" height="3.8"
+        rx="0.4" fill="#11161c"/>
+  <g fill="#e0bb3c" stroke="#a98a1e" stroke-width="0.12">
+    <rect x="5.20" y="15.30" width="1.6" height="2.6" rx="0.2"/>
+    <rect x="7.74" y="15.30" width="1.6" height="2.6" rx="0.2"/>
+    <rect x="10.28" y="15.30" width="1.6" height="2.6" rx="0.2"/>
+    <rect x="12.82" y="15.30" width="1.6" height="2.6" rx="0.2"/>
+  </g>
+  <text fill="#cfd3d8" font-size="1.4px">
+    <tspan x="6.00" y="14.50">GND</tspan>
+    <tspan x="8.54" y="14.50">VCC</tspan>
+    <tspan x="11.08" y="14.50">SDA</tspan>
+    <tspan x="13.62" y="14.50">SCL</tspan>
+  </text>
+</svg>

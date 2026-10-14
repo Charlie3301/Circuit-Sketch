@@ -1,0 +1,68 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Anel NeoPixel arco-iris (ESP32)",
+  "",
+  "Dezesseis LEDs WS2812 (NeoPixel) num anel, ligados no GPIO5: o",
+  "arco-iris gira com o ColorHSV da biblioteca da Adafruit."
+ ],
+ "codigo": [
+  "// Arco-iris girando num anel de 16 LEDs WS2812 (NeoPixel).",
+  "#include <Adafruit_NeoPixel.h>",
+  "Adafruit_NeoPixel anel(16, 5, NEO_GRB + NEO_KHZ800);",
+  "long matiz = 0;",
+  "",
+  "void setup() {",
+  "  anel.begin();",
+  "  anel.setBrightness(60);",
+  "}",
+  "",
+  "void loop() {",
+  "  for (int i = 0; i < 16; i++) anel.setPixelColor(i, anel.ColorHSV(matiz + i * 4096));",
+  "  anel.show();",
+  "  matiz += 256;",
+  "  delay(20);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "anel",
+    "Tipo": "led-ring",
+    "X": 300,
+    "Y": 60
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "anel",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "VIN",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "anel",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "anel",
+    "DePino": "DIN",
+    "ParaPeca": "placa",
+    "ParaPino": "D5",
+    "Cor": "#00A651"
+   }
+  ]
+ }
+}

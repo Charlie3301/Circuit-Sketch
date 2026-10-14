@@ -1,0 +1,155 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Termostato com contratos, em SPARK.",
+  "",
+  "O que esta demo mostra:",
+  "- uma funcao com contrato (Pre) e o if/elsif do Ada;",
+  "- histerese: o aquecedor liga abaixo de 18 graus e so desliga acima de 22.",
+  "",
+  "Aperte F5 e gire o potenciometro, que faz o papel do sensor (0 a 50 C)."
+ ],
+ "codigo": [
+  "--  Termostato com contratos, em SPARK.",
+  "--",
+  "--  SPARK e Ada com contratos: o \"Pre\" diz o que a funcao exige de quem a",
+  "--  chama. Uma ferramenta de prova (o GNATprove) confere que ninguem quebra",
+  "--  o contrato -- aqui ele e lido e guardado, e o programa roda com ele no",
+  "--  lugar.",
+  "--",
+  "--  O potenciometro faz o papel do sensor, de 0 a 50 graus. O aquecedor",
+  "--  (LED vermelho) liga abaixo de 18 e so desliga acima de 22: a folga -- a",
+  "--  histerese -- evita que ele fique ligando e desligando.",
+  "",
+  "pragma SPARK_Mode (On);",
+  "",
+  "procedure Termostato is",
+  "   Sensor     : constant Integer := A0;",
+  "   Aquecedor  : constant Integer := 8;",
+  "   Liga_Em    : constant Integer := 18;",
+  "   Desliga_Em : constant Integer := 22;",
+  "   Ligado     : Boolean := False;",
+  "   Graus      : Integer := 0;",
+  "",
+  "   function Para_Graus (Leitura : Integer) return Integer",
+  "     with Pre => Leitura >= 0 and Leitura <= 1023;",
+  "",
+  "   function Para_Graus (Leitura : Integer) return Integer is",
+  "   begin",
+  "      return Leitura * 50 / 1023;",
+  "   end Para_Graus;",
+  "",
+  "begin",
+  "   Pin_Mode (Aquecedor, Output);",
+  "",
+  "   loop",
+  "      Graus := Para_Graus (Analog_Read (Sensor));",
+  "",
+  "      if Graus < Liga_Em then",
+  "         Ligado := True;",
+  "      elsif Graus > Desliga_Em then",
+  "         Ligado := False;",
+  "      end if;",
+  "",
+  "      if Ligado then",
+  "         Digital_Write (Aquecedor, High);",
+  "      else",
+  "         Digital_Write (Aquecedor, Low);",
+  "      end if;",
+  "",
+  "      Put (\"temperatura: \");",
+  "      Put (Graus);",
+  "      if Ligado then",
+  "         Put_Line (\" C, aquecendo\");",
+  "      else",
+  "         Put_Line (\" C\");",
+  "      end if;",
+  "",
+  "      Delay_Ms (500);",
+  "   end loop;",
+  "end Termostato;"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 60,
+    "Y": 160
+   },
+   {
+    "Id": "pot",
+    "Tipo": "potentiometer",
+    "X": 420,
+    "Y": 20,
+    "Giro": 0.3
+   },
+   {
+    "Id": "aquecedor",
+    "Tipo": "led",
+    "X": 540,
+    "Y": 30,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_aquecedor",
+    "Tipo": "resistor",
+    "X": 468,
+    "Y": 76,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pot",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "SIG",
+    "ParaPeca": "placa",
+    "ParaPino": "A0",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "r_aquecedor",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_aquecedor",
+    "DePino": "2",
+    "ParaPeca": "aquecedor",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "aquecedor",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

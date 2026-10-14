@@ -1,0 +1,151 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente bts7960.",
+  "",
+  "O BTS7960 (43 A): VCC, R_EN e L_EN nos 5 V (VIN); RPWM e LPWM, um para cada sentido.",
+  "",
+  "Ligado numa ESP32 DevKit V1, com o que ele precisa para funcionar",
+  "de verdade: o driver, o motor e a bateria de cada um.",
+  "",
+  "A placa esta no cabo USB (na barra dela: USB -> cabo ligado); a bateria e so do motor."
+ ],
+ "codigo": [
+  "// A velocidade e o PWM de uma entrada, com a outra em zero.",
+  "const int ENTRADA_A = 13;",
+  "const int ENTRADA_B = 12;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(ENTRADA_A, OUTPUT);",
+  "  pinMode(ENTRADA_B, OUTPUT);",
+  "  Serial.println(\"driver pronto\");",
+  "}",
+  "",
+  "void loop() {",
+  "  Serial.println(\"para frente, acelerando\");",
+  "  analogWrite(ENTRADA_B, 0);",
+  "  for (int v = 0; v <= 255; v += 51) {",
+  "    analogWrite(ENTRADA_A, v);",
+  "    delay(400);",
+  "  }",
+  "",
+  "  Serial.println(\"para tras, a meia velocidade\");",
+  "  analogWrite(ENTRADA_A, 0);",
+  "  analogWrite(ENTRADA_B, 128);",
+  "  delay(1500);",
+  "",
+  "  Serial.println(\"freio: as duas em cima\");",
+  "  analogWrite(ENTRADA_A, 255);",
+  "  analogWrite(ENTRADA_B, 255);",
+  "  delay(1000);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 60,
+    "Y": 60,
+    "Usb": true
+   },
+   {
+    "Id": "peca",
+    "Tipo": "bts7960",
+    "X": 300,
+    "Y": 60
+   },
+   {
+    "Id": "motor",
+    "Tipo": "motor-tt",
+    "X": 540,
+    "Y": 80
+   },
+   {
+    "Id": "pilhas",
+    "Tipo": "bateria",
+    "X": 300,
+    "Y": 300,
+    "Volts": 6,
+    "MiliAmperes": 2000,
+    "MiliAmperesHora": 2500,
+    "Nome": "4 pilhas AA (6 V)"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pilhas",
+    "DePino": "+",
+    "ParaPeca": "peca",
+    "ParaPino": "B+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pilhas",
+    "DePino": "-",
+    "ParaPeca": "peca",
+    "ParaPino": "B-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "VIN",
+    "ParaPeca": "peca",
+    "ParaPino": "VCC",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GND.2",
+    "ParaPeca": "peca",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "VIN",
+    "ParaPeca": "peca",
+    "ParaPino": "R_EN",
+    "Cor": "#8E44AD"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "VIN",
+    "ParaPeca": "peca",
+    "ParaPino": "L_EN",
+    "Cor": "#8E44AD"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D13",
+    "ParaPeca": "peca",
+    "ParaPino": "RPWM",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "D12",
+    "ParaPeca": "peca",
+    "ParaPino": "LPWM",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M+",
+    "ParaPeca": "motor",
+    "ParaPino": "+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "M-",
+    "ParaPeca": "motor",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

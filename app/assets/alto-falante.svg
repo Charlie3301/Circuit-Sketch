@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="28.0mm" height="32.6mm" viewBox="0 0 28.0 32.6">
+
+  <!-- fios: o vermelho e o + -->
+  <path d="M12.73 25.0 V32.20" stroke="#d62a2a" stroke-width="0.6" stroke-linecap="round"/>
+  <path d="M15.27 25.0 V32.20" stroke="#5a5f68" stroke-width="0.6" stroke-linecap="round"/>
+
+  <!-- aro de metal -->
+  <circle cx="14.0" cy="14.0" r="13.6" fill="#2b2e35" stroke="#15171b" stroke-width="0.4"/>
+  <circle cx="14.0" cy="14.0" r="12.5" fill="#434852"/>
+
+  <!-- cone -->
+  <circle cx="14.0" cy="14.0" r="11.3" fill="#1c1e23"/>
+  <circle cx="14.0" cy="14.0" r="9.8" fill="none" stroke="#2e3138" stroke-width="0.45"/>
+  <circle cx="14.0" cy="14.0" r="8.0" fill="none" stroke="#2e3138" stroke-width="0.45"/>
+  <circle cx="14.0" cy="14.0" r="6.2" fill="none" stroke="#2e3138" stroke-width="0.45"/>
+
+  <!-- cupula -->
+  <circle cx="14.0" cy="14.0" r="3.8" fill="#50555f"/>
+  <circle cx="13.1" cy="13.1" r="1.5" fill="#666c77"/>
+
+  <text x="14.0" y="21.90" fill="#8b9199" font-size="1.6px"
+        text-anchor="middle" font-family="Verdana">8&#937; 0,5W</text>
+
+  <text x="11.23" y="30.60" fill="#d05a5a" font-size="2.1px"
+        text-anchor="middle" font-family="Verdana">+</text>
+  <text x="16.77" y="30.60" fill="#8b9199" font-size="2.4px"
+        text-anchor="middle" font-family="Verdana">-</text>
+</svg>

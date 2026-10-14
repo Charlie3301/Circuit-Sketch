@@ -1,0 +1,86 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente lm2596.",
+  "",
+  "O LM2596 (step-down, 5 V no trimpot) baixa a LiPo 3S e liga a ESP32 pelo VIN, com pouca perda.",
+  "",
+  "Ligado numa ESP32 DevKit V1, com o que ele precisa para funcionar",
+  "de verdade: o driver, o motor e a bateria de cada um."
+ ],
+ "codigo": [
+  "const int PINO = 2;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(PINO, OUTPUT);",
+  "  Serial.println(\"saida pronta\");",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(PINO, HIGH);",
+  "  delay(150);",
+  "  digitalWrite(PINO, LOW);",
+  "  delay(150);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "peca",
+    "Tipo": "lm2596",
+    "X": 300,
+    "Y": 200,
+    "Volts": 5.0
+   },
+   {
+    "Id": "pilhas",
+    "Tipo": "bateria",
+    "X": 560,
+    "Y": 200,
+    "Volts": 11.1,
+    "MiliAmperes": 20000,
+    "MiliAmperesHora": 2200,
+    "Nome": "LiPo 3S 2200 mAh (11,1 V)"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pilhas",
+    "DePino": "+",
+    "ParaPeca": "peca",
+    "ParaPino": "IN+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pilhas",
+    "DePino": "-",
+    "ParaPeca": "peca",
+    "ParaPino": "IN-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "OUT+",
+    "ParaPeca": "placa",
+    "ParaPino": "VIN",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "OUT-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

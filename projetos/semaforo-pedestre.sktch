@@ -1,0 +1,248 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Semaforo com botao de pedestre (Uno)",
+  "",
+  "Cinco LEDs (tres do carro, dois do pedestre) e um botao com INPUT_PULLUP:",
+  "aperte o botao e o semaforo fecha para o carro e abre para o pedestre."
+ ],
+ "codigo": [
+  "// Semaforo de pedestre: o carro fica no verde ate alguem apertar o botao.",
+  "const int C_VERMELHO = 12, C_AMARELO = 11, C_VERDE = 10;",
+  "const int P_VERMELHO = 9, P_VERDE = 8;",
+  "const int BOTAO = 2;",
+  "",
+  "void carro(int v, int a, int g) { digitalWrite(C_VERMELHO, v); digitalWrite(C_AMARELO, a); digitalWrite(C_VERDE, g); }",
+  "void pedestre(int v, int g) { digitalWrite(P_VERMELHO, v); digitalWrite(P_VERDE, g); }",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  for (int p = 8; p <= 12; p++) pinMode(p, OUTPUT);",
+  "  pinMode(BOTAO, INPUT_PULLUP);",
+  "  carro(LOW, LOW, HIGH);",
+  "  pedestre(HIGH, LOW);",
+  "}",
+  "",
+  "void loop() {",
+  "  if (digitalRead(BOTAO) == LOW) {",
+  "    Serial.println(\"pedestre pediu para atravessar\");",
+  "    carro(LOW, HIGH, LOW);",
+  "    delay(2000);",
+  "    carro(HIGH, LOW, LOW);",
+  "    pedestre(LOW, HIGH);",
+  "    delay(4000);",
+  "    pedestre(HIGH, LOW);",
+  "    carro(LOW, LOW, HIGH);",
+  "  }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 260
+   },
+   {
+    "Id": "c_vermelho",
+    "Tipo": "led",
+    "X": 340,
+    "Y": 40,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_c_vermelho",
+    "Tipo": "resistor",
+    "X": 270,
+    "Y": 100,
+    "Ohms": 220
+   },
+   {
+    "Id": "c_amarelo",
+    "Tipo": "led",
+    "X": 420,
+    "Y": 40,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r_c_amarelo",
+    "Tipo": "resistor",
+    "X": 350,
+    "Y": 100,
+    "Ohms": 220
+   },
+   {
+    "Id": "c_verde",
+    "Tipo": "led",
+    "X": 500,
+    "Y": 40,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_c_verde",
+    "Tipo": "resistor",
+    "X": 430,
+    "Y": 100,
+    "Ohms": 220
+   },
+   {
+    "Id": "p_vermelho",
+    "Tipo": "led",
+    "X": 620,
+    "Y": 40,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_p_vermelho",
+    "Tipo": "resistor",
+    "X": 550,
+    "Y": 100,
+    "Ohms": 220
+   },
+   {
+    "Id": "p_verde",
+    "Tipo": "led",
+    "X": 700,
+    "Y": 40,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_p_verde",
+    "Tipo": "resistor",
+    "X": 630,
+    "Y": 100,
+    "Ohms": 220
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 380,
+    "Y": 520
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "12",
+    "ParaPeca": "r_c_vermelho",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_c_vermelho",
+    "DePino": "2",
+    "ParaPeca": "c_vermelho",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "c_vermelho",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "11",
+    "ParaPeca": "r_c_amarelo",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_c_amarelo",
+    "DePino": "2",
+    "ParaPeca": "c_amarelo",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "c_amarelo",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "10",
+    "ParaPeca": "r_c_verde",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_c_verde",
+    "DePino": "2",
+    "ParaPeca": "c_verde",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "c_verde",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "r_p_vermelho",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_p_vermelho",
+    "DePino": "2",
+    "ParaPeca": "p_vermelho",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "p_vermelho",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "r_p_verde",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_p_verde",
+    "DePino": "2",
+    "ParaPeca": "p_verde",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "p_verde",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "2",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

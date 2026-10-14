@@ -1,0 +1,68 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Bateria e LED, sem placa.",
+  "",
+  "A bateria de 9 V acende o LED pelo resistor de 330 ohms: uns 20 mA.",
+  "O resistor e o que segura a corrente -- tire-o e o LED queima,",
+  "como na bancada. Inverta o LED e ele apaga (o diodo so conduz",
+  "num sentido). Solte o fio do \"-\" e o circuito abre."
+ ],
+ "codigo": [
+  "// Sem placa: este circuito funciona so com a bateria.",
+  "// Nao ha nada para rodar -- a energia ja esta ligada."
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "bateria",
+    "Tipo": "bateria",
+    "X": 80,
+    "Y": 220,
+    "Volts": 9,
+    "MiliAmperes": 500,
+    "MiliAmperesHora": 500,
+    "Nome": "Bateria 9 V"
+   },
+   {
+    "Id": "resistor",
+    "Tipo": "resistor",
+    "X": 250,
+    "Y": 150,
+    "Ohms": 330
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 380,
+    "Y": 110,
+    "Cor": "vermelho"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "bateria",
+    "DePino": "+",
+    "ParaPeca": "resistor",
+    "ParaPino": "1",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "resistor",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "bateria",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

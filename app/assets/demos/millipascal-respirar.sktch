@@ -1,0 +1,90 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "LED respirando em Millipascal.",
+  "",
+  "O que esta demo mostra:",
+  "- variaveis com tipo, \"set\" para atribuir e blocos com begin/end;",
+  "- PWM com analogWrite no pino 9 do Uno.",
+  "",
+  "Aperte F5 e veja o LED respirar."
+ ],
+ "codigo": [
+  "# LED respirando em Millipascal.",
+  "#",
+  "# O analogWrite vai de 0 a 255 e volta: o LED no pino 9 (que tem PWM)",
+  "# acende e apaga devagar, como quem respira.",
+  "#",
+  "# Millipascal e um Pascal enxuto: \"proc\" abre o procedimento, \"begin\" e",
+  "# \"end\" delimitam os blocos, e \"set\" atribui.",
+  "",
+  "proc main",
+  "var brilho:i32, passo:i32",
+  "begin",
+  "    pin_mode(9, OUTPUT);",
+  "    set brilho = 0;",
+  "    set passo = 5;",
+  "",
+  "    while true begin",
+  "        analog_write(9, brilho);",
+  "        set brilho = brilho + passo;",
+  "        if brilho >= 255 or brilho <= 0 begin",
+  "            set passo = 0 - passo;",
+  "        end",
+  "        delay_ms(30);",
+  "    end",
+  "end proc"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 60,
+    "Y": 160
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 460,
+    "Y": 30,
+    "Cor": "azul"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 388,
+    "Y": 76,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

@@ -1,0 +1,284 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Estufa automatica, na ESP32-C3.",
+  "",
+  "O que esta demo mostra:",
+  "- o DHT22 (temperatura e umidade), um servo e um LCD I2C na mesma placa;",
+  "- decisao por faixa: acima de 28 C ventila, abaixo de 18 C aquece.",
+  "",
+  "A estufa comeca quente (31 C). Clique no DHT22 e baixe a temperatura para",
+  "ver a janela fechar e o aquecedor ligar."
+ ],
+ "codigo": [
+  "// Estufa automatica na ESP32-C3.",
+  "//",
+  "// O DHT22 mede a temperatura e a umidade. Com calor, a janela (o servo)",
+  "// abre e o ventilador (LED azul) liga; com frio, o aquecedor (LED",
+  "// vermelho) liga e a janela fecha. O LCD mostra tudo.",
+  "",
+  "#include <DHT.h>",
+  "#include <Wire.h>",
+  "#include <LiquidCrystal_I2C.h>",
+  "#include <ESP32Servo.h>",
+  "",
+  "const int PINO_DHT = 4;",
+  "const int PINO_JANELA = 5;",
+  "const int VENTILADOR = 6;",
+  "const int AQUECEDOR = 7;",
+  "",
+  "const float QUENTE = 28.0;",
+  "const float FRIO = 18.0;",
+  "",
+  "DHT dht(PINO_DHT, DHT22);",
+  "LiquidCrystal_I2C lcd(0x27, 16, 2);",
+  "Servo janela;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(VENTILADOR, OUTPUT);",
+  "  pinMode(AQUECEDOR, OUTPUT);",
+  "  dht.begin();",
+  "  lcd.init();          // o I2C de fabrica da C3: SDA no 8, SCL no 9",
+  "  lcd.backlight();",
+  "  janela.attach(PINO_JANELA);",
+  "  janela.write(0);",
+  "}",
+  "",
+  "void loop() {",
+  "  float temperatura = dht.readTemperature();",
+  "  float umidade = dht.readHumidity();",
+  "",
+  "  if (isnan(temperatura) || isnan(umidade)) {",
+  "    Serial.println(\"o DHT22 nao respondeu\");",
+  "    delay(2000);",
+  "    return;",
+  "  }",
+  "",
+  "  String estado;",
+  "  if (temperatura > QUENTE) {",
+  "    janela.write(90);",
+  "    digitalWrite(VENTILADOR, HIGH);",
+  "    digitalWrite(AQUECEDOR, LOW);",
+  "    estado = \"Ventilando\";",
+  "  } else if (temperatura < FRIO) {",
+  "    janela.write(0);",
+  "    digitalWrite(VENTILADOR, LOW);",
+  "    digitalWrite(AQUECEDOR, HIGH);",
+  "    estado = \"Aquecendo\";",
+  "  } else {",
+  "    janela.write(0);",
+  "    digitalWrite(VENTILADOR, LOW);",
+  "    digitalWrite(AQUECEDOR, LOW);",
+  "    estado = \"Tudo certo\";",
+  "  }",
+  "",
+  "  lcd.setCursor(0, 0);",
+  "  lcd.print(temperatura, 1);",
+  "  lcd.print(\"C  \");",
+  "  lcd.print(umidade, 0);",
+  "  lcd.print(\"%    \");",
+  "  lcd.setCursor(0, 1);",
+  "  lcd.print(estado);",
+  "  lcd.print(\"        \");",
+  "",
+  "  Serial.print(temperatura, 1);",
+  "  Serial.print(\" C, \");",
+  "  Serial.print(umidade, 0);",
+  "  Serial.print(\" % -> \");",
+  "  Serial.println(estado);",
+  "",
+  "  delay(2000);   // o DHT22 le no maximo uma vez a cada 2 s",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-c3-devkit",
+    "X": 60,
+    "Y": 60
+   },
+   {
+    "Id": "dht",
+    "Tipo": "dht22",
+    "X": 300,
+    "Y": 20,
+    "Giro": 0.5916666666666667,
+    "Giro2": 0.64
+   },
+   {
+    "Id": "janela",
+    "Tipo": "servo",
+    "X": 420,
+    "Y": 180
+   },
+   {
+    "Id": "ventilador",
+    "Tipo": "led",
+    "X": 380,
+    "Y": 330,
+    "Cor": "azul"
+   },
+   {
+    "Id": "r_ventilador",
+    "Tipo": "resistor",
+    "X": 308,
+    "Y": 376,
+    "Ohms": 220
+   },
+   {
+    "Id": "aquecedor",
+    "Tipo": "led",
+    "X": 480,
+    "Y": 330,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_aquecedor",
+    "Tipo": "resistor",
+    "X": 408,
+    "Y": 376,
+    "Ohms": 220
+   },
+   {
+    "Id": "lcd",
+    "Tipo": "lcd1602-i2c",
+    "X": 60,
+    "Y": 330
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "dht",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "dht",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "4",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "dht",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "janela",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "janela",
+    "DePino": "V+",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "janela",
+    "DePino": "PWM",
+    "ParaPeca": "placa",
+    "ParaPino": "5",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "6",
+    "ParaPeca": "r_ventilador",
+    "ParaPino": "1",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_ventilador",
+    "DePino": "2",
+    "ParaPeca": "ventilador",
+    "ParaPino": "A",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "ventilador",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "7",
+    "ParaPeca": "r_aquecedor",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_aquecedor",
+    "DePino": "2",
+    "ParaPeca": "aquecedor",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "aquecedor",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "8",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "SCL",
+    "ParaPeca": "placa",
+    "ParaPino": "9",
+    "Cor": "#8E44AD",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

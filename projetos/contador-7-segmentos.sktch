@@ -1,0 +1,137 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Contador no display de 7 segmentos (Uno)",
+  "",
+  "Um display de 7 segmentos de catodo comum (os segmentos nos pinos 2 a",
+  "8) conta de 0 a 9 a cada toque no botao."
+ ],
+ "codigo": [
+  "// Contador de 0 a 9 no display de 7 segmentos (catodo comum).",
+  "// Os segmentos a..g nos pinos 2..8; o botao no A0.",
+  "const byte DIGITOS[10] = {",
+  "  0b0111111, 0b0000110, 0b1011011, 0b1001111, 0b1100110,",
+  "  0b1101101, 0b1111101, 0b0000111, 0b1111111, 0b1101111",
+  "};",
+  "int contagem = 0;",
+  "int antes = HIGH;",
+  "",
+  "void mostrar(int n) {",
+  "  for (int s = 0; s < 7; s++) digitalWrite(2 + s, (DIGITOS[n] >> s) & 1);",
+  "}",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  for (int p = 2; p <= 8; p++) pinMode(p, OUTPUT);",
+  "  pinMode(A0, INPUT_PULLUP);",
+  "  mostrar(0);",
+  "}",
+  "",
+  "void loop() {",
+  "  int agora = digitalRead(A0);",
+  "  if (antes == HIGH && agora == LOW) {",
+  "    contagem = (contagem + 1) % 10;",
+  "    mostrar(contagem);",
+  "    Serial.println(contagem);",
+  "    delay(50);",
+  "  }",
+  "  antes = agora;",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 220
+   },
+   {
+    "Id": "display",
+    "Tipo": "7segment",
+    "X": 420,
+    "Y": 40
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 560,
+    "Y": 60
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "2",
+    "ParaPeca": "display",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "3",
+    "ParaPeca": "display",
+    "ParaPino": "B",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "4",
+    "ParaPeca": "display",
+    "ParaPino": "C",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "5",
+    "ParaPeca": "display",
+    "ParaPino": "D",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "6",
+    "ParaPeca": "display",
+    "ParaPino": "E",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "7",
+    "ParaPeca": "display",
+    "ParaPino": "F",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "display",
+    "ParaPino": "G",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "display",
+    "DePino": "COM.1",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "A0",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

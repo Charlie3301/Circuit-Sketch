@@ -1,0 +1,130 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Relogio com RTC DS1307 e LCD I2C (Uno)",
+  "",
+  "O DS1307 guarda a hora (com a bateria dele); o LCD 16x2 I2C mostra a",
+  "hora e a data. Os dois dividem o barramento I2C (A4 e A5)."
+ ],
+ "codigo": [
+  "// Relogio: o RTC DS1307 guarda a hora; o LCD I2C mostra.",
+  "#include <Wire.h>",
+  "#include <RTClib.h>",
+  "#include <LiquidCrystal_I2C.h>",
+  "",
+  "RTC_DS1307 rtc;",
+  "LiquidCrystal_I2C lcd(0x27, 16, 2);",
+  "",
+  "void doisDigitos(int n) {",
+  "  if (n < 10) lcd.print(0);",
+  "  lcd.print(n);",
+  "}",
+  "",
+  "void setup() {",
+  "  lcd.init();",
+  "  lcd.backlight();",
+  "  rtc.begin();",
+  "  if (!rtc.isrunning()) rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));",
+  "}",
+  "",
+  "void loop() {",
+  "  DateTime agora = rtc.now();",
+  "  lcd.setCursor(0, 0);",
+  "  lcd.print(\"Hora \");",
+  "  doisDigitos(agora.hour());",
+  "  lcd.print(\":\");",
+  "  doisDigitos(agora.minute());",
+  "  lcd.print(\":\");",
+  "  doisDigitos(agora.second());",
+  "  lcd.setCursor(0, 1);",
+  "  doisDigitos(agora.day());",
+  "  lcd.print(\"/\");",
+  "  doisDigitos(agora.month());",
+  "  lcd.print(\"/\");",
+  "  lcd.print(agora.year());",
+  "  delay(500);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 220
+   },
+   {
+    "Id": "rtc",
+    "Tipo": "ds1307",
+    "X": 380,
+    "Y": 40
+   },
+   {
+    "Id": "lcd",
+    "Tipo": "lcd1602-i2c",
+    "X": 520,
+    "Y": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "rtc",
+    "DePino": "5V",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "rtc",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "rtc",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "A4",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "rtc",
+    "DePino": "SCL",
+    "ParaPeca": "placa",
+    "ParaPino": "A5",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "A4",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "lcd",
+    "DePino": "SCL",
+    "ParaPeca": "placa",
+    "ParaPino": "A5",
+    "Cor": "#00A651"
+   }
+  ]
+ }
+}

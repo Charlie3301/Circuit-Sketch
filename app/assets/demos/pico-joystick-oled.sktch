@@ -1,0 +1,155 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Joystick e OLED na Raspberry Pi Pico, em MicroPython.",
+  "",
+  "O que esta demo mostra:",
+  "- MicroPython na Pico: ADC por canal (ADC(0) e o GP26), read_u16 de 0 a",
+  "  65535 e o driver ssd1306 no I2C 0;",
+  "- entrada analogica virando posicao na tela.",
+  "",
+  "Aperte F5 e clique no joystick para mexer nos eixos X e Y."
+ ],
+ "codigo": [
+  "# Joystick e OLED na Raspberry Pi Pico, em MicroPython.",
+  "#",
+  "# O joystick move um simbolo pela tela do OLED, e o botao dele troca o",
+  "# simbolo. As leituras cruas aparecem na linha de cima.",
+  "#",
+  "# Na Pico, ADC(0) e o canal 0 -- o GP26 --, e o read_u16 vai de 0 a 65535.",
+  "",
+  "from machine import Pin, ADC, I2C",
+  "import ssd1306",
+  "import time",
+  "",
+  "eixo_x = ADC(0)          # GP26",
+  "eixo_y = ADC(1)          # GP27",
+  "botao = Pin(22, Pin.IN, Pin.PULL_UP)",
+  "",
+  "i2c = I2C(0, sda=Pin(4), scl=Pin(5))",
+  "oled = ssd1306.SSD1306_I2C(128, 64, i2c)",
+  "",
+  "simbolos = [\"o\", \"*\", \"+\", \"@\"]",
+  "qual = 0",
+  "antes = 1",
+  "",
+  "while True:",
+  "    x = eixo_x.read_u16()",
+  "    y = eixo_y.read_u16()",
+  "",
+  "    agora = botao.value()",
+  "    if antes == 1 and agora == 0:",
+  "        qual = (qual + 1) % len(simbolos)",
+  "    antes = agora",
+  "",
+  "    # 0..65535 vira coluna 0..20 e linha 2..7 (as de cima sao do texto).",
+  "    coluna = x * 20 // 65535",
+  "    linha = 2 + y * 5 // 65535",
+  "",
+  "    oled.fill(0)",
+  "    oled.text(\"X \" + str(x) + \" Y \" + str(y), 0, 0)",
+  "    oled.text(simbolos[qual], coluna * 6, linha * 8)",
+  "    oled.show()",
+  "    time.sleep_ms(50)"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "pi-pico",
+    "X": 60,
+    "Y": 60
+   },
+   {
+    "Id": "joy",
+    "Tipo": "analog-joystick",
+    "X": 280,
+    "Y": 20,
+    "Giro": 0.5,
+    "Giro2": 0.5
+   },
+   {
+    "Id": "oled",
+    "Tipo": "ssd1306-i2c",
+    "X": 280,
+    "Y": 200
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "joy",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "joy",
+    "DePino": "HORZ",
+    "ParaPeca": "placa",
+    "ParaPino": "GP26",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "joy",
+    "DePino": "VERT",
+    "ParaPeca": "placa",
+    "ParaPino": "GP27",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "joy",
+    "DePino": "SEL",
+    "ParaPeca": "placa",
+    "ParaPino": "GP22",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "joy",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.6",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "oled",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "oled",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "oled",
+    "DePino": "SDA",
+    "ParaPeca": "placa",
+    "ParaPino": "GP4",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "oled",
+    "DePino": "SCL",
+    "ParaPeca": "placa",
+    "ParaPino": "GP5",
+    "Cor": "#8E44AD",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

@@ -1,0 +1,172 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Vela eletronica, na Franzininho.",
+  "",
+  "O que esta demo mostra:",
+  "- PWM com analogWrite nos pinos do ATtiny85 que tem PWM (PB0 e PB1);",
+  "- random() dando vida a chama, num chip de meio KB de RAM.",
+  "",
+  "Aperte F5 e o botao para soprar e reacender a vela."
+ ],
+ "codigo": [
+  "// Vela eletronica, na Franzininho.",
+  "//",
+  "// Dois LEDs (amarelo e laranja) tremulam como chama de vela, com brilho",
+  "// sorteado a cada instante. O botao \"sopra\" a vela -- ela se apaga",
+  "// devagar -- e acende de novo no proximo aperto.",
+  "//",
+  "// PB0 e PB1 tem PWM: e o analogWrite que faz a chama variar.",
+  "",
+  "const int CHAMA_AMARELA = 0;   // PB0",
+  "const int CHAMA_LARANJA = 1;   // PB1",
+  "const int BOTAO = 2;           // PB2",
+  "",
+  "bool acesa = true;",
+  "int botaoAntes = HIGH;",
+  "",
+  "void apagarDevagar() {",
+  "  for (int brilho = 200; brilho >= 0; brilho -= 5) {",
+  "    analogWrite(CHAMA_AMARELA, brilho);",
+  "    analogWrite(CHAMA_LARANJA, brilho / 2);",
+  "    delay(15);",
+  "  }",
+  "}",
+  "",
+  "void setup() {",
+  "  pinMode(CHAMA_AMARELA, OUTPUT);",
+  "  pinMode(CHAMA_LARANJA, OUTPUT);",
+  "  pinMode(BOTAO, INPUT_PULLUP);",
+  "}",
+  "",
+  "void loop() {",
+  "  int botao = digitalRead(BOTAO);",
+  "  if (botaoAntes == HIGH && botao == LOW) {",
+  "    acesa = !acesa;",
+  "    if (!acesa) apagarDevagar();",
+  "  }",
+  "  botaoAntes = botao;",
+  "",
+  "  if (acesa) {",
+  "    // A chama: um brilho de base com um tremido sorteado por cima.",
+  "    analogWrite(CHAMA_AMARELA, random(120, 256));",
+  "    analogWrite(CHAMA_LARANJA, random(40, 140));",
+  "    delay(random(30, 110));",
+  "  } else {",
+  "    delay(20);",
+  "  }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "franzininho",
+    "X": 40,
+    "Y": 60
+   },
+   {
+    "Id": "chama1",
+    "Tipo": "led",
+    "X": 400,
+    "Y": 20,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r_chama1",
+    "Tipo": "resistor",
+    "X": 328,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "chama2",
+    "Tipo": "led",
+    "X": 480,
+    "Y": 20,
+    "Cor": "laranja"
+   },
+   {
+    "Id": "r_chama2",
+    "Tipo": "resistor",
+    "X": 408,
+    "Y": 66,
+    "Ohms": 220
+   },
+   {
+    "Id": "sopro",
+    "Tipo": "pushbutton",
+    "X": 400,
+    "Y": 160
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "PB0",
+    "ParaPeca": "r_chama1",
+    "ParaPino": "1",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_chama1",
+    "DePino": "2",
+    "ParaPeca": "chama1",
+    "ParaPino": "A",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "chama1",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "PB1",
+    "ParaPeca": "r_chama2",
+    "ParaPino": "1",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_chama2",
+    "DePino": "2",
+    "ParaPeca": "chama2",
+    "ParaPino": "A",
+    "Cor": "#F28C28",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "chama2",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "PB2",
+    "ParaPeca": "sopro",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FEB",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "sopro",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

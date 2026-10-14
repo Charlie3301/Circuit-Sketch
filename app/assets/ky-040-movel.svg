@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30.815mm" height="18.63mm" version="1.1" viewBox="0 0 116 70.4">
+        <defs>
+          <linearGradient id="a" x1="158" x2="170" y1="86.5" y2="86.5" gradientTransform="translate(-75.1 -60.1)" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#4d4d4d" offset="0" />
+            <stop stop-color="#4d4d4d" stop-opacity="0" offset="1" />
+          </linearGradient>
+        </defs>
+
+        
+        <g tabindex="0">
+          <g id="knob"><circle cx="36.6" cy="28.5" r="13.5" fill="#666" />
+          <rect x="32.5" y="7.87" width="7.42" height="41.5" fill="#666" />
+
+          
+          <path d="m36.3 21.4a7.03 7.14 0 0&#10;              0-3.74 1.1v12.1a7.03 7.14 0 0 0 3.74 1.1 7.03 7.14 0 0 0 7.03-7.14 7.03 7.14 0 0&#10;              0-7.03-7.14z" fill="#ccc" stroke="#060606" stroke-width=".3" transform="rotate(0, 36.244, 28.5)" class="handle " /></g>
+
+          
+          </g>
+
+        
+        </svg>

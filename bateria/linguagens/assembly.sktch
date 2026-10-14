@@ -1,0 +1,95 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste da linguagem assembly.",
+  "",
+  "Todas as dez fazem exatamente a mesma coisa — piscar um LED e",
+  "contar — para que a comparação entre elas fique limpa."
+ ],
+ "codigo": [
+  "; Bateria — Assembly AVR.",
+  ";",
+  "; Opcodes de verdade, ciclos do datasheet. O .hex que sai daqui",
+  "; e o mesmo binario que o avrdude grava na placa.",
+  ";",
+  "; PB5 do ATmega328P E o pino 13 do Arduino Uno.",
+  "",
+  ".equ LED = 5",
+  "",
+  "    ldi r16, (1<<LED)",
+  "    out DDRB, r16",
+  "",
+  "principal:",
+  "    sbi PORTB, LED",
+  "    rcall espera",
+  "    cbi PORTB, LED",
+  "    rcall espera",
+  "    rjmp principal",
+  "",
+  "; 3 niveis de contagem: 3.916.867 ciclos por chamada,",
+  "; que a 16 MHz sao 244,8 ms.",
+  "espera:",
+  "    ldi r20, 20",
+  "nivel3:",
+  "    ldi r18, 255",
+  "nivel2:",
+  "    ldi r17, 255",
+  "nivel1:",
+  "    dec r17",
+  "    brne nivel1",
+  "    dec r18",
+  "    brne nivel2",
+  "    dec r20",
+  "    brne nivel3",
+  "    ret"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 120,
+    "Y": 60
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 520,
+    "Y": 120,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r",
+    "Tipo": "resistor",
+    "X": 520,
+    "Y": 280,
+    "Ohms": 330
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "13",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "r",
+    "ParaPino": "1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "r",
+    "DePino": "2",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

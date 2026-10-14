@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="22.5mm" height="53.0mm" viewBox="0 0 22.5 53.0">
+
+  <rect x="0" y="0" width="22.5" height="53.0" rx="1.4" fill="#1f4fa8"/>
+  <rect x="0" y="0" width="22.5" height="53.0" rx="1.4"
+        fill="none" stroke="#153a7d" stroke-width="0.3"/>
+
+  <rect x="6.4" y="20.0" width="9.6" height="9.6" rx="0.8" fill="#15181e"/>
+  <rect x="6.4" y="20.0" width="9.6" height="9.6" rx="0.8"
+        fill="none" stroke="#0c0e12" stroke-width="0.25"/>
+  <rect x="8.0" y="2.2" width="6.5" height="5.6" rx="0.7" fill="#c9ccd1"/>
+  <rect x="7.2" y="33.0" width="8.2" height="4.2" rx="0.5" fill="#2a2f38"/>
+  <circle cx="8.4" cy="41.5" r="0.85" fill="#3fa35c"/>
+  <circle cx="14.10" cy="41.5" r="0.85" fill="#d05a5a"/>
+
+  <rect x="0.70" y="1.20" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="2.20" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="3.74" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="4.74" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="6.28" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="7.28" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="8.82" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="9.82" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="11.36" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="12.36" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="13.90" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="14.90" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="16.44" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="17.44" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="18.98" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="19.98" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="21.52" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="22.52" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="24.06" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="25.06" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="26.60" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="27.60" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="29.14" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="30.14" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="31.68" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="32.68" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="34.22" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="35.22" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="36.76" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="37.76" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="39.30" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="40.30" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="41.84" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="42.84" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="44.38" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="45.38" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="46.92" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="47.92" r="0.55" fill="#14181f"/>
+  <rect x="0.70" y="49.46" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="1.70" cy="50.46" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="1.20" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="2.20" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="3.74" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="4.74" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="6.28" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="7.28" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="8.82" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="9.82" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="11.36" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="12.36" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="13.90" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="14.90" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="16.44" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="17.44" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="18.98" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="19.98" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="21.52" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="22.52" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="24.06" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="25.06" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="26.60" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="27.60" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="29.14" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="30.14" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="31.68" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="32.68" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="34.22" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="35.22" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="36.76" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="37.76" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="39.30" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="40.30" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="41.84" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="42.84" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="44.38" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="45.38" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="46.92" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="47.92" r="0.55" fill="#14181f"/>
+  <rect x="19.80" y="49.46" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
+  <circle cx="20.80" cy="50.46" r="0.55" fill="#14181f"/>
+  <text x="3.40" y="2.75" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">VB</text>
+  <text x="3.40" y="5.29" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PC13</text>
+  <text x="3.40" y="7.83" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PC14</text>
+  <text x="3.40" y="10.37" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PC15</text>
+  <text x="3.40" y="12.91" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PA0</text>
+  <text x="3.40" y="15.45" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PA1</text>
+  <text x="3.40" y="17.99" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PA2</text>
+  <text x="3.40" y="20.53" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PA3</text>
+  <text x="3.40" y="23.07" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PA4</text>
+  <text x="3.40" y="25.61" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PA5</text>
+  <text x="3.40" y="28.15" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PA6</text>
+  <text x="3.40" y="30.69" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PA7</text>
+  <text x="3.40" y="33.23" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PB0</text>
+  <text x="3.40" y="35.77" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PB1</text>
+  <text x="3.40" y="38.31" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PB10</text>
+  <text x="3.40" y="40.85" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">PB11</text>
+  <text x="3.40" y="43.39" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">RST</text>
+  <text x="3.40" y="45.93" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">3V3</text>
+  <text x="3.40" y="48.47" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GND</text>
+  <text x="3.40" y="51.01" fill="#cfd8e3" font-size="1.35px" font-family="Verdana">GND</text>
+  <text x="19.10" y="2.75" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">3V3</text>
+  <text x="19.10" y="5.29" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GND</text>
+  <text x="19.10" y="7.83" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">GND</text>
+  <text x="19.10" y="10.37" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">5V</text>
+  <text x="19.10" y="12.91" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PB9</text>
+  <text x="19.10" y="15.45" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PB8</text>
+  <text x="19.10" y="17.99" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PB7</text>
+  <text x="19.10" y="20.53" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PB6</text>
+  <text x="19.10" y="23.07" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PB5</text>
+  <text x="19.10" y="25.61" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PB4</text>
+  <text x="19.10" y="28.15" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PB3</text>
+  <text x="19.10" y="30.69" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PA15</text>
+  <text x="19.10" y="33.23" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PA12</text>
+  <text x="19.10" y="35.77" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PA11</text>
+  <text x="19.10" y="38.31" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PA10</text>
+  <text x="19.10" y="40.85" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PA9</text>
+  <text x="19.10" y="43.39" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PA8</text>
+  <text x="19.10" y="45.93" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PB15</text>
+  <text x="19.10" y="48.47" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PB14</text>
+  <text x="19.10" y="51.01" fill="#cfd8e3" font-size="1.35px" text-anchor="end" font-family="Verdana">PB13</text>
+
+  <text x="11.25" y="27.10" fill="#cfd8e3" font-size="2.2px"
+        text-anchor="middle" font-family="Verdana" opacity="0.85">STM32F103</text>
+</svg>

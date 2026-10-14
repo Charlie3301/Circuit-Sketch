@@ -1,0 +1,75 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Teste do componente neopixel.",
+  "",
+  "Ligado numa ESP32 DevKit V1, que tem pino para tudo — assim o",
+  "que muda de um teste para o outro é só a peça.",
+  "",
+  "Pinos ligados: VDD → 3V3, DIN → D5, VSS → GND.1"
+ ],
+ "codigo": [
+  "#include <Adafruit_NeoPixel.h>",
+  "",
+  "Adafruit_NeoPixel fita(8, 5, NEO_GRB + NEO_KHZ800);",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  fita.begin();",
+  "  Serial.println(\"fita pronta\");",
+  "}",
+  "",
+  "void loop() {",
+  "  for (int i = 0; i < 8; i++) {",
+  "    fita.setPixelColor(i, fita.Color(120, 0, 0));",
+  "  }",
+  "  fita.show();",
+  "  delay(300);",
+  "",
+  "  fita.clear();",
+  "  fita.show();",
+  "  delay(300);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 100,
+    "Y": 60
+   },
+   {
+    "Id": "peca",
+    "Tipo": "neopixel",
+    "X": 520,
+    "Y": 160
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "peca",
+    "DePino": "VDD",
+    "ParaPeca": "placa",
+    "ParaPino": "3V3",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "DIN",
+    "ParaPeca": "placa",
+    "ParaPino": "D5",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "peca",
+    "DePino": "VSS",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

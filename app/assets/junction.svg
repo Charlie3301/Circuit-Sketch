@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="5.08mm" height="5.08mm" viewBox="0 0 5.08 5.08">
+  <!-- Pernas ate as quatro bordas: o fio encosta no lado que quiser. -->
+  <g stroke="#b08d57" stroke-width="0.55" stroke-linecap="round">
+    <path d="M2.54 0.35 V2.54"/>
+    <path d="M4.73 2.54 H2.54"/>
+    <path d="M2.54 4.73 V2.54"/>
+    <path d="M0.35 2.54 H2.54"/>
+  </g>
+  <circle cx="2.54" cy="2.54" r="1.15" fill="#c8a165" stroke="#8c6d3f" stroke-width="0.2"/>
+  <circle cx="2.24" cy="2.19" r="0.35" fill="#e8d2ab" opacity="0.8"/>
+</svg>

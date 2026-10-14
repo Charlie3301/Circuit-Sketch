@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="34.0mm" height="19.0mm" viewBox="0 0 34.0 19.0">
+
+  <!-- corpo -->
+  <rect x="0.4" y="3.2" width="33.2" height="12.0" rx="1.4" fill="#2b2f36"/>
+  <rect x="0.4" y="3.2" width="33.2" height="12.0" rx="1.4"
+        fill="none" stroke="#1a1d22" stroke-width="0.35"/>
+
+  <!-- rotulo -->
+  <rect x="1.6" y="4.4" width="30.8" height="9.6" rx="0.8" fill="#1f6f4a"/>
+  <rect x="1.6" y="4.4" width="30.8" height="3.1" rx="0.8" fill="#258457"/>
+
+  <!-- o simbolo de pilha: tracos longo e curto -->
+  <g stroke="#e9f3ec" stroke-width="0.55" stroke-linecap="round">
+    <path d="M9.0 7.4 V11.0"/>
+    <path d="M11.4 8.3 V10.1"/>
+    <path d="M13.8 7.4 V11.0"/>
+    <path d="M16.2 8.3 V10.1"/>
+  </g>
+
+  <text x="30.00" y="10.6" fill="#cfe6d8" font-size="2.0px"
+        text-anchor="end" font-family="Verdana">BATERIA</text>
+
+  <!-- terminais -->
+  <g stroke="#9aa0a6" stroke-width="0.5" stroke-linecap="round" fill="none">
+    <path d="M15.73 15.0 V18.60"/>
+    <path d="M18.27 15.0 V18.60"/>
+  </g>
+
+  <text x="15.73" y="2.6" fill="#d05a5a" font-size="2.2px"
+        text-anchor="middle" font-family="Verdana">+</text>
+  <text x="18.27" y="2.6" fill="#8b9199" font-size="2.6px"
+        text-anchor="middle" font-family="Verdana">-</text>
+</svg>

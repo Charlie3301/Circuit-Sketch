@@ -1,0 +1,154 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "demo do CircuitSketch",
+ "descricao": [
+  "Barra de LEDs em varredura, no Arduino Mega.",
+  "",
+  "O que esta demo mostra:",
+  "- dez saidas seguidas num laco for -- o Mega tem pinos de sobra, sem",
+  "  precisar multiplexar;",
+  "- a barra de LEDs na protoboard, indo e voltando.",
+  "",
+  "Aperte F5."
+ ],
+ "codigo": [
+  "// Barra de LEDs em varredura.",
+  "// O Mega tem pinos de sobra: dez saídas seguidas, sem multiplexar.",
+  "",
+  "const int PRIMEIRO = 22;",
+  "const int QUANTOS  = 10;",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  for (int i = 0; i < QUANTOS; i++) {",
+  "    pinMode(PRIMEIRO + i, OUTPUT);",
+  "  }",
+  "}",
+  "",
+  "void loop() {",
+  "  for (int i = 0; i < QUANTOS; i++) {",
+  "    digitalWrite(PRIMEIRO + i, HIGH);",
+  "    delay(80);",
+  "    digitalWrite(PRIMEIRO + i, LOW);",
+  "  }",
+  "  for (int i = QUANTOS - 2; i > 0; i--) {",
+  "    digitalWrite(PRIMEIRO + i, HIGH);",
+  "    delay(80);",
+  "    digitalWrite(PRIMEIRO + i, LOW);",
+  "  }",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "bb",
+    "Tipo": "protoboard-830",
+    "X": 60,
+    "Y": 340
+   },
+   {
+    "Id": "placa",
+    "Tipo": "arduino-mega",
+    "X": 40,
+    "Y": 20
+   },
+   {
+    "Id": "barra",
+    "Tipo": "led-bar-graph",
+    "X": 160.8,
+    "Y": 421.6
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "22",
+    "ParaPeca": "bb",
+    "ParaPino": "A10",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "23",
+    "ParaPeca": "bb",
+    "ParaPino": "A11",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "24",
+    "ParaPeca": "bb",
+    "ParaPino": "A12",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "25",
+    "ParaPeca": "bb",
+    "ParaPino": "A13",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "26",
+    "ParaPeca": "bb",
+    "ParaPino": "A14",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "27",
+    "ParaPeca": "bb",
+    "ParaPino": "A15",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "28",
+    "ParaPeca": "bb",
+    "ParaPino": "A16",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "29",
+    "ParaPeca": "bb",
+    "ParaPino": "A17",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "30",
+    "ParaPeca": "bb",
+    "ParaPino": "A18",
+    "Cor": "#F2C300",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "31",
+    "ParaPeca": "bb",
+    "ParaPino": "A19",
+    "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "bb",
+    "DePino": "J10",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A",
+    "Estilo": "solto"
+   }
+  ]
+ }
+}

@@ -1,0 +1,84 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Servidor web com LED (ESP32)",
+  "",
+  "A ESP32 conecta no WiFi do simulador e abre um servidor web: /liga e",
+  "/desliga acendem e apagam o LED. O endereco aparece no painel REDE."
+ ],
+ "codigo": [
+  "// Servidor web na ESP32: /liga e /desliga acendem o LED.",
+  "#include <WiFi.h>",
+  "#include <WebServer.h>",
+  "",
+  "WebServer servidor(80);",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(2, OUTPUT);",
+  "  WiFi.begin(\"CircuitSketch-WiFi\", \"12345678\");",
+  "  while (WiFi.status() != WL_CONNECTED) delay(300);",
+  "  Serial.print(\"IP da placa: \");",
+  "  Serial.println(WiFi.localIP());",
+  "  servidor.on(\"/\", []() { servidor.send(200, \"text/html\", \"<a href=/liga>liga</a> | <a href=/desliga>desliga</a>\"); });",
+  "  servidor.on(\"/liga\", []() { digitalWrite(2, HIGH); servidor.send(200, \"text/plain\", \"LED aceso\"); });",
+  "  servidor.on(\"/desliga\", []() { digitalWrite(2, LOW); servidor.send(200, \"text/plain\", \"LED apagado\"); });",
+  "  servidor.begin();",
+  "  Serial.println(\"servidor pronto\");",
+  "}",
+  "",
+  "void loop() {",
+  "  servidor.handleClient();",
+  "  delay(2);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 280,
+    "Y": 40,
+    "Cor": "amarelo"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 210,
+    "Y": 100,
+    "Ohms": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D2",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

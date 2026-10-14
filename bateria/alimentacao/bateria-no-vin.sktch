@@ -1,0 +1,100 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "A LiPo 2S (7,4 V) no VIN da ESP32, sem o cabo USB.",
+  "",
+  "O VIN passa pelo regulador da placa (AMS1117): de 4,3 a 12 V ela liga,",
+  "e o regulador faz os 3,3 V do chip e do pino 3V3. Tire o fio do +",
+  "com a simulacao rodando e ela apaga; ponha de volta e ela liga do boot."
+ ],
+ "codigo": [
+  "// Sem o cabo USB: esta placa so roda se a bateria a alimentar.",
+  "const int LED = 2;",
+  "",
+  "void setup() {",
+  "  Serial.begin(115200);",
+  "  pinMode(LED, OUTPUT);",
+  "  Serial.println(\"ligou pela bateria\");",
+  "}",
+  "",
+  "void loop() {",
+  "  digitalWrite(LED, HIGH);",
+  "  delay(300);",
+  "  digitalWrite(LED, LOW);",
+  "  delay(300);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "esp32-devkit-v1",
+    "X": 60,
+    "Y": 40
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 360,
+    "Y": 60,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r",
+    "Tipo": "resistor",
+    "X": 340,
+    "Y": 180,
+    "Ohms": 330
+   },
+   {
+    "Id": "bateria",
+    "Tipo": "bateria",
+    "X": 380,
+    "Y": 300,
+    "Volts": 7.4,
+    "MiliAmperes": 20000,
+    "MiliAmperesHora": 1000,
+    "Nome": "LiPo 2S 1000 mAh (7,4 V)"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "D2",
+    "ParaPeca": "r",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.1",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "bateria",
+    "DePino": "+",
+    "ParaPeca": "placa",
+    "ParaPino": "VIN",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "bateria",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

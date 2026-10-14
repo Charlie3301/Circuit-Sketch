@@ -1,0 +1,77 @@
+# ============================================================
+#  Plataforma minima de teste - CircuitSketch
+#
+#  Duas coisas estao sendo testadas de uma vez:
+#    1) as receitas de compilacao podem ser no-op?
+#    2) o upload recebe {build.source.path} (caminho do sketch)?
+#
+#  Os hooks de prebuild/postbuild existem para que, MESMO se a
+#  compilacao no-op falhar, a gente saiba ate onde chegou.
+# ============================================================
+
+name=CircuitSketch
+version=1.5.0
+
+# ------------------------------------------------------------
+# Diagnostico: dispara antes e depois do build
+# ------------------------------------------------------------
+recipe.hooks.postbuild.1.pattern=powershell -NoProfile -ExecutionPolicy Bypass -File "{runtime.platform.path}/tools/ponte.ps1" -Modo compilar -Sketch "{build.source.path}" -Build "{build.path}" -Peca "{simulador.peca}"
+
+# ------------------------------------------------------------
+# Compilacao no-op: cada receita so precisa CRIAR o arquivo que
+# o passo seguinte espera encontrar. "copy nul" cria vazio sem
+# depender de redirecionamento de shell.
+# ------------------------------------------------------------
+recipe.preproc.macros=cmd.exe /c "{runtime.platform.path}/tools/noop-cc.bat" "{preprocessed_file_path}"
+recipe.c.o.pattern=cmd.exe /c "{runtime.platform.path}/tools/noop-cc.bat" "{object_file}"
+recipe.cpp.o.pattern=cmd.exe /c "{runtime.platform.path}/tools/noop-cc.bat" "{object_file}"
+recipe.S.o.pattern=cmd.exe /c "{runtime.platform.path}/tools/noop-cc.bat" "{object_file}"
+recipe.ar.pattern=cmd.exe /c "{runtime.platform.path}/tools/noop-cc.bat" "{archive_file_path}"
+recipe.c.combine.pattern=cmd.exe /c "{runtime.platform.path}/tools/noop-cc.bat" "{build.path}/{build.project_name}.elf"
+recipe.objcopy.bin.pattern=cmd.exe /c "{runtime.platform.path}/tools/noop-cc.bat" "{build.path}/{build.project_name}.bin"
+# ------------------------------------------------------------
+# Uso de memoria
+#
+# A IDE nao inventa as linhas "Sketch uses ... bytes": ela roda o
+# recipe.size.pattern e passa a saida pelas regex abaixo. Sem isso
+# o build terminava sem nenhuma informacao de memoria, diferente de
+# qualquer outra placa.
+# ------------------------------------------------------------
+recipe.size.pattern=cmd.exe /c powershell -NoProfile -ExecutionPolicy Bypass -File "{runtime.platform.path}/tools/tamanho.ps1" -Sketch "{build.source.path}" -PisoFlash {simulador.piso_flash} -PisoRam {simulador.piso_ram} -FatorFlash {simulador.fator_flash} -FatorRam {simulador.fator_ram} -FlashMaxima {upload.maximum_size} -RamMaxima {upload.maximum_data_size}
+recipe.size.regex=^\.flash\.text\s+([0-9]+).*
+recipe.size.regex.data=^\.dram0\.data\s+([0-9]+).*
+
+# ------------------------------------------------------------
+# Porta virtual
+#
+# A IDE exige uma porta para deixar gravar, e com a placa fantasma
+# nao ha nenhuma -- o Upload morria em "port not found" e so o
+# Verificar servia. Esta discovery anuncia uma porta que nao existe
+# em lugar nenhum, que e o suficiente para a IDE seguir em frente.
+# ------------------------------------------------------------
+pluggable_discovery.circuitsketch.pattern=cmd.exe /c "{runtime.platform.path}/tools/porta.bat"
+
+# ------------------------------------------------------------
+# Monitor serial
+#
+# Sem isto o monitor da IDE abre vazio: nao ha porta de verdade do
+# outro lado. Este monitor le o arquivo que o CircuitSketch escreve
+# em %APPDATA%\CircuitSketch\serial.txt, entao o Serial.println do
+# sketch aparece onde o aluno esta olhando.
+#
+# So o sentido simulador -> IDE: mandar texto de volta pediria
+# Serial.read, que o motor ainda nao tem.
+# ------------------------------------------------------------
+pluggable_monitor.pattern.circuitsketch=cmd.exe /c "{runtime.platform.path}/tools/monitor.bat"
+
+# ------------------------------------------------------------
+# O que o botao Upload (a seta) executa
+# ------------------------------------------------------------
+# As plataformas reais declaram estas tres alem do pattern, e o
+# arduino-cli conta com elas ao montar a linha de comando.
+tools.enviar.upload.protocol=circuitsketch
+tools.enviar.upload.params.verbose=
+tools.enviar.upload.params.quiet=
+# {build.source.path} nao existe no passo de upload -- chegaria literal.
+# O postbuild anota o caminho na pasta de build e o upload le de la.
+tools.enviar.upload.pattern=powershell -NoProfile -ExecutionPolicy Bypass -File "{runtime.platform.path}/tools/ponte.ps1" -Modo gravar -Build "{build.path}" -Peca "{simulador.peca}" -Placa "{simulador.rotulo}" -Gravador "{simulador.gravador}" -Assinatura "{simulador.assinatura}" -PisoFlash {simulador.piso_flash} -PisoRam {simulador.piso_ram} -FatorFlash {simulador.fator_flash} -FatorRam {simulador.fator_ram} -FlashMaxima {upload.maximum_size} -RamMaxima {upload.maximum_data_size}

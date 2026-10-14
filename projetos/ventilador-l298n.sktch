@@ -1,0 +1,164 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Ventilador com controle de velocidade (L298N, Uno)",
+  "",
+  "O motor 130 com a helice, pela ponte H L298N, nas 4 pilhas AA: o",
+  "potenciometro no A0 vira o PWM do ENA (a velocidade).",
+  "",
+  "O Uno esta no cabo USB (na barra da placa: USB -> cabo ligado): 6 V",
+  "no VIN nao bastam para ele (o regulador pede 7 V), e as pilhas sao so",
+  "do motor."
+ ],
+ "codigo": [
+  "// Ventilador: o potenciometro regula a velocidade do motor 130 pela L298N.",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  pinMode(9, OUTPUT);",
+  "  pinMode(7, OUTPUT);",
+  "  pinMode(8, OUTPUT);",
+  "  digitalWrite(7, HIGH);   // sempre no mesmo sentido",
+  "  digitalWrite(8, LOW);",
+  "}",
+  "",
+  "void loop() {",
+  "  int velocidade = analogRead(A0) / 4;",
+  "  analogWrite(9, velocidade);",
+  "  delay(50);",
+  "}"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "arduino-uno",
+    "X": 40,
+    "Y": 220,
+    "Usb": true
+   },
+   {
+    "Id": "ponte",
+    "Tipo": "l298n",
+    "X": 380,
+    "Y": 220
+   },
+   {
+    "Id": "motor",
+    "Tipo": "motor-dc",
+    "X": 620,
+    "Y": 220
+   },
+   {
+    "Id": "pot",
+    "Tipo": "potentiometer",
+    "X": 380,
+    "Y": 460,
+    "Giro": 0.3
+   },
+   {
+    "Id": "pilhas",
+    "Tipo": "bateria",
+    "X": 620,
+    "Y": 420,
+    "Volts": 6,
+    "MiliAmperes": 2000,
+    "MiliAmperesHora": 2500,
+    "Nome": "4 pilhas AA (6 V)"
+   },
+   {
+    "Id": "helice",
+    "Tipo": "helice-130",
+    "X": 529.29,
+    "Y": 123.62
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pilhas",
+    "DePino": "+",
+    "ParaPeca": "ponte",
+    "ParaPino": "12V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pilhas",
+    "DePino": "-",
+    "ParaPeca": "ponte",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "ponte",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.2",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "5V",
+    "ParaPeca": "ponte",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "9",
+    "ParaPeca": "ponte",
+    "ParaPino": "ENA",
+    "Cor": "#E8B400"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "7",
+    "ParaPeca": "ponte",
+    "ParaPino": "IN1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "8",
+    "ParaPeca": "ponte",
+    "ParaPino": "IN2",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "ponte",
+    "DePino": "OUT1",
+    "ParaPeca": "motor",
+    "ParaPino": "+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "ponte",
+    "DePino": "OUT2",
+    "ParaPeca": "motor",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "VCC",
+    "ParaPeca": "placa",
+    "ParaPino": "5V",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "GND",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.3",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "pot",
+    "DePino": "SIG",
+    "ParaPeca": "placa",
+    "ParaPino": "A0",
+    "Cor": "#E8B400"
+   }
+  ]
+ }
+}

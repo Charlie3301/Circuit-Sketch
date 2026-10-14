@@ -1,0 +1,318 @@
+<Application x:Class="Simulador.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Startup="AoIniciar">
+    <Application.Resources>
+
+        <!-- paleta -->
+        <SolidColorBrush x:Key="Fundo"      Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="Painel"     Color="#252526"/>
+        <SolidColorBrush x:Key="Borda"      Color="#3C3C3C"/>
+        <SolidColorBrush x:Key="Texto"      Color="#D4D4D4"/>
+        <SolidColorBrush x:Key="TextoFraco" Color="#858585"/>
+        <SolidColorBrush x:Key="Destaque"   Color="#00979D"/>
+
+        <!-- O resto da paleta do tema escuro, para nenhuma janela nascer
+             com cor faltando antes do tema ser aplicado. Quem manda
+             depois e o Tema.cs, que troca tudo de uma vez. -->
+        <SolidColorBrush x:Key="Campo"           Color="#1B1B1B"/>
+        <SolidColorBrush x:Key="TextoForte"      Color="#EAEAEA"/>
+        <SolidColorBrush x:Key="FundoDoCircuito" Color="#101012"/>
+        <SolidColorBrush x:Key="PontoDaGrade"    Color="#2C2C30"/>
+        <SolidColorBrush x:Key="TextoNoDestaque" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="Selecao"         Color="#094771"/>
+        <SolidColorBrush x:Key="Hover"           Color="#353536"/>
+        <SolidColorBrush x:Key="Aviso"           Color="#F1C40F"/>
+        <SolidColorBrush x:Key="Erro"            Color="#F48371"/>
+        <SolidColorBrush x:Key="BordaDoAviso"    Color="#8A6D1A"/>
+        <SolidColorBrush x:Key="Terminal"        Color="#9CDCFE"/>
+        <SolidColorBrush x:Key="TerminalRede"    Color="#B5CEA8"/>
+        <SolidColorBrush x:Key="TerminalBt"      Color="#CE9178"/>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Texto}"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="Titulo" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextoFraco}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Width" Value="62"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="Cartao" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource Painel}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Borda}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+
+        <Style x:Key="BotaoAcao" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource Destaque}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextoNoDestaque}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="{DynamicResource Borda}"/>
+                    <Setter Property="Foreground" Value="{DynamicResource TextoFraco}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="BotaoPequeno" TargetType="Button">
+            <Setter Property="Foreground" Value="{DynamicResource Texto}"/>
+            <Setter Property="Background" Value="{DynamicResource Painel}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="fundo" Background="{TemplateBinding Background}"
+                                CornerRadius="4" Padding="8,0">
+                            <TextBlock Text="{TemplateBinding Content}"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="fundo" Property="Background" Value="{DynamicResource Borda}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- O campo de texto do programa inteiro, com as cores do tema.
+             O desenho do sistema tem a borda azul fixa quando o campo
+             ganha o foco, e no tema amarelo, no rosa ou no preto e branco
+             ela aparecia do mesmo azul. Aqui a borda do foco e o destaque
+             do tema, e a rolagem continua a que o campo pedir. -->
+        <ControlTemplate x:Key="ModeloDoCampo" TargetType="TextBox">
+            <Border x:Name="borda" Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="3" SnapsToDevicePixels="True">
+                <ScrollViewer x:Name="PART_ContentHost" Focusable="False"
+                              HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                              VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter TargetName="borda" Property="BorderBrush" Value="{DynamicResource Destaque}"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter TargetName="borda" Property="Opacity" Value="0.6"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{DynamicResource Campo}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Texto}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource Texto}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Borda}"/>
+            <Setter Property="SelectionBrush" Value="{DynamicResource Destaque}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template" Value="{StaticResource ModeloDoCampo}"/>
+        </Style>
+
+        <Style x:Key="CampoEscuro" TargetType="TextBox">
+            <Setter Property="Template" Value="{StaticResource ModeloDoCampo}"/>
+            <Setter Property="SelectionBrush" Value="{DynamicResource Destaque}"/>
+            <Setter Property="Background" Value="{DynamicResource Campo}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Texto}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource Texto}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Borda}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="4,2"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Item de lista da tela de abertura: o conteudo e um painel
+             inteiro (foto + duas linhas de texto), entao o gabarito usa
+             ContentPresenter, e nao um TextBlock. -->
+        <Style x:Key="BotaoDaAbertura" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="fundo" Background="{TemplateBinding Background}"
+                                CornerRadius="5" Padding="8,6">
+                            <ContentPresenter HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="fundo" Property="Background" Value="{DynamicResource Hover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <!-- Os menus moram AQUI, no programa inteiro, e nao so na janela
+             principal: o estilo de TextBlock logo acima pinta todo texto
+             de claro, inclusive o dos menus de outras janelas, que ficavam
+             com o fundo claro do sistema. O "Mais placas" da tela de
+             abertura saia claro sobre claro, ilegivel.
+
+             O item de menu ganha cor propria em vez de depender do tema
+             do sistema: com a janela escura mandando Foreground clara por
+             heranca, o padrao do WPF dava texto claro em fundo claro.
+
+             O template inclui o Popup dos filhos. Sem ele um submenu
+             simplesmente nao abriria, e com o template do sistema ele
+             abriria com o fundo claro, que foi o problema que tirou os
+             submenus do menu na primeira tentativa. -->
+        <Style TargetType="MenuItem">
+            <Setter Property="Foreground" Value="{DynamicResource Texto}"/>
+            <Setter Property="Background" Value="{DynamicResource Painel}"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border x:Name="fundo" Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="18"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock x:Name="marca" Grid.Column="0" Text="✓"
+                                           Foreground="{DynamicResource Destaque}" FontSize="12"
+                                           VerticalAlignment="Center"
+                                           Visibility="Collapsed"/>
+
+                                <ContentPresenter Grid.Column="1"
+                                                  ContentSource="Header"
+                                                  RecognizesAccessKey="True"
+                                                  VerticalAlignment="Center"/>
+
+                                <TextBlock Grid.Column="2" Margin="24,0,4,0"
+                                           Text="{TemplateBinding InputGestureText}"
+                                           Foreground="{DynamicResource TextoFraco}" FontSize="11"
+                                           VerticalAlignment="Center"/>
+
+                                <TextBlock x:Name="seta" Grid.Column="3" Text="›"
+                                           Margin="10,0,2,0" FontSize="14"
+                                           Foreground="{DynamicResource TextoFraco}"
+                                           VerticalAlignment="Center"
+                                           Visibility="Collapsed"/>
+
+                                <Popup x:Name="submenu" Grid.Column="3"
+                                       Placement="Right" VerticalOffset="-6"
+                                       IsOpen="{TemplateBinding IsSubmenuOpen}"
+                                       AllowsTransparency="True" Focusable="False"
+                                       PopupAnimation="None">
+                                    <Border Background="{DynamicResource Painel}" BorderBrush="{DynamicResource Borda}"
+                                            BorderThickness="1" Padding="0,3">
+                                        <!-- Com rolagem: submenu comprido
+                                             passava da borda de baixo da
+                                             tela, e o que ficava la fora
+                                             nao tinha como ser clicado. -->
+                                        <ScrollViewer MaxHeight="640"
+                                                      VerticalScrollBarVisibility="Auto"
+                                                      HorizontalScrollBarVisibility="Disabled">
+                                            <StackPanel IsItemsHost="True"
+                                                        KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="fundo" Property="Background" Value="{DynamicResource Selecao}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="marca" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="HasItems" Value="True">
+                                <Setter TargetName="seta" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="{DynamicResource TextoFraco}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- O menu em si, com desenho proprio. O do sistema tem a faixa
+             dos icones a esquerda pintada de claro, com cor fixa: os
+             itens escuros a cobriam, mas em cada separador ela aparecia
+             como um toquinho branco. A rolagem continua a do sistema,
+             com as setas de menu comprido. -->
+        <Style TargetType="ContextMenu">
+            <Setter Property="Background" Value="{DynamicResource Painel}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Texto}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Borda}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1" Padding="0,3">
+                            <ScrollViewer Style="{DynamicResource {ComponentResourceKey TypeInTargetAssembly={x:Type FrameworkElement}, ResourceId=MenuScrollViewer}}">
+                                <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- O separador dentro de menu: uma linha, de ponta a ponta. -->
+        <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
+            <Setter Property="Background" Value="{DynamicResource Borda}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Separator">
+                        <Border Height="1" Margin="6,4" Background="{TemplateBinding Background}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Application.Resources>
+</Application>

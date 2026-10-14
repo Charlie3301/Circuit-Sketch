@@ -1,0 +1,52 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "bateria de testes (Alpha 18; pecas da Alpha 23; alimentacao da Alpha 24)",
+ "descricao": [
+  "Bateria e motor, sem placa.",
+  "",
+  "Quatro pilhas AA (6 V) no motor amarelo de reducao 1:48: ~250 rpm,",
+  "o numero que a Adafruit mediu. Troque os fios de lado e ele gira",
+  "para o outro lado; tire um fio e ele freia ate parar."
+ ],
+ "codigo": [
+  "// Sem placa: este circuito funciona so com a bateria.",
+  "// Nao ha nada para rodar -- a energia ja esta ligada."
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "motor",
+    "Tipo": "motor-tt",
+    "X": 60,
+    "Y": 90
+   },
+   {
+    "Id": "pilhas",
+    "Tipo": "bateria",
+    "X": 430,
+    "Y": 170,
+    "Volts": 6,
+    "MiliAmperes": 2000,
+    "MiliAmperesHora": 2500,
+    "Nome": "4 pilhas AA (6 V)"
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "pilhas",
+    "DePino": "+",
+    "ParaPeca": "motor",
+    "ParaPino": "+",
+    "Cor": "#D23B33"
+   },
+   {
+    "DePeca": "pilhas",
+    "DePino": "-",
+    "ParaPeca": "motor",
+    "ParaPino": "-",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}

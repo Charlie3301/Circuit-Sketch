@@ -1,0 +1,91 @@
+{
+ "formato": "sktch",
+ "versao": 1,
+ "gerado": "projetos de teste (Alpha 24)",
+ "descricao": [
+  "Botao e LED em MicroPython (Raspberry Pi Pico)",
+  "",
+  "O mesmo botao-e-LED em MicroPython, na Raspberry Pi Pico: o Pin com",
+  "PULL_UP le 0 com o botao apertado."
+ ],
+ "codigo": [
+  "# MicroPython na Raspberry Pi Pico: o botao no GP14 acende o LED no GP15.",
+  "from machine import Pin",
+  "import time",
+  "",
+  "led = Pin(15, Pin.OUT)",
+  "botao = Pin(14, Pin.IN, Pin.PULL_UP)",
+  "",
+  "print(\"Pico pronta\")",
+  "while True:",
+  "    led.value(1 if botao.value() == 0 else 0)",
+  "    time.sleep_ms(20)"
+ ],
+ "circuito": {
+  "Pecas": [
+   {
+    "Id": "placa",
+    "Tipo": "pi-pico",
+    "X": 40,
+    "Y": 40
+   },
+   {
+    "Id": "led",
+    "Tipo": "led",
+    "X": 260,
+    "Y": 40,
+    "Cor": "verde"
+   },
+   {
+    "Id": "r_led",
+    "Tipo": "resistor",
+    "X": 190,
+    "Y": 100,
+    "Ohms": 220
+   },
+   {
+    "Id": "botao",
+    "Tipo": "pushbutton",
+    "X": 260,
+    "Y": 220
+   }
+  ],
+  "Fios": [
+   {
+    "DePeca": "placa",
+    "DePino": "GP15",
+    "ParaPeca": "r_led",
+    "ParaPino": "1",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "r_led",
+    "DePino": "2",
+    "ParaPeca": "led",
+    "ParaPino": "A",
+    "Cor": "#00A651"
+   },
+   {
+    "DePeca": "led",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.4",
+    "Cor": "#1A1A1A"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GP14",
+    "ParaPeca": "botao",
+    "ParaPino": "1.l",
+    "Cor": "#1F6FD1"
+   },
+   {
+    "DePeca": "botao",
+    "DePino": "2.l",
+    "ParaPeca": "placa",
+    "ParaPino": "GND.5",
+    "Cor": "#1A1A1A"
+   }
+  ]
+ }
+}
