@@ -1782,6 +1782,12 @@ public class Maquina
     public void AnalogWrite(int p, int duty, double hz = 0)
     {
         if (!Valido(p)) return;
+        // Pino sem PWM (o 2 do Uno): o analogWrite do core so liga ou desliga.
+        if (hz <= 0 && !Perfil.TemPwm(p))
+        {
+            DigitalWrite(p, duty < 128 ? 0 : 1);
+            return;
+        }
         Pwm[p] = Math.Clamp(duty, 0, 255);
         Digital[p] = Pwm[p] > 127 ? 1 : 0;
 

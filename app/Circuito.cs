@@ -1091,6 +1091,19 @@ public class Netlist
                 gpioPorRaiz.GetValueOrDefault(raiz, -1));
     }
 
+    /// <summary>Os nomes dos pinos de placa no mesmo no deste pino ("5V", "GND.2", "D13"...).</summary>
+    public IEnumerable<string> PinosDePlacaNoMesmoNo(Circuito circuito, string peca, string pino)
+    {
+        string raiz = RaizDe(No(peca, pino));
+        if (raiz is null) yield break;
+        foreach (var p in circuito.Pecas)
+        {
+            if (PerfilPlaca.De(p.Tipo) is null || Catalogo.Obter(p.Tipo) is not { } def) continue;
+            foreach (var x in def.Pinos)
+                if (RaizDe(No(p.Id, x.Nome)) == raiz) yield return x.Nome;
+        }
+    }
+
     readonly Dictionary<(string, int), List<(string Placa, int Gpio)>> noMesmoFio = [];
 
     /// <summary>

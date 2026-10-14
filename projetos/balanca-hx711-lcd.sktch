@@ -6,7 +6,10 @@
   "Balanca com HX711 e LCD I2C (Uno)",
   "",
   "A celula de carga pelo amplificador HX711 (DT no 3, SCK no 2) e o peso",
-  "no LCD 16x2 I2C. Mude o peso na barra da celula."
+  "no LCD 16x2 I2C. Mude o peso na barra da celula.",
+  "",
+  "O tare() no setup faz da celula vazia o zero: sem ele, o HX711 mostra",
+  "o peso da propria plataforma (~200 g aqui), como na bancada."
  ],
  "codigo": [
   "// Balanca: a celula de carga pelo HX711, o peso no LCD.",
@@ -20,6 +23,7 @@
   "void setup() {",
   "  balanca.begin(3, 2);",
   "  balanca.set_scale(420.0);",
+  "  balanca.tare();   // a celula vazia vira o zero",
   "  lcd.init();",
   "  lcd.backlight();",
   "}",
@@ -46,7 +50,7 @@
     "Tipo": "hx711",
     "X": 380,
     "Y": 40,
-    "Giro": 0.1
+    "Giro": 0.0
    },
    {
     "Id": "lcd",

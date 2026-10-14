@@ -19,6 +19,9 @@ public sealed class CargaEspNow
     public string Texto { get; init; } = "";
     public Dictionary<string, Valor> Campos { get; init; }
     public int Tamanho { get; init; }
+
+    /// <summary>Os bytes crus, quando o sketch mandou um numero ("&amp;apertado"): o 0 e o byte 0, e nao o "0".</summary>
+    public byte[] Bytes { get; init; }
 }
 
 public sealed class PlacaEspNow

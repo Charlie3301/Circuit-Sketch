@@ -55,7 +55,7 @@
     "Tipo": "potentiometer",
     "X": 380,
     "Y": 460,
-    "Giro": 0.3
+    "Giro": 0.2
    },
    {
     "Id": "pilhas",

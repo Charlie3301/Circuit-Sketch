@@ -365,6 +365,13 @@ public static class Catalogo
     /// Furos ligados entre si: colunas da area central e trilhos inteiros.
     /// E o que faz a protoboard conduzir de verdade no netlist.
     /// </summary>
+    /// <summary>"5V.2" -> "5V"; o "3.3V" fica inteiro (o ponto dele nao e de repeticao).</summary>
+    static string SemRepeticao(string pino)
+    {
+        int ponto = pino.LastIndexOf('.');
+        return ponto > 0 && ponto < pino.Length - 1 && pino[(ponto + 1)..].All(char.IsAsciiDigit) ? pino[..ponto] : pino;
+    }
+
     public static IEnumerable<(string a, string b)> LigacoesInternas(string idPeca)
     {
         // A juncao e um no so com quatro bordas: e para isso que ela
@@ -374,6 +381,24 @@ public static class Catalogo
             yield return ("1", "2");
             yield return ("1", "3");
             yield return ("1", "4");
+            yield break;
+        }
+
+        // Na placa, os pinos repetidos de alimentacao (5V e 5V.2, GND.1 e
+        // GND.2, 3V3 e 3V3.2) sao a mesma trilha de cobre: o receptor no 5V.2
+        // de um Nano alimentado pelo 5V recebe os mesmos 5 V.
+        if (PerfilPlaca.De(idPeca) is not null && Obter(idPeca) is { } placa)
+        {
+            foreach (var grupo in placa.Pinos.Select(p => p.Nome)
+                         .Where(n => Netlist.EhPinoDeTerra(n) || Netlist.EhPinoDeAlimentacao(n))
+                         .GroupBy(SemRepeticao).Where(g => g.Count() > 1))
+            {
+                string primeiro = grupo.First();
+                foreach (string outro in grupo.Skip(1)) yield return (primeiro, outro);
+            }
+            // Os GND (o "GND.1" e o "GND") e os VSS sao um so.
+            var terras = placa.Pinos.Select(p => p.Nome).Where(Netlist.EhPinoDeTerra).ToList();
+            for (int i = 1; i < terras.Count; i++) yield return (terras[0], terras[i]);
             yield break;
         }
 

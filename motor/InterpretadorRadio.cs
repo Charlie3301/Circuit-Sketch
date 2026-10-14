@@ -443,7 +443,22 @@ public partial class Interpretador
             }
         }
 
-        string valor = Avaliar(arg, amb).Mostrar();
+        var lido = Avaliar(arg, amb);
+
+        // "esp_now_send(mac, &apertado, 1)" com um numero: vai a memoria
+        // dele, do tamanho pedido (little-endian, como na ESP32).
+        if (!lido.EhTexto && lido.Referencia is null)
+        {
+            int tamanho = c.Args.Count > i + 1 ? Math.Clamp((int)Avaliar(c.Args[i + 1], amb).Num, 1, 250) : 4;
+            byte[] memoria = !lido.Inteiro && tamanho == 4 ? BitConverter.GetBytes((float)lido.Num)
+                           : !lido.Inteiro && tamanho >= 8 ? BitConverter.GetBytes(lido.Num)
+                           : BitConverter.GetBytes((long)lido.Num);
+            var bytes = new byte[tamanho];
+            Array.Copy(memoria, bytes, Math.Min(tamanho, memoria.Length));
+            return new CargaEspNow { Origem = origem, Texto = lido.Mostrar(), Tamanho = tamanho, Bytes = bytes };
+        }
+
+        string valor = lido.Mostrar();
         return new CargaEspNow { Origem = origem, Texto = valor, Tamanho = valor.Length + 1 };
     }
 
@@ -460,7 +475,7 @@ public partial class Interpretador
 
             if (minha.AoReceber is null || !funcoes.TryGetValue(minha.AoReceber, out var f)) continue;
 
-            var bytes = TextoArduino.ParaBytes(carga.Texto);
+            var bytes = carga.Bytes ?? TextoArduino.ParaBytes(carga.Texto);
             var vetor = new Valor[bytes.Length + 1];
             for (int i = 0; i < bytes.Length; i++) vetor[i] = Valor.DeCaractere(bytes[i]);
             vetor[^1] = Valor.DeCaractere(0);

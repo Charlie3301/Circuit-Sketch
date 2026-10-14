@@ -164,6 +164,13 @@ public static partial class Autoteste
             visto = "monitor: " + string.Join(" | ", linhas.TakeLast(4));
             return linhas.Any(l => l.Contains(serial.GetValue<string>()));
         }
+        // A linha inteira (o "re" sozinho, e nao o "re" de dentro do "frente").
+        if (c["linha"] is { } linha)
+        {
+            var linhas = LinhasDoSerial(maquina);
+            visto = "monitor: " + string.Join(" | ", linhas.TakeLast(4));
+            return linhas.Any(l => l.Trim() == linha.GetValue<string>());
+        }
         if (c["energizada"] is { } energizada)
         {
             visto = $"energizada={maquina.Energizada} ({ed.SituacaoDaEnergia(c["placa"]?.GetValue<string>() ?? "placa")})";

@@ -767,6 +767,10 @@ public partial class Interpretador(Programa prog, Maquina maq)
                     obj.Pino = Arg(0);
                     break;
 
+                case "sensors_event_t":
+                    MontarEventoDeSensor(obj);
+                    break;
+
                 case "Adafruit_NeoPixel":
                     // Adafruit_NeoPixel fita(quantidade, pino, formato)
                     obj.Fita = new Fita(Arg(0));
@@ -915,6 +919,25 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 for (int i = 0; i < quantos; i++)
                     objetos[i] = ElementoDeClasse(daClasse, d.Itens is not null && i < d.Itens.Count ? d.Itens[i] : null,
                                                   amb, d.Linha);
+                return objetos;
+            }
+
+            // "Servo motor[4];": cada item e um objeto da biblioteca, montado
+            // como se fosse declarado sozinho ("Servo motor_0;").
+            if (Bibliotecas.Existe(d.Tipo) && !estruturas.ContainsKey(d.Tipo))
+            {
+                int quantos = Math.Max(d.Itens?.Count ?? 0, tamanho);
+                var objetos = new Valor[quantos];
+                for (int i = 0; i < quantos; i++)
+                {
+                    var item = d.Itens is not null && i < d.Itens.Count ? d.Itens[i] : null;
+                    var argsDoItem = item is Chamada { Alvo: Variavel construtor } chamada && construtor.Nome == d.Tipo ? chamada.Args
+                                   : item is ListaLiteral lista ? lista.Itens
+                                   : item is null ? [] : [item];
+                    var escopo = new Ambiente(amb);
+                    ExecDeclObj(new CmdDeclObj(d.Tipo, "__item", argsDoItem, d.Linha), escopo);
+                    objetos[i] = escopo.BuscarObjeto("__item", out var montado) ? Valor.DeReferencia(montado) : Valor.Vazio;
+                }
                 return objetos;
             }
 
@@ -1595,6 +1618,63 @@ public partial class Interpretador(Programa prog, Maquina maq)
     }
 
     /// <summary>
+    /// O sensors_event_t da Adafruit Unified Sensor. Na biblioteca o vetor e
+    /// uma union: acceleration, gyro, magnetic e orientation sao a MESMA
+    /// memoria -- aqui, o mesmo objeto.
+    /// </summary>
+    static void MontarEventoDeSensor(Objeto evento)
+    {
+        var vetor = new Objeto("sensors_vec_t");
+        foreach (string eixo in new[] { "x", "y", "z", "roll", "pitch", "heading" }) vetor.Campos[eixo] = Valor.DeReal(0);
+        foreach (string nome in new[] { "acceleration", "gyro", "magnetic", "orientation" })
+            evento.Campos[nome] = Valor.DeReferencia(vetor);
+        evento.Campos["temperature"] = Valor.DeReal(0);
+        evento.Campos["version"] = Valor.DeInt(1);
+        evento.Campos["sensor_id"] = Valor.DeInt(0);
+        evento.Campos["type"] = Valor.DeInt(0);
+        evento.Campos["timestamp"] = Valor.DeInt(0);
+    }
+
+    /// <summary>
+    /// "mpu.getEvent(&a, &g, &temp)" da Adafruit_MPU6050: a aceleracao em
+    /// m/s2, a rotacao em rad/s e a temperatura em graus, das leituras da
+    /// peca (as cruas sao as do registrador: 16384 por g, 131 por grau/s).
+    /// </summary>
+    Valor EventoDoMpu(Chamada c, Ambiente amb)
+    {
+        const double G = 9.80665, Rad = Math.PI / 180;
+        Objeto Alvo(int k)
+        {
+            if (k >= c.Args.Count || SemEndereco(c.Args[k]) is not Variavel v || !amb.BuscarObjeto(v.Nome, out var o)) return null;
+            if (!o.Campos.ContainsKey("acceleration")) MontarEventoDeSensor(o);
+            return o;
+        }
+        void Vetor(Objeto evento, double x, double y, double z, int tipo)
+        {
+            var vetor = (Objeto)evento.Campos["acceleration"].Referencia;
+            vetor.Campos["x"] = Valor.DeReal(x);
+            vetor.Campos["y"] = Valor.DeReal(y);
+            vetor.Campos["z"] = Valor.DeReal(z);
+            evento.Campos["type"] = Valor.DeInt(tipo);
+            evento.Campos["timestamp"] = Valor.DeInt(maq.Ms);
+        }
+
+        if (Alvo(0) is { } a)
+            Vetor(a, maq.Leitura("mpu:ax") / 16384.0 * G, maq.Leitura("mpu:ay") / 16384.0 * G,
+                  maq.Leitura("mpu:az", 16384) / 16384.0 * G, 1);
+        if (Alvo(1) is { } g)
+            Vetor(g, maq.Leitura("mpu:gx") / 131.0 * Rad, maq.Leitura("mpu:gy") / 131.0 * Rad,
+                  maq.Leitura("mpu:gz") / 131.0 * Rad, 4);
+        if (Alvo(2) is { } t)
+        {
+            double graus = maq.Leitura("mpu:temp", 25);
+            Vetor(t, graus, 0, 0, 13);
+            t.Campos["temperature"] = Valor.DeReal(graus);
+        }
+        return Valor.DeBool(true);
+    }
+
+    /// <summary>
     /// "&x" devolve o proprio x: nao ha ponteiro aqui. Quem precisa do
     /// objeto apontado olha o argumento sem avaliar.
     /// </summary>
@@ -2003,6 +2083,17 @@ public partial class Interpretador(Programa prog, Maquina maq)
     {
         ["HIGH"] = Valor.DeInt(1),
         ["LOW"] = Valor.DeInt(0),
+
+        // Os enums da Adafruit_MPU6050 (os valores dos registradores).
+        ["MPU6050_RANGE_2_G"] = Valor.DeInt(0), ["MPU6050_RANGE_4_G"] = Valor.DeInt(1),
+        ["MPU6050_RANGE_8_G"] = Valor.DeInt(2), ["MPU6050_RANGE_16_G"] = Valor.DeInt(3),
+        ["MPU6050_RANGE_250_DEG"] = Valor.DeInt(0), ["MPU6050_RANGE_500_DEG"] = Valor.DeInt(1),
+        ["MPU6050_RANGE_1000_DEG"] = Valor.DeInt(2), ["MPU6050_RANGE_2000_DEG"] = Valor.DeInt(3),
+        ["MPU6050_BAND_260_HZ"] = Valor.DeInt(0), ["MPU6050_BAND_184_HZ"] = Valor.DeInt(1),
+        ["MPU6050_BAND_94_HZ"] = Valor.DeInt(2), ["MPU6050_BAND_44_HZ"] = Valor.DeInt(3),
+        ["MPU6050_BAND_21_HZ"] = Valor.DeInt(4), ["MPU6050_BAND_10_HZ"] = Valor.DeInt(5),
+        ["MPU6050_BAND_5_HZ"] = Valor.DeInt(6),
+        ["MPU6050_HIGHPASS_DISABLE"] = Valor.DeInt(0), ["MPU6050_HIGHPASS_5_HZ"] = Valor.DeInt(1),
         ["INPUT"] = Valor.DeInt(0),
         ["OUTPUT"] = Valor.DeInt(1),
         ["INPUT_PULLUP"] = Valor.DeInt(2),
@@ -3092,6 +3183,8 @@ public partial class Interpretador(Programa prog, Maquina maq)
         // attachInterrupt, que recebe o nome de uma funcao.
         if (obj.Classe == "IRrecv" && metodo == "decode")
             return DecodificarIr(c, amb);
+        if (obj.Classe == "Adafruit_MPU6050" && metodo == "getEvent")
+            return EventoDoMpu(c, amb);
 
         if (obj.Classe == "RF24") return ChamarRf24(obj, metodo, c, amb);
         if (obj.Classe == "SPIClass" && obj.Rede is BarramentoDoSketch barramento) return ChamarSpi(barramento, metodo, c, amb);
@@ -3210,6 +3303,22 @@ public partial class Interpretador(Programa prog, Maquina maq)
                     case "getAccelerationY": return Valor.DeInt(maq.Leitura("mpu:ay"));
                     case "getAccelerationZ": return Valor.DeInt(maq.Leitura("mpu:az", 16384));
                     case "readTemperature": return Valor.DeReal(maq.Leitura("mpu:temp", 25));
+                    case "getRotationX": return Valor.DeInt(maq.Leitura("mpu:gx"));
+                    case "getRotationY": return Valor.DeInt(maq.Leitura("mpu:gy"));
+                    case "getRotationZ": return Valor.DeInt(maq.Leitura("mpu:gz"));
+
+                    // A configuracao da Adafruit_MPU6050: guarda, e devolve no get.
+                    case "setAccelerometerRange": case "setGyroRange": case "setFilterBandwidth":
+                    case "setHighPassFilter": case "setMotionDetectionThreshold": case "setMotionDetectionDuration":
+                    case "setInterruptPinLatch": case "setInterruptPinPolarity": case "setMotionInterrupt":
+                    case "setSampleRateDivisor": case "setCycleRate": case "enableSleep": case "enableCycle":
+                    case "reset": case "setClock": case "setTemperatureStandby":
+                        if (args.Count > 0) obj.Campos["_" + metodo[3..]] = args[0];
+                        return Valor.Vazio;
+                    case "getAccelerometerRange": return obj.Campos.GetValueOrDefault("_AccelerometerRange", Valor.DeInt(0));
+                    case "getGyroRange": return obj.Campos.GetValueOrDefault("_GyroRange", Valor.DeInt(0));
+                    case "getFilterBandwidth": return obj.Campos.GetValueOrDefault("_FilterBandwidth", Valor.DeInt(0));
+                    case "getMotionInterruptStatus": return Valor.DeBool(false);
                 }
                 break;
 

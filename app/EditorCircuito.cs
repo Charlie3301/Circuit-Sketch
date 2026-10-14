@@ -449,6 +449,9 @@ public partial class EditorCircuito : Border
     /// <summary>A tecla do controle que esta apertada agora, por peca.</summary>
     readonly Dictionary<string, (string Nome, long Codigo)> teclaDoControle = [];
 
+    /// <summary>A ultima tecla entregue por controle, e quando (no relogio da placa): o aperto e o repeat do NEC.</summary>
+    readonly Dictionary<string, (long Codigo, long Ms)> irEntregue = [];
+
     /// <summary>
     /// Aperta (ou solta) uma tecla do controle infravermelho pelo nome.
     ///
@@ -5775,8 +5778,25 @@ public partial class EditorCircuito : Border
         // Tecla apertada no desenho manda mais que o controle deslizante
         // da barra: e o gesto mais direto, e e o que a pessoa acabou de
         // fazer.
+        //
+        // O NEC de verdade: o codigo sai UMA vez no aperto; segurando, so o
+        // "repeat" (0xFFFFFFFF) a cada ~108 ms. Antes o codigo era reescrito
+        // a cada quadro, e o resume() do sketch o pegava de novo: uma tecla
+        // virava varias, e o "alternar" do LED voltava ao que era.
         if (peca.Tipo == "ir-remote" && teclaDoControle.TryGetValue(peca.Id, out var tecla))
-            maq.Leituras["ir:codigo"] = tecla.Codigo;
+        {
+            if (!irEntregue.TryGetValue(peca.Id, out var entregue) || entregue.Codigo != tecla.Codigo)
+            {
+                maq.Leituras["ir:codigo"] = tecla.Codigo;
+                irEntregue[peca.Id] = (tecla.Codigo, maq.Ms);
+            }
+            else if (maq.Ms - entregue.Ms >= 108)
+            {
+                maq.Leituras["ir:codigo"] = 0xFFFFFFFF;
+                irEntregue[peca.Id] = (tecla.Codigo, maq.Ms);
+            }
+        }
+        else if (peca.Tipo == "ir-remote") irEntregue.Remove(peca.Id);
 
         foreach (string pino in comp.Digitais)
         {
@@ -5833,13 +5853,23 @@ public partial class EditorCircuito : Border
         MostrarRele(peca, ligado);
     }
 
-    /// <summary>A bobina esta sendo acionada pela placa?</summary>
+    /// <summary>
+    /// A bobina pegou? Com a conta de energia, pela tensao nela (o KS2E de
+    /// 5 V puxa a partir de ~3 V, nos dois sentidos). Sem a conta, pelo pino:
+    /// a bobina entre o pino e o GND liga com o HIGH; entre o 5V e o pino --
+    /// como nos modulos, ativos em LOW --, com o LOW.
+    /// </summary>
     bool BobinaEnergizada(PecaNoCircuito peca, Maquina maq, Netlist rede)
     {
-        foreach (string pino in new[] { "COIL1", "COIL2" })
+        if (EnergiaDoQuadro is { } conta)
+            return Math.Abs(conta.TensaoDoPino(peca.Id, "COIL1") - conta.TensaoDoPino(peca.Id, "COIL2")) >= 3.0;
+        if (maq is null) return false;
+        foreach (var (pino, outro) in new[] { ("COIL1", "COIL2"), ("COIL2", "COIL1") })
         {
             int gpio = rede.GpioDe(Atual, peca.Id, pino);
-            if (gpio >= 0 && maq.Pwm[gpio] > 127) return true;
+            if (gpio < 0) continue;
+            bool noTrilho = rede.PinosDePlacaNoMesmoNo(Atual, peca.Id, outro).Any(Netlist.EhPinoDeAlimentacao);
+            return noTrilho ? maq.Modo[gpio] == 1 && maq.Pwm[gpio] <= 127 : maq.Pwm[gpio] > 127;
         }
         return false;
     }
@@ -6241,6 +6271,15 @@ public partial class EditorCircuito : Border
         // que perguntar sobre ela.
         if (PerfilPlaca.EhPlaca(peca.Tipo)) return bancada.De(peca.Id);
         if (Catalogo.EhProtoboard(peca.Tipo)) return bancada.Solta;
+
+        // O controle infravermelho nao tem fio: a tecla chega na placa do
+        // receptor que o "ve" (o primeiro ligado numa placa).
+        if (peca.Tipo == "ir-remote")
+        {
+            foreach (var receptor in Atual.Pecas.Where(p => p.Tipo == "ir-receiver"))
+                if (PlacasDaPeca(rede, receptor) is { Count: > 0 } doReceptor) return bancada.De(doReceptor[0]);
+            return bancada.Solta;
+        }
 
         var placas = PlacasDaPeca(rede, peca);
         if (placas.Count == 0) return bancada.Solta;

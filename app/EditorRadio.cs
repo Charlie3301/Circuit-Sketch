@@ -227,6 +227,9 @@ public partial class EditorCircuito
 
     readonly Dictionary<string, double> vinculoDoRadioAntes = [];
 
+    /// <summary>Os controles com algum manche na tecla no quadro de antes.</summary>
+    readonly HashSet<string> radiosNaTecla = [];
+
     /// <summary>
     /// O controle pelo teclado e pelo controle de videogame: o acelerador
     /// sobe e desce enquanto a tecla esta em baixo (e fica); o leme e o
@@ -246,9 +249,20 @@ public partial class EditorCircuito
         if (mancheDoRadio?.Peca == peca.Id) return;   // o mouse manda
         double acelera = F(Vinculos.Mais) - F(Vinculos.Menos);
         if (acelera != 0) peca.Giro = Math.Clamp(peca.Giro + acelera * segundos * 0.8, 0, 1);
-        peca.Giro4 = 0.5 + (F("leme-dir") - F("leme-esq")) / 2;
-        peca.Giro3 = 0.5 + (F(Vinculos.Direita) - F(Vinculos.Esquerda)) / 2;
-        peca.Giro2 = 0.5 + (F(Vinculos.Cima) - F(Vinculos.Baixo)) / 2;
+        // Os manches com mola: a tecla leva ate onde manda, e soltar traz ao
+        // centro. Sem tecla nenhuma (nem agora nem no quadro de antes) o
+        // manche fica onde o resto o pos -- o diagrama, o teste, o Wokwi.
+        double leme = F("leme-dir") - F("leme-esq");
+        double lados = F(Vinculos.Direita) - F(Vinculos.Esquerda);
+        double frente = F(Vinculos.Cima) - F(Vinculos.Baixo);
+        bool comTecla = leme != 0 || lados != 0 || frente != 0;
+        if (comTecla || radiosNaTecla.Contains(peca.Id))
+        {
+            peca.Giro4 = 0.5 + leme / 2;
+            peca.Giro3 = 0.5 + lados / 2;
+            peca.Giro2 = 0.5 + frente / 2;
+        }
+        if (comTecla) radiosNaTecla.Add(peca.Id); else radiosNaTecla.Remove(peca.Id);
         if (Ligou("chave-a")) peca.Bits ^= 1;
         if (Ligou("chave-b")) peca.Bits ^= 2;
     }

@@ -154,6 +154,19 @@ public partial record PerfilPlaca(
     /// Timer1 e do Timer2 (490,2 Hz); ESP32, ESP8266, RP2040 e STM32
     /// usam 1 kHz de fabrica.
     /// </summary>
+    /// <summary>
+    /// O pino tem PWM de hardware? Nos AVR so alguns: no Uno o 3, 5, 6, 9, 10
+    /// e 11 (os do "~" na placa). O analogWrite nos outros e o do core: abaixo
+    /// de 128 vira LOW, a partir dele HIGH. ESP32, RP2040 e afins: todos.
+    /// </summary>
+    public bool TemPwm(int pino) => Processador switch
+    {
+        "ATmega328P" => pino is 3 or 5 or 6 or 9 or 10 or 11,
+        "ATmega2560" => pino is (>= 2 and <= 13) or 44 or 45 or 46,
+        "ATtiny85" => pino is 0 or 1 or 4,
+        _ => true,
+    };
+
     public double FrequenciaDoPwm(int pino) => Processador switch
     {
         "ATmega328P" => pino is 5 or 6 ? 976.5625 : 490.196,
@@ -235,10 +248,11 @@ public partial record PerfilPlaca(
 
     // ---------------- ajudantes de nome ----------------
     /// <summary>Tira o sufixo de pad repetido: "13.2" e o mesmo que "13".</summary>
+    // So o ".2" de pino repetido e sufixo: o "3.3V" e um nome inteiro (e nao o pino 3).
     static string Base(string nome)
     {
-        int ponto = nome.IndexOf('.');
-        return ponto < 0 ? nome : nome[..ponto];
+        int ponto = nome.LastIndexOf('.');
+        return ponto > 0 && ponto < nome.Length - 1 && nome[(ponto + 1)..].All(char.IsAsciiDigit) ? nome[..ponto] : nome;
     }
 
     static int SoDigitos(string nome)

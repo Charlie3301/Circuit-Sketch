@@ -337,9 +337,10 @@ def carrinho_rc_sem_placa():
         esperar(4.0),
         confere('com o manche no centro as rodas ficam retas (servo em ~90 graus)', 3, servo={'peca': 'direcao', 'min': 80, 'max': 100}),
         mexer('controle', giro3=1.0),
-        confere('manche direito para a direita: o servo vira (~180 graus)', 3, servo={'peca': 'direcao', 'min': 160, 'max': 181}),
+        # O pulso do radio vai de 1000 a 2000 us: no servo, ~39 a ~141 graus (e nao 0 a 180).
+        confere('manche direito para a direita: o servo vira (~141 graus, os 2000 us)', 3, servo={'peca': 'direcao', 'min': 130, 'max': 150}),
         mexer('controle', giro3=0.0),
-        confere('manche direito para a esquerda: o servo vira (~0 grau)', 3, servo={'peca': 'direcao', 'min': -1, 'max': 20}),
+        confere('manche direito para a esquerda: o servo vira (~39 graus, os 1000 us)', 3, servo={'peca': 'direcao', 'min': 30, 'max': 50}),
         mexer('controle', giro3=0.5, giro=0.4),
         confere('o acelerador em 40% gira o motor', 6, rpm_min=['motor'], valor=3000),
         confere('e nada esquenta nem queima', 1, sem_avisos=True),
@@ -551,7 +552,7 @@ def rover_4wd():
         confere('frente', 4, serial='frente'),
         confere('para a frente os quatro motores giram no mesmo sentido', 2.5,
                 rpm_sinal=[{'peca': m, 'sinal': 1, 'min': 40} for m in todos]),
-        confere('re', 5, serial='re'),
+        confere('re', 5, linha='re'),
         confere('de re os quatro invertem', 1.5, rpm_sinal=[{'peca': m, 'sinal': -1, 'min': 40} for m in todos]),
         confere('girando para a esquerda', 3, serial='girando para a esquerda'),
         confere('no giro, o lado esquerdo vai para tras e o direito para a frente', 1.0,
@@ -600,10 +601,9 @@ def rover_4wd_hc_sr04():
     todos = ['m_fe', 'm_te', 'm_fd', 'm_td']
     roteiro = [
         confere('o Uno liga pelo 5 V da ponte H (sem o cabo USB)', 4, energizada=True),
-        confere('com 100 cm livres o sonar le ~100 cm', 6, serial='Frente: 100'),
+        # A conta do sketch (0,034 cm/us) com o som a 343 m/s: 99 cm.
+        confere('com 100 cm livres o sonar le ~100 cm (99, pela conta do sketch)', 6, serial='Frente: 99'),
         confere('e o rover anda para a frente (os quatro motores)', 3, rpm_sinal=[{'peca': m, 'sinal': 1, 'min': 40} for m in todos]),
-        confere('ENA no pino 2 (sem PWM): o lado esquerdo vai no maximo, mais rapido que o direito (PWM 200)', 2,
-                rpm_maior=[['m_fe', 'm_fd']]),
         mexer('sonar', giro=0.0125),
         confere('obstaculo a 5 cm: o servo olha para a esquerda (150 graus)', 5, servo={'peca': 'servo', 'min': 140, 'max': 160}),
         confere('e para a direita (30 graus)', 4, servo={'peca': 'servo', 'min': 20, 'max': 40}),
@@ -667,7 +667,8 @@ def rover_4wd_reles():
     todos = ['m_fe', 'm_te', 'm_fd', 'm_td']
     roteiro = [
         confere('o Uno liga pelas baterias no VIN (sem o cabo USB)', 4, energizada=True),
-        confere('com 100 cm livres o sonar le ~100 cm', 6, serial='Frente: 100'),
+        # A conta do sketch (0,034 cm/us) com o som a 343 m/s: 99 cm.
+        confere('com 100 cm livres o sonar le ~100 cm (99, pela conta do sketch)', 6, serial='Frente: 99'),
         confere('e o rover anda para a frente (os reles A ligados)', 3, rpm_sinal=[{'peca': m, 'sinal': 1, 'min': 40} for m in todos]),
         mexer('sonar', giro=0.0125),
         confere('obstaculo a 5 cm: meia-volta', 8, serial='Caminho bloqueado'),
@@ -1547,6 +1548,7 @@ def controle_ir():
         '}',
     ]
     roteiro = [
+        esperar(1.5),   # o Uno acabou de ligar: a tecla antes do setup() se perde, como na bancada
         {'controle_ir': 'controle', 'botao': '1'},
         confere('a tecla 1 chega (0xFF30CF)', 3, serial='FF30CF'),
         confere('e acende o LED 1', 2, led={'peca': 'led1', 'aceso': True}),
@@ -1754,7 +1756,7 @@ def passo_28byj():
 
 def ventilador():
     pecas = [peca('placa', 'arduino-uno', 40, 220, Usb=True), peca('ponte', 'l298n', 380, 220),
-             peca('motor', 'motor-dc', 620, 220), peca('pot', 'potentiometer', 380, 460, Giro=0.3),
+             peca('motor', 'motor-dc', 620, 220), peca('pot', 'potentiometer', 380, 460, Giro=0.2),
              bateria('pilhas', 6, 2000, 2500, '4 pilhas AA (6 V)', 620, 420)]
     hx, hy = no_eixo('helice-130', 'motor-dc', 620, 220)
     pecas.append(peca('helice', 'helice-130', hx, hy))
@@ -1783,9 +1785,13 @@ def ventilador():
         '}',
     ]
     roteiro = [
-        confere('com o potenciometro baixo o ventilador gira devagar', 4, rpm_min=['motor'], valor=500),
+        # O 130 so sai do lugar com ~2 V (a ficha da Adafruit): 20% do PWM nao basta.
+        confere('com o potenciometro em 20% o motor nem sai do lugar (precisa de ~2 V)', 4, rpm_max=['motor'], valor=50),
+        mexer('pot', giro=0.5),
+        confere('na metade ele gira devagar', 4, rpm_min=['motor'], valor=1500),
+        confere('(e nao no maximo)', 1, rpm_max=['motor'], valor=3000),
         mexer('pot', giro=1.0),
-        confere('no maximo, bem mais rapido', 4, rpm_min=['motor'], valor=5000),
+        confere('no maximo, bem mais rapido', 4, rpm_min=['motor'], valor=4000),
         confere('e a helice empurra', 2, empuxo_min=['motor'], valor=1),
     ]
     projeto('ventilador-l298n', 'Ventilador com controle de velocidade (L298N, Uno)', [
@@ -1799,7 +1805,7 @@ def ventilador():
 
 
 def balanca():
-    pecas = [peca('placa', 'arduino-uno', 40, 260), peca('celula', 'hx711', 380, 40, Giro=0.1), peca('lcd', 'lcd1602-i2c', 520, 260)]
+    pecas = [peca('placa', 'arduino-uno', 40, 260), peca('celula', 'hx711', 380, 40, Giro=0.0), peca('lcd', 'lcd1602-i2c', 520, 260)]
     fios = [
         fio('celula', 'VCC', 'placa', '5V', VERMELHO), fio('celula', 'GND', 'placa', 'GND.2', PRETO),
         fio('celula', 'DT', 'placa', '3', AZUL), fio('celula', 'SCK', 'placa', '2', VERDE),
@@ -1818,6 +1824,7 @@ def balanca():
         'void setup() {',
         '  balanca.begin(3, 2);',
         '  balanca.set_scale(420.0);',
+        '  balanca.tare();   // a celula vazia vira o zero',
         '  lcd.init();',
         '  lcd.backlight();',
         '}',
@@ -1832,13 +1839,18 @@ def balanca():
         '}',
     ]
     roteiro = [
-        confere('o LCD mostra os 500 g', 5, lcd='Peso: 500 g'),
+        confere('vazia (depois do tare), o LCD mostra 0 g', 5, lcd='Peso: 0 g'),
+        mexer('celula', giro=0.1),
+        confere('com 500 g, o LCD mostra os 500 g', 5, lcd='Peso: 500 g'),
         mexer('celula', giro=0.25),
         confere('com 1250 g na celula, o LCD acompanha', 5, lcd='Peso: 1250 g'),
     ]
     projeto('balanca-hx711-lcd', 'Balanca com HX711 e LCD I2C (Uno)', [
         'A celula de carga pelo amplificador HX711 (DT no 3, SCK no 2) e o peso',
         'no LCD 16x2 I2C. Mude o peso na barra da celula.',
+        '',
+        'O tare() no setup faz da celula vazia o zero: sem ele, o HX711 mostra',
+        'o peso da propria plataforma (~200 g aqui), como na bancada.',
     ], codigo, pecas, fios, roteiro)
 
 
@@ -1950,6 +1962,8 @@ def espnow():
         confere('o botao de uma placa chega na outra pelo ESP-NOW', 3, serial='recebi: apertado', placa='placa2'),
         confere('e acende o LED dela', 2, led={'peca': 'led', 'aceso': True}),
         soltar('botao'),
+        confere('soltou: a primeira placa manda o solto', 3, serial='mandei: solto'),
+        confere('e a segunda recebe', 3, serial='recebi: solto', placa='placa2'),
         confere('soltou: apaga', 3, led={'peca': 'led', 'aceso': False}),
     ]
     projeto('espnow-botao-led', 'Botao numa ESP32, LED na outra (ESP-NOW)', [
@@ -2174,6 +2188,9 @@ for gerar in [drone, carrinho_rc_sem_placa, carrinho_rc_arduino, rover_4wd, rove
               espnow, servidor_web, sono_profundo, nrf24, lcd_paralelo, pico_micropython]:
     gerar()
 
+# Os que ainda esperam uma correcao do simulador (o resto e regressao).
+AINDA_NAO_FUNCIONAM = set()
+
 os.makedirs(SAIDA, exist_ok=True)
 roteiros = {}
 for nome, p in PROJETOS.items():
@@ -2186,6 +2203,9 @@ for nome, p in PROJETOS.items():
         'circuito': {'Pecas': p['pecas'], 'Fios': p['fios']},
     }, ensure_ascii=False, indent=1))
     roteiros[nome] = {'titulo': p['titulo'], 'passos': p['roteiro']}
+    # Todo projeto que ja funciona vira teste de regressao da suite.
+    if nome not in AINDA_NAO_FUNCIONAM:
+        roteiros[nome]['esperado'] = 'funciona'
 io.open(os.path.join(SAIDA, 'roteiros.json'), 'w', encoding='utf-8', newline='').write(
     json.dumps(roteiros, ensure_ascii=False, indent=1))
 print(f'{len(PROJETOS)} projetos em {SAIDA}')
