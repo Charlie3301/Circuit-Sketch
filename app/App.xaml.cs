@@ -178,7 +178,7 @@ public partial class App : Application
         // gravariam nas preferencias e nos recentes de quem os rodou.
         // Tem que ser a primeira coisa: as preferencias ficam em memoria
         // depois da primeira leitura.
-        if (e.Args.Any(a => a is "--teste" or "--passeio" or "--fluxo"))
+        if (e.Args.Any(a => a is "--teste" or "--passeio" or "--fluxo" or "--desenho"))
         {
             Armazem.Isolar();
             Exit += (_, _) => Armazem.Descartar();
@@ -241,6 +241,28 @@ public partial class App : Application
             if (iAudio + 1 < e.Args.Length && !e.Args[iAudio + 1].StartsWith("--"))
                 File.WriteAllText(e.Args[iAudio + 1], relato.ToString());
             Shutdown(0);
+            return;
+        }
+
+        // A foto de conferencia de uma peca sozinha (FotoDePeca.cs): o
+        // redesenho dos componentes mostra cada um antes de entrar.
+        int iDesenho = Array.IndexOf(e.Args, "--desenho");
+        if (iDesenho >= 0 && iDesenho + 2 < e.Args.Length)
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            string Valor(string nome) { int i = Array.IndexOf(e.Args, nome); return i >= 0 && i + 1 < e.Args.Length ? e.Args[i + 1] : null; }
+            double zoom = double.TryParse(Valor("--zoom"), System.Globalization.NumberStyles.Float,
+                                          System.Globalization.CultureInfo.InvariantCulture, out double z) ? z : 4;
+            Rect? recorte = null;
+            if (Valor("--recorte") is { } r && r.Split(',') is { Length: 4 } partes)
+            {
+                double N(string x) => double.Parse(x, System.Globalization.CultureInfo.InvariantCulture);
+                recorte = new Rect(N(partes[0]), N(partes[1]), N(partes[2]), N(partes[3]));
+            }
+            int codigo;
+            try { codigo = FotoDePeca.Gravar(e.Args[iDesenho + 1], Valor("--cor"), zoom, recorte, Array.IndexOf(e.Args, "--furos") >= 0, e.Args[iDesenho + 2]); }
+            catch (Exception erro) { Registrar("--desenho", erro); codigo = 1; }
+            Shutdown(codigo);
             return;
         }
 

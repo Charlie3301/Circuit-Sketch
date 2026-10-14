@@ -1110,12 +1110,12 @@ public partial class EditorCircuito : Border
         AtualizarRealce();
     }
 
-    void CriarVisual(PecaNoCircuito peca)
-    {
-        var def = Catalogo.Obter(peca.Tipo);
-        if (def is null) return;
-
-        FrameworkElement visual = Catalogo.EhPcb(peca.Tipo) ? DesenharPcb(peca, def)
+    /// <summary>
+    /// O desenho de uma peca, como ele entra no circuito (sem posicao). E o
+    /// mesmo para a foto de conferencia de uma peca sozinha (--desenho).
+    /// </summary>
+    internal FrameworkElement DesenhoDa(PecaNoCircuito peca, PecaDef def)
+        => Catalogo.EhPcb(peca.Tipo) ? DesenharPcb(peca, def)
             : Catalogo.EhProtoboard(peca.Tipo)
             ? DesenharProtoboard(peca, def)
             : peca.Tipo == "texto"
@@ -1129,6 +1129,13 @@ public partial class EditorCircuito : Border
                     Height = Geometria.Tamanho(peca, def).Altura,
                     Stretch = Stretch.Uniform
                 };
+
+    void CriarVisual(PecaNoCircuito peca)
+    {
+        var def = Catalogo.Obter(peca.Tipo);
+        if (def is null) return;
+
+        FrameworkElement visual = DesenhoDa(peca, def);
 
         visual.Tag = peca.Id;
         Posicionar(visual, peca);
@@ -2026,89 +2033,6 @@ public partial class EditorCircuito : Border
         (byte)Math.Clamp(c.R * fator, 0, 255),
         (byte)Math.Clamp(c.G * fator, 0, 255),
         (byte)Math.Clamp(c.B * fator, 0, 255));
-
-    static FrameworkElement DesenharProtoboard(PecaNoCircuito peca, PecaDef def)
-    {
-        var f = Catalogo.FormatoDe(peca.Tipo);
-        double P = Catalogo.Passo, m = P;
-        int colunas = f.Colunas;
-
-        var corpo = CorDaProtoboard(peca);
-        bool escura = Escura(corpo);
-        var corFuro = escura ? Color.FromRgb(0x18, 0x18, 0x1A)
-                             : Color.FromRgb(0x4A, 0x4A, 0x47);
-        var corRotulo = escura ? Color.FromRgb(0xC9, 0xC8, 0xC2)
-                               : Color.FromRgb(0x8A, 0x89, 0x82);
-
-        var caixa = new Canvas { Width = def.Largura, Height = def.Altura };
-
-        caixa.Children.Add(new Rectangle
-        {
-            Width = def.Largura,
-            Height = def.Altura,
-            RadiusX = 3,
-            RadiusY = 3,
-            Fill = new SolidColorBrush(corpo),
-            Stroke = new SolidColorBrush(escura
-                ? Color.FromRgb(0x22, 0x22, 0x24) : Color.FromRgb(0xBD, 0xBC, 0xB4)),
-            StrokeThickness = 1
-        });
-
-        // O vao vai de meio passo abaixo de E ate meio passo acima de F,
-        // qualquer que seja a largura do canal.
-        var vao = new Rectangle
-        {
-            Width = def.Largura - P,
-            Height = (f.F - f.E - 1) * P,
-            Fill = new SolidColorBrush(Puxar(corpo, escura ? 1.3 : 0.93)),
-            Stroke = new SolidColorBrush(Puxar(corpo, escura ? 1.6 : 0.86)),
-            StrokeThickness = 0.6
-        };
-        Canvas.SetLeft(vao, P / 2);
-        Canvas.SetTop(vao, m + f.E * P + P / 2);
-        caixa.Children.Add(vao);
-
-        // A mini de 170 nao tem trilho, entao nao tem as listras.
-        foreach (var (linha, desloc, cor) in f.TemTrilhos ? new[]
-        {
-            (f.TrilhoTopo, -0.62, Color.FromRgb(0xCE, 0x36, 0x36)),
-            (f.TrilhoTopo + 1, 0.62, Color.FromRgb(0x2B, 0x59, 0xBF)),
-            (f.TrilhoBase, -0.62, Color.FromRgb(0xCE, 0x36, 0x36)),
-            (f.TrilhoBase + 1, 0.62, Color.FromRgb(0x2B, 0x59, 0xBF)),
-        } : [])
-        {
-            var traco = new Rectangle
-            {
-                Width = def.Largura - 2 * P,
-                Height = 1.1,
-                Fill = new SolidColorBrush(cor)
-            };
-            Canvas.SetLeft(traco, P);
-            Canvas.SetTop(traco, m + linha * P + desloc * P);
-            caixa.Children.Add(traco);
-        }
-
-        // Todos os furos num unico Path: um elemento em vez de milhares.
-        var furos = new GeometryGroup();
-        foreach (var pino in def.Pinos)
-            furos.Children.Add(new RectangleGeometry(
-                new Rect(pino.X - 1.5, pino.Y - 1.5, 3.0, 3.0), 0.7, 0.7));
-        caixa.Children.Add(new Path { Data = furos, Fill = new SolidColorBrush(corFuro) });
-
-        const string letras = "ABCDEFGHIJ";
-        for (int l = 0; l < 10; l++)
-        {
-            int linha = l < 5 ? f.A + l : f.F + (l - 5);
-            foreach (double x in new[] { m - P * 0.8, m + (colunas - 1) * P + P * 0.4 })
-                caixa.Children.Add(Rotulo(letras[l].ToString(), x,
-                                          m + linha * P - 3.6, corRotulo));
-        }
-        for (int c = 0; c < colunas; c += 5)
-            foreach (double y in new[] { m + (f.A - 1) * P - 3.4, m + (f.J + 1) * P - 3.4 })
-                caixa.Children.Add(Rotulo((c + 1).ToString(), m + c * P - 2.2, y, corRotulo));
-
-        return caixa;
-    }
 
     // ---------------- PCB perfurada ----------------
     /// <summary>As cores da mascara de solda (e a fenolite, a marrom sem mascara).</summary>
