@@ -47,4 +47,14 @@ DevKit V1 (a de 30 pinos) foi medida numa foto. ESP32 e Espressif sao marcas
 registradas da Espressif Systems; o nome dos modulos aparece so para
 identifica-los, e o logotipo nao e reproduzido.
 
+As placas STM32 (stm32-bluepill.svg, st-nucleo-l031k6.svg e st-nucleo-c031c6.svg)
+tambem NAO estao sob a licenca acima: sao desenhos proprios do CircuitSketch.
+Foram usadas so as medidas e a posicao de cada componente e de cada pino: da
+Nucleo-32, o desenho mecanico do manual UM1956 da STMicroelectronics; da
+Nucleo-64, o desenho mecanico do manual UM1724, a pinagem do manual UM2953 e
+uma foto de cima da placa; da Blue Pill, uma foto de cima (stm32-base.org).
+Nenhuma trilha nem arte da serigrafia foi copiada. STM32 e ST sao marcas
+registradas da STMicroelectronics; o nome do chip aparece so para
+identifica-lo, e o logotipo nao e reproduzido.
+
 O restante do CircuitSketch nao e afetado por esta licenca.

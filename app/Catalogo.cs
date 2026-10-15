@@ -397,11 +397,22 @@ public static class Catalogo
         // os mesmos 5 V.
         if (PerfilPlaca.De(idPeca) is not null && Obter(idPeca) is { } placa)
         {
+            // (os NC nao: cada um e um furo solto, sem ligacao com os outros)
             foreach (var grupo in placa.Pinos.Select(p => p.Nome)
-                         .GroupBy(SemRepeticao).Where(g => g.Count() > 1))
+                         .GroupBy(SemRepeticao).Where(g => g.Key != "NC" && g.Count() > 1))
             {
                 string primeiro = grupo.First();
                 foreach (string outro in grupo.Skip(1)) yield return (primeiro, outro);
+            }
+            // Dois nomes do mesmo pino do chip: o D13 do conector do Arduino e o
+            // PA5 do morpho da Nucleo-64 sao a mesma trilha (Alpha 25).
+            var perfil = PerfilPlaca.De(idPeca);
+            foreach (var grupo in placa.Pinos.Select(p => p.Nome).Where(n => perfil.Numero(n) >= 0)
+                         .GroupBy(n => perfil.Numero(n)).Where(g => g.Select(SemRepeticao).Distinct().Count() > 1))
+            {
+                string primeiro = grupo.First();
+                foreach (string outro in grupo.Skip(1).Where(o => SemRepeticao(o) != SemRepeticao(primeiro)))
+                    yield return (primeiro, outro);
             }
             // Os GND (o "GND.1" e o "GND") e os VSS sao um so.
             var terras = placa.Pinos.Select(p => p.Nome).Where(Netlist.EhPinoDeTerra).ToList();

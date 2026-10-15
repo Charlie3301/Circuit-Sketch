@@ -419,10 +419,16 @@ public partial class EditorCircuito : Border
         // chave. Nao reinicia: o sketch le ele (BOOTSEL, rp2.bootsel_button()).
         ["pi-pico"] = [(26.1, 43.4, 5.5, "BOOTSEL")],
         ["pi-pico-w"] = [(26.7, 43.9, 5.5, "BOOTSEL")],
+
+        // As STM32 (placas-stm32.py, Alpha 25): o RESET de cada uma e, na
+        // Nucleo-64, o USER azul (B1), que leva o PC13 a LOW.
+        ["stm32-bluepill"] = [(51.4, 141.35, 8.0, "RESET")],
+        ["st-nucleo-l031k6"] = [(35.3, 182.0, 7.0, "RESET")],
+        ["st-nucleo-c031c6"] = [(102.0, 105.8, 9.5, "USER"), (172.3, 105.8, 9.5, "RESET")],
     };
 
-    /// <summary>O botao da placa que segura o pino de boot (BOOT das ESP32, BOOTSEL da Pico), e nao o reset.</summary>
-    static bool EhBotaoDeBoot(string nome) => nome is "BOOT" or "BOOTSEL";
+    /// <summary>O botao da placa que vai num pino (BOOT das ESP32, BOOTSEL da Pico, USER da Nucleo-64), e nao o reset.</summary>
+    static bool EhBotaoDeBoot(string nome) => nome is "BOOT" or "BOOTSEL" or "USER";
 
     /// <summary>
     /// Os vinte botoes do controle remoto, com o codigo que cada um manda.
@@ -581,6 +587,27 @@ public partial class EditorCircuito : Border
         ["pi-pico"] = [(17.7, 16.4, 2.6, 25, Color.FromRgb(0x5C, 0xFF, 0x5A))],
         ["pi-pico-w"] = [(18.2, 16.9, 2.6, 32, Color.FromRgb(0x5C, 0xFF, 0x5A))],
 
+        // As STM32 (placas-stm32.py). Na Blue Pill o LED do PC13 acende com
+        // LOW (ele vai do 3V3 ao pino); nas Nucleo o LD1 (COM, do ST-LINK)
+        // fica vermelho com a placa ligada, e o verde e o D13.
+        ["stm32-bluepill"] =
+        [
+            (26.83, 29.48, 3.4, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)),
+            (54.05, 29.48, 3.4, LedInvertido + 45, Color.FromRgb(0x5C, 0xFF, 0x5A)),
+        ],
+        ["st-nucleo-l031k6"] =
+        [
+            (7.3, 13.0, 3.6, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)),
+            (16.4, 180.3, 3.4, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)),
+            (54.2, 180.3, 3.4, 13, Color.FromRgb(0x5C, 0xFF, 0x5A)),
+        ],
+        ["st-nucleo-c031c6"] =
+        [
+            (227.9, 15.1, 3.4, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)),
+            (201.8, 97.1, 2.8, LedDeEnergia, Color.FromRgb(0x5C, 0xFF, 0x5A)),
+            (213.2, 97.1, 2.8, 13, Color.FromRgb(0x5C, 0xFF, 0x5A)),
+        ],
+
         // Os mesmos quatro na Mega 2560 R3: o ON fica la do outro lado, perto do chip.
         ["arduino-mega"] =
         [
@@ -593,6 +620,9 @@ public partial class EditorCircuito : Border
 
     /// <summary>O LED da placa que acende so por ela estar ligada; o TX e o RX, que piscam com a serial.</summary>
     const int LedDeEnergia = -1, LedTx = -2, LedRx = -3;
+
+    /// <summary>Somado ao GPIO: o LED acende com o pino em LOW (o do PC13 da Blue Pill).</summary>
+    const int LedInvertido = 1000;
 
     /// <summary>A "cor" do LED RGB enderecavel da placa: a de verdade sai do sketch a cada quadro.</summary>
     // Propriedade, e nao campo: a tabela dos LEDs, mais acima, e montada antes
@@ -631,6 +661,9 @@ public partial class EditorCircuito : Border
         LedTx => maq.Energizada && maq.FimDaTransmissaoUs > 0
                  && maq.AgoraUs() - maq.FimDaTransmissaoUs < PiscadaDaSerialMs * 1000 ? 0.9 : 0,
         LedRx => maq.Energizada && Environment.TickCount64 - maq.EntradaSerial.UltimaChegadaMs < PiscadaDaSerialMs ? 0.9 : 0,
+        // Ligado entre o 3V3 e o pino: so acende com o pino de SAIDA em LOW.
+        >= LedInvertido => maq.Energizada && gpio - LedInvertido < maq.Pwm.Length && maq.Modo[gpio - LedInvertido] == 1
+                           ? 1 - maq.Pwm[gpio - LedInvertido] / 255.0 : 0,
         _ => gpio < maq.Pwm.Length ? maq.Pwm[gpio] / 255.0 : 0,
     };
 
@@ -5704,6 +5737,12 @@ public partial class EditorCircuito : Border
                     // O BOOTSEL nao e GPIO: e o chip select da flash, que o
                     // sketch le por uma funcao do core.
                     maq.BootselApertado = BootPressionado.Contains(peca.Id);
+                    break;
+
+                case "st-nucleo-c031c6":
+                    // O USER (B1) vai do PC13 ao GND, com o pull-up da placa:
+                    // solto le HIGH, apertado le LOW (o USER_BTN do core).
+                    maq.NivelExterno[21] = BootPressionado.Contains(peca.Id) ? 0 : 1;
                     break;
 
                 case "analog-joystick":

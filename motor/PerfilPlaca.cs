@@ -499,6 +499,9 @@ public partial record PerfilPlaca(
     static int NumeroDaBluePill(string nome)
     {
         string b = Base(nome);
+        // O conector SWD da ponta da placa: o DIO e o PA13, o CLK e o PA14.
+        if (b == "SWDIO") return 13;
+        if (b == "SWCLK") return 14;
         if (b.Length < 3 || b[0] != 'P') return -1;
 
         int porta = b[1] switch { 'A' => 0, 'B' => 16, 'C' => 32, _ => -1 };

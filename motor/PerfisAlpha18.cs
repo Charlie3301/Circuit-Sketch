@@ -249,8 +249,15 @@ public partial record PerfilPlaca
     // numeração funciona: D<n> é o n, e A<n> continua a contagem depois
     // dos digitais -- a mesma regra do Uno e do Nano.
     public static readonly PerfilPlaca NucleoL031K6 = new(
-        "st-nucleo-l031k6", "ST Nucleo-L031K6", NumPinos: 22, MaxAdc: 4095, LedInterno: 13)
+        "st-nucleo-l031k6", "ST Nucleo-L031K6", NumPinos: 25, MaxAdc: 4095, LedInterno: 13)
     {
+        // Os nomes do chip (PA5, PB3...) na numeracao do variant_NUCLEO_L031K6 do
+        // STM32duino: D0..D13 sao o 0..13, A0..A7 o 14..21; o PA15 (RX do
+        // ST-LINK), o PA13 e o PA14 (SWD) ficam fora da barra.
+        NomesDoCore = Core(Pares(("PA10", 0), ("PA9", 1), ("PA12", 2), ("PB0", 3), ("PB7", 4), ("PB6", 5),
+            ("PB1", 6), ("PC14", 7), ("PC15", 8), ("PA8", 9), ("PA11", 10), ("PB5", 11), ("PB4", 12), ("PB3", 13),
+            ("PA0", 14), ("PA1", 15), ("PA3", 16), ("PA4", 17), ("PA5", 18), ("PA6", 19), ("PA7", 20), ("PA2", 21),
+            ("PA15", 22), ("PA13", 23), ("PA14", 24), ("A8", 3), ("A9", 6))),
         TensaoDeOperacao = 3.3, CorrenteDoPino = 20,
         SdaPadrao = 18, SclPadrao = 19,   // A4 e A5
         Processador = "STM32L031K6", Nucleos = 1, Megahertz = 32,
@@ -261,17 +268,42 @@ public partial record PerfilPlaca
     };
 
     public static readonly PerfilPlaca NucleoC031C6 = new(
-        "st-nucleo-c031c6", "ST Nucleo-C031C6", NumPinos: 22, MaxAdc: 4095, LedInterno: 13)
+        "st-nucleo-c031c6", "ST Nucleo-C031C6", NumPinos: 45, MaxAdc: 4095, LedInterno: 13)
     {
         TensaoDeOperacao = 3.3, CorrenteDoPino = 20,
         SdaPadrao = 14, SclPadrao = 15,   // D14 e D15, como no cabeçalho do Uno
         Processador = "STM32C031C6", Nucleos = 1, Megahertz = 48,
         RamBytes = 12288, FlashBytes = 32768,
         BaseDaRam = 2400, BaseDaFlash = 10000,
-        NomesDoCore = Core(Pares(("SDA", 14), ("SCL", 15))),
-        NomePorRegra = nome => ComPrefixo(nome, "D"),
-        Numero = nome => ComPrefixo(nome, "D") is var d && d >= 0 ? d : Analogico(nome, 14),
+        NomesDoCore = Core(PinosDaC031C6, Pares(("SDA", 14), ("SCL", 15), ("USER_BTN", 21), ("LED_GREEN", 13))),
+        NomePorRegra = nome => ComPrefixo(nome, "D") is var d && d is >= 0 and < 45 ? d : -1,
+        Numero = nome => ComPrefixo(nome, "D") is var d && d is >= 0 and < 45 ? d
+            : PinosDaC031C6.FirstOrDefault(p => p.Nome == Base(nome)) is { Nome: not null } achado ? achado.Gpio : -1,
     };
+
+    /// <summary>
+    /// Os pinos da Nucleo-C031C6 na numeracao do variant_NUCLEO_C031C6 do
+    /// STM32duino (Alpha 25): o Arduino (D0..D15) primeiro, depois o que so
+    /// existe no morpho (o PC13 do botao USER e o 21), o A0..A5 do conector
+    /// do Arduino (o PA0, PA1, PA4, PB1, PA11 e PA12) e os outros canais do
+    /// conversor (A6..A18) nos pinos do chip. Antes o A0 era o 14 -- o mesmo
+    /// numero do D14. Propriedade preguicosa: o perfil, mais acima, e montado
+    /// antes dos campos que vem depois dele.
+    /// </summary>
+    static (string Nome, int Gpio)[] PinosDaC031C6 => pinosDaC031C6 ??=
+    [
+        ("PB7", 0), ("PB6", 1), ("PA10", 2), ("PB3", 3), ("PB10", 4), ("PB4", 5), ("PB5", 6), ("PA15", 7),
+        ("PA9", 8), ("PC7", 9), ("PB0", 10), ("PA7", 11), ("PA6", 12), ("PA5", 13), ("PB9", 14), ("PB8", 15),
+        ("PD0", 16), ("PD2", 17), ("PA14", 18), ("PA13", 19), ("PC6", 20), ("PC13", 21), ("PC14", 22), ("PF0", 23),
+        ("PF1", 24), ("PB11", 25), ("PA2", 26), ("PD1", 27), ("PD3", 28), ("PA0", 29), ("PA1", 30), ("PA4", 31),
+        ("PB1", 32), ("PA11", 33), ("PA12", 34), ("PA3", 35), ("PC15", 36), ("PB12", 37), ("PB2", 38), ("PF3", 39),
+        ("PA8", 40), ("PB15", 41), ("PB14", 42), ("PB13", 43), ("PF2", 44),
+        ("A0", 29), ("A1", 30), ("A2", 31), ("A3", 32), ("A4", 33), ("A5", 34), ("A6", 26), ("A7", 35), ("A8", 13),
+        ("A9", 12), ("A10", 11), ("A11", 40), ("A12", 19), ("A13", 18), ("A14", 10), ("A15", 38), ("A16", 4),
+        ("A17", 25), ("A18", 37),
+    ];
+
+    static (string Nome, int Gpio)[] pinosDaC031C6;
 
     // =================================================================
     //  Raspberry Pi Pico W

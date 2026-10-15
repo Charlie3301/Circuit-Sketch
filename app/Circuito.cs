@@ -375,6 +375,8 @@ public class Circuito
     {
         ["esp32-c6-devkit"] = new() { ["16"] = "TX", ["17"] = "RX" },
         ["esp32-h2-devkit"] = new() { ["24"] = "TX", ["23"] = "RX" },
+        // Na Nucleo-C031C6 o furo do AREF do Arduino e o AVDD (Alpha 25).
+        ["st-nucleo-c031c6"] = new() { ["AREF"] = "AVDD" },
     };
 
     /// <summary>Passa os fios de um projeto antigo para os nomes de pino de agora.</summary>
@@ -903,7 +905,7 @@ public class Netlist
     /// <summary>Nome de pino de alimentacao ("5V", "3V3", "VIN", "V+"...).</summary>
     public static bool EhPinoDeAlimentacao(string pino)
         => SemSufixo(pino) is "3V3" or "3.3V" or "5V" or "VIN" or "VCC" or "VDD"
-                           or "VBUS" or "VUSB" or "V+" or "IOREF" or "VBAT";
+                           or "VBUS" or "VUSB" or "V+" or "IOREF" or "VBAT" or "AVDD";
 
     /// <summary>
     /// Tira so o sufixo de repeticao ("5V.2" -> "5V").

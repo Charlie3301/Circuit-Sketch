@@ -11899,34 +11899,592 @@
  },
  {
   "id": "st-nucleo-c031c6",
-  "largura": 121,
-  "altura": 174,
+  "largura": 265,
+  "altura": 312,
   "pinos": [
    {
-    "nome": "NC",
-    "x": 6.8,
-    "y": 12.09,
+    "nome": "PD0",
     "sinais": [],
-    "descricao": ""
+    "descricao": "",
+    "x": 12.09,
+    "y": 117.92
+   },
+   {
+    "nome": "PD1",
+    "sinais": [],
+    "descricao": "",
+    "x": 21.69,
+    "y": 117.92
+   },
+   {
+    "nome": "PD2",
+    "sinais": [],
+    "descricao": "",
+    "x": 12.09,
+    "y": 127.52
+   },
+   {
+    "nome": "PD2.2",
+    "sinais": [],
+    "descricao": "",
+    "x": 21.69,
+    "y": 127.52
+   },
+   {
+    "nome": "VDD",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "VDD: a alimentacao do STM32 (3,3 V).",
+    "x": 12.09,
+    "y": 137.12
+   },
+   {
+    "nome": "E5V",
+    "sinais": [],
+    "descricao": "E5V: entrada de 5 V de fora (com o jumper JP5 em E5V, a placa liga por aqui).",
+    "x": 21.69,
+    "y": 137.12
+   },
+   {
+    "nome": "PA14",
+    "sinais": [],
+    "descricao": "",
+    "x": 12.09,
+    "y": 146.72
+   },
+   {
+    "nome": "GND.4",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 21.69,
+    "y": 146.72
+   },
+   {
+    "nome": "NC.2",
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum.",
+    "x": 12.09,
+    "y": 156.32
+   },
+   {
+    "nome": "NC.3",
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum.",
+    "x": 21.69,
+    "y": 156.32
+   },
+   {
+    "nome": "NC.4",
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum.",
+    "x": 12.09,
+    "y": 165.92
+   },
+   {
+    "nome": "IOREF.2",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "IOREF: a tensao dos pinos (3,3 V).",
+    "x": 21.69,
+    "y": 165.92
+   },
+   {
+    "nome": "PA13",
+    "sinais": [],
+    "descricao": "",
+    "x": 12.09,
+    "y": 175.52
+   },
+   {
+    "nome": "RST.2",
+    "sinais": [],
+    "descricao": "",
+    "x": 21.69,
+    "y": 175.52
+   },
+   {
+    "nome": "NC.5",
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum.",
+    "x": 12.09,
+    "y": 185.12
+   },
+   {
+    "nome": "3V3.2",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 21.69,
+    "y": 185.12
+   },
+   {
+    "nome": "PC6",
+    "sinais": [],
+    "descricao": "",
+    "x": 12.09,
+    "y": 194.72
+   },
+   {
+    "nome": "5V.2",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 21.69,
+    "y": 194.72
+   },
+   {
+    "nome": "GND.5",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 12.09,
+    "y": 204.32
+   },
+   {
+    "nome": "GND.6",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 21.69,
+    "y": 204.32
+   },
+   {
+    "nome": "NC.6",
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum.",
+    "x": 12.09,
+    "y": 213.92
+   },
+   {
+    "nome": "GND.7",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 21.69,
+    "y": 213.92
+   },
+   {
+    "nome": "PC13",
+    "sinais": [],
+    "descricao": "",
+    "x": 12.09,
+    "y": 223.52
+   },
+   {
+    "nome": "VIN.2",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 21.69,
+    "y": 223.52
+   },
+   {
+    "nome": "PC14",
+    "sinais": [],
+    "descricao": "",
+    "x": 12.09,
+    "y": 233.12
+   },
+   {
+    "nome": "NC.7",
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum.",
+    "x": 21.69,
+    "y": 233.12
+   },
+   {
+    "nome": "NC.8",
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum.",
+    "x": 12.09,
+    "y": 242.72
+   },
+   {
+    "nome": "PA0",
+    "sinais": [],
+    "descricao": "",
+    "x": 21.69,
+    "y": 242.72
+   },
+   {
+    "nome": "PF0",
+    "sinais": [],
+    "descricao": "",
+    "x": 12.09,
+    "y": 252.32
+   },
+   {
+    "nome": "PA1",
+    "sinais": [],
+    "descricao": "",
+    "x": 21.69,
+    "y": 252.32
+   },
+   {
+    "nome": "PF1",
+    "sinais": [],
+    "descricao": "",
+    "x": 12.09,
+    "y": 261.92
+   },
+   {
+    "nome": "PA4",
+    "sinais": [],
+    "descricao": "",
+    "x": 21.69,
+    "y": 261.92
+   },
+   {
+    "nome": "NC.9",
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum.",
+    "x": 12.09,
+    "y": 271.52
+   },
+   {
+    "nome": "PB1",
+    "sinais": [],
+    "descricao": "",
+    "x": 21.69,
+    "y": 271.52
+   },
+   {
+    "nome": "PB11",
+    "sinais": [],
+    "descricao": "",
+    "x": 12.09,
+    "y": 281.12
+   },
+   {
+    "nome": "PA11",
+    "sinais": [],
+    "descricao": "",
+    "x": 21.69,
+    "y": 281.12
+   },
+   {
+    "nome": "PA2",
+    "sinais": [],
+    "descricao": "",
+    "x": 12.09,
+    "y": 290.72
+   },
+   {
+    "nome": "PA12",
+    "sinais": [],
+    "descricao": "",
+    "x": 21.69,
+    "y": 290.72
+   },
+   {
+    "nome": "PD3",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 117.92
+   },
+   {
+    "nome": "NC.10",
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum.",
+    "x": 252.09,
+    "y": 117.92
+   },
+   {
+    "nome": "PB8",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 127.52
+   },
+   {
+    "nome": "NC.11",
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum.",
+    "x": 252.09,
+    "y": 127.52
+   },
+   {
+    "nome": "PB9",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 137.12
+   },
+   {
+    "nome": "NC.12",
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum.",
+    "x": 252.09,
+    "y": 137.12
+   },
+   {
+    "nome": "AVDD.2",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "AVDD: a alimentacao analogica do STM32 (3,3 V), no lugar do AREF do Arduino.",
+    "x": 242.49,
+    "y": 146.72
+   },
+   {
+    "nome": "5V_USB_CHG",
+    "sinais": [],
+    "descricao": "5V_USB_CHG: os 5 V da USB do ST-LINK no modo carregador (JP5 em CHG).",
+    "x": 252.09,
+    "y": 146.72
+   },
+   {
+    "nome": "GND.8",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 242.49,
+    "y": 156.32
+   },
+   {
+    "nome": "PA3",
+    "sinais": [],
+    "descricao": "",
+    "x": 252.09,
+    "y": 156.32
+   },
+   {
+    "nome": "PA5",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 165.92
+   },
+   {
+    "nome": "PC15",
+    "sinais": [],
+    "descricao": "",
+    "x": 252.09,
+    "y": 165.92
+   },
+   {
+    "nome": "PA6",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 175.52
+   },
+   {
+    "nome": "PB12",
+    "sinais": [],
+    "descricao": "",
+    "x": 252.09,
+    "y": 175.52
+   },
+   {
+    "nome": "PA7",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 185.12
+   },
+   {
+    "nome": "PB12.2",
+    "sinais": [],
+    "descricao": "",
+    "x": 252.09,
+    "y": 185.12
+   },
+   {
+    "nome": "PB0",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 194.72
+   },
+   {
+    "nome": "PB2",
+    "sinais": [],
+    "descricao": "",
+    "x": 252.09,
+    "y": 194.72
+   },
+   {
+    "nome": "PC7",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 204.32
+   },
+   {
+    "nome": "GND.9",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 252.09,
+    "y": 204.32
+   },
+   {
+    "nome": "PA9",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 213.92
+   },
+   {
+    "nome": "PF3",
+    "sinais": [],
+    "descricao": "",
+    "x": 252.09,
+    "y": 213.92
+   },
+   {
+    "nome": "PA15",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 223.52
+   },
+   {
+    "nome": "PA8",
+    "sinais": [],
+    "descricao": "",
+    "x": 252.09,
+    "y": 223.52
+   },
+   {
+    "nome": "PB5",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 233.12
+   },
+   {
+    "nome": "PB15",
+    "sinais": [],
+    "descricao": "",
+    "x": 252.09,
+    "y": 233.12
+   },
+   {
+    "nome": "PB4",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 242.72
+   },
+   {
+    "nome": "PB14",
+    "sinais": [],
+    "descricao": "",
+    "x": 252.09,
+    "y": 242.72
+   },
+   {
+    "nome": "PB10",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 252.32
+   },
+   {
+    "nome": "PB13",
+    "sinais": [],
+    "descricao": "",
+    "x": 252.09,
+    "y": 252.32
+   },
+   {
+    "nome": "PB3",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 261.92
+   },
+   {
+    "nome": "AGND",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "AGND: o terra analogico (o mesmo GND da placa).",
+    "x": 252.09,
+    "y": 261.92
+   },
+   {
+    "nome": "PA10",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 271.52
+   },
+   {
+    "nome": "PB0.2",
+    "sinais": [],
+    "descricao": "",
+    "x": 252.09,
+    "y": 271.52
+   },
+   {
+    "nome": "PB6",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 281.12
+   },
+   {
+    "nome": "NC.13",
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum.",
+    "x": 252.09,
+    "y": 281.12
+   },
+   {
+    "nome": "PB7",
+    "sinais": [],
+    "descricao": "",
+    "x": 242.49,
+    "y": 290.72
+   },
+   {
+    "nome": "NC.14",
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum.",
+    "x": 252.09,
+    "y": 290.72
+   },
+   {
+    "nome": "NC",
+    "x": 41.08,
+    "y": 156.09,
+    "sinais": [],
+    "descricao": "Nao conectado: o pino existe no conector, mas nao vai a lugar nenhum."
    },
    {
     "nome": "IOREF",
-    "x": 6.8,
-    "y": 21.69,
+    "x": 41.08,
+    "y": 165.69,
     "sinais": [],
-    "descricao": ""
+    "descricao": "IOREF: a tensao dos pinos (3,3 V)."
    },
    {
     "nome": "RST",
-    "x": 6.8,
-    "y": 31.29,
+    "x": 41.08,
+    "y": 175.29,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "3V3",
-    "x": 6.8,
-    "y": 40.89,
+    "x": 41.08,
+    "y": 184.89,
     "sinais": [
      "power"
     ],
@@ -11934,8 +12492,8 @@
    },
    {
     "nome": "5V",
-    "x": 6.8,
-    "y": 50.49,
+    "x": 41.08,
+    "y": 194.49,
     "sinais": [
      "power"
     ],
@@ -11943,8 +12501,8 @@
    },
    {
     "nome": "GND",
-    "x": 6.8,
-    "y": 60.09,
+    "x": 41.08,
+    "y": 204.09,
     "sinais": [
      "power"
     ],
@@ -11952,8 +12510,8 @@
    },
    {
     "nome": "GND.2",
-    "x": 6.8,
-    "y": 69.69,
+    "x": 41.08,
+    "y": 213.69,
     "sinais": [
      "power"
     ],
@@ -11961,8 +12519,8 @@
    },
    {
     "nome": "VIN",
-    "x": 6.8,
-    "y": 79.29,
+    "x": 41.08,
+    "y": 223.29,
     "sinais": [
      "power"
     ],
@@ -11970,50 +12528,50 @@
    },
    {
     "nome": "A0",
-    "x": 6.8,
-    "y": 88.89,
+    "x": 41.08,
+    "y": 242.65,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A1",
-    "x": 6.8,
-    "y": 98.49,
+    "x": 41.08,
+    "y": 252.25,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A2",
-    "x": 6.8,
-    "y": 108.09,
+    "x": 41.08,
+    "y": 261.85,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A3",
-    "x": 6.8,
-    "y": 117.69,
+    "x": 41.08,
+    "y": 271.45,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A4",
-    "x": 6.8,
-    "y": 127.29,
+    "x": 41.08,
+    "y": 281.05,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A5",
-    "x": 6.8,
-    "y": 136.89,
+    "x": 41.08,
+    "y": 290.65,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D15",
-    "x": 114.14,
-    "y": 12.09,
+    "x": 223.48,
+    "y": 121.7,
     "sinais": [
      "i2c"
     ],
@@ -12021,26 +12579,26 @@
    },
    {
     "nome": "D14",
-    "x": 114.14,
-    "y": 21.69,
+    "x": 223.48,
+    "y": 131.3,
     "sinais": [
      "i2c"
     ],
     "descricao": ""
    },
    {
-    "nome": "AREF",
-    "x": 114.14,
-    "y": 31.29,
+    "nome": "AVDD",
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "AVDD: a alimentacao analogica do STM32 (3,3 V), no lugar do AREF do Arduino.",
+    "x": 223.48,
+    "y": 140.9
    },
    {
     "nome": "GND.3",
-    "x": 114.14,
-    "y": 40.89,
+    "x": 223.48,
+    "y": 150.5,
     "sinais": [
      "power"
     ],
@@ -12048,73 +12606,101 @@
    },
    {
     "nome": "D13",
-    "x": 114.14,
-    "y": 50.49,
+    "x": 223.48,
+    "y": 160.1,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D12",
-    "x": 114.14,
-    "y": 60.09,
+    "x": 223.48,
+    "y": 169.7,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D11",
-    "x": 114.14,
-    "y": 69.69,
+    "x": 223.48,
+    "y": 179.3,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D10",
-    "x": 114.14,
-    "y": 79.29,
+    "x": 223.48,
+    "y": 188.9,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D9",
-    "x": 114.14,
-    "y": 88.89,
+    "x": 223.48,
+    "y": 198.5,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D8",
-    "x": 114.14,
-    "y": 98.49,
+    "x": 223.48,
+    "y": 208.1,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D7",
-    "x": 114.14,
-    "y": 108.09,
+    "x": 223.48,
+    "y": 223.45,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D6",
-    "x": 114.14,
-    "y": 117.69,
+    "x": 223.48,
+    "y": 233.05,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D5",
-    "x": 114.14,
-    "y": 127.29,
+    "x": 223.48,
+    "y": 242.65,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D4",
-    "x": 114.14,
-    "y": 136.89,
+    "x": 223.48,
+    "y": 252.25,
     "sinais": [],
     "descricao": ""
+   },
+   {
+    "nome": "D3",
+    "sinais": [],
+    "descricao": "",
+    "x": 223.48,
+    "y": 261.85
+   },
+   {
+    "nome": "D2",
+    "sinais": [],
+    "descricao": "",
+    "x": 223.48,
+    "y": 271.45
+   },
+   {
+    "nome": "D1",
+    "sinais": [],
+    "descricao": "",
+    "x": 223.48,
+    "y": 281.05
+   },
+   {
+    "nome": "D0",
+    "sinais": [],
+    "descricao": "",
+    "x": 223.48,
+    "y": 290.65
    }
   ],
   "variantes": [],
@@ -12122,13 +12708,120 @@
  },
  {
   "id": "st-nucleo-l031k6",
-  "largura": 68,
-  "altura": 189,
+  "largura": 70,
+  "altura": 190,
   "pinos": [
    {
+    "nome": "D1",
+    "x": 6.24,
+    "y": 33.46,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D0",
+    "x": 6.24,
+    "y": 43.06,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "RST.2",
+    "x": 6.24,
+    "y": 52.66,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "GND.2",
+    "x": 6.24,
+    "y": 62.26,
+    "sinais": [
+     "power"
+    ],
+    "descricao": ""
+   },
+   {
+    "nome": "D2",
+    "x": 6.24,
+    "y": 71.86,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D3",
+    "x": 6.24,
+    "y": 81.46,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D4",
+    "x": 6.24,
+    "y": 91.06,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D5",
+    "x": 6.24,
+    "y": 100.66,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D6",
+    "x": 6.24,
+    "y": 110.26,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D7",
+    "x": 6.24,
+    "y": 119.86,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D8",
+    "x": 6.24,
+    "y": 129.46,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D9",
+    "x": 6.24,
+    "y": 139.06,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D10",
+    "x": 6.24,
+    "y": 148.66,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D11",
+    "x": 6.24,
+    "y": 158.26,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D12",
+    "x": 6.24,
+    "y": 167.86,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
     "nome": "VIN",
-    "x": 6.05,
-    "y": 11.34,
+    "x": 63.83,
+    "y": 33.46,
     "sinais": [
      "power"
     ],
@@ -12136,8 +12829,8 @@
    },
    {
     "nome": "GND",
-    "x": 6.05,
-    "y": 20.94,
+    "x": 63.83,
+    "y": 43.06,
     "sinais": [
      "power"
     ],
@@ -12145,15 +12838,15 @@
    },
    {
     "nome": "RST",
-    "x": 6.05,
-    "y": 30.54,
+    "x": 63.83,
+    "y": 52.66,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "5V",
-    "x": 6.05,
-    "y": 40.14,
+    "x": 63.83,
+    "y": 62.26,
     "sinais": [
      "power"
     ],
@@ -12161,22 +12854,22 @@
    },
    {
     "nome": "A7",
-    "x": 6.05,
-    "y": 49.74,
+    "x": 63.83,
+    "y": 71.86,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A6",
-    "x": 6.05,
-    "y": 59.34,
+    "x": 63.83,
+    "y": 81.46,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A5",
-    "x": 6.05,
-    "y": 68.94,
+    "x": 63.83,
+    "y": 91.06,
     "sinais": [
      "i2c"
     ],
@@ -12184,8 +12877,8 @@
    },
    {
     "nome": "A4",
-    "x": 6.05,
-    "y": 78.54,
+    "x": 63.83,
+    "y": 100.66,
     "sinais": [
      "i2c"
     ],
@@ -12193,36 +12886,36 @@
    },
    {
     "nome": "A3",
-    "x": 6.05,
-    "y": 88.14,
+    "x": 63.83,
+    "y": 110.26,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A2",
-    "x": 6.05,
-    "y": 97.74,
+    "x": 63.83,
+    "y": 119.86,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A1",
-    "x": 6.05,
-    "y": 107.34,
+    "x": 63.83,
+    "y": 129.46,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A0",
-    "x": 6.05,
-    "y": 116.94,
+    "x": 63.83,
+    "y": 139.06,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "AREF",
-    "x": 6.05,
-    "y": 126.54,
+    "x": 63.83,
+    "y": 148.66,
     "sinais": [
      "power"
     ],
@@ -12230,8 +12923,8 @@
    },
    {
     "nome": "3V3",
-    "x": 6.05,
-    "y": 136.14,
+    "x": 63.83,
+    "y": 158.26,
     "sinais": [
      "power"
     ],
@@ -12239,115 +12932,8 @@
    },
    {
     "nome": "D13",
-    "x": 6.05,
-    "y": 145.74,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D12",
-    "x": 61.98,
-    "y": 11.34,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D11",
-    "x": 61.98,
-    "y": 20.94,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D10",
-    "x": 61.98,
-    "y": 30.54,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D9",
-    "x": 61.98,
-    "y": 40.14,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D8",
-    "x": 61.98,
-    "y": 49.74,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D7",
-    "x": 61.98,
-    "y": 59.34,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D6",
-    "x": 61.98,
-    "y": 68.94,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D5",
-    "x": 61.98,
-    "y": 78.54,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D4",
-    "x": 61.98,
-    "y": 88.14,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D3",
-    "x": 61.98,
-    "y": 97.74,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D2",
-    "x": 61.98,
-    "y": 107.34,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "GND.2",
-    "x": 61.98,
-    "y": 116.94,
-    "sinais": [
-     "power"
-    ],
-    "descricao": ""
-   },
-   {
-    "nome": "RST.2",
-    "x": 61.98,
-    "y": 126.54,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D0",
-    "x": 61.98,
-    "y": 136.14,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D1",
-    "x": 61.98,
-    "y": 145.74,
+    "x": 63.83,
+    "y": 167.86,
     "sinais": [],
     "descricao": ""
    }
@@ -12463,134 +13049,134 @@
  },
  {
   "id": "stm32-bluepill",
-  "largura": 85,
-  "altura": 200,
+  "largura": 82,
+  "altura": 198,
   "pinos": [
    {
     "nome": "VB",
-    "x": 6.43,
-    "y": 8.31,
+    "x": 12.09,
+    "y": 7.71,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "VBAT: alimenta o relogio (RTC) e os registradores de backup com a placa desligada (uma pilha de 3 V)."
    },
    {
     "nome": "PC13",
-    "x": 6.43,
-    "y": 17.91,
+    "x": 12.09,
+    "y": 17.31,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PC14",
-    "x": 6.43,
-    "y": 27.51,
+    "x": 12.09,
+    "y": 26.91,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PC15",
-    "x": 6.43,
-    "y": 37.11,
+    "x": 12.09,
+    "y": 36.51,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA0",
-    "x": 6.43,
-    "y": 46.71,
+    "x": 12.09,
+    "y": 46.11,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA1",
-    "x": 6.43,
-    "y": 56.31,
+    "x": 12.09,
+    "y": 55.71,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA2",
-    "x": 6.43,
-    "y": 65.91,
+    "x": 12.09,
+    "y": 65.31,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA3",
-    "x": 6.43,
-    "y": 75.51,
+    "x": 12.09,
+    "y": 74.91,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA4",
-    "x": 6.43,
-    "y": 85.11,
+    "x": 12.09,
+    "y": 84.51,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA5",
-    "x": 6.43,
-    "y": 94.71,
+    "x": 12.09,
+    "y": 94.11,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA6",
-    "x": 6.43,
-    "y": 104.31,
+    "x": 12.09,
+    "y": 103.71,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA7",
-    "x": 6.43,
-    "y": 113.91,
+    "x": 12.09,
+    "y": 113.31,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB0",
-    "x": 6.43,
-    "y": 123.51,
+    "x": 12.09,
+    "y": 122.91,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB1",
-    "x": 6.43,
-    "y": 133.11,
+    "x": 12.09,
+    "y": 132.51,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB10",
-    "x": 6.43,
-    "y": 142.71,
+    "x": 12.09,
+    "y": 142.11,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB11",
-    "x": 6.43,
-    "y": 152.31,
+    "x": 12.09,
+    "y": 151.71,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "RST",
-    "x": 6.43,
-    "y": 161.91,
+    "x": 12.09,
+    "y": 161.31,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "3V3",
-    "x": 6.43,
-    "y": 171.51,
+    "x": 12.09,
+    "y": 170.91,
     "sinais": [
      "power"
     ],
@@ -12598,8 +13184,8 @@
    },
    {
     "nome": "GND",
-    "x": 6.43,
-    "y": 181.11,
+    "x": 12.09,
+    "y": 180.51,
     "sinais": [
      "power"
     ],
@@ -12607,8 +13193,8 @@
    },
    {
     "nome": "GND.2",
-    "x": 6.43,
-    "y": 190.71,
+    "x": 12.09,
+    "y": 190.11,
     "sinais": [
      "power"
     ],
@@ -12616,8 +13202,8 @@
    },
    {
     "nome": "3V3.2",
-    "x": 78.61,
-    "y": 8.31,
+    "x": 69.69,
+    "y": 7.71,
     "sinais": [
      "power"
     ],
@@ -12625,17 +13211,8 @@
    },
    {
     "nome": "GND.3",
-    "x": 78.61,
-    "y": 17.91,
-    "sinais": [
-     "power"
-    ],
-    "descricao": ""
-   },
-   {
-    "nome": "GND.4",
-    "x": 78.61,
-    "y": 27.51,
+    "x": 69.69,
+    "y": 17.31,
     "sinais": [
      "power"
     ],
@@ -12643,8 +13220,8 @@
    },
    {
     "nome": "5V",
-    "x": 78.61,
-    "y": 37.11,
+    "x": 69.69,
+    "y": 26.91,
     "sinais": [
      "power"
     ],
@@ -12652,22 +13229,22 @@
    },
    {
     "nome": "PB9",
-    "x": 78.61,
-    "y": 46.71,
+    "x": 69.69,
+    "y": 36.51,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB8",
-    "x": 78.61,
-    "y": 56.31,
+    "x": 69.69,
+    "y": 46.11,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB7",
-    "x": 78.61,
-    "y": 65.91,
+    "x": 69.69,
+    "y": 55.71,
     "sinais": [
      "i2c"
     ],
@@ -12675,8 +13252,8 @@
    },
    {
     "nome": "PB6",
-    "x": 78.61,
-    "y": 75.51,
+    "x": 69.69,
+    "y": 65.31,
     "sinais": [
      "i2c"
     ],
@@ -12684,87 +13261,126 @@
    },
    {
     "nome": "PB5",
-    "x": 78.61,
-    "y": 85.11,
+    "x": 69.69,
+    "y": 74.91,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB4",
-    "x": 78.61,
-    "y": 94.71,
+    "x": 69.69,
+    "y": 84.51,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB3",
-    "x": 78.61,
-    "y": 104.31,
+    "x": 69.69,
+    "y": 94.11,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA15",
-    "x": 78.61,
-    "y": 113.91,
+    "x": 69.69,
+    "y": 103.71,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA12",
-    "x": 78.61,
-    "y": 123.51,
+    "x": 69.69,
+    "y": 113.31,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA11",
-    "x": 78.61,
-    "y": 133.11,
+    "x": 69.69,
+    "y": 122.91,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA10",
-    "x": 78.61,
-    "y": 142.71,
+    "x": 69.69,
+    "y": 132.51,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA9",
-    "x": 78.61,
-    "y": 152.31,
+    "x": 69.69,
+    "y": 142.11,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PA8",
-    "x": 78.61,
-    "y": 161.91,
+    "x": 69.69,
+    "y": 151.71,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB15",
-    "x": 78.61,
-    "y": 171.51,
+    "x": 69.69,
+    "y": 161.31,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB14",
-    "x": 78.61,
-    "y": 181.11,
+    "x": 69.69,
+    "y": 170.91,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "PB13",
-    "x": 78.61,
-    "y": 190.71,
+    "x": 69.69,
+    "y": 180.51,
     "sinais": [],
     "descricao": ""
+   },
+   {
+    "nome": "PB12",
+    "sinais": [],
+    "descricao": "",
+    "x": 69.69,
+    "y": 190.11
+   },
+   {
+    "nome": "GND.4",
+    "x": 26.42,
+    "y": 22.68,
+    "sinais": [
+     "power"
+    ],
+    "descricao": ""
+   },
+   {
+    "nome": "SWCLK",
+    "sinais": [],
+    "descricao": "SWCLK (o CLK do conector SWD): o PA14. Depuracao pelo ST-LINK; com a depuracao desligada, e um GPIO.",
+    "x": 36.02,
+    "y": 22.68
+   },
+   {
+    "nome": "SWDIO",
+    "sinais": [],
+    "descricao": "SWDIO (o DIO do conector SWD): o PA13. Depuracao pelo ST-LINK; com a depuracao desligada, e um GPIO.",
+    "x": 45.62,
+    "y": 22.68
+   },
+   {
+    "nome": "3V3.3",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 55.22,
+    "y": 22.68
    }
   ],
   "variantes": [],
