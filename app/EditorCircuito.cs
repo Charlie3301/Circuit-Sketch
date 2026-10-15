@@ -4298,11 +4298,18 @@ public partial class EditorCircuito : Border
         if (!visuais.TryGetValue(peca.Id, out var v) || v is not TextBlock alvo) return;
 
         alvo.Text = TextoDaAnotacao(peca);
+        // Sem texto, o "escreva aqui" e so uma dica: inclinado e apagado.
+        bool vazio = string.IsNullOrWhiteSpace(peca.Nome);
+        alvo.FontStyle = vazio ? FontStyles.Italic : FontStyles.Normal;
+        alvo.Foreground = Tema.Pincel(vazio ? Tema.TextoFraco : Tema.TextoForte);
         alvo.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
 
         caixasDeTexto[peca.Id] = new Size(
             Math.Max(40, alvo.DesiredSize.Width), Math.Max(20, alvo.DesiredSize.Height));
     }
+
+    /// <summary>Para o teste: o tamanho medido de uma anotacao.</summary>
+    internal Size CaixaDoTextoParaTeste(string id) => caixasDeTexto.GetValueOrDefault(id);
 
     Rect CaixaNaTela(PecaNoCircuito peca, PecaDef def)
         => peca.Tipo == "texto" && caixasDeTexto.TryGetValue(peca.Id, out var medida)
@@ -4399,7 +4406,8 @@ public partial class EditorCircuito : Border
     public void DefinirNome(PecaNoCircuito peca, string nome, bool avisar = true)
     {
         if (peca is null) return;
-        peca.Nome = string.IsNullOrWhiteSpace(nome) ? null : nome.Trim();
+        // (o Texto pode ter mais de uma linha: Shift+Enter no campo)
+        peca.Nome = string.IsNullOrWhiteSpace(nome) ? null : nome.Replace("\r\n", "\n").Trim();
 
         var def = Catalogo.Obter(peca.Tipo);
         if (def is not null) AtualizarRotulo(peca, def);

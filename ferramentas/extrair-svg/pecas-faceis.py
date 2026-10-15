@@ -43,17 +43,24 @@ L = 2 * PASSO / (96 / 25.4) * (96 / 25.4)   # legibilidade: 2 passos
 L = 2 * PASSO                                # 5,08 mm
 m = L / 2
 
+# A emenda soldada (Alpha 25): as pontas de cobre descascadas ate as quatro
+# bordas -- o fio encosta no lado que quiser -- e a gota de estanho no meio,
+# a mesma cor das soldas das placas.
 junction = f'''<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
      width="{L}mm" height="{L}mm" viewBox="0 0 {L} {L}">
-  <!-- Pernas ate as quatro bordas: o fio encosta no lado que quiser. -->
-  <g stroke="#b08d57" stroke-width="0.55" stroke-linecap="round">
-    <path d="M{m} 0.35 V{m}"/>
-    <path d="M{L - 0.35} {m} H{m}"/>
-    <path d="M{m} {L - 0.35} V{m}"/>
-    <path d="M0.35 {m} H{m}"/>
+  <defs>
+    <radialGradient id="estanho" cx="0.38" cy="0.34" r="0.7"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.55" stop-color="#c3c9cf"/><stop offset="1" stop-color="#7c838b"/></radialGradient>
+  </defs>
+  <g stroke-linecap="round">
+    <g stroke="#7a4a22" stroke-width="0.62">
+      <path d="M{m} 0.35 V{m}"/><path d="M{L - 0.35} {m} H{m}"/><path d="M{m} {L - 0.35} V{m}"/><path d="M0.35 {m} H{m}"/>
+    </g>
+    <g stroke="#d08a52" stroke-width="0.42">
+      <path d="M{m} 0.35 V{m}"/><path d="M{L - 0.35} {m} H{m}"/><path d="M{m} {L - 0.35} V{m}"/><path d="M0.35 {m} H{m}"/>
+    </g>
   </g>
-  <circle cx="{m}" cy="{m}" r="1.15" fill="#c8a165" stroke="#8c6d3f" stroke-width="0.2"/>
-  <circle cx="{m - 0.3}" cy="{m - 0.35}" r="0.35" fill="#e8d2ab" opacity="0.8"/>
+  <circle cx="{m}" cy="{m}" r="1.2" fill="url(#estanho)" stroke="#6d747b" stroke-width="0.12"/>
+  <circle cx="{m - 0.38}" cy="{m - 0.42}" r="0.32" fill="#ffffff" opacity="0.75"/>
 </svg>
 '''
 guardar('junction', junction, L, L, [

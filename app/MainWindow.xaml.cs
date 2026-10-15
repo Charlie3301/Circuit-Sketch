@@ -1554,9 +1554,18 @@ public partial class MainWindow : Window
         };
         campoNome.TextChanged += (_, _) => editor.DefinirNome(peca, campoNome.Text, avisar: false);
         campoNome.LostFocus += (_, _) => editor.DefinirNome(peca, campoNome.Text);
-        campoNome.KeyDown += (_, ev) =>
+        // O Texto e a anotacao inteira: campo mais largo, e Shift+Enter quebra a linha.
+        if (peca.Tipo == "texto")
         {
-            if (ev.Key != Key.Enter) return;
+            campoNome.Width = 240;
+            campoNome.AcceptsReturn = true;
+            campoNome.MaxLines = 3;
+            campoNome.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            campoNome.ToolTip = "O texto da anotação. Shift+Enter quebra a linha.";
+        }
+        campoNome.PreviewKeyDown += (_, ev) =>
+        {
+            if (ev.Key != Key.Enter || Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)) return;
             editor.DefinirNome(peca, campoNome.Text);
             Keyboard.ClearFocus();
             ev.Handled = true;
