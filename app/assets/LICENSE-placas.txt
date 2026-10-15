@@ -18,4 +18,14 @@ Internacional (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0/
     comunidade Franzininho), CC BY-SA 4.0
     (github.com/Franzininho/franzininho-diy-board).
 
+As placas ESP32 (esp32-devkit-v1.svg, esp32-s2-devkit.svg, esp32-s3-devkit.svg,
+esp32-c3-devkit.svg, esp32-c6-devkit.svg e esp32-h2-devkit.svg) NAO estao sob
+a licenca acima: sao desenhos proprios do CircuitSketch. Das DevKits da
+Espressif foram usadas so as medidas e a posicao de cada componente e de cada
+pino, tiradas dos guias e dos layouts publicados pela Espressif
+(docs.espressif.com); nenhuma trilha nem arte da serigrafia foi copiada. A
+DevKit V1 (a de 30 pinos) foi medida numa foto. ESP32 e Espressif sao marcas
+registradas da Espressif Systems; o nome dos modulos aparece so para
+identifica-los, e o logotipo nao e reproduzido.
+
 O restante do CircuitSketch nao e afetado por esta licenca.

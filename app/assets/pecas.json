@@ -4861,21 +4861,53 @@
  {
   "id": "esp32-c3-devkit",
   "largura": 96,
-  "altura": 109,
+  "altura": 170,
   "pinos": [
    {
-    "nome": "3V3",
-    "x": 6.43,
-    "y": 9.83,
+    "nome": "GND",
+    "x": 4.8,
+    "y": 28.01,
     "sinais": [
      "power"
     ],
     "descricao": ""
    },
    {
-    "nome": "GND",
-    "x": 6.43,
-    "y": 19.43,
+    "nome": "3V3",
+    "x": 4.8,
+    "y": 37.61,
+    "sinais": [
+     "power"
+    ],
+    "descricao": ""
+   },
+   {
+    "nome": "3V3.2",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 4.8,
+    "y": 47.21
+   },
+   {
+    "nome": "2",
+    "x": 4.8,
+    "y": 56.81,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "3",
+    "x": 4.8,
+    "y": 66.41,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "GND.2",
+    "x": 4.8,
+    "y": 76.01,
     "sinais": [
      "power"
     ],
@@ -4883,137 +4915,195 @@
    },
    {
     "nome": "EN",
-    "x": 6.43,
-    "y": 29.03,
+    "x": 4.8,
+    "y": 85.61,
     "sinais": [],
-    "descricao": ""
+    "descricao": "EN (o RST da serigrafia): ligado ao GND, segura a placa em reset; solto, ela roda."
+   },
+   {
+    "nome": "GND.3",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 4.8,
+    "y": 95.21
    },
    {
     "nome": "0",
-    "x": 6.43,
-    "y": 38.63,
+    "x": 4.8,
+    "y": 104.81,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "1",
-    "x": 6.43,
-    "y": 48.23,
+    "x": 4.8,
+    "y": 114.41,
     "sinais": [],
     "descricao": ""
    },
    {
-    "nome": "2",
-    "x": 6.43,
-    "y": 57.83,
+    "nome": "10",
+    "x": 4.8,
+    "y": 124.01,
     "sinais": [],
     "descricao": ""
    },
    {
-    "nome": "3",
-    "x": 6.43,
-    "y": 67.43,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "4",
-    "x": 6.43,
-    "y": 77.03,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "5",
-    "x": 6.43,
-    "y": 86.63,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "6",
-    "x": 6.43,
-    "y": 96.23,
-    "sinais": [],
-    "descricao": ""
+    "nome": "GND.4",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 4.8,
+    "y": 133.61
    },
    {
     "nome": "5V",
-    "x": 89.57,
-    "y": 9.83,
+    "x": 4.8,
+    "y": 143.21,
     "sinais": [
      "power"
     ],
     "descricao": ""
    },
    {
-    "nome": "GND.2",
-    "x": 89.57,
-    "y": 19.43,
+    "nome": "5V.2",
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "",
+    "x": 4.8,
+    "y": 152.81
+   },
+   {
+    "nome": "GND.5",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 4.8,
+    "y": 162.41
+   },
+   {
+    "nome": "GND.6",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 91.2,
+    "y": 28.01
    },
    {
     "nome": "TX",
-    "x": 89.57,
-    "y": 29.03,
+    "x": 91.2,
+    "y": 37.61,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "RX",
-    "x": 89.57,
-    "y": 38.63,
+    "x": 91.2,
+    "y": 47.21,
     "sinais": [],
     "descricao": ""
    },
    {
-    "nome": "7",
-    "x": 89.57,
-    "y": 48.23,
-    "sinais": [],
+    "nome": "GND.7",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 91.2,
+    "y": 56.81
+   },
+   {
+    "nome": "9",
+    "x": 91.2,
+    "y": 66.41,
+    "sinais": [
+     "i2c"
+    ],
     "descricao": ""
    },
    {
     "nome": "8",
-    "x": 89.57,
-    "y": 57.83,
+    "x": 91.2,
+    "y": 76.01,
     "sinais": [
      "i2c"
     ],
     "descricao": ""
    },
    {
-    "nome": "9",
-    "x": 89.57,
-    "y": 67.43,
+    "nome": "GND.8",
     "sinais": [
-     "i2c"
+     "power"
     ],
-    "descricao": ""
+    "descricao": "",
+    "x": 91.2,
+    "y": 85.61
    },
    {
-    "nome": "10",
-    "x": 89.57,
-    "y": 77.03,
+    "nome": "7",
+    "x": 91.2,
+    "y": 95.21,
     "sinais": [],
     "descricao": ""
    },
    {
+    "nome": "6",
+    "x": 91.2,
+    "y": 104.81,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "5",
+    "x": 91.2,
+    "y": 114.41,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "4",
+    "x": 91.2,
+    "y": 124.01,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "GND.9",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 91.2,
+    "y": 133.61
+   },
+   {
     "nome": "18",
-    "x": 89.57,
-    "y": 86.63,
+    "x": 91.2,
+    "y": 143.21,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "19",
-    "x": 89.57,
-    "y": 96.23,
+    "x": 91.2,
+    "y": 152.81,
     "sinais": [],
     "descricao": ""
+   },
+   {
+    "nome": "GND.10",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 91.2,
+    "y": 162.41
    }
   ],
   "variantes": [],
@@ -5022,21 +5112,12 @@
  {
   "id": "esp32-c6-devkit",
   "largura": 96,
-  "altura": 166,
+  "altura": 222,
   "pinos": [
    {
     "nome": "3V3",
-    "x": 6.43,
-    "y": 9.83,
-    "sinais": [
-     "power"
-    ],
-    "descricao": ""
-   },
-   {
-    "nome": "GND",
-    "x": 6.43,
-    "y": 19.43,
+    "x": 4.8,
+    "y": 29.95,
     "sinais": [
      "power"
     ],
@@ -5044,57 +5125,29 @@
    },
    {
     "nome": "EN",
-    "x": 6.43,
-    "y": 29.03,
+    "x": 4.8,
+    "y": 39.55,
     "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "0",
-    "x": 6.43,
-    "y": 38.63,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "1",
-    "x": 6.43,
-    "y": 48.23,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "2",
-    "x": 6.43,
-    "y": 57.83,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "3",
-    "x": 6.43,
-    "y": 67.43,
-    "sinais": [],
-    "descricao": ""
+    "descricao": "EN (o RST da serigrafia): ligado ao GND, segura a placa em reset; solto, ela roda."
    },
    {
     "nome": "4",
-    "x": 6.43,
-    "y": 77.03,
+    "x": 4.8,
+    "y": 49.15,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "5",
-    "x": 6.43,
-    "y": 86.63,
+    "x": 4.8,
+    "y": 58.75,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "6",
-    "x": 6.43,
-    "y": 96.23,
+    "x": 4.8,
+    "y": 68.35,
     "sinais": [
      "i2c"
     ],
@@ -5102,54 +5155,91 @@
    },
    {
     "nome": "7",
-    "x": 6.43,
-    "y": 105.83,
+    "x": 4.8,
+    "y": 77.95,
     "sinais": [
      "i2c"
     ],
     "descricao": ""
    },
    {
-    "nome": "8",
-    "x": 6.43,
-    "y": 115.43,
+    "nome": "0",
+    "x": 4.8,
+    "y": 87.55,
     "sinais": [],
     "descricao": ""
    },
    {
-    "nome": "9",
-    "x": 6.43,
-    "y": 125.03,
+    "nome": "1",
+    "x": 4.8,
+    "y": 97.15,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "8",
+    "x": 4.8,
+    "y": 106.75,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "10",
-    "x": 6.43,
-    "y": 134.63,
+    "x": 4.8,
+    "y": 116.35,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "11",
-    "x": 6.43,
-    "y": 144.23,
+    "x": 4.8,
+    "y": 125.95,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "2",
+    "x": 4.8,
+    "y": 135.55,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "3",
+    "x": 4.8,
+    "y": 145.15,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "5V",
-    "x": 89.57,
-    "y": 9.83,
+    "x": 4.8,
+    "y": 154.75,
     "sinais": [
      "power"
     ],
     "descricao": ""
    },
    {
+    "nome": "GND",
+    "x": 4.8,
+    "y": 164.35,
+    "sinais": [
+     "power"
+    ],
+    "descricao": ""
+   },
+   {
+    "nome": "NC",
+    "sinais": [],
+    "descricao": "Nao conectado: o furo existe na barra, mas nao vai a lugar nenhum.",
+    "x": 4.8,
+    "y": 173.95
+   },
+   {
     "nome": "GND.2",
-    "x": 89.57,
-    "y": 19.43,
+    "x": 91.2,
+    "y": 29.95,
     "sinais": [
      "power"
     ],
@@ -5157,101 +5247,112 @@
    },
    {
     "nome": "TX",
-    "x": 89.57,
-    "y": 29.03,
+    "x": 91.2,
+    "y": 39.55,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "RX",
-    "x": 89.57,
-    "y": 38.63,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "12",
-    "x": 89.57,
-    "y": 48.23,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "13",
-    "x": 89.57,
-    "y": 57.83,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "14",
-    "x": 89.57,
-    "y": 67.43,
+    "x": 91.2,
+    "y": 49.15,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "15",
-    "x": 89.57,
-    "y": 77.03,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "16",
-    "x": 89.57,
-    "y": 86.63,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "17",
-    "x": 89.57,
-    "y": 96.23,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "18",
-    "x": 89.57,
-    "y": 105.83,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "19",
-    "x": 89.57,
-    "y": 115.43,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "20",
-    "x": 89.57,
-    "y": 125.03,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "21",
-    "x": 89.57,
-    "y": 134.63,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "22",
-    "x": 89.57,
-    "y": 144.23,
+    "x": 91.2,
+    "y": 58.75,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "23",
-    "x": 89.57,
-    "y": 153.83,
+    "x": 91.2,
+    "y": 68.35,
     "sinais": [],
     "descricao": ""
+   },
+   {
+    "nome": "22",
+    "x": 91.2,
+    "y": 77.95,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "21",
+    "x": 91.2,
+    "y": 87.55,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "20",
+    "x": 91.2,
+    "y": 97.15,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "19",
+    "x": 91.2,
+    "y": 106.75,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "18",
+    "x": 91.2,
+    "y": 116.35,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "9",
+    "x": 91.2,
+    "y": 125.95,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "GND.3",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 91.2,
+    "y": 135.55
+   },
+   {
+    "nome": "13",
+    "x": 91.2,
+    "y": 145.15,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "12",
+    "x": 91.2,
+    "y": 154.75,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "GND.4",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 91.2,
+    "y": 164.35
+   },
+   {
+    "nome": "NC.2",
+    "sinais": [],
+    "descricao": "Nao conectado: o furo existe na barra, mas nao vai a lugar nenhum.",
+    "x": 91.2,
+    "y": 173.95
    }
   ],
   "variantes": [],
@@ -5260,30 +5361,92 @@
  {
   "id": "esp32-devkit-v1",
   "largura": 107,
-  "altura": 204,
+  "altura": 199,
   "pinos": [
    {
-    "nome": "VIN",
-    "x": 5,
-    "y": 158.5,
+    "nome": "EN",
+    "x": 5.0,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "EN (o RST da serigrafia): ligado ao GND, segura a placa em reset; solto, ela roda."
+   },
+   {
+    "nome": "VP",
+    "x": 5.0,
+    "y": 33.6,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "VN",
+    "x": 5.0,
+    "y": 43.2,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D34",
+    "x": 5.0,
+    "y": 52.8,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D35",
+    "x": 5.0,
+    "y": 62.4,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "D32",
+    "x": 5.0,
+    "y": 72.0,
     "sinais": [
-     "power"
+     "pwm"
     ],
     "descricao": ""
    },
    {
-    "nome": "GND.2",
-    "x": 5,
-    "y": 149,
+    "nome": "D33",
+    "x": 5.0,
+    "y": 81.6,
     "sinais": [
-     "power"
+     "pwm"
     ],
     "descricao": ""
    },
    {
-    "nome": "D13",
-    "x": 5,
-    "y": 139.5,
+    "nome": "D25",
+    "x": 5.0,
+    "y": 91.2,
+    "sinais": [
+     "pwm"
+    ],
+    "descricao": ""
+   },
+   {
+    "nome": "D26",
+    "x": 5.0,
+    "y": 100.8,
+    "sinais": [
+     "pwm"
+    ],
+    "descricao": ""
+   },
+   {
+    "nome": "D27",
+    "x": 5.0,
+    "y": 110.4,
+    "sinais": [
+     "pwm"
+    ],
+    "descricao": ""
+   },
+   {
+    "nome": "D14",
+    "x": 5.0,
+    "y": 120.0,
     "sinais": [
      "spi",
      "pwm"
@@ -5292,8 +5455,8 @@
    },
    {
     "nome": "D12",
-    "x": 5,
-    "y": 130.4,
+    "x": 5.0,
+    "y": 129.6,
     "sinais": [
      "spi",
      "pwm"
@@ -5301,9 +5464,9 @@
     "descricao": ""
    },
    {
-    "nome": "D14",
-    "x": 5,
-    "y": 120,
+    "nome": "D13",
+    "x": 5.0,
+    "y": 139.2,
     "sinais": [
      "spi",
      "pwm"
@@ -5311,107 +5474,27 @@
     "descricao": ""
    },
    {
-    "nome": "D27",
-    "x": 5,
-    "y": 110.8,
-    "sinais": [
-     "pwm"
-    ],
-    "descricao": ""
-   },
-   {
-    "nome": "D26",
-    "x": 5,
-    "y": 101,
-    "sinais": [
-     "pwm"
-    ],
-    "descricao": ""
-   },
-   {
-    "nome": "D25",
-    "x": 5,
-    "y": 91.3,
-    "sinais": [
-     "pwm"
-    ],
-    "descricao": ""
-   },
-   {
-    "nome": "D33",
-    "x": 5,
-    "y": 81.7,
-    "sinais": [
-     "pwm"
-    ],
-    "descricao": ""
-   },
-   {
-    "nome": "D32",
-    "x": 5,
-    "y": 72.2,
-    "sinais": [
-     "pwm"
-    ],
-    "descricao": ""
-   },
-   {
-    "nome": "D35",
-    "x": 5,
-    "y": 62.9,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "D34",
-    "x": 5,
-    "y": 53.1,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "VN",
-    "x": 5,
-    "y": 44,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "VP",
-    "x": 5,
-    "y": 34,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "EN",
-    "x": 5,
-    "y": 24,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "3V3",
-    "x": 101.3,
-    "y": 158.5,
+    "nome": "GND.2",
+    "x": 5.0,
+    "y": 148.8,
     "sinais": [
      "power"
     ],
     "descricao": ""
    },
    {
-    "nome": "GND.1",
-    "x": 101.3,
-    "y": 149,
+    "nome": "VIN",
+    "x": 5.0,
+    "y": 158.4,
     "sinais": [
      "power"
     ],
     "descricao": ""
    },
    {
-    "nome": "D15",
-    "x": 101.3,
-    "y": 139.5,
+    "nome": "D23",
+    "x": 101.0,
+    "y": 24.0,
     "sinais": [
      "spi",
      "pwm"
@@ -5419,27 +5502,19 @@
     "descricao": ""
    },
    {
-    "nome": "D2",
-    "x": 101.3,
-    "y": 130.4,
+    "nome": "D22",
+    "x": 101.0,
+    "y": 33.6,
     "sinais": [
+     "i2c",
      "pwm"
     ],
     "descricao": ""
    },
    {
-    "nome": "D4",
-    "x": 101.3,
-    "y": 120,
-    "sinais": [
-     "pwm"
-    ],
-    "descricao": ""
-   },
-   {
-    "nome": "RX2",
-    "x": 101.3,
-    "y": 110.8,
+    "nome": "TX0",
+    "x": 101.0,
+    "y": 43.2,
     "sinais": [
      "usart",
      "pwm"
@@ -5447,9 +5522,9 @@
     "descricao": ""
    },
    {
-    "nome": "TX2",
-    "x": 101.3,
-    "y": 101,
+    "nome": "RX0",
+    "x": 101.0,
+    "y": 52.8,
     "sinais": [
      "usart",
      "pwm"
@@ -5457,9 +5532,19 @@
     "descricao": ""
    },
    {
-    "nome": "D5",
-    "x": 101.3,
-    "y": 91.3,
+    "nome": "D21",
+    "x": 101.0,
+    "y": 62.4,
+    "sinais": [
+     "i2c",
+     "pwm"
+    ],
+    "descricao": ""
+   },
+   {
+    "nome": "D19",
+    "x": 101.0,
+    "y": 72.0,
     "sinais": [
      "spi",
      "pwm"
@@ -5468,8 +5553,8 @@
    },
    {
     "nome": "D18",
-    "x": 101.3,
-    "y": 81.7,
+    "x": 101.0,
+    "y": 81.6,
     "sinais": [
      "spi",
      "pwm"
@@ -5477,9 +5562,9 @@
     "descricao": ""
    },
    {
-    "nome": "D19",
-    "x": 101.3,
-    "y": 72.2,
+    "nome": "D5",
+    "x": 101.0,
+    "y": 91.2,
     "sinais": [
      "spi",
      "pwm"
@@ -5487,19 +5572,9 @@
     "descricao": ""
    },
    {
-    "nome": "D21",
-    "x": 101.3,
-    "y": 62.9,
-    "sinais": [
-     "i2c",
-     "pwm"
-    ],
-    "descricao": ""
-   },
-   {
-    "nome": "RX0",
-    "x": 101.3,
-    "y": 53.1,
+    "nome": "TX2",
+    "x": 101.0,
+    "y": 100.8,
     "sinais": [
      "usart",
      "pwm"
@@ -5507,9 +5582,9 @@
     "descricao": ""
    },
    {
-    "nome": "TX0",
-    "x": 101.3,
-    "y": 44,
+    "nome": "RX2",
+    "x": 101.0,
+    "y": 110.4,
     "sinais": [
      "usart",
      "pwm"
@@ -5517,22 +5592,48 @@
     "descricao": ""
    },
    {
-    "nome": "D22",
-    "x": 101.3,
-    "y": 34,
+    "nome": "D4",
+    "x": 101.0,
+    "y": 120.0,
     "sinais": [
-     "i2c",
      "pwm"
     ],
     "descricao": ""
    },
    {
-    "nome": "D23",
-    "x": 101.3,
-    "y": 24,
+    "nome": "D2",
+    "x": 101.0,
+    "y": 129.6,
+    "sinais": [
+     "pwm"
+    ],
+    "descricao": ""
+   },
+   {
+    "nome": "D15",
+    "x": 101.0,
+    "y": 139.2,
     "sinais": [
      "spi",
      "pwm"
+    ],
+    "descricao": ""
+   },
+   {
+    "nome": "GND.1",
+    "x": 101.0,
+    "y": 148.8,
+    "sinais": [
+     "power"
+    ],
+    "descricao": ""
+   },
+   {
+    "nome": "3V3",
+    "x": 101.0,
+    "y": 158.4,
+    "sinais": [
+     "power"
     ],
     "descricao": ""
    }
@@ -5543,21 +5644,12 @@
  {
   "id": "esp32-h2-devkit",
   "largura": 96,
-  "altura": 138,
+  "altura": 205,
   "pinos": [
    {
     "nome": "3V3",
-    "x": 6.43,
-    "y": 9.83,
-    "sinais": [
-     "power"
-    ],
-    "descricao": ""
-   },
-   {
-    "nome": "GND",
-    "x": 6.43,
-    "y": 19.43,
+    "x": 4.8,
+    "y": 26.36,
     "sinais": [
      "power"
     ],
@@ -5565,22 +5657,22 @@
    },
    {
     "nome": "EN",
-    "x": 6.43,
-    "y": 29.03,
+    "x": 4.8,
+    "y": 35.96,
     "sinais": [],
-    "descricao": ""
+    "descricao": "EN (o RST da serigrafia): ligado ao GND, segura a placa em reset; solto, ela roda."
    },
    {
     "nome": "0",
-    "x": 6.43,
-    "y": 38.63,
+    "x": 4.8,
+    "y": 45.56,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "1",
-    "x": 6.43,
-    "y": 48.23,
+    "x": 4.8,
+    "y": 55.16,
     "sinais": [
      "i2c"
     ],
@@ -5588,8 +5680,8 @@
    },
    {
     "nome": "2",
-    "x": 6.43,
-    "y": 57.83,
+    "x": 4.8,
+    "y": 64.76,
     "sinais": [
      "i2c"
     ],
@@ -5597,57 +5689,68 @@
    },
    {
     "nome": "3",
-    "x": 6.43,
-    "y": 67.43,
+    "x": 4.8,
+    "y": 74.36,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "13",
+    "x": 4.8,
+    "y": 83.96,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "14",
+    "x": 4.8,
+    "y": 93.56,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "4",
-    "x": 6.43,
-    "y": 77.03,
+    "x": 4.8,
+    "y": 103.16,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "5",
-    "x": 6.43,
-    "y": 86.63,
+    "x": 4.8,
+    "y": 112.76,
     "sinais": [],
     "descricao": ""
    },
    {
-    "nome": "8",
-    "x": 6.43,
-    "y": 96.23,
+    "nome": "NC",
     "sinais": [],
-    "descricao": ""
+    "descricao": "Nao conectado: o furo existe na barra, mas nao vai a lugar nenhum.",
+    "x": 4.8,
+    "y": 122.36
    },
    {
-    "nome": "9",
-    "x": 6.43,
-    "y": 105.83,
-    "sinais": [],
-    "descricao": ""
+    "nome": "VBAT",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "VBAT: entrada de 3,3 V (ou de uma bateria) para a placa.",
+    "x": 4.8,
+    "y": 131.96
    },
    {
-    "nome": "10",
-    "x": 6.43,
-    "y": 115.43,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "11",
-    "x": 6.43,
-    "y": 125.03,
-    "sinais": [],
+    "nome": "GND",
+    "x": 4.8,
+    "y": 141.56,
+    "sinais": [
+     "power"
+    ],
     "descricao": ""
    },
    {
     "nome": "5V",
-    "x": 89.57,
-    "y": 9.83,
+    "x": 4.8,
+    "y": 151.16,
     "sinais": [
      "power"
     ],
@@ -5655,89 +5758,125 @@
    },
    {
     "nome": "GND.2",
-    "x": 89.57,
-    "y": 19.43,
+    "x": 4.8,
+    "y": 160.76,
     "sinais": [
      "power"
     ],
     "descricao": ""
    },
    {
+    "nome": "GND.3",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 91.2,
+    "y": 26.36
+   },
+   {
     "nome": "TX",
-    "x": 89.57,
-    "y": 29.03,
+    "x": 91.2,
+    "y": 35.96,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "RX",
-    "x": 89.57,
-    "y": 38.63,
+    "x": 91.2,
+    "y": 45.56,
     "sinais": [],
     "descricao": ""
    },
    {
-    "nome": "12",
-    "x": 89.57,
-    "y": 48.23,
+    "nome": "10",
+    "x": 91.2,
+    "y": 55.16,
     "sinais": [],
     "descricao": ""
    },
    {
-    "nome": "13",
-    "x": 89.57,
-    "y": 57.83,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "14",
-    "x": 89.57,
-    "y": 67.43,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "22",
-    "x": 89.57,
-    "y": 77.03,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "23",
-    "x": 89.57,
-    "y": 86.63,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "24",
-    "x": 89.57,
-    "y": 96.23,
+    "nome": "11",
+    "x": 91.2,
+    "y": 64.76,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "25",
-    "x": 89.57,
-    "y": 105.83,
+    "x": 91.2,
+    "y": 74.36,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "12",
+    "x": 91.2,
+    "y": 83.96,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "8",
+    "x": 91.2,
+    "y": 93.56,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "22",
+    "x": 91.2,
+    "y": 103.16,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "GND.4",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 91.2,
+    "y": 112.76
+   },
+   {
+    "nome": "9",
+    "x": 91.2,
+    "y": 122.36,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "GND.5",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 91.2,
+    "y": 131.96
+   },
+   {
+    "nome": "27",
+    "x": 91.2,
+    "y": 141.56,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "26",
-    "x": 89.57,
-    "y": 115.43,
+    "x": 91.2,
+    "y": 151.16,
     "sinais": [],
     "descricao": ""
    },
    {
-    "nome": "27",
-    "x": 89.57,
-    "y": 125.03,
-    "sinais": [],
-    "descricao": ""
+    "nome": "GND.6",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 91.2,
+    "y": 160.76
    }
   ],
   "variantes": [],
@@ -5746,93 +5885,77 @@
  {
   "id": "esp32-s2-devkit",
   "largura": 96,
-  "altura": 205,
+  "altura": 224,
   "pinos": [
    {
     "nome": "3V3",
-    "x": 6.43,
-    "y": 9.83,
+    "x": 4.8,
+    "y": 23.47,
     "sinais": [
      "power"
     ],
-    "descricao": ""
-   },
-   {
-    "nome": "GND",
-    "x": 6.43,
-    "y": 19.43,
-    "sinais": [
-     "power"
-    ],
-    "descricao": ""
-   },
-   {
-    "nome": "EN",
-    "x": 6.43,
-    "y": 29.03,
-    "sinais": [],
     "descricao": ""
    },
    {
     "nome": "0",
-    "x": 6.43,
-    "y": 38.63,
+    "x": 4.8,
+    "y": 33.07,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "1",
-    "x": 6.43,
-    "y": 48.23,
+    "x": 4.8,
+    "y": 42.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "2",
-    "x": 6.43,
-    "y": 57.83,
+    "x": 4.8,
+    "y": 52.27,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "3",
-    "x": 6.43,
-    "y": 67.43,
+    "x": 4.8,
+    "y": 61.87,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "4",
-    "x": 6.43,
-    "y": 77.03,
+    "x": 4.8,
+    "y": 71.47,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "5",
-    "x": 6.43,
-    "y": 86.63,
+    "x": 4.8,
+    "y": 81.07,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "6",
-    "x": 6.43,
-    "y": 96.23,
+    "x": 4.8,
+    "y": 90.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "7",
-    "x": 6.43,
-    "y": 105.83,
+    "x": 4.8,
+    "y": 100.27,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "8",
-    "x": 6.43,
-    "y": 115.43,
+    "x": 4.8,
+    "y": 109.87,
     "sinais": [
      "i2c"
     ],
@@ -5840,8 +5963,8 @@
    },
    {
     "nome": "9",
-    "x": 6.43,
-    "y": 125.03,
+    "x": 4.8,
+    "y": 119.47,
     "sinais": [
      "i2c"
     ],
@@ -5849,50 +5972,73 @@
    },
    {
     "nome": "10",
-    "x": 6.43,
-    "y": 134.63,
+    "x": 4.8,
+    "y": 129.07,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "11",
-    "x": 6.43,
-    "y": 144.23,
+    "x": 4.8,
+    "y": 138.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "12",
-    "x": 6.43,
-    "y": 153.83,
+    "x": 4.8,
+    "y": 148.27,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "13",
-    "x": 6.43,
-    "y": 163.43,
+    "x": 4.8,
+    "y": 157.87,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "14",
-    "x": 6.43,
-    "y": 173.03,
+    "x": 4.8,
+    "y": 167.47,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "15",
-    "x": 6.43,
-    "y": 182.63,
+    "x": 4.8,
+    "y": 177.07,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "16",
+    "x": 4.8,
+    "y": 186.67,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "17",
+    "x": 4.8,
+    "y": 196.27,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "5V",
-    "x": 89.57,
-    "y": 9.83,
+    "x": 4.8,
+    "y": 205.87,
+    "sinais": [
+     "power"
+    ],
+    "descricao": ""
+   },
+   {
+    "nome": "GND",
+    "x": 4.8,
+    "y": 215.47,
     "sinais": [
      "power"
     ],
@@ -5900,136 +6046,150 @@
    },
    {
     "nome": "GND.2",
-    "x": 89.57,
-    "y": 19.43,
+    "x": 91.2,
+    "y": 23.47,
     "sinais": [
      "power"
     ],
     "descricao": ""
    },
    {
-    "nome": "TX",
-    "x": 89.57,
-    "y": 29.03,
+    "nome": "EN",
+    "x": 91.2,
+    "y": 33.07,
     "sinais": [],
-    "descricao": ""
+    "descricao": "EN (o RST da serigrafia): ligado ao GND, segura a placa em reset; solto, ela roda."
+   },
+   {
+    "nome": "46",
+    "sinais": [],
+    "descricao": "",
+    "x": 91.2,
+    "y": 42.67
+   },
+   {
+    "nome": "45",
+    "sinais": [],
+    "descricao": "",
+    "x": 91.2,
+    "y": 52.27
    },
    {
     "nome": "RX",
-    "x": 89.57,
-    "y": 38.63,
+    "x": 91.2,
+    "y": 61.87,
     "sinais": [],
     "descricao": ""
    },
    {
-    "nome": "16",
-    "x": 89.57,
-    "y": 48.23,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "17",
-    "x": 89.57,
-    "y": 57.83,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "18",
-    "x": 89.57,
-    "y": 67.43,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "19",
-    "x": 89.57,
-    "y": 77.03,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "20",
-    "x": 89.57,
-    "y": 86.63,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "21",
-    "x": 89.57,
-    "y": 96.23,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "33",
-    "x": 89.57,
-    "y": 105.83,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "34",
-    "x": 89.57,
-    "y": 115.43,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "35",
-    "x": 89.57,
-    "y": 125.03,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "36",
-    "x": 89.57,
-    "y": 134.63,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "37",
-    "x": 89.57,
-    "y": 144.23,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "38",
-    "x": 89.57,
-    "y": 153.83,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "39",
-    "x": 89.57,
-    "y": 163.43,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "40",
-    "x": 89.57,
-    "y": 173.03,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "41",
-    "x": 89.57,
-    "y": 182.63,
+    "nome": "TX",
+    "x": 91.2,
+    "y": 71.47,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "42",
-    "x": 89.57,
-    "y": 192.23,
+    "x": 91.2,
+    "y": 81.07,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "41",
+    "x": 91.2,
+    "y": 90.67,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "40",
+    "x": 91.2,
+    "y": 100.27,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "39",
+    "x": 91.2,
+    "y": 109.87,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "38",
+    "x": 91.2,
+    "y": 119.47,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "37",
+    "x": 91.2,
+    "y": 129.07,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "36",
+    "x": 91.2,
+    "y": 138.67,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "35",
+    "x": 91.2,
+    "y": 148.27,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "34",
+    "x": 91.2,
+    "y": 157.87,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "33",
+    "x": 91.2,
+    "y": 167.47,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "26",
+    "sinais": [],
+    "descricao": "",
+    "x": 91.2,
+    "y": 177.07
+   },
+   {
+    "nome": "21",
+    "x": 91.2,
+    "y": 186.67,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "20",
+    "x": 91.2,
+    "y": 196.27,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "19",
+    "x": 91.2,
+    "y": 205.87,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "18",
+    "x": 91.2,
+    "y": 215.47,
     "sinais": [],
     "descricao": ""
    }
@@ -6040,102 +6200,116 @@
  {
   "id": "esp32-s3-devkit",
   "largura": 96,
-  "altura": 214,
+  "altura": 264,
   "pinos": [
    {
     "nome": "3V3",
-    "x": 6.43,
-    "y": 9.83,
+    "x": 4.8,
+    "y": 29.63,
     "sinais": [
      "power"
     ],
     "descricao": ""
    },
    {
-    "nome": "GND",
-    "x": 6.43,
-    "y": 19.43,
+    "nome": "3V3.2",
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "",
+    "x": 4.8,
+    "y": 39.23
    },
    {
     "nome": "EN",
-    "x": 6.43,
-    "y": 29.03,
+    "x": 4.8,
+    "y": 48.83,
     "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "0",
-    "x": 6.43,
-    "y": 38.63,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "1",
-    "x": 6.43,
-    "y": 48.23,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "2",
-    "x": 6.43,
-    "y": 57.83,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "3",
-    "x": 6.43,
-    "y": 67.43,
-    "sinais": [],
-    "descricao": ""
+    "descricao": "EN (o RST da serigrafia): ligado ao GND, segura a placa em reset; solto, ela roda."
    },
    {
     "nome": "4",
-    "x": 6.43,
-    "y": 77.03,
+    "x": 4.8,
+    "y": 58.43,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "5",
-    "x": 6.43,
-    "y": 86.63,
+    "x": 4.8,
+    "y": 68.03,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "6",
-    "x": 6.43,
-    "y": 96.23,
+    "x": 4.8,
+    "y": 77.63,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "7",
-    "x": 6.43,
-    "y": 105.83,
+    "x": 4.8,
+    "y": 87.23,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "15",
+    "x": 4.8,
+    "y": 96.83,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "16",
+    "x": 4.8,
+    "y": 106.43,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "17",
+    "x": 4.8,
+    "y": 116.03,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "18",
+    "x": 4.8,
+    "y": 125.63,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "8",
-    "x": 6.43,
-    "y": 115.43,
+    "x": 4.8,
+    "y": 135.23,
     "sinais": [
      "i2c"
     ],
     "descricao": ""
    },
    {
+    "nome": "3",
+    "x": 4.8,
+    "y": 144.83,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "46",
+    "x": 4.8,
+    "y": 154.43,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
     "nome": "9",
-    "x": 6.43,
-    "y": 125.03,
+    "x": 4.8,
+    "y": 164.03,
     "sinais": [
      "i2c"
     ],
@@ -6143,57 +6317,52 @@
    },
    {
     "nome": "10",
-    "x": 6.43,
-    "y": 134.63,
+    "x": 4.8,
+    "y": 173.63,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "11",
-    "x": 6.43,
-    "y": 144.23,
+    "x": 4.8,
+    "y": 183.23,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "12",
-    "x": 6.43,
-    "y": 153.83,
+    "x": 4.8,
+    "y": 192.83,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "13",
-    "x": 6.43,
-    "y": 163.43,
+    "x": 4.8,
+    "y": 202.43,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "14",
-    "x": 6.43,
-    "y": 173.03,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "15",
-    "x": 6.43,
-    "y": 182.63,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "16",
-    "x": 6.43,
-    "y": 192.23,
+    "x": 4.8,
+    "y": 212.03,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "5V",
-    "x": 89.57,
-    "y": 9.83,
+    "x": 4.8,
+    "y": 221.63,
+    "sinais": [
+     "power"
+    ],
+    "descricao": ""
+   },
+   {
+    "nome": "GND",
+    "x": 4.8,
+    "y": 231.23,
     "sinais": [
      "power"
     ],
@@ -6201,8 +6370,8 @@
    },
    {
     "nome": "GND.2",
-    "x": 89.57,
-    "y": 19.43,
+    "x": 91.2,
+    "y": 29.63,
     "sinais": [
      "power"
     ],
@@ -6210,136 +6379,154 @@
    },
    {
     "nome": "TX",
-    "x": 89.57,
-    "y": 29.03,
+    "x": 91.2,
+    "y": 39.23,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "RX",
-    "x": 89.57,
-    "y": 38.63,
+    "x": 91.2,
+    "y": 48.83,
     "sinais": [],
     "descricao": ""
    },
    {
-    "nome": "17",
-    "x": 89.57,
-    "y": 48.23,
+    "nome": "1",
+    "x": 91.2,
+    "y": 58.43,
     "sinais": [],
     "descricao": ""
    },
    {
-    "nome": "18",
-    "x": 89.57,
-    "y": 57.83,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "19",
-    "x": 89.57,
-    "y": 67.43,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "20",
-    "x": 89.57,
-    "y": 77.03,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "21",
-    "x": 89.57,
-    "y": 86.63,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "35",
-    "x": 89.57,
-    "y": 96.23,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "36",
-    "x": 89.57,
-    "y": 105.83,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "37",
-    "x": 89.57,
-    "y": 115.43,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "38",
-    "x": 89.57,
-    "y": 125.03,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "39",
-    "x": 89.57,
-    "y": 134.63,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "40",
-    "x": 89.57,
-    "y": 144.23,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "41",
-    "x": 89.57,
-    "y": 153.83,
+    "nome": "2",
+    "x": 91.2,
+    "y": 68.03,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "42",
-    "x": 89.57,
-    "y": 163.43,
+    "x": 91.2,
+    "y": 77.63,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "41",
+    "x": 91.2,
+    "y": 87.23,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "40",
+    "x": 91.2,
+    "y": 96.83,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "39",
+    "x": 91.2,
+    "y": 106.43,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "38",
+    "x": 91.2,
+    "y": 116.03,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "37",
+    "x": 91.2,
+    "y": 125.63,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "36",
+    "x": 91.2,
+    "y": 135.23,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "35",
+    "x": 91.2,
+    "y": 144.83,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "0",
+    "x": 91.2,
+    "y": 154.43,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "45",
-    "x": 89.57,
-    "y": 173.03,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "46",
-    "x": 89.57,
-    "y": 182.63,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "47",
-    "x": 89.57,
-    "y": 192.23,
+    "x": 91.2,
+    "y": 164.03,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "48",
-    "x": 89.57,
-    "y": 201.83,
+    "x": 91.2,
+    "y": 173.63,
     "sinais": [],
     "descricao": ""
+   },
+   {
+    "nome": "47",
+    "x": 91.2,
+    "y": 183.23,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "21",
+    "x": 91.2,
+    "y": 192.83,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "20",
+    "x": 91.2,
+    "y": 202.43,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "19",
+    "x": 91.2,
+    "y": 212.03,
+    "sinais": [],
+    "descricao": ""
+   },
+   {
+    "nome": "GND.3",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 91.2,
+    "y": 221.63
+   },
+   {
+    "nome": "GND.4",
+    "sinais": [
+     "power"
+    ],
+    "descricao": "",
+    "x": 91.2,
+    "y": 231.23
    }
   ],
   "variantes": [],

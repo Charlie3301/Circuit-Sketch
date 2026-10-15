@@ -147,6 +147,13 @@ public static class FormatoWokwi
                                   ["GND.4"] = "GND.1", ["5V.3"] = "5V", ["GND.5"] = "GND.2" },
         ["arduino-mega"] = new() { ["50.2"] = "50", ["52.2"] = "52", ["51.2"] = "51", ["5V.3"] = "5V", ["RESET.2"] = "RESET",
                                    ["GND.6"] = "GND.1", ["5V.4"] = "5V", ["GND.7"] = "GND.2" },
+        // As DevKits da Espressif: o nosso EN e o RST da serigrafia (e do
+        // Wokwi), e la todo pino de energia repetido e numerado desde o 1.
+        ["esp32-s3-devkit"] = new() { ["EN"] = "RST", ["3V3"] = "3V3.1", ["GND"] = "GND.1" },
+        ["esp32-s2-devkit"] = new() { ["EN"] = "RST", ["GND"] = "GND.1" },
+        ["esp32-c3-devkit"] = new() { ["EN"] = "RST", ["3V3"] = "3V3.1", ["5V"] = "5V.1", ["GND"] = "GND.1" },
+        ["esp32-c6-devkit"] = new() { ["EN"] = "RST", ["GND"] = "GND.1", ["NC"] = "NC0", ["NC.2"] = "NC1" },
+        ["esp32-h2-devkit"] = new() { ["EN"] = "RST", ["GND"] = "GND.1" },
         ["and-gate"] = Portas("OUT"), ["or-gate"] = Portas("OUT"), ["xor-gate"] = Portas("OUT"),
         ["nand-gate"] = Portas("OUT"), ["nor-gate"] = Portas("OUT"), ["xnor-gate"] = Portas("OUT"),
         ["not-gate"] = Portas("OUT"), ["mux-2"] = Portas("OUT"),
@@ -202,6 +209,8 @@ public static class FormatoWokwi
             case "VCC": yield return "VIN"; yield return "5V"; yield return "3V3"; break;
             case "3.3V": case "3V": yield return "3V3"; break;
             case "3V3": yield return "3.3V"; break;
+            // O reset: RST nas DevKits novas, EN na DevKit V1.
+            case "RST": yield return "EN"; break;
         }
         yield return "D" + pino;                            // 4 -> D4
         if (pino.StartsWith('D')) yield return pino[1..];   // D4 -> 4

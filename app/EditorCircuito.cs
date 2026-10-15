@@ -392,9 +392,15 @@ public partial class EditorCircuito : Border
     internal static readonly Dictionary<string, (double X, double Y, double R, string Nome)[]>
         BotoesPorPlaca = new()
     {
-        // <rect> de 11,1 x 9,96 em x=17,7 e x=77,6, y=177; viewBox 107x201
-        // em caixa 107x204, escala 1 e 1,5 de folga vertical.
-        ["esp32-devkit-v1"] = [(23.25, 183.5, 8.0, "EN"), (83.15, 183.5, 8.0, "BOOT")],
+        // As ESP32 redesenhadas (placas-esp32.py, Alpha 25): o centro do botao
+        // preto de cada chave tatil. O BOOT segura o pino de boot em LOW; o
+        // outro (EN na DevKit V1, RESET/RST nas da Espressif) reinicia.
+        ["esp32-devkit-v1"] = [(20.9, 180.2, 6.0, "EN"), (81.7, 180.2, 6.0, "BOOT")],
+        ["esp32-s3-devkit"] = [(28.5, 208.6, 6.0, "BOOT"), (67.8, 208.6, 6.0, "RESET")],
+        ["esp32-s2-devkit"] = [(21.7, 209.5, 6.0, "BOOT"), (74.5, 209.5, 6.0, "RST")],
+        ["esp32-c3-devkit"] = [(19.4, 155.3, 6.0, "BOOT"), (76.9, 155.3, 6.0, "RST")],
+        ["esp32-c6-devkit"] = [(67.0, 171.5, 6.0, "BOOT"), (29.2, 171.5, 6.0, "RESET")],
+        ["esp32-h2-devkit"] = [(69.7, 150.0, 6.0, "BOOT"), (30.4, 150.0, 6.0, "RESET")],
 
         // O TS42 do arquivo da placa (placas-arduino.py, Alpha 25): o botao
         // vermelho de 2,5 mm no centro do RESET.
@@ -502,23 +508,30 @@ public partial class EditorCircuito : Border
 
     /// <summary>Qual botao da placa esta sob o ponto, se algum.</summary>
     /// <summary>
-    /// Os dois LEDs soldados na ESP32 DevKit V1.
+    /// Os LEDs soldados nas placas.
     ///
-    /// O SVG do Wokwi desenha o encapsulamento -- dois retangulos claros
-    /// logo abaixo do modulo -- mas nao acende nada, entao a luz e uma
-    /// sobreposicao nossa. As posicoes vieram do proprio SVG: rect x=35
-    /// y=111 e x=69,5 y=110, de 3,8x5,3, num viewBox de 107x201 dentro de
-    /// uma caixa de 107x204, o que deixa 1,5 de folga em cima.
+    /// O desenho traz o encapsulamento apagado; a luz e uma sobreposicao
+    /// nossa, no centro do LED de cada SVG (o gerador de cada placa imprime
+    /// onde ficam: placas-arduino.py e placas-esp32.py).
     /// </summary>
     static readonly Dictionary<string, (double X, double Y, double R, int Gpio, Color Cor)[]> LedsPorPlaca = new()
     {
         ["esp32-devkit-v1"] =
         [
             // Vermelho de energia: acende so por estar ligada, sem GPIO.
-            (36.9, 115.2, 3.1, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)),
+            (35.6, 112.4, 3.1, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)),
             // Azul no GPIO 2, que e o LED_BUILTIN da placa.
-            (71.4, 114.2, 3.1, 2, Color.FromRgb(0x3B, 0x8C, 0xFF)),
+            (70.8, 112.4, 3.1, 2, Color.FromRgb(0x3B, 0x8C, 0xFF)),
         ],
+
+        // As DevKits da Espressif (Alpha 25): o LED vermelho de energia e o
+        // RGB enderecavel (a cor vem do sketch: neopixelWrite, uma fita do
+        // Adafruit_NeoPixel no pino, ou branco com digitalWrite).
+        ["esp32-s3-devkit"] = [(72.3, 129.1, 3.1, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)), (28.4, 151.4, 5.6, 48, LedRgb)],
+        ["esp32-s2-devkit"] = [(72.6, 105.4, 3.1, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)), (28.4, 125.5, 5.6, 18, LedRgb)],
+        ["esp32-c3-devkit"] = [(17.2, 132.3, 3.1, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)), (73.5, 83.9, 5.6, 8, LedRgb)],
+        ["esp32-c6-devkit"] = [(81.6, 118.1, 3.1, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)), (24.7, 151.9, 5.6, 8, LedRgb)],
+        ["esp32-h2-devkit"] = [(61.6, 74.0, 3.1, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)), (23.4, 128.9, 5.6, 8, LedRgb)],
 
         // Os quatro LEDs 0805 do Uno R3 (Alpha 25), no lugar do arquivo da
         // placa (placas-arduino.py): o ON verde, e o L (pino 13), o TX e o
@@ -566,6 +579,33 @@ public partial class EditorCircuito : Border
 
     /// <summary>O LED da placa que acende so por ela estar ligada; o TX e o RX, que piscam com a serial.</summary>
     const int LedDeEnergia = -1, LedTx = -2, LedRx = -3;
+
+    /// <summary>A "cor" do LED RGB enderecavel da placa: a de verdade sai do sketch a cada quadro.</summary>
+    // Propriedade, e nao campo: a tabela dos LEDs, mais acima, e montada antes
+    // dos campos que vem depois dela, e veria a cor ainda zerada.
+    static Color LedRgb => Color.FromArgb(0, 0xFF, 0xFF, 0xFF);
+
+    /// <summary>
+    /// A cor e a forca do LED RGB da placa: a fita de um LED no pino (o
+    /// neopixelWrite, ou um Adafruit_NeoPixel nele), com o brilho dela; sem
+    /// fita, branco pelo nivel do pino (o digitalWrite(RGB_BUILTIN, HIGH)
+    /// do core acende branco fraco, com RGB_BRIGHTNESS 64).
+    /// </summary>
+    static (Color Cor, double Forca) CorDoLedRgb(Maquina maq, int gpio)
+    {
+        if (!maq.Energizada) return (Colors.White, 0);
+        if (maq.Fitas.TryGetValue(gpio, out var fita) && fita.Cores.Length > 0)
+        {
+            int c = fita.Cores[0];
+            double b = fita.Brilho / 255.0;
+            byte r = (byte)((c >> 16) & 0xFF), g = (byte)((c >> 8) & 0xFF), a = (byte)(c & 0xFF);
+            int maior = Math.Max(r, Math.Max(g, a));
+            if (maior == 0) return (Colors.White, 0);
+            // a cor no maximo (o tom), e a forca pelo canal mais aceso
+            return (Color.FromRgb((byte)(r * 255 / maior), (byte)(g * 255 / maior), (byte)(a * 255 / maior)), maior / 255.0 * b);
+        }
+        return (Colors.White, gpio < maq.Pwm.Length ? maq.Pwm[gpio] / 255.0 * 0.5 : 0);
+    }
 
     /// <summary>Quanto o TX e o RX ficam acesos depois de cada byte (o 16U2 da um pulso assim).</summary>
     const double PiscadaDaSerialMs = 60;
@@ -1607,8 +1647,9 @@ public partial class EditorCircuito : Border
     void CriarLedsDaPlaca(PecaNoCircuito peca, PecaDef def)
     {
         var luzes = new List<Ellipse>();
-        foreach (var (lx, ly, raio, _, cor) in LedsPorPlaca[peca.Tipo])
+        foreach (var (lx, ly, raio, _, corDoLed) in LedsPorPlaca[peca.Tipo])
         {
+            var cor = corDoLed == LedRgb ? Colors.White : corDoLed;
             var luz = new Ellipse
             {
                 Width = raio * 2,
@@ -1632,6 +1673,11 @@ public partial class EditorCircuito : Border
     /// <summary>Para o teste: o brilho de cada LED da placa (na ordem de LedsPorPlaca).</summary>
     internal double[] LedsDaPlacaParaTeste(string idDaPeca)
         => ledsDePlaca.TryGetValue(idDaPeca, out var luzes) ? [.. luzes.Select(l => l.Opacity)] : [];
+
+    /// <summary>Para o teste: a cor de cada LED da placa agora (a do RGB muda com o sketch).</summary>
+    internal Color[] CoresDosLedsDaPlacaParaTeste(string idDaPeca)
+        => ledsDePlaca.TryGetValue(idDaPeca, out var luzes)
+            ? [.. luzes.Select(l => l.Fill is SolidColorBrush p ? p.Color : Colors.Transparent)] : [];
 
     void PosicionarLedsDaPlaca(PecaNoCircuito peca, PecaDef def)
     {
@@ -5599,8 +5645,17 @@ public partial class EditorCircuito : Border
                     break;
 
                 case "esp32-devkit-v1":
+                case "esp32-s2-devkit":
+                case "esp32-s3-devkit":
                     // BOOT segurado leva o GPIO 0 a LOW.
                     maq.Pressionado[0] = BootPressionado.Contains(peca.Id);
+                    break;
+
+                case "esp32-c3-devkit":
+                case "esp32-c6-devkit":
+                case "esp32-h2-devkit":
+                    // Nas RISC-V o pino de boot e o GPIO 9.
+                    maq.Pressionado[9] = BootPressionado.Contains(peca.Id);
                     break;
 
                 case "analog-joystick":
@@ -6453,7 +6508,18 @@ public partial class EditorCircuito : Border
             {
                 for (int k = 0; k < luzesDaPlaca.Count && k < ledsDaPlaca.Length; k++)
                 {
-                    double alvo = 0.94 * Luminancia(ForcaDoLedDaPlaca(maq, ledsDaPlaca[k].Gpio));
+                    double forca;
+                    if (ledsDaPlaca[k].Cor == LedRgb)
+                    {
+                        (var cor, forca) = CorDoLedRgb(maq, ledsDaPlaca[k].Gpio);
+                        if (luzesDaPlaca[k].Fill is SolidColorBrush pincel && pincel.Color != cor)
+                        {
+                            luzesDaPlaca[k].Fill = new SolidColorBrush(cor);
+                            if (luzesDaPlaca[k].Effect is System.Windows.Media.Effects.DropShadowEffect sombra) sombra.Color = cor;
+                        }
+                    }
+                    else forca = ForcaDoLedDaPlaca(maq, ledsDaPlaca[k].Gpio);
+                    double alvo = 0.94 * Luminancia(forca);
                     if (Math.Abs(luzesDaPlaca[k].Opacity - alvo) > 0.005) luzesDaPlaca[k].Opacity = alvo;
                 }
             }

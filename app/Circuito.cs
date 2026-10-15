@@ -332,6 +332,7 @@ public class Circuito
 
         circuito.Pecas ??= [];
         circuito.Fios ??= [];
+        circuito.AtualizarPinosAntigos();
 
         // Peca sem tipo conhecido nao pode entrar: ela nao teria desenho
         // nem pinos, e o resto do programa quebraria longe daqui.
@@ -363,6 +364,32 @@ public class Circuito
     }
 
     public PecaNoCircuito Achar(string id) => Pecas.FirstOrDefault(p => p.Id == id);
+
+    /// <summary>
+    /// Pinos que mudaram de nome quando a placa ganhou a barra de verdade
+    /// (Alpha 25). A C6 e a H2 tinham o GPIO do TX e do RX tambem com o
+    /// numero, num furo a mais que a placa real nao tem: o fio ligado nele
+    /// passa para o TX/RX, que e o mesmo GPIO.
+    /// </summary>
+    static readonly Dictionary<string, Dictionary<string, string>> PinosRenomeados = new()
+    {
+        ["esp32-c6-devkit"] = new() { ["16"] = "TX", ["17"] = "RX" },
+        ["esp32-h2-devkit"] = new() { ["24"] = "TX", ["23"] = "RX" },
+    };
+
+    /// <summary>Passa os fios de um projeto antigo para os nomes de pino de agora.</summary>
+    public void AtualizarPinosAntigos()
+    {
+        if (Pecas is null || Fios is null) return;
+        string Novo(string peca, string pino)
+            => Achar(peca) is { } p && PinosRenomeados.TryGetValue(p.Tipo, out var mapa)
+               && pino is not null && mapa.TryGetValue(pino, out var novo) ? novo : pino;
+        foreach (var f in Fios)
+        {
+            f.DePino = Novo(f.DePeca, f.DePino);
+            f.ParaPino = Novo(f.ParaPeca, f.ParaPino);
+        }
+    }
 
     /// <summary>As placas de desenvolvimento, na ordem em que entraram.</summary>
     public IEnumerable<PecaNoCircuito> Placas()
@@ -875,7 +902,7 @@ public class Netlist
     /// <summary>Nome de pino de alimentacao ("5V", "3V3", "VIN", "V+"...).</summary>
     public static bool EhPinoDeAlimentacao(string pino)
         => SemSufixo(pino) is "3V3" or "3.3V" or "5V" or "VIN" or "VCC" or "VDD"
-                           or "VBUS" or "VUSB" or "V+" or "IOREF";
+                           or "VBUS" or "VUSB" or "V+" or "IOREF" or "VBAT";
 
     /// <summary>
     /// Tira so o sufixo de repeticao ("5V.2" -> "5V").

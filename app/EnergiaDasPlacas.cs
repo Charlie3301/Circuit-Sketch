@@ -43,7 +43,8 @@ public sealed partial class Energia
     {
         var entradas = new List<Entrada>();
         bool Tem(string n) => def.Pinos.Any(p => p.Nome == n);
-        string[] TresVolts() => [.. def.Pinos.Select(p => p.Nome).Where(n => n is "3V3" or "3.3V" || n.StartsWith("3V3.", StringComparison.Ordinal))];
+        // (o VBAT da ESP32-H2 DevKit e o mesmo trilho de 3,3 V, para uma bateria)
+        string[] TresVolts() => [.. def.Pinos.Select(p => p.Nome).Where(n => n is "3V3" or "3.3V" or "VBAT" || n.StartsWith("3V3.", StringComparison.Ordinal))];
         bool cincoVolts = perfil.TensaoDeOperacao >= 4.5;
         string proc = perfil.Processador ?? "";
         bool avr = proc.StartsWith("ATmega", StringComparison.Ordinal);

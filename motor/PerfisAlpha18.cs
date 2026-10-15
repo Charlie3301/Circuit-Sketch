@@ -29,6 +29,13 @@ public partial record PerfilPlaca
     static int NumeroCru(string nome) => SoDigitos(nome);
 
     /// <summary>
+    /// As DevKits com o LED RGB enderecavel soldado (o RGB_BUILTIN do core,
+    /// no mesmo pino do LED_BUILTIN): S2 no 18, S3 no 48, C3/C6/H2 no 8.
+    /// </summary>
+    public static bool TemLedRgb(string id)
+        => id is "esp32-s2-devkit" or "esp32-s3-devkit" or "esp32-c3-devkit" or "esp32-c6-devkit" or "esp32-h2-devkit";
+
+    /// <summary>
     /// O numero cru, mais o TX e o RX da serigrafia -- que nestas placas sao
     /// os pinos da UART0, a que vai para o conversor USB. Cada variante os
     /// pos num GPIO diferente.
@@ -40,9 +47,10 @@ public partial record PerfilPlaca
     // oficial da Espressif.
 
     public static readonly PerfilPlaca Esp32S2 = new(
-        "esp32-s2-devkit", "ESP32-S2 DevKit", NumPinos: 46, MaxAdc: 4095, LedInterno: 18)
+        "esp32-s2-devkit", "ESP32-S2 DevKit", NumPinos: 47, MaxAdc: 4095, LedInterno: 18)
     {
-        TemWifi = true, BitsDoAnalogRead = 12,
+        // O GPIO 46 (na barra desde a Alpha 25) e so de entrada no S2.
+        TemWifi = true, BitsDoAnalogRead = 12, PinoSoDeEntrada = p => p == 46,
         SdaPadrao = 8, SclPadrao = 9,
         Processador = "Xtensa LX7", Nucleos = 1, Megahertz = 240,
         RamBytes = 327680, FlashBytes = 1310720,

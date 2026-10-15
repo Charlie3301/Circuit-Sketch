@@ -22,9 +22,8 @@ public static partial class Autoteste
     //  as regras de cada placa (as da placa de verdade)
     // ---------------------------------------------------------------------
 
-    /// <summary>O pino so le (nao tem saida): os GPIO 34 a 39 da ESP32 classica.</summary>
-    static bool SoDeEntrada(PerfilPlaca perfil, int gpio)
-        => perfil.AvisosDoEsp32 && Maquina.SoEntrada(gpio);
+    /// <summary>O pino so le (nao tem saida): os GPIO 34 a 39 da ESP32 classica, o 46 da S2.</summary>
+    static bool SoDeEntrada(PerfilPlaca perfil, int gpio) => perfil.PinoSoDeEntrada(gpio);
 
 
     /// <summary>O pino le tensao (tem ADC)?</summary>

@@ -1750,7 +1750,7 @@ public class Maquina
 
     // Os avisos abaixo so valem no ESP32: num Arduino o pino 7 nao tem
     // nada de especial, e avisar seria mentira.
-    bool AvisoSoEntrada(int p) => Perfil.AvisosDoEsp32 && SoEntrada(p);
+    bool AvisoSoEntrada(int p) => Perfil.PinoSoDeEntrada(p);
     bool AvisoFlash(int p) => Perfil.AvisosDoEsp32 && LigadoAFlash(p);
 
     public void PinMode(int p, int modo)
@@ -1763,9 +1763,9 @@ public class Maquina
             return;
         }
         if (modo == 1 && AvisoSoEntrada(p))
-            Avisar($"GPIO {p} e somente entrada no ESP32: nao pode ser OUTPUT.");
+            Avisar($"GPIO {p} e somente entrada na {Perfil.Nome}: nao pode ser OUTPUT.");
         if (modo == 2 && AvisoSoEntrada(p))
-            Avisar($"GPIO {p} nao tem pull-up interno no ESP32.");
+            Avisar($"GPIO {p} nao tem pull-up interno na {Perfil.Nome}.");
         if (AvisoFlash(p))
             Avisar($"GPIO {p} e usado pela flash interna: evite.");
         Modo[p] = modo;

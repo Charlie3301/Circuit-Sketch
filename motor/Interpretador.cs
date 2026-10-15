@@ -1158,6 +1158,10 @@ public partial class Interpretador(Programa prog, Maquina maq)
             case Variavel v:
                 // Depende da placa, entao nao pode morar no dicionario fixo.
                 if (v.Nome == "LED_BUILTIN") return Valor.DeInt(maq.Perfil.LedInterno);
+                // O LED RGB da placa (so as DevKits que tem um) e o brilho que o
+                // digitalWrite(RGB_BUILTIN, HIGH) do core usa.
+                if (v.Nome == "RGB_BUILTIN" && PerfilPlaca.TemLedRgb(maq.Perfil.Id)) return Valor.DeInt(maq.Perfil.LedInterno);
+                if (v.Nome == "RGB_BRIGHTNESS" && PerfilPlaca.TemLedRgb(maq.Perfil.Id)) return Valor.DeInt(64);
 
                 // A0..A19 tambem dependem da placa: 14 no Uno, 54 no Mega,
                 // 36 na ESP32, 26 na Pico -- o que o pins_arduino.h de cada
@@ -2645,6 +2649,21 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 if (RitmoDaCpu) maq.GastarProcessador(Custos.AnalogReadUs);
                 return DoTipo((int)Math.Round(maq.AnalogRead((int)A(0)) * 3300.0 / maq.Perfil.MaxAdc), TipoC.UInt);
             case "analogWrite": maq.AnalogWriteNaResolucao((int)A(0), A(1)); return Valor.Vazio;
+
+            // O LED RGB enderecavel soldado nas DevKits S2/S3/C3/C6/H2: o core
+            // da ESP32 escreve nele sem biblioteca (neopixelWrite, que o core
+            // 3.x chama de rgbLedWrite). Vira uma fita de um LED no pino.
+            case "neopixelWrite":
+            case "rgbLedWrite":
+            {
+                if (!EhFamiliaEsp32)
+                    throw new ErroDeExecucao($"{fn.Nome}() so existe no core da ESP32.", c.Linha);
+                int pinoRgb = (int)A(0);
+                if (!maq.Fitas.TryGetValue(pinoRgb, out var fitaRgb)) maq.Fitas[pinoRgb] = fitaRgb = new Fita(1);
+                fitaRgb.Definir(0, Fita.Montar((int)A(1), (int)A(2), (int)A(3)));
+                fitaRgb.Mostrar();
+                return Valor.Vazio;
+            }
 
             // analogWriteResolution(10): o analogWrite passa a ir de 0 a 1023
             // (ESP32, RP2040, STM32). analogWriteFrequency(f) ou (pino, f).

@@ -22,7 +22,9 @@ public partial class EditorCircuito
     {
         int ponto = nome.LastIndexOf('.');
         string base_ = ponto > 0 && nome[(ponto + 1)..].All(char.IsAsciiDigit) ? nome[..ponto] : nome;
-        return base_ is "RESET" or "RST";
+        // EN: o CHIP_PU das ESP32 e o CH_PD das ESP8266 (o RST da serigrafia
+        // nas DevKits novas); RUN: o da Pico. Todos seguram o chip parado no GND.
+        return base_ is "RESET" or "RST" or "EN" or "RUN";
     }
 
     /// <summary>A janela nao pode segurar agora (parada): esquece, para tentar de novo no proximo quadro.</summary>

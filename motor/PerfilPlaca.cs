@@ -22,6 +22,12 @@ public partial record PerfilPlaca(
     /// <summary>Avisos de GPIO especificos do ESP32 (34-39, 6-11).</summary>
     public bool AvisosDoEsp32 { get; init; }
 
+    /// <summary>
+    /// O pino so le: nao tem saida nem pull-up. Os GPIO 34 a 39 da ESP32
+    /// classica e o GPIO 46 da S2 (o chip nao liga o driver de saida neles).
+    /// </summary>
+    public Func<int, bool> PinoSoDeEntrada { get; init; } = _ => false;
+
     /// <summary>A placa tem WiFi: ESP32 e Nano RP2040 Connect.</summary>
     public bool TemWifi { get; init; }
 
@@ -284,6 +290,7 @@ public partial record PerfilPlaca(
         "esp32-devkit-v1", "ESP32 DevKit V1", NumPinos: 40, MaxAdc: 4095, LedInterno: 2)
     {
         AvisosDoEsp32 = true,
+        PinoSoDeEntrada = p => p is >= 34 and <= 39,
         TemWifi = true,
         TemBluetoothClassico = true,
         SdaPadrao = 21, SclPadrao = 22,

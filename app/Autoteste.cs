@@ -193,6 +193,7 @@ public static partial class Autoteste
         Bloco("Baterias_Presets", Baterias_Presets);
         Bloco("Placas_LedsDaPlaca", Placas_LedsDaPlaca);
         Bloco("Placas_TodosOsPinos", Placas_TodosOsPinos);
+        Bloco("Placas_Esp32", Placas_Esp32);
         Bloco("Chave_FimDeCurso", Chave_FimDeCurso);
         Bloco("Esc_Brushless", Esc_Brushless);
         Bloco("Receptor_Radio", Receptor_Radio);
@@ -11006,7 +11007,10 @@ public static partial class Autoteste
         };
         c.Pecas.Add(bb);
 
-        var esp = new PecaNoCircuito { Id = "esp", Tipo = "esp32-devkit-v1", X = 0, Y = 0 };
+        // Deitada, como se espeta de verdade: cada pino numa tira da protoboard.
+        // Em pe, cinco pinos seguidos cairiam na mesma tira (o D21 e o D22 em
+        // curto) -- desde que os pinos ficaram no passo exato de 2,54 mm.
+        var esp = new PecaNoCircuito { Id = "esp", Tipo = "esp32-devkit-v1", X = 0, Y = 0, Rotacao = 90 };
         c.Pecas.Add(esp);
 
         var defEsp = Catalogo.Obter("esp32-devkit-v1");
