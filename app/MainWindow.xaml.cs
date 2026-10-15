@@ -180,6 +180,7 @@ public partial class MainWindow : Window
         editor.MenuPedido += MontarMenuDoCircuito;
         editor.ResetApertado += id => SegurarReset(id);
         editor.ResetSolto += SoltarReset;
+        editor.RedeDoRoteador = redeSimulada;
         // O RESET da barra ligado no GND (por fio ou por um botao): a placa
         // fica parada enquanto ele estiver la. Parada a simulacao, a janela
         // esquece e o editor pergunta de novo quando ela rodar.

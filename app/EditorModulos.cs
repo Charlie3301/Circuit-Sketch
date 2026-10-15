@@ -38,6 +38,14 @@ public partial class EditorCircuito
             (188.14, 141.66, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "canal3"),
             (255.34, 141.66, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "canal4"),
         ],
+        // O roteador (pecas-wifi-ap.py): energia, WiFi, clientes e internet.
+        ["wifi-ap"] =
+        [
+            (28.7, 93.0, 0.75 * Mm, Color.FromRgb(0x5C, 0xFF, 0x5A), "ap-energia"),
+            (60.1, 93.0, 0.75 * Mm, Color.FromRgb(0x5C, 0xFF, 0x5A), "ap-wifi"),
+            (91.1, 93.0, 0.75 * Mm, Color.FromRgb(0x5C, 0xFF, 0x5A), "ap-clientes"),
+            (122.5, 93.0, 0.75 * Mm, Color.FromRgb(0x5C, 0xFF, 0x5A), "ap-internet"),
+        ],
         ["uln2003"] =
         [
             (26.0 * Mm, 12.5 * Mm, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "A"),
@@ -120,8 +128,17 @@ public partial class EditorCircuito
         "rx" => ReceptorAlimentado(peca) && (ControleLigado() is not null || DateTime.Now.Millisecond < 500),
         "ir" => teclaDoControle.Count > 0 && EnergiaDoQuadro is { } conta
                 && conta.TensaoDoPino(peca.Id, "VCC") - conta.TensaoDoPino(peca.Id, "GND") >= 2.5,
+        // O roteador: ligado com a simulacao rodando; o WiFi com a rede nomeada;
+        // clientes com alguma placa conectada nela; internet com o "Usar internet".
+        "ap-energia" => EmSimulacao,
+        "ap-wifi" => EmSimulacao && !string.IsNullOrWhiteSpace(peca.Ssid),
+        "ap-clientes" => EmSimulacao && RedeDoRoteador?.ClientesDe(peca.Ssid) > 0,
+        "ap-internet" => EmSimulacao && RedeDoRoteador?.UsarInternet == true,
         _ => false,
     };
+
+    /// <summary>A rede da bancada, para as luzes do roteador (a janela entrega).</summary>
+    public Simulador.Rede RedeDoRoteador { get; set; }
 
     /// <summary>Para o teste: a luz numero <paramref name="indice"/> do modulo esta acesa?</summary>
     internal bool LuzDeModuloAcesaParaTeste(string idDaPeca, int indice)

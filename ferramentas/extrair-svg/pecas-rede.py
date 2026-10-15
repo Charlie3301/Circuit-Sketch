@@ -61,7 +61,8 @@ wifi_ap = f'''<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
   </g>
 </svg>
 '''
-guardar('wifi-ap', wifi_ap, lap, aap, [])
+# o wifi-ap foi refeito na Alpha 25 (pecas-wifi-ap.py): aqui fica de fora
+# guardar('wifi-ap', wifi_ap, lap, aap, [])
 
 
 lnrf, anrf = 17.0, 29.0

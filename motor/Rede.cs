@@ -242,6 +242,15 @@ public sealed partial class Rede
         Anotar(placa, "wifi", $"abriu a rede \"{estado.Ssid}\" (ponto de acesso) · IP {estado.Ip}");
     }
 
+    /// <summary>Quantas placas estao conectadas agora na rede deste nome (as luzes do roteador).</summary>
+    public int ClientesDe(string ssid)
+    {
+        if (string.IsNullOrWhiteSpace(ssid)) return 0;
+        lock (trava)
+            return wifi.Count(par => par.Value is { Ligado: true, Falha: 0, ModoAp: false } e
+                                     && e.Ssid == ssid.Trim() && par.Key.Ms >= e.ConectaEm);
+    }
+
     public bool WifiConectado(Maquina placa)
     {
         var estado = Wifi(placa);
