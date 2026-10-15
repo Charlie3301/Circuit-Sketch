@@ -10,7 +10,9 @@ pecas = []
 
 
 def guardar(id_peca, svg, larg_mm, alt_mm, pinos):
-    io.open(BASE + f'app/assets/{id_peca}.svg', 'w', encoding='utf-8', newline='').write(svg)
+    # o LDR e desenhado por pecas-passivos.py (Alpha 25); aqui so o catalogo
+    if id_peca != 'ldr':
+        io.open(BASE + f'app/assets/{id_peca}.svg', 'w', encoding='utf-8', newline='').write(svg)
     pecas.append({
         'id': id_peca,
         'largura': round(larg_mm * PX),

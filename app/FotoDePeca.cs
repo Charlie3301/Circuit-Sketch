@@ -48,7 +48,8 @@ internal static class FotoDePeca
                 tela.Children.Add(ponto);
             }
 
-        const double margem = 16;
+        // A arte que passa da caixa (a sobra do SVG) tambem entra na foto.
+        double margem = 16 + Math.Max(0, Math.Max(-desenho.Margin.Left, -desenho.Margin.Top));
         var moldura = new Border
         {
             Background = new SolidColorBrush(Color.FromRgb(0x26, 0x27, 0x2B)),

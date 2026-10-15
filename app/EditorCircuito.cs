@@ -1672,6 +1672,10 @@ public partial class EditorCircuito : Border
     }
 
     /// <summary>Para o teste: o brilho de cada LED da placa (na ordem de LedsPorPlaca).</summary>
+    /// <summary>Para o teste: a imagem desenhada da peca (nula se ela nao e uma imagem so).</summary>
+    internal Image DesenhoDaPecaParaTeste(string idDaPeca)
+        => visuais.TryGetValue(idDaPeca, out var v) ? v as Image : null;
+
     internal double[] LedsDaPlacaParaTeste(string idDaPeca)
         => ledsDePlaca.TryGetValue(idDaPeca, out var luzes) ? [.. luzes.Select(l => l.Opacity)] : [];
 
@@ -2198,25 +2202,35 @@ public partial class EditorCircuito : Border
         });
 
         // As tres primeiras juntas, a de tolerancia afastada -- e assim
-        // que se sabe por qual ponta comecar a ler.
+        // que se sabe por qual ponta comecar a ler. O lugar de cada uma e o
+        // do desenho (pecas-passivos.py); a sombra e a do corpo redondo.
         var faixas = FaixasDe(peca.Ohms);
-        double largura = 2.6, passo = 3.8;
-        double x0 = def.Largura * 0.30;
-
-        for (int i = 0; i < faixas.Length; i++)
+        for (int i = 0; i < faixas.Length && i < DesenhoDosPassivos.FaixasDoResistor.Length; i++)
         {
-            double x = i < 3 ? x0 + i * passo : x0 + 2 * passo + passo * 2.6;
+            var (x, largura, altura) = DesenhoDosPassivos.FaixasDoResistor[i];
+            var c = faixas[i];
             var barra = new Rectangle
             {
                 Width = largura,
-                Height = def.Altura * 0.62,
-                RadiusX = 0.6,
-                RadiusY = 0.6,
-                Fill = new SolidColorBrush(faixas[i]),
+                Height = altura,
+                RadiusX = largura * 0.2,
+                RadiusY = largura * 0.2,
+                Fill = new LinearGradientBrush
+                {
+                    StartPoint = new Point(0, 0), EndPoint = new Point(0, 1),
+                    GradientStops =
+                    [
+                        new GradientStop(Puxar(c, 0.62), 0.0),
+                        new GradientStop(MisturarBranco(c, 0.22), 0.3),
+                        new GradientStop(c, 0.48),
+                        new GradientStop(Puxar(c, 0.85), 0.75),
+                        new GradientStop(Puxar(c, 0.55), 1.0),
+                    ],
+                },
                 IsHitTestVisible = false
             };
-            Canvas.SetLeft(barra, x);
-            Canvas.SetTop(barra, def.Altura * 0.19);
+            Canvas.SetLeft(barra, x - largura / 2);
+            Canvas.SetTop(barra, DesenhoDosPassivos.CentroDasFaixas - altura / 2);
             caixa.Children.Add(barra);
         }
         return caixa;
@@ -2229,6 +2243,9 @@ public partial class EditorCircuito : Border
         if (EhEsc(peca.Tipo) && (peca.Amperes > 0 || peca.Acabamento is not null)) return NomeSvgDoEsc(peca);
         if (Reguladores.EhRegulador(peca.Tipo)) return NomeSvgDoRegulador(peca);
         if (Diodos.EhDiodo(peca.Tipo)) return Diodos.Da(peca).Svg ?? peca.Tipo;
+        // Os passivos com valor, o fusivel e o varistor: um desenho por modelo (pecas-passivos.py).
+        if (Passivos.EhPassivoComValor(peca.Tipo) && Passivos.Da(peca) is { } passivo) return $"{peca.Tipo}-{passivo.Modelo}";
+        if (peca.Tipo is "fusivel" or "varistor") return $"{peca.Tipo}-{Semicondutores.Protecao(peca).Modelo}";
         if (Semicondutores.TemModelo(peca.Tipo)) return Semicondutores.Svg(peca);
         return peca.Tipo;
     }
@@ -4876,8 +4893,16 @@ public partial class EditorCircuito : Border
         var peca = Selecionada;
         if (peca is null) return;
         peca.Modelo = modelo;
-        if (visuais.TryGetValue(peca.Id, out var v) && v is Image img)
-            img.Source = Pecas.Obter(NomeSvg(peca, false));
+        if (visuais.TryGetValue(peca.Id, out var v) && v is Image img && Catalogo.Obter(peca.Tipo) is { } def)
+        {
+            // O modelo novo pode ter outro tamanho (a lata de 2200 uF passa da caixa).
+            var nova = DesenharImagem(peca, def);
+            img.Source = nova.Source;
+            img.Width = nova.Width;
+            img.Height = nova.Height;
+            img.Margin = nova.Margin;
+            img.Stretch = nova.Stretch;
+        }
         Mudou?.Invoke();
     }
 

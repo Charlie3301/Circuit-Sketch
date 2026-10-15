@@ -125,7 +125,7 @@ s = (f'  <rect x="0" y="{a / 2 - 0.3:.2f}" width="{l}" height="0.6" fill="#b4b8b
      '  <rect x="3.0" y="0.5" width="1.6" height="3.0" rx="0.2" fill="#c9ccd1" stroke="#80858c" stroke-width="0.12"/>\n'
      '  <rect x="11.0" y="0.5" width="1.6" height="3.0" rx="0.2" fill="#c9ccd1" stroke="#80858c" stroke-width="0.12"/>\n'
      '  <path d="M4.6 2.0 C6.0 1.4 7.0 2.6 7.8 2.0 C8.6 1.4 9.6 2.6 11.0 2.0" fill="none" stroke="#6a6d73" stroke-width="0.12"/>\n')
-gravar('fusivel', l, a, s)
+# (o desenho do fusivel e do varistor agora sai de pecas-passivos.py, um por modelo)
 guardar('fusivel', l, a, [('1', 0, a / 2, 'Terminal'), ('2', l - 0.05, a / 2, 'Terminal')])
 
 # ---- varistor ----
@@ -135,7 +135,6 @@ s = pernas(xs4, 6.0, a - 0.3)
 s += ('  <ellipse cx="4.0" cy="3.7" rx="3.7" ry="3.5" fill="#1f5fb4" stroke="#123e7a" stroke-width="0.15"/>\n'
       '  <ellipse cx="3.1" cy="2.6" rx="1.4" ry="0.9" fill="#ffffff" opacity="0.2"/>\n')
 s += texto(4.0, 3.8, '14D', 1.2, '#dfe7f7') + texto(4.0, 5.1, '270K', 0.9, '#cfe0f7')
-gravar('varistor', l, a, s)
 guardar('varistor', l, a, [('1', xs4[0], a - 0.3, 'Terminal (sem polaridade)'), ('2', xs4[1], a - 0.3, 'Terminal')])
 
 cam = BASE + 'app/assets/pecas.json'

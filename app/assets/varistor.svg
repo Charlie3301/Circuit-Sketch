@@ -1,10 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-     width="8.0mm" height="12.0mm" viewBox="0 0 8.0 12.0">
-  <rect x="1.24" y="6.00" width="0.44" height="5.70" fill="#b4b8be"/>
-  <rect x="6.32" y="6.00" width="0.44" height="5.70" fill="#b4b8be"/>
-  <ellipse cx="4.0" cy="3.7" rx="3.7" ry="3.5" fill="#1f5fb4" stroke="#123e7a" stroke-width="0.15"/>
-  <ellipse cx="3.1" cy="2.6" rx="1.4" ry="0.9" fill="#ffffff" opacity="0.2"/>
-  <text x="4.00" y="3.80" fill="#dfe7f7" font-size="1.2px" text-anchor="middle" font-family="Verdana" font-weight="bold">14D</text>
-  <text x="4.00" y="5.10" fill="#cfe0f7" font-size="0.9px" text-anchor="middle" font-family="Verdana" font-weight="bold">270K</text>
-
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="60.8px" height="93.8px" data-sobra="15.4 24.4" viewBox="0 0 60.8 93.8">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <linearGradient id="cilindro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000000" stop-opacity="0.28"/><stop offset="0.28" stop-color="#ffffff" stop-opacity="0.22"/><stop offset="0.42" stop-color="#ffffff" stop-opacity="0.05"/><stop offset="0.75" stop-color="#000000" stop-opacity="0.08"/><stop offset="1" stop-color="#000000" stop-opacity="0.35"/></linearGradient>
+  <linearGradient id="cilindro-v" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000000" stop-opacity="0.35"/><stop offset="0.22" stop-color="#ffffff" stop-opacity="0.22"/><stop offset="0.38" stop-color="#ffffff" stop-opacity="0.04"/><stop offset="0.8" stop-color="#000000" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.4"/></linearGradient>
+  <radialGradient id="disco" cx="0.38" cy="0.32" r="0.75"><stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.3"/></radialGradient>
+  <linearGradient id="cobre" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6e3b14"/><stop offset="0.25" stop-color="#d98c4a"/><stop offset="0.45" stop-color="#f0b27a"/><stop offset="0.75" stop-color="#b8692e"/><stop offset="1" stop-color="#5e3110"/></linearGradient>
+  <linearGradient id="ferrite" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1c1d20"/><stop offset="0.3" stop-color="#55575c"/><stop offset="0.6" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="vidro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6e4ec" stop-opacity="0.5"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0.3"/><stop offset="0.55" stop-color="#dfe9ef" stop-opacity="0.08"/><stop offset="1" stop-color="#9fb4c0" stop-opacity="0.4"/></linearGradient>
+</defs>
+<path d="M16.347 47.833 L16.347 61.817 L20.92 65.596 L20.92 69.754" fill="none" stroke="#8e959c" stroke-width="2.457" stroke-linecap="butt"/>
+<path d="M15.905 47.833 L15.905 61.817 L20.478 65.596 L20.478 69.754" fill="none" stroke="#e9edf0" stroke-width="0.737" stroke-linecap="butt" stroke-opacity="0.85"/>
+<path d="M44.693 47.833 L44.693 61.817 L40.12 65.596 L40.12 69.754" fill="none" stroke="#8e959c" stroke-width="2.457" stroke-linecap="butt"/>
+<path d="M44.251 47.833 L44.251 61.817 L39.678 65.596 L39.678 69.754" fill="none" stroke="#e9edf0" stroke-width="0.737" stroke-linecap="butt" stroke-opacity="0.85"/>
+<path d="M14.268 52.226 L15.024 62.951 L17.67 62.951 L43.37 62.951 L46.016 62.951 L46.772 52.226 Z" fill="#1f5fb5"/>
+<circle cx="30.52" cy="30.258" r="29.291" fill="#1f5fb5" stroke="#123c78" stroke-width="0.302"/>
+<circle cx="30.52" cy="30.258" r="29.291" fill="url(#disco)"/>
+<text transform="translate(30.52 27.234) rotate(0)" x="0" y="3.024" font-family="Arial" font-weight="bold" font-size="7.559" fill="#e9eef6" text-anchor="middle">14D270K</text>
+<text transform="translate(30.52 35.927) rotate(0)" x="0" y="1.89" font-family="Arial" font-weight="normal" font-size="4.724" fill="#c9d6ea" text-anchor="middle">MOV</text>
 </svg>
