@@ -897,7 +897,8 @@ public class Netlist
     /// e o desenho: um LED ligado no trilho acende, e para saber isso e
     /// preciso saber o que e trilho.
     /// </summary>
-    public static bool EhPinoDeTerra(string pino) => SemSufixo(pino) is "GND" or "VSS";
+    // (o AGND da Pico: o plano de terra analogico, que se junta ao GND na placa)
+    public static bool EhPinoDeTerra(string pino) => SemSufixo(pino) is "GND" or "VSS" or "AGND";
 
     /// <summary>Nome de pino de alimentacao ("5V", "3V3", "VIN", "V+"...).</summary>
     public static bool EhPinoDeAlimentacao(string pino)

@@ -752,7 +752,7 @@ public class Maquina
     public const int ReferenciaExterna = 0, ReferenciaPadrao = 1, ReferenciaInterna1V1 = 2,
                      ReferenciaInterna = 3, ReferenciaInterna2V56 = 6;
 
-    /// <summary>A tensao no pino AREF agora (o editor mede a cada quadro); nulo com o AREF solto.</summary>
+    /// <summary>A tensao no pino AREF (ou no ADC_VREF da Pico) agora (o editor mede a cada quadro); nulo com ele solto.</summary>
     public double? TensaoNoAref { get; set; }
 
     /// <summary>Em volts, a tensao que o conversor le como o valor maximo.</summary>
@@ -1847,7 +1847,28 @@ public class Maquina
         return Digital[p];
     }
 
-    public int AnalogRead(int p) => Valido(p) ? Analogico[p] : 0;
+    public int AnalogRead(int p)
+    {
+        if (!Valido(p)) return 0;
+        int cru = Analogico[p];
+        // A Pico com uma referencia de fora no ADC_VREF: a mesma tensao vira
+        // outro numero (3,0 V de referencia: 1,5 V ja e meia escala). No GND,
+        // sem referencia, o conversor satura.
+        if (Perfil.AdcVrefNoPino && TensaoNoAref is { } vref)
+        {
+            double vcc = Perfil.TensaoDeOperacao > 0 ? Perfil.TensaoDeOperacao : 3.3;
+            cru = vref <= 0.01 ? (cru > 0 ? Perfil.MaxAdc : 0)
+                : (int)Math.Round(Math.Clamp(cru * vcc / vref, 0, Perfil.MaxAdc));
+        }
+        return cru;
+    }
+
+    /// <summary>
+    /// O botao BOOTSEL da Pico apertado agora: o "BOOTSEL" do core da Pico
+    /// para Arduino, o rp2040.getBootselButton() e o rp2.bootsel_button() do
+    /// MicroPython leem ele (o editor escreve a cada quadro).
+    /// </summary>
+    public bool BootselApertado { get; set; }
 
     /// <summary>
     /// PWM de 0 a 255. <paramref name="hz"/> e a frequencia pedida (ledc,

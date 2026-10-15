@@ -187,7 +187,12 @@ public partial class MainWindow : Window
         {
             bool rodando = btParar.IsEnabled && programas.ContainsKey(id);
             if (!rodando) { if (preso) editor.EsquecerResetPorFio(id); return; }
-            if (preso) SegurarReset(id, "o RESET está ligado no GND: a placa fica parada até ele sair.");
+            if (preso) SegurarReset(id, editor.PinoQueSegura(id) switch
+            {
+                "3V3_EN" => "o 3V3_EN está ligado no GND: o regulador desliga e a placa fica apagada até ele sair.",
+                { } pino and not "RESET" => $"o {pino.Split('.')[0]} está ligado no GND: a placa fica parada até ele sair.",
+                _ => "o RESET está ligado no GND: a placa fica parada até ele sair.",
+            });
             else SoltarReset(id);
         };
         editor.PecaSolta += peca =>

@@ -414,7 +414,15 @@ public partial class EditorCircuito : Border
         ["arduino-nano"] = [(98.0, 33.5, 5.0, "RESET")],
         ["nano-rp2040-connect"] = [(46.5, 34.1, 5.5, "RESET")],
         ["franzininho"] = [(190.0, 16.0, 6.6, "RESET")],
+
+        // O BOOTSEL das Pico (placas-pico.py, Alpha 25): a tampa branca da
+        // chave. Nao reinicia: o sketch le ele (BOOTSEL, rp2.bootsel_button()).
+        ["pi-pico"] = [(26.1, 43.4, 5.5, "BOOTSEL")],
+        ["pi-pico-w"] = [(26.7, 43.9, 5.5, "BOOTSEL")],
     };
+
+    /// <summary>O botao da placa que segura o pino de boot (BOOT das ESP32, BOOTSEL da Pico), e nao o reset.</summary>
+    static bool EhBotaoDeBoot(string nome) => nome is "BOOT" or "BOOTSEL";
 
     /// <summary>
     /// Os vinte botoes do controle remoto, com o codigo que cada um manda.
@@ -566,6 +574,12 @@ public partial class EditorCircuito : Border
             (128.5, 98.6, 6.2, LedDeEnergia, Color.FromRgb(0x5C, 0xFF, 0x5A)),
             (147.7, 98.6, 6.2, 1, Color.FromRgb(0xFF, 0xE0, 0x3A)),
         ],
+
+        // O LED verde 0603 das Pico (placas-pico.py): o GP25 na Pico; na Pico W
+        // ele mora no radio (o "WL_GPIO0"), que o core chama de LED_BUILTIN (32).
+        // A Pico nao tem LED de energia.
+        ["pi-pico"] = [(17.7, 16.4, 2.6, 25, Color.FromRgb(0x5C, 0xFF, 0x5A))],
+        ["pi-pico-w"] = [(18.2, 16.9, 2.6, 32, Color.FromRgb(0x5C, 0xFF, 0x5A))],
 
         // Os mesmos quatro na Mega 2560 R3: o ON fica la do outro lado, perto do chip.
         ["arduino-mega"] =
@@ -852,7 +866,7 @@ public partial class EditorCircuito : Border
 
             foreach (var (bx, by, raio, nome) in botoes)
             {
-                bool apertado = nome == "BOOT"
+                bool apertado = EhBotaoDeBoot(nome)
                     ? BootPressionado.Contains(peca.Id)
                     : ResetSegurado.Contains(peca.Id);
                 (apertado ? apertados : soltos).Children.Add(new EllipseGeometry(
@@ -3789,7 +3803,7 @@ public partial class EditorCircuito : Border
             }
 
             case Camada.BotaoPlaca:
-                if (acerto.Botao == "BOOT") BootPressionado.Add(acerto.Peca.Id);
+                if (EhBotaoDeBoot(acerto.Botao)) BootPressionado.Add(acerto.Peca.Id);
                 else if (ResetSegurado.Add(acerto.Peca.Id)) ResetApertado?.Invoke(acerto.Peca.Id);
                 DesenharBotoesDaPlaca();
 
@@ -5683,6 +5697,13 @@ public partial class EditorCircuito : Border
                 case "esp32-h2-devkit":
                     // Nas RISC-V o pino de boot e o GPIO 9.
                     maq.Pressionado[9] = BootPressionado.Contains(peca.Id);
+                    break;
+
+                case "pi-pico":
+                case "pi-pico-w":
+                    // O BOOTSEL nao e GPIO: e o chip select da flash, que o
+                    // sketch le por uma funcao do core.
+                    maq.BootselApertado = BootPressionado.Contains(peca.Id);
                     break;
 
                 case "analog-joystick":

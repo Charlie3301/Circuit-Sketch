@@ -1214,6 +1214,10 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 // funcao do C. Quem recebe o callback le o nome.
                 if (funcoes.ContainsKey(v.Nome)) return Valor.DeTexto(v.Nome);
 
+                // O botao BOOTSEL da Pico ("if (BOOTSEL)", do core arduino-pico).
+                if (v.Nome == "BOOTSEL" && maq.Perfil.Id is "pi-pico" or "pi-pico-w" && !EhPython)
+                    return Valor.DeInt(maq.BootselApertado ? 1 : 0);
+
                 // A data e a hora da compilacao, que o exemplo do RTClib usa
                 // para acertar o relogio: "Sep 24 2026" e "14:05:09".
                 if (v.Nome is "__DATE__" or "__TIME__")

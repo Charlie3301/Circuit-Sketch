@@ -38,6 +38,7 @@ public static class ModulosPy
         ["os"] = ["listdir", "mkdir", "remove", "rename", "uname"],
         ["micropython"] = ["const"],
         ["esp32"] = ["raw_temperature", "hall_sensor"],
+        ["rp2"] = ["bootsel_button"],
         ["esp"] = ["osdebug"],
         ["binascii"] = ["hexlify", "unhexlify"],
         ["ubinascii"] = ["hexlify", "unhexlify"],
@@ -256,6 +257,10 @@ public partial class Interpretador
                 return nome == "raw_temperature"
                     ? Valor.DeInt(128) : Valor.DeInt(0);
             case "esp": return Valor.Vazio;
+            case "rp2":
+                if (maq.Perfil?.Id is not ("pi-pico" or "pi-pico-w"))
+                    throw new ErroDeExecucao($"o modulo rp2 e o do RP2040 (Raspberry Pi Pico): na {maq.Perfil?.Nome} ele nao existe.", linha);
+                return Valor.DeInt(maq.BootselApertado ? 1 : 0);
 
             case "sys":
                 if (nome == "exit") throw new ExecucaoInterrompida();

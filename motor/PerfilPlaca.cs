@@ -31,6 +31,13 @@ public partial record PerfilPlaca(
     /// <summary>A placa tem WiFi: ESP32 e Nano RP2040 Connect.</summary>
     public bool TemWifi { get; init; }
 
+    /// <summary>
+    /// O conversor usa a tensao de um pino da barra como fundo de escala, sem
+    /// analogReference: o ADC_VREF da Pico (de fabrica, os 3,3 V por um filtro
+    /// de 200 ohm; uma referencia de fora ligada nele manda).
+    /// </summary>
+    public bool AdcVrefNoPino { get; init; }
+
     /// <summary>Bluetooth classico, o do BluetoothSerial. So a ESP32 tem.</summary>
     public bool TemBluetoothClassico { get; init; }
 
@@ -427,6 +434,7 @@ public partial record PerfilPlaca(
         "pi-pico", "Raspberry Pi Pico", NumPinos: 30, MaxAdc: 4095, LedInterno: 25)
     {
         TensaoDeOperacao = 3.3,
+        AdcVrefNoPino = true,
 
         // O RP2040 entrega bem menos por pino do que um AVR de 5 V: o
         // limite de projeto e 12 mA, e passar disso estraga a saida.

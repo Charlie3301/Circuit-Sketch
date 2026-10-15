@@ -284,7 +284,7 @@ public partial record PerfilPlaca
         "pi-pico-w", "Raspberry Pi Pico W", NumPinos: 34, MaxAdc: 4095, LedInterno: 32)
     {
         TensaoDeOperacao = 3.3, CorrenteDoPino = 12,
-        TemWifi = true,
+        TemWifi = true, AdcVrefNoPino = true,
         SdaPadrao = 4, SclPadrao = 5,
         Processador = "RP2040", Nucleos = 2, Megahertz = 133,
         RamBytes = 270336, FlashBytes = 2093056,    // 264 KB de SRAM (264 x 1024)

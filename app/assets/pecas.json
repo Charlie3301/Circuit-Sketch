@@ -10795,6 +10795,29 @@
     "y": 188.83,
     "sinais": [],
     "descricao": ""
+   },
+   {
+    "nome": "SWCLK",
+    "x": 30.12,
+    "y": 189.54,
+    "sinais": [],
+    "descricao": "Depuracao SWD: o relogio (para a Raspberry Pi Debug Probe). O sketch nao usa este pino."
+   },
+   {
+    "nome": "GND.8",
+    "x": 39.72,
+    "y": 189.54,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Terra (o do conector de depuracao)."
+   },
+   {
+    "nome": "SWDIO",
+    "x": 49.32,
+    "y": 189.54,
+    "sinais": [],
+    "descricao": "Depuracao SWD: os dados (para a Raspberry Pi Debug Probe). O sketch nao usa este pino."
    }
   ],
   "variantes": [],
@@ -11114,6 +11137,29 @@
     "y": 188.83,
     "sinais": [],
     "descricao": ""
+   },
+   {
+    "nome": "SWCLK",
+    "x": 42.1,
+    "y": 118.11,
+    "sinais": [],
+    "descricao": "Depuracao SWD: o relogio (para a Raspberry Pi Debug Probe). O sketch nao usa este pino."
+   },
+   {
+    "nome": "GND.8",
+    "x": 51.7,
+    "y": 118.11,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Terra (o do conector de depuracao)."
+   },
+   {
+    "nome": "SWDIO",
+    "x": 61.3,
+    "y": 118.11,
+    "sinais": [],
+    "descricao": "Depuracao SWD: os dados (para a Raspberry Pi Debug Probe). O sketch nao usa este pino."
    }
   ],
   "variantes": [],

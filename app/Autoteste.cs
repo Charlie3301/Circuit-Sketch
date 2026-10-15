@@ -194,6 +194,7 @@ public static partial class Autoteste
         Bloco("Placas_LedsDaPlaca", Placas_LedsDaPlaca);
         Bloco("Placas_TodosOsPinos", Placas_TodosOsPinos);
         Bloco("Placas_Esp32", Placas_Esp32);
+        Bloco("Placas_Pico", Placas_Pico);
         Bloco("Leds_Familia", Leds_Familia);
         Bloco("Passivos_Desenho", Passivos_Desenho);
         Bloco("Outros_Desenho", Outros_Desenho);

@@ -28,6 +28,15 @@ Internacional (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0/
     (github.com/sparkfun/microSD_Transflash_Breakout). SparkFun e uma marca
     registrada; o logotipo nao e reproduzido.
 
+  - pi-pico.svg e pi-pico-w.svg: a posicao e o tamanho de cada componente
+    tirados dos desenhos da pinagem da Pico e da Pico W na documentacao da
+    Raspberry Pi, (c) Raspberry Pi Ltd, CC BY-SA 4.0
+    (github.com/raspberrypi/documentation); as medidas da placa e dos furos,
+    dos arquivos de projeto da Pico e da Pico W (datasheets.raspberrypi.com,
+    liberados sem restricao). Raspberry Pi e uma marca registrada da
+    Raspberry Pi Ltd; o nome aparece so para identificar as placas, e o
+    logotipo nao e reproduzido.
+
 As placas ESP32 (esp32-devkit-v1.svg, esp32-s2-devkit.svg, esp32-s3-devkit.svg,
 esp32-c3-devkit.svg, esp32-c6-devkit.svg e esp32-h2-devkit.svg) NAO estao sob
 a licenca acima: sao desenhos proprios do CircuitSketch. Das DevKits da

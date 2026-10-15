@@ -684,6 +684,7 @@ public partial class Interpretador
             "getCycleCount" => DoTipo((long)(maq.AgoraUs() * (maq.Perfil?.Megahertz ?? 133)), TipoC.ULong),
             "getCycleCount64" => DoTipo((long)(maq.AgoraUs() * (maq.Perfil?.Megahertz ?? 133)), TipoC.ULongLong),
             "reboot" or "restart" => throw Reiniciar(ReinicioDaPlaca.PeloSoftware, 0, 0),
+            "getBootselButton" => DoTipo(maq.BootselApertado ? 1 : 0, TipoC.Bool),
             _ => throw new ErroDeExecucao($"rp2040.{metodo}() ainda nao e suportado pelo simulador.", c.Linha),
         };
     }
