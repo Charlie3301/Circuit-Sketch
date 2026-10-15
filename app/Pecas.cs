@@ -387,13 +387,6 @@ public static class Pecas
         // invisivel que desce mais que o desenho, e corrigir por ela
         // levava os terminais 22 px acima dos pinos.
         ["stepper-motor"] = new Vector(0, -4.0),
-
-        // As duas pernas ficavam acima e a esquerda dos pinos: o
-        // desenho ocupa so um pedaco do viewBox, encostado no canto.
-        ["led"] = new Vector(7.7, 4.6),
-
-        // Mesmo caso, com quatro pernas.
-        ["rgb-led"] = new Vector(6.3, 0.7),
     };
 
     static Drawing Endireitar(DrawingGroup desenho, string svg, string nome)

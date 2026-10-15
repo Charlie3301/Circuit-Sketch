@@ -1194,6 +1194,7 @@ public partial class EditorCircuito : Border
         rotulosDePeca.Clear();
         ApagarRotulosDeGiro();
         ApagarLuzesDeModulo();
+        ApagarLuzesDeLed();
         ApagarDesenhosDeRadio();
 
         visuais.Clear(); parteMovel.Clear(); brilhos.Clear();
@@ -2071,8 +2072,9 @@ public partial class EditorCircuito : Border
     void PosicionarBrilho(PecaNoCircuito peca, PecaDef def)
     {
         if (!brilhos.TryGetValue(peca.Id, out var luz)) return;
-        // O bulbo do LED fica no topo, em torno de 30% da altura.
-        var centro = Geometria.PosicaoLocal(peca, def, def.Largura / 2, def.Altura * 0.30);
+        // No chip, dentro do bulbo (o desenho diz onde: pecas-leds.py).
+        var (cx, cy) = DesenhoDosLeds.CentroDoBrilho.TryGetValue(peca.Tipo, out var c) ? c : (def.Largura / 2, def.Altura * 0.30);
+        var centro = Geometria.PosicaoLocal(peca, def, cx, cy);
         Canvas.SetLeft(luz, centro.X - luz.Width / 2);
         Canvas.SetTop(luz, centro.Y - luz.Height / 2);
     }
@@ -6482,6 +6484,7 @@ public partial class EditorCircuito : Border
         if (rede is null || bancada is null) return;
 
         DesenharSaidas(bancada, rede);
+        DesenharLuzesDeLed(bancada, rede);
 
         // Alguma placa energizada? E o que diz se os trilhos estao vivos.
         bool bancadaLigada = bancada.Todas.Any(x => x.Value.Energizada);
@@ -6669,6 +6672,8 @@ public partial class EditorCircuito : Border
         {
             var comp = Comportamento.De(peca.Tipo);
             if (comp is null || comp.Saidas.Length == 0) continue;
+            // O display e a barra acendem o proprio segmento (EditorLeds).
+            if (DesenhoDosLeds.Segmentos.ContainsKey(peca.Tipo)) continue;
             var def = Catalogo.Obter(peca.Tipo);
             if (def is null) continue;
 
