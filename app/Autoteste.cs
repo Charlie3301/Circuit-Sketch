@@ -196,6 +196,7 @@ public static partial class Autoteste
         Bloco("Placas_Esp32", Placas_Esp32);
         Bloco("Leds_Familia", Leds_Familia);
         Bloco("Passivos_Desenho", Passivos_Desenho);
+        Bloco("Outros_Desenho", Outros_Desenho);
         Bloco("Chave_FimDeCurso", Chave_FimDeCurso);
         Bloco("Esc_Brushless", Esc_Brushless);
         Bloco("Receptor_Radio", Receptor_Radio);

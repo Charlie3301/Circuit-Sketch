@@ -1,14 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-     width="34.0mm" height="15.0mm" viewBox="0 0 34.0 15.0">
-
-  <!-- a lingueta de metal: encaixado, ela fica dentro da carcaca -->
-  <rect x="13.80" y="3.0" width="8.0" height="9.0" rx="0.4" fill="#c4cad2" stroke="#7d838c" stroke-width="0.25"/>
-  <rect x="16.80" y="5.0" width="1.6" height="1.4" fill="#4d535c"/>
-  <rect x="16.80" y="8.6" width="1.6" height="1.4" fill="#4d535c"/>
-  <!-- o corpo -->
-  <rect x="21.20" y="2.2" width="12.4" height="10.6" rx="1.8" fill="#23262c" stroke="#0f1013" stroke-width="0.3"/>
-  <rect x="22.20" y="3.2" width="10.4" height="8.6" rx="1.2" fill="#2e3239"/>
-  <circle cx="32.40" cy="7.5" r="0.55" fill="#3b8cff"/>
-  <text x="26.80" y="8.0" fill="#e6ecf5" font-size="1.7px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">16 GB</text>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="129px" height="57px" viewBox="0 0 129 57">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <radialGradient id="cupula" cx="0.4" cy="0.35" r="0.65"><stop offset="0" stop-color="#5a5c62"/><stop offset="0.55" stop-color="#202125"/><stop offset="1" stop-color="#0b0b0d"/></radialGradient>
+  <radialGradient id="tecla" cx="0.42" cy="0.36" r="0.68"><stop offset="0" stop-color="#ffffff"/><stop offset="0.7" stop-color="#eeeeec"/><stop offset="1" stop-color="#cfcfcc"/></radialGradient>
+  <radialGradient id="tecla-preta" cx="0.42" cy="0.36" r="0.68"><stop offset="0" stop-color="#4c4d52"/><stop offset="0.6" stop-color="#1d1e21"/><stop offset="1" stop-color="#0c0c0e"/></radialGradient>
+  <linearGradient id="corpo-controle" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e2e2df"/><stop offset="0.12" stop-color="#fbfbf9"/><stop offset="0.85" stop-color="#f4f4f1"/><stop offset="1" stop-color="#d6d6d2"/></linearGradient>
+  <radialGradient id="lente-ir" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#7a3a4a"/><stop offset="0.6" stop-color="#2a0f16"/><stop offset="1" stop-color="#120608"/></radialGradient>
+  <linearGradient id="plastico-pen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3d42"/><stop offset="0.35" stop-color="#26282c"/><stop offset="1" stop-color="#121315"/></linearGradient>
+</defs>
+<rect x="34.016" y="5.673" width="46.866" height="45.354" rx="1.134" fill="url(#metal)" stroke="#6f767e" stroke-width="0.302"/>
+<rect x="59.15" y="17.2" width="5.669" height="5.669" rx="0.567" fill="#3a3d42"/>
+<rect x="59.15" y="33.83" width="5.669" height="5.669" rx="0.567" fill="#3a3d42"/>
+<rect x="79.37" y="5.295" width="48.496" height="46.11" rx="5.291" fill="url(#plastico-pen)" stroke="#060607" stroke-width="0.378"/>
+<rect x="80.504" y="6.429" width="3.78" height="43.843" rx="1.134" fill="#3d3f44"/>
+<rect x="89.197" y="15.878" width="27.969" height="24.945" rx="2.268" fill="#1d1e22" stroke="#3a3c41" stroke-width="0.302"/>
+<text transform="translate(103.181 28.35) rotate(0)" x="0" y="2.457" font-family="Arial" font-weight="bold" font-size="6.142" fill="#e8e8e6" text-anchor="middle">16 GB</text>
+<circle cx="120.685" cy="28.35" r="3.78" fill="#08090a" stroke="#3a3c41" stroke-width="0.378"/>
+<circle cx="112.37" cy="44.224" r="1.701" fill="#3b8cff" stroke="#16233a" stroke-width="0.227"/>
 </svg>

@@ -89,9 +89,7 @@ movel = f'''
   <text x="{xb + 5.6:.2f}" y="8.0" fill="#e6ecf5" font-size="1.7px" text-anchor="middle"
         font-family="Verdana" font-weight="bold">16 GB</text>'''
 
-gravar_svg('pendrive-usb', f'{cabeca}\n{corpo}\n{movel}\n</svg>\n')
-gravar_svg('pendrive-usb-corpo', f'{cabeca}\n{corpo}\n</svg>\n')
-gravar_svg('pendrive-usb-movel', f'{cabeca}\n{movel}\n</svg>\n')
+# (o desenho agora sai de pecas-outros.py, Alpha 25; aqui fica so o catalogo)
 
 descricoes_pen = {
     'VBUS': 'Os 5 V do pendrive: no 5V da placa (na DevKitC-1, o da porta USB)',

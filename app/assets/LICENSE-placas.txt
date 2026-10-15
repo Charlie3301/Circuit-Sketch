@@ -18,6 +18,16 @@ Internacional (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0/
     comunidade Franzininho), CC BY-SA 4.0
     (github.com/Franzininho/franzininho-diy-board).
 
+  - ds1307.svg: derivado do projeto do DS1307 Real Time Clock Assembled
+    Breakout Board (produto 3296), (c) Adafruit Industries, CC BY-SA 3.0
+    (github.com/adafruit/DS1307-breakout-board). Adafruit e uma marca
+    registrada; o logotipo nao e reproduzido.
+
+  - microsd-card.svg: derivado do projeto do SparkFun microSD Transflash
+    Breakout (BOB-00544), (c) SparkFun Electronics, CC BY-SA 4.0
+    (github.com/sparkfun/microSD_Transflash_Breakout). SparkFun e uma marca
+    registrada; o logotipo nao e reproduzido.
+
 As placas ESP32 (esp32-devkit-v1.svg, esp32-s2-devkit.svg, esp32-s3-devkit.svg,
 esp32-c3-devkit.svg, esp32-c6-devkit.svg e esp32-h2-devkit.svg) NAO estao sob
 a licenca acima: sao desenhos proprios do CircuitSketch. Das DevKits da

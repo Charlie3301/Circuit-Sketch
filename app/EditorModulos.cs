@@ -5,8 +5,8 @@ using System.Windows.Shapes;
 namespace Simulador.App;
 
 /// <summary>
-/// As luzinhas dos modulos de motor: a de energia do L298N e do L9110S, as
-/// quatro fases do ULN2003. Elas dizem o que a conta de energia decidiu --
+/// As luzinhas dos modulos: a de energia do L298N e do L9110S, as quatro
+/// fases do ULN2003, a dos reles, a do receptor de radio e a do infravermelho. Elas dizem o que a conta de energia decidiu --
 /// o modulo esta com a logica alimentada, a fase A esta ligada -- sem a
 /// pessoa ter que medir nada, que e para isso que elas existem na placa.
 /// </summary>
@@ -19,6 +19,9 @@ public partial class EditorCircuito
         ["l9110s"] = [(26.0 * Mm, 11.4 * Mm, 0.8 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "energia")],
         // A luz do receptor: acesa com o controle ligado, piscando sem ele.
         ["receptor-rc"] = [(8.0 * Mm, 22.6 * Mm, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "rx")],
+        // O LED de sinal do receptor infravermelho (KY-022, pecas-outros.py):
+        // acende enquanto chega o sinal do controle.
+        ["ir-receiver"] = [(47.2, 42.3, 0.6 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "ir")],
         // Os modulos de rele: a luz de energia e a de cada canal (o LED do opto).
         ["modulo-rele-1"] = [(49.97, 185.95, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc"), (63.34, 141.66, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "canal1")],
         ["modulo-rele-2"] =
@@ -115,6 +118,8 @@ public partial class EditorCircuito
         // A fase do ULN2003: o LED esta na entrada, acende com ela em HIGH.
         "A" or "B" or "C" or "D" => EnergiaDoQuadro?.KDaSaida(peca.Id, chave) is not null,
         "rx" => ReceptorAlimentado(peca) && (ControleLigado() is not null || DateTime.Now.Millisecond < 500),
+        "ir" => teclaDoControle.Count > 0 && EnergiaDoQuadro is { } conta
+                && conta.TensaoDoPino(peca.Id, "VCC") - conta.TensaoDoPino(peca.Id, "GND") >= 2.5,
         _ => false,
     };
 

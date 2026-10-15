@@ -416,10 +416,13 @@ def corpo(d, el):
         nome = 'SOT223'
     if 'LED' in nome and '0805' in nome:
         nome = 'CHIP-LED0805'
+    if nome == '0805-NO':
+        nome = '0805-R' if not valor.upper().endswith('F') else '0805-C'
     if valor.endswith('NM'):
         return
     if nome.startswith(('1X', '2X')):
-        barra(d, pk, 'F' in valor.split()[0] if valor else False)
+        if not SEM_BARRA:
+            barra(d, pk, 'F' in valor.split()[0] if valor else False)
     elif nome.startswith('HEAD'):
         for pad in pk.findall('pad'):
             x, y = num(pad, 'x'), num(pad, 'y')
@@ -534,6 +537,57 @@ def corpo(d, el):
     elif nome == 'SMB':
         catodo = 1 if [p.get('name') for p in pk.findall('smd')][1] == 'C' else -1
         chip2(d, pk, 4.4, 3.6, '#202124', frac=0.12, banda=catodo, marca='M7', cor_marca='#cfd3d8')
+    elif nome == '0805-R':
+        chip2(d, pk, 2.0, 1.25, '#1c1c1e', marca={'10K': '1002', '1K': '1001', '4.7K': '4701'}.get(valor.upper(), ''))
+    elif nome == '0805-C':
+        chip2(d, pk, 2.0, 1.25, '#b7956a')
+    elif nome == 'SOIC8-150MIL':
+        xs, ys = [x for x, _ in pads_smd(pk)], [y for _, y in pads_smd(pk)]
+        deitado = max(xs) - min(xs) > max(ys) - min(ys)
+        cw, ch = (4.9, 3.9) if not deitado else (3.9, 4.9)
+        pernas_smd(d, pk, cw / 2, ch / 2)
+        ci(d, cw, ch, [(valor or 'DS1307', 0.78), ('1606', 0.55), ('B49B', 0.5)], pino1=(-cw / 2 + 0.6, -ch / 2 + 0.6))
+    elif nome == 'CRYSTAL-8X3.8':
+        # o cristal de 32,768 kHz de SMD (o MC-306): o corpo preto e as quatro pernas
+        xs, ys = [x for x, _ in pads_smd(pk)], [y for _, y in pads_smd(pk)]
+        deitado = max(xs) - min(xs) > max(ys) - min(ys)
+        cw, ch = (8.0, 3.8) if deitado else (3.8, 8.0)
+        for x, y in pads_smd(pk):
+            d.ret_c(x, y, 1.2 if deitado else 1.6, 1.6 if deitado else 1.2, 'url(#metal)', rx=0.1)
+        d.ret_c(0, 0, cw, ch, PRETO_CI, rx=0.35)
+        d.ret_c(0, 0, cw, ch, 'url(#luz)', rx=0.35)
+        d.texto(0, 0, '32.768', 0.75, MARCA_CI, ang=0 if deitado else 90, ancora='middle', alinhar='center', peso='normal')
+    elif nome == 'CR1220':
+        # o suporte da pilha CR1220: a ilha dourada do negativo e a mola de aco por cima
+        ps = pads_smd(pk)
+        cx, cy = sum(x for x, _ in ps) / len(ps), sum(y for _, y in ps) / len(ps)
+        abas = sorted(ps, key=lambda q: -math.hypot(q[0] - cx, q[1] - cy))[:2]
+        vert = abs(abas[0][1] - abas[1][1]) > abs(abas[0][0] - abas[1][0])
+        for x, y in abas:
+            d.ret_c(x, y, 3.6 if vert else 2.6, 2.6 if vert else 3.6, 'url(#metal)', rx=0.2, stroke='#7c838b', sw=0.06)
+        d.circ(cx, cy, 5.0, '#c9a24a')
+        w, h = (12.4, 13.6) if vert else (13.6, 12.4)
+        d.ret_c(cx, cy, w, h, 'url(#metal)', rx=2.2, stroke='#6f767e', sw=0.08)
+        d.circ(cx, cy, 4.6, '#d8b45a', stroke='#8a6d2a', sw=0.08)
+        d.circ(cx, cy, 4.6, 'url(#luz)')
+        for k in (-1, 1):
+            if vert:
+                d.ret_c(cx, cy + k * 2.3, 2.2, 1.6, 'url(#metal)', rx=0.3, stroke='#7c838b', sw=0.06)
+            else:
+                d.ret_c(cx + k * 2.3, cy, 1.6, 2.2, 'url(#metal)', rx=0.3, stroke='#7c838b', sw=0.06)
+        d.texto(cx - (4.2 if not vert else 0), cy - (0 if not vert else 4.2), '+', 1.2, '#5a6068', ancora='middle', alinhar='center')
+    elif nome == 'MICRO-SD-SOCKET-PP':
+        # o soquete push-push de microSD: a carcaca de aco e a boca do cartao
+        ps = pads_smd(pk)
+        xs, ys = [x for x, _ in ps], [y for _, y in ps]
+        cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+        w, h = max(xs) - min(xs) + 0.6, max(ys) - min(ys) + 0.6
+        for x, y in ps:
+            d.ret_c(x, y, 1.0, 1.0, ESTANHO, rx=0.1)
+        d.ret_c(cx, cy, w - 1.2, h - 1.0, 'url(#metal)', rx=0.4, stroke='#6f767e', sw=0.08)
+        for k in range(3):
+            d.linha(cx - (w - 2.4) / 2, cy - h / 4 + k * h / 4, cx + (w - 2.4) / 2, cy - h / 4 + k * h / 4, '#9aa1a8', 0.12)
+        d.ret_c(cx, cy, w * 0.42, h * 0.22, None, rx=0.3, stroke='#8d949b', sw=0.1)
     elif nome == 'MINIMELF':
         catodo = 1 if [p.get('name') for p in pk.findall('smd')][1] == 'C' else -1
         chip2(d, pk, 3.5, 1.5, '#c8553a', frac=0.12, banda=catodo)
@@ -542,7 +596,11 @@ def corpo(d, el):
 # =====================================================================
 #  uma placa inteira
 # =====================================================================
-MARCAS = ('arduino', 'tm', 'made in', 'italy', 'www.', 'designed by', 'tinker it')
+MARCAS = ('arduino', 'tm', 'made in', 'italy', 'www.', 'designed by', 'tinker it', 'adafruit', 'sparkfun')
+
+# As placas de outros fabricantes (o DS1307 da Adafruit, o microSD da
+# SparkFun) vem so com os furos, sem a barra de pinos soldada.
+SEM_BARRA = False
 
 
 def eh_marca(t):
@@ -657,11 +715,39 @@ def atualizar_pinos(peca, reais):
     io.open(cam, 'w', encoding='utf-8', newline='').write(json.dumps(lista, ensure_ascii=False, indent=1))
 
 
+def ajustar_girada(placa, peca, cfg):
+    """A placa girada de 90 graus (o DS1307: a barra embaixo no arquivo, a
+    esquerda na peca): X = a*y + tx, Y = a*x + ty, na escala real. O
+    deslocamento sai da media entre cada pino e o furo da barra na mesma ordem."""
+    a = 96 / 25.4
+    el = next(e for e in placa.elementos if e['nome'] == cfg['barra'])
+    t = Placa.t_do(el)
+    furos = sorted((t(num(p, 'x'), num(p, 'y')) for p in el['pk'].findall('pad')), key=lambda q: q[0])
+    pinos = sorted(peca['pinos'], key=lambda q: q['y'])
+    tx = sum(q['x'] - a * f_[1] for q, f_ in zip(pinos, furos)) / len(pinos)
+    ty = sum(q['y'] - a * f_[0] for q, f_ in zip(pinos, furos)) / len(pinos)
+    erro = max(math.hypot(a * f_[1] + tx - q['x'], a * f_[0] + ty - q['y']) for q, f_ in zip(pinos, furos))
+    print(f'{id_peca_atual}: girada 90 graus, escala real, desvio dos pinos max {erro:.2f} px')
+    return a, tx, ty
+
+
+id_peca_atual = ''
+
+
 def gerar(id_peca, cfg):
+    global SEM_BARRA, id_peca_atual
+    id_peca_atual = id_peca
+    SEM_BARRA = cfg.get('sem_barra', False)
+    masc, masc_escura, trilha = cfg.get('cores', (MASCARA, MASCARA_ESCURA, TRILHA))
+    fora = set(cfg.get('sem_elementos', ()))
     placa = Placa(CAD + cfg['brd'])
+    placa.elementos = [e for e in placa.elementos if e['nome'] not in fora]
     catalogo = {p['id']: p for p in json.load(io.open(BASE + 'app/assets/pecas.json', encoding='utf-8'))}
     peca = catalogo[id_peca]
-    if 'pinos_reais' in cfg:
+    girada = cfg.get('girar90', False)
+    if girada:
+        a, tx, ty = ajustar_girada(placa, peca, cfg)
+    elif 'pinos_reais' in cfg:
         a, tx, ty = pinos_reais(placa, peca, cfg)
         print(f'{id_peca}: escala real {a:.4f} px/mm')
     else:
@@ -671,7 +757,7 @@ def gerar(id_peca, cfg):
         pinos_extra(placa, peca, cfg['pinos_extra'], a, tx, ty)
     L, A = peca['largura'], peca['altura']
     m = cfg.get('margem', 0)          # a sobra, igual dos dois lados (px)
-    d = Desenho(T(a, 0, 0, -a, tx + m, ty))
+    d = Desenho(T(0, a, a, 0, tx + m, ty) if girada else T(a, 0, 0, -a, tx + m, ty))
 
     # ---- a placa: a mascara, com os furos de fixacao vazados ----
     segs = [seg_de_fio(w) for w in placa.plain if w.tag == 'wire' and w.get('layer') == '20']
@@ -699,7 +785,7 @@ def gerar(id_peca, cfg):
     furos = [(num(h, 'x'), num(h, 'y'), num(h, 'drill') / 2) for h in placa.plain if h.tag == 'hole']
     for x, y, r in furos:
         cmds += [('M', x - r, y), ('A', r, 1, 0, x + r, y), ('A', r, 1, 0, x - r, y), ('Z',)]
-    d.caminho(cmds, MASCARA, MASCARA_ESCURA, 0.25)
+    d.caminho(cmds, masc, masc_escura, 0.25)
     d.partes[-1] = d.partes[-1].replace('<path ', '<path fill-rule="evenodd" ', 1)
     for x, y, r in furos:
         d.circ(x, y, r + 0.55, None, OURO, 0.5)
@@ -709,12 +795,12 @@ def gerar(id_peca, cfg):
         for w in sig.findall('wire'):
             if w.get('layer') == '1':
                 x1, y1, x2, y2, c = seg_de_fio(w)
-                d.linha(x1, y1, x2, y2, TRILHA, max(num(w, 'width'), 0.1), c)
+                d.linha(x1, y1, x2, y2, trilha, max(num(w, 'width'), 0.1), c)
     for sig in placa.sinais:
         for v in sig.findall('via'):
             x, y, dr = num(v, 'x'), num(v, 'y'), num(v, 'drill')
-            d.circ(x, y, (num(v, 'diameter') or dr + 0.5) / 2, TRILHA)
-            d.circ(x, y, dr / 2, MASCARA_ESCURA)
+            d.circ(x, y, (num(v, 'diameter') or dr + 0.5) / 2, trilha)
+            d.circ(x, y, dr / 2, masc_escura)
 
     # ---- as ilhas (as dos componentes, estanhadas; as soltas, douradas) ----
     for el in placa.elementos:
@@ -723,7 +809,7 @@ def gerar(id_peca, cfg):
         d.entrar(Placa.t_do(el))
         fiducial = el['pacote'].startswith(('FIDUCIA', 'FD-'))
         if fiducial:
-            d.circ(0, 0, 1.0, MASCARA_ESCURA)
+            d.circ(0, 0, 1.0, masc_escura)
         for p in el['pk'].findall('smd'):
             if p.get('layer') == '1':
                 pad_smd(d, p, OURO if el['pacote'] == 'SJ' or fiducial else ESTANHO)
@@ -774,7 +860,7 @@ def gerar(id_peca, cfg):
         d.entrar(Placa.t_do(el))
         corpo(d, el)
         d.sair()
-        centros[el['nome']] = (a * el['x'] + tx, -a * el['y'] + ty)
+        centros[el['nome']] = (a * el['y'] + tx, a * el['x'] + ty) if girada else (a * el['x'] + tx, -a * el['y'] + ty)
 
     largura_svg = L + 2 * m
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="{largura_svg}px" height="{A}px" data-sobra="{m} 0" '
@@ -1302,6 +1388,14 @@ PLACAS = {
                         pinos_reais={'JP3': ['PB0', 'PB1', 'PB2', 'PB3', 'PB5', 'PB4', 'VCC.1', 'GND.1'],
                                      'J1': ['VCC.2', 'GND.2', 'VIN']}),
     'attiny85': dict(a_mao=True),
+    # Outros fabricantes, mesmo caminho (Alpha 25): o RTC DS1307 da Adafruit
+    # (#3296, CC BY-SA 3.0) e o microSD da SparkFun (BOB-00544, CC BY-SA 4.0);
+    # os logotipos (marcas registradas) ficam de fora.
+    'ds1307': dict(brd='../outros-cad/DS1307_RevB.brd', girar90=True, barra='JP2', sem_barra=True,
+                   cores=('#1f63c0', '#174f9c', '#2c72cf'), sem_elementos=('U$2', 'U$3', 'U$5'),
+                   marcos=['B1', 'U1', 'Q1']),
+    'microsd-card': dict(brd='../outros-cad/SparkFun_microSD_Breakout.brd', chute=(3.78, 0.0, 77.0), sem_barra=True,
+                         cores=('#c8102e', '#9a0c22', '#d8283f'), sem_elementos=('U$1',), marcos=['U1']),
 }
 
 if __name__ == '__main__':
