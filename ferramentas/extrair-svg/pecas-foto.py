@@ -10,6 +10,9 @@ pecas = []
 
 
 def guardar(id_peca, svg, larg_mm, alt_mm, pinos):
+    # O DHT11 foi refeito na Alpha 25 (pecas-sensores.py): nao reescreve.
+    if id_peca == 'dht11':
+        return
     # o LDR e desenhado por pecas-passivos.py (Alpha 25); aqui so o catalogo
     if id_peca != 'ldr':
         io.open(BASE + f'app/assets/{id_peca}.svg', 'w', encoding='utf-8', newline='').write(svg)

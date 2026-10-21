@@ -111,4 +111,14 @@ chips seguem o DIP de 0,3" da JEDEC (MS-001) e a pinagem das fichas da
 Texas Instruments de cada um; o codigo na tampa e so o do tipo, sem o
 prefixo de fabricante.
 
+Os sensores (hc-sr04.svg, dht22.svg, dht11.svg, photoresistor-sensor.svg,
+flame-sensor.svg, gas-sensor.svg, ntc-temperature-sensor.svg,
+heart-beat-sensor.svg, big-sound-sensor.svg, small-sound-sensor.svg,
+pir-motion-sensor.svg, mpu6050.svg e hx711.svg) tambem sao desenhos
+proprios do CircuitSketch, com as medidas publicadas pelos fabricantes e
+pelos vendedores de cada modulo (o HC-SR04 de 45 x 20 mm, o HC-SR501 de
+32 x 24 mm com a lente de 23 mm, o AM2302, o DHT11, o GY-521, o HX711 e os
+modulos do LM393, do MQ-2 e da linha KY). Nenhuma foto e reproduzida, e
+nenhuma marca e desenhada.
+
 O restante do CircuitSketch nao e afetado por esta licenca.

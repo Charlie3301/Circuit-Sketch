@@ -253,9 +253,9 @@ public sealed class Logica
     /// <summary>
     /// Um chip 74HC. Sem o VCC em HIGH e o GND em LOW ele nao faz nada -- as
     /// saidas ficam soltas, como no chip de verdade sem alimentacao. Entrada
-    /// solta deixa a saida dela solta (no CMOS ela flutua); so o PRE e o CLR
-    /// do 74HC74 (soltos, como no VCC) e o G do 74HC157 (solto, como no GND)
-    /// ficam no lugar de sempre, para o circuito de aula nao parar por eles.
+    /// solta deixa a saida solta: no CMOS ela flutua, e a ficha manda ligar
+    /// toda entrada sem uso. Vale tambem para os pinos de controle -- o PRE e o
+    /// CLR do 74HC74, o G do 74HC157, o OE do 74HC125.
     /// </summary>
     bool PassoDoChip(PecaNoCircuito peca, Dictionary<string, int> memoria)
     {
@@ -268,21 +268,20 @@ public sealed class Logica
             if (q != Indefinido) mudou |= Sair(peca.Id, porta.Saida, q);
         }
 
-        // O 74HC125: cada buffer passa o A com o OE em LOW (solto, como no GND).
+        // O 74HC125: cada buffer passa o A com o OE em LOW; em HIGH a saida se solta.
         if (peca.Tipo == "74hc125")
             for (int k = 1; k <= 4; k++)
             {
                 int a = Ler(peca.Id, $"{k}A");
-                if (Ler(peca.Id, $"{k}OE") != 1 && a != Indefinido) mudou |= Sair(peca.Id, $"{k}Y", a);
+                if (Ler(peca.Id, $"{k}OE") == 0 && a != Indefinido) mudou |= Sair(peca.Id, $"{k}Y", a);
             }
 
         if (peca.Tipo == "74hc157")
         {
-            int s = Ler(peca.Id, "S");
-            bool desligado = Ler(peca.Id, "G") == 1;
+            int s = Ler(peca.Id, "S"), g = Ler(peca.Id, "G");
             for (int k = 1; k <= 4; k++)
             {
-                int y = desligado ? 0 : s == Indefinido ? Indefinido : Ler(peca.Id, s == 1 ? $"{k}B" : $"{k}A");
+                int y = g == 1 ? 0 : g == Indefinido || s == Indefinido ? Indefinido : Ler(peca.Id, s == 1 ? $"{k}B" : $"{k}A");
                 if (y != Indefinido) mudou |= Sair(peca.Id, $"{k}Y", y);
             }
         }
@@ -298,7 +297,10 @@ public sealed class Logica
                 if (clk != Indefinido) memoria[chaveClk] = clk;
 
                 // PRE e CLR sao ativos em LOW; os dois juntos poem Q e Q barrado em HIGH.
-                bool pre = Ler(peca.Id, $"{u}PRE") == 0, clr = Ler(peca.Id, $"{u}CLR") == 0;
+                // Algum deles solto: o flip-flop fica sem estado certo, e as saidas, soltas.
+                int npre = Ler(peca.Id, $"{u}PRE"), nclr = Ler(peca.Id, $"{u}CLR");
+                if (npre == Indefinido || nclr == Indefinido) continue;
+                bool pre = npre == 0, clr = nclr == 0;
                 int d = Ler(peca.Id, $"{u}D");
                 if (pre && clr)
                 {

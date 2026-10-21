@@ -120,6 +120,17 @@ public static partial class Autoteste
             }
             Conferir("74HC125: com o OE em LOW o Y segue o A; em HIGH a saida fica solta (alta impedancia)",
                 Y(0, 1) == 1 && Y(0, 0) == 0 && Y(1, 1) == Logica.Indefinido, $"{Y(0, 1)} {Y(0, 0)} {Y(1, 1)}");
+
+            // Como no CMOS de verdade: o pino de controle solto flutua, e a saida fica sem nivel certo.
+            var c125 = ComChip("74hc125");
+            Nivel(c125, "1A", 1);
+            var c157 = ComChip("74hc157");
+            Nivel(c157, "S", 0); Nivel(c157, "1A", 1); Nivel(c157, "1B", 0);
+            var c74 = ComChip("74hc74");
+            Nivel(c74, "1D", 1); Nivel(c74, "1CLK", 1); Nivel(c74, "1CLR", 1);
+            int y125 = Rodar(c125).NivelDoPino("ci", "1Y"), y157 = Rodar(c157).NivelDoPino("ci", "1Y"), q74 = Rodar(c74).NivelDoPino("ci", "1Q");
+            Conferir("74HC125/157/74: com o OE, o G ou o PRE soltos a saida fica solta (no CMOS a entrada sem ligar flutua)",
+                y125 == Logica.Indefinido && y157 == Logica.Indefinido && q74 == Logica.Indefinido, $"{y125} {y157} {q74}");
         }
 
         // ---- as portas ideais novas: o buffer, o tri-state e as de tres entradas ----

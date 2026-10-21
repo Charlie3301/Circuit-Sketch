@@ -313,7 +313,9 @@ public partial class EditorCircuito
                                                        || ModeloDeServo.De(p.Tipo) is not null || EhEsc(p.Tipo) || p.Tipo == "receptor-rc"
                                                        || Reguladores.EhRegulador(p.Tipo) || ModulosDeRele.EhModulo(p.Tipo)
                                                        // as saidas da logica acendem LED pela conta (Alpha 25)
-                                                       || Logica.EhPecaDeLogica(p.Tipo));
+                                                       || Logica.EhPecaDeLogica(p.Tipo)
+                                                       // e os modulos com LED de energia (Alpha 25)
+                                                       || LuzesDosModulos.ContainsKey(p.Tipo));
         if (!energia)
         {
             relogioDosMotores.Reset();

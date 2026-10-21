@@ -371,7 +371,7 @@ dip('74hc7266', 14, '74HC7266N', [('1A', [], 'Entrada A da porta 1'), ('1B', [],
 
 
 def buf(k, q):
-    return {'OE': (f'{k}OE', [], f'Habilita o buffer {k} (ativo em LOW): em HIGH o {k}Y se solta. Sem uso, no GND'),
+    return {'OE': (f'{k}OE', [], f'Habilita o buffer {k} (ativo em LOW): em HIGH o {k}Y se solta. Para usar, ligue no GND (solto, flutua)'),
             'A': (f'{k}A', [], f'Entrada do buffer {k}'),
             'Y': (f'{k}Y', [], f'Saida do buffer {k} (o {k}A, ou solta com o {k}OE em HIGH)')}[q]
 
@@ -381,10 +381,10 @@ dip('74hc125', 14, '74HC125N', [buf(1, 'OE'), buf(1, 'A'), buf(1, 'Y'), buf(2, '
 
 
 def ff(u, qual):
-    return {'CLR': (f'{u}CLR', [], f'Clear do flip-flop {u} (ativo em LOW: leva o {u}Q a LOW). Sem uso, no VCC'),
+    return {'CLR': (f'{u}CLR', [], f'Clear do flip-flop {u} (ativo em LOW: leva o {u}Q a LOW). Sem uso, ligue no VCC (solto, flutua)'),
             'D': (f'{u}D', [], f'O dado do flip-flop {u}: entra no {u}Q na subida do {u}CLK'),
             'CLK': (f'{u}CLK', [], f'O relogio do flip-flop {u} (borda de subida)'),
-            'PRE': (f'{u}PRE', [], f'Preset do flip-flop {u} (ativo em LOW: leva o {u}Q a HIGH). Sem uso, no VCC'),
+            'PRE': (f'{u}PRE', [], f'Preset do flip-flop {u} (ativo em LOW: leva o {u}Q a HIGH). Sem uso, ligue no VCC (solto, flutua)'),
             'Q': (f'{u}Q', [], f'Saida do flip-flop {u}'),
             'NQ': (f'{u}NQ', [], f'Saida invertida do flip-flop {u} (Q barrado)')}[qual]
 
@@ -402,7 +402,7 @@ def mux(k, qual):
 dip('74hc157', 16, '74HC157N', [('S', [], 'A escolha dos quatro: LOW passa os A, HIGH passa os B'),
                                 mux(1, 'A'), mux(1, 'B'), mux(1, 'Y'), mux(2, 'A'), mux(2, 'B'), mux(2, 'Y'), GND,
                                 mux(3, 'Y'), mux(3, 'B'), mux(3, 'A'), mux(4, 'Y'), mux(4, 'B'), mux(4, 'A'),
-                                ('G', [], 'Habilita (ativo em LOW): em HIGH as quatro saidas vao a LOW. Sem uso, no GND'), VCC])
+                                ('G', [], 'Habilita (ativo em LOW): em HIGH as quatro saidas vao a LOW. Para usar, ligue no GND (solto, flutua)'), VCC])
 
 # =====================================================================
 cam = pa.BASE + 'app/assets/pecas.json'

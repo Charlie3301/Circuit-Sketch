@@ -135,6 +135,7 @@ public static partial class Autoteste
         Bloco("Mostradores_NoEditor", Mostradores_NoEditor);
         Bloco("Entradas_Redesenhadas", Entradas_Redesenhadas);
         Bloco("Logica_Chips", Logica_Chips);
+        Bloco("Sensores_Redesenhados", Sensores_Redesenhados);
         Bloco("Pcb_Base", Pcb_Base);
         Bloco("ModulosDeRele_NoCircuito", ModulosDeRele_NoCircuito);
         Bloco("Audio_Estereo", Audio_Estereo);

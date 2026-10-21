@@ -675,7 +675,7 @@
     "x": 8.2,
     "y": 31.9,
     "sinais": [],
-    "descricao": "Pino 1: Habilita o buffer 1 (ativo em LOW): em HIGH o 1Y se solta. Sem uso, no GND"
+    "descricao": "Pino 1: Habilita o buffer 1 (ativo em LOW): em HIGH o 1Y se solta. Para usar, ligue no GND (solto, flutua)"
    },
    {
     "nome": "1A",
@@ -696,7 +696,7 @@
     "x": 37.0,
     "y": 31.9,
     "sinais": [],
-    "descricao": "Pino 4: Habilita o buffer 2 (ativo em LOW): em HIGH o 2Y se solta. Sem uso, no GND"
+    "descricao": "Pino 4: Habilita o buffer 2 (ativo em LOW): em HIGH o 2Y se solta. Para usar, ligue no GND (solto, flutua)"
    },
    {
     "nome": "2A",
@@ -740,7 +740,7 @@
     "x": 46.6,
     "y": 3.1,
     "sinais": [],
-    "descricao": "Pino 10: Habilita o buffer 3 (ativo em LOW): em HIGH o 3Y se solta. Sem uso, no GND"
+    "descricao": "Pino 10: Habilita o buffer 3 (ativo em LOW): em HIGH o 3Y se solta. Para usar, ligue no GND (solto, flutua)"
    },
    {
     "nome": "4Y",
@@ -761,7 +761,7 @@
     "x": 17.8,
     "y": 3.1,
     "sinais": [],
-    "descricao": "Pino 13: Habilita o buffer 4 (ativo em LOW): em HIGH o 4Y se solta. Sem uso, no GND"
+    "descricao": "Pino 13: Habilita o buffer 4 (ativo em LOW): em HIGH o 4Y se solta. Para usar, ligue no GND (solto, flutua)"
    },
    {
     "nome": "VCC",
@@ -997,7 +997,7 @@
     "x": 13.5,
     "y": 3.1,
     "sinais": [],
-    "descricao": "Pino 15: Habilita (ativo em LOW): em HIGH as quatro saidas vao a LOW. Sem uso, no GND"
+    "descricao": "Pino 15: Habilita (ativo em LOW): em HIGH as quatro saidas vao a LOW. Para usar, ligue no GND (solto, flutua)"
    },
    {
     "nome": "VCC",
@@ -1577,7 +1577,7 @@
     "x": 8.2,
     "y": 31.9,
     "sinais": [],
-    "descricao": "Pino 1: Clear do flip-flop 1 (ativo em LOW: leva o 1Q a LOW). Sem uso, no VCC"
+    "descricao": "Pino 1: Clear do flip-flop 1 (ativo em LOW: leva o 1Q a LOW). Sem uso, ligue no VCC (solto, flutua)"
    },
    {
     "nome": "1D",
@@ -1598,7 +1598,7 @@
     "x": 37.0,
     "y": 31.9,
     "sinais": [],
-    "descricao": "Pino 4: Preset do flip-flop 1 (ativo em LOW: leva o 1Q a HIGH). Sem uso, no VCC"
+    "descricao": "Pino 4: Preset do flip-flop 1 (ativo em LOW: leva o 1Q a HIGH). Sem uso, ligue no VCC (solto, flutua)"
    },
    {
     "nome": "1Q",
@@ -1642,7 +1642,7 @@
     "x": 46.6,
     "y": 3.1,
     "sinais": [],
-    "descricao": "Pino 10: Preset do flip-flop 2 (ativo em LOW: leva o 2Q a HIGH). Sem uso, no VCC"
+    "descricao": "Pino 10: Preset do flip-flop 2 (ativo em LOW: leva o 2Q a HIGH). Sem uso, ligue no VCC (solto, flutua)"
    },
    {
     "nome": "2CLK",
@@ -1663,7 +1663,7 @@
     "x": 17.8,
     "y": 3.1,
     "sinais": [],
-    "descricao": "Pino 13: Clear do flip-flop 2 (ativo em LOW: leva o 2Q a LOW). Sem uso, no VCC"
+    "descricao": "Pino 13: Clear do flip-flop 2 (ativo em LOW: leva o 2Q a LOW). Sem uso, ligue no VCC (solto, flutua)"
    },
    {
     "nome": "VCC",
@@ -3920,40 +3920,42 @@
  },
  {
   "id": "big-sound-sensor",
-  "largura": 140,
-  "altura": 50,
+  "largura": 156,
+  "altura": 58,
   "pinos": [
    {
     "nome": "AOUT",
-    "x": 0,
-    "y": 11,
-    "sinais": [],
-    "descricao": ""
+    "x": 3.4,
+    "y": 14.6,
+    "sinais": [
+     "analog"
+    ],
+    "descricao": "Saida analogica: o som do microfone"
    },
    {
     "nome": "GND",
-    "x": 0,
-    "y": 20.5,
+    "x": 3.4,
+    "y": 24.2,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND (G na placa)"
    },
    {
     "nome": "VCC",
-    "x": 0,
-    "y": 30.5,
+    "x": 3.4,
+    "y": 33.8,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao (+ na placa): 3,3 V ou 5 V"
    },
    {
     "nome": "DOUT",
-    "x": 0,
-    "y": 40.5,
+    "x": 3.4,
+    "y": 43.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida digital: HIGH com o som acima do ponto do trimpot (o L2 acende)"
    }
   ],
   "variantes": [],
@@ -4223,33 +4225,40 @@
  },
  {
   "id": "dht11",
-  "largura": 45,
-  "altura": 68,
+  "largura": 47,
+  "altura": 85,
   "pinos": [
    {
     "nome": "VCC",
-    "x": 13.08,
-    "y": 66.52,
+    "x": 9.1,
+    "y": 82.17,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao: 3,3 a 5,5 V"
    },
    {
     "nome": "DATA",
-    "x": 22.68,
-    "y": 66.52,
+    "x": 18.7,
+    "y": 82.17,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Os dados (um fio so): no pino digital, com pull-up de 10k"
+   },
+   {
+    "nome": "NC",
+    "x": 28.3,
+    "y": 82.17,
+    "sinais": [],
+    "descricao": "Nao ligado"
    },
    {
     "nome": "GND",
-    "x": 32.28,
-    "y": 66.52,
+    "x": 37.9,
+    "y": 82.17,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    }
   ],
   "variantes": [],
@@ -4257,40 +4266,40 @@
  },
  {
   "id": "dht22",
-  "largura": 57,
-  "altura": 117,
+  "largura": 59,
+  "altura": 121,
   "pinos": [
    {
     "nome": "VCC",
-    "x": 15,
-    "y": 114.9,
+    "x": 15.1,
+    "y": 118.17,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao: 3,3 a 6 V"
    },
    {
     "nome": "SDA",
-    "x": 24.5,
-    "y": 114.9,
+    "x": 24.7,
+    "y": 118.17,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Os dados (um fio so): no pino digital, com pull-up de 10k"
    },
    {
     "nome": "NC",
-    "x": 34.1,
-    "y": 114.9,
+    "x": 34.3,
+    "y": 118.17,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Nao ligado"
    },
    {
     "nome": "GND",
-    "x": 43.8,
-    "y": 114.9,
+    "x": 43.9,
+    "y": 118.17,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    }
   ],
   "variantes": [],
@@ -8662,40 +8671,42 @@
  },
  {
   "id": "flame-sensor",
-  "largura": 200,
-  "altura": 61,
+  "largura": 180,
+  "altura": 54,
   "pinos": [
    {
     "nome": "VCC",
-    "x": 199,
-    "y": 14.6,
+    "x": 176.6,
+    "y": 12.6,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao: 3,3 a 5 V"
    },
    {
     "nome": "GND",
-    "x": 199,
-    "y": 24.3,
+    "x": 176.6,
+    "y": 22.2,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    },
    {
     "nome": "DOUT",
-    "x": 199,
-    "y": 34,
+    "x": 176.6,
+    "y": 31.8,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida digital: LOW com chama (o LED DO acende)"
    },
    {
     "nome": "AOUT",
-    "x": 199,
-    "y": 43.7,
-    "sinais": [],
-    "descricao": ""
+    "x": 176.6,
+    "y": 41.4,
+    "sinais": [
+     "analog"
+    ],
+    "descricao": "Saida analogica: mais chama, menos tensao"
    }
   ],
   "variantes": [],
@@ -9053,40 +9064,42 @@
  },
  {
   "id": "gas-sensor",
-  "largura": 137,
-  "altura": 63,
+  "largura": 145,
+  "altura": 85,
   "pinos": [
    {
     "nome": "AOUT",
-    "x": 137,
-    "y": 16.5,
-    "sinais": [],
-    "descricao": ""
+    "x": 141.6,
+    "y": 28.1,
+    "sinais": [
+     "analog"
+    ],
+    "descricao": "Saida analogica: mais gas, mais tensao"
    },
    {
     "nome": "DOUT",
-    "x": 137,
-    "y": 26.4,
+    "x": 141.6,
+    "y": 37.7,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida digital: LOW com gas acima do ponto do trimpot (o LED DO acende)"
    },
    {
     "nome": "GND",
-    "x": 137,
-    "y": 36.5,
+    "x": 141.6,
+    "y": 47.3,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    },
    {
     "nome": "VCC",
-    "x": 137,
-    "y": 46.2,
+    "x": 141.6,
+    "y": 56.9,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao: 5 V (o aquecedor do MQ-2 gasta ~150 mA)"
    }
   ],
   "variantes": [],
@@ -9112,40 +9125,40 @@
  },
  {
   "id": "hc-sr04",
-  "largura": 170,
-  "altura": 94,
+  "largura": 171,
+  "altura": 99,
   "pinos": [
    {
     "nome": "VCC",
-    "x": 71.3,
-    "y": 94.5,
+    "x": 71.1,
+    "y": 95.98,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao: 5 V"
    },
    {
     "nome": "TRIG",
-    "x": 81.3,
-    "y": 94.5,
+    "x": 80.7,
+    "y": 95.98,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Disparo: um pulso de 10 us em HIGH manda o som"
    },
    {
     "nome": "ECHO",
-    "x": 91.3,
-    "y": 94.5,
+    "x": 90.3,
+    "y": 95.98,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Eco: fica em HIGH o tempo da ida e volta do som (58 us por cm). Em 5 V: no ESP32, use um divisor"
    },
    {
     "nome": "GND",
-    "x": 101.3,
-    "y": 94.5,
+    "x": 99.9,
+    "y": 95.98,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    }
   ],
   "variantes": [],
@@ -9153,33 +9166,35 @@
  },
  {
   "id": "heart-beat-sensor",
-  "largura": 88,
-  "altura": 79,
+  "largura": 93,
+  "altura": 58,
   "pinos": [
    {
     "nome": "GND",
-    "x": 87,
-    "y": 17.8,
+    "x": 89.6,
+    "y": 19.4,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND (- na placa)"
    },
    {
     "nome": "VCC",
-    "x": 87,
-    "y": 27.5,
+    "x": 89.6,
+    "y": 29.0,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao (o pino do meio): 3,3 V ou 5 V"
    },
    {
     "nome": "OUT",
-    "x": 87,
-    "y": 37.5,
-    "sinais": [],
-    "descricao": ""
+    "x": 89.6,
+    "y": 38.6,
+    "sinais": [
+     "analog"
+    ],
+    "descricao": "Saida analogica (S na placa): a luz do LED que passa pelo dedo"
    }
   ],
   "variantes": [],
@@ -9211,40 +9226,40 @@
  },
  {
   "id": "hx711",
-  "largura": 219,
-  "altura": 163,
+  "largura": 182,
+  "altura": 81,
   "pinos": [
    {
-    "nome": "VCC",
-    "x": 7,
-    "y": 55,
+    "nome": "GND",
+    "x": 7.94,
+    "y": 26.1,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    },
    {
     "nome": "DT",
-    "x": 7,
-    "y": 36.3,
+    "x": 7.94,
+    "y": 35.7,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Os dados (DOUT do HX711)"
    },
    {
     "nome": "SCK",
-    "x": 7,
-    "y": 46.2,
+    "x": 7.94,
+    "y": 45.3,
     "sinais": [],
-    "descricao": ""
+    "descricao": "O relogio (PD_SCK do HX711)"
    },
    {
-    "nome": "GND",
-    "x": 7,
-    "y": 26.5,
+    "nome": "VCC",
+    "x": 7.94,
+    "y": 54.9,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao: 2,6 a 5,5 V"
    }
   ],
   "variantes": [],
@@ -11757,72 +11772,68 @@
  },
  {
   "id": "mpu6050",
-  "largura": 82,
+  "largura": 80,
   "altura": 61,
   "pinos": [
    {
-    "nome": "INT",
-    "x": 7.28,
-    "y": 5.78,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "AD0",
-    "x": 16.9,
-    "y": 5.78,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "XCL",
-    "x": 26.4,
-    "y": 5.78,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "XDA",
-    "x": 36,
-    "y": 5.78,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "SDA",
-    "x": 45.6,
-    "y": 5.78,
+    "nome": "VCC",
+    "x": 6.46,
+    "y": 6.43,
     "sinais": [
-     "i2c"
+     "power"
     ],
-    "descricao": ""
-   },
-   {
-    "nome": "SCL",
-    "x": 55.2,
-    "y": 5.78,
-    "sinais": [
-     "i2c"
-    ],
-    "descricao": ""
+    "descricao": "Alimentacao: 3,3 a 5 V (o regulador da placa faz os 3,3 V)"
    },
    {
     "nome": "GND",
-    "x": 64.8,
-    "y": 5.78,
+    "x": 16.06,
+    "y": 6.43,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    },
    {
-    "nome": "VCC",
-    "x": 74.4,
-    "y": 5.78,
-    "sinais": [
-     "power"
-    ],
-    "descricao": ""
+    "nome": "SCL",
+    "x": 25.66,
+    "y": 6.43,
+    "sinais": [],
+    "descricao": "I2C: o relogio (SCL da placa)"
+   },
+   {
+    "nome": "SDA",
+    "x": 35.26,
+    "y": 6.43,
+    "sinais": [],
+    "descricao": "I2C: os dados (SDA da placa)"
+   },
+   {
+    "nome": "XDA",
+    "x": 44.86,
+    "y": 6.43,
+    "sinais": [],
+    "descricao": "I2C auxiliar: dados de um sensor de fora (magnetometro)"
+   },
+   {
+    "nome": "XCL",
+    "x": 54.46,
+    "y": 6.43,
+    "sinais": [],
+    "descricao": "I2C auxiliar: o relogio"
+   },
+   {
+    "nome": "AD0",
+    "x": 64.06,
+    "y": 6.43,
+    "sinais": [],
+    "descricao": "O endereco: LOW (ou solto) = 0x68, HIGH = 0x69"
+   },
+   {
+    "nome": "INT",
+    "x": 73.66,
+    "y": 6.43,
+    "sinais": [],
+    "descricao": "Interrupcao: avisa que ha dado novo"
    }
   ],
   "variantes": [],
@@ -12590,35 +12601,35 @@
  },
  {
   "id": "ntc-temperature-sensor",
-  "largura": 135,
-  "altura": 72,
+  "largura": 93,
+  "altura": 58,
   "pinos": [
    {
     "nome": "GND",
-    "x": 135,
-    "y": 26.2,
+    "x": 89.6,
+    "y": 19.4,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND (- na placa)"
    },
    {
     "nome": "VCC",
-    "x": 135,
-    "y": 35.8,
+    "x": 89.6,
+    "y": 29.0,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao (o pino do meio): 3,3 V ou 5 V"
    },
    {
     "nome": "OUT",
-    "x": 135,
-    "y": 45.5,
+    "x": 89.6,
+    "y": 38.6,
     "sinais": [
      "analog"
     ],
-    "descricao": ""
+    "descricao": "Saida analogica (S na placa): o divisor do NTC de 10k com o resistor de 10k"
    }
   ],
   "variantes": [],
@@ -12946,42 +12957,42 @@
  },
  {
   "id": "photoresistor-sensor",
-  "largura": 174,
-  "altura": 61,
+  "largura": 145,
+  "altura": 54,
   "pinos": [
    {
     "nome": "VCC",
-    "x": 172,
-    "y": 16,
+    "x": 141.6,
+    "y": 12.6,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao: 3,3 a 5 V"
    },
    {
     "nome": "GND",
-    "x": 172,
-    "y": 26,
+    "x": 141.6,
+    "y": 22.2,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    },
    {
     "nome": "DO",
-    "x": 172,
-    "y": 35.8,
+    "x": 141.6,
+    "y": 31.8,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida digital: LOW com a luz acima do ponto do trimpot (o LED DO acende)"
    },
    {
     "nome": "AO",
-    "x": 172,
-    "y": 45.5,
+    "x": 141.6,
+    "y": 41.4,
     "sinais": [
      "analog"
     ],
-    "descricao": ""
+    "descricao": "Saida analogica: mais luz, menos tensao"
    }
   ],
   "variantes": [],
@@ -13673,33 +13684,33 @@
  },
  {
   "id": "pir-motion-sensor",
-  "largura": 91,
-  "altura": 92,
+  "largura": 122,
+  "altura": 111,
   "pinos": [
    {
     "nome": "VCC",
-    "x": 36.178,
-    "y": 92,
+    "x": 51.4,
+    "y": 107.98,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao: 5 a 20 V (o regulador da placa faz os 3,3 V)"
    },
    {
     "nome": "OUT",
-    "x": 45.9175,
-    "y": 92,
+    "x": 61.0,
+    "y": 107.98,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida: 3,3 V com movimento (pelo tempo do trimpot), LOW parado"
    },
    {
     "nome": "GND",
-    "x": 55.6415,
-    "y": 92,
+    "x": 70.6,
+    "y": 107.98,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    }
   ],
   "variantes": [],
@@ -14288,40 +14299,42 @@
  },
  {
   "id": "small-sound-sensor",
-  "largura": 133,
-  "altura": 50,
+  "largura": 156,
+  "altura": 58,
   "pinos": [
    {
     "nome": "AOUT",
-    "x": 0,
-    "y": 11,
-    "sinais": [],
-    "descricao": ""
+    "x": 3.4,
+    "y": 14.6,
+    "sinais": [
+     "analog"
+    ],
+    "descricao": "Saida analogica: o som do microfone"
    },
    {
     "nome": "GND",
-    "x": 0,
-    "y": 20.5,
+    "x": 3.4,
+    "y": 24.2,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND (G na placa)"
    },
    {
     "nome": "VCC",
-    "x": 0,
-    "y": 30.5,
+    "x": 3.4,
+    "y": 33.8,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao (+ na placa): 3,3 V ou 5 V"
    },
    {
     "nome": "DOUT",
-    "x": 0,
-    "y": 40.5,
+    "x": 3.4,
+    "y": 43.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida digital: HIGH com o som acima do ponto do trimpot (o L2 acende)"
    }
   ],
   "variantes": [],

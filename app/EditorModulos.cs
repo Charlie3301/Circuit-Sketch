@@ -42,6 +42,14 @@ public partial class EditorCircuito
         // (modulo-i2c.py) e o do PCM5102A (pecas-pcm5102a.py).
         ["modulo-i2c"] = [(22.3, 58.2, 0.6 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd")],
         ["pcm5102a"] = [(58.6, 48.8, 0.6 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vin-gnd")],
+        // Os sensores (pecas-sensores.py): o PWR acende com o VCC, o DO quando o
+        // sensor detecta (a saida do comparador).
+        ["photoresistor-sensor"] = [(96.00, 9.61, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (96.00, 44.39, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
+        ["flame-sensor"] = [(130.77, 9.61, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (130.77, 44.39, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
+        ["gas-sensor"] = [(99.02, 12.26, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (99.02, 72.74, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
+        ["big-sound-sensor"] = [(106.58, 8.97, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (106.58, 49.03, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
+        ["small-sound-sensor"] = [(106.58, 8.97, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (106.58, 49.03, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
+        ["mpu6050"] = [(25.32, 52.54, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd")],
         // O LED do modulo do AMS1117 (pecas-reguladores.py): fica na saida, acende com o VOUT.
         ["ams1117"] = [(28.7, 35.1, 0.5 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vout-gnd")],
         // O roteador (pecas-wifi-ap.py): energia, WiFi, clientes e internet.
@@ -136,6 +144,9 @@ public partial class EditorCircuito
                 && conta.TensaoDoPino(peca.Id, "VCC") - conta.TensaoDoPino(peca.Id, "GND") >= 2.5,
         // O LED de energia de um modulo: aceso com 2,5 V ou mais entre os pinos.
         "vcc-gnd" => EnergiaDoQuadro is { } c1 && c1.TensaoDoPino(peca.Id, "VCC") - c1.TensaoDoPino(peca.Id, "GND") >= 2.5,
+        // O LED do DO: o comparador disparou (o controle passou do limiar), com o modulo alimentado.
+        "sensor-do" => EnergiaDoQuadro is { } c4 && c4.TensaoDoPino(peca.Id, "VCC") - c4.TensaoDoPino(peca.Id, "GND") >= 2.5
+                       && Comportamento.De(peca.Tipo) is { } comp && peca.Giro > comp.Limiar,
         "vin-gnd" => EnergiaDoQuadro is { } c2 && c2.TensaoDoPino(peca.Id, "VIN") - c2.TensaoDoPino(peca.Id, "GND") >= 2.5,
         "vout-gnd" => EnergiaDoQuadro is { } c3 && c3.TensaoDoPino(peca.Id, "VOUT") - c3.TensaoDoPino(peca.Id, "GND.2") >= 1.8,
         // O roteador: ligado com a simulacao rodando; o WiFi com a rede nomeada;
