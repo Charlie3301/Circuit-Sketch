@@ -10240,6 +10240,87 @@
   "metades": false
  },
  {
+  "id": "nrf24l01-pa-lna",
+  "largura": 59,
+  "altura": 157,
+  "pinos": [
+   {
+    "nome": "GND",
+    "x": 44.03,
+    "y": 4.8,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Terra."
+   },
+   {
+    "nome": "VCC",
+    "x": 44.03,
+    "y": 14.4,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Alimentacao: 1,9 a 3,6 V (no 3V3; 5 V queima). Transmitindo, o amplificador puxa ate ~115 mA."
+   },
+   {
+    "nome": "CE",
+    "x": 34.43,
+    "y": 4.8,
+    "sinais": [
+     "spi"
+    ],
+    "descricao": "Chip Enable: liga a transmissao ou a recepcao."
+   },
+   {
+    "nome": "CSN",
+    "x": 34.43,
+    "y": 14.4,
+    "sinais": [
+     "spi"
+    ],
+    "descricao": "Chip Select do SPI (ativo em LOW)."
+   },
+   {
+    "nome": "SCK",
+    "x": 24.83,
+    "y": 4.8,
+    "sinais": [
+     "spi"
+    ],
+    "descricao": "Relogio do SPI."
+   },
+   {
+    "nome": "MOSI",
+    "x": 24.83,
+    "y": 14.4,
+    "sinais": [
+     "spi"
+    ],
+    "descricao": "Dados do SPI, da placa para o radio."
+   },
+   {
+    "nome": "MISO",
+    "x": 15.23,
+    "y": 4.8,
+    "sinais": [
+     "spi"
+    ],
+    "descricao": "Dados do SPI, do radio para a placa."
+   },
+   {
+    "nome": "IRQ",
+    "x": 15.23,
+    "y": 14.4,
+    "sinais": [
+     "spi"
+    ],
+    "descricao": "Interrupcao (ativa em LOW): chegou pacote ou terminou o envio."
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "ntc-temperature-sensor",
   "largura": 135,
   "altura": 72,

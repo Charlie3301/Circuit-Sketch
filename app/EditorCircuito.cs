@@ -2603,7 +2603,8 @@ public partial class EditorCircuito : Border
 
         foreach (var peca in Atual.Pecas)
         {
-            if (peca.Tipo != "nrf24l01") continue;
+            // (o de antena externa, com o amplificador, e o mesmo radio para o sketch)
+            if (peca.Tipo is not ("nrf24l01" or "nrf24l01-pa-lna")) continue;
 
             foreach (string pino in new[] { "CE", "CSN", "SCK", "MOSI", "MISO" })
             {

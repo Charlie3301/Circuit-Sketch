@@ -39,6 +39,29 @@ public static partial class Autoteste
                 fora && dentro && ordem, $"GND ({P(d, "GND").X},{P(d, "GND").Y}) VCC ({P(d, "VCC").X},{P(d, "VCC").Y})");
         }
 
+        // ---- o nRF24L01+PA+LNA (o de antena externa): a mesma barra, e o mesmo radio para o sketch ----
+        {
+            var d = Catalogo.Obter("nrf24l01-pa-lna");
+            var curto = Catalogo.Obter("nrf24l01");
+            bool mesmaBarra = d is not null && d.Pinos.Count == 8 && d.Pinos.All(p =>
+                curto.Pinos.FirstOrDefault(q => q.Nome == p.Nome) is { } q
+                && Math.Abs((p.X - P(d, "GND").X) - (q.X - P(curto, "GND").X)) < 0.2 && Math.Abs(p.Y - q.Y) < 0.2);
+            Conferir("nrf24l01-pa-lna: no catalogo (Modulos, 15,5 x 41,5 mm), com a mesma barra 2x4 do nRF24L01",
+                mesmaBarra && d.Largura == 59 && d.Altura == 157 && d.Categoria == "Modulos" && Pecas.Existe("nrf24l01-pa-lna"),
+                d is null ? "sem peca" : $"{d.Largura}x{d.Altura} {d.Categoria}");
+            var c = new Circuito();
+            c.Pecas.Add(new PecaNoCircuito { Id = "placa", Tipo = "esp32-devkit-v1", X = 0, Y = 0, Usb = true });
+            c.Pecas.Add(new PecaNoCircuito { Id = "r", Tipo = "nrf24l01-pa-lna", X = 400, Y = 0 });
+            foreach (var (pr, pp) in new[] { ("VCC", "3V3"), ("GND", "GND.1"), ("CE", "D4"), ("CSN", "D5"), ("SCK", "D18"), ("MOSI", "D23"), ("MISO", "D19") })
+                c.Fios.Add(new Fio { DePeca = "r", DePino = pr, ParaPeca = "placa", ParaPino = pp });
+            var ed = new EditorCircuito { EmSimulacao = true };
+            ed.Carregar(c);
+            var maq = new Maquina { Perfil = PerfilPlaca.Esp32 };
+            maq.Reiniciar();
+            ed.AplicarEntradas(Simulador.App.Bancada.DeUmaSo(maq), new Netlist(c));
+            Conferir("nrf24l01-pa-lna: ligado no SPI, a placa acha o radio (radio.begin() funciona)", maq.RadioPresente);
+        }
+
         // ---- o MAX98357A: a barra na ordem da serigrafia e o borne com o - a esquerda ----
         {
             var d = Catalogo.Obter("max98357a");

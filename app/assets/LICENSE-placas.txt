@@ -62,10 +62,11 @@ Nenhuma trilha nem arte da serigrafia foi copiada. STM32 e ST sao marcas
 registradas da STMicroelectronics; o nome do chip aparece so para
 identifica-lo, e o logotipo nao e reproduzido.
 
-Os modulos nrf24l01.svg, pcm5102a.svg e modulo-i2c.svg tambem sao desenhos
-proprios do CircuitSketch, com o lugar de cada peca medido em fotos: a do
-nRF24L01 e a foto "NRF24l01 Nordic Semiconductor radio.JPG" do Wikimedia
-Commons (Dmcole, CC BY-SA 3.0); a do PCM5102A, as fotos de frente e de verso
+Os modulos nrf24l01.svg, nrf24l01-pa-lna.svg, pcm5102a.svg e modulo-i2c.svg
+tambem sao desenhos proprios do CircuitSketch, com o lugar de cada peca medido
+em fotos: as dos dois nRF24L01 sao as fotos "NRF24l01 Nordic Semiconductor
+radio.JPG" e "NRF24l01-pa-lna-duck.jpg" do Wikimedia Commons (Dmcole,
+CC BY-SA 3.0); a do PCM5102A, as fotos de frente e de verso
 do modulo GY-PCM5102; a do adaptador I2C, a do guia da Handson Technology.
 Nenhuma foto e reproduzida.
 

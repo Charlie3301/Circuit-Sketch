@@ -949,6 +949,8 @@ public sealed partial class Energia
         "neopixel" => 90,
         "lcd1602" or "lcd2004" or "lcd1602-i2c" or "lcd2004-i2c" => 180,
         "ssd1306" or "ssd1306-i2c" or "ili9341" or "st7789" => 250,
+        // O nRF24L01 com amplificador: ~115 mA transmitindo, ~45 mA na media.
+        "nrf24l01-pa-lna" => 75,
         _ => 400,
     };
 

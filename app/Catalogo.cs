@@ -553,6 +553,7 @@ public static class Catalogo
         "wifi-ap" => "Ponto de acesso WiFi",
         "texto" => "Texto",
         "nrf24l01" => "Modulo de radio NRF24L01",
+        "nrf24l01-pa-lna" => "Modulo de radio NRF24L01+PA+LNA (antena externa)",
         "flame-sensor" => "Sensor de chama",
         "gas-sensor" => "Sensor de gas",
         "heart-beat-sensor" => "Sensor de batimento",
@@ -666,7 +667,7 @@ public static class Catalogo
             or "nor-gate" or "xnor-gate" or "mux-2" or "flip-flop-d"
             or "flip-flop-sr" or "flip-flop-dsr" or "clock-generator"
             or "logic-analyzer" => "Logica",
-        "modulo-i2c" or "nrf24l01" or "max98357a" or "pcm5102a" => "Modulos",
+        "modulo-i2c" or "nrf24l01" or "nrf24l01-pa-lna" or "max98357a" or "pcm5102a" => "Modulos",
         "wifi-ap" => "Rede",
         "texto" => "Anotacao",
         IdProtoboard or IdProtoboard830 or IdProtoboard170 => "Base",
