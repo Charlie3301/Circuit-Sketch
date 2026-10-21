@@ -21,8 +21,9 @@ dos fabricantes e dos vendedores; os pinos nos lugares de verdade):
                             e os furos M2 a 28 mm;
   - mpu6050               : o GY-521 de 21 x 16 mm, os oito furos na ordem da
                             placa (VCC, GND, SCL, SDA, XDA, XCL, AD0, INT);
-  - hx711                 : o modulo verde de 38 x 21 mm, com os fios da celula
-                            de carga soldados no E+, E-, A- e A+.
+  - hx711                 : o modulo verde comum (XFW-HX711, 24,2 x 15,7 mm): os
+                            seis furos da celula (E+, E-, A-, A+, B-, B+) numa
+                            ponta e o GND, DT, SCK, VCC na outra.
 
 Os LEDs de energia e o do DO dos modulos (as posicoes saem impressas para o
 EditorModulos.cs) acendem pela conta: o PWR com o VCC ligado, o DO quando o
@@ -530,45 +531,51 @@ guardar('mpu6050', L, H, [(n, x, Y_GY, *DESC_GY[n]) for n, x in zip(NOMES_GY, XS
 luz('mpu6050', X0 + 6.6, Y0 + 13.8, 0.55, 'vermelho', 'vcc-gnd')
 
 # =====================================================================
-#  hx711: o modulo verde, com os fios da celula de carga
+#  hx711: o modulo verde comum (XFW-HX711, 24,2 x 15,7 mm)
 # =====================================================================
-L, H = caixa(38.2 + 10.0, 21.4)
-X0, Y0 = 0.2, (H - 21.0) / 2
-cy = H / 2
+L, H = caixa(24.6, 16.1)
+X0, Y0 = 0.2, 0.2
+LP, AP = 24.2, 15.7
+cy = Y0 + AP / 2
 NOMES_HX = ['GND', 'DT', 'SCK', 'VCC']
+X_HX = X0 + LP - 2.3                                              # os quatro furos da direita
 YS_HX = [cy + (k - 1.5) * PASSO for k in range(4)]
+X_CEL = X0 + 1.6                                                  # a coluna dos seis da celula, na esquerda
 YS_CEL = [cy + (k - 2.5) * PASSO for k in range(6)]
 d = Desenho(T(A, 0, 0, A, 0, 0))
-placa(d, X0, Y0, 38.0, 21.0, VERDE, VERDE_BORDA)
-for k, y in enumerate(YS_HX):
-    ilha(d, X0 + 1.9, y, quadrada=k == 0)
-    d.texto(X0 + 3.4, y, NOMES_HX[k], 0.75, BRANCO, alinhar='center-left')
+placa(d, X0, Y0, LP, AP, '#1d8a3e', '#0f4a20', rx=0.5)
 for k, (y, n) in enumerate(zip(YS_CEL, ('E+', 'E-', 'A-', 'A+', 'B-', 'B+'))):
-    ilha(d, X0 + 36.1, y, quadrada=k == 0)
-    d.texto(X0 + 34.4, y, n, 0.75, BRANCO, alinhar='center-right')
-d.ret_c(X0 + 19.0, cy, 10.0, 4.0, '#202124', rx=0.15)                                      # o HX711 (SOP-16)
+    ilha(d, X_CEL, y, quadrada=k == 0)
+    d.texto(X_CEL + 1.3, y, n, 0.85, BRANCO, alinhar='center-left', peso='normal')
+d.ret(X_HX - 1.3, YS_HX[0] - 1.5, 2.6, YS_HX[-1] - YS_HX[0] + 3.0, None, rx=0.15, stroke=BRANCO, sw=0.12)  # a moldura da barra
+for k, (y, n) in enumerate(zip(YS_HX, NOMES_HX)):
+    ilha(d, X_HX, y, quadrada=k == 0)
+    d.texto(X_HX - 1.6, y, n, 0.85, BRANCO, alinhar='center-right', peso='normal')
+# o HX711 (SOP-16), em pe no meio da placa
+CX_CI, CY_CI = X0 + 13.2, Y0 + 6.6
 for k in range(8):
-    for s in (-1, 1):
-        d.ret_c(X0 + 19.0 - 4.445 + k * 1.27, cy + s * 2.6, 0.42, 1.2, ESTANHO)
-d.texto(X0 + 19.0, cy, 'HX711', 0.9, '#c8cbd0', alinhar='center')
-d.circ(X0 + 14.6, cy + 1.2, 0.3, '#3a3c40')
-d.ret_c(X0 + 26.8, Y0 + 4.0, 2.9, 1.6, '#202124')                                          # o transistor do E+
-for x, y, cor in ((X0 + 9.0, Y0 + 4.0, '#a37a52'), (X0 + 11.2, Y0 + 4.0, '#1a1a1a'), (X0 + 9.0, Y0 + 17.0, '#a37a52'),
-                  (X0 + 11.2, Y0 + 17.0, '#1a1a1a'), (X0 + 26.8, Y0 + 17.0, '#a37a52'), (X0 + 29.0, Y0 + 17.0, '#1a1a1a'),
-                  (X0 + 29.4, Y0 + 4.0, '#a37a52')):
-    smd(d, x, y, 1.6, 0.8, cor, vertical=True)
-d.texto(X0 + 19.0, Y0 + 19.6, 'Load Cell Amp', 0.6, BRANCO, alinhar='center')
-# os fios da celula de carga: vermelho no E+, preto no E-, branco no A-, verde no A+
-for y, cor in zip(YS_CEL[:4], ('#d0312d', '#1b1b1b', '#eeeeea', '#2e9a3e')):
-    d.linha(X0 + 36.1, y, L - 2.6, cy - 1.8 + (YS_CEL.index(y)) * 1.2, cor, 0.7, curva=0)
-for k, cor in enumerate(('#d0312d', '#1b1b1b', '#eeeeea', '#2e9a3e')):
-    d.linha(L - 2.7, cy - 1.8 + k * 1.2, L - 0.4, cy - 1.8 + k * 1.2, cor, 0.7, cap='butt')
-d.ret(L - 2.9, cy - 2.6, 1.2, 4.8, '#2b2d31', rx=0.3)                                       # o termorretratil da celula
-d.texto(L - 2.3, cy + 4.4, 'celula', 0.55, BRANCO, alinhar='center')
+    for s_ in (-1, 1):
+        d.ret_c(CX_CI + s_ * 2.55, CY_CI - 4.445 + k * 1.27, 1.2, 0.42, ESTANHO)
+d.ret_c(CX_CI, CY_CI, 4.0, 10.0, '#202124', rx=0.15)
+d.circ(CX_CI - 1.2, CY_CI - 4.2, 0.28, '#3a3c40')
+d.texto(CX_CI, CY_CI, 'HX711', 0.75, '#c8cbd0', ang=90, alinhar='center')
+# o transistor do E+ (S8550, SOT-23) e os passivos
+d.ret_c(X0 + 7.2, Y0 + 2.4, 1.4, 2.9, '#202124')
+for y in (Y0 + 1.45, Y0 + 3.35):
+    d.ret_c(X0 + 6.2, y, 0.7, 0.4, ESTANHO)
+d.ret_c(X0 + 8.2, Y0 + 2.4, 0.7, 0.4, ESTANHO)
+for k in range(4):                                                # a coluna de resistores e capacitores
+    smd(d, X0 + 7.6, Y0 + 7.0 + k * 1.9, 1.6, 0.8, '#a37a52' if k % 2 else '#1a1a1a')
+for k in range(3):
+    smd(d, X0 + 9.6, Y0 + 9.0 + k * 1.9, 1.6, 0.8, '#1a1a1a' if k % 2 else '#a37a52')
+for x in (X0 + 12.6, X0 + 16.4):                                  # a fileira de cima
+    smd(d, x, Y0 + 0.9, 1.6, 0.8, '#a37a52')
+smd(d, X0 + 21.2, Y0 + 1.0, 1.6, 0.8, '#1a1a1a')
+d.texto(X0 + 14.9, Y0 + AP - 1.4, 'XFW-HX711', 1.15, BRANCO, alinhar='center')
 gravar('hx711', d, L, H)
 DESC_HX = {'GND': (['power'], 'GND'), 'DT': ([], 'Os dados (DOUT do HX711)'), 'SCK': ([], 'O relogio (PD_SCK do HX711)'),
            'VCC': (['power'], 'Alimentacao: 2,6 a 5,5 V')}
-guardar('hx711', L, H, [(n, X0 + 1.9, y, *DESC_HX[n]) for n, y in zip(NOMES_HX, YS_HX)])
+guardar('hx711', L, H, [(n, X_HX, y, *DESC_HX[n]) for n, y in zip(NOMES_HX, YS_HX)])
 
 # =====================================================================
 cam = pa.BASE + 'app/assets/pecas.json'

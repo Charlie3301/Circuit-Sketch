@@ -9226,13 +9226,13 @@
  },
  {
   "id": "hx711",
-  "largura": 182,
-  "altura": 81,
+  "largura": 93,
+  "altura": 61,
   "pinos": [
    {
     "nome": "GND",
-    "x": 7.94,
-    "y": 26.1,
+    "x": 83.53,
+    "y": 16.03,
     "sinais": [
      "power"
     ],
@@ -9240,22 +9240,22 @@
    },
    {
     "nome": "DT",
-    "x": 7.94,
-    "y": 35.7,
+    "x": 83.53,
+    "y": 25.63,
     "sinais": [],
     "descricao": "Os dados (DOUT do HX711)"
    },
    {
     "nome": "SCK",
-    "x": 7.94,
-    "y": 45.3,
+    "x": 83.53,
+    "y": 35.23,
     "sinais": [],
     "descricao": "O relogio (PD_SCK do HX711)"
    },
    {
     "nome": "VCC",
-    "x": 7.94,
-    "y": 54.9,
+    "x": 83.53,
+    "y": 44.83,
     "sinais": [
      "power"
     ],
