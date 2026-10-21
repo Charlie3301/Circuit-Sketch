@@ -180,13 +180,13 @@
     "DePeca": "placa",
     "DePino": "D3",
     "ParaPeca": "buzzer",
-    "ParaPino": "1",
+    "ParaPino": "2",
     "Cor": "#F28C28",
     "Estilo": "solto"
    },
    {
     "DePeca": "buzzer",
-    "DePino": "2",
+    "DePino": "1",
     "ParaPeca": "placa",
     "ParaPino": "GND.2",
     "Cor": "#1A1A1A",

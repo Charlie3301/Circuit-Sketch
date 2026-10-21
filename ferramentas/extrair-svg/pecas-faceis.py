@@ -76,12 +76,14 @@ guardar('junction', junction, L, L, [
 lv, av = 3 * PASSO, 3 * PASSO        # 7,62 x 7,62 mm
 meio = lv / 2
 
+# (Alpha 25: o texto em Arial, como o resto das pecas, e a ponta do pino marcada.)
 vcc = f'''<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
      width="{lv}mm" height="{av}mm" viewBox="0 0 {lv} {av}"
-     font-family="sans-serif" text-anchor="middle">
-  <path d="M1.1 3.1 H{lv - 1.1}" stroke="#e04b4b" stroke-width="0.7" stroke-linecap="round"/>
-  <path d="M{meio} 3.1 V{av - 0.4}" stroke="#e04b4b" stroke-width="0.55"/>
-  <text x="{meio}" y="2.2" fill="#e04b4b" font-size="2.3px" font-weight="bold">VCC</text>
+     font-family="Arial" text-anchor="middle">
+  <path d="M1.1 3.3 H{lv - 1.1}" stroke="#e04b4b" stroke-width="0.7" stroke-linecap="round"/>
+  <path d="M{meio} 3.3 V{av - 0.5}" stroke="#e04b4b" stroke-width="0.55"/>
+  <circle cx="{meio}" cy="{av - 0.5}" r="0.42" fill="#e04b4b"/>
+  <text x="{meio}" y="2.25" fill="#e04b4b" font-size="2.2px" font-weight="bold">VCC</text>
 </svg>
 '''
 guardar('vcc-symbol', vcc, lv, av,
@@ -90,16 +92,18 @@ guardar('vcc-symbol', vcc, lv, av,
 # ---------------------------------------------------------------
 # GND: as tres barras, com o pino em cima.
 # ---------------------------------------------------------------
+# (Alpha 25: as barras subiram -- o "GND" encostava na ultima.)
 gnd = f'''<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
      width="{lv}mm" height="{av}mm" viewBox="0 0 {lv} {av}"
-     font-family="sans-serif" text-anchor="middle">
-  <path d="M{meio} 0.4 V3.5" stroke="#6f7681" stroke-width="0.55"/>
-  <g stroke="#6f7681" stroke-linecap="round">
-    <path d="M1.1 3.6 H{lv - 1.1}" stroke-width="0.7"/>
-    <path d="M2.1 4.7 H{lv - 2.1}" stroke-width="0.6"/>
-    <path d="M3.1 5.7 H{lv - 3.1}" stroke-width="0.5"/>
+     font-family="Arial" text-anchor="middle">
+  <circle cx="{meio}" cy="0.5" r="0.42" fill="#8a919b"/>
+  <path d="M{meio} 0.5 V2.9" stroke="#8a919b" stroke-width="0.55"/>
+  <g stroke="#8a919b" stroke-linecap="round">
+    <path d="M1.1 3.0 H{lv - 1.1}" stroke-width="0.7"/>
+    <path d="M2.1 4.0 H{lv - 2.1}" stroke-width="0.6"/>
+    <path d="M3.1 4.9 H{lv - 3.1}" stroke-width="0.5"/>
   </g>
-  <text x="{meio}" y="{av - 0.3}" fill="#6f7681" font-size="2.1px">GND</text>
+  <text x="{meio}" y="{av - 0.35}" fill="#8a919b" font-size="2.0px" font-weight="bold">GND</text>
 </svg>
 '''
 guardar('gnd-symbol', gnd, lv, av,

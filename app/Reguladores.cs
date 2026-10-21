@@ -118,11 +118,11 @@ public static class Reguladores
         _ => null,
     };
 
-    /// <summary>Os pinos: a entrada (+ e -) e a saida (+ e -). Nos de tres pernas o GND e o mesmo.</summary>
+    /// <summary>Os pinos: a entrada (+ e -) e a saida (+ e -). No 7805 o GND e o mesmo; no AMS1117 sao dois, ligados por dentro.</summary>
     public static (string Entrada, string TerraDaEntrada, string Saida, string TerraDaSaida) PinosDe(string tipo) => tipo switch
     {
         "regulador-7805" => ("IN", "GND", "OUT", "GND"),
-        "ams1117" => ("VIN", "GND", "VOUT", "GND"),
+        "ams1117" => ("VIN", "GND", "VOUT", "GND.2"),
         "lm2596" => ("IN+", "IN-", "OUT+", "OUT-"),
         "mt3608" => ("VIN+", "VIN-", "VOUT+", "VOUT-"),
         _ => default,

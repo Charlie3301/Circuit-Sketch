@@ -70,4 +70,16 @@ CC BY-SA 3.0); a do PCM5102A, as fotos de frente e de verso
 do modulo GY-PCM5102; a do adaptador I2C, a do guia da Handson Technology.
 Nenhuma foto e reproduzida.
 
+Os reguladores (regulador-7805*.svg, ams1117*.svg, lm2596.svg e mt3608.svg),
+os modulos de rele (modulo-rele-1.svg, modulo-rele-2.svg e modulo-rele-4.svg),
+o buzzer.svg, o alto-falante.svg e o ks2e-m-dc5.svg tambem sao desenhos
+proprios do CircuitSketch. O 78xx segue as medidas do TO-220 (JEDEC); o lugar
+das pecas do LM2596 foi medido na foto "LM2596 buck converter module, MP1584
+buck converter module, and SDB628 boost converter module.jpg" do Wikimedia
+Commons (Matthew Berardi, CC BY-SA 4.0); o do rele SRD-05VDC-SL-C, na foto
+"SRD-05VDC-SL-C 5V one-channel relay module.jpg" (Suyash Dwivedi, CC BY-SA
+4.0); o do MT3608, no desenho de cotas da components101; o do AMS1117, numa
+foto do modulo de 25 x 11 mm. Nenhuma foto e reproduzida. Os nomes dos
+fabricantes dos reles nao sao desenhados; aparece so o modelo.
+
 O restante do CircuitSketch nao e afetado por esta licenca.

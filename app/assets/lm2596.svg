@@ -1,52 +1,98 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-     width="43.0mm" height="21.0mm" viewBox="0 0 43.0 21.0">
-  <rect x="0.2" y="0.2" width="42.60" height="20.60" rx="1.0" fill="#1f5fb4" stroke="#123e7a" stroke-width="0.35"/>
-  <rect x="0.9" y="0.9" width="41.20" height="19.20" rx="0.7" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="0.3"/>
-  <rect x="5.4" y="4.2" width="12.6" height="12.6" rx="1.6" fill="#232428" stroke="#0b0b0c" stroke-width="0.3"/>
-  <circle cx="11.7" cy="10.5" r="4.6" fill="#2c2d32" stroke="#3a3c41" stroke-width="0.3"/>
-  <text x="11.70" y="11.10" fill="#c9ccd1" font-size="1.6px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">330</text>
-  <rect x="20.2" y="11.6" width="8.4" height="2.0" fill="#cfd3d8" stroke="#80858c" stroke-width="0.15"/>
-  <rect x="20.0" y="4.0" width="8.8" height="7.8" rx="0.3" fill="#1d1e22" stroke="#0a0a0b" stroke-width="0.2"/>
-  <text x="24.40" y="7.00" fill="#d9dce0" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">LM2596S</text>
-  <text x="24.40" y="8.50" fill="#b9bec6" font-size="0.9px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">ADJ</text>
-  <rect x="21.00" y="15.20" width="4.00" height="2.60" rx="0.15" fill="#26282c" stroke="#4a3622" stroke-width="0.12"/>
-  <rect x="21.0" y="15.2" width="0.8" height="2.6" fill="#b9bec6"/>
-  <circle cx="33.40" cy="6.40" r="3.15" fill="#1c1d21" stroke="#0b0b0c" stroke-width="0.25"/>
-  <circle cx="33.40" cy="6.40" r="2.58" fill="#b9bec6" stroke="#7d828a" stroke-width="0.2"/>
-  <path d="M31.82 6.40 H34.98 M33.40 4.83 V7.98" stroke="#7d828a" stroke-width="0.25"/>
-  <path d="M30.82 6.40 A2.58 2.58 0 0 1 32.45 4.01" fill="none" stroke="#e8e8e8" stroke-width="0.45"/>
-  <text x="33.56" y="10.65" fill="#cfe0f7" font-size="0.85px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">220</text>
-  <circle cx="33.40" cy="14.60" r="3.15" fill="#1c1d21" stroke="#0b0b0c" stroke-width="0.25"/>
-  <circle cx="33.40" cy="14.60" r="2.58" fill="#b9bec6" stroke="#7d828a" stroke-width="0.2"/>
-  <path d="M31.82 14.60 H34.98 M33.40 13.03 V16.18" stroke="#7d828a" stroke-width="0.25"/>
-  <path d="M30.82 14.60 A2.58 2.58 0 0 1 32.45 12.21" fill="none" stroke="#e8e8e8" stroke-width="0.45"/>
-  <text x="33.56" y="18.85" fill="#cfe0f7" font-size="0.85px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">220</text>
-  <rect x="8.20" y="17.70" width="9.50" height="2.60" rx="0.5" fill="#2f6fd6" stroke="#173a73" stroke-width="0.3"/>
-  <rect x="8.80" y="18.30" width="8.30" height="1.40" rx="0.3" fill="#3a7ce0"/>
-  <circle cx="16.30" cy="19.00" r="1.05" fill="#d8b660" stroke="#7d6420" stroke-width="0.25"/>
-  <path d="M15.50 19.00 H17.10" stroke="#7d6420" stroke-width="0.3"/>
-  <text x="27.50" y="20.10" fill="#cfe0f7" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">DC-DC STEP DOWN</text>
-  <circle cx="2.60" cy="3.20" r="0.95" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
-  <circle cx="2.60" cy="3.20" r="0.43" fill="#2a2a2a"/>
-  <text x="4.80" y="3.60" fill="#e6ecf5" font-size="0.95px" text-anchor="start"
-        font-family="Verdana" font-weight="bold">IN+</text>
-  <circle cx="2.60" cy="17.80" r="0.95" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
-  <circle cx="2.60" cy="17.80" r="0.43" fill="#2a2a2a"/>
-  <text x="4.80" y="18.20" fill="#e6ecf5" font-size="0.95px" text-anchor="start"
-        font-family="Verdana" font-weight="bold">IN-</text>
-  <circle cx="40.40" cy="3.20" r="0.95" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
-  <circle cx="40.40" cy="3.20" r="0.43" fill="#2a2a2a"/>
-  <text x="38.20" y="3.60" fill="#e6ecf5" font-size="0.95px" text-anchor="end"
-        font-family="Verdana" font-weight="bold">OUT+</text>
-  <circle cx="40.40" cy="17.80" r="0.95" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
-  <circle cx="40.40" cy="17.80" r="0.43" fill="#2a2a2a"/>
-  <text x="38.20" y="18.20" fill="#e6ecf5" font-size="0.95px" text-anchor="end"
-        font-family="Verdana" font-weight="bold">OUT-</text>
-
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="162.52px" height="79.37px" viewBox="0 0 162.52 79.37">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <radialGradient id="lata-topo" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#f1f3f5"/><stop offset="0.6" stop-color="#c3c8ce"/><stop offset="1" stop-color="#8a9097"/></radialGradient>
+  <linearGradient id="niquel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9ecef"/><stop offset="0.5" stop-color="#c2c7cd"/><stop offset="1" stop-color="#959ba2"/></linearGradient>
+  <linearGradient id="trimpot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f8be8"/><stop offset="1" stop-color="#2459b8"/></linearGradient>
+  <radialGradient id="latao" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#f6e3a0"/><stop offset="0.6" stop-color="#d1a845"/><stop offset="1" stop-color="#8f6d1f"/></radialGradient>
+</defs>
+<rect x="0" y="0" width="162.52" height="79.37" rx="3.024" fill="#1f5fb4" stroke="#123e7a" stroke-width="0.567"/>
+<rect x="0" y="0" width="162.52" height="79.37" rx="3.024" fill="url(#luz)"/>
+<circle cx="24.945" cy="8.315" r="6.425" fill="url(#ouro)" stroke="#8a6a22" stroke-width="0.378"/>
+<circle cx="24.945" cy="8.315" r="4.724" fill="#15171b"/>
+<circle cx="139.087" cy="70.299" r="6.425" fill="url(#ouro)" stroke="#8a6a22" stroke-width="0.378"/>
+<circle cx="139.087" cy="70.299" r="4.724" fill="#15171b"/>
+<rect x="0.189" y="0.189" width="10.205" height="10.205" rx="1.89" fill="#cfd3d8"/>
+<circle cx="5.291" cy="5.291" r="2.079" fill="#15171b"/>
+<text transform="translate(1.512 15.118) rotate(0)" x="0" y="1.89" font-family="Arial" font-weight="normal" font-size="4.724" fill="#f2f5f7" text-anchor="start">IN+</text>
+<rect x="0.189" y="68.976" width="10.205" height="10.205" rx="1.89" fill="#cfd3d8"/>
+<circle cx="5.291" cy="74.079" r="2.079" fill="#15171b"/>
+<text transform="translate(1.512 64.252) rotate(0)" x="0" y="1.89" font-family="Arial" font-weight="normal" font-size="4.724" fill="#f2f5f7" text-anchor="start">IN-</text>
+<rect x="152.126" y="0.189" width="10.205" height="10.205" rx="1.89" fill="#cfd3d8"/>
+<circle cx="157.228" cy="5.291" r="2.079" fill="#15171b"/>
+<text transform="translate(161.008 15.118) rotate(0)" x="0" y="1.89" font-family="Arial" font-weight="normal" font-size="4.724" fill="#f2f5f7" text-anchor="end">OUT+</text>
+<rect x="152.126" y="68.976" width="10.205" height="10.205" rx="1.89" fill="#cfd3d8"/>
+<circle cx="157.228" cy="74.079" r="2.079" fill="#15171b"/>
+<text transform="translate(161.008 64.252) rotate(0)" x="0" y="1.89" font-family="Arial" font-weight="normal" font-size="4.724" fill="#f2f5f7" text-anchor="end">OUT-</text>
+<rect x="40.63" y="2.268" width="30.236" height="6.047" fill="url(#metal)"/>
+<rect x="41.386" y="40.063" width="3.024" height="16.63" fill="url(#metal-h)"/>
+<rect x="40.819" y="55.181" width="4.157" height="6.047" rx="0.378" fill="#cfd3d8"/>
+<rect x="47.811" y="40.063" width="3.024" height="16.63" fill="url(#metal-h)"/>
+<rect x="47.244" y="55.181" width="4.157" height="6.047" rx="0.378" fill="#cfd3d8"/>
+<rect x="54.236" y="40.063" width="3.024" height="16.63" fill="url(#metal-h)"/>
+<rect x="53.669" y="55.181" width="4.157" height="6.047" rx="0.378" fill="#cfd3d8"/>
+<rect x="60.661" y="40.063" width="3.024" height="16.63" fill="url(#metal-h)"/>
+<rect x="60.094" y="55.181" width="4.157" height="6.047" rx="0.378" fill="#cfd3d8"/>
+<rect x="67.087" y="40.063" width="3.024" height="16.63" fill="url(#metal-h)"/>
+<rect x="66.52" y="55.181" width="4.157" height="6.047" rx="0.378" fill="#cfd3d8"/>
+<rect x="36.661" y="7.559" width="38.173" height="32.504" rx="1.625" fill="#1f2023"/>
+<rect x="36.661" y="7.559" width="38.173" height="32.504" rx="1.625" fill="url(#luz)"/>
+<text transform="translate(55.748 26.391) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="normal" font-size="4.016" fill="#c3c6cb" text-anchor="middle">ADJ</text>
+<text transform="translate(55.748 21.231) rotate(0)" x="0" y="1.984" font-family="Arial" font-weight="normal" font-size="4.961" fill="#c3c6cb" text-anchor="middle">LM2596S</text>
+<rect x="22.583" y="58.961" width="4.724" height="7.559" rx="0.302" fill="#b7956a"/>
+<rect x="22.583" y="58.961" width="4.724" height="7.559" rx="0.302" fill="url(#luz)"/>
+<rect x="22.583" y="58.961" width="4.724" height="1.663" fill="url(#metal)"/>
+<rect x="22.583" y="64.857" width="4.724" height="1.663" fill="url(#metal)"/>
+<rect x="12.85" y="56.598" width="6.047" height="3.213" rx="0.302" fill="#b7956a"/>
+<rect x="12.85" y="56.598" width="6.047" height="3.213" rx="0.302" fill="url(#luz)"/>
+<rect x="12.85" y="56.598" width="1.33" height="3.213" fill="url(#metal)"/>
+<rect x="17.567" y="56.598" width="1.33" height="3.213" fill="url(#metal)"/>
+<rect x="81.921" y="3.024" width="3.213" height="6.047" rx="0.302" fill="#b7956a"/>
+<rect x="81.921" y="3.024" width="3.213" height="6.047" rx="0.302" fill="url(#luz)"/>
+<rect x="81.921" y="3.024" width="3.213" height="1.33" fill="url(#metal)"/>
+<rect x="81.921" y="7.74" width="3.213" height="1.33" fill="url(#metal)"/>
+<rect x="131.906" y="6.331" width="7.559" height="4.724" rx="0.302" fill="#1e1f22"/>
+<rect x="131.906" y="6.331" width="7.559" height="4.724" rx="0.302" fill="url(#luz)"/>
+<rect x="131.906" y="6.331" width="1.663" height="4.724" fill="url(#metal)"/>
+<rect x="137.802" y="6.331" width="1.663" height="4.724" fill="url(#metal)"/>
+<text transform="translate(135.685 8.693) rotate(0)" x="0" y="1.063" font-family="Arial" font-weight="normal" font-size="2.657" fill="#c3c6cb" text-anchor="middle">102</text>
+<rect x="143.622" y="56.976" width="6.047" height="3.213" rx="0.302" fill="#b7956a"/>
+<rect x="143.622" y="56.976" width="6.047" height="3.213" rx="0.302" fill="url(#luz)"/>
+<rect x="143.622" y="56.976" width="1.33" height="3.213" fill="url(#metal)"/>
+<rect x="148.339" y="56.976" width="1.33" height="3.213" fill="url(#metal)"/>
+<rect x="33.638" y="67.54" width="5.291" height="7.03" rx="0.378" fill="#cfd3d8"/>
+<rect x="56.315" y="67.54" width="5.291" height="7.03" rx="0.378" fill="#cfd3d8"/>
+<rect x="39.685" y="65.197" width="15.874" height="11.717" rx="0.756" fill="#1f2023"/>
+<rect x="39.685" y="65.197" width="15.874" height="11.717" rx="0.756" fill="url(#luz)"/>
+<rect x="53.008" y="65.197" width="1.701" height="11.717" fill="#9aa1a8"/>
+<text transform="translate(46.488 71.055) rotate(0)" x="0" y="1.757" font-family="Arial" font-weight="normal" font-size="4.394" fill="#c3c6cb" text-anchor="middle">SS34</text>
+<rect x="75.969" y="31.37" width="45.732" height="45.354" rx="6.803" fill="#2b2c30" stroke="#0b0b0c" stroke-width="0.454"/>
+<rect x="75.969" y="31.37" width="45.732" height="45.354" rx="6.803" fill="url(#luz)"/>
+<circle cx="98.835" cy="54.047" r="19.276" fill="#3a3c41" stroke="#1c1d20" stroke-width="0.945"/>
+<text transform="translate(98.835 54.047) rotate(0)" x="0" y="4.337" font-family="Arial" font-weight="bold" font-size="10.843" fill="#c9ccd1" text-anchor="middle">330</text>
+<path d="M5.48 22.866 L27.024 22.866 L31.937 27.78 L31.937 54.236 L0.567 54.236 L0.567 27.78 Z" fill="#2a2b2f" stroke="#111214" stroke-width="0.302"/>
+<rect x="14.362" y="20.976" width="3.78" height="2.646" rx="0.378" fill="#cfd3d8"/>
+<rect x="14.362" y="53.48" width="3.78" height="2.646" rx="0.378" fill="#cfd3d8"/>
+<circle cx="16.252" cy="38.551" r="15.118" fill="url(#lata-topo)" stroke="#7d828a" stroke-width="0.454"/>
+<path d="M3.159 46.11 A15.118 15.118 0 0 0 29.345 46.11 Z" fill="#1b1c20" fill-opacity="0.92"/>
+<text transform="translate(9.902 35.83) rotate(-90)" x="0" y="1.512" font-family="Arial" font-weight="bold" font-size="3.78" fill="#1c1d21" text-anchor="middle">100</text>
+<text transform="translate(16.252 35.83) rotate(-90)" x="0" y="1.512" font-family="Arial" font-weight="bold" font-size="3.78" fill="#1c1d21" text-anchor="middle">50V</text>
+<text transform="translate(22.602 35.83) rotate(-90)" x="0" y="1.512" font-family="Arial" font-weight="bold" font-size="3.78" fill="#1c1d21" text-anchor="middle">RVT</text>
+<path d="M135.496 22.866 L157.039 22.866 L161.953 27.78 L161.953 54.236 L130.583 54.236 L130.583 27.78 Z" fill="#2a2b2f" stroke="#111214" stroke-width="0.302"/>
+<rect x="144.378" y="20.976" width="3.78" height="2.646" rx="0.378" fill="#cfd3d8"/>
+<rect x="144.378" y="53.48" width="3.78" height="2.646" rx="0.378" fill="#cfd3d8"/>
+<circle cx="146.268" cy="38.551" r="15.118" fill="url(#lata-topo)" stroke="#7d828a" stroke-width="0.454"/>
+<path d="M133.175 46.11 A15.118 15.118 0 0 0 159.36 46.11 Z" fill="#1b1c20" fill-opacity="0.92"/>
+<text transform="translate(139.918 35.83) rotate(-90)" x="0" y="1.512" font-family="Arial" font-weight="bold" font-size="3.78" fill="#1c1d21" text-anchor="middle">220</text>
+<text transform="translate(146.268 35.83) rotate(-90)" x="0" y="1.512" font-family="Arial" font-weight="bold" font-size="3.78" fill="#1c1d21" text-anchor="middle">35V</text>
+<text transform="translate(152.617 35.83) rotate(-90)" x="0" y="1.512" font-family="Arial" font-weight="bold" font-size="3.78" fill="#1c1d21" text-anchor="middle">RVT</text>
+<rect x="89.953" y="1.134" width="35.906" height="18.142" rx="1.323" fill="url(#trimpot)" stroke="#173a73" stroke-width="0.378"/>
+<rect x="91.465" y="2.646" width="32.882" height="15.118" rx="0.945" fill="none" stroke="#7aa8f0" stroke-width="0.302"/>
+<circle cx="94.866" cy="10.205" r="4.157" fill="url(#latao)" stroke="#7d6420" stroke-width="0.378"/>
+<path d="M91.843 10.205 L97.89 10.205" fill="none" stroke="#6b5418" stroke-width="1.058" stroke-linecap="round"/>
 </svg>

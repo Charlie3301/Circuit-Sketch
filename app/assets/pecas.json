@@ -232,13 +232,13 @@
  },
  {
   "id": "ams1117",
-  "largura": 62,
-  "altura": 45,
+  "largura": 94,
+  "altura": 42,
   "pinos": [
    {
     "nome": "VIN",
-    "x": 21.58,
-    "y": 40.06,
+    "x": 5.86,
+    "y": 16.2,
     "sinais": [
      "power"
     ],
@@ -246,21 +246,30 @@
    },
    {
     "nome": "GND",
-    "x": 31.18,
-    "y": 40.06,
+    "x": 5.86,
+    "y": 25.8,
     "sinais": [
      "power"
     ],
-    "descricao": "GND: o - da entrada e o da saida, os dois aqui"
+    "descricao": "GND da entrada (o mesmo da saida)"
    },
    {
     "nome": "VOUT",
-    "x": 40.78,
-    "y": 40.06,
+    "x": 88.14,
+    "y": 16.2,
     "sinais": [
      "power"
     ],
     "descricao": "Saida regulada: 3,3 V (ou 5 V no AMS1117-5.0), ate ~0,8 A"
+   },
+   {
+    "nome": "GND.2",
+    "x": 88.14,
+    "y": 25.8,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND da saida (o mesmo da entrada)"
    }
   ],
   "variantes": [],
@@ -2226,22 +2235,22 @@
  },
  {
   "id": "buzzer",
-  "largura": 64,
-  "altura": 76,
+  "largura": 46,
+  "altura": 63,
   "pinos": [
    {
     "nome": "1",
-    "x": 27,
-    "y": 84,
+    "x": 8.69,
+    "y": 60.85,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Negativo (-): no GND"
    },
    {
     "nome": "2",
-    "x": 37,
-    "y": 84,
+    "x": 37.42,
+    "y": 60.85,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Positivo (+, a perna mais comprida): no pino que toca (tone(), PWM ou HIGH no ativo)"
    }
   ],
   "variantes": [],
@@ -7473,61 +7482,61 @@
   "pinos": [
    {
     "nome": "NO2",
-    "x": 5.5,
-    "y": 5.1,
+    "x": 6.05,
+    "y": 4.5,
     "sinais": [],
-    "descricao": ""
+    "descricao": "NO (normalmente aberto) do polo 2: liga no P2 so com a bobina energizada"
    },
    {
     "nome": "NC2",
-    "x": 25,
-    "y": 5.1,
+    "x": 25.25,
+    "y": 4.5,
     "sinais": [],
-    "descricao": ""
+    "descricao": "NC (normalmente fechado) do polo 2: ligado no P2 com a bobina desligada"
    },
    {
     "nome": "P2",
-    "x": 45,
-    "y": 5.1,
+    "x": 44.45,
+    "y": 4.5,
     "sinais": [],
-    "descricao": ""
+    "descricao": "P2, o comum do polo 2: vai para o NC2 desligado e para o NO2 ligado"
    },
    {
     "nome": "COIL2",
-    "x": 74,
-    "y": 5.1,
+    "x": 73.25,
+    "y": 4.5,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Bobina (5 V, ~70 mA): 5 V entre o COIL1 e o COIL2 ligam o rele. Precisa de transistor (o pino da placa nao aguenta) e de diodo de roda livre"
    },
    {
     "nome": "NO1",
-    "x": 5.5,
-    "y": 32.7,
+    "x": 6.05,
+    "y": 33.3,
     "sinais": [],
-    "descricao": ""
+    "descricao": "NO (normalmente aberto) do polo 1: liga no P1 so com a bobina energizada"
    },
    {
     "nome": "NC1",
-    "x": 25,
-    "y": 32.7,
+    "x": 25.25,
+    "y": 33.3,
     "sinais": [],
-    "descricao": ""
+    "descricao": "NC (normalmente fechado) do polo 1: ligado no P1 com a bobina desligada"
    },
    {
     "nome": "P1",
-    "x": 45,
-    "y": 32.7,
+    "x": 44.45,
+    "y": 33.3,
     "sinais": [],
-    "descricao": ""
+    "descricao": "P1, o comum do polo 1: vai para o NC1 desligado e para o NO1 ligado"
    },
    {
     "nome": "COIL1",
-    "x": 74,
-    "y": 32.7,
+    "x": 73.25,
+    "y": 33.3,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Bobina (5 V, ~70 mA): 5 V entre o COIL1 e o COIL2 ligam o rele. Precisa de transistor (o pino da placa nao aguenta) e de diodo de roda livre"
    }
   ],
   "variantes": [],
@@ -8624,8 +8633,8 @@
   "pinos": [
    {
     "nome": "IN+",
-    "x": 9.83,
-    "y": 12.09,
+    "x": 5.29,
+    "y": 5.29,
     "sinais": [
      "power"
     ],
@@ -8633,8 +8642,8 @@
    },
    {
     "nome": "IN-",
-    "x": 9.83,
-    "y": 67.28,
+    "x": 5.29,
+    "y": 74.08,
     "sinais": [
      "power"
     ],
@@ -8642,8 +8651,8 @@
    },
    {
     "nome": "OUT+",
-    "x": 152.69,
-    "y": 12.09,
+    "x": 157.23,
+    "y": 5.29,
     "sinais": [
      "power"
     ],
@@ -8651,8 +8660,8 @@
    },
    {
     "nome": "OUT-",
-    "x": 152.69,
-    "y": 67.28,
+    "x": 157.23,
+    "y": 74.08,
     "sinais": [
      "power"
     ],
@@ -9636,13 +9645,13 @@
  },
  {
   "id": "mt3608",
-  "largura": 140,
-  "altura": 64,
+  "largura": 141,
+  "altura": 65,
   "pinos": [
    {
     "nome": "VIN+",
-    "x": 9.07,
-    "y": 12.85,
+    "x": 131.91,
+    "y": 19.65,
     "sinais": [
      "power"
     ],
@@ -9650,8 +9659,8 @@
    },
    {
     "nome": "VIN-",
-    "x": 9.07,
-    "y": 51.4,
+    "x": 131.91,
+    "y": 49.13,
     "sinais": [
      "power"
     ],
@@ -9659,8 +9668,8 @@
    },
    {
     "nome": "VOUT+",
-    "x": 130.77,
-    "y": 12.85,
+    "x": 8.69,
+    "y": 19.65,
     "sinais": [
      "power"
     ],
@@ -9668,8 +9677,8 @@
    },
    {
     "nome": "VOUT-",
-    "x": 130.77,
-    "y": 51.4,
+    "x": 8.69,
+    "y": 49.13,
     "sinais": [
      "power"
     ],

@@ -20,9 +20,15 @@ PX = 96 / 25.4
 PASSO = 2.54
 
 pecas = []
+# As duas foram redesenhadas na Alpha 25: o alto-falante em pecas-atuadores.py,
+# o MAX98357A em placas-arduino.py. Rodar este script nao as desfaz.
+REFEITAS_NA_ALPHA_25 = {'alto-falante', 'max98357a'}
 
 
 def guardar(id_peca, svg, larg_mm, alt_mm, pinos):
+    if id_peca in REFEITAS_NA_ALPHA_25:
+        print(f'{id_peca}: refeita na Alpha 25, fica como esta')
+        return
     io.open(BASE + f'app/assets/{id_peca}.svg', 'w', encoding='utf-8', newline='').write(svg)
     pecas.append({
         'id': id_peca,

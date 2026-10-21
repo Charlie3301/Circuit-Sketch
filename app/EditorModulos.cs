@@ -42,6 +42,8 @@ public partial class EditorCircuito
         // (modulo-i2c.py) e o do PCM5102A (pecas-pcm5102a.py).
         ["modulo-i2c"] = [(22.3, 58.2, 0.6 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd")],
         ["pcm5102a"] = [(58.6, 48.8, 0.6 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vin-gnd")],
+        // O LED do modulo do AMS1117 (pecas-reguladores.py): fica na saida, acende com o VOUT.
+        ["ams1117"] = [(28.7, 35.1, 0.5 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vout-gnd")],
         // O roteador (pecas-wifi-ap.py): energia, WiFi, clientes e internet.
         ["wifi-ap"] =
         [
@@ -135,6 +137,7 @@ public partial class EditorCircuito
         // O LED de energia de um modulo: aceso com 2,5 V ou mais entre os pinos.
         "vcc-gnd" => EnergiaDoQuadro is { } c1 && c1.TensaoDoPino(peca.Id, "VCC") - c1.TensaoDoPino(peca.Id, "GND") >= 2.5,
         "vin-gnd" => EnergiaDoQuadro is { } c2 && c2.TensaoDoPino(peca.Id, "VIN") - c2.TensaoDoPino(peca.Id, "GND") >= 2.5,
+        "vout-gnd" => EnergiaDoQuadro is { } c3 && c3.TensaoDoPino(peca.Id, "VOUT") - c3.TensaoDoPino(peca.Id, "GND.2") >= 1.8,
         // O roteador: ligado com a simulacao rodando; o WiFi com a rede nomeada;
         // clientes com alguma placa conectada nela; internet com o "Usar internet".
         "ap-energia" => EmSimulacao,

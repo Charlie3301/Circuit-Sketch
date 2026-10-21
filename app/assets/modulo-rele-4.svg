@@ -1,191 +1,295 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-     width="76.0mm" height="52.0mm" viewBox="0 0 76.0 52.0">
-  <rect x="0.3" y="0.3" width="75.4" height="51.4" rx="1.2" fill="#1d4b9c" stroke="#0f2c61" stroke-width="0.3"/>
-  <circle cx="2.00" cy="2.00" r="1.2" fill="#0b1630"/>
-  <circle cx="2.00" cy="43.00" r="1.2" fill="#0b1630"/>
-  <circle cx="74.00" cy="2.00" r="1.2" fill="#0b1630"/>
-  <circle cx="74.00" cy="43.00" r="1.2" fill="#0b1630"/>
-  <rect x="2.90" y="0.48" width="15.84" height="6.0" rx="0.5" fill="#1f5fb4" stroke="#0f2f5c" stroke-width="0.25"/>
-  <circle cx="5.74" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
-  <path d="M4.64 3.48 H6.84" stroke="#5a6068" stroke-width="0.45"/>
-  <text x="5.74" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">NO</text>
-  <circle cx="10.82" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
-  <path d="M9.72 3.48 H11.92" stroke="#5a6068" stroke-width="0.45"/>
-  <text x="10.82" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">COM</text>
-  <circle cx="15.90" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
-  <path d="M14.80 3.48 H17.00" stroke="#5a6068" stroke-width="0.45"/>
-  <text x="15.90" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">NC</text>
-  <rect x="3.12" y="9.48" width="15.4" height="19.0" rx="0.7" fill="#2b74d6" stroke="#123f80" stroke-width="0.3"/>
-  <rect x="3.72" y="10.08" width="14.20" height="1.4" rx="0.4" fill="#ffffff" opacity="0.16"/>
-  <text x="10.82" y="13.68" fill="#e8eef8" font-size="1.5px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">SONGLE</text>
-  <text x="10.82" y="17.08" fill="#e8eef8" font-size="1.05px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">SRD-05VDC-SL-C</text>
-  <text x="10.82" y="19.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">10A 250VAC</text>
-  <text x="10.82" y="21.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">10A 30VDC</text>
-  <text x="10.82" y="24.88" fill="#d7e2f4" font-size="1.0px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">CE</text>
-  <rect x="5.22" y="31.08" width="4.6" height="3.4" rx="0.3" fill="#1b1b1d"/>
-  <circle cx="5.92" cy="31.78" r="0.3" fill="#555"/>
-  <rect x="11.82" y="31.28" width="2.6" height="2.4" rx="0.3" fill="#1b1b1d"/>
-  <rect x="15.02" y="31.68" width="2.8" height="1.4" rx="0.3" fill="#1b1b1d"/>
-  <rect x="17.22" y="31.68" width="0.5" height="1.4" fill="#c9ccd1"/>
-  <text x="7.52" y="36.08" fill="#bfc6d2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">817C</text>
-  <circle cx="14.22" cy="37.48" r="0.9" fill="#5a1414" stroke="#2a0b0b" stroke-width="0.2"/>
-  <text x="14.22" y="39.88" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">IN1</text>
-  <rect x="20.68" y="0.48" width="15.84" height="6.0" rx="0.5" fill="#1f5fb4" stroke="#0f2f5c" stroke-width="0.25"/>
-  <circle cx="23.52" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
-  <path d="M22.42 3.48 H24.62" stroke="#5a6068" stroke-width="0.45"/>
-  <text x="23.52" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">NO</text>
-  <circle cx="28.60" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
-  <path d="M27.50 3.48 H29.70" stroke="#5a6068" stroke-width="0.45"/>
-  <text x="28.60" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">COM</text>
-  <circle cx="33.68" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
-  <path d="M32.58 3.48 H34.78" stroke="#5a6068" stroke-width="0.45"/>
-  <text x="33.68" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">NC</text>
-  <rect x="20.90" y="9.48" width="15.4" height="19.0" rx="0.7" fill="#2b74d6" stroke="#123f80" stroke-width="0.3"/>
-  <rect x="21.50" y="10.08" width="14.20" height="1.4" rx="0.4" fill="#ffffff" opacity="0.16"/>
-  <text x="28.60" y="13.68" fill="#e8eef8" font-size="1.5px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">SONGLE</text>
-  <text x="28.60" y="17.08" fill="#e8eef8" font-size="1.05px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">SRD-05VDC-SL-C</text>
-  <text x="28.60" y="19.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">10A 250VAC</text>
-  <text x="28.60" y="21.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">10A 30VDC</text>
-  <text x="28.60" y="24.88" fill="#d7e2f4" font-size="1.0px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">CE</text>
-  <rect x="23.00" y="31.08" width="4.6" height="3.4" rx="0.3" fill="#1b1b1d"/>
-  <circle cx="23.70" cy="31.78" r="0.3" fill="#555"/>
-  <rect x="29.60" y="31.28" width="2.6" height="2.4" rx="0.3" fill="#1b1b1d"/>
-  <rect x="32.80" y="31.68" width="2.8" height="1.4" rx="0.3" fill="#1b1b1d"/>
-  <rect x="35.00" y="31.68" width="0.5" height="1.4" fill="#c9ccd1"/>
-  <text x="25.30" y="36.08" fill="#bfc6d2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">817C</text>
-  <circle cx="32.00" cy="37.48" r="0.9" fill="#5a1414" stroke="#2a0b0b" stroke-width="0.2"/>
-  <text x="32.00" y="39.88" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">IN2</text>
-  <rect x="38.46" y="0.48" width="15.84" height="6.0" rx="0.5" fill="#1f5fb4" stroke="#0f2f5c" stroke-width="0.25"/>
-  <circle cx="41.30" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
-  <path d="M40.20 3.48 H42.40" stroke="#5a6068" stroke-width="0.45"/>
-  <text x="41.30" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">NO</text>
-  <circle cx="46.38" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
-  <path d="M45.28 3.48 H47.48" stroke="#5a6068" stroke-width="0.45"/>
-  <text x="46.38" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">COM</text>
-  <circle cx="51.46" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
-  <path d="M50.36 3.48 H52.56" stroke="#5a6068" stroke-width="0.45"/>
-  <text x="51.46" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">NC</text>
-  <rect x="38.68" y="9.48" width="15.4" height="19.0" rx="0.7" fill="#2b74d6" stroke="#123f80" stroke-width="0.3"/>
-  <rect x="39.28" y="10.08" width="14.20" height="1.4" rx="0.4" fill="#ffffff" opacity="0.16"/>
-  <text x="46.38" y="13.68" fill="#e8eef8" font-size="1.5px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">SONGLE</text>
-  <text x="46.38" y="17.08" fill="#e8eef8" font-size="1.05px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">SRD-05VDC-SL-C</text>
-  <text x="46.38" y="19.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">10A 250VAC</text>
-  <text x="46.38" y="21.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">10A 30VDC</text>
-  <text x="46.38" y="24.88" fill="#d7e2f4" font-size="1.0px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">CE</text>
-  <rect x="40.78" y="31.08" width="4.6" height="3.4" rx="0.3" fill="#1b1b1d"/>
-  <circle cx="41.48" cy="31.78" r="0.3" fill="#555"/>
-  <rect x="47.38" y="31.28" width="2.6" height="2.4" rx="0.3" fill="#1b1b1d"/>
-  <rect x="50.58" y="31.68" width="2.8" height="1.4" rx="0.3" fill="#1b1b1d"/>
-  <rect x="52.78" y="31.68" width="0.5" height="1.4" fill="#c9ccd1"/>
-  <text x="43.08" y="36.08" fill="#bfc6d2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">817C</text>
-  <circle cx="49.78" cy="37.48" r="0.9" fill="#5a1414" stroke="#2a0b0b" stroke-width="0.2"/>
-  <text x="49.78" y="39.88" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">IN3</text>
-  <rect x="56.24" y="0.48" width="15.84" height="6.0" rx="0.5" fill="#1f5fb4" stroke="#0f2f5c" stroke-width="0.25"/>
-  <circle cx="59.08" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
-  <path d="M57.98 3.48 H60.18" stroke="#5a6068" stroke-width="0.45"/>
-  <text x="59.08" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">NO</text>
-  <circle cx="64.16" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
-  <path d="M63.06 3.48 H65.26" stroke="#5a6068" stroke-width="0.45"/>
-  <text x="64.16" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">COM</text>
-  <circle cx="69.24" cy="3.48" r="1.75" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.25"/>
-  <path d="M68.14 3.48 H70.34" stroke="#5a6068" stroke-width="0.45"/>
-  <text x="69.24" y="8.08" fill="#f2f2f2" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">NC</text>
-  <rect x="56.46" y="9.48" width="15.4" height="19.0" rx="0.7" fill="#2b74d6" stroke="#123f80" stroke-width="0.3"/>
-  <rect x="57.06" y="10.08" width="14.20" height="1.4" rx="0.4" fill="#ffffff" opacity="0.16"/>
-  <text x="64.16" y="13.68" fill="#e8eef8" font-size="1.5px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">SONGLE</text>
-  <text x="64.16" y="17.08" fill="#e8eef8" font-size="1.05px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">SRD-05VDC-SL-C</text>
-  <text x="64.16" y="19.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">10A 250VAC</text>
-  <text x="64.16" y="21.88" fill="#d7e2f4" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">10A 30VDC</text>
-  <text x="64.16" y="24.88" fill="#d7e2f4" font-size="1.0px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">CE</text>
-  <rect x="58.56" y="31.08" width="4.6" height="3.4" rx="0.3" fill="#1b1b1d"/>
-  <circle cx="59.26" cy="31.78" r="0.3" fill="#555"/>
-  <rect x="65.16" y="31.28" width="2.6" height="2.4" rx="0.3" fill="#1b1b1d"/>
-  <rect x="68.36" y="31.68" width="2.8" height="1.4" rx="0.3" fill="#1b1b1d"/>
-  <rect x="70.56" y="31.68" width="0.5" height="1.4" fill="#c9ccd1"/>
-  <text x="60.86" y="36.08" fill="#bfc6d2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="normal">817C</text>
-  <circle cx="67.56" cy="37.48" r="0.9" fill="#5a1414" stroke="#2a0b0b" stroke-width="0.2"/>
-  <text x="67.56" y="39.88" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">IN4</text>
-  <rect x="2.00" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
-  <rect x="2.82" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
-  <text x="3.20" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">GND</text>
-  <rect x="4.54" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
-  <rect x="5.36" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
-  <text x="5.74" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">IN1</text>
-  <rect x="7.08" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
-  <rect x="7.90" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
-  <text x="8.28" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">IN2</text>
-  <rect x="9.62" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
-  <rect x="10.44" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
-  <text x="10.82" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">IN3</text>
-  <rect x="12.16" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
-  <rect x="12.98" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
-  <text x="13.36" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">IN4</text>
-  <rect x="14.70" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
-  <rect x="15.52" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
-  <text x="15.90" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">VCC</text>
-  <circle cx="20.84" cy="49.20" r="0.9" fill="#5a1414" stroke="#2a0b0b" stroke-width="0.2"/>
-  <text x="20.84" y="47.20" fill="#f2f2f2" font-size="0.8px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">PWR</text>
-  <rect x="66.52" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
-  <rect x="67.34" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
-  <text x="67.72" y="47.20" fill="#f2f2f2" font-size="0.7px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">GND</text>
-  <rect x="69.06" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
-  <rect x="69.88" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
-  <text x="70.26" y="47.20" fill="#f2f2f2" font-size="0.7px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">VCC</text>
-  <rect x="71.60" y="48.00" width="2.4" height="2.4" fill="#1b1b1d"/>
-  <rect x="72.42" y="48.82" width="0.76" height="0.76" fill="#d9b44a"/>
-  <text x="72.80" y="47.20" fill="#f2f2f2" font-size="0.7px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">JD</text>
-  <rect x="68.96" y="47.80" width="5.14" height="2.8" rx="0.5" fill="#e8c21c" stroke="#8a7110" stroke-width="0.2"/>
-  <text x="38.00" y="44.40" fill="#cfe0ff" font-size="1.1px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">4 Relay Module</text>
-
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="287.244px" height="196.535px" viewBox="0 0 287.244 196.535">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+</defs>
+<rect x="1.134" y="1.134" width="284.976" height="194.268" rx="4.535" fill="#1d4b9c" stroke="#0f2c61" stroke-width="1.134"/>
+<rect x="1.134" y="1.134" width="284.976" height="194.268" rx="4.535" fill="url(#luz)"/>
+<circle cx="6.614" cy="30.236" r="4.913" fill="#cfd3d8"/>
+<circle cx="6.614" cy="30.236" r="3.538" fill="#0b1630"/>
+<circle cx="280.63" cy="30.236" r="4.913" fill="#cfd3d8"/>
+<circle cx="280.63" cy="30.236" r="3.538" fill="#0b1630"/>
+<circle cx="7.559" cy="162.52" r="6.047" fill="#cfd3d8"/>
+<circle cx="7.559" cy="162.52" r="4.354" fill="#0b1630"/>
+<circle cx="279.685" cy="162.52" r="6.047" fill="#cfd3d8"/>
+<circle cx="279.685" cy="162.52" r="4.354" fill="#0b1630"/>
+<rect x="10.961" y="1.814" width="59.868" height="22.677" rx="1.512" fill="#2b84dc" stroke="#134a8c" stroke-width="0.567"/>
+<rect x="10.961" y="1.814" width="59.868" height="22.677" rx="1.512" fill="url(#luz)"/>
+<rect x="11.528" y="2.003" width="58.734" height="4.535" rx="1.134" fill="#2370c4"/>
+<rect x="16.781" y="2.948" width="9.827" height="2.646" rx="0.567" fill="#0f2d55"/>
+<rect x="35.981" y="2.948" width="9.827" height="2.646" rx="0.567" fill="#0f2d55"/>
+<rect x="55.181" y="2.948" width="9.827" height="2.646" rx="0.567" fill="#0f2d55"/>
+<path d="M31.294 7.106 L31.294 23.735" fill="none" stroke="#1b5fae" stroke-width="0.756" stroke-linecap="round"/>
+<path d="M50.494 7.106 L50.494 23.735" fill="none" stroke="#1b5fae" stroke-width="0.756" stroke-linecap="round"/>
+<circle cx="21.694" cy="15.043" r="6.614" fill="#1a4f92"/>
+<circle cx="21.694" cy="15.043" r="5.669" fill="url(#lata)" stroke="#6d737c" stroke-width="0.454"/>
+<path d="M17.726 16.365 L25.663 13.72" fill="none" stroke="#4f555d" stroke-width="1.436" stroke-linecap="round"/>
+<circle cx="40.894" cy="15.043" r="6.614" fill="#1a4f92"/>
+<circle cx="40.894" cy="15.043" r="5.669" fill="url(#lata)" stroke="#6d737c" stroke-width="0.454"/>
+<path d="M36.926 16.365 L44.863 13.72" fill="none" stroke="#4f555d" stroke-width="1.436" stroke-linecap="round"/>
+<circle cx="60.094" cy="15.043" r="6.614" fill="#1a4f92"/>
+<circle cx="60.094" cy="15.043" r="5.669" fill="url(#lata)" stroke="#6d737c" stroke-width="0.454"/>
+<path d="M56.126 16.365 L64.063 13.72" fill="none" stroke="#4f555d" stroke-width="1.436" stroke-linecap="round"/>
+<text transform="translate(21.694 30.539) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#f2f5f7" text-anchor="middle">NO</text>
+<text transform="translate(40.894 30.539) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#f2f5f7" text-anchor="middle">COM</text>
+<text transform="translate(60.094 30.539) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#f2f5f7" text-anchor="middle">NC</text>
+<rect x="11.792" y="35.83" width="58.205" height="71.811" rx="2.268" fill="#2f7ad3" stroke="#174e96" stroke-width="0.756"/>
+<rect x="11.792" y="35.83" width="58.205" height="71.811" rx="2.268" fill="url(#luz)"/>
+<rect x="13.682" y="37.72" width="54.425" height="68.031" rx="1.701" fill="none" stroke="#4f92e0" stroke-width="0.378"/>
+<circle cx="19.729" cy="44.145" r="3.591" fill="#2a6dbf" stroke="#245fa8" stroke-width="0.302"/>
+<circle cx="40.139" cy="70.98" r="3.591" fill="#2a6dbf" stroke="#245fa8" stroke-width="0.302"/>
+<text transform="translate(49.209 71.735) rotate(-90)" x="0" y="1.795" font-family="Arial" font-weight="normal" font-size="4.488" fill="#e3ecf8" text-anchor="middle">10A 250VAC  10A 125VAC</text>
+<text transform="translate(55.635 71.735) rotate(-90)" x="0" y="1.795" font-family="Arial" font-weight="normal" font-size="4.488" fill="#e3ecf8" text-anchor="middle">10A  30VDC  10A  28VDC</text>
+<text transform="translate(62.816 71.735) rotate(-90)" x="0" y="2.457" font-family="Arial" font-weight="bold" font-size="6.142" fill="#e3ecf8" text-anchor="middle">SRD-05VDC-SL-C</text>
+<rect x="22.375" y="115.578" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="22.375" y="130.318" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="31.975" y="115.578" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="31.975" y="130.318" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="19.729" y="117.468" width="17.386" height="12.85" rx="0.945" fill="#1f2023"/>
+<rect x="19.729" y="117.468" width="17.386" height="12.85" rx="0.945" fill="url(#luz)"/>
+<circle cx="22.375" cy="127.672" r="1.134" fill="#3a3c41"/>
+<text transform="translate(28.422 123.137) rotate(0)" x="0" y="1.323" font-family="Arial" font-weight="normal" font-size="3.307" fill="#c3c6cb" text-anchor="middle">817C</text>
+<rect x="47.981" y="116.901" width="1.701" height="2.646" fill="url(#metal-h)"/>
+<rect x="44.391" y="124.46" width="1.701" height="2.646" fill="url(#metal-h)"/>
+<rect x="51.572" y="124.46" width="1.701" height="2.646" fill="url(#metal-h)"/>
+<rect x="43.351" y="119.357" width="10.961" height="5.291" rx="0.454" fill="#1f2023"/>
+<text transform="translate(48.831 122.003) rotate(0)" x="0" y="1.039" font-family="Arial" font-weight="normal" font-size="2.598" fill="#c3c6cb" text-anchor="middle">J3Y</text>
+<rect x="55.446" y="120.302" width="3.024" height="3.402" rx="0.302" fill="#cfd3d8"/>
+<rect x="67.162" y="120.302" width="3.024" height="3.402" rx="0.302" fill="#cfd3d8"/>
+<rect x="57.524" y="119.169" width="10.583" height="5.669" rx="0.454" fill="#1f2023"/>
+<rect x="66.406" y="119.169" width="1.134" height="5.669" fill="#9aa1a8"/>
+<text transform="translate(62.06 122.003) rotate(0)" x="0" y="1.134" font-family="Arial" font-weight="normal" font-size="2.835" fill="#c3c6cb" text-anchor="middle">M7</text>
+<rect x="25.398" y="136.271" width="6.047" height="3.213" rx="0.302" fill="#1e1f22"/>
+<rect x="25.398" y="136.271" width="1.33" height="3.213" fill="url(#metal)"/>
+<rect x="30.115" y="136.271" width="1.33" height="3.213" fill="url(#metal)"/>
+<text transform="translate(28.422 137.877) rotate(0)" x="0" y="0.723" font-family="Arial" font-weight="normal" font-size="1.807" fill="#c3c6cb" text-anchor="middle">102</text>
+<rect x="40.8" y="131.074" width="3.213" height="6.047" rx="0.302" fill="#1e1f22"/>
+<rect x="40.8" y="131.074" width="3.213" height="1.33" fill="url(#metal)"/>
+<rect x="40.8" y="135.791" width="3.213" height="1.33" fill="url(#metal)"/>
+<text transform="translate(42.406 134.098) rotate(-90)" x="0" y="0.723" font-family="Arial" font-weight="normal" font-size="1.807" fill="#c3c6cb" text-anchor="middle">102</text>
+<rect x="49.965" y="139.294" width="7.559" height="4.724" rx="0.454" fill="#f2efe6"/>
+<rect x="51.666" y="140.05" width="4.157" height="3.213" rx="0.567" fill="#e7d9c7"/>
+<rect x="53.083" y="140.995" width="1.323" height="1.323" fill="#b8a27a"/>
+<text transform="translate(53.745 149.216) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="bold" font-size="3.543" fill="#f2f5f7" text-anchor="middle">IN1</text>
+<rect x="78.161" y="1.814" width="59.868" height="22.677" rx="1.512" fill="#2b84dc" stroke="#134a8c" stroke-width="0.567"/>
+<rect x="78.161" y="1.814" width="59.868" height="22.677" rx="1.512" fill="url(#luz)"/>
+<rect x="78.728" y="2.003" width="58.734" height="4.535" rx="1.134" fill="#2370c4"/>
+<rect x="83.981" y="2.948" width="9.827" height="2.646" rx="0.567" fill="#0f2d55"/>
+<rect x="103.181" y="2.948" width="9.827" height="2.646" rx="0.567" fill="#0f2d55"/>
+<rect x="122.381" y="2.948" width="9.827" height="2.646" rx="0.567" fill="#0f2d55"/>
+<path d="M98.494 7.106 L98.494 23.735" fill="none" stroke="#1b5fae" stroke-width="0.756" stroke-linecap="round"/>
+<path d="M117.694 7.106 L117.694 23.735" fill="none" stroke="#1b5fae" stroke-width="0.756" stroke-linecap="round"/>
+<circle cx="88.894" cy="15.043" r="6.614" fill="#1a4f92"/>
+<circle cx="88.894" cy="15.043" r="5.669" fill="url(#lata)" stroke="#6d737c" stroke-width="0.454"/>
+<path d="M84.926 16.365 L92.863 13.72" fill="none" stroke="#4f555d" stroke-width="1.436" stroke-linecap="round"/>
+<circle cx="108.094" cy="15.043" r="6.614" fill="#1a4f92"/>
+<circle cx="108.094" cy="15.043" r="5.669" fill="url(#lata)" stroke="#6d737c" stroke-width="0.454"/>
+<path d="M104.126 16.365 L112.063 13.72" fill="none" stroke="#4f555d" stroke-width="1.436" stroke-linecap="round"/>
+<circle cx="127.294" cy="15.043" r="6.614" fill="#1a4f92"/>
+<circle cx="127.294" cy="15.043" r="5.669" fill="url(#lata)" stroke="#6d737c" stroke-width="0.454"/>
+<path d="M123.326 16.365 L131.263 13.72" fill="none" stroke="#4f555d" stroke-width="1.436" stroke-linecap="round"/>
+<text transform="translate(88.894 30.539) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#f2f5f7" text-anchor="middle">NO</text>
+<text transform="translate(108.094 30.539) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#f2f5f7" text-anchor="middle">COM</text>
+<text transform="translate(127.294 30.539) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#f2f5f7" text-anchor="middle">NC</text>
+<rect x="78.992" y="35.83" width="58.205" height="71.811" rx="2.268" fill="#2f7ad3" stroke="#174e96" stroke-width="0.756"/>
+<rect x="78.992" y="35.83" width="58.205" height="71.811" rx="2.268" fill="url(#luz)"/>
+<rect x="80.882" y="37.72" width="54.425" height="68.031" rx="1.701" fill="none" stroke="#4f92e0" stroke-width="0.378"/>
+<circle cx="86.929" cy="44.145" r="3.591" fill="#2a6dbf" stroke="#245fa8" stroke-width="0.302"/>
+<circle cx="107.339" cy="70.98" r="3.591" fill="#2a6dbf" stroke="#245fa8" stroke-width="0.302"/>
+<text transform="translate(116.409 71.735) rotate(-90)" x="0" y="1.795" font-family="Arial" font-weight="normal" font-size="4.488" fill="#e3ecf8" text-anchor="middle">10A 250VAC  10A 125VAC</text>
+<text transform="translate(122.835 71.735) rotate(-90)" x="0" y="1.795" font-family="Arial" font-weight="normal" font-size="4.488" fill="#e3ecf8" text-anchor="middle">10A  30VDC  10A  28VDC</text>
+<text transform="translate(130.016 71.735) rotate(-90)" x="0" y="2.457" font-family="Arial" font-weight="bold" font-size="6.142" fill="#e3ecf8" text-anchor="middle">SRD-05VDC-SL-C</text>
+<rect x="89.575" y="115.578" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="89.575" y="130.318" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="99.175" y="115.578" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="99.175" y="130.318" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="86.929" y="117.468" width="17.386" height="12.85" rx="0.945" fill="#1f2023"/>
+<rect x="86.929" y="117.468" width="17.386" height="12.85" rx="0.945" fill="url(#luz)"/>
+<circle cx="89.575" cy="127.672" r="1.134" fill="#3a3c41"/>
+<text transform="translate(95.622 123.137) rotate(0)" x="0" y="1.323" font-family="Arial" font-weight="normal" font-size="3.307" fill="#c3c6cb" text-anchor="middle">817C</text>
+<rect x="115.181" y="116.901" width="1.701" height="2.646" fill="url(#metal-h)"/>
+<rect x="111.591" y="124.46" width="1.701" height="2.646" fill="url(#metal-h)"/>
+<rect x="118.772" y="124.46" width="1.701" height="2.646" fill="url(#metal-h)"/>
+<rect x="110.551" y="119.357" width="10.961" height="5.291" rx="0.454" fill="#1f2023"/>
+<text transform="translate(116.031 122.003) rotate(0)" x="0" y="1.039" font-family="Arial" font-weight="normal" font-size="2.598" fill="#c3c6cb" text-anchor="middle">J3Y</text>
+<rect x="122.646" y="120.302" width="3.024" height="3.402" rx="0.302" fill="#cfd3d8"/>
+<rect x="134.362" y="120.302" width="3.024" height="3.402" rx="0.302" fill="#cfd3d8"/>
+<rect x="124.724" y="119.169" width="10.583" height="5.669" rx="0.454" fill="#1f2023"/>
+<rect x="133.606" y="119.169" width="1.134" height="5.669" fill="#9aa1a8"/>
+<text transform="translate(129.26 122.003) rotate(0)" x="0" y="1.134" font-family="Arial" font-weight="normal" font-size="2.835" fill="#c3c6cb" text-anchor="middle">M7</text>
+<rect x="92.598" y="136.271" width="6.047" height="3.213" rx="0.302" fill="#1e1f22"/>
+<rect x="92.598" y="136.271" width="1.33" height="3.213" fill="url(#metal)"/>
+<rect x="97.315" y="136.271" width="1.33" height="3.213" fill="url(#metal)"/>
+<text transform="translate(95.622 137.877) rotate(0)" x="0" y="0.723" font-family="Arial" font-weight="normal" font-size="1.807" fill="#c3c6cb" text-anchor="middle">102</text>
+<rect x="108" y="131.074" width="3.213" height="6.047" rx="0.302" fill="#1e1f22"/>
+<rect x="108" y="131.074" width="3.213" height="1.33" fill="url(#metal)"/>
+<rect x="108" y="135.791" width="3.213" height="1.33" fill="url(#metal)"/>
+<text transform="translate(109.606 134.098) rotate(-90)" x="0" y="0.723" font-family="Arial" font-weight="normal" font-size="1.807" fill="#c3c6cb" text-anchor="middle">102</text>
+<rect x="117.165" y="139.294" width="7.559" height="4.724" rx="0.454" fill="#f2efe6"/>
+<rect x="118.866" y="140.05" width="4.157" height="3.213" rx="0.567" fill="#e7d9c7"/>
+<rect x="120.283" y="140.995" width="1.323" height="1.323" fill="#b8a27a"/>
+<text transform="translate(120.945 149.216) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="bold" font-size="3.543" fill="#f2f5f7" text-anchor="middle">IN2</text>
+<rect x="145.361" y="1.814" width="59.868" height="22.677" rx="1.512" fill="#2b84dc" stroke="#134a8c" stroke-width="0.567"/>
+<rect x="145.361" y="1.814" width="59.868" height="22.677" rx="1.512" fill="url(#luz)"/>
+<rect x="145.928" y="2.003" width="58.734" height="4.535" rx="1.134" fill="#2370c4"/>
+<rect x="151.181" y="2.948" width="9.827" height="2.646" rx="0.567" fill="#0f2d55"/>
+<rect x="170.381" y="2.948" width="9.827" height="2.646" rx="0.567" fill="#0f2d55"/>
+<rect x="189.581" y="2.948" width="9.827" height="2.646" rx="0.567" fill="#0f2d55"/>
+<path d="M165.694 7.106 L165.694 23.735" fill="none" stroke="#1b5fae" stroke-width="0.756" stroke-linecap="round"/>
+<path d="M184.894 7.106 L184.894 23.735" fill="none" stroke="#1b5fae" stroke-width="0.756" stroke-linecap="round"/>
+<circle cx="156.094" cy="15.043" r="6.614" fill="#1a4f92"/>
+<circle cx="156.094" cy="15.043" r="5.669" fill="url(#lata)" stroke="#6d737c" stroke-width="0.454"/>
+<path d="M152.126 16.365 L160.063 13.72" fill="none" stroke="#4f555d" stroke-width="1.436" stroke-linecap="round"/>
+<circle cx="175.294" cy="15.043" r="6.614" fill="#1a4f92"/>
+<circle cx="175.294" cy="15.043" r="5.669" fill="url(#lata)" stroke="#6d737c" stroke-width="0.454"/>
+<path d="M171.326 16.365 L179.263 13.72" fill="none" stroke="#4f555d" stroke-width="1.436" stroke-linecap="round"/>
+<circle cx="194.494" cy="15.043" r="6.614" fill="#1a4f92"/>
+<circle cx="194.494" cy="15.043" r="5.669" fill="url(#lata)" stroke="#6d737c" stroke-width="0.454"/>
+<path d="M190.526 16.365 L198.463 13.72" fill="none" stroke="#4f555d" stroke-width="1.436" stroke-linecap="round"/>
+<text transform="translate(156.094 30.539) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#f2f5f7" text-anchor="middle">NO</text>
+<text transform="translate(175.294 30.539) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#f2f5f7" text-anchor="middle">COM</text>
+<text transform="translate(194.494 30.539) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#f2f5f7" text-anchor="middle">NC</text>
+<rect x="146.192" y="35.83" width="58.205" height="71.811" rx="2.268" fill="#2f7ad3" stroke="#174e96" stroke-width="0.756"/>
+<rect x="146.192" y="35.83" width="58.205" height="71.811" rx="2.268" fill="url(#luz)"/>
+<rect x="148.082" y="37.72" width="54.425" height="68.031" rx="1.701" fill="none" stroke="#4f92e0" stroke-width="0.378"/>
+<circle cx="154.129" cy="44.145" r="3.591" fill="#2a6dbf" stroke="#245fa8" stroke-width="0.302"/>
+<circle cx="174.539" cy="70.98" r="3.591" fill="#2a6dbf" stroke="#245fa8" stroke-width="0.302"/>
+<text transform="translate(183.609 71.735) rotate(-90)" x="0" y="1.795" font-family="Arial" font-weight="normal" font-size="4.488" fill="#e3ecf8" text-anchor="middle">10A 250VAC  10A 125VAC</text>
+<text transform="translate(190.035 71.735) rotate(-90)" x="0" y="1.795" font-family="Arial" font-weight="normal" font-size="4.488" fill="#e3ecf8" text-anchor="middle">10A  30VDC  10A  28VDC</text>
+<text transform="translate(197.216 71.735) rotate(-90)" x="0" y="2.457" font-family="Arial" font-weight="bold" font-size="6.142" fill="#e3ecf8" text-anchor="middle">SRD-05VDC-SL-C</text>
+<rect x="156.775" y="115.578" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="156.775" y="130.318" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="166.375" y="115.578" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="166.375" y="130.318" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="154.129" y="117.468" width="17.386" height="12.85" rx="0.945" fill="#1f2023"/>
+<rect x="154.129" y="117.468" width="17.386" height="12.85" rx="0.945" fill="url(#luz)"/>
+<circle cx="156.775" cy="127.672" r="1.134" fill="#3a3c41"/>
+<text transform="translate(162.822 123.137) rotate(0)" x="0" y="1.323" font-family="Arial" font-weight="normal" font-size="3.307" fill="#c3c6cb" text-anchor="middle">817C</text>
+<rect x="182.381" y="116.901" width="1.701" height="2.646" fill="url(#metal-h)"/>
+<rect x="178.791" y="124.46" width="1.701" height="2.646" fill="url(#metal-h)"/>
+<rect x="185.972" y="124.46" width="1.701" height="2.646" fill="url(#metal-h)"/>
+<rect x="177.751" y="119.357" width="10.961" height="5.291" rx="0.454" fill="#1f2023"/>
+<text transform="translate(183.231 122.003) rotate(0)" x="0" y="1.039" font-family="Arial" font-weight="normal" font-size="2.598" fill="#c3c6cb" text-anchor="middle">J3Y</text>
+<rect x="189.846" y="120.302" width="3.024" height="3.402" rx="0.302" fill="#cfd3d8"/>
+<rect x="201.562" y="120.302" width="3.024" height="3.402" rx="0.302" fill="#cfd3d8"/>
+<rect x="191.924" y="119.169" width="10.583" height="5.669" rx="0.454" fill="#1f2023"/>
+<rect x="200.806" y="119.169" width="1.134" height="5.669" fill="#9aa1a8"/>
+<text transform="translate(196.46 122.003) rotate(0)" x="0" y="1.134" font-family="Arial" font-weight="normal" font-size="2.835" fill="#c3c6cb" text-anchor="middle">M7</text>
+<rect x="159.798" y="136.271" width="6.047" height="3.213" rx="0.302" fill="#1e1f22"/>
+<rect x="159.798" y="136.271" width="1.33" height="3.213" fill="url(#metal)"/>
+<rect x="164.515" y="136.271" width="1.33" height="3.213" fill="url(#metal)"/>
+<text transform="translate(162.822 137.877) rotate(0)" x="0" y="0.723" font-family="Arial" font-weight="normal" font-size="1.807" fill="#c3c6cb" text-anchor="middle">102</text>
+<rect x="175.2" y="131.074" width="3.213" height="6.047" rx="0.302" fill="#1e1f22"/>
+<rect x="175.2" y="131.074" width="3.213" height="1.33" fill="url(#metal)"/>
+<rect x="175.2" y="135.791" width="3.213" height="1.33" fill="url(#metal)"/>
+<text transform="translate(176.806 134.098) rotate(-90)" x="0" y="0.723" font-family="Arial" font-weight="normal" font-size="1.807" fill="#c3c6cb" text-anchor="middle">102</text>
+<rect x="184.365" y="139.294" width="7.559" height="4.724" rx="0.454" fill="#f2efe6"/>
+<rect x="186.066" y="140.05" width="4.157" height="3.213" rx="0.567" fill="#e7d9c7"/>
+<rect x="187.483" y="140.995" width="1.323" height="1.323" fill="#b8a27a"/>
+<text transform="translate(188.145 149.216) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="bold" font-size="3.543" fill="#f2f5f7" text-anchor="middle">IN3</text>
+<rect x="212.561" y="1.814" width="59.868" height="22.677" rx="1.512" fill="#2b84dc" stroke="#134a8c" stroke-width="0.567"/>
+<rect x="212.561" y="1.814" width="59.868" height="22.677" rx="1.512" fill="url(#luz)"/>
+<rect x="213.128" y="2.003" width="58.734" height="4.535" rx="1.134" fill="#2370c4"/>
+<rect x="218.381" y="2.948" width="9.827" height="2.646" rx="0.567" fill="#0f2d55"/>
+<rect x="237.581" y="2.948" width="9.827" height="2.646" rx="0.567" fill="#0f2d55"/>
+<rect x="256.781" y="2.948" width="9.827" height="2.646" rx="0.567" fill="#0f2d55"/>
+<path d="M232.894 7.106 L232.894 23.735" fill="none" stroke="#1b5fae" stroke-width="0.756" stroke-linecap="round"/>
+<path d="M252.094 7.106 L252.094 23.735" fill="none" stroke="#1b5fae" stroke-width="0.756" stroke-linecap="round"/>
+<circle cx="223.294" cy="15.043" r="6.614" fill="#1a4f92"/>
+<circle cx="223.294" cy="15.043" r="5.669" fill="url(#lata)" stroke="#6d737c" stroke-width="0.454"/>
+<path d="M219.326 16.365 L227.263 13.72" fill="none" stroke="#4f555d" stroke-width="1.436" stroke-linecap="round"/>
+<circle cx="242.494" cy="15.043" r="6.614" fill="#1a4f92"/>
+<circle cx="242.494" cy="15.043" r="5.669" fill="url(#lata)" stroke="#6d737c" stroke-width="0.454"/>
+<path d="M238.526 16.365 L246.463 13.72" fill="none" stroke="#4f555d" stroke-width="1.436" stroke-linecap="round"/>
+<circle cx="261.694" cy="15.043" r="6.614" fill="#1a4f92"/>
+<circle cx="261.694" cy="15.043" r="5.669" fill="url(#lata)" stroke="#6d737c" stroke-width="0.454"/>
+<path d="M257.726 16.365 L265.663 13.72" fill="none" stroke="#4f555d" stroke-width="1.436" stroke-linecap="round"/>
+<text transform="translate(223.294 30.539) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#f2f5f7" text-anchor="middle">NO</text>
+<text transform="translate(242.494 30.539) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#f2f5f7" text-anchor="middle">COM</text>
+<text transform="translate(261.694 30.539) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#f2f5f7" text-anchor="middle">NC</text>
+<rect x="213.392" y="35.83" width="58.205" height="71.811" rx="2.268" fill="#2f7ad3" stroke="#174e96" stroke-width="0.756"/>
+<rect x="213.392" y="35.83" width="58.205" height="71.811" rx="2.268" fill="url(#luz)"/>
+<rect x="215.282" y="37.72" width="54.425" height="68.031" rx="1.701" fill="none" stroke="#4f92e0" stroke-width="0.378"/>
+<circle cx="221.329" cy="44.145" r="3.591" fill="#2a6dbf" stroke="#245fa8" stroke-width="0.302"/>
+<circle cx="241.739" cy="70.98" r="3.591" fill="#2a6dbf" stroke="#245fa8" stroke-width="0.302"/>
+<text transform="translate(250.809 71.735) rotate(-90)" x="0" y="1.795" font-family="Arial" font-weight="normal" font-size="4.488" fill="#e3ecf8" text-anchor="middle">10A 250VAC  10A 125VAC</text>
+<text transform="translate(257.235 71.735) rotate(-90)" x="0" y="1.795" font-family="Arial" font-weight="normal" font-size="4.488" fill="#e3ecf8" text-anchor="middle">10A  30VDC  10A  28VDC</text>
+<text transform="translate(264.416 71.735) rotate(-90)" x="0" y="2.457" font-family="Arial" font-weight="bold" font-size="6.142" fill="#e3ecf8" text-anchor="middle">SRD-05VDC-SL-C</text>
+<rect x="223.975" y="115.578" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="223.975" y="130.318" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="233.575" y="115.578" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="233.575" y="130.318" width="2.268" height="1.89" fill="url(#metal-h)"/>
+<rect x="221.329" y="117.468" width="17.386" height="12.85" rx="0.945" fill="#1f2023"/>
+<rect x="221.329" y="117.468" width="17.386" height="12.85" rx="0.945" fill="url(#luz)"/>
+<circle cx="223.975" cy="127.672" r="1.134" fill="#3a3c41"/>
+<text transform="translate(230.022 123.137) rotate(0)" x="0" y="1.323" font-family="Arial" font-weight="normal" font-size="3.307" fill="#c3c6cb" text-anchor="middle">817C</text>
+<rect x="249.581" y="116.901" width="1.701" height="2.646" fill="url(#metal-h)"/>
+<rect x="245.991" y="124.46" width="1.701" height="2.646" fill="url(#metal-h)"/>
+<rect x="253.172" y="124.46" width="1.701" height="2.646" fill="url(#metal-h)"/>
+<rect x="244.951" y="119.357" width="10.961" height="5.291" rx="0.454" fill="#1f2023"/>
+<text transform="translate(250.431 122.003) rotate(0)" x="0" y="1.039" font-family="Arial" font-weight="normal" font-size="2.598" fill="#c3c6cb" text-anchor="middle">J3Y</text>
+<rect x="257.046" y="120.302" width="3.024" height="3.402" rx="0.302" fill="#cfd3d8"/>
+<rect x="268.762" y="120.302" width="3.024" height="3.402" rx="0.302" fill="#cfd3d8"/>
+<rect x="259.124" y="119.169" width="10.583" height="5.669" rx="0.454" fill="#1f2023"/>
+<rect x="268.006" y="119.169" width="1.134" height="5.669" fill="#9aa1a8"/>
+<text transform="translate(263.66 122.003) rotate(0)" x="0" y="1.134" font-family="Arial" font-weight="normal" font-size="2.835" fill="#c3c6cb" text-anchor="middle">M7</text>
+<rect x="226.998" y="136.271" width="6.047" height="3.213" rx="0.302" fill="#1e1f22"/>
+<rect x="226.998" y="136.271" width="1.33" height="3.213" fill="url(#metal)"/>
+<rect x="231.715" y="136.271" width="1.33" height="3.213" fill="url(#metal)"/>
+<text transform="translate(230.022 137.877) rotate(0)" x="0" y="0.723" font-family="Arial" font-weight="normal" font-size="1.807" fill="#c3c6cb" text-anchor="middle">102</text>
+<rect x="242.4" y="131.074" width="3.213" height="6.047" rx="0.302" fill="#1e1f22"/>
+<rect x="242.4" y="131.074" width="3.213" height="1.33" fill="url(#metal)"/>
+<rect x="242.4" y="135.791" width="3.213" height="1.33" fill="url(#metal)"/>
+<text transform="translate(244.006 134.098) rotate(-90)" x="0" y="0.723" font-family="Arial" font-weight="normal" font-size="1.807" fill="#c3c6cb" text-anchor="middle">102</text>
+<rect x="251.565" y="139.294" width="7.559" height="4.724" rx="0.454" fill="#f2efe6"/>
+<rect x="253.266" y="140.05" width="4.157" height="3.213" rx="0.567" fill="#e7d9c7"/>
+<rect x="254.683" y="140.995" width="1.323" height="1.323" fill="#b8a27a"/>
+<text transform="translate(255.345 149.216) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="bold" font-size="3.543" fill="#f2f5f7" text-anchor="middle">IN4</text>
+<rect x="7.559" y="181.417" width="9.071" height="9.071" rx="1.134" fill="url(#plastico)"/>
+<rect x="10.507" y="184.365" width="3.175" height="3.175" fill="#7a5c18"/>
+<rect x="10.885" y="184.743" width="2.419" height="2.419" fill="url(#ouro)"/>
+<text transform="translate(12.094 178.394) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="bold" font-size="3.543" fill="#f2f5f7" text-anchor="middle">GND</text>
+<rect x="17.159" y="181.417" width="9.071" height="9.071" rx="1.134" fill="url(#plastico)"/>
+<rect x="20.107" y="184.365" width="3.175" height="3.175" fill="#7a5c18"/>
+<rect x="20.485" y="184.743" width="2.419" height="2.419" fill="url(#ouro)"/>
+<text transform="translate(21.694 178.394) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="bold" font-size="3.543" fill="#f2f5f7" text-anchor="middle">IN1</text>
+<rect x="26.759" y="181.417" width="9.071" height="9.071" rx="1.134" fill="url(#plastico)"/>
+<rect x="29.707" y="184.365" width="3.175" height="3.175" fill="#7a5c18"/>
+<rect x="30.085" y="184.743" width="2.419" height="2.419" fill="url(#ouro)"/>
+<text transform="translate(31.294 178.394) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="bold" font-size="3.543" fill="#f2f5f7" text-anchor="middle">IN2</text>
+<rect x="36.359" y="181.417" width="9.071" height="9.071" rx="1.134" fill="url(#plastico)"/>
+<rect x="39.307" y="184.365" width="3.175" height="3.175" fill="#7a5c18"/>
+<rect x="39.685" y="184.743" width="2.419" height="2.419" fill="url(#ouro)"/>
+<text transform="translate(40.894 178.394) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="bold" font-size="3.543" fill="#f2f5f7" text-anchor="middle">IN3</text>
+<rect x="45.959" y="181.417" width="9.071" height="9.071" rx="1.134" fill="url(#plastico)"/>
+<rect x="48.907" y="184.365" width="3.175" height="3.175" fill="#7a5c18"/>
+<rect x="49.285" y="184.743" width="2.419" height="2.419" fill="url(#ouro)"/>
+<text transform="translate(50.494 178.394) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="bold" font-size="3.543" fill="#f2f5f7" text-anchor="middle">IN4</text>
+<rect x="55.559" y="181.417" width="9.071" height="9.071" rx="1.134" fill="url(#plastico)"/>
+<rect x="58.507" y="184.365" width="3.175" height="3.175" fill="#7a5c18"/>
+<rect x="58.885" y="184.743" width="2.419" height="2.419" fill="url(#ouro)"/>
+<text transform="translate(60.094 178.394) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="bold" font-size="3.543" fill="#f2f5f7" text-anchor="middle">VCC</text>
+<rect x="74.986" y="183.591" width="7.559" height="4.724" rx="0.454" fill="#f2efe6"/>
+<rect x="76.687" y="184.346" width="4.157" height="3.213" rx="0.567" fill="#e7d9c7"/>
+<rect x="78.104" y="185.291" width="1.323" height="1.323" fill="#b8a27a"/>
+<text transform="translate(78.765 178.394) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="bold" font-size="3.543" fill="#f2f5f7" text-anchor="middle">PWR</text>
+<rect x="251.414" y="181.417" width="9.071" height="9.071" rx="1.134" fill="url(#plastico)"/>
+<rect x="254.362" y="184.365" width="3.175" height="3.175" fill="#7a5c18"/>
+<rect x="254.74" y="184.743" width="2.419" height="2.419" fill="url(#ouro)"/>
+<text transform="translate(255.95 178.394) rotate(0)" x="0" y="1.228" font-family="Arial" font-weight="bold" font-size="3.071" fill="#f2f5f7" text-anchor="middle">GND</text>
+<rect x="261.014" y="181.417" width="9.071" height="9.071" rx="1.134" fill="url(#plastico)"/>
+<rect x="263.962" y="184.365" width="3.175" height="3.175" fill="#7a5c18"/>
+<rect x="264.34" y="184.743" width="2.419" height="2.419" fill="url(#ouro)"/>
+<text transform="translate(265.55 178.394) rotate(0)" x="0" y="1.228" font-family="Arial" font-weight="bold" font-size="3.071" fill="#f2f5f7" text-anchor="middle">VCC</text>
+<rect x="270.614" y="181.417" width="9.071" height="9.071" rx="1.134" fill="url(#plastico)"/>
+<rect x="273.562" y="184.365" width="3.175" height="3.175" fill="#7a5c18"/>
+<rect x="273.94" y="184.743" width="2.419" height="2.419" fill="url(#ouro)"/>
+<text transform="translate(275.15 178.394) rotate(0)" x="0" y="1.228" font-family="Arial" font-weight="bold" font-size="3.071" fill="#f2f5f7" text-anchor="middle">JD</text>
+<rect x="260.636" y="180.661" width="19.427" height="10.583" rx="1.89" fill="#e8c21c" stroke="#8a7110" stroke-width="0.756"/>
+<rect x="263.282" y="182.929" width="14.135" height="6.047" rx="1.134" fill="#c9a512"/>
+<text transform="translate(143.622 167.811) rotate(0)" x="0" y="1.89" font-family="Arial" font-weight="bold" font-size="4.724" fill="#f2f5f7" text-anchor="middle">4 Relay Module</text>
 </svg>

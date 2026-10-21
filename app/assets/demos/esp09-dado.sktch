@@ -374,13 +374,13 @@
     "DePeca": "placa",
     "DePino": "GPIO4",
     "ParaPeca": "buzzer",
-    "ParaPino": "1",
+    "ParaPino": "2",
     "Cor": "#F28C28",
     "Estilo": "solto"
    },
    {
     "DePeca": "buzzer",
-    "DePino": "2",
+    "DePino": "1",
     "ParaPeca": "placa",
     "ParaPino": "GND",
     "Cor": "#1A1A1A",

@@ -168,13 +168,13 @@
     "DePeca": "placa",
     "DePino": "3",
     "ParaPeca": "sirene",
-    "ParaPino": "1",
+    "ParaPino": "2",
     "Cor": "#F28C28",
     "Estilo": "solto"
    },
    {
     "DePeca": "sirene",
-    "DePino": "2",
+    "DePino": "1",
     "ParaPeca": "placa",
     "ParaPino": "GND",
     "Cor": "#1A1A1A",

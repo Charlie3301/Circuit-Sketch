@@ -442,6 +442,8 @@ public static class Catalogo
         // Os modulos chaveados: o - da entrada e o da saida sao a mesma trilha.
         if (idPeca == "lm2596") { yield return ("IN-", "OUT-"); yield break; }
         if (idPeca == "mt3608") { yield return ("VIN-", "VOUT-"); yield break; }
+        // O modulo do AMS1117: o GND da entrada e o da saida (as duas barras) sao a mesma trilha.
+        if (idPeca == "ams1117") { yield return ("GND", "GND.2"); yield break; }
         if (idPeca is "a4988" or "drv8825") { yield return ("GND", "GND.2"); yield break; }
         // O PCM5102A: o GND da barra e os dois AGND da lateral sao o mesmo terra.
         if (idPeca == "pcm5102a") { yield return ("GND", "AGND"); yield return ("GND", "AGND.2"); yield break; }

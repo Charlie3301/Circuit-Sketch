@@ -71,8 +71,9 @@ class Circuito:
     def buzzer(self, id, pino, gnd, x, y, placa=None):
         placa = placa or self.placa
         self.peca(id, 'buzzer', x, y)
-        self.ligar(placa, pino, id, '1', LARANJA)
-        self.ligar(id, '2', placa, gnd, PRETO)
+        # o 2 e o + (a perna comprida, o fio vermelho do Wokwi), o 1 e o -
+        self.ligar(placa, pino, id, '2', LARANJA)
+        self.ligar(id, '1', placa, gnd, PRETO)
 
 
 def gravar(recurso, codigo, circuito, descricao, codigos_por_placa=None):

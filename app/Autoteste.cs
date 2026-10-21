@@ -199,6 +199,7 @@ public static partial class Autoteste
         Bloco("Rede_Roteador", Rede_Roteador);
         Bloco("Anotacao_TextoEJuncao", Anotacao_TextoEJuncao);
         Bloco("Modulos_Desenho", Modulos_Desenho);
+        Bloco("AtuadoresAlimentacao_Desenho", AtuadoresAlimentacao_Desenho);
         Bloco("Leds_Familia", Leds_Familia);
         Bloco("Passivos_Desenho", Passivos_Desenho);
         Bloco("Outros_Desenho", Outros_Desenho);

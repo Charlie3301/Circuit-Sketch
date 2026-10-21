@@ -1,34 +1,65 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-     width="16.5mm" height="12.0mm" viewBox="0 0 16.5 12.0">
-  <rect x="0.2" y="0.2" width="16.10" height="11.60" rx="1.0" fill="#1f5fb4" stroke="#123e7a" stroke-width="0.35"/>
-  <rect x="0.9" y="0.9" width="14.70" height="10.20" rx="0.7" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="0.3"/>
-  <rect x="6.65" y="1.0" width="3.2" height="1.3" fill="#cfd3d8" stroke="#80858c" stroke-width="0.12"/>
-  <rect x="4.95" y="2.2" width="6.6" height="3.6" rx="0.25" fill="#1d1e22" stroke="#0a0a0b" stroke-width="0.2"/>
-  <rect x="5.60" y="5.8" width="0.7" height="0.9" fill="#cfd3d8" stroke="#80858c" stroke-width="0.1"/>
-  <rect x="7.90" y="5.8" width="0.7" height="0.9" fill="#cfd3d8" stroke="#80858c" stroke-width="0.1"/>
-  <rect x="10.20" y="5.8" width="0.7" height="0.9" fill="#cfd3d8" stroke="#80858c" stroke-width="0.1"/>
-  <text x="8.25" y="3.90" fill="#d9dce0" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">AMS1117</text>
-  <text x="8.25" y="5.25" fill="#b9bec6" font-size="0.95px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">3.3</text>
-  <rect x="1.60" y="2.00" width="2.20" height="3.20" rx="0.15" fill="#e0b43a" stroke="#4a3622" stroke-width="0.12"/>
-  <rect x="1.6" y="2.0" width="2.2" height="0.7" fill="#8a6a16"/>
-  <rect x="12.70" y="2.00" width="2.20" height="3.20" rx="0.15" fill="#e0b43a" stroke="#4a3622" stroke-width="0.12"/>
-  <rect x="12.70" y="2.0" width="2.2" height="0.7" fill="#8a6a16"/>
-  <rect x="1.70" y="6.30" width="1.60" height="0.90" rx="0.15" fill="#f2f2ee" stroke="#4a3622" stroke-width="0.12"/>
-  <rect x="2.05" y="6.38" width="0.9" height="0.74" fill="#7a1414"/>
-  <rect x="13.10" y="6.30" width="1.60" height="0.90" rx="0.15" fill="#2a2a2a" stroke="#4a3622" stroke-width="0.12"/>
-  <text x="5.71" y="9.25" fill="#e6ecf5" font-size="0.7px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">VIN</text>
-  <circle cx="5.71" cy="10.60" r="0.62" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
-  <circle cx="5.71" cy="10.60" r="0.28" fill="#2a2a2a"/>
-  <text x="8.25" y="9.25" fill="#e6ecf5" font-size="0.7px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">GND</text>
-  <circle cx="8.25" cy="10.60" r="0.62" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
-  <circle cx="8.25" cy="10.60" r="0.28" fill="#2a2a2a"/>
-  <text x="10.79" y="9.25" fill="#e6ecf5" font-size="0.7px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">VOUT</text>
-  <circle cx="10.79" cy="10.60" r="0.62" fill="#d9b44a" stroke="#8a6d1f" stroke-width="0.2"/>
-  <circle cx="10.79" cy="10.60" r="0.28" fill="#2a2a2a"/>
-
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="94px" height="42px" viewBox="0 0 94 42">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <radialGradient id="lata-topo" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#f1f3f5"/><stop offset="0.6" stop-color="#c3c8ce"/><stop offset="1" stop-color="#8a9097"/></radialGradient>
+  <linearGradient id="niquel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9ecef"/><stop offset="0.5" stop-color="#c2c7cd"/><stop offset="1" stop-color="#959ba2"/></linearGradient>
+  <linearGradient id="trimpot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f8be8"/><stop offset="1" stop-color="#2459b8"/></linearGradient>
+  <radialGradient id="latao" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#f6e3a0"/><stop offset="0.6" stop-color="#d1a845"/><stop offset="1" stop-color="#8f6d1f"/></radialGradient>
+</defs>
+<rect x="0" y="0" width="94" height="42" rx="2.268" fill="#1f5fb4" stroke="#123e7a" stroke-width="0.567"/>
+<rect x="0" y="0" width="94" height="42" rx="2.268" fill="url(#luz)"/>
+<text transform="translate(12.472 4.535) rotate(0)" x="0" y="1.512" font-family="Arial" font-weight="normal" font-size="3.78" fill="#f2f5f7" text-anchor="start">VIN+</text>
+<text transform="translate(12.472 38.22) rotate(0)" x="0" y="1.512" font-family="Arial" font-weight="normal" font-size="3.78" fill="#f2f5f7" text-anchor="start">GND-</text>
+<text transform="translate(81.528 4.535) rotate(0)" x="0" y="1.512" font-family="Arial" font-weight="normal" font-size="3.78" fill="#f2f5f7" text-anchor="end">VOUT+</text>
+<text transform="translate(81.528 38.22) rotate(0)" x="0" y="1.512" font-family="Arial" font-weight="normal" font-size="3.78" fill="#f2f5f7" text-anchor="end">GND-</text>
+<text transform="translate(34.016 35.15) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="normal" font-size="3.543" fill="#f2f5f7" text-anchor="start">LED</text>
+<rect x="24" y="31.937" width="9.449" height="6.425" rx="0.756" fill="none" stroke="#f2f5f7" stroke-width="0.454"/>
+<rect x="24" y="10.583" width="7.181" height="11.339" rx="0.756" fill="none" stroke="#f2f5f7" stroke-width="0.454"/>
+<rect x="63.307" y="7.181" width="7.181" height="11.339" rx="0.756" fill="none" stroke="#f2f5f7" stroke-width="0.454"/>
+<rect x="68.031" y="19.843" width="11.339" height="7.181" rx="0.756" fill="none" stroke="#f2f5f7" stroke-width="0.454"/>
+<rect x="58.205" y="29.669" width="9.071" height="6.425" rx="0.756" fill="none" stroke="#f2f5f7" stroke-width="0.454"/>
+<rect x="1.323" y="11.665" width="9.071" height="9.071" rx="1.134" fill="url(#plastico)"/>
+<rect x="4.271" y="14.613" width="3.175" height="3.175" fill="#7a5c18"/>
+<rect x="4.649" y="14.991" width="2.419" height="2.419" fill="url(#ouro)"/>
+<rect x="1.323" y="21.265" width="9.071" height="9.071" rx="1.134" fill="url(#plastico)"/>
+<rect x="4.271" y="24.213" width="3.175" height="3.175" fill="#7a5c18"/>
+<rect x="4.649" y="24.591" width="2.419" height="2.419" fill="url(#ouro)"/>
+<rect x="83.606" y="11.665" width="9.071" height="9.071" rx="1.134" fill="url(#plastico)"/>
+<rect x="86.554" y="14.613" width="3.175" height="3.175" fill="#7a5c18"/>
+<rect x="86.932" y="14.991" width="2.419" height="2.419" fill="url(#ouro)"/>
+<rect x="83.606" y="21.265" width="9.071" height="9.071" rx="1.134" fill="url(#plastico)"/>
+<rect x="86.554" y="24.213" width="3.175" height="3.175" fill="#7a5c18"/>
+<rect x="86.932" y="24.591" width="2.419" height="2.419" fill="url(#ouro)"/>
+<rect x="36.984" y="7.559" width="2.646" height="5.669" fill="url(#metal-h)"/>
+<rect x="45.677" y="7.559" width="2.646" height="5.669" fill="url(#metal-h)"/>
+<rect x="54.37" y="7.559" width="2.646" height="5.669" fill="url(#metal-h)"/>
+<rect x="41.331" y="25.512" width="11.339" height="6.047" fill="url(#metal-h)"/>
+<rect x="34.717" y="13.039" width="24.567" height="13.228" rx="0.661" fill="#1f2023"/>
+<rect x="34.717" y="13.039" width="24.567" height="13.228" rx="0.661" fill="url(#luz)"/>
+<text transform="translate(47 21.742) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="normal" font-size="3.543" fill="#c3c6cb" text-anchor="middle">1117-3.3</text>
+<text transform="translate(47 17.565) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="normal" font-size="4.016" fill="#c3c6cb" text-anchor="middle">AMS1117</text>
+<rect x="25.228" y="12.472" width="4.724" height="7.559" rx="0.302" fill="#b7956a"/>
+<rect x="25.228" y="12.472" width="4.724" height="7.559" rx="0.302" fill="url(#luz)"/>
+<rect x="25.228" y="12.472" width="4.724" height="1.663" fill="url(#metal)"/>
+<rect x="25.228" y="18.369" width="4.724" height="1.663" fill="url(#metal)"/>
+<rect x="64.535" y="9.071" width="4.724" height="7.559" rx="0.302" fill="#b7956a"/>
+<rect x="64.535" y="9.071" width="4.724" height="7.559" rx="0.302" fill="url(#luz)"/>
+<rect x="64.535" y="9.071" width="4.724" height="1.663" fill="url(#metal)"/>
+<rect x="64.535" y="14.967" width="4.724" height="1.663" fill="url(#metal)"/>
+<rect x="69.921" y="21.071" width="7.559" height="4.724" rx="0.302" fill="#b7956a"/>
+<rect x="69.921" y="21.071" width="7.559" height="4.724" rx="0.302" fill="url(#luz)"/>
+<rect x="69.921" y="21.071" width="1.663" height="4.724" fill="url(#metal)"/>
+<rect x="75.817" y="21.071" width="1.663" height="4.724" fill="url(#metal)"/>
+<rect x="59.717" y="31.276" width="6.047" height="3.213" rx="0.302" fill="#1e1f22"/>
+<rect x="59.717" y="31.276" width="6.047" height="3.213" rx="0.302" fill="url(#luz)"/>
+<rect x="59.717" y="31.276" width="1.33" height="3.213" fill="url(#metal)"/>
+<rect x="64.433" y="31.276" width="1.33" height="3.213" fill="url(#metal)"/>
+<text transform="translate(62.74 32.882) rotate(0)" x="0" y="0.723" font-family="Arial" font-weight="normal" font-size="1.807" fill="#c3c6cb" text-anchor="middle">102</text>
+<rect x="25.701" y="33.543" width="6.047" height="3.213" rx="0.302" fill="#f4f2ec"/>
+<rect x="27.024" y="34.11" width="3.402" height="2.079" rx="0.378" fill="#e3dfe6"/>
 </svg>

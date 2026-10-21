@@ -1,19 +1,24 @@
-<svg width="21mm" height="10mm" version="1.1" viewBox="0 0 21 10" xmlns="http://www.w3.org/2000/svg">
-        <g stroke-width=".4" fill="#f7b93c" stroke="#dda137">
-          <rect x=".20" y=".20" width="20.6" height="9.61" ry=".58"/>
-          <rect x="20.2" y="4.5" width=".40" height="1" fill="#dda137"/>
-        </g>
-        <g fill="none" stroke="#dda137" stroke-width=".47">
-          <ellipse cx="1.6" cy="1.35" rx=".76" ry=".76"/>
-          <ellipse cx="6.68" cy="1.35" rx=".76" ry=".76"/>
-          <ellipse cx="11.76" cy="1.35" rx=".76" ry=".76"/>
-          <ellipse cx="19.38" cy="1.35" rx=".76" ry=".76"/>
-          <ellipse cx="1.6" cy="8.65" rx=".76" ry=".76"/>
-          <ellipse cx="6.68" cy="8.65" rx=".76" ry=".76"/>
-          <ellipse cx="11.76" cy="8.65" rx=".76" ry=".76"/>
-          <ellipse cx="19.38" cy="8.65" rx=".76" ry=".76"/>
-        </g>
-        <text fill="#4a3510" font-family="sans-serif" font-size="2.8222px">
-          <tspan x="1.07" y="6.03">KS2E-M-DC5</tspan>
-        </text>
-      </svg>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="79.37px" height="37.795px" viewBox="0 0 79.37 37.795">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <radialGradient id="buzzer-topo" cx="0.38" cy="0.34" r="0.75"><stop offset="0" stop-color="#34363b"/><stop offset="0.7" stop-color="#18191c"/><stop offset="1" stop-color="#0c0c0e"/></radialGradient>
+  <radialGradient id="cone" cx="0.5" cy="0.5" r="0.5"><stop offset="0.3" stop-color="#16171a"/><stop offset="1" stop-color="#2c2e33"/></radialGradient>
+  <radialGradient id="borda-cone" cx="0.5" cy="0.5" r="0.5"><stop offset="0.86" stop-color="#1a1b1f"/><stop offset="0.93" stop-color="#3c3f46"/><stop offset="1" stop-color="#16171a"/></radialGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.32" r="0.8"><stop offset="0" stop-color="#5d626c"/><stop offset="0.6" stop-color="#2a2c31"/><stop offset="1" stop-color="#17181b"/></radialGradient>
+  <linearGradient id="aro" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8d939b"/><stop offset="0.45" stop-color="#3b3e44"/><stop offset="1" stop-color="#202226"/></linearGradient>
+</defs>
+<rect x="0.378" y="0.378" width="78.614" height="37.039" rx="1.89" fill="#1b1c1f" stroke="#070708" stroke-width="0.567"/>
+<rect x="0.378" y="0.378" width="78.614" height="37.039" rx="1.89" fill="url(#luz)"/>
+<rect x="2.646" y="2.646" width="74.079" height="32.504" rx="1.323" fill="none" stroke="#2a2b2f" stroke-width="0.454"/>
+<text transform="translate(31.748 13.606) rotate(0)" x="0" y="2.457" font-family="Arial" font-weight="bold" font-size="6.142" fill="#e6e7ea" text-anchor="middle">KS2E-M-DC5</text>
+<text transform="translate(31.748 23.055) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="normal" font-size="4.016" fill="#e6e7ea" text-anchor="middle">5VDC  2A 30VDC</text>
+<rect x="63.496" y="13.228" width="6.047" height="11.339" fill="none" stroke="#e6e7ea" stroke-width="0.491"/>
+<path d="M63.496 24.567 L69.543 13.228" fill="none" stroke="#e6e7ea" stroke-width="0.491" stroke-linecap="round"/>
+<path d="M66.52 5.669 L66.52 13.228" fill="none" stroke="#e6e7ea" stroke-width="0.491" stroke-linecap="round"/>
+<path d="M66.52 24.567 L66.52 32.126" fill="none" stroke="#e6e7ea" stroke-width="0.491" stroke-linecap="round"/>
+</svg>
