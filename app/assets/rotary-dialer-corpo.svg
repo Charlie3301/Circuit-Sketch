@@ -1,26 +1,46 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="266" height="286">
-      
-      <g fill="#9f9f9f" stroke-width=".987">
-        <path d="m123.4 266c0-0.377-0.149-0.739-0.416-1.01-0.268-0.267-0.629-0.417-1.01-0.417-0.377 0-0.739 0.15-1.01 0.417s-0.417 0.629-0.417 1.01v25.8c0 0.231 0.188 0.419 0.418 0.419h2.01c0.231 0 0.418-0.188 0.418-0.419v-25.8z" />
-        <path d="m133 266c0-0.377-0.149-0.739-0.416-1.01-0.268-0.267-0.629-0.417-1.01-0.417-0.377 0-0.739 0.15-1.01 0.417s-0.417 0.629-0.417 1.01v25.8c0 0.231 0.188 0.419 0.418 0.419h2.01c0.231 0 0.418-0.188 0.418-0.419v-25.8z" />
-        <path d="m142.6 266c0-0.377-0.15-0.739-0.417-1.01s-0.629-0.417-1.01-0.417c-0.377 0-0.739 0.15-1.01 0.417s-0.417 0.629-0.417 1.01v25.8c0 0.231 0.188 0.419 0.419 0.419h2.01c0.231 0 0.419-0.188 0.419-0.419v-25.8z" />
-      </g>
-      <g transform="translate(1 1)">
-        <circle stroke="#979797" stroke-width="3" fill="#1F1F1F" cx="133" cy="133" r="131" />
-        <circle stroke="#fff" stroke-width="2" fill="#D8D8D8" cx="133" cy="133" r="72" />
-        </g>
-      <circle id="container" fill-opacity=".5" fill="#070707" cx="132.5" cy="132.5" r="132.5" />
-      <g class="text" font-family="Marker Felt, monospace" font-size="21" fill="#FFF">
-        <text x="129" y="243">0</text>
-        <text x="78" y="230">9</text>
-        <text x="40" y="194">8</text>
-        <text x="28" y="145">7</text>
-        <text x="35" y="97">6</text>
-        <text x="72" y="58">5</text>
-        <text x="117" y="41">4</text>
-        <text x="168" y="47">3</text>
-        <text x="210" y="79">2</text>
-        <text x="230" y="126">1</text>
-      </g>
-      <path d="M182.738529,211.096297 L177.320119,238.659185 L174.670528,252.137377 L188.487742,252.137377 L182.738529,211.096297 Z" stroke="#979797" fill="#D8D8D8" transform="translate(181.562666, 230.360231) rotate(-22.000000) translate(-181.562666, -230.360231)" />
-    </svg>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="266px" height="293px" viewBox="0 0 266 293">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
+  <radialGradient id="borda-capa" cx="0.5" cy="0.5" r="0.5"><stop offset="0.72" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.45"/></radialGradient>
+  <linearGradient id="aco" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset="0.5" stop-color="#c3c9cf"/><stop offset="1" stop-color="#959ca4"/></linearGradient>
+  <radialGradient id="knob" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#4a4d52"/><stop offset="0.7" stop-color="#202124"/><stop offset="1" stop-color="#0d0e10"/></radialGradient>
+  <radialGradient id="cromo" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#fbfcfd"/><stop offset="0.45" stop-color="#c9ced4"/><stop offset="0.8" stop-color="#8e959d"/><stop offset="1" stop-color="#b7bdc3"/></radialGradient>
+</defs>
+<rect x="100.874" y="267.299" width="64.252" height="24.189" rx="2.268" fill="#1e1f22" stroke="#0a0a0b" stroke-width="0.454"/>
+<circle cx="113.8" cy="280.906" r="5.858" fill="url(#lata)" stroke="#5f666e" stroke-width="0.378"/>
+<path d="M110.02 277.126 L117.58 284.685" fill="none" stroke="#5f666e" stroke-width="1.134" stroke-linecap="round"/>
+<text transform="translate(113.8 271.268) rotate(0)" x="0" y="1.512" font-family="Arial" font-weight="bold" font-size="3.78" fill="#f2f4f6" text-anchor="middle">GND</text>
+<circle cx="133" cy="280.906" r="5.858" fill="url(#lata)" stroke="#5f666e" stroke-width="0.378"/>
+<path d="M129.22 277.126 L136.78 284.685" fill="none" stroke="#5f666e" stroke-width="1.134" stroke-linecap="round"/>
+<text transform="translate(133 271.268) rotate(0)" x="0" y="1.512" font-family="Arial" font-weight="bold" font-size="3.78" fill="#f2f4f6" text-anchor="middle">DIAL</text>
+<circle cx="152.2" cy="280.906" r="5.858" fill="url(#lata)" stroke="#5f666e" stroke-width="0.378"/>
+<path d="M148.42 277.126 L155.98 284.685" fill="none" stroke="#5f666e" stroke-width="1.134" stroke-linecap="round"/>
+<text transform="translate(152.2 271.268) rotate(0)" x="0" y="1.512" font-family="Arial" font-weight="bold" font-size="3.78" fill="#f2f4f6" text-anchor="middle">PULSE</text>
+<circle cx="133" cy="133.795" r="132.283" fill="#141517" stroke="#050506" stroke-width="0.756"/>
+<circle cx="133" cy="133.795" r="129.26" fill="none" stroke="#9aa1a8" stroke-width="1.323"/>
+<circle cx="133" cy="133.795" r="124.346" fill="#f3f1ea"/>
+<text transform="translate(141.4 230.373) rotate(0)" x="0" y="7.559" font-family="Arial" font-weight="bold" font-size="18.898" fill="#161616" text-anchor="middle">0</text>
+<text transform="translate(229.011 125.962) rotate(0)" x="0" y="7.559" font-family="Arial" font-weight="bold" font-size="18.898" fill="#161616" text-anchor="middle">1</text>
+<text transform="translate(211.948 79.082) rotate(0)" x="0" y="7.559" font-family="Arial" font-weight="bold" font-size="18.898" fill="#161616" text-anchor="middle">2</text>
+<text transform="translate(173.731 47.014) rotate(0)" x="0" y="7.559" font-family="Arial" font-weight="bold" font-size="18.898" fill="#161616" text-anchor="middle">3</text>
+<text transform="translate(124.6 38.351) rotate(0)" x="0" y="7.559" font-family="Arial" font-weight="bold" font-size="18.898" fill="#161616" text-anchor="middle">4</text>
+<text transform="translate(77.72 55.414) rotate(0)" x="0" y="7.559" font-family="Arial" font-weight="bold" font-size="18.898" fill="#161616" text-anchor="middle">5</text>
+<text transform="translate(45.652 93.631) rotate(0)" x="0" y="7.559" font-family="Arial" font-weight="bold" font-size="18.898" fill="#161616" text-anchor="middle">6</text>
+<text transform="translate(36.989 142.762) rotate(0)" x="0" y="7.559" font-family="Arial" font-weight="bold" font-size="18.898" fill="#161616" text-anchor="middle">7</text>
+<text transform="translate(54.052 189.642) rotate(0)" x="0" y="7.559" font-family="Arial" font-weight="bold" font-size="18.898" fill="#161616" text-anchor="middle">8</text>
+<text transform="translate(92.269 221.71) rotate(0)" x="0" y="7.559" font-family="Arial" font-weight="bold" font-size="18.898" fill="#161616" text-anchor="middle">9</text>
+<circle cx="133" cy="133.795" r="47.622" fill="#f6f4ee" stroke="#9b1d1d" stroke-width="1.701"/>
+<path d="M113.724 117.921 L152.276 117.921" fill="none" stroke="#b9b4a6" stroke-width="0.68" stroke-linecap="round"/>
+<path d="M107.677 128.504 L158.323 128.504" fill="none" stroke="#b9b4a6" stroke-width="0.68" stroke-linecap="round"/>
+<path d="M107.677 139.087 L158.323 139.087" fill="none" stroke="#b9b4a6" stroke-width="0.68" stroke-linecap="round"/>
+<path d="M113.724 149.669 L152.276 149.669" fill="none" stroke="#b9b4a6" stroke-width="0.68" stroke-linecap="round"/>
+<path d="M245.375 180.775 L257.706 186.525 L253.553 195.432 L241.222 189.681 Z" fill="url(#metal)" stroke="#3f454d" stroke-width="0.68"/>
+<path d="M244.543 184.349 L248.653 186.266 L247.535 188.663 L243.424 186.747 Z" fill="#5d646b"/>
+<circle cx="252.547" cy="189.541" r="2.079" fill="#6d747c" stroke="#3f454d" stroke-width="0.378"/>
+</svg>

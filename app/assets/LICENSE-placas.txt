@@ -93,4 +93,15 @@ desenhos nao dao foi medido nas fotos dos mesmos fabricantes. O TM1637, a
 matriz do MAX7219 e o semaforo seguem as medidas dos vendedores. Nenhuma foto
 e reproduzida, e nenhuma marca e desenhada.
 
+As entradas (pushbutton*.svg, potentiometer*.svg, slide-potentiometer*.svg,
+slide-switch*.svg, dip-switch-8*.svg, membrane-keypad.svg,
+analog-joystick*.svg, ky-040*.svg, rotary-dialer*.svg, tilt-switch.svg e
+micro-switch*.svg) tambem sao desenhos proprios do CircuitSketch. As medidas
+vieram das fichas dos fabricantes: a do potenciometro deslizante PTA3043 e a
+do encoder PEC11R (o EC11 do KY-040), da Bourns, e a da chave KW4A da
+Dongnan (a KW11-3Z com roldana). As dos botoes tateis de 12 e de 6 mm, do
+potenciometro WH148, da chave SS12D00, da DIP de 8 vias, do teclado de
+membrana 4 x 4 e dos modulos KY-023, KY-040 e KY-020 sao as dos vendedores.
+Nenhuma foto e reproduzida, e nenhuma marca e desenhada.
+
 O restante do CircuitSketch nao e afetado por esta licenca.

@@ -29,9 +29,9 @@ internal static class FotoDePeca
     {
         var def = Catalogo.Obter(tipo);
         if (def is null) return 2;
-        if (svg is not null) Pecas.DefinirDesenho(tipo, File.ReadAllText(svg));
-
         var peca = new PecaNoCircuito { Id = "foto", Tipo = tipo, Cor = cor, Virada = virada, Braco = braco, Modelo = modelo, Bits = bits };
+        // No lugar do desenho que o editor usa: o do pushbutton e o "-solto".
+        if (svg is not null) Pecas.DefinirDesenho(EditorCircuito.NomeDoDesenho(peca), File.ReadAllText(svg));
         var editor = new EditorCircuito();
         var desenho = editor.DesenhoDa(peca, def);
 

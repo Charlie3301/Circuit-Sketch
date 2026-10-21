@@ -1,30 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" height="29mm" version="1.1" width="55mm" viewBox="0 0 55 29">
-      <defs>
-        <filter id="outline">
-          <fedropshadow dx="0" dy="0" stdDeviation="1" flood-color="#4faaff" />
-        </filter>
-        <linearGradient id="tipGradient" x1="36.482" x2="50.447" y1="91.25" y2="91.25" gradientTransform="matrix(.8593 0 0 1.1151 -14.849 -92.256)" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#1a1a1a" offset="0" />
-          <stop stop-color="#595959" offset=".4" />
-          <stop stop-color="#595959" offset=".6" />
-          <stop stop-color="#1a1a1a" offset="1" />
-        </linearGradient>
-        <radialGradient id="bodyGradient" cx="62.59" cy="65.437" r="22.5" gradientTransform="matrix(1.9295 3.7154e-8 0 .49697 -98.268 -23.02)" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#d2d2d2" offset="0" />
-          <stop stop-color="#7a7a7a" offset="1" />
-        </radialGradient>
-        <g id="screw">
-          <circle cx="0" cy="0" r="1" fill="#858585" stroke="#000" stroke-width=".05" />
-          <path d="m0 1 0-2" fill="none" stroke="#000" stroke-width=".151" />
-        </g>
-      </defs>
-      
-      <g transform="translate(5 5)">
-        
-        <g id="tip" transform="translate(-15 0)">
-          <rect x="19.75" y="8.6" width="5.5" height="1.8" />
-          <rect x="16.5" y="0" width="12" height="19" fill="url(#tipGradient)" stroke-width="2.6518" rx=".1" ry=".1" />
-          <rect x="22.2" y="0" width=".6" height="19" fill="#efefef" />
-        </g>
-      </g>
-      </svg>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="172px" height="57px" viewBox="0 0 172 57">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
+  <radialGradient id="borda-capa" cx="0.5" cy="0.5" r="0.5"><stop offset="0.72" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.45"/></radialGradient>
+  <linearGradient id="aco" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset="0.5" stop-color="#c3c9cf"/><stop offset="1" stop-color="#959ca4"/></linearGradient>
+  <radialGradient id="knob" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#4a4d52"/><stop offset="0.7" stop-color="#202124"/><stop offset="1" stop-color="#0d0e10"/></radialGradient>
+  <radialGradient id="cromo" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#fbfcfd"/><stop offset="0.45" stop-color="#c9ced4"/><stop offset="0.8" stop-color="#8e959d"/><stop offset="1" stop-color="#b7bdc3"/></radialGradient>
+</defs>
+<rect x="15.512" y="3.933" width="30.236" height="52.913" rx="3.78" fill="#000000" fill-opacity="0.35"/>
+<rect x="14.189" y="2.043" width="30.236" height="52.913" rx="3.78" fill="url(#plastico)" stroke="#0b0c0d" stroke-width="0.454"/>
+<rect x="16.835" y="4.689" width="24.945" height="47.622" rx="2.646" fill="#26282c"/>
+<path d="M18.724 7.335 L18.724 49.665" fill="none" stroke="#18191b" stroke-width="0.831" stroke-linecap="round"/>
+<path d="M21.37 7.335 L21.37 49.665" fill="none" stroke="#18191b" stroke-width="0.831" stroke-linecap="round"/>
+<path d="M24.016 7.335 L24.016 49.665" fill="none" stroke="#18191b" stroke-width="0.831" stroke-linecap="round"/>
+<path d="M26.661 7.335 L26.661 49.665" fill="none" stroke="#18191b" stroke-width="0.831" stroke-linecap="round"/>
+<path d="M31.953 7.335 L31.953 49.665" fill="none" stroke="#18191b" stroke-width="0.831" stroke-linecap="round"/>
+<path d="M34.598 7.335 L34.598 49.665" fill="none" stroke="#18191b" stroke-width="0.831" stroke-linecap="round"/>
+<path d="M37.244 7.335 L37.244 49.665" fill="none" stroke="#18191b" stroke-width="0.831" stroke-linecap="round"/>
+<path d="M39.89 7.335 L39.89 49.665" fill="none" stroke="#18191b" stroke-width="0.831" stroke-linecap="round"/>
+<path d="M29.307 5.823 L29.307 51.177" fill="none" stroke="#f2f2ee" stroke-width="1.701" stroke-linecap="round"/>
+</svg>

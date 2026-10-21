@@ -254,6 +254,8 @@ public static class ImportarWokwi
         p.Modelo = A("modelo");
         // O LCD azul do Wokwi (background="blue") e o nosso modelo azul.
         if (p.Modelo is null && EditorCircuito.EhLcd(p.Tipo) && A("background") == "blue") p.Modelo = "azul";
+        // E o botao de 12 mm do Wokwi traz a cor da capa no "color".
+        if (p.Modelo is null && p.Tipo == "pushbutton") p.Modelo = EditorCircuito.CorDoBotaoDoWokwi(A("color"));
         p.Ficha = p.Modelo == "personalizado"
             ? new FichaPersonalizada
             {

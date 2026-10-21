@@ -132,6 +132,8 @@ public static class ExportarWokwi
             case "lcd1602-i2c" or "lcd2004-i2c": Por("pins", "i2c"); break;
             case "texto": Por("text", p.Nome ?? ""); break;
             case "servo" when FormatoWokwi.BracoParaWokwi(p.Braco) is { } horn: Por("horn", horn); break;
+            // A cor da capa do botao de 12 mm e o "color" do Wokwi.
+            case "pushbutton" when p.Modelo is not null: Por("color", EditorCircuito.CorDoBotaoParaWokwi(EditorCircuito.CorDoBotao(p))); break;
         }
 
         // Os do Wokwi que vieram num diagrama deles e o simulador nao usa.

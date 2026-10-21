@@ -1,30 +1,31 @@
-<svg role="slider" width="20mm" height="20mm" version="1.1" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="--knob-angle:-135deg;">
-      <defs>
-        <filter id="outline">
-          <fedropshadow id="glow" dx="0" dy="0" stdDeviation="0.5" flood-color="cyan"/>
-        </filter>
-      </defs>
-      <rect x=".15" y=".15" width="19.5" height="19.5" ry="1.23" fill="#045881" stroke="#045881" stroke-width=".30"/>
-      <rect x="5.4" y=".70" width="9.1" height="1.9" fill="#ccdae3" stroke-width=".15"/>
-      <ellipse id="knob" rx="7.27" ry="7.43" fill="#e4e8eb" stroke-width=".15" cx="9.91" cy="8.18"/>
-      <rect x="6" y="17" width="8" height="2" fill-opacity="0" stroke="#fff" stroke-width=".30"/>
-      <g stroke-width=".15">
-        <text x="6.21" y="16.6" font-size="1px" fill="#ffffff" letter-spacing="0px">GND</text>
-        <text x="9.2" y="16.63" font-size="1px" fill="#ffffff" letter-spacing="0px">SIG</text>
-        <text x="11.5" y="16.59" font-size="1px" fill="#ffffff" letter-spacing="0px">VCC</text>
-      </g>
-      <g fill="#fff" stroke-width=".15">
-        <ellipse cx="1.68" cy="1.81" rx=".99" ry=".96"/>
-        <ellipse cx="1.48" cy="18.37" rx=".99" ry=".96"/>
-        <ellipse cx="17.97" cy="18.47" rx=".99" ry=".96"/>
-        <ellipse cx="18.07" cy="1.91" rx=".99" ry=".96"/>
-      </g>
-      <g fill="#b3b1b0" stroke-width=".15">
-        <ellipse cx="7.68" cy="18" rx=".61" ry=".63"/>
-        <ellipse cx="10.22" cy="18" rx=".61" ry=".63"/>
-        <ellipse cx="12.76" cy="18" rx=".61" ry=".63"/>
-      </g>
-      <ellipse cx="9.95" cy="8.06" rx="6.60" ry="6.58" fill="#c3c2c3" stroke-width=".15"/>
-      
-      <rect x="0" y="9.5" width="1" height="1" fill="none" id="firefox-workaround"/>
-    </svg>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="64px" height="85px" viewBox="0 0 64 85">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
+  <radialGradient id="borda-capa" cx="0.5" cy="0.5" r="0.5"><stop offset="0.72" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.45"/></radialGradient>
+  <linearGradient id="aco" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset="0.5" stop-color="#c3c9cf"/><stop offset="1" stop-color="#959ca4"/></linearGradient>
+  <radialGradient id="knob" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#4a4d52"/><stop offset="0.7" stop-color="#202124"/><stop offset="1" stop-color="#0d0e10"/></radialGradient>
+  <radialGradient id="cromo" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#fbfcfd"/><stop offset="0.45" stop-color="#c9ced4"/><stop offset="0.8" stop-color="#8e959d"/><stop offset="1" stop-color="#b7bdc3"/></radialGradient>
+</defs>
+<rect x="9.398" y="53.669" width="6.803" height="23.811" fill="url(#metal-h)" stroke="#70767e" stroke-width="0.302"/>
+<rect x="11.099" y="76.724" width="3.402" height="7.709" fill="url(#metal-h)" stroke="#70767e" stroke-width="0.227"/>
+<circle cx="12.8" cy="71.433" r="1.701" fill="#5f656c"/>
+<rect x="28.598" y="53.669" width="6.803" height="23.811" fill="url(#metal-h)" stroke="#70767e" stroke-width="0.302"/>
+<rect x="30.299" y="76.724" width="3.402" height="7.709" fill="url(#metal-h)" stroke="#70767e" stroke-width="0.227"/>
+<circle cx="32" cy="71.433" r="1.701" fill="#5f656c"/>
+<rect x="47.798" y="53.669" width="6.803" height="23.811" fill="url(#metal-h)" stroke="#70767e" stroke-width="0.302"/>
+<rect x="49.499" y="76.724" width="3.402" height="7.709" fill="url(#metal-h)" stroke="#70767e" stroke-width="0.227"/>
+<circle cx="51.2" cy="71.433" r="1.701" fill="#5f656c"/>
+<rect x="8.189" y="57.827" width="47.622" height="6.047" rx="1.134" fill="#4a3424"/>
+<circle cx="32" cy="32.882" r="30.236" fill="url(#lata)" stroke="#757c84" stroke-width="0.567"/>
+<circle cx="32" cy="32.882" r="27.78" fill="none" stroke="#a3aab1" stroke-width="0.945"/>
+<circle cx="32" cy="32.882" r="17.386" fill="#b9bfc5" stroke="#7c838b" stroke-width="0.454"/>
+<rect x="29.354" y="5.102" width="5.291" height="3.402" fill="#9aa1a8" stroke="#6c737b" stroke-width="0.302"/>
+<text transform="translate(32 59.339) rotate(0)" x="0" y="1.417" font-family="Arial" font-weight="bold" font-size="3.543" fill="#4f565d" text-anchor="middle">B10K</text>
+<circle cx="33.323" cy="34.583" r="24.756" fill="#000000" fill-opacity="0.35"/>
+</svg>

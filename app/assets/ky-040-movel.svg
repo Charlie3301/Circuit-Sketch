@@ -1,21 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="30.815mm" height="18.63mm" version="1.1" viewBox="0 0 116 70.4">
-        <defs>
-          <linearGradient id="a" x1="158" x2="170" y1="86.5" y2="86.5" gradientTransform="translate(-75.1 -60.1)" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#4d4d4d" offset="0" />
-            <stop stop-color="#4d4d4d" stop-opacity="0" offset="1" />
-          </linearGradient>
-        </defs>
-
-        
-        <g tabindex="0">
-          <g id="knob"><circle cx="36.6" cy="28.5" r="13.5" fill="#666" />
-          <rect x="32.5" y="7.87" width="7.42" height="41.5" fill="#666" />
-
-          
-          <path d="m36.3 21.4a7.03 7.14 0 0&#10;              0-3.74 1.1v12.1a7.03 7.14 0 0 0 3.74 1.1 7.03 7.14 0 0 0 7.03-7.14 7.03 7.14 0 0&#10;              0-7.03-7.14z" fill="#ccc" stroke="#060606" stroke-width=".3" transform="rotate(0, 36.244, 28.5)" class="handle " /></g>
-
-          
-          </g>
-
-        
-        </svg>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="122px" height="72px" viewBox="0 0 122 72">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
+  <radialGradient id="borda-capa" cx="0.5" cy="0.5" r="0.5"><stop offset="0.72" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.45"/></radialGradient>
+  <linearGradient id="aco" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset="0.5" stop-color="#c3c9cf"/><stop offset="1" stop-color="#959ca4"/></linearGradient>
+  <radialGradient id="knob" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#4a4d52"/><stop offset="0.7" stop-color="#202124"/><stop offset="1" stop-color="#0d0e10"/></radialGradient>
+  <radialGradient id="cromo" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#fbfcfd"/><stop offset="0.45" stop-color="#c9ced4"/><stop offset="0.8" stop-color="#8e959d"/><stop offset="1" stop-color="#b7bdc3"/></radialGradient>
+</defs>
+<path d="M40.441 30.331 L41.037 30.331 L41.646 30.331 L42.283 30.331 L42.965 30.331 L43.714 30.331 L44.56 30.331 L45.546 30.331 L46.737 30.331 L48.244 30.331 L50.26 30.331 L50.074 31.711 L51.225 32.496 L50.755 33.808 L51.717 34.815 L50.986 36 L51.717 37.185 L50.755 38.192 L51.225 39.504 L50.074 40.289 L50.26 41.669 L48.972 42.198 L48.867 43.587 L47.497 43.836 L47.106 45.173 L45.713 45.132 L45.053 46.358 L43.699 46.029 L42.798 47.091 L41.543 46.487 L40.441 47.339 L39.339 46.487 L38.084 47.091 L37.182 46.029 L35.829 46.358 L35.169 45.132 L33.776 45.173 L33.385 43.836 L32.015 43.587 L31.91 42.198 L30.621 41.669 L30.808 40.289 L29.657 39.504 L30.126 38.192 L29.164 37.185 L29.896 36 L29.164 34.815 L30.126 33.808 L29.657 32.496 L30.808 31.711 L30.621 30.331 L32.638 30.331 L34.145 30.331 L35.336 30.331 L36.322 30.331 L37.168 30.331 L37.917 30.331 L38.599 30.331 L39.236 30.331 L39.845 30.331 Z" fill="url(#cromo)" stroke="#6b727a" stroke-width="0.302"/>
+<path d="M31.37 30.331 L49.512 30.331" fill="none" stroke="#6b727a" stroke-width="0.454" stroke-linecap="round"/>
+<path d="M40.441 31.465 L40.441 45.449" fill="none" stroke="#5d646b" stroke-width="1.323" stroke-linecap="round"/>
+</svg>

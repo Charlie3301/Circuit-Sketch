@@ -2055,6 +2055,23 @@ public partial class MainWindow : Window
                 AtualizarBarraObjeto();
             });
         }
+        else if (peca.Tipo is "pushbutton" or "dip-switch-8")
+        {
+            // A cor da capa do botao de 12 mm, ou a do corpo da chave DIP.
+            opcoesObjeto.Children.Add(new TextBlock
+            {
+                Text = Idioma.T("Cor"), Foreground = Cinza, FontSize = 10,
+                VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
+            });
+            bool botao = peca.Tipo == "pushbutton";
+            string[] cores = botao ? EditorCircuito.OpcoesDeCorDoBotao : EditorCircuito.OpcoesDeCorDoDip;
+            Escolha([.. cores.Select(c => Idioma.T(char.ToUpper(c[0]) + c[1..]))],
+                    Array.IndexOf(cores, botao ? EditorCircuito.CorDoBotao(peca) : EditorCircuito.CorDoDip(peca)), i =>
+            {
+                editor.DefinirModeloSimples(cores[i]);
+                AtualizarBarraObjeto();
+            });
+        }
         else if (peca.Tipo == "tm1637")
         {
             // A cor do display: o vermelho, o verde, o azul, o branco ou o amarelo.

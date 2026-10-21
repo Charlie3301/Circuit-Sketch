@@ -649,43 +649,32 @@ public partial class EditorCircuito : Border
 
     /// <summary>
     /// Circulo que se aperta em cada botao de modulo, em coordenadas da
-    /// CAIXA da peca. Medido no proprio SVG -- class="button-active-circle"
-    /// nos botoes, id="knob" no joystick e no encoder -- e convertido pela
-    /// mesma escala uniforme do desenho. Chutar essas medidas ja me custou
-    /// tres rodadas neste projeto.
+    /// CAIXA da peca. As entradas saem do mesmo gerador dos desenhos
+    /// (pecas-entradas.py, em DesenhoDasEntradas): chutar essas medidas ja
+    /// me custou tres rodadas neste projeto.
     /// </summary>
     internal static readonly Dictionary<string, (double X, double Y, double R)>
         CapasDeBotao = new()
     {
-        // viewBox "-3 0 18 12" em caixa 67x45 -> escala 3,722.
-        // circle cx=6 cy=6 r=3,822.
-        ["pushbutton"] = (33.5, 22.5, 14.2),
+        // A capa redonda da chave de 12 mm e o pino da de 6 mm (com folga:
+        // o pino tem 3,5 mm).
+        ["pushbutton"] = DesenhoDasEntradas.CapaPushbutton,
+        ["pushbutton-6mm"] = DesenhoDasEntradas.CapaPushbutton6mm,
 
-        // o circulo esta dentro de um grupo com matrix(0,5056 ...),
-        // viewBox "-3 0 7,4954 6" em caixa 28x23 -> escala 3,736.
-        ["pushbutton-6mm"] = (14.0, 11.5, 7.2),
+        // A alavanca da chave deslizante, nos dois lados do curso.
+        ["slide-switch"] = DesenhoDasEntradas.CapaChaveDeslizante,
 
-        // A alavanca da chave deslizante. O desenho tem id="handle" e
-        // mede 2,74..3,99 x 0..2,06 no viewBox de 8,5 mm, que na caixa
-        // de 32 px da 10,4..15,1 -- mais o curso de 5,8 px.
-        ["slide-switch"] = (15.6, 4.5, 9.5),
-
-        // knob cx=13,6 cy=13,6 r=10,6, viewBox 27,2x31,8 em caixa
-        // 103x120 -> escala 3,774.
-        ["analog-joystick"] = (51.5, 51.3, 40.0),
-
-        // knob cx=36,6 cy=28,5 r=13,5, viewBox 116x70,4 em caixa
-        // 116x70 -> escala 0,994.
-        ["ky-040"] = (36.7, 28.3, 13.4),
+        // A capa do manche do joystick e o eixo do encoder.
+        ["analog-joystick"] = DesenhoDasEntradas.CapaJoystick,
+        ["ky-040"] = DesenhoDasEntradas.CapaEncoder,
 
         // O corpo do pendrive (pendrive-usb-movel.svg) vai de 21,2 a 33,6 mm
         // na caixa de 34x15 mm (129x57 px): o circulo pega o pendrive
         // encaixado e a boca do conector, por onde ele volta.
         ["pendrive-usb"] = (103.6, 28.3, 20.4),
 
-        // A alavanca da chave fim de curso, da dobradica ate a roldana
-        // (micro-switch-movel.svg: 5..26 mm x 1..8 mm na caixa de 28x19 mm).
-        ["micro-switch"] = (60.5, 17.4, 22.0),
+        // A alavanca da chave fim de curso, da dobradica ate a roldana.
+        ["micro-switch"] = DesenhoDasEntradas.CapaFimDeCurso,
     };
 
     /// <summary>
@@ -716,40 +705,23 @@ public partial class EditorCircuito : Border
             var oposto = Geometria.PosicaoLocal(
                 peca, def, x + DipLargura, DipTopo + DipAltura);
 
+            // A folga nao pode passar da metade do vao entre dois rasgos
+            // (3,9 px): senao o clique na beira acerta a chave do lado.
             var caixa = new Rect(canto, oposto);
-            caixa.Inflate(2, 2);
+            caixa.Inflate(1.8, 2);
             if (caixa.Contains(p)) return k;
         }
         return -1;
     }
 
     /// <summary>
-    /// As dezesseis teclas do teclado matricial, em pixels da peca.
-    ///
-    /// Vem do proprio SVG: cada tecla e um grupo com
-    /// translate(x y) e data-key-name, e o retangulo tem 11,2 x 11 nas
-    /// unidades do viewBox (70,336 de largura para 265,8 px de caixa).
+    /// As dezesseis teclas do teclado matricial (o centro de cada uma), em
+    /// pixels da peca: as do desenho, que sai do mesmo gerador.
     /// </summary>
-    internal static readonly (double X, double Y, string Tecla)[] TeclasMatriciais =
-        MontarTeclado();
-
-    static (double, double, string)[] MontarTeclado()
-    {
-        const double escala = 265.8 / 70.336;
-        (double x, double y, string tecla)[] cru =
-        [
-            (7, 10.7, "1"), (22, 10.7, "2"), (37, 10.7, "3"), (52, 10.7, "A"),
-            (7, 25.0, "4"), (22, 25.0, "5"), (37, 25.0, "6"), (52, 25.0, "B"),
-            (7, 39.3, "7"), (22, 39.3, "8"), (37, 39.3, "9"), (52, 39.3, "C"),
-            (7, 53.6, "*"), (22, 53.6, "0"), (37, 53.6, "#"), (52, 53.6, "D"),
-        ];
-
-        // O centro da tecla: o retangulo mede 11,2 x 11 a partir do canto.
-        return [.. cru.Select(t => ((t.x + 5.6) * escala, (t.y + 5.5) * escala, t.tecla))];
-    }
+    internal static readonly (double X, double Y, string Tecla)[] TeclasMatriciais = DesenhoDasEntradas.Teclas;
 
     /// <summary>Meia tecla, em pixels da peca: o alvo do clique.</summary>
-    const double RaioDaTecla = 20.0;
+    const double RaioDaTecla = DesenhoDasEntradas.MeiaTecla;
 
     static string TeclaMatricialNoPonto(PecaNoCircuito peca, PecaDef def, Point p)
     {
@@ -765,18 +737,12 @@ public partial class EditorCircuito : Border
     }
 
     /// <summary>
-    /// Os dez furos do disco de telefone, em pixels da peca.
-    ///
-    /// Sao as posicoes dos numeros no proprio SVG -- o desenho nao tem
-    /// viewBox, entao ja estao em pixels da caixa.
+    /// Os dez furos do disco de telefone, em pixels da peca: os do desenho
+    /// (o "1" junto do batente, cada um 30 graus antes do outro).
     /// </summary>
-    internal static readonly (double X, double Y, int Numero)[] FurosDoDisco =
-    [
-        (230, 126, 1), (210, 79, 2), (168, 47, 3), (117, 41, 4), (72, 58, 5),
-        (35, 97, 6), (28, 145, 7), (40, 194, 8), (78, 230, 9), (129, 243, 0),
-    ];
+    internal static readonly (double X, double Y, int Numero)[] FurosDoDisco = DesenhoDasEntradas.Furos;
 
-    const double RaioDoFuro = 22.0;
+    const double RaioDoFuro = DesenhoDasEntradas.RaioDoFuro;
 
     static int FuroDoDiscoNoPonto(PecaNoCircuito peca, PecaDef def, Point p)
     {
@@ -800,14 +766,14 @@ public partial class EditorCircuito : Border
     }
 
     /// <summary>
-    /// Troca o desenho pela variante apertada, quando ela existe. So o
-    /// pushbutton grande tem: antes o codigo usava "pushbutton-solto"
+    /// Troca o desenho pela variante apertada, quando ela existe. So os
+    /// dois pushbuttons tem: antes o codigo usava "pushbutton-solto"
     /// para todos, entao apertar um joystick trocava o desenho dele por
-    /// um botao.
+    /// um botao. O de 12 mm tem uma por cor da capa.
     /// </summary>
     void DesenhoDoBotao(PecaNoCircuito peca, string estado)
     {
-        string nome = $"{peca.Tipo}-{estado}";
+        string nome = peca.Tipo == "pushbutton" ? NomeDoPushbutton(peca, estado == "pressionado") : $"{peca.Tipo}-{estado}";
         if (!Pecas.Existe(nome)) return;
         if (visuais.TryGetValue(peca.Id, out var v) && v is Image img)
             img.Source = Pecas.Obter(nome);
@@ -885,10 +851,10 @@ public partial class EditorCircuito : Border
             }
         }
         // A capa de QUALQUER botao apertado escurece, venha o aperto do
-        // mouse ou de uma tecla vinculada. So o pushbutton grande tem
-        // desenho proprio para o estado apertado, e mesmo nele a
-        // diferenca e pequena demais para ler na tela; nos outros nao
-        // havia sinal nenhum de que o clique pegou.
+        // mouse ou de uma tecla vinculada. Os dois pushbuttons tem
+        // desenho proprio para o estado apertado, mas a diferenca e
+        // pequena demais para ler na tela; nos outros nao havia sinal
+        // nenhum de que o clique pegou.
         foreach (var (idDoTeclado, tecla) in teclaMatricial)
         {
             var teclado = Atual.Achar(idDoTeclado);
@@ -899,7 +865,7 @@ public partial class EditorCircuito : Border
             {
                 if (nome != tecla) continue;
                 apertados.Children.Add(new EllipseGeometry(
-                    Geometria.PosicaoLocal(teclado, defTeclado, tx, ty), 17, 17));
+                    Geometria.PosicaoLocal(teclado, defTeclado, tx, ty), RaioDaTecla * 0.8, RaioDaTecla * 0.8));
             }
         }
 
@@ -1360,15 +1326,20 @@ public partial class EditorCircuito : Border
     static readonly Dictionary<string, PecaAnimada> Animadas = new()
     {
         // ---- giram em torno de um eixo ----
-        ["potentiometer"] = new(0.5, 0.4),
-        ["ky-040"] = new(36.6 / 116, 28.5 / 70),
-        ["rotary-dialer"] = new(134.0 / 266, 134.0 / 286),
+        // (as entradas saem do pecas-entradas.py, em DesenhoDasEntradas)
+        ["potentiometer"] = new(DesenhoDasEntradas.PotEixoX, DesenhoDasEntradas.PotEixoY),
+        ["ky-040"] = new(DesenhoDasEntradas.EncoderEixoX, DesenhoDasEntradas.EncoderEixoY),
+        ["rotary-dialer"] = new(DesenhoDasEntradas.DiscoEixoX, DesenhoDasEntradas.DiscoEixoY),
         ["stepper-motor"] = new(109.1 / 220, 109.1 / 235),
 
         // ---- deslizam ----
-        ["slide-switch"] = new(0.5, 0.5, CursoX: 5.8),
-        ["slide-potentiometer"] = new(0.5, 0.5, InicioX: -5.7, CursoX: 124.8),
-        ["analog-joystick"] = new(0.5, 0.5, CursoX: 16, CursoY: 16),
+        // A alavanca da chave anda 1,9 mm; o knob do deslizante, os 30 mm
+        // do curso (o desenho dele ja esta no comeco); o manche, 3 mm para
+        // cada lado.
+        ["slide-switch"] = new(0.5, 0.5, CursoX: DesenhoDasEntradas.ChaveDeslizanteCurso),
+        ["slide-potentiometer"] = new(0.5, 0.5, CursoX: DesenhoDasEntradas.DeslizanteCurso),
+        ["analog-joystick"] = new(DesenhoDasEntradas.JoystickEixoX, DesenhoDasEntradas.JoystickEixoY,
+                                  CursoX: DesenhoDasEntradas.JoystickCurso, CursoY: DesenhoDasEntradas.JoystickCurso),
 
         // O pendrive sai do conector: 9 mm para a direita.
         ["pendrive-usb"] = new(0.5, 0.5, CursoX: 34.0),
@@ -1386,8 +1357,8 @@ public partial class EditorCircuito : Border
         ["helice-1045"] = new(0.5, 0.5),
         ["helice-5045"] = new(0.5, 0.5),
 
-        // A alavanca do fim de curso gira na dobradica (5 x 7,2 mm).
-        ["micro-switch"] = new(5.0 / 28.0, 7.2 / 19.0),
+        // A alavanca do fim de curso gira na dobradica.
+        ["micro-switch"] = new(DesenhoDasEntradas.FimDeCursoEixoX, DesenhoDasEntradas.FimDeCursoEixoY),
     };
 
     /// <summary>
@@ -1413,11 +1384,13 @@ public partial class EditorCircuito : Border
     /// <summary>As oito chaves do DIP, desenhadas por cima do SVG.</summary>
     readonly Dictionary<string, (Canvas tela, Rectangle[] botoes)> chavesDip = [];
 
-    // Medidas tiradas do proprio SVG do DIP (viewBox de 82,87 x 55,355,
-    // que e o tamanho da peca em pixels): o primeiro rasgo comeca em
-    // 4,693 e eles se repetem a cada 9,6 -- o passo de 0,1".
-    const double DipPrimeira = 4.693, DipPasso = 9.6;
-    const double DipLargura = 5.8168, DipTopo = 21.2, DipAltura = 13;
+    // As medidas do desenho do DIP (pecas-entradas.py): o primeiro rasgo,
+    // o passo de 0,1" entre eles, o rasgo e a alavanca branca dentro dele.
+    const double DipPrimeira = DesenhoDasEntradas.DipPrimeira, DipPasso = DesenhoDasEntradas.DipPasso;
+    const double DipLargura = DesenhoDasEntradas.DipLargura, DipTopo = DesenhoDasEntradas.DipTopo;
+    const double DipAltura = DesenhoDasEntradas.DipAltura;
+    /// <summary>A sobra da alavanca de cada lado, dentro do rasgo (0,15 mm).</summary>
+    const double DipLado = 0.15 * 96 / 25.4;
 
     /// <summary>
     /// O DIP tem oito chaves independentes -- 256 combinacoes -- entao
@@ -1443,7 +1416,9 @@ public partial class EditorCircuito : Border
             {
                 Width = DipLargura,
                 Height = DipAltura,
-                Fill = new SolidColorBrush(Color.FromRgb(0x91, 0x7C, 0x6F)),
+                RadiusX = DipLado,
+                RadiusY = DipLado,
+                Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(DesenhoDasEntradas.DipCorDoRasgo)),
             };
             Canvas.SetLeft(rasgo, x);
             Canvas.SetTop(rasgo, DipTopo);
@@ -1451,13 +1426,13 @@ public partial class EditorCircuito : Border
 
             botoes[k] = new Rectangle
             {
-                Width = DipLargura - 0.6,
-                Height = 6.2,
-                RadiusX = 0.8,
-                RadiusY = 0.8,
-                Fill = new SolidColorBrush(Color.FromRgb(0xFF, 0xFE, 0xF4)),
+                Width = DipLargura - 2 * DipLado,
+                Height = DesenhoDasEntradas.DipAlavanca,
+                RadiusX = DipLado,
+                RadiusY = DipLado,
+                Fill = new SolidColorBrush(Color.FromRgb(0xF6, 0xF6, 0xF1)),
             };
-            Canvas.SetLeft(botoes[k], x + 0.3);
+            Canvas.SetLeft(botoes[k], x + DipLado);
             tela.Children.Add(botoes[k]);
         }
 
@@ -1487,7 +1462,8 @@ public partial class EditorCircuito : Border
 
             // Ligada, a chave sobe para o lado do "ON" -- que no desenho
             // e o de cima.
-            double alvo = ligada ? DipTopo + 0.4 : DipTopo + DipAltura - 6.6;
+            double alvo = ligada ? DipTopo + DesenhoDasEntradas.DipFolga
+                                 : DipTopo + DipAltura - DesenhoDasEntradas.DipFolga - DesenhoDasEntradas.DipAlavanca;
 
             // O Canvas.Top comeca NaN, e comparacao com NaN e sempre
             // falsa: sem este teste a chave nunca era posicionada e as
@@ -1647,9 +1623,9 @@ public partial class EditorCircuito : Border
                 break;
             }
 
-            // Apertada, a alavanca desce ate encostar no pino do botao.
+            // Apertada, a alavanca desce ate o pino do botao entrar.
             case "micro-switch":
-                gira.Angle = BotoesPressionados.Contains(peca.Id) ? 7 : 0;
+                gira.Angle = BotoesPressionados.Contains(peca.Id) ? DesenhoDasEntradas.FimDeCursoGiro : 0;
                 break;
 
             // Tirado, o pendrive fica fora do conector, meio apagado.
@@ -2258,10 +2234,14 @@ public partial class EditorCircuito : Border
         return caixa;
     }
 
+    /// <summary>O nome do SVG com que a peca parada e desenhada (o FotoDePeca troca este).</summary>
+    internal static string NomeDoDesenho(PecaNoCircuito peca) => NomeSvg(peca, false);
+
     static string NomeSvg(PecaNoCircuito peca, bool ligado)
     {
         if (peca.Tipo == "led") return $"led-{peca.Cor}-{(ligado ? "on" : "off")}";
-        if (peca.Tipo == "pushbutton") return ligado ? "pushbutton-pressionado" : "pushbutton-solto";
+        if (peca.Tipo == "pushbutton") return NomeDoPushbutton(peca, ligado);
+        if (peca.Tipo == "dip-switch-8" && CorDoDip(peca) != "vermelho") return $"dip-switch-8-{CorDoDip(peca)}";
         if (EhEsc(peca.Tipo) && (peca.Amperes > 0 || peca.Acabamento is not null)) return NomeSvgDoEsc(peca);
         if (Reguladores.EhRegulador(peca.Tipo)) return NomeSvgDoRegulador(peca);
         if (Diodos.EhDiodo(peca.Tipo)) return Diodos.Da(peca).Svg ?? peca.Tipo;

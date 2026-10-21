@@ -58,7 +58,7 @@
     "Id": "pot",
     "Tipo": "potentiometer",
     "X": 520,
-    "Y": 260,
+    "Y": 200,
     "Giro": 0.5
    }
   ],

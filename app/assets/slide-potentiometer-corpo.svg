@@ -1,42 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" height="29mm" version="1.1" width="55mm" viewBox="0 0 55 29">
-      <defs>
-        <filter id="outline">
-          <fedropshadow dx="0" dy="0" stdDeviation="1" flood-color="#4faaff" />
-        </filter>
-        <linearGradient id="tipGradient" x1="36.482" x2="50.447" y1="91.25" y2="91.25" gradientTransform="matrix(.8593 0 0 1.1151 -14.849 -92.256)" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#1a1a1a" offset="0" />
-          <stop stop-color="#595959" offset=".4" />
-          <stop stop-color="#595959" offset=".6" />
-          <stop stop-color="#1a1a1a" offset="1" />
-        </linearGradient>
-        <radialGradient id="bodyGradient" cx="62.59" cy="65.437" r="22.5" gradientTransform="matrix(1.9295 3.7154e-8 0 .49697 -98.268 -23.02)" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#d2d2d2" offset="0" />
-          <stop stop-color="#7a7a7a" offset="1" />
-        </radialGradient>
-        <g id="screw">
-          <circle cx="0" cy="0" r="1" fill="#858585" stroke="#000" stroke-width=".05" />
-          <path d="m0 1 0-2" fill="none" stroke="#000" stroke-width=".151" />
-        </g>
-      </defs>
-      
-      <g fill="#ccc">
-        <rect x="0" y="11" width="5" height="0.75" />
-        <rect y="11" width="5" height="0.75" x="50" />
-        <rect x="0" y="16.25" width="5" height="0.75" />
-      </g>
-      <g transform="translate(5 5)">
-        
-        <rect id="sliderCase" x="0" y="5" height="9" rx=".2" ry=".2" fill="url(#bodyGradient)" fill-rule="evenodd" width="45" />
-        <rect x="3.25" y="8" height="3" rx=".1" ry=".1" fill="#3f1e1e" width="38.5" />
-        
-        <g transform="translate(1.625 9.5) rotate(45)">
-          <use href="#screw" />
-        </g>
-        
-        <g transform="translate(43.375 9.5) rotate(45)">
-          <use href="#screw" />
-        </g>
-        
-        </g>
-      <rect x="0" y="14" width="1" height="1" fill="none" id="firefox-workaround" />
-    </svg>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="172px" height="57px" viewBox="0 0 172 57">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
+  <radialGradient id="borda-capa" cx="0.5" cy="0.5" r="0.5"><stop offset="0.72" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.45"/></radialGradient>
+  <linearGradient id="aco" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset="0.5" stop-color="#c3c9cf"/><stop offset="1" stop-color="#959ca4"/></linearGradient>
+  <radialGradient id="knob" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#4a4d52"/><stop offset="0.7" stop-color="#202124"/><stop offset="1" stop-color="#0d0e10"/></radialGradient>
+  <radialGradient id="cromo" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#fbfcfd"/><stop offset="0.45" stop-color="#c9ced4"/><stop offset="0.8" stop-color="#8e959d"/><stop offset="1" stop-color="#b7bdc3"/></radialGradient>
+</defs>
+<rect x="0.961" y="11.492" width="170.079" height="34.016" rx="1.323" fill="url(#metal)" stroke="#6b7279" stroke-width="0.567"/>
+<rect x="16.079" y="14.894" width="139.843" height="27.213" rx="1.134" fill="#c8cdd2" stroke="#9aa1a8" stroke-width="0.378"/>
+<rect x="16.079" y="14.894" width="139.843" height="27.213" rx="1.134" fill="url(#luz)"/>
+<rect x="21.748" y="26.043" width="128.504" height="4.913" rx="2.268" fill="#16171a"/>
+<circle cx="8.52" cy="28.5" r="3.969" fill="#2a2d31" stroke="#858c94" stroke-width="0.567"/>
+<circle cx="163.48" cy="28.5" r="3.969" fill="#2a2d31" stroke="#858c94" stroke-width="0.567"/>
+<circle cx="3.795" cy="21.886" r="1.587" fill="#e1e4e8" stroke="#6f767e" stroke-width="0.302"/>
+<circle cx="3.795" cy="35.114" r="1.587" fill="#e1e4e8" stroke="#6f767e" stroke-width="0.302"/>
+<circle cx="168.205" cy="21.886" r="1.587" fill="#e1e4e8" stroke="#6f767e" stroke-width="0.302"/>
+<text transform="translate(142.693 38.327) rotate(0)" x="0" y="1.512" font-family="Arial" font-weight="bold" font-size="3.78" fill="#5c636a" text-anchor="middle">B10K</text>
+<path d="M29.307 22.831 L29.307 19.429" fill="none" stroke="#6b7279" stroke-width="0.68" stroke-linecap="round"/>
+<path d="M48.205 22.831 L48.205 20.941" fill="none" stroke="#6b7279" stroke-width="0.68" stroke-linecap="round"/>
+<path d="M67.102 22.831 L67.102 20.941" fill="none" stroke="#6b7279" stroke-width="0.68" stroke-linecap="round"/>
+<path d="M86 22.831 L86 19.429" fill="none" stroke="#6b7279" stroke-width="0.68" stroke-linecap="round"/>
+<path d="M104.898 22.831 L104.898 20.941" fill="none" stroke="#6b7279" stroke-width="0.68" stroke-linecap="round"/>
+<path d="M123.795 22.831 L123.795 20.941" fill="none" stroke="#6b7279" stroke-width="0.68" stroke-linecap="round"/>
+<path d="M142.693 22.831 L142.693 19.429" fill="none" stroke="#6b7279" stroke-width="0.68" stroke-linecap="round"/>
+</svg>

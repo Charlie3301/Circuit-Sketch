@@ -277,51 +277,51 @@
  },
  {
   "id": "analog-joystick",
-  "largura": 103,
-  "altura": 120,
+  "largura": 100,
+  "altura": 153,
   "pinos": [
    {
-    "nome": "VCC",
-    "x": 33,
-    "y": 115.8,
+    "nome": "GND",
+    "x": 30.8,
+    "y": 149.22,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    },
    {
-    "nome": "VERT",
-    "x": 42.6012,
-    "y": 115.8,
+    "nome": "VCC",
+    "x": 40.4,
+    "y": 149.22,
     "sinais": [
-     "analog"
+     "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao (+5V na placa): 3,3 V ou 5 V"
    },
    {
     "nome": "HORZ",
-    "x": 52.2024,
-    "y": 115.8,
+    "x": 50.0,
+    "y": 149.22,
     "sinais": [
      "analog"
     ],
-    "descricao": ""
+    "descricao": "Eixo X (VRx na placa): a tensao do potenciometro horizontal"
+   },
+   {
+    "nome": "VERT",
+    "x": 59.6,
+    "y": 149.22,
+    "sinais": [
+     "analog"
+    ],
+    "descricao": "Eixo Y (VRy na placa): a tensao do potenciometro vertical"
    },
    {
     "nome": "SEL",
-    "x": 61.8036,
-    "y": 115.8,
+    "x": 69.2,
+    "y": 149.22,
     "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "GND",
-    "x": 71.4048,
-    "y": 115.8,
-    "sinais": [
-     "power"
-    ],
-    "descricao": ""
+    "descricao": "O botao do manche (SW na placa): vai ao GND apertado (use INPUT_PULLUP)"
    }
   ],
   "variantes": [],
@@ -2488,119 +2488,119 @@
  {
   "id": "dip-switch-8",
   "largura": 83,
-  "altura": 55,
+  "altura": 39,
   "pinos": [
    {
     "nome": "1a",
-    "x": 8.1,
-    "y": 51.3,
+    "x": 7.9,
+    "y": 33.9,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 1, lado de baixo: ligado ao 1b com a chave em ON"
    },
    {
     "nome": "2a",
-    "x": 17.7,
-    "y": 51.3,
+    "x": 17.5,
+    "y": 33.9,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 2, lado de baixo: ligado ao 2b com a chave em ON"
    },
    {
     "nome": "3a",
-    "x": 27.3,
-    "y": 51.3,
+    "x": 27.1,
+    "y": 33.9,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 3, lado de baixo: ligado ao 3b com a chave em ON"
    },
    {
     "nome": "4a",
-    "x": 36.9,
-    "y": 51.3,
+    "x": 36.7,
+    "y": 33.9,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 4, lado de baixo: ligado ao 4b com a chave em ON"
    },
    {
     "nome": "5a",
-    "x": 46.5,
-    "y": 51.3,
+    "x": 46.3,
+    "y": 33.9,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 5, lado de baixo: ligado ao 5b com a chave em ON"
    },
    {
     "nome": "6a",
-    "x": 56.1,
-    "y": 51.3,
+    "x": 55.9,
+    "y": 33.9,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 6, lado de baixo: ligado ao 6b com a chave em ON"
    },
    {
     "nome": "7a",
-    "x": 65.7,
-    "y": 51.3,
+    "x": 65.5,
+    "y": 33.9,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 7, lado de baixo: ligado ao 7b com a chave em ON"
    },
    {
     "nome": "8a",
-    "x": 75.3,
-    "y": 51.3,
+    "x": 75.1,
+    "y": 33.9,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 8, lado de baixo: ligado ao 8b com a chave em ON"
    },
    {
     "nome": "8b",
-    "x": 75.3,
-    "y": 3,
+    "x": 75.1,
+    "y": 5.1,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 8, lado de cima: ligado ao 8a com a chave em ON"
    },
    {
     "nome": "7b",
-    "x": 65.7,
-    "y": 3,
+    "x": 65.5,
+    "y": 5.1,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 7, lado de cima: ligado ao 7a com a chave em ON"
    },
    {
     "nome": "6b",
-    "x": 56.1,
-    "y": 3,
+    "x": 55.9,
+    "y": 5.1,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 6, lado de cima: ligado ao 6a com a chave em ON"
    },
    {
     "nome": "5b",
-    "x": 46.5,
-    "y": 3,
+    "x": 46.3,
+    "y": 5.1,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 5, lado de cima: ligado ao 5a com a chave em ON"
    },
    {
     "nome": "4b",
-    "x": 36.9,
-    "y": 3,
+    "x": 36.7,
+    "y": 5.1,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 4, lado de cima: ligado ao 4a com a chave em ON"
    },
    {
     "nome": "3b",
-    "x": 27.3,
-    "y": 3,
+    "x": 27.1,
+    "y": 5.1,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 3, lado de cima: ligado ao 3a com a chave em ON"
    },
    {
     "nome": "2b",
-    "x": 17.7,
-    "y": 3,
+    "x": 17.5,
+    "y": 5.1,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 2, lado de cima: ligado ao 2a com a chave em ON"
    },
    {
     "nome": "1b",
-    "x": 8.1,
-    "y": 3,
+    "x": 7.9,
+    "y": 5.1,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chave 1, lado de cima: ligado ao 1a com a chave em ON"
    }
   ],
   "variantes": [],
@@ -7536,47 +7536,47 @@
  },
  {
   "id": "ky-040",
-  "largura": 116,
-  "altura": 70,
+  "largura": 122,
+  "altura": 72,
   "pinos": [
    {
     "nome": "CLK",
-    "x": 116,
-    "y": 7.9,
+    "x": 118.6,
+    "y": 16.8,
     "sinais": [],
-    "descricao": ""
+    "descricao": "O canal A do encoder (CLK): pull-up de 10k no modulo"
    },
    {
     "nome": "DT",
-    "x": 116,
-    "y": 17.4,
+    "x": 118.6,
+    "y": 26.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "O canal B do encoder (DT): pull-up de 10k no modulo"
    },
    {
     "nome": "SW",
-    "x": 116,
-    "y": 27,
+    "x": 118.6,
+    "y": 36.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "O botao do eixo: vai ao GND apertado (use INPUT_PULLUP)"
    },
    {
     "nome": "VCC",
-    "x": 116,
-    "y": 36.3,
+    "x": 118.6,
+    "y": 45.6,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao (+ na placa): 3,3 V ou 5 V, para os pull-ups"
    },
    {
     "nome": "GND",
-    "x": 116,
-    "y": 45.5,
+    "x": 118.6,
+    "y": 55.2,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    }
   ],
   "variantes": [],
@@ -8900,64 +8900,64 @@
  },
  {
   "id": "membrane-keypad",
-  "largura": 266,
-  "altura": 338,
+  "largura": 263,
+  "altura": 344,
   "pinos": [
    {
     "nome": "R1",
-    "x": 100,
-    "y": 338,
+    "x": 97.9,
+    "y": 332.47,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Linha 1 (as teclas 123A)"
    },
    {
     "nome": "R2",
-    "x": 110,
-    "y": 338,
+    "x": 107.5,
+    "y": 332.47,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Linha 2 (as teclas 456B)"
    },
    {
     "nome": "R3",
-    "x": 119.5,
-    "y": 338,
+    "x": 117.1,
+    "y": 332.47,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Linha 3 (as teclas 789C)"
    },
    {
     "nome": "R4",
-    "x": 129,
-    "y": 338,
+    "x": 126.7,
+    "y": 332.47,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Linha 4 (as teclas *0#D)"
    },
    {
     "nome": "C1",
-    "x": 138.5,
-    "y": 338,
+    "x": 136.3,
+    "y": 332.47,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Coluna 1 (as teclas 147*)"
    },
    {
     "nome": "C2",
-    "x": 148,
-    "y": 338,
+    "x": 145.9,
+    "y": 332.47,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Coluna 2 (as teclas 2580)"
    },
    {
     "nome": "C3",
-    "x": 157.75,
-    "y": 338,
+    "x": 155.5,
+    "y": 332.47,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Coluna 3 (as teclas 369#)"
    },
    {
     "nome": "C4",
-    "x": 167.5,
-    "y": 338,
+    "x": 165.1,
+    "y": 332.47,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Coluna 4 (as teclas ABCD)"
    }
   ],
   "variantes": [],
@@ -8965,29 +8965,29 @@
  },
  {
   "id": "micro-switch",
-  "largura": 106,
-  "altura": 72,
+  "largura": 76,
+  "altura": 86,
   "pinos": [
    {
     "nome": "COM",
-    "x": 24.19,
-    "y": 68.41,
+    "x": 7.57,
+    "y": 80.13,
     "sinais": [],
-    "descricao": "Comum: o que a chave liga ao NC (solta) ou ao NO (apertada). Em geral, o GND"
-   },
-   {
-    "nome": "NC",
-    "x": 52.99,
-    "y": 68.41,
-    "sinais": [],
-    "descricao": "Normalmente fechado: ligado ao COM com a alavanca solta"
+    "descricao": "Comum (C na chave): o que a chave liga ao NC (solta) ou ao NO (apertada). Em geral, o GND"
    },
    {
     "nome": "NO",
-    "x": 81.79,
-    "y": 68.41,
+    "x": 40.83,
+    "y": 80.13,
     "sinais": [],
     "descricao": "Normalmente aberto: ligado ao COM so com a alavanca apertada (num GPIO com INPUT_PULLUP, le LOW apertada)"
+   },
+   {
+    "nome": "NC",
+    "x": 68.43,
+    "y": 80.13,
+    "sinais": [],
+    "descricao": "Normalmente fechado: ligado ao COM com a alavanca solta"
    }
   ],
   "variantes": [],
@@ -11559,39 +11559,39 @@
  },
  {
   "id": "potentiometer",
-  "largura": 76,
-  "altura": 76,
+  "largura": 64,
+  "altura": 85,
   "pinos": [
    {
     "nome": "GND",
-    "x": 29,
-    "y": 68.5,
+    "x": 12.8,
+    "y": 81.41,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Perna 1 (esquerda): uma ponta da trilha. Em geral, o GND"
    },
    {
     "nome": "SIG",
-    "x": 39,
-    "y": 68.5,
+    "x": 32.0,
+    "y": 81.41,
     "sinais": [
      "analog"
     ],
-    "descricao": ""
+    "descricao": "Perna 2 (do meio): o cursor. Vai ao pino analogico"
    },
    {
     "nome": "VCC",
-    "x": 49,
-    "y": 68.5,
+    "x": 51.2,
+    "y": 81.41,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Perna 3 (direita): a outra ponta da trilha. Em geral, o 3,3 V ou o 5 V"
    }
   ],
   "variantes": [],
-  "metades": true
+  "metades": false
  },
  {
   "id": "power-bank",
@@ -11622,36 +11622,36 @@
  },
  {
   "id": "pushbutton",
-  "largura": 67,
-  "altura": 45,
+  "largura": 53,
+  "altura": 48,
   "pinos": [
    {
     "nome": "1.l",
-    "x": 0,
-    "y": 13,
+    "x": 2.5,
+    "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Perna 1 (esquerda): a mesma lamina do 1.r. Apertado, liga ao 2"
    },
    {
     "nome": "2.l",
-    "x": 0,
-    "y": 32,
+    "x": 2.5,
+    "y": 33.6,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Perna 2 (esquerda): a mesma lamina do 2.r. Apertado, liga ao 1"
    },
    {
     "nome": "1.r",
-    "x": 67,
-    "y": 13,
+    "x": 50.5,
+    "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Perna 1 (direita): a mesma lamina do 1.l. Apertado, liga ao 2"
    },
    {
     "nome": "2.r",
-    "x": 67,
-    "y": 32,
+    "x": 50.5,
+    "y": 33.6,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Perna 2 (direita): a mesma lamina do 2.l. Apertado, liga ao 1"
    }
   ],
   "variantes": [
@@ -11662,39 +11662,42 @@
  },
  {
   "id": "pushbutton-6mm",
-  "largura": 28,
-  "altura": 23,
+  "largura": 33,
+  "altura": 25,
   "pinos": [
    {
     "nome": "1.l",
-    "x": 0,
-    "y": 2.2,
+    "x": 2.1,
+    "y": 2.9,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Perna 1 (esquerda): a mesma lamina do 1.r. Apertado, liga ao 2"
    },
    {
     "nome": "2.l",
-    "x": 0,
-    "y": 21,
+    "x": 2.1,
+    "y": 22.1,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Perna 2 (esquerda): a mesma lamina do 2.r. Apertado, liga ao 1"
    },
    {
     "nome": "1.r",
-    "x": 28,
-    "y": 2.2,
+    "x": 30.9,
+    "y": 2.9,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Perna 1 (direita): a mesma lamina do 1.l. Apertado, liga ao 2"
    },
    {
     "nome": "2.r",
-    "x": 28,
-    "y": 21,
+    "x": 30.9,
+    "y": 22.1,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Perna 2 (direita): a mesma lamina do 2.l. Apertado, liga ao 1"
    }
   ],
-  "variantes": [],
+  "variantes": [
+   "pushbutton-6mm-solto",
+   "pushbutton-6mm-pressionado"
+  ],
   "metades": false
  },
  {
@@ -11895,30 +11898,30 @@
  {
   "id": "rotary-dialer",
   "largura": 266,
-  "altura": 286,
+  "altura": 293,
   "pinos": [
    {
     "nome": "GND",
-    "x": 122,
-    "y": 286,
+    "x": 113.8,
+    "y": 280.91,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "O comum dos dois contatos do disco"
    },
    {
     "nome": "DIAL",
-    "x": 131.6,
-    "y": 286,
+    "x": 133.0,
+    "y": 280.91,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Vai ao GND enquanto o disco esta fora do lugar (use INPUT_PULLUP)"
    },
    {
     "nome": "PULSE",
-    "x": 141.2,
-    "y": 286,
+    "x": 152.2,
+    "y": 280.91,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Um pulso por numero na volta do disco (o 0 da dez)"
    }
   ],
   "variantes": [],
@@ -12071,35 +12074,35 @@
  },
  {
   "id": "slide-potentiometer",
-  "largura": 208,
-  "altura": 110,
+  "largura": 172,
+  "altura": 57,
   "pinos": [
    {
-    "nome": "VCC",
-    "x": 1,
-    "y": 43,
+    "nome": "GND",
+    "x": 3.8,
+    "y": 21.89,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Pino 1: a ponta da trilha do lado do knob no zero. Em geral, o GND"
    },
    {
     "nome": "SIG",
-    "x": 1,
-    "y": 63,
+    "x": 3.8,
+    "y": 35.11,
     "sinais": [
      "analog"
     ],
-    "descricao": ""
+    "descricao": "Pino 2: o cursor. Vai ao pino analogico"
    },
    {
-    "nome": "GND",
-    "x": 207,
-    "y": 43,
+    "nome": "VCC",
+    "x": 168.2,
+    "y": 21.89,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Pino 3: a outra ponta da trilha. Em geral, o 3,3 V ou o 5 V"
    }
   ],
   "variantes": [],
@@ -12107,33 +12110,33 @@
  },
  {
   "id": "slide-switch",
-  "largura": 32,
-  "altura": 35,
+  "largura": 35,
+  "altura": 43,
   "pinos": [
    {
     "nome": "1",
-    "x": 6.5,
-    "y": 34,
+    "x": 7.9,
+    "y": 40.73,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Um lado: ligado ao 2 com a alavanca a esquerda"
    },
    {
     "nome": "2",
-    "x": 16,
-    "y": 34,
+    "x": 17.5,
+    "y": 40.73,
     "sinais": [],
-    "descricao": ""
+    "descricao": "O comum: vai ao 1 (alavanca a esquerda) ou ao 3 (a direita)"
    },
    {
     "nome": "3",
-    "x": 25.5,
-    "y": 34,
+    "x": 27.1,
+    "y": 40.73,
     "sinais": [],
-    "descricao": ""
+    "descricao": "O outro lado: ligado ao 2 com a alavanca a direita"
    }
   ],
   "variantes": [],
-  "metades": true
+  "metades": false
  },
  {
   "id": "small-sound-sensor",
@@ -14028,33 +14031,33 @@
  },
  {
   "id": "tilt-switch",
-  "largura": 88,
-  "altura": 56,
+  "largura": 93,
+  "altura": 58,
   "pinos": [
    {
     "nome": "GND",
-    "x": 88,
-    "y": 18,
+    "x": 89.6,
+    "y": 19.4,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND (- na placa)"
    },
    {
     "nome": "VCC",
-    "x": 88,
-    "y": 27.8,
+    "x": 89.6,
+    "y": 29.0,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao (o pino do meio): 3,3 V ou 5 V, pelo resistor de 10k"
    },
    {
     "nome": "OUT",
-    "x": 88,
-    "y": 37.5,
+    "x": 89.6,
+    "y": 38.6,
     "sinais": [],
-    "descricao": ""
+    "descricao": "A saida (S na placa): muda de nivel quando o modulo inclina"
    }
   ],
   "variantes": [],

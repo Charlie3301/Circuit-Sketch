@@ -10,6 +10,9 @@ Roda direto sobre app/assets: nao precisa do node nem dos wokwi-elements
 (o extrair.mjs so sabe fazer isso para os ids que ele conhece, e alguns
 desses elementos nem tem id no desenho).
 
+Na Alpha 25 as entradas foram redesenhadas (pecas-entradas.py, que ja grava
+o corpo e o movel de cada uma); aqui ficou so o motor de passo do Wokwi.
+
     python ferramentas/extrair-svg/animar.py
 """
 import io
@@ -24,29 +27,8 @@ ET.register_namespace('xlink', 'http://www.w3.org/1999/xlink')
 
 # id do desenho -> ids dos elementos que se mexem
 PARTES = {
-    'slide-switch': ['handle'],
-    'analog-joystick': ['knob'],
-    'slide-potentiometer': ['tip'],
-    'rotary-dialer': ['slots'],
     'stepper-motor': ['shaft-path', 'arrow-path'],
-    'ky-040': ['knob'],          # o id e criado abaixo, o desenho nao tem
 }
-
-
-def preparar_ky040(texto):
-    """Envolve o botao do encoder num grupo com id.
-
-    O KY-040 do Wokwi desenha o botao em tres pedacos soltos -- o disco,
-    a barra do meio e a marca em D -- e nenhum tem id. Sem um grupo nao
-    ha o que girar.
-    """
-    if 'id="knob"' in texto:
-        return texto
-
-    inicio = texto.index('<circle cx="36.6" cy="28.5" r="13.5" fill="#666"/>')
-    marca = texto.index('/>', texto.index('<path d="m36.3 21.4a7.03')) + 2
-    miolo = texto[inicio:marca]
-    return texto[:inicio] + '<g id="knob">' + miolo + '</g>' + texto[marca:]
 
 
 def ramo_tem(no, alvos):
@@ -97,9 +79,6 @@ def gravar(arvore, caminho):
 
 for peca, ids in PARTES.items():
     texto = io.open(BASE + peca + '.svg', encoding='utf-8').read()
-    if peca == 'ky-040':
-        texto = preparar_ky040(texto)
-        io.open(BASE + peca + '.svg', 'w', encoding='utf-8', newline='').write(texto)
 
     corpo = ET.ElementTree(ET.fromstring(texto))
     alvos = achar(corpo.getroot(), ids)

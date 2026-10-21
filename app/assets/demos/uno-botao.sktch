@@ -52,8 +52,9 @@
    {
     "Id": "bt",
     "Tipo": "pushbutton",
-    "X": 126.4,
-    "Y": 354.2
+    "X": 109.5,
+    "Y": 386.4,
+    "Rotacao": 90
    },
    {
     "Id": "led",
@@ -81,7 +82,7 @@
    },
    {
     "DePeca": "bb",
-    "DePino": "H8",
+    "DePino": "H10",
     "ParaPeca": "placa",
     "ParaPino": "GND.1",
     "Cor": "#1A1A1A",

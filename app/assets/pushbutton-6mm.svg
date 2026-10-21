@@ -1,28 +1,31 @@
-<svg width="7.4129977mm" height="6mm" version="1.1" viewBox="-3 0 7.4954476 6" id="svg17" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
-      <defs id="defs8">
-        <linearGradient x1="0" x2="1" y1="0" y2="1" id="grad-up-pushbutton0">
-          <stop stop-color="#ffffff" offset="0" id="stop1"/>
-          <stop offset="0.3" id="stop2" stop-color="red"/>
-          <stop offset="0.5" id="stop3" stop-color="red"/>
-          <stop offset="1" id="stop4"/>
-        </linearGradient>
-        <linearGradient x1="9.8219995" x2="2.178" y1="9.8219995" y2="2.178" gradientUnits="userSpaceOnUse" id="grad-down-pushbutton0">
-          <stop stop-color="#ffffff" offset="0" id="stop5"/>
-          <stop offset="0.3" id="stop6" stop-color="red"/>
-          <stop offset="0.5" id="stop7" stop-color="red"/>
-          <stop offset="1" id="stop8"/>
-        </linearGradient>
-      </defs>
-      <rect x="-2.2698734" y="-0.033367086" width="6.0667338" height="6.0667338" rx="0.22244692" ry="0.22244692" fill="#464646" id="rect8" style="stroke-width:0.505561"/>
-      <rect x="-1.8907025" y="0.3458038" width="5.3083925" height="5.3083925" rx="0.1066734" ry="0.1066734" fill="#eaeaea" id="rect9" style="stroke-width:0.505561"/>
-      <g class="clickable-element" id="g17" transform="matrix(0.50556117,0,0,0.50556117,-2.2698734,-0.03336708)">
-        <circle cx="6" cy="6" r="3.822" id="circle15" fill="url(#grad-up-pushbutton0)"/>
-        <circle class="button-active-circle" cx="6" cy="6" r="3.822" id="circle16" style="fill:url(#grad-down-$%7BuniqueId%7D)" fill="url(#grad-down-pushbutton0)"/>
-        <circle cx="6" cy="6" r="2.9000001" stroke="#2f2f2f" stroke-opacity="0.47" stroke-width="0.08" id="circle17" fill="red"/>
-        <rect style="fill:#b3b3b3;stroke-width:1.72987;paint-order:stroke markers fill" id="rect18" width="1.455145" height="0.85429525" x="-1.4441905" y="0.59993488" rx="0.014974313"/>
-        <!--?lit$688897438$-->
-        <rect style="fill:#b3b3b3;stroke-width:1.69238;paint-order:stroke markers fill" id="rect18-5" width="1.3927531" height="0.85429525" x="-1.3971666" y="10.694777" rx="0.014332262"/>
-        <rect style="fill:#b3b3b3;stroke-width:1.69238;paint-order:stroke markers fill" id="rect18-0" width="1.3927531" height="0.85429525" x="11.989052" y="0.59516686" rx="0.014332262"/>
-        <rect style="fill:#b3b3b3;stroke-width:1.69238;paint-order:stroke markers fill" id="rect18-0-4" width="1.3927531" height="0.85429525" x="11.985411" y="10.744086" rx="0.014332262"/>
-      </g>
-    </svg>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="33px" height="25px" viewBox="0 0 33 25">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
+  <radialGradient id="borda-capa" cx="0.5" cy="0.5" r="0.5"><stop offset="0.72" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.45"/></radialGradient>
+  <linearGradient id="aco" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset="0.5" stop-color="#c3c9cf"/><stop offset="1" stop-color="#959ca4"/></linearGradient>
+  <radialGradient id="knob" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#4a4d52"/><stop offset="0.7" stop-color="#202124"/><stop offset="1" stop-color="#0d0e10"/></radialGradient>
+  <radialGradient id="cromo" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#fbfcfd"/><stop offset="0.45" stop-color="#c9ced4"/><stop offset="0.8" stop-color="#8e959d"/><stop offset="1" stop-color="#b7bdc3"/></radialGradient>
+</defs>
+<rect x="0.378" y="1.388" width="5.539" height="3.024" rx="0.378" fill="url(#metal-h)" stroke="#6c727a" stroke-width="0.227"/>
+<rect x="0.378" y="20.588" width="5.539" height="3.024" rx="0.378" fill="url(#metal-h)" stroke="#6c727a" stroke-width="0.227"/>
+<rect x="27.083" y="1.388" width="5.539" height="3.024" rx="0.378" fill="url(#metal-h)" stroke="#6c727a" stroke-width="0.227"/>
+<rect x="27.083" y="20.588" width="5.539" height="3.024" rx="0.378" fill="url(#metal-h)" stroke="#6c727a" stroke-width="0.227"/>
+<rect x="5.161" y="1.161" width="22.677" height="22.677" rx="1.134" fill="#1e1f22" stroke="#0b0c0e" stroke-width="0.454"/>
+<rect x="5.728" y="1.728" width="21.543" height="21.543" rx="0.756" fill="url(#aco)" stroke="#7f868e" stroke-width="0.302"/>
+<rect x="5.464" y="8.343" width="1.512" height="8.315" fill="#868d95"/>
+<circle cx="9.13" cy="19.87" r="1.209" fill="#5b6169"/>
+<circle cx="23.87" cy="19.87" r="1.209" fill="#5b6169"/>
+<rect x="26.024" y="8.343" width="1.512" height="8.315" fill="#868d95"/>
+<circle cx="23.87" cy="5.13" r="1.209" fill="#5b6169"/>
+<circle cx="9.13" cy="5.13" r="1.209" fill="#5b6169"/>
+<circle cx="16.5" cy="12.5" r="7.748" fill="#3b3f45"/>
+<circle cx="16.954" cy="13.067" r="6.728" fill="#000000" fill-opacity="0.3"/>
+<circle cx="16.5" cy="12.5" r="6.614" fill="#1c1d20" stroke="#050506" stroke-width="0.378"/>
+<circle cx="15.177" cy="10.988" r="2.835" fill="#ffffff" fill-opacity="0.16"/>
+</svg>
