@@ -20,6 +20,6 @@
 <path d="M14.268 52.226 L15.024 62.951 L17.67 62.951 L43.37 62.951 L46.016 62.951 L46.772 52.226 Z" fill="#1f5fb5"/>
 <circle cx="30.52" cy="30.258" r="29.291" fill="#1f5fb5" stroke="#123c78" stroke-width="0.302"/>
 <circle cx="30.52" cy="30.258" r="29.291" fill="url(#disco)"/>
-<text transform="translate(30.52 27.234) rotate(0)" x="0" y="3.024" font-family="Arial" font-weight="bold" font-size="7.559" fill="#e9eef6" text-anchor="middle">14D270K</text>
-<text transform="translate(30.52 35.927) rotate(0)" x="0" y="1.89" font-family="Arial" font-weight="normal" font-size="4.724" fill="#c9d6ea" text-anchor="middle">MOV</text>
+<text transform="translate(30.52 27.329) rotate(0)" x="0" y="3.017" font-family="Arial" font-weight="bold" font-size="7.543" fill="#e9eef6" text-anchor="middle">14D270K</text>
+<text transform="translate(30.52 36.116) rotate(0)" x="0" y="1.904" font-family="Arial" font-weight="normal" font-size="4.76" fill="#c9d6ea" text-anchor="middle">MOV</text>
 </svg>

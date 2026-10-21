@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="59px" height="15px" viewBox="0 0 59 15">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <linearGradient id="cilindro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000000" stop-opacity="0.28"/><stop offset="0.28" stop-color="#ffffff" stop-opacity="0.22"/><stop offset="0.42" stop-color="#ffffff" stop-opacity="0.05"/><stop offset="0.75" stop-color="#000000" stop-opacity="0.08"/><stop offset="1" stop-color="#000000" stop-opacity="0.35"/></linearGradient>
+  <linearGradient id="cilindro-v" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000000" stop-opacity="0.35"/><stop offset="0.22" stop-color="#ffffff" stop-opacity="0.22"/><stop offset="0.38" stop-color="#ffffff" stop-opacity="0.04"/><stop offset="0.8" stop-color="#000000" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.4"/></linearGradient>
+  <radialGradient id="disco" cx="0.38" cy="0.32" r="0.75"><stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.3"/></radialGradient>
+  <linearGradient id="cobre" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6e3b14"/><stop offset="0.25" stop-color="#d98c4a"/><stop offset="0.45" stop-color="#f0b27a"/><stop offset="0.75" stop-color="#b8692e"/><stop offset="1" stop-color="#5e3110"/></linearGradient>
+  <linearGradient id="ferrite" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1c1d20"/><stop offset="0.3" stop-color="#55575c"/><stop offset="0.6" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="vidro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6e4ec" stop-opacity="0.5"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0.3"/><stop offset="0.55" stop-color="#dfe9ef" stop-opacity="0.08"/><stop offset="1" stop-color="#9fb4c0" stop-opacity="0.4"/></linearGradient>
+</defs>
+<path d="M0 7.56 L12.462 7.56" fill="none" stroke="#8e959c" stroke-width="2.268" stroke-linecap="butt"/>
+<path d="M-0.408 7.56 L12.054 7.56" fill="none" stroke="#e9edf0" stroke-width="0.68" stroke-linecap="butt" stroke-opacity="0.85"/>
+<path d="M46.478 7.56 L58.94 7.56" fill="none" stroke="#8e959c" stroke-width="2.268" stroke-linecap="butt"/>
+<path d="M46.07 7.56 L58.532 7.56" fill="none" stroke="#e9edf0" stroke-width="0.68" stroke-linecap="butt" stroke-opacity="0.85"/>
+<rect x="18.131" y="1.324" width="22.677" height="12.472" fill="url(#vidro)" stroke="#9fb4c0" stroke-width="0.189"/>
+<path d="M18.509 7.56 L40.431 7.56" fill="none" stroke="#6b7178" stroke-width="1.225" stroke-linecap="round"/>
+<path d="M18.509 7.56 L40.431 7.56" fill="none" stroke="#dfe3e7" stroke-width="0.998" stroke-linecap="round"/>
+<rect x="18.131" y="1.891" width="22.677" height="2.744" fill="#ffffff" fill-opacity="0.35"/>
+<rect x="10.572" y="0.757" width="8.693" height="13.606" rx="0.945" fill="url(#metal)" stroke="#7c838b" stroke-width="0.189"/>
+<rect x="39.675" y="0.757" width="8.693" height="13.606" rx="0.945" fill="url(#metal)" stroke="#7c838b" stroke-width="0.189"/>
+<text transform="translate(14.919 7.56) rotate(0)" x="0" y="1.172" font-family="Arial" font-weight="normal" font-size="2.929" fill="#4a4f56" text-anchor="middle">3A</text>
+</svg>

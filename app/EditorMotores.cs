@@ -465,8 +465,7 @@ public partial class EditorCircuito
                         achados.Add(new Estouro(peca.Id, Idioma.T("o capacitor de {0} recebeu {1:0.#} V, e aguenta {2:0} V: estourou.", ficha.Nome, Math.Abs(v), ficha.Volts)));
                     break;
                 }
-                case "transistor-npn":
-                case "transistor-pnp":
+                case var bipolar when Semicondutores.EhBipolar(bipolar):
                 {
                     var f = Semicondutores.Transistor(peca);
                     double ic = Math.Abs(conta.CorrenteDoRamo(peca.Id, "coletor"));
@@ -475,13 +474,14 @@ public partial class EditorCircuito
                     double p = ic * vce;
                     if (ic > f.CorrenteMaxima * 1.5 || p > f.Potencia * 1.5)
                         achados.Add(new Estouro(peca.Id, Idioma.T("o {0} passou {1:0.##} A ({2:0.##} W), e aguenta {3:0.##} A e {4:0.##} W: queimou.", f.Nome, ic, p, f.CorrenteMaxima, f.Potencia)));
-                    else if (ib > 0.02)
+                    else if (ib > Math.Max(0.02, 2 * f.CorrenteMaxima / f.Beta))
                         achados.Add(new Estouro(peca.Id, Idioma.T("a base do {0} está puxando {1:0} mA: falta o resistor da base (1 kohm é o comum).", f.Nome, ib * 1000), Queimou: false));
                     else if (p > f.Potencia)
                         achados.Add(new Estouro(peca.Id, Idioma.T("o {0} está esquentando {1:0.##} W: ele não está saturando (corrente de base pequena para a carga).", f.Nome, p), Queimou: false));
                     break;
                 }
                 case "mosfet-n":
+                case "mosfet-p":
                 {
                     var f = Semicondutores.Mosfet(peca);
                     double id = Math.Abs(conta.CorrenteDoRamo(peca.Id, "dreno"));
@@ -492,6 +492,8 @@ public partial class EditorCircuito
                         achados.Add(new Estouro(peca.Id, Idioma.T("o gate do {0} recebeu {1:0.#} V, e aguenta {2:0} V: queimou.", f.Nome, Math.Abs(vgs), f.GateMaximo)));
                     else if (p > f.Potencia * 2)
                         achados.Add(new Estouro(peca.Id, Idioma.T("o {0} está dissipando {1:0.#} W sem dissipador: queimou.", f.Nome, p)));
+                    else if (p > f.Potencia && f.CanalP)
+                        achados.Add(new Estouro(peca.Id, Idioma.T("o {0} está esquentando {1:0.##} W: com {2:0.#} V entre o gate e o source ele não liga inteiro. No canal P o gate precisa ficar ~10 V abaixo do source (um transistor puxando o gate para o GND).", f.Nome, p, vgs), Queimou: false));
                     else if (p > f.Potencia)
                         achados.Add(new Estouro(peca.Id, Idioma.T("o {0} está esquentando {1:0.##} W: com {2:0.#} V no gate ele não liga inteiro. Use um MOSFET de nível lógico (IRLZ44N) ou 10 V no gate.", f.Nome, p, vgs), Queimou: false));
                     break;

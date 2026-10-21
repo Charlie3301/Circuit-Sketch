@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="34px" height="33px" viewBox="0 0 34 33">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <linearGradient id="niquel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9ecef"/><stop offset="0.5" stop-color="#c2c7cd"/><stop offset="1" stop-color="#959ba2"/></linearGradient>
+</defs>
+<rect x="5.51" y="0.777" width="3.78" height="4.195" fill="url(#metal-h)"/>
+<rect x="5.51" y="28.028" width="3.78" height="4.195" fill="url(#metal-h)"/>
+<rect x="15.11" y="0.777" width="3.78" height="4.195" fill="url(#metal-h)"/>
+<rect x="15.11" y="28.028" width="3.78" height="4.195" fill="url(#metal-h)"/>
+<rect x="24.71" y="0.777" width="3.78" height="4.195" fill="url(#metal-h)"/>
+<rect x="24.71" y="28.028" width="3.78" height="4.195" fill="url(#metal-h)"/>
+<rect x="3.545" y="4.217" width="26.91" height="24.567" rx="1.134" fill="#eeeae1" stroke="#a8a296" stroke-width="0.454"/>
+<rect x="3.545" y="4.217" width="26.91" height="24.567" rx="1.134" fill="url(#luz)"/>
+<circle cx="6.455" cy="24.286" r="1.436" fill="#cfc9bd" stroke="#b1aa9d" stroke-width="0.227"/>
+<text transform="translate(17 13.854) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#3a3d42" text-anchor="middle">4N35</text>
+<text transform="translate(17 19.146) rotate(0)" x="0" y="1.323" font-family="Arial" font-weight="normal" font-size="3.307" fill="#5b5f66" text-anchor="middle">V 418</text>
+<circle cx="7.4" cy="30.9" r="2.079" fill="#d8b45a"/>
+<circle cx="7.4" cy="30.9" r="0.945" fill="#15171b"/>
+<circle cx="17" cy="30.9" r="2.079" fill="#d8b45a"/>
+<circle cx="17" cy="30.9" r="0.945" fill="#15171b"/>
+<circle cx="26.6" cy="30.9" r="2.079" fill="#d8b45a"/>
+<circle cx="26.6" cy="30.9" r="0.945" fill="#15171b"/>
+<circle cx="26.6" cy="2.1" r="2.079" fill="#d8b45a"/>
+<circle cx="26.6" cy="2.1" r="0.945" fill="#15171b"/>
+<circle cx="17" cy="2.1" r="2.079" fill="#d8b45a"/>
+<circle cx="17" cy="2.1" r="0.945" fill="#15171b"/>
+<circle cx="7.4" cy="2.1" r="2.079" fill="#d8b45a"/>
+<circle cx="7.4" cy="2.1" r="0.945" fill="#15171b"/>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="36.2px" height="47px" data-sobra="3.1 1" viewBox="0 0 36.2 47">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <linearGradient id="cilindro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000000" stop-opacity="0.28"/><stop offset="0.28" stop-color="#ffffff" stop-opacity="0.22"/><stop offset="0.42" stop-color="#ffffff" stop-opacity="0.05"/><stop offset="0.75" stop-color="#000000" stop-opacity="0.08"/><stop offset="1" stop-color="#000000" stop-opacity="0.35"/></linearGradient>
+  <linearGradient id="cilindro-v" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000000" stop-opacity="0.35"/><stop offset="0.22" stop-color="#ffffff" stop-opacity="0.22"/><stop offset="0.38" stop-color="#ffffff" stop-opacity="0.04"/><stop offset="0.8" stop-color="#000000" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.4"/></linearGradient>
+  <radialGradient id="disco" cx="0.38" cy="0.32" r="0.75"><stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.3"/></radialGradient>
+  <linearGradient id="cobre" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6e3b14"/><stop offset="0.25" stop-color="#d98c4a"/><stop offset="0.45" stop-color="#f0b27a"/><stop offset="0.75" stop-color="#b8692e"/><stop offset="1" stop-color="#5e3110"/></linearGradient>
+  <linearGradient id="ferrite" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1c1d20"/><stop offset="0.3" stop-color="#55575c"/><stop offset="0.6" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="vidro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6e4ec" stop-opacity="0.5"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0.3"/><stop offset="0.55" stop-color="#dfe9ef" stop-opacity="0.08"/><stop offset="1" stop-color="#9fb4c0" stop-opacity="0.4"/></linearGradient>
+</defs>
+<path d="M8.771 29.346 L8.771 38.417 L8.62 42.196 L8.62 46.354" fill="none" stroke="#8e959c" stroke-width="2.457" stroke-linecap="butt"/>
+<path d="M8.329 29.346 L8.329 38.417 L8.178 42.196 L8.178 46.354" fill="none" stroke="#e9edf0" stroke-width="0.737" stroke-linecap="butt" stroke-opacity="0.85"/>
+<path d="M27.669 29.346 L27.669 38.417 L27.82 42.196 L27.82 46.354" fill="none" stroke="#8e959c" stroke-width="2.457" stroke-linecap="butt"/>
+<path d="M27.227 29.346 L27.227 38.417 L27.378 42.196 L27.378 46.354" fill="none" stroke="#e9edf0" stroke-width="0.737" stroke-linecap="butt" stroke-opacity="0.85"/>
+<path d="M6.692 31.897 L7.448 39.551 L10.094 39.551 L26.346 39.551 L28.992 39.551 L29.748 31.897 Z" fill="#1f5fb5"/>
+<circle cx="18.22" cy="19.141" r="17.008" fill="#1f5fb5" stroke="#123c78" stroke-width="0.302"/>
+<circle cx="18.22" cy="19.141" r="17.008" fill="url(#disco)"/>
+<text transform="translate(18.22 17.44) rotate(0)" x="0" y="1.752" font-family="Arial" font-weight="bold" font-size="4.38" fill="#e9eef6" text-anchor="middle">07D220K</text>
+<text transform="translate(18.22 22.543) rotate(0)" x="0" y="1.106" font-family="Arial" font-weight="normal" font-size="2.764" fill="#c9d6ea" text-anchor="middle">MOV</text>
+</svg>

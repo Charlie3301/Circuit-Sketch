@@ -611,10 +611,7 @@ public sealed partial class Energia
             case "ams1117":
             case "lm2596":
             case "mt3608":
-            case "transistor-npn":
-            case "transistor-pnp":
-            case "mosfet-n":
-            case "optoacoplador":
+            case var semicondutor when Semicondutores.EhControlado(semicondutor):
             case "modulo-rele-1":
             case "modulo-rele-2":
             case "modulo-rele-4":

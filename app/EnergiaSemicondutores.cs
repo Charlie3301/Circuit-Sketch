@@ -14,7 +14,11 @@ namespace Simulador.App;
 ///   - MOSFET: abaixo do limiar, aberto; acima, k (Vgs - Vt)^2 na saturacao,
 ///     ou a resistencia de ligado (Rds on) se a carga pede menos -- e o diodo
 ///     do corpo, ao contrario;
-///   - opto: o fototransistor leva a corrente do LED vezes o CTR (100%).
+///   - opto: o fototransistor leva a corrente do LED vezes o CTR (100% no
+///     PC817, 50% no 4N25). No 4N35 a base fica para fora, e solta nao conta.
+///
+/// O MOSFET de canal P e o espelho do N: o canal vai do source (no +) ao
+/// dreno, e liga com o gate abaixo do source.
 /// </summary>
 public sealed partial class Energia
 {
@@ -41,16 +45,17 @@ public sealed partial class Energia
             var chave = new Chave { Peca = peca };
             switch (peca.Tipo)
             {
-                case "transistor-npn":
-                case "transistor-pnp":
+                case var bipolar when Semicondutores.EhBipolar(bipolar):
                 {
                     var f = Semicondutores.Transistor(peca);
                     int e = N("E"), b = N("B"), c = N("C");
                     if (e < 0 || b < 0 || c < 0) continue;
-                    bool pnp = peca.Tipo == "transistor-pnp";
+                    bool pnp = Semicondutores.EhPnp(peca.Tipo);
+                    // A base dos de potencia puxa bem mais (o TIP31C tem beta 25).
+                    double baseMaxima = Math.Max(0.05, 3 * f.CorrenteMaxima / f.Beta);
                     chave.Controle = ramos.Count;
-                    ramos.Add(pnp ? new Ramo(peca.Id, e, b, 1, f.Vbe, 0.001, 0.05, Rotulo: "base")
-                                  : new Ramo(peca.Id, b, e, 1, f.Vbe, 0.001, 0.05, Rotulo: "base"));
+                    ramos.Add(pnp ? new Ramo(peca.Id, e, b, 1, f.Vbe, 0.001, baseMaxima, Rotulo: "base")
+                                  : new Ramo(peca.Id, b, e, 1, f.Vbe, 0.001, baseMaxima, Rotulo: "base"));
                     chave.Canal = ramos.Count;
                     ramos.Add(pnp ? new Ramo(peca.Id, e, c, 1e9, f.Vcesat, 0.01, f.CorrenteMaxima, Rotulo: "coletor")
                                   : new Ramo(peca.Id, c, e, 1e9, f.Vcesat, 0.01, f.CorrenteMaxima, Rotulo: "coletor"));
@@ -60,6 +65,7 @@ public sealed partial class Energia
                     break;
                 }
                 case "mosfet-n":
+                case "mosfet-p":
                 {
                     var f = Semicondutores.Mosfet(peca);
                     int g = N("G"), d = N("D"), s = N("S");
@@ -68,13 +74,23 @@ public sealed partial class Energia
                     chave.Fonte = s;
                     chave.Mosfet = f;
                     chave.Canal = ramos.Count;
-                    ramos.Add(new Ramo(peca.Id, d, s, 1e9, 0.001, 0.01, f.CorrenteMaxima, Rotulo: "dreno"));
-                    // O diodo do corpo: do source para o dreno.
-                    ramos.Add(new Ramo(peca.Id, s, d, 0.05, 0.8, 0.01, f.CorrenteMaxima, Rotulo: "corpo"));
+                    // O canal: do dreno ao source no N; do source ao dreno no P (o source no +).
+                    // E o diodo do corpo, ao contrario do canal.
+                    if (f.CanalP)
+                    {
+                        ramos.Add(new Ramo(peca.Id, s, d, 1e9, 0.001, 0.01, f.CorrenteMaxima, Rotulo: "dreno"));
+                        ramos.Add(new Ramo(peca.Id, d, s, 0.05, 0.8, 0.01, f.CorrenteMaxima, Rotulo: "corpo"));
+                    }
+                    else
+                    {
+                        ramos.Add(new Ramo(peca.Id, d, s, 1e9, 0.001, 0.01, f.CorrenteMaxima, Rotulo: "dreno"));
+                        ramos.Add(new Ramo(peca.Id, s, d, 0.05, 0.8, 0.01, f.CorrenteMaxima, Rotulo: "corpo"));
+                    }
                     chave.Saturacao = f.ResistenciaLigado;
                     break;
                 }
                 case "optoacoplador":
+                case "optoacoplador-4n35":
                 {
                     int a = N("A"), k = N("K"), c = N("C"), e = N("E");
                     if (a < 0 || k < 0 || c < 0 || e < 0) continue;
@@ -82,7 +98,7 @@ public sealed partial class Energia
                     ramos.Add(new Ramo(peca.Id, a, k, 5, 1.2, 0.005, 0.05, Rotulo: "led"));
                     chave.Canal = ramos.Count;
                     ramos.Add(new Ramo(peca.Id, c, e, 1e9, 0.2, 0.001, 0.05, Rotulo: "coletor"));
-                    chave.Ganho = 1.0;
+                    chave.Ganho = Semicondutores.Opto(peca).Ctr;
                     chave.Saturacao = 50;
                     chave.QuedaDoCanal = 0.2;
                     break;
@@ -104,6 +120,7 @@ public sealed partial class Energia
             if (ch.Mosfet is { } f)
             {
                 double vgs = TensaoDoIndice(ch.Gate) - TensaoDoIndice(ch.Fonte);
+                if (f.CanalP) vgs = -vgs;               // o P liga com o gate abaixo do source
                 if (vgs <= f.Limiar) r = 1e9;
                 else
                 {

@@ -7,10 +7,12 @@ polegada) e com o desenho seguindo o modelo escolhido na peca:
   - resistor.svg: o de 1/4 W de filme de carbono (6,3 x 2,4 mm, o "osso"
     bege); as faixas do valor sao desenhadas por cima pelo editor, no lugar
     que sai daqui (app/DesenhoDosPassivos.cs);
-  - capacitor-<modelo>.svg: o ceramico de disco com o codigo (10 pF a 100 nF)
-    e o multicamada de 1 uF;
+  - capacitor-<modelo>.svg: o ceramico de disco com o codigo (10 pF a 470 nF),
+    o multicamada de 1 uF, o de poliester verde (2A103J, 2A104J) e o de filme
+    em caixa (100 nF e 1 uF);
   - capacitor-eletrolitico-<modelo>.svg: a lata de cada valor (5 x 11 mm do
-    1 uF ate 10 x 20 mm do 2200 uF), a capa com a faixa do negativo e o valor;
+    1 uF ate 12,5 x 25 mm do 3300 uF), a capa com a faixa do negativo e o
+    valor; e os de tantalo (a gota amarela com o +: 1 uF, 10 uF e 47 uF);
   - indutor-<modelo>.svg: o de nucleo de tambor (8 x 10 mm), o fio mais grosso
     nos de poucos uH (mais corrente) e mais fino nos de mH;
   - cristal-<modelo>.svg: o HC-49/S com a frequencia, e o cilindro de 2 x 6 mm
@@ -18,7 +20,8 @@ polegada) e com o desenho seguindo o modelo escolhido na peca:
   - ldr.svg: o GL5528 de 5 mm, com a trilha de CdS em zigue-zague;
   - fusivel-<modelo>.svg: o de vidro de 3,6 x 10 mm com o filamento (mais
     grosso quanto maior a corrente) e o ceramico de 5 x 20 mm do de 10 A;
-  - varistor-<modelo>.svg: o disco 14D (15,5 mm), azul.
+  - varistor-<modelo>.svg: o disco azul no tamanho de cada serie (07D, 10D,
+    14D e 20D).
 
 Os pinos de cada peca nao mudam. O que passa da caixa (a lata grande, o disco
 do varistor) vai na sobra do SVG (data-sobra): o editor desenha para fora,
@@ -138,8 +141,9 @@ def gerar_resistor():
 CERAMICOS = {
     #        diametro, cor, codigo
     '10p': (3.8, '#e7a24a', '10'), '22p': (3.8, '#e7a24a', '22'), '100p': (4.0, '#e59a44', '101'),
-    '1n': (4.5, '#df8a3b', '102'), '10n': (5.0, '#d97a31', '103'), '100n': (5.5, '#cf6a26', '104'),
-    '1u': (None, '#e3b23c', '105'),
+    '1n': (4.5, '#df8a3b', '102'), '4n7': (4.5, '#dc843a', '472'), '10n': (5.0, '#d97a31', '103'),
+    '47n': (5.0, '#d4742e', '473'), '100n': (5.5, '#cf6a26', '104'), '220n': (6.0, '#ca6223', '224'),
+    '470n': (6.5, '#c45a1f', '474'), '1u': (None, '#e3b23c', '105'),
 }
 
 
@@ -148,7 +152,9 @@ def gerar_ceramico(modelo):
     p = pinos('capacitor')
     (xa, yp), (xb, _) = p['1'], p['2']
     cx = (xa + xb) / 2
-    d = desenho()
+    # os discos grandes (220 e 470 nF) passam da caixa: vao na sobra
+    sx, sy = sobra_de('capacitor', cx - diam / 2, 5.6 - diam, cx + diam / 2, yp + 0.3) if diam else (0, 0)
+    d = desenho(sx, sy)
     if diam:                                     # o disco
         r = diam / 2
         cy = 5.6 - r
@@ -171,7 +177,79 @@ def gerar_ceramico(modelo):
         d.ret_c(cx, cy, w, h, cor, rx=1.3, stroke='#9a7418', sw=0.06)
         d.ret_c(cx, cy, w, h, 'url(#disco)', rx=1.3)
         d.texto(cx, cy, codigo, 1.05, '#3b2b05', ancora='middle', alinhar='center')
-    documento('capacitor', 0, 0, d.partes, f'capacitor-{modelo}')
+    documento('capacitor', sx, sy, d.partes, f'capacitor-{modelo}')
+
+
+# =====================================================================
+#  os de filme: o poliester verde ("2A104J") e o de caixa
+# =====================================================================
+FILMES = {
+    #                   forma,    largura, altura, linhas
+    '10n-poliester': ('poliester', 5.6, 4.6, ('2A103J',)),
+    '100n-poliester': ('poliester', 7.2, 5.8, ('2A104J',)),
+    '100n-filme': ('caixa', 7.2, 6.5, ('.1µ', '63')),
+    '1u-filme': ('caixa', 7.2, 9.0, ('1µ', '63')),
+}
+
+
+def gerar_filme(modelo):
+    forma, w, h, linhas = FILMES[modelo]
+    p = pinos('capacitor')
+    (xa, yp), (xb, _) = p['1'], p['2']
+    cx = (xa + xb) / 2
+    yb = 6.4                                     # a base do corpo
+    yt = yb - h
+    sx, sy = sobra_de('capacitor', cx - w / 2 - 0.1, yt - 0.1, cx + w / 2 + 0.1, yp + 0.3)
+    d = desenho(sx, sy)
+    # as pernas saem no passo de 5 mm e fecham para os 2,54 da protoboard
+    for x, xs in ((xa, cx - 2.5), (xb, cx + 2.5)):
+        perna(d, [(xs, yb - 0.6), (xs, yb + 0.7), (x, yb + 2.0), (x, yp + 0.3)], 0.5)
+    if forma == 'poliester':                     # mergulhado em resina verde, o "travesseiro"
+        rx = min(w, h) * 0.42
+        for xs in (cx - 2.5, cx + 2.5):          # o escorrido nas pernas
+            d.caminho([('M', xs - 0.7, yb - 0.5), ('L', xs - 0.3, yb + 0.6), ('A', 0.3, 0, 0, xs + 0.3, yb + 0.6),
+                       ('L', xs + 0.7, yb - 0.5), ('Z',)], '#2b7338')
+        d.ret(cx - w / 2, yt, w, h, '#2e7b3c', rx=rx, stroke='#17451f', sw=0.08)
+        d.ret(cx - w / 2, yt, w, h, 'url(#disco)', rx=rx)
+        d.texto(cx, yt + h * 0.5, linhas[0], w * 0.13, '#efe7b8', ancora='middle', alinhar='center')
+    else:                                        # a caixa vermelha de filme
+        d.ret(cx - w / 2, yt, w, h, '#c42a20', rx=0.45, stroke='#7a150f', sw=0.08)
+        d.ret(cx - w / 2, yt, w, h, 'url(#cilindro-v)', rx=0.45)
+        for k, t in enumerate(linhas):
+            d.texto(cx, yt + h * (0.38 + 0.26 * k), t, 1.35 if k == 0 else 1.1, '#f6f1ea', ancora='middle', alinhar='center')
+    documento('capacitor', sx, sy, d.partes, f'capacitor-{modelo}')
+
+
+# =====================================================================
+#  o tantalo: a gota amarela de resina, com o + marcado
+# =====================================================================
+TANTALOS = {
+    #                     largura, altura, codigo, volts
+    '1u-35v-tantalo': (4.5, 6.5, '105', '35V'),
+    '10u-16v-tantalo': (5.0, 7.5, '106', '16V'),
+    '47u-10v-tantalo': (5.5, 8.5, '476', '10V'),
+}
+
+
+def gerar_tantalo(modelo):
+    w, h, codigo, volts = TANTALOS[modelo]
+    p = pinos('capacitor-eletrolitico')
+    (xm, yp), (xn, _) = p['+'], p['-']
+    cx = (xm + xn) / 2
+    yb = yp - 3.2
+    yt = yb - h
+    sx, sy = sobra_de('capacitor-eletrolitico', cx - w / 2 - 0.1, yt - 0.1, cx + w / 2 + 0.1, yp + 0.3)
+    d = desenho(sx, sy)
+    for x in (xm, xn):
+        perna(d, [(x, yb - 0.8), (x, yp + 0.3)], 0.5)
+    ombro = yt + w / 2
+    gota = [('M', cx - w / 2, ombro), ('A', w / 2, 0, 1, cx + w / 2, ombro), ('L', cx + w * 0.36, yb), ('L', cx - w * 0.36, yb), ('Z',)]
+    d.caminho(gota, '#e3a51f', '#9a6d0e', 0.08)
+    d.caminho(gota, 'url(#disco)')
+    d.texto(cx - w * 0.22, yt + w * 0.38, '+', w * 0.24, '#5a3a06', ancora='middle', alinhar='center')
+    d.texto(cx, yt + h * 0.52, codigo, w * 0.2, '#4a3005', ancora='middle', alinhar='center')
+    d.texto(cx, yt + h * 0.75, volts, w * 0.15, '#4a3005', ancora='middle', alinhar='center', peso='normal')
+    documento('capacitor-eletrolitico', sx, sy, d.partes, f'capacitor-eletrolitico-{modelo}')
 
 
 # =====================================================================
@@ -179,10 +257,14 @@ def gerar_ceramico(modelo):
 # =====================================================================
 ELETROLITICOS = {
     #              D,    L,   passo, texto
-    '1u-50v': (5.0, 11.0, 2.0, ('1µF', '50V')), '10u-25v': (5.0, 11.0, 2.0, ('10µF', '25V')),
-    '47u-25v': (5.0, 11.0, 2.0, ('47µF', '25V')), '100u-25v': (6.3, 11.0, 2.5, ('100µF', '25V')),
-    '220u-16v': (6.3, 11.0, 2.5, ('220µF', '16V')), '470u-16v': (8.0, 11.5, 3.5, ('470µF', '16V')),
+    '1u-50v': (5.0, 11.0, 2.0, ('1µF', '50V')), '2u2-50v': (5.0, 11.0, 2.0, ('2.2µF', '50V')),
+    '4u7-50v': (5.0, 11.0, 2.0, ('4.7µF', '50V')), '10u-25v': (5.0, 11.0, 2.0, ('10µF', '25V')),
+    '22u-25v': (5.0, 11.0, 2.0, ('22µF', '25V')), '47u-25v': (5.0, 11.0, 2.0, ('47µF', '25V')),
+    '100u-25v': (6.3, 11.0, 2.5, ('100µF', '25V')), '100u-50v': (8.0, 11.5, 3.5, ('100µF', '50V')),
+    '220u-16v': (6.3, 11.0, 2.5, ('220µF', '16V')), '330u-25v': (8.0, 12.0, 3.5, ('330µF', '25V')),
+    '470u-16v': (8.0, 11.5, 3.5, ('470µF', '16V')), '470u-35v': (10.0, 16.0, 5.0, ('470µF', '35V')),
     '1000u-16v': (10.0, 16.0, 5.0, ('1000µF', '16V')), '2200u-16v': (10.0, 20.0, 5.0, ('2200µF', '16V')),
+    '3300u-16v': (12.5, 25.0, 5.0, ('3300µF', '16V')),
 }
 
 
@@ -220,7 +302,8 @@ def gerar_eletrolitico(modelo):
 # =====================================================================
 #  o indutor de tambor
 # =====================================================================
-INDUTORES = {'10uh': 0.85, '22uh': 0.75, '47uh': 0.62, '100uh': 0.5, '330uh': 0.36, '1mh': 0.22, '10mh': 0.11}
+INDUTORES = {'4u7h': 1.0, '10uh': 0.85, '22uh': 0.75, '47uh': 0.62, '100uh': 0.5, '220uh': 0.42, '330uh': 0.36, '470uh': 0.3,
+             '1mh': 0.22, '2m2h': 0.16, '10mh': 0.11}
 
 
 def gerar_indutor(modelo):
@@ -254,7 +337,8 @@ def gerar_indutor(modelo):
 # =====================================================================
 #  o cristal
 # =====================================================================
-CRISTAIS = {'16mhz': '16.000', '8mhz': '8.000', '12mhz': '12.000', '32khz': None}
+CRISTAIS = {'16mhz': '16.000', '8mhz': '8.000', '12mhz': '12.000', '32khz': None, '4mhz': '4.000', '11m0592': '11.0592',
+            '20mhz': '20.000', '25mhz': '25.000'}
 
 
 def gerar_cristal(modelo):
@@ -312,7 +396,8 @@ def gerar_ldr():
 # =====================================================================
 #  o fusivel
 # =====================================================================
-FUSIVEIS = {'500ma': (0.04, '500mA'), '1a': (0.06, '1A'), '2a': (0.09, '2A'), '5a': (0.16, '5A'), '10a': (None, 'F10A 250V')}
+FUSIVEIS = {'250ma': (0.03, '250mA'), '500ma': (0.04, '500mA'), '1a': (0.06, '1A'), '2a': (0.09, '2A'), '3a': (0.12, '3A'),
+            '5a': (0.16, '5A'), '10a': (None, 'F10A 250V')}
 
 
 def gerar_fusivel(modelo):
@@ -357,27 +442,32 @@ def gerar_fusivel(modelo):
 # =====================================================================
 #  o varistor 14D
 # =====================================================================
-VARISTORES = {'14d270k': ('14D270K', 4.3), '14d470k': ('14D470K', 4.4), '14d391k': ('14D391K', 5.6)}
+VARISTORES = {
+    #            marca, espessura, disco (mm), passo das pernas
+    '07d220k': ('07D220K', 4.0, 9.0, 5.0), '14d270k': ('14D270K', 4.3, 15.5, 7.5), '10d330k': ('10D330K', 4.2, 12.0, 7.5),
+    '14d470k': ('14D470K', 4.4, 15.5, 7.5), '14d391k': ('14D391K', 5.6, 15.5, 7.5), '20d471k': ('20D471K', 6.0, 21.5, 10.0),
+}
 
 
 def gerar_varistor(modelo):
-    marca, espessura = VARISTORES[modelo]
+    marca, espessura, D, passo = VARISTORES[modelo]
     p = pinos('varistor')
     (xa, yp), (xb, _) = p['1'], p['2']
     cx = (xa + xb) / 2
-    D = 15.5
     r = D / 2
     cy = yp - 2.4 - r
     sx, sy = sobra_de('varistor', cx - r - 0.1, cy - r - 0.1, cx + r + 0.1, yp + 0.3)
     d = desenho(sx, sy)
-    for x, xs in ((xa, cx - 3.75), (xb, cx + 3.75)):
+    meio = passo / 2
+    for x, xs in ((xa, cx - meio), (xb, cx + meio)):
         perna(d, [(xs, cy + r * 0.6), (xs, cy + r + 0.6), (x, cy + r + 1.6), (x, yp + 0.3)], 0.65)
-    d.caminho([('M', cx - 4.3, cy + r * 0.75), ('L', cx - 4.1, cy + r + 0.9), ('L', cx - 3.4, cy + r + 0.9),
-               ('L', cx + 3.4, cy + r + 0.9), ('L', cx + 4.1, cy + r + 0.9), ('L', cx + 4.3, cy + r * 0.75), ('Z',)], '#1f5fb5')
+    d.caminho([('M', cx - meio - 0.55, cy + r * 0.75), ('L', cx - meio - 0.35, cy + r + 0.9), ('L', cx - meio + 0.35, cy + r + 0.9),
+               ('L', cx + meio - 0.35, cy + r + 0.9), ('L', cx + meio + 0.35, cy + r + 0.9), ('L', cx + meio + 0.55, cy + r * 0.75),
+               ('Z',)], '#1f5fb5')
     d.circ(cx, cy, r, '#1f5fb5', '#123c78', 0.08)
     d.circ(cx, cy, r, 'url(#disco)')
-    d.texto(cx, cy - 0.8, marca, 1.6, '#e9eef6', ancora='middle', alinhar='center')
-    d.texto(cx, cy + 1.5, 'MOV', 1.0, '#c9d6ea', ancora='middle', alinhar='center', peso='normal')
+    d.texto(cx, cy - D * 0.05, marca, D * 0.103, '#e9eef6', ancora='middle', alinhar='center')
+    d.texto(cx, cy + D * 0.1, 'MOV', D * 0.065, '#c9d6ea', ancora='middle', alinhar='center', peso='normal')
     documento('varistor', sx, sy, d.partes, f'varistor-{modelo}')
 
 
@@ -415,8 +505,12 @@ if __name__ == '__main__':
     gerar_resistor()
     for m in CERAMICOS:
         gerar_ceramico(m)
+    for m in FILMES:
+        gerar_filme(m)
     for m in ELETROLITICOS:
         gerar_eletrolitico(m)
+    for m in TANTALOS:
+        gerar_tantalo(m)
     for m in INDUTORES:
         gerar_indutor(m)
     for m in CRISTAIS:

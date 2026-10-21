@@ -609,10 +609,16 @@ public static class Catalogo
         "cristal" => "Cristal (16 MHz...)",
         "diodo-zener" => "Diodo Zener",
         "diodo-schottky" => "Diodo Schottky",
-        "transistor-npn" => "Transistor NPN (2N2222A...)",
-        "transistor-pnp" => "Transistor PNP (2N2907A...)",
-        "mosfet-n" => "MOSFET canal N (IRLZ44N, IRF520)",
-        "optoacoplador" => "Optoacoplador PC817",
+        "transistor-npn" => "Transistor NPN E-B-C (2N2222A, 2N3904...)",
+        "transistor-pnp" => "Transistor PNP E-B-C (2N2907A, 2N3906...)",
+        "transistor-npn-cbe" => "Transistor NPN C-B-E (BC547, BC337...)",
+        "transistor-pnp-cbe" => "Transistor PNP C-B-E (BC557, BC327...)",
+        "transistor-npn-potencia" => "Transistor NPN de potência (TIP120, TIP31C...)",
+        "transistor-pnp-potencia" => "Transistor PNP de potência (TIP125, TIP32C...)",
+        "mosfet-n" => "MOSFET canal N (IRLZ44N, IRF520...)",
+        "mosfet-p" => "MOSFET canal P (IRF9540N, IRF4905...)",
+        "optoacoplador" => "Optoacoplador PC817 (4 pinos)",
+        "optoacoplador-4n35" => "Optoacoplador 4N35 (6 pinos)",
         "fusivel" => "Fusível",
         "varistor" => "Varistor",
         "ams1117" => "Regulador AMS1117 (3,3 V)",
@@ -659,7 +665,9 @@ public static class Catalogo
         "resistor" or "junction" or "ldr"
             or "capacitor" or "capacitor-eletrolitico" or "indutor" or "cristal" => "Passivos",
         "diodo" or "diodo-zener" or "diodo-schottky"
-            or "transistor-npn" or "transistor-pnp" or "mosfet-n" or "optoacoplador" => "Semicondutores",
+            or "transistor-npn" or "transistor-pnp" or "transistor-npn-cbe" or "transistor-pnp-cbe"
+            or "transistor-npn-potencia" or "transistor-pnp-potencia" or "mosfet-n" or "mosfet-p"
+            or "optoacoplador" or "optoacoplador-4n35" => "Semicondutores",
         "fusivel" or "varistor" => "Alimentacao",
         _ when Baterias.EhBateria(id) => "Alimentacao",
         "vcc-symbol" or "gnd-symbol"

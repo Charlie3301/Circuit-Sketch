@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="28.724px" height="49.134px" viewBox="0 0 28.724 49.134">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <linearGradient id="niquel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9ecef"/><stop offset="0.5" stop-color="#c2c7cd"/><stop offset="1" stop-color="#959ba2"/></linearGradient>
+</defs>
+<path d="M9.562 19.654 L9.562 24.189 L4.762 29.48 L4.762 46.866" fill="none" stroke="#8e959c" stroke-width="1.701" stroke-linecap="butt"/>
+<path d="M9.256 19.654 L9.256 24.189 L4.456 29.48 L4.456 46.866" fill="none" stroke="#e9edf0" stroke-width="0.51" stroke-linecap="butt" stroke-opacity="0.85"/>
+<path d="M14.362 19.654 L14.362 24.189 L14.362 29.48 L14.362 46.866" fill="none" stroke="#8e959c" stroke-width="1.701" stroke-linecap="butt"/>
+<path d="M14.056 19.654 L14.056 24.189 L14.056 29.48 L14.056 46.866" fill="none" stroke="#e9edf0" stroke-width="0.51" stroke-linecap="butt" stroke-opacity="0.85"/>
+<path d="M19.162 19.654 L19.162 24.189 L23.962 29.48 L23.962 46.866" fill="none" stroke="#8e959c" stroke-width="1.701" stroke-linecap="butt"/>
+<path d="M18.856 19.654 L18.856 24.189 L23.656 29.48 L23.656 46.866" fill="none" stroke="#e9edf0" stroke-width="0.51" stroke-linecap="butt" stroke-opacity="0.85"/>
+<path d="M5.291 20.409 L5.291 4.535 A2.646 2.646 0 0 1 7.937 1.89 L20.787 1.89 A2.646 2.646 0 0 1 23.433 4.535 L23.433 20.409 Z" fill="#1d1e22" stroke="#0a0a0b" stroke-width="0.378"/>
+<rect x="5.291" y="1.89" width="18.142" height="18.52" rx="1.134" fill="url(#luz)"/>
+<rect x="6.236" y="18.709" width="16.252" height="0.945" fill="#2c2e33"/>
+<text transform="translate(14.362 6.992) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#d9dce0" text-anchor="middle">S8050</text>
+<text transform="translate(14.362 11.339) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#d9dce0" text-anchor="middle">D</text>
+<text transform="translate(14.362 15.685) rotate(0)" x="0" y="1.172" font-family="Arial" font-weight="normal" font-size="2.929" fill="#9aa0a8" text-anchor="middle">C 331</text>
+<circle cx="4.762" cy="46.866" r="2.079" fill="#d8b45a"/>
+<circle cx="4.762" cy="46.866" r="0.945" fill="#15171b"/>
+<circle cx="14.362" cy="46.866" r="2.079" fill="#d8b45a"/>
+<circle cx="14.362" cy="46.866" r="0.945" fill="#15171b"/>
+<circle cx="23.962" cy="46.866" r="2.079" fill="#d8b45a"/>
+<circle cx="23.962" cy="46.866" r="0.945" fill="#15171b"/>
+</svg>

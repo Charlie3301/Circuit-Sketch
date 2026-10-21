@@ -128,6 +128,8 @@ public static partial class Autoteste
         Bloco("Diodos_NoCircuito", Diodos_NoCircuito);
         Bloco("Passivos_NoTempo", Passivos_NoTempo);
         Bloco("Semicondutores_NoCircuito", Semicondutores_NoCircuito);
+        Bloco("Semicondutores_Familias", Semicondutores_Familias);
+        Bloco("Passivos_Modelos", Passivos_Modelos);
         Bloco("Pcb_Base", Pcb_Base);
         Bloco("ModulosDeRele_NoCircuito", ModulosDeRele_NoCircuito);
         Bloco("Audio_Estereo", Audio_Estereo);

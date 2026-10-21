@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="23px" height="38px" viewBox="0 0 23 38">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <linearGradient id="cilindro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000000" stop-opacity="0.28"/><stop offset="0.28" stop-color="#ffffff" stop-opacity="0.22"/><stop offset="0.42" stop-color="#ffffff" stop-opacity="0.05"/><stop offset="0.75" stop-color="#000000" stop-opacity="0.08"/><stop offset="1" stop-color="#000000" stop-opacity="0.35"/></linearGradient>
+  <linearGradient id="cilindro-v" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000000" stop-opacity="0.35"/><stop offset="0.22" stop-color="#ffffff" stop-opacity="0.22"/><stop offset="0.38" stop-color="#ffffff" stop-opacity="0.04"/><stop offset="0.8" stop-color="#000000" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.4"/></linearGradient>
+  <radialGradient id="disco" cx="0.38" cy="0.32" r="0.75"><stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.3"/></radialGradient>
+  <linearGradient id="cobre" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6e3b14"/><stop offset="0.25" stop-color="#d98c4a"/><stop offset="0.45" stop-color="#f0b27a"/><stop offset="0.75" stop-color="#b8692e"/><stop offset="1" stop-color="#5e3110"/></linearGradient>
+  <linearGradient id="ferrite" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1c1d20"/><stop offset="0.3" stop-color="#55575c"/><stop offset="0.6" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="vidro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6e4ec" stop-opacity="0.5"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0.3"/><stop offset="0.55" stop-color="#dfe9ef" stop-opacity="0.08"/><stop offset="1" stop-color="#9fb4c0" stop-opacity="0.4"/></linearGradient>
+</defs>
+<path d="M7.74 16.063 L6.54 24.567 L6.54 37.794" fill="none" stroke="#8e959c" stroke-width="1.89" stroke-linecap="butt"/>
+<path d="M7.4 16.063 L6.2 24.567 L6.2 37.794" fill="none" stroke="#e9edf0" stroke-width="0.567" stroke-linecap="butt" stroke-opacity="0.85"/>
+<path d="M14.94 16.063 L16.14 24.567 L16.14 37.794" fill="none" stroke="#8e959c" stroke-width="1.89" stroke-linecap="butt"/>
+<path d="M14.6 16.063 L15.8 24.567 L15.8 37.794" fill="none" stroke="#e9edf0" stroke-width="0.567" stroke-linecap="butt" stroke-opacity="0.85"/>
+<path d="M5.421 18.898 L5.331 24.378 A1.209 1.209 0 0 0 7.749 24.378 L9.579 18.898 Z" fill="#dc843a"/>
+<path d="M13.101 18.898 L14.931 24.378 A1.209 1.209 0 0 0 17.349 24.378 L17.259 18.898 Z" fill="#dc843a"/>
+<circle cx="11.34" cy="12.661" r="8.504" fill="#dc843a" stroke="#8a4515" stroke-width="0.227"/>
+<circle cx="11.34" cy="12.661" r="8.504" fill="url(#disco)"/>
+<text transform="translate(11.34 12.661) rotate(0)" x="0" y="2.041" font-family="Arial" font-weight="bold" font-size="5.102" fill="#3a1d08" text-anchor="middle">472</text>
+</svg>

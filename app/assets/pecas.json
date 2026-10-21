@@ -9449,6 +9449,36 @@
   "metades": false
  },
  {
+  "id": "mosfet-p",
+  "largura": 38,
+  "altura": 102,
+  "pinos": [
+   {
+    "nome": "G",
+    "x": 9.3,
+    "y": 99.78,
+    "sinais": [],
+    "descricao": "Gate: liga com o gate ABAIXO do source (~10 V abaixo para ligar inteiro). Um resistor de 10 kohm ao source mantém desligado"
+   },
+   {
+    "nome": "D",
+    "x": 18.9,
+    "y": 99.78,
+    "sinais": [],
+    "descricao": "Dreno: no + da carga (a carga vai do dreno ao GND)"
+   },
+   {
+    "nome": "S",
+    "x": 28.5,
+    "y": 99.78,
+    "sinais": [],
+    "descricao": "Source: no + da alimentação"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "motor-28byj48",
   "largura": 166,
   "altura": 174,
@@ -10372,31 +10402,82 @@
   "pinos": [
    {
     "nome": "A",
-    "x": 7.67,
-    "y": 31.37,
+    "x": 7.7,
+    "y": 30.9,
     "sinais": [],
-    "descricao": "Anodo do LED de dentro (pelo resistor no pino da placa)"
+    "descricao": "Anodo do LED de dentro (pino 1, o da bolinha): pelo resistor no pino da placa"
    },
    {
     "nome": "K",
-    "x": 17.27,
-    "y": 31.37,
+    "x": 17.3,
+    "y": 30.9,
     "sinais": [],
-    "descricao": "Catodo do LED (no GND da placa)"
+    "descricao": "Catodo do LED (pino 2): no GND da placa"
    },
    {
     "nome": "C",
-    "x": 17.27,
-    "y": 1.13,
+    "x": 7.7,
+    "y": 2.1,
     "sinais": [],
-    "descricao": "Coletor do fototransistor (o lado isolado: no - da carga)"
+    "descricao": "Coletor do fototransistor (pino 4, o lado isolado): no - da carga"
    },
    {
     "nome": "E",
-    "x": 7.67,
-    "y": 1.13,
+    "x": 17.3,
+    "y": 2.1,
     "sinais": [],
-    "descricao": "Emissor do fototransistor (no GND do outro circuito)"
+    "descricao": "Emissor do fototransistor (pino 3): no GND do outro circuito"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "optoacoplador-4n35",
+  "largura": 34,
+  "altura": 33,
+  "pinos": [
+   {
+    "nome": "A",
+    "x": 7.4,
+    "y": 30.9,
+    "sinais": [],
+    "descricao": "Anodo do LED de dentro (pino 1, o da bolinha): pelo resistor no pino da placa"
+   },
+   {
+    "nome": "K",
+    "x": 17.0,
+    "y": 30.9,
+    "sinais": [],
+    "descricao": "Catodo do LED (pino 2): no GND da placa"
+   },
+   {
+    "nome": "NC",
+    "x": 26.6,
+    "y": 30.9,
+    "sinais": [],
+    "descricao": "Pino 3: sem ligação por dentro"
+   },
+   {
+    "nome": "E",
+    "x": 26.6,
+    "y": 2.1,
+    "sinais": [],
+    "descricao": "Emissor do fototransistor (pino 4): no GND do outro circuito"
+   },
+   {
+    "nome": "C",
+    "x": 17.0,
+    "y": 2.1,
+    "sinais": [],
+    "descricao": "Coletor do fototransistor (pino 5, o lado isolado): no - da carga"
+   },
+   {
+    "nome": "B",
+    "x": 7.4,
+    "y": 2.1,
+    "sinais": [],
+    "descricao": "Base do fototransistor (pino 6): pode ficar solta; um resistor dela ao emissor deixa a resposta mais rápida"
    }
   ],
   "variantes": [],
@@ -13749,6 +13830,66 @@
   "metades": false
  },
  {
+  "id": "transistor-npn-cbe",
+  "largura": 29,
+  "altura": 49,
+  "pinos": [
+   {
+    "nome": "C",
+    "x": 4.76,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Coletor (C): no - da carga (o relé, o motor, o LED)"
+   },
+   {
+    "nome": "B",
+    "x": 14.36,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Base (B): pelo resistor (1 kohm) no pino da placa"
+   },
+   {
+    "nome": "E",
+    "x": 23.96,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Emissor (E): no GND, no NPN que liga uma carga"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "transistor-npn-potencia",
+  "largura": 38,
+  "altura": 102,
+  "pinos": [
+   {
+    "nome": "B",
+    "x": 9.3,
+    "y": 99.78,
+    "sinais": [],
+    "descricao": "Base (B): pelo resistor no pino da placa (o Darlington TIP120 pede pouca corrente: 1 kohm)"
+   },
+   {
+    "nome": "C",
+    "x": 18.9,
+    "y": 99.78,
+    "sinais": [],
+    "descricao": "Coletor (C): no - da carga (é também a aba de metal)"
+   },
+   {
+    "nome": "E",
+    "x": 28.5,
+    "y": 99.78,
+    "sinais": [],
+    "descricao": "Emissor (E): no GND"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "transistor-pnp",
   "largura": 29,
   "altura": 49,
@@ -13773,6 +13914,66 @@
     "y": 46.87,
     "sinais": [],
     "descricao": "Coletor (C): no + da carga"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "transistor-pnp-cbe",
+  "largura": 29,
+  "altura": 49,
+  "pinos": [
+   {
+    "nome": "C",
+    "x": 4.76,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Coletor (C): no + da carga"
+   },
+   {
+    "nome": "B",
+    "x": 14.36,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Base (B): pelo resistor no pino (LOW liga)"
+   },
+   {
+    "nome": "E",
+    "x": 23.96,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Emissor (E): no + da alimentação, no PNP"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "transistor-pnp-potencia",
+  "largura": 38,
+  "altura": 102,
+  "pinos": [
+   {
+    "nome": "B",
+    "x": 9.3,
+    "y": 99.78,
+    "sinais": [],
+    "descricao": "Base (B): pelo resistor no pino (LOW liga)"
+   },
+   {
+    "nome": "C",
+    "x": 18.9,
+    "y": 99.78,
+    "sinais": [],
+    "descricao": "Coletor (C): no + da carga (é também a aba de metal)"
+   },
+   {
+    "nome": "E",
+    "x": 28.5,
+    "y": 99.78,
+    "sinais": [],
+    "descricao": "Emissor (E): no + da alimentação"
    }
   ],
   "variantes": [],
