@@ -1,51 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-     width="18.0mm" height="22.7mm" viewBox="0 0 18.0 22.7">
-
-  <rect x="0" y="0" width="18.0" height="22.7" rx="1.4" fill="#0d6b6f"/>
-  <rect x="0" y="0" width="18.0" height="22.7" rx="1.4"
-        fill="none" stroke="#084a4d" stroke-width="0.3"/>
-
-  <line x1="1.0" y1="6.00" x2="17.00" y2="6.00" stroke="#084a4d" stroke-width="0.25"/>
-  <rect x="7.10" y="6.80" width="3.8" height="13.90" rx="0.5" fill="#9aa3ad" opacity="0.55"/>
-
-  <rect x="0.60" y="6.40" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="1.60" cy="7.40" r="0.55" fill="#14181f"/>
-  <rect x="0.60" y="8.94" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="1.60" cy="9.94" r="0.55" fill="#14181f"/>
-  <rect x="0.60" y="11.48" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="1.60" cy="12.48" r="0.55" fill="#14181f"/>
-  <rect x="0.60" y="14.02" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="1.60" cy="15.02" r="0.55" fill="#14181f"/>
-  <rect x="0.60" y="16.56" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="1.60" cy="17.56" r="0.55" fill="#14181f"/>
-  <rect x="0.60" y="19.10" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="1.60" cy="20.10" r="0.55" fill="#14181f"/>
-  <rect x="15.40" y="6.40" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="16.40" cy="7.40" r="0.55" fill="#14181f"/>
-  <rect x="15.40" y="8.94" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="16.40" cy="9.94" r="0.55" fill="#14181f"/>
-  <rect x="15.40" y="11.48" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="16.40" cy="12.48" r="0.55" fill="#14181f"/>
-  <rect x="15.40" y="14.02" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="16.40" cy="15.02" r="0.55" fill="#14181f"/>
-  <rect x="15.40" y="16.56" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="16.40" cy="17.56" r="0.55" fill="#14181f"/>
-  <rect x="15.40" y="19.10" width="2.0" height="2.0" rx="0.35" fill="#d8b24a"/>
-  <circle cx="16.40" cy="20.10" r="0.55" fill="#14181f"/>
-  <text x="3.30" y="7.90" fill="#e6eef2" font-size="1.15px" font-family="Verdana">CH_PD</text>
-  <text x="3.30" y="10.44" fill="#e6eef2" font-size="1.15px" font-family="Verdana">GPIO16</text>
-  <text x="3.30" y="12.98" fill="#e6eef2" font-size="1.15px" font-family="Verdana">GPIO14</text>
-  <text x="3.30" y="15.52" fill="#e6eef2" font-size="1.15px" font-family="Verdana">GPIO12</text>
-  <text x="3.30" y="18.06" fill="#e6eef2" font-size="1.15px" font-family="Verdana">GPIO13</text>
-  <text x="3.30" y="20.60" fill="#e6eef2" font-size="1.15px" font-family="Verdana">VCC</text>
-  <text x="14.70" y="7.90" fill="#e6eef2" font-size="1.15px" text-anchor="end" font-family="Verdana">TXD</text>
-  <text x="14.70" y="10.44" fill="#e6eef2" font-size="1.15px" text-anchor="end" font-family="Verdana">RXD</text>
-  <text x="14.70" y="12.98" fill="#e6eef2" font-size="1.15px" text-anchor="end" font-family="Verdana">GPIO5</text>
-  <text x="14.70" y="15.52" fill="#e6eef2" font-size="1.15px" text-anchor="end" font-family="Verdana">GPIO4</text>
-  <text x="14.70" y="18.06" fill="#e6eef2" font-size="1.15px" text-anchor="end" font-family="Verdana">GPIO0</text>
-  <text x="14.70" y="20.60" fill="#e6eef2" font-size="1.15px" text-anchor="end" font-family="Verdana">GND</text>
-
-  <text x="9.00" y="14.31" fill="#e6eef2"
-        font-size="1.6px" text-anchor="middle" font-family="Verdana"
-        opacity="0.85" transform="rotate(-90 9.00 13.75)">ESP-06</text>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="63px" height="51px" viewBox="0 0 63 51">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <linearGradient id="blindagem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset="0.45" stop-color="#c8cdd2"/><stop offset="1" stop-color="#9aa1a8"/></linearGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
+  <linearGradient id="ceramica" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f1e8"/><stop offset="1" stop-color="#cfc9b8"/></linearGradient>
+</defs>
+<path fill-rule="evenodd" d="M1.89 0.756 L61.228 0.756 A1.134 1.134 0 0 1 62.362 1.89 L62.362 49.134 A1.134 1.134 0 0 1 61.228 50.268 L1.89 50.268 A1.134 1.134 0 0 1 0.756 49.134 L0.756 1.89 A1.134 1.134 0 0 1 1.89 0.756 Z" fill="#1b1d21" stroke="#0a0b0d" stroke-width="0.756"/>
+<path fill-rule="evenodd" d="M1.89 0.756 L61.228 0.756 A1.134 1.134 0 0 1 62.362 1.89 L62.362 49.134 A1.134 1.134 0 0 1 61.228 50.268 L1.89 50.268 A1.134 1.134 0 0 1 0.756 49.134 L0.756 1.89 A1.134 1.134 0 0 1 1.89 0.756 Z" fill="url(#luz)"/>
+<rect x="0.756" y="12.85" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="0.756" y="23.811" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="0.756" y="34.772" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="19.276" y="0.756" width="3.402" height="2.646" rx="0.302" fill="#d8b45a"/>
+<rect x="29.858" y="0.756" width="3.402" height="2.646" rx="0.302" fill="#d8b45a"/>
+<rect x="40.441" y="0.756" width="3.402" height="2.646" rx="0.302" fill="#d8b45a"/>
+<rect x="59.717" y="12.85" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="59.717" y="23.811" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="59.717" y="34.772" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="19.276" y="47.622" width="3.402" height="2.646" rx="0.302" fill="#d8b45a"/>
+<rect x="29.858" y="47.622" width="3.402" height="2.646" rx="0.302" fill="#d8b45a"/>
+<rect x="40.441" y="47.622" width="3.402" height="2.646" rx="0.302" fill="#d8b45a"/>
+<rect x="0.756" y="2.457" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="59.717" y="2.457" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="59.717" y="45.165" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="0.756" y="45.165" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="4.724" y="4.913" width="54.803" height="42.709" rx="1.512" fill="#000000" fill-opacity="0.3"/>
+<rect x="4.157" y="4.157" width="54.803" height="42.709" rx="1.512" fill="url(#blindagem)" stroke="#7f868d" stroke-width="0.567"/>
+<rect x="6.047" y="6.047" width="51.024" height="38.929" rx="1.134" fill="none" stroke="#a9b0b6" stroke-width="0.567"/>
+<text transform="translate(31.559 16.063) rotate(0)" x="0" y="1.89" font-family="Arial" font-weight="bold" font-size="4.724" fill="#5b6168" text-anchor="middle">ESP8266MOD</text>
+<text transform="translate(31.559 20.787) rotate(0)" x="0" y="1.512" font-family="Arial" font-weight="normal" font-size="3.78" fill="#5b6168" text-anchor="middle">ESP-06</text>
+<text transform="translate(31.559 25.512) rotate(0)" x="0" y="1.323" font-family="Arial" font-weight="normal" font-size="3.307" fill="#5b6168" text-anchor="middle">ISM 2.4GHz</text>
+<text transform="translate(31.559 30.236) rotate(0)" x="0" y="1.323" font-family="Arial" font-weight="normal" font-size="3.307" fill="#5b6168" text-anchor="middle">PA +25dBm</text>
+<text transform="translate(31.559 34.961) rotate(0)" x="0" y="1.323" font-family="Arial" font-weight="normal" font-size="3.307" fill="#5b6168" text-anchor="middle">802.11b/g/n</text>
 </svg>

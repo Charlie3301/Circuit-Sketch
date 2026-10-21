@@ -136,6 +136,7 @@ public static partial class Autoteste
         Bloco("Entradas_Redesenhadas", Entradas_Redesenhadas);
         Bloco("Logica_Chips", Logica_Chips);
         Bloco("Sensores_Redesenhados", Sensores_Redesenhados);
+        Bloco("Esp8266_Redesenhadas", Esp8266_Redesenhadas);
         Bloco("Pcb_Base", Pcb_Base);
         Bloco("ModulosDeRele_NoCircuito", ModulosDeRele_NoCircuito);
         Bloco("Audio_Estereo", Audio_Estereo);
@@ -685,9 +686,15 @@ public static partial class Autoteste
         double P = Catalogo.Passo;
         var piores = new List<(string peca, double desvio)>();
 
+        // Os modulos ESP8266 de ilha castelada (2,0 mm; 1,5 mm no ESP-13), de
+        // ilha por baixo e o de 1,27 mm (ESP-11) nao sao de 0,1": na bancada
+        // vao soldados numa placa adaptadora. O passo deles e o de verdade,
+        // conferido em Esp8266_Redesenhadas.
+        string[] passoMetrico = ["esp-03", "esp-04", "esp-06", "esp-07", "esp-08", "esp-09", "esp-10", "esp-11",
+                                 "esp-12", "esp-12e", "esp-12f", "esp-13", "esp-14"];
         foreach (var def in Catalogo.Todas)
         {
-            if (Catalogo.EhProtoboard(def.Id) || def.Pinos.Count < 3) continue;
+            if (Catalogo.EhProtoboard(def.Id) || def.Pinos.Count < 3 || passoMetrico.Contains(def.Id)) continue;
 
             double pior = 0;
             foreach (bool porX in new[] { true, false })
@@ -14244,8 +14251,9 @@ public static partial class Autoteste
                     return (TemNaSerial("Visita numero 1"), Serial());
 
                 case "esp03-termo-higrometro":
+                    // O seco (umidade de 35 %) fica no GPIO15: o ESP-03 nao tem o GPIO4.
                     return (EsperarPor(() => Linhas().Any(l => l.Contains("umidade: 35 %"))
-                                             && m.DigitalRead(4) == 1 && m.DigitalRead(13) == 1, 4000),
+                                             && m.DigitalRead(15) == 1 && m.DigitalRead(13) == 1, 4000),
                             Serial());
 
                 case "esp04-semaforo-pedestre":
@@ -14294,10 +14302,13 @@ public static partial class Autoteste
                     return (TemNaSerial("ok, esta na pagina: ola mundo"), Serial());
 
                 case "esp11-minuteria":
-                    TemNaSerial("Minuteria pronta");
+                {
+                    // A luz vai no RXD (o GPIO3), que acende com LOW; o sketch
+                    // nao abre a Serial, que tomaria o pino.
+                    bool apagada = EsperarPor(() => m.Modo[3] == 1 && m.DigitalRead(3) == 1, 3000);
                     Apertar("botao");
-                    return (TemNaSerial("acendeu por 10 s") && EsperarPor(() => m.DigitalRead(2) == 0, 2000),
-                            Serial());
+                    return (apagada && EsperarPor(() => m.DigitalRead(3) == 0, 2000), $"GPIO3 = {m.DigitalRead(3)}");
+                }
 
                 case "esp12-balanca":
                     TemNaSerial(" g");
@@ -14324,10 +14335,15 @@ public static partial class Autoteste
                             Serial());
 
                 case "esp14-placar":
-                    EsperarPor(() => TextoDe(M().Oled).Contains("TIME A"), 3000);
-                    Apertar("time_a");
-                    return (TemNaSerial("ponto do time A: 1 x 0")
-                            && EsperarPor(() => TextoDe(M().Oled).Contains("1 x 0"), 2000), Serial());
+                {
+                    // Do ESP8266 do ESP-14 so sai o GPIO0: o placar e o anel
+                    // NeoPixel nele, e os pontos chegam pelo MQTT.
+                    bool pronto = TemNaSerial("broker... ok", 6000) && TemNaSerial("placar: 0 x 0", 3000);
+                    janela.TestePublicarNoBroker("placar/ponto", "a", retida: false);
+                    bool ponto = TemNaSerial("placar: 1 x 0")
+                                 && EsperarPor(() => m.Fitas.Values.Any(f => f.Cores[0] != 0 && f.Cores.Count(c => c != 0) == 1), 3000);
+                    return (pronto && ponto, Serial());
+                }
 
                 case "franzininho-vela":
                 {

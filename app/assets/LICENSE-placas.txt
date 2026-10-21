@@ -121,4 +121,17 @@ pelos vendedores de cada modulo (o HC-SR04 de 45 x 20 mm, o HC-SR501 de
 modulos do LM393, do MQ-2 e da linha KY). Nenhuma foto e reproduzida, e
 nenhuma marca e desenhada.
 
+A NodeMCU (esp8266-nodemcu.svg) sai do projeto aberto NodeMCU DevKit V1.0
+(github.com/nodemcu/nodemcu-devkit-v1.0), Copyright (c) 2014 NODE MCU TEAM,
+Vowstar, sob a licenca MIT: o contorno, as trilhas, as vias, as ilhas, a
+serigrafia e a posicao dos componentes sao os do arquivo do Altium. O
+modulo ESP-12E por cima dela e os modulos ESP-01 a ESP-14 (esp-*.svg) sao
+desenhos proprios do CircuitSketch; a posicao das ilhas do ESP-01, 03, 06,
+07, 12, 12E e 13 segue os footprints do kicad-ESP8266, de J. Dunmire
+(github.com/jdunmire/kicad-ESP8266), sob a licenca Creative Commons
+Atribuicao-CompartilhaIgual 4.0 Internacional (CC BY-SA 4.0); as medidas e
+a pinagem dos outros vem dos desenhos com cota publicados pela comunidade
+(o guia de modulos da l0l.org.uk e o wiki do esp8266.com). Nenhuma foto e
+reproduzida, e nenhuma marca e desenhada.
+
 O restante do CircuitSketch nao e afetado por esta licenca.

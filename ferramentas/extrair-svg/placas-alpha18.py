@@ -42,9 +42,12 @@ pecas = []
 
 
 # As placas refeitas na Alpha 25 tem o desenho e os pinos de outro gerador
-# (placas-esp32.py, placas-arduino.py, placas-pico.py, placas-stm32.py): aqui ficam de fora,
-# para rodar este de novo nao trazer o desenho antigo de volta.
-REFEITAS_NA_ALPHA_25 = {'esp32-s2-devkit', 'esp32-s3-devkit', 'esp32-c3-devkit', 'esp32-c6-devkit', 'esp32-h2-devkit', 'attiny85', 'pi-pico', 'pi-pico-w', 'st-nucleo-l031k6', 'st-nucleo-c031c6'}
+# (placas-esp32.py, placas-arduino.py, placas-pico.py, placas-stm32.py,
+# placas-esp8266.py): aqui ficam de fora, para rodar este de novo nao trazer o
+# desenho antigo de volta.
+REFEITAS_NA_ALPHA_25 = {'esp32-s2-devkit', 'esp32-s3-devkit', 'esp32-c3-devkit', 'esp32-c6-devkit', 'esp32-h2-devkit', 'attiny85', 'pi-pico', 'pi-pico-w', 'st-nucleo-l031k6', 'st-nucleo-c031c6',
+                        'esp8266-nodemcu', 'esp-01', 'esp-02', 'esp-03', 'esp-04', 'esp-05', 'esp-06', 'esp-07', 'esp-08',
+                        'esp-09', 'esp-10', 'esp-11', 'esp-12', 'esp-12e', 'esp-12f', 'esp-13', 'esp-14'}
 
 
 def guardar(id_peca, svg, larg_mm, alt_mm, pinos):

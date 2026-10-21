@@ -871,8 +871,8 @@ c.ligar('dht', 'DATA', 'placa', 'GPIO14', AMARELO)
 c.ligar('dht', 'GND', 'placa', 'GND', PRETO)
 c.led('frio', 'GPIO12', 'GND', 'azul', 330, 150, AZUL)
 c.led('conforto', 'GPIO13', 'GND', 'verde', 420, 150, VERDE)
-c.led('quente', 'GPIO5', 'GND', 'vermelho', 510, 150, VERMELHO)
-c.led('seco', 'GPIO4', 'GND', 'amarelo', 600, 150, AMARELO)
+c.led('quente', 'GPIO16', 'GND', 'vermelho', 510, 150, VERMELHO)
+c.led('seco', 'GPIO15', 'GND', 'amarelo', 600, 150, AMARELO)
 
 gravar('esp03-termo-higrometro', r'''
 // Termo-higrometro com DHT11, num ESP-03.
@@ -880,14 +880,17 @@ gravar('esp03-termo-higrometro', r'''
 // Tres LEDs dizem como esta a sala: azul (frio, abaixo de 20 C), verde
 // (confortavel) e vermelho (quente, acima de 27 C). O amarelo acende com o
 // ar seco, abaixo de 40 % de umidade.
+//
+// O ESP-03 nao traz o GPIO4 nem o GPIO5 para fora: os LEDs vao nos que
+// ele tem. O do GPIO15 ainda ajuda na partida, que pede esse pino em LOW.
 
 #include <DHT.h>
 
 const int PINO_DHT = 14;
 const int FRIO = 12;
 const int CONFORTO = 13;
-const int QUENTE = 5;
-const int SECO = 4;
+const int QUENTE = 16;
+const int SECO = 15;
 
 DHT dht(PINO_DHT, DHT11);
 
@@ -942,8 +945,8 @@ c = Circuito('placa', 'esp-04', 80, 100)
 c.led('carro_vermelho', 'GPIO14', 'GND', 'vermelho', 330, 20, VERMELHO)
 c.led('carro_amarelo', 'GPIO12', 'GND', 'amarelo', 330, 110, AMARELO)
 c.led('carro_verde', 'GPIO13', 'GND', 'verde', 330, 200, VERDE)
-c.led('pedestre_vermelho', 'GPIO5', 'GND', 'vermelho', 470, 60, VERMELHO)
-c.led('pedestre_verde', 'GPIO4', 'GND', 'verde', 470, 150, VERDE)
+c.led('pedestre_vermelho', 'GPIO15', 'GND', 'vermelho', 470, 60, VERMELHO)
+c.led('pedestre_verde', 'GPIO2', 'GND', 'verde', 470, 150, VERDE)
 c.botao('botao', 'GPIO0', 'GND', 440, 250)
 c.buzzer('buzzer', 'GPIO16', 'GND', 560, 230)
 
@@ -954,12 +957,15 @@ gravar('esp04-semaforo-pedestre', r'''
 // carros passa pelo amarelo e fecha, o do pedestre abre com um bipe
 // ritmado (o sinal sonoro para quem nao enxerga) e, no fim, o vermelho do
 // pedestre pisca avisando que vai fechar.
+//
+// O ESP-04 traz sete GPIO para fora (0, 2, 12, 13, 14, 15 e 16) e esta
+// demo usa os sete.
 
 const int CARRO_VERMELHO = 14;
 const int CARRO_AMARELO = 12;
 const int CARRO_VERDE = 13;
-const int PEDESTRE_VERMELHO = 5;
-const int PEDESTRE_VERDE = 4;
+const int PEDESTRE_VERMELHO = 15;
+const int PEDESTRE_VERDE = 2;
 const int BOTAO = 0;
 const int BUZZER = 16;
 
@@ -1129,9 +1135,9 @@ c.led('vermelho', 'GPIO16', 'GND', 'vermelho', 330, 20, VERMELHO)
 c.led('verde', 'GPIO14', 'GND', 'verde', 430, 20, VERDE)
 c.led('azul', 'GPIO12', 'GND', 'azul', 530, 20, AZUL)
 c.botao('b_vermelho', 'GPIO13', 'GND', 300, 150, VERMELHO)
-c.botao('b_verde', 'GPIO5', 'GND', 400, 150, VERDE)
+c.botao('b_verde', 'GPIO2', 'GND', 400, 150, VERDE)
 c.botao('b_azul', 'GPIO0', 'GND', 500, 150, AZUL)
-c.buzzer('buzzer', 'GPIO4', 'GND', 420, 240)
+c.buzzer('buzzer', 'GPIO15', 'GND', 420, 240)
 
 gravar('esp06-genius', r'''
 // Genius, num ESP-06.
@@ -1143,9 +1149,9 @@ gravar('esp06-genius', r'''
 // Aperte qualquer botao para comecar.
 
 const int LEDS[] = {16, 14, 12};       // vermelho, verde, azul
-const int BOTOES[] = {13, 5, 0};
+const int BOTOES[] = {13, 2, 0};
 const int NOTAS[] = {262, 330, 392};   // do, mi, sol
-const int BUZZER = 4;
+const int BUZZER = 15;
 const int MAXIMO = 20;
 
 int sequencia[MAXIMO];
@@ -1407,14 +1413,15 @@ c = Circuito('placa', 'esp-09', 80, 100)
 # Os sete pontos na posicao do dado: grupos que acendem juntos dividem o pino.
 PONTOS = [
     ('d_sup_esq', 'GPIO14', 330, 20),  ('d_sup_dir', 'GPIO12', 470, 20),
-    ('d_meio_esq', 'GPIO13', 330, 110), ('d_centro', 'GPIO16', 400, 110),
+    ('d_meio_esq', 'GPIO13', 330, 110),
     ('d_meio_dir', 'GPIO13', 470, 110),
     ('d_inf_esq', 'GPIO12', 330, 200), ('d_inf_dir', 'GPIO14', 470, 200),
 ]
 for id, pino, x, y in PONTOS:
     c.led(id, pino, 'GND', 'vermelho', x, y, VERMELHO)
-c.botao('botao', 'GPIO5', 'GND', 320, 300)
-c.buzzer('buzzer', 'GPIO4', 'GND', 470, 290)
+c.led_ativo_baixo('d_centro', 'GPIO0', 'VCC', 'vermelho', 400, 110, VERMELHO)
+c.botao('botao', 'GPIO2', 'GND', 320, 300)
+c.buzzer('buzzer', 'GPIO15', 'GND', 470, 290)
 
 gravar('esp09-dado', r'''
 // Dado eletronico, num ESP-09.
@@ -1425,16 +1432,21 @@ gravar('esp09-dado', r'''
 //
 // Sao sete LEDs e so quatro pinos: os pontos que acendem sempre juntos
 // dividem o pino. No 6, por exemplo, as duas colunas acendem inteiras.
+//
+// O ESP-09 so traz seis GPIO para fora (0, 2, 12, 13, 14 e 15), e tres
+// deles mandam na partida: o GPIO0 e o GPIO2 tem que estar em HIGH, o
+// GPIO15 em LOW. Por isso o ponto do centro vai entre o 3,3 V e o GPIO0
+// (acende com LOW), o botao fica no GPIO2 e o buzzer no GPIO15.
 
-const int CENTRO = 16;      // o do meio
+const int CENTRO = 0;       // o do meio, acende com LOW
 const int DIAGONAL1 = 14;   // canto de cima a esquerda e de baixo a direita
 const int DIAGONAL2 = 12;   // os outros dois cantos
 const int MEIO = 13;        // meio da esquerda e meio da direita
-const int BOTAO = 5;
-const int BUZZER = 4;
+const int BOTAO = 2;
+const int BUZZER = 15;
 
 void mostrar(int n) {
-  digitalWrite(CENTRO, n == 1 || n == 3 || n == 5);
+  digitalWrite(CENTRO, (n == 1 || n == 3 || n == 5) ? LOW : HIGH);
   digitalWrite(DIAGONAL1, n >= 2);
   digitalWrite(DIAGONAL2, n >= 4);
   digitalWrite(MEIO, n == 6);
@@ -1574,7 +1586,7 @@ demo('esp10-ponte-serial-web', 'Ponte entre a serial e uma página web', 'ESP-10
 # =====================================================================
 
 c = Circuito('placa', 'esp-11', 80, 100)
-c.led_ativo_baixo('luz', 'GPIO2', 'VCC', 'branco', 330, 50, BRANCO)
+c.led_ativo_baixo('luz', 'RXD', 'VCC', 'branco', 330, 50, BRANCO)
 c.botao('botao', 'GPIO0', 'GND', 300, 170)
 
 gravar('esp11-minuteria', r'''
@@ -1584,11 +1596,13 @@ gravar('esp11-minuteria', r'''
 // apagar, avisando quem ainda esta na escada. Segurar o botao por 2 s
 // deixa a luz fixa (modo faxina); outro toque volta ao normal.
 //
-// Como no ESP-01: o GPIO2 precisa estar em HIGH na partida, entao a
-// lampada (o LED) vai entre o 3,3 V e o pino, e acende com LOW.
+// O ESP-11 so traz para fora o GPIO0 e os pinos da serial (o TX e o
+// GPIO1, o RX e o GPIO3). A lampada (o LED) vai no RX, entre o 3,3 V e
+// o pino, e acende com LOW -- e o sketch nao abre a Serial, que tomaria
+// o pino de volta.
 
 const int BOTAO = 0;   // GPIO0
-const int LUZ = 2;     // GPIO2, acende com LOW
+const int LUZ = 3;     // RXD (GPIO3), acende com LOW
 
 const unsigned long TEMPO_ACESA = 10000;
 const unsigned long TOQUE_LONGO = 2000;
@@ -1603,11 +1617,9 @@ void luz(bool ligar) {
 }
 
 void setup() {
-  Serial.begin(115200);
   pinMode(BOTAO, INPUT_PULLUP);
   pinMode(LUZ, OUTPUT);
   luz(false);
-  Serial.println("Minuteria pronta");
 }
 
 void loop() {
@@ -1618,16 +1630,13 @@ void loop() {
     if (millis() - apertou >= TOQUE_LONGO) {
       fixa = true;
       luz(true);
-      Serial.println("luz fixa (modo faxina)");
       while (digitalRead(BOTAO) == LOW) delay(10);   // espera soltar
     } else if (fixa) {
       fixa = false;
       luz(false);
-      Serial.println("de volta ao modo normal");
     } else {
       luz(true);
       acendeuEm = millis();
-      Serial.println("acendeu por 10 s");
     }
   }
 
@@ -1635,7 +1644,6 @@ void loop() {
     unsigned long passou = millis() - acendeuEm;
     if (passou > TEMPO_ACESA) {
       luz(false);
-      Serial.println("apagou");
     } else if (passou > TEMPO_ACESA - 1000 && passou < TEMPO_ACESA - 700) {
       digitalWrite(LUZ, HIGH);   // a piscada de aviso
     } else {
@@ -2094,131 +2102,146 @@ demo('esp13-fechadura', 'Fechadura com teclado e senha', 'ESP-13')
 
 
 # =====================================================================
-#  ESP-14: placar de jogo no OLED
+#  ESP-14: placar no anel de LEDs, pelo MQTT
 # =====================================================================
 
 c = Circuito('placa', 'esp-14', 80, 100)
-c.peca('oled', 'ssd1306-i2c', 330, 10)
-c.ligar('oled', 'GND', 'placa', 'GND', PRETO)
-c.ligar('oled', 'VCC', 'placa', 'VCC', VERMELHO)
-c.ligar('oled', 'SDA', 'placa', 'GPIO4', AZUL)
-c.ligar('oled', 'SCL', 'placa', 'GPIO5', ROXO)
-c.botao('time_a', 'GPIO14', 'GND', 300, 160, VERMELHO)
-c.botao('time_b', 'GPIO12', 'GND', 400, 160, AZUL)
-c.botao('zerar', 'GPIO13', 'GND', 500, 160, CINZA)
-c.buzzer('buzzer', 'GPIO16', 'GND', 420, 240)
+c.peca('anel', 'led-ring', 320, 20)
+c.ligar('anel', 'GND', 'placa', 'GND', PRETO)
+c.ligar('anel', 'VCC', 'placa', 'VCC', VERMELHO)
+c.ligar('anel', 'DIN', 'placa', 'GPIO0', VERDE)
 
 gravar('esp14-placar', r'''
-// Placar de jogo, num ESP-14.
+// Placar no anel de LEDs, pelo MQTT, num ESP-14.
 //
-// Um botao para cada time soma um ponto; o terceiro, segurado por 1 s,
-// zera o jogo. O placar aparece no OLED, o buzzer apita a cada ponto -- e
-// toca uma fanfarra quando alguem chega a 10.
+// O ESP-14 junta um ESP8266 e um STM8S003 num modulo so, e quase todos os
+// pinos de fora sao do STM8: do ESP8266 so sai o GPIO0. Aqui roda so o
+// ESP8266 (e ele que o Arduino programa) -- e um pino basta, porque o anel
+// de 16 NeoPixels conversa por um fio so.
 //
-// (O ESP-14 tem um microcontrolador STM8 junto do ESP8266. Aqui so o
-// ESP8266 e usado: e ele que roda o sketch do Arduino.)
+// Os pontos chegam pelo MQTT:
+//   placar/ponto   "a" ou "b" (um ponto para o time)
+//   placar/zerar   qualquer coisa
+// O time A acende em vermelho a partir do topo, no sentido horario; o B em
+// azul, no anti-horario. Quem chega a 8 vence, e o anel pisca na cor dele.
+//
+// Na bancada: o GPIO0 precisa estar em HIGH na partida, e o DIN do anel nao
+// puxa o pino para lado nenhum. A serial do ESP8266 vai para o STM8 de
+// dentro do modulo; o monitor mostra o que ela diria.
 
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include <ESP8266WiFi.h>
+#include <PubSubClient.h>
+#include <Adafruit_NeoPixel.h>
 
-const int BOTAO_A = 14;
-const int BOTAO_B = 12;
-const int ZERAR = 13;
-const int BUZZER = 16;
-const int VENCE = 10;
+const int PINO_ANEL = 0;     // E_GPIO0, o unico do ESP8266 para fora
+const int QUANTOS = 16;
+const int VENCE = 8;
 
-Adafruit_SSD1306 tela(128, 64, &Wire, -1);
+Adafruit_NeoPixel anel(QUANTOS, PINO_ANEL, NEO_GRB + NEO_KHZ800);
+WiFiClient rede;
+PubSubClient mqtt(rede);
 
 int pontosA = 0;
 int pontosB = 0;
-int antesA = HIGH;
-int antesB = HIGH;
 
 void desenhar() {
-  tela.clearDisplay();
-  tela.setTextSize(1);
-  tela.setCursor(0, 0);
-  tela.print(" TIME A    TIME B");
-  tela.setTextSize(3);
-  tela.setCursor(12, 24);
-  if (pontosA < 10) tela.print(" ");
-  tela.print(pontosA);
-  tela.print(" x ");
-  tela.print(pontosB);
-  tela.display();
+  anel.clear();
+  for (int i = 0; i < pontosA; i++) anel.setPixelColor(i, anel.Color(255, 0, 0));
+  for (int i = 0; i < pontosB; i++) anel.setPixelColor(QUANTOS - 1 - i, anel.Color(0, 0, 255));
+  anel.show();
 }
 
-void fanfarra() {
-  int notas[] = {523, 659, 784, 1047};
-  for (int i = 0; i < 4; i++) {
-    tone(BUZZER, notas[i], 150);
-    delay(180);
+void comemorar(uint32_t cor) {
+  for (int vez = 0; vez < 4; vez++) {
+    anel.fill(cor);
+    anel.show();
+    delay(250);
+    anel.clear();
+    anel.show();
+    delay(250);
   }
 }
 
-void marcou(bool timeA) {
-  if (timeA) pontosA++;
-  else pontosB++;
-  tone(BUZZER, 1500, 60);
-  Serial.print(timeA ? "ponto do time A: " : "ponto do time B: ");
-  Serial.print(pontosA);
-  Serial.print(" x ");
-  Serial.println(pontosB);
-  desenhar();
+void publicar() {
+  String placar = String(pontosA) + " x " + String(pontosB);
+  mqtt.publish("placar/estado", placar.c_str(), true);
+  Serial.print("placar: ");
+  Serial.println(placar);
+}
 
-  if (pontosA >= VENCE || pontosB >= VENCE) {
-    Serial.println(timeA ? "o time A venceu!" : "o time B venceu!");
-    fanfarra();
+void chegou(char* topico, byte* dados, unsigned int tamanho) {
+  String valor;
+  for (unsigned int i = 0; i < tamanho; i++) valor += (char)dados[i];
+  valor.trim();
+  valor.toLowerCase();
+  bool emJogo = pontosA < VENCE && pontosB < VENCE;
+
+  if (String(topico) == "placar/zerar") {
+    pontosA = 0;
+    pontosB = 0;
+  } else if (valor == "a" && emJogo) {
+    pontosA++;
+  } else if (valor == "b" && emJogo) {
+    pontosB++;
+  }
+  desenhar();
+  publicar();
+
+  if (emJogo && (pontosA == VENCE || pontosB == VENCE)) {
+    Serial.println(pontosA == VENCE ? "o time A venceu!" : "o time B venceu!");
+    comemorar(pontosA == VENCE ? anel.Color(255, 0, 0) : anel.Color(0, 0, 255));
+    desenhar();
+  }
+}
+
+void conectar() {
+  // ID unico no broker: o MAC da placa.
+  String id = "placar-" + WiFi.macAddress();
+  id.replace(":", "");
+
+  while (!mqtt.connected()) {
+    Serial.print("broker... ");
+    if (mqtt.connect(id.c_str())) {
+      Serial.println("ok");
+      mqtt.subscribe("placar/ponto");
+      mqtt.subscribe("placar/zerar");
+      publicar();
+    } else {
+      Serial.println("falhou, tento de novo em 2 s");
+      delay(2000);
+    }
   }
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(BOTAO_A, INPUT_PULLUP);
-  pinMode(BOTAO_B, INPUT_PULLUP);
-  pinMode(ZERAR, INPUT_PULLUP);
-  Wire.begin();   // SDA no GPIO4, SCL no GPIO5
-  tela.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-  tela.setTextColor(SSD1306_WHITE);
+  anel.begin();
+  anel.setBrightness(40);
   desenhar();
+
+  WiFi.begin("Wokwi-GUEST", "");
+  while (WiFi.status() != WL_CONNECTED) delay(250);
+  mqtt.setServer("broker.hivemq.com", 1883);
+  mqtt.setCallback(chegou);
 }
 
 void loop() {
-  int a = digitalRead(BOTAO_A);
-  int b = digitalRead(BOTAO_B);
-  if (antesA == HIGH && a == LOW) marcou(true);
-  if (antesB == HIGH && b == LOW) marcou(false);
-  antesA = a;
-  antesB = b;
-
-  if (digitalRead(ZERAR) == LOW) {
-    unsigned long desde = millis();
-    while (digitalRead(ZERAR) == LOW) {
-      if (millis() - desde > 1000) {
-        pontosA = 0;
-        pontosB = 0;
-        tone(BUZZER, 400, 300);
-        Serial.println("placar zerado");
-        desenhar();
-        while (digitalRead(ZERAR) == LOW) delay(10);
-      }
-      delay(10);
-    }
-  }
-  delay(15);
+  if (!mqtt.connected()) conectar();
+  mqtt.loop();
+  delay(10);
 }
 ''', c, '''
-Placar de jogo no OLED, num ESP-14.
+Placar no anel de LEDs, pelo MQTT, num ESP-14.
 
 O que esta demo mostra:
-- deteccao de borda (o ponto conta uma vez por aperto, e nao enquanto o
-  botao esta segurado) e toque longo para zerar;
-- o OLED I2C atualizado so quando o placar muda.
+- o ESP-14 por dentro: dos pinos de fora, so o GPIO0 e do ESP8266, e um
+  pino basta para um anel de NeoPixels;
+- os pontos chegando pelo MQTT e o placar publicado como mensagem retida.
 
-Aperte F5 e os botoes dos times. Segure o terceiro por 1 s para zerar.
+Aperte F5 e, no painel REDE, publique "a" ou "b" em placar/ponto (e
+qualquer coisa em placar/zerar para recomecar).
 ''')
-demo('esp14-placar', 'Placar de jogo no OLED', 'ESP-14')
+demo('esp14-placar', 'Placar no anel de LEDs, pelo MQTT', 'ESP-14')
 
 
 # =====================================================================

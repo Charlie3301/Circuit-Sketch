@@ -403,10 +403,14 @@ public partial class EditorCircuito : Border
         ["stm32-bluepill"] = [(51.4, 141.35, 8.0, "RESET")],
         ["st-nucleo-l031k6"] = [(35.3, 182.0, 7.0, "RESET")],
         ["st-nucleo-c031c6"] = [(102.0, 105.8, 9.5, "USER"), (172.3, 105.8, 9.5, "RESET")],
+
+        // A NodeMCU (placas-esp8266.py, Alpha 25): as duas PTS820 do arquivo
+        // da placa. O FLASH leva o GPIO0 a LOW (o D3); o RST reinicia.
+        ["esp8266-nodemcu"] = [(25.5, 171.7, 4.9, "RST"), (72.5, 171.7, 4.9, "FLASH")],
     };
 
-    /// <summary>O botao da placa que vai num pino (BOOT das ESP32, BOOTSEL da Pico, USER da Nucleo-64), e nao o reset.</summary>
-    static bool EhBotaoDeBoot(string nome) => nome is "BOOT" or "BOOTSEL" or "USER";
+    /// <summary>O botao da placa que vai num pino (BOOT das ESP32, BOOTSEL da Pico, USER da Nucleo-64, FLASH da NodeMCU), e nao o reset.</summary>
+    static bool EhBotaoDeBoot(string nome) => nome is "BOOT" or "BOOTSEL" or "USER" or "FLASH";
 
     /// <summary>
     /// Os vinte botoes do controle remoto, com o codigo que cada um manda.
@@ -594,6 +598,29 @@ public partial class EditorCircuito : Border
             (120.8, 63.3, 3.4, LedTx, Color.FromRgb(0xFF, 0xC4, 0x2E)),
             (120.8, 72.0, 3.4, LedRx, Color.FromRgb(0xFF, 0xC4, 0x2E)),
         ],
+
+        // As ESP8266 (placas-esp8266.py, Alpha 25). O LED azul dos modulos vai
+        // do 3V3 ao GPIO2 e acende com LOW; na NodeMCU tem mais o da placa, no
+        // GPIO16 (o D0), do mesmo jeito. O ESP-01 tem o vermelho de energia e
+        // o azul no TX, que pisca com a serial; o ESP-07, o de energia e o do GPIO2.
+        ["esp8266-nodemcu"] =
+        [
+            (69.4, 26.3, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF)),
+            (33.5, 137.8, 3.0, LedInvertido + 16, Color.FromRgb(0x3B, 0x8C, 0xFF)),
+        ],
+        ["esp-01"] =
+        [
+            (4.9, 66.1, 3.0, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)),
+            (17.0, 66.1, 3.0, LedTx, Color.FromRgb(0x3B, 0x8C, 0xFF)),
+        ],
+        ["esp-07"] =
+        [
+            (53.7, 16.6, 3.0, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)),
+            (29.9, 17.4, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF)),
+        ],
+        ["esp-12"] = [(51.4, 26.3, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF))],
+        ["esp-12e"] = [(51.4, 26.3, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF))],
+        ["esp-12f"] = [(51.4, 26.3, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF))],
     };
 
     /// <summary>O LED da placa que acende so por ela estar ligada; o TX e o RX, que piscam com a serial.</summary>
@@ -5690,6 +5717,11 @@ public partial class EditorCircuito : Border
                 case "esp32-s2-devkit":
                 case "esp32-s3-devkit":
                     // BOOT segurado leva o GPIO 0 a LOW.
+                    maq.Pressionado[0] = BootPressionado.Contains(peca.Id);
+                    break;
+
+                case "esp8266-nodemcu":
+                    // O FLASH da NodeMCU vai do GPIO0 (o D3) ao GND.
                     maq.Pressionado[0] = BootPressionado.Contains(peca.Id);
                     break;
 

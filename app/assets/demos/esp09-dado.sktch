@@ -21,16 +21,21 @@
   "//",
   "// Sao sete LEDs e so quatro pinos: os pontos que acendem sempre juntos",
   "// dividem o pino. No 6, por exemplo, as duas colunas acendem inteiras.",
+  "//",
+  "// O ESP-09 so traz seis GPIO para fora (0, 2, 12, 13, 14 e 15), e tres",
+  "// deles mandam na partida: o GPIO0 e o GPIO2 tem que estar em HIGH, o",
+  "// GPIO15 em LOW. Por isso o ponto do centro vai entre o 3,3 V e o GPIO0",
+  "// (acende com LOW), o botao fica no GPIO2 e o buzzer no GPIO15.",
   "",
-  "const int CENTRO = 16;      // o do meio",
+  "const int CENTRO = 0;       // o do meio, acende com LOW",
   "const int DIAGONAL1 = 14;   // canto de cima a esquerda e de baixo a direita",
   "const int DIAGONAL2 = 12;   // os outros dois cantos",
   "const int MEIO = 13;        // meio da esquerda e meio da direita",
-  "const int BOTAO = 5;",
-  "const int BUZZER = 4;",
+  "const int BOTAO = 2;",
+  "const int BUZZER = 15;",
   "",
   "void mostrar(int n) {",
-  "  digitalWrite(CENTRO, n == 1 || n == 3 || n == 5);",
+  "  digitalWrite(CENTRO, (n == 1 || n == 3 || n == 5) ? LOW : HIGH);",
   "  digitalWrite(DIAGONAL1, n >= 2);",
   "  digitalWrite(DIAGONAL2, n >= 4);",
   "  digitalWrite(MEIO, n == 6);",
@@ -117,20 +122,6 @@
     "Ohms": 220
    },
    {
-    "Id": "d_centro",
-    "Tipo": "led",
-    "X": 400,
-    "Y": 110,
-    "Cor": "vermelho"
-   },
-   {
-    "Id": "r_d_centro",
-    "Tipo": "resistor",
-    "X": 328,
-    "Y": 156,
-    "Ohms": 220
-   },
-   {
     "Id": "d_meio_dir",
     "Tipo": "led",
     "X": 470,
@@ -171,6 +162,20 @@
     "X": 398,
     "Y": 246,
     "Ohms": 220
+   },
+   {
+    "Id": "d_centro",
+    "Tipo": "led",
+    "X": 400,
+    "Y": 110,
+    "Cor": "vermelho"
+   },
+   {
+    "Id": "r_d_centro",
+    "Tipo": "resistor",
+    "X": 328,
+    "Y": 156,
+    "Ohms": 330
    },
    {
     "Id": "botao",
@@ -260,30 +265,6 @@
    },
    {
     "DePeca": "placa",
-    "DePino": "GPIO16",
-    "ParaPeca": "r_d_centro",
-    "ParaPino": "1",
-    "Cor": "#D6202A",
-    "Estilo": "solto"
-   },
-   {
-    "DePeca": "r_d_centro",
-    "DePino": "2",
-    "ParaPeca": "d_centro",
-    "ParaPino": "A",
-    "Cor": "#D6202A",
-    "Estilo": "solto"
-   },
-   {
-    "DePeca": "d_centro",
-    "DePino": "C",
-    "ParaPeca": "placa",
-    "ParaPino": "GND",
-    "Cor": "#1A1A1A",
-    "Estilo": "solto"
-   },
-   {
-    "DePeca": "placa",
     "DePino": "GPIO13",
     "ParaPeca": "r_d_meio_dir",
     "ParaPino": "1",
@@ -356,7 +337,31 @@
    },
    {
     "DePeca": "placa",
-    "DePino": "GPIO5",
+    "DePino": "VCC",
+    "ParaPeca": "r_d_centro",
+    "ParaPino": "1",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "r_d_centro",
+    "DePino": "2",
+    "ParaPeca": "d_centro",
+    "ParaPino": "A",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "d_centro",
+    "DePino": "C",
+    "ParaPeca": "placa",
+    "ParaPino": "GPIO0",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "placa",
+    "DePino": "GPIO2",
     "ParaPeca": "botao",
     "ParaPino": "1.l",
     "Cor": "#1F6FEB",
@@ -372,7 +377,7 @@
    },
    {
     "DePeca": "placa",
-    "DePino": "GPIO4",
+    "DePino": "GPIO15",
     "ParaPeca": "buzzer",
     "ParaPino": "2",
     "Cor": "#F28C28",

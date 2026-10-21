@@ -186,7 +186,7 @@ public static class Demos
         new("esp12e-rgb-navegador", "Cor do LED RGB pelo navegador", "ESP-12E"),
         new("esp12f-luminaria-mqtt", "Luminária NeoPixel por MQTT", "ESP-12F"),
         new("esp13-fechadura", "Fechadura com teclado e senha", "ESP-13"),
-        new("esp14-placar", "Placar de jogo no OLED", "ESP-14"),
+        new("esp14-placar", "Placar no anel de LEDs, pelo MQTT", "ESP-14"),
 
         // ---- Arduino ----
         new("uno-botao",              "Botão e LED",       "Arduino Uno"),

@@ -190,8 +190,10 @@ public static partial class Autoteste
                     juntos.Add($"{perfil.Id}:{string.Join("=", g.Select(Base).Distinct())}");
             }
             saida.AppendLine("        juntos pelo GPIO: " + string.Join(", ", juntos));
-            Conferir("os pinos juntados pelo GPIO sao so os nomes repetidos de verdade (o morpho da Nucleo-64, o SDA/SCL do Arduino)",
-                juntos.All(j => j.StartsWith("st-nucleo-c031c6:", StringComparison.Ordinal) || j.Contains("SDA") || j.Contains("SCL")),
+            // O ESP-11 traz o TXD e, numa ilha a mais, o "GPIO1": e o mesmo pino do chip (o U0TXD).
+            Conferir("os pinos juntados pelo GPIO sao so os nomes repetidos de verdade (o morpho da Nucleo-64, o SDA/SCL do Arduino, o TXD/GPIO1 do ESP-11)",
+                juntos.All(j => j.StartsWith("st-nucleo-c031c6:", StringComparison.Ordinal) || j.Contains("SDA") || j.Contains("SCL")
+                                || j == "esp-11:TXD=GPIO1"),
                 string.Join(", ", juntos.Where(j => !j.StartsWith("st-nucleo-c031c6:", StringComparison.Ordinal))));
         }
     }

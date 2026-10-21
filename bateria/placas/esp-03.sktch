@@ -5,17 +5,17 @@
  "descricao": [
   "Teste da placa esp-03.",
   "",
-  "O pino GPIO4 da serigrafia é o GPIO 4. O LED tem que",
+  "O pino GPIO14 da serigrafia é o GPIO 14. O LED tem que",
   "piscar e o monitor tem que contar as piscadas."
  ],
  "codigo": [
   "// Bateria de testes — esp-03.",
   "//",
   "// Pisca o LED externo e conta as piscadas no monitor serial.",
-  "// O pino GPIO4 da serigrafia é o GPIO 4: se essa",
+  "// O pino GPIO14 da serigrafia é o GPIO 14: se essa",
   "// tradução estiver errada, o LED fica apagado sem dar erro.",
   "",
-  "const int LED = 4;",
+  "const int LED = 14;",
   "int piscadas = 0;",
   "",
   "void setup() {",
@@ -61,7 +61,7 @@
   "Fios": [
    {
     "DePeca": "placa",
-    "DePino": "GPIO4",
+    "DePino": "GPIO14",
     "ParaPeca": "led",
     "ParaPino": "A",
     "Cor": "#00A651"

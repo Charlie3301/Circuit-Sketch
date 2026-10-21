@@ -106,17 +106,24 @@ PINO_DA_PLACA = {
     'st-nucleo-c031c6': ('D5', 5),
 }
 
-# Os modulos ESP-xx: o GPIO que cada um traz para fora.
-for modulo in ('esp-01', 'esp-02', 'esp-11'):
+# Os modulos ESP-xx: o GPIO que cada um traz para fora (a pinagem de
+# verdade de cada modulo, Alpha 25).
+for modulo in ('esp-01', 'esp-02'):
     PINO_DA_PLACA[modulo] = ('GPIO2', 2)
 
 for modulo in ('esp-05', 'esp-10'):
     PINO_DA_PLACA[modulo] = ('TXD', 1)
 
-PINO_DA_PLACA['esp-09'] = ('GPIO4', 4)
+# O ESP-11 so traz o GPIO0 (e a serial); o ESP-14, so o GPIO0 do ESP8266
+# (o resto e do STM8S003 de dentro).
+for modulo in ('esp-11', 'esp-14'):
+    PINO_DA_PLACA[modulo] = ('GPIO0', 0)
 
-for modulo in ('esp-03', 'esp-04', 'esp-06', 'esp-07', 'esp-08',
-               'esp-12', 'esp-12e', 'esp-12f', 'esp-13', 'esp-14'):
+# Os sem GPIO4: o GPIO14, que nao manda na partida.
+for modulo in ('esp-03', 'esp-04', 'esp-06', 'esp-09'):
+    PINO_DA_PLACA[modulo] = ('GPIO14', 14)
+
+for modulo in ('esp-07', 'esp-08', 'esp-12', 'esp-12e', 'esp-12f', 'esp-13'):
     PINO_DA_PLACA[modulo] = ('GPIO4', 4)
 
 
