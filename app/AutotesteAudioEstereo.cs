@@ -53,6 +53,6 @@ public static partial class Autoteste
         Conferir("PCM5102A: o SCK no 3V3 (sem o clock), nao toca",
             Tocando(c => c.Fios.Single(f => f.DePino == "SCK").ParaPino = "3V3") is null);
         Conferir("PCM5102A: esta no catalogo, com desenho, na categoria dos modulos",
-            Catalogo.Obter("pcm5102a") is { Pinos.Count: 6 } && Pecas.Existe("pcm5102a"));
+            Catalogo.Obter("pcm5102a") is { Pinos.Count: 15 } && Pecas.Existe("pcm5102a"));
     }
 }

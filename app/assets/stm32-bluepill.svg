@@ -272,9 +272,9 @@
 <path d="M21.733 112.657 L40.441 93.949 L59.149 112.657 L40.441 131.364 Z" fill="#1f2023"/>
 <path d="M21.733 112.657 L40.441 93.949 L59.149 112.657 L40.441 131.364 Z" fill="url(#luz)"/>
 <circle cx="26.971" cy="112.657" r="1.852" fill="#383a3f"/>
-<text transform="translate(43.047 115.262) rotate(-45)" x="0" y="1.417" font-family="Arial" font-weight="normal" font-size="3.543" fill="#c3c6cb" text-anchor="middle">STM32</text>
+<text transform="translate(43.047 115.262) rotate(-45)" x="0" y="0.945" font-family="Arial" font-weight="normal" font-size="2.362" fill="#c3c6cb" text-anchor="middle">GH21K 93</text>
 <text transform="translate(40.441 112.657) rotate(-45)" x="0" y="1.172" font-family="Arial" font-weight="normal" font-size="2.929" fill="#c3c6cb" text-anchor="middle">F103C8T6</text>
-<text transform="translate(37.835 110.051) rotate(-45)" x="0" y="0.945" font-family="Arial" font-weight="normal" font-size="2.362" fill="#c3c6cb" text-anchor="middle">GH21K 93</text>
+<text transform="translate(37.835 110.051) rotate(-45)" x="0" y="1.417" font-family="Arial" font-weight="normal" font-size="3.543" fill="#c3c6cb" text-anchor="middle">STM32</text>
 <rect x="20.598" y="75.428" width="4.913" height="4.535" fill="#cfd3d8"/>
 <rect x="55.37" y="75.428" width="4.913" height="4.535" fill="#cfd3d8"/>
 <rect x="20.598" y="68.909" width="39.685" height="17.575" rx="8.787" fill="url(#metal)" stroke="#7c838b" stroke-width="0.302"/>

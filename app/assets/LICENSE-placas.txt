@@ -23,6 +23,11 @@ Internacional (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0/
     (github.com/adafruit/DS1307-breakout-board). Adafruit e uma marca
     registrada; o logotipo nao e reproduzido.
 
+  - max98357a.svg: derivado do projeto do Adafruit MAX98357 I2S Class-D Mono
+    Amp (produto 3006), (c) Adafruit Industries, CC BY-SA 3.0
+    (github.com/adafruit/Adafruit-MAX98357-I2S-Amp-Breakout). Adafruit e uma
+    marca registrada; o logotipo nao e reproduzido.
+
   - microsd-card.svg: derivado do projeto do SparkFun microSD Transflash
     Breakout (BOB-00544), (c) SparkFun Electronics, CC BY-SA 4.0
     (github.com/sparkfun/microSD_Transflash_Breakout). SparkFun e uma marca
@@ -56,5 +61,12 @@ uma foto de cima da placa; da Blue Pill, uma foto de cima (stm32-base.org).
 Nenhuma trilha nem arte da serigrafia foi copiada. STM32 e ST sao marcas
 registradas da STMicroelectronics; o nome do chip aparece so para
 identifica-lo, e o logotipo nao e reproduzido.
+
+Os modulos nrf24l01.svg, pcm5102a.svg e modulo-i2c.svg tambem sao desenhos
+proprios do CircuitSketch, com o lugar de cada peca medido em fotos: a do
+nRF24L01 e a foto "NRF24l01 Nordic Semiconductor radio.JPG" do Wikimedia
+Commons (Dmcole, CC BY-SA 3.0); a do PCM5102A, as fotos de frente e de verso
+do modulo GY-PCM5102; a do adaptador I2C, a do guia da Handson Technology.
+Nenhuma foto e reproduzida.
 
 O restante do CircuitSketch nao e afetado por esta licenca.

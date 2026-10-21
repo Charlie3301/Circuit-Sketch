@@ -119,11 +119,12 @@ nrf = f'''<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
   <text x="2.4" y="27.2" fill="#9dbbd9" font-size="1.3px">NRF24L01</text>
 </svg>
 '''
-guardar('nrf24l01', nrf, lnrf, anrf, [
-    (nome, x, y, (['power'] if nome in ('GND', 'VCC') else ['spi']), '')
-    for y, par in zip(linhas, nomes)
-    for x, nome in zip(colunas, par)
-])
+# o nrf24l01 tambem foi refeito na Alpha 25 (pecas-nrf24l01.py): fica de fora
+# guardar('nrf24l01', nrf, lnrf, anrf, [
+#     (nome, x, y, (['power'] if nome in ('GND', 'VCC') else ['spi']), '')
+#     for y, par in zip(linhas, nomes)
+#     for x, nome in zip(colunas, par)
+# ])
 
 
 cam = BASE + 'app/assets/pecas.json'

@@ -521,9 +521,9 @@
 <rect x="21.808" y="110.854" width="26.457" height="26.457" rx="1.323" fill="#1f2023"/>
 <rect x="21.808" y="110.854" width="26.457" height="26.457" rx="1.323" fill="url(#luz)"/>
 <circle cx="25.512" cy="114.557" r="1.852" fill="#383a3f"/>
-<text transform="translate(35.036 128.013) rotate(0)" x="0" y="1.512" font-family="Arial" font-weight="normal" font-size="3.78" fill="#c3c6cb" text-anchor="middle">STM32</text>
+<text transform="translate(35.036 128.013) rotate(0)" x="0" y="0.983" font-family="Arial" font-weight="normal" font-size="2.457" fill="#c3c6cb" text-anchor="middle">GH24Q 97</text>
 <text transform="translate(35.036 124.082) rotate(0)" x="0" y="1.247" font-family="Arial" font-weight="normal" font-size="3.118" fill="#c3c6cb" text-anchor="middle">L031K6T6</text>
-<text transform="translate(35.036 120.151) rotate(0)" x="0" y="0.983" font-family="Arial" font-weight="normal" font-size="2.457" fill="#c3c6cb" text-anchor="middle">GH24Q 97</text>
+<text transform="translate(35.036 120.151) rotate(0)" x="0" y="1.512" font-family="Arial" font-weight="normal" font-size="3.78" fill="#c3c6cb" text-anchor="middle">STM32</text>
 <rect x="22.942" y="157.682" width="12.094" height="5.669" rx="0.567" fill="#8f7b52"/>
 <rect x="23.603" y="158.343" width="10.772" height="4.346" rx="0.454" fill="url(#metal)"/>
 <rect x="47.887" y="159.761" width="7.559" height="7.559" rx="0.378" fill="#1f2023"/>

@@ -8736,62 +8736,62 @@
  },
  {
   "id": "max98357a",
-  "largura": 77,
-  "altura": 73,
+  "largura": 67,
+  "altura": 72,
   "pinos": [
    {
     "nome": "OUT+",
-    "x": 31.79,
-    "y": 1.13,
+    "x": 40.03,
+    "y": 13.44,
     "sinais": [],
     "descricao": "Alto-falante, positivo (4 a 8 ohms)"
    },
    {
     "nome": "OUT-",
-    "x": 45.01,
-    "y": 1.13,
+    "x": 26.8,
+    "y": 13.44,
     "sinais": [],
     "descricao": "Alto-falante, negativo"
    },
    {
     "nome": "LRC",
-    "x": 9.6,
-    "y": 67.28,
+    "x": 4.8,
+    "y": 62.4,
     "sinais": [],
     "descricao": "Relogio das palavras do I2S (WS, LRCLK)"
    },
    {
     "nome": "BCLK",
-    "x": 19.2,
-    "y": 67.28,
+    "x": 14.4,
+    "y": 62.4,
     "sinais": [],
     "descricao": "Relogio dos bits do I2S"
    },
    {
     "nome": "DIN",
-    "x": 28.8,
-    "y": 67.28,
+    "x": 24.0,
+    "y": 62.4,
     "sinais": [],
     "descricao": "Dados do I2S: o som"
    },
    {
     "nome": "GAIN",
-    "x": 38.4,
-    "y": 67.28,
+    "x": 33.6,
+    "y": 62.4,
     "sinais": [],
     "descricao": "Ganho: solto = 9 dB, no GND = 12 dB, no VIN = 6 dB"
    },
    {
     "nome": "SD",
-    "x": 48.0,
-    "y": 67.28,
+    "x": 43.2,
+    "y": 62.4,
     "sinais": [],
     "descricao": "No GND desliga o amplificador; solto, toca a media dos dois canais"
    },
    {
     "nome": "GND",
-    "x": 57.6,
-    "y": 67.28,
+    "x": 52.8,
+    "y": 62.4,
     "sinais": [
      "power"
     ],
@@ -8799,8 +8799,8 @@
    },
    {
     "nome": "VIN",
-    "x": 67.2,
-    "y": 67.28,
+    "x": 62.4,
+    "y": 62.4,
     "sinais": [
      "power"
     ],
@@ -8977,13 +8977,13 @@
  },
  {
   "id": "modulo-i2c",
-  "largura": 204,
+  "largura": 157,
   "altura": 72,
   "pinos": [
    {
     "nome": "VSS",
-    "x": 11.34,
-    "y": 7.18,
+    "x": 149.29,
+    "y": 5.67,
     "sinais": [
      "power"
     ],
@@ -8991,8 +8991,8 @@
    },
    {
     "nome": "VDD",
-    "x": 20.94,
-    "y": 7.18,
+    "x": 139.69,
+    "y": 5.67,
     "sinais": [
      "power"
     ],
@@ -9000,106 +9000,106 @@
    },
    {
     "nome": "V0",
-    "x": 30.54,
-    "y": 7.18,
+    "x": 130.09,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "RS",
-    "x": 40.14,
-    "y": 7.18,
+    "x": 120.49,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "RW",
-    "x": 49.74,
-    "y": 7.18,
+    "x": 110.89,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "E",
-    "x": 59.34,
-    "y": 7.18,
+    "x": 101.29,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D0",
-    "x": 68.94,
-    "y": 7.18,
+    "x": 91.69,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D1",
-    "x": 78.54,
-    "y": 7.18,
+    "x": 82.09,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D2",
-    "x": 88.14,
-    "y": 7.18,
+    "x": 72.49,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D3",
-    "x": 97.74,
-    "y": 7.18,
+    "x": 62.89,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D4",
-    "x": 107.34,
-    "y": 7.18,
+    "x": 53.29,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D5",
-    "x": 116.94,
-    "y": 7.18,
+    "x": 43.69,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D6",
-    "x": 126.54,
-    "y": 7.18,
+    "x": 34.09,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "D7",
-    "x": 136.14,
-    "y": 7.18,
+    "x": 24.49,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A",
-    "x": 145.74,
-    "y": 7.18,
+    "x": 14.89,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "K",
-    "x": 155.34,
-    "y": 7.18,
+    "x": 5.29,
+    "y": 5.67,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "GND",
-    "x": 22.68,
-    "y": 62.74,
+    "x": 151.18,
+    "y": 22.3,
     "sinais": [
      "power"
     ],
@@ -9107,8 +9107,8 @@
    },
    {
     "nome": "VCC",
-    "x": 32.28,
-    "y": 62.74,
+    "x": 151.18,
+    "y": 31.9,
     "sinais": [
      "power"
     ],
@@ -9116,15 +9116,15 @@
    },
    {
     "nome": "SDA",
-    "x": 41.88,
-    "y": 62.74,
+    "x": 151.18,
+    "y": 41.5,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "SCL",
-    "x": 51.48,
-    "y": 62.74,
+    "x": 151.18,
+    "y": 51.1,
     "sinais": [],
     "descricao": ""
    }
@@ -10160,80 +10160,80 @@
  },
  {
   "id": "nrf24l01",
-  "largura": 64,
+  "largura": 57,
   "altura": 110,
   "pinos": [
    {
     "nome": "GND",
-    "x": 9.07,
-    "y": 12.09,
+    "x": 49.93,
+    "y": 4.8,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Terra."
    },
    {
     "nome": "VCC",
-    "x": 18.67,
-    "y": 12.09,
+    "x": 49.93,
+    "y": 14.4,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao: 1,9 a 3,6 V (no 3V3; 5 V queima o modulo)."
    },
    {
     "nome": "CE",
-    "x": 9.07,
-    "y": 21.69,
+    "x": 40.33,
+    "y": 4.8,
     "sinais": [
      "spi"
     ],
-    "descricao": ""
+    "descricao": "Chip Enable: liga a transmissao ou a recepcao."
    },
    {
     "nome": "CSN",
-    "x": 18.67,
-    "y": 21.69,
+    "x": 40.33,
+    "y": 14.4,
     "sinais": [
      "spi"
     ],
-    "descricao": ""
+    "descricao": "Chip Select do SPI (ativo em LOW)."
    },
    {
     "nome": "SCK",
-    "x": 9.07,
-    "y": 31.29,
+    "x": 30.73,
+    "y": 4.8,
     "sinais": [
      "spi"
     ],
-    "descricao": ""
+    "descricao": "Relogio do SPI."
    },
    {
     "nome": "MOSI",
-    "x": 18.67,
-    "y": 31.29,
+    "x": 30.73,
+    "y": 14.4,
     "sinais": [
      "spi"
     ],
-    "descricao": ""
+    "descricao": "Dados do SPI, da placa para o radio."
    },
    {
     "nome": "MISO",
-    "x": 9.07,
-    "y": 40.89,
+    "x": 21.13,
+    "y": 4.8,
     "sinais": [
      "spi"
     ],
-    "descricao": ""
+    "descricao": "Dados do SPI, do radio para a placa."
    },
    {
     "nome": "IRQ",
-    "x": 18.67,
-    "y": 40.89,
+    "x": 21.13,
+    "y": 14.4,
     "sinais": [
      "spi"
     ],
-    "descricao": ""
+    "descricao": "Interrupcao (ativa em LOW): chegou pacote ou terminou o envio."
    }
   ],
   "variantes": [],
@@ -10344,54 +10344,123 @@
  },
  {
   "id": "pcm5102a",
-  "largura": 121,
-  "altura": 83,
+  "largura": 64,
+  "altura": 121,
   "pinos": [
    {
-    "nome": "VIN",
-    "x": 36.47,
-    "y": 73.32,
+    "nome": "LROUT",
+    "sinais": [],
+    "x": 5.29,
+    "y": 13.76,
+    "descricao": "Saida de linha do canal esquerdo (a mesma do P2)."
+   },
+   {
+    "nome": "AGND",
     "sinais": [
      "power"
     ],
-    "descricao": "VIN: 3,3 a 5 V (o regulador da placa faz os 3,3 V do chip)"
+    "x": 5.29,
+    "y": 23.36,
+    "descricao": "Terra analogico (o mesmo GND do modulo)."
    },
    {
-    "nome": "GND",
-    "x": 46.07,
-    "y": 73.32,
+    "nome": "ROUT",
+    "sinais": [],
+    "x": 5.29,
+    "y": 32.96,
+    "descricao": "Saida de linha do canal direito (a mesma do P2)."
+   },
+   {
+    "nome": "AGND.2",
     "sinais": [
      "power"
     ],
-    "descricao": "GND: o GND da placa"
+    "x": 5.29,
+    "y": 42.56,
+    "descricao": "Terra analogico (o mesmo GND do modulo)."
    },
    {
-    "nome": "LCK",
-    "x": 55.67,
-    "y": 73.32,
-    "sinais": [],
-    "descricao": "LCK (LRCK, WS): o canal da vez -- o pino de WS do I2S da placa"
+    "nome": "A3V3",
+    "sinais": [
+     "power"
+    ],
+    "x": 5.29,
+    "y": 52.16,
+    "descricao": "Os 3,3 V do regulador analogico do modulo (saida; nao alimentar por aqui)."
    },
    {
-    "nome": "DIN",
-    "x": 65.27,
-    "y": 73.32,
+    "nome": "FMT",
     "sinais": [],
-    "descricao": "DIN: os dados do audio -- o pino de saida de dados do I2S da placa (DOUT)"
+    "x": 5.29,
+    "y": 61.76,
+    "descricao": "Formato do audio: LOW (de fabrica, jumper H4) e I2S; em HIGH o chip le left-justified e o som sai errado."
    },
    {
-    "nome": "BCK",
-    "x": 74.87,
-    "y": 73.32,
+    "nome": "XSMT",
     "sinais": [],
-    "descricao": "BCK: o clock dos bits -- o pino de BCLK do I2S da placa"
+    "x": 5.29,
+    "y": 71.36,
+    "descricao": "Mudo suave: HIGH (de fabrica, jumper H3) toca; em LOW (no GND, ou um pino em LOW) o modulo emudece."
+   },
+   {
+    "nome": "DEMP",
+    "sinais": [],
+    "x": 5.29,
+    "y": 80.96,
+    "descricao": "De-enfase de 44,1 kHz: LOW de fabrica (jumper H2)."
+   },
+   {
+    "nome": "FLT",
+    "sinais": [],
+    "x": 5.29,
+    "y": 90.56,
+    "descricao": "Filtro digital: LOW (de fabrica, jumper H1) e o normal; HIGH e o de baixa latencia."
    },
    {
     "nome": "SCK",
-    "x": 84.47,
-    "y": 73.32,
+    "x": 7.56,
+    "y": 115.28,
     "sinais": [],
-    "descricao": "SCK: o clock mestre. Ligue no GND: o chip tira o clock do BCK sozinho"
+    "descricao": "Relogio do sistema: no GND (o jumper ao lado ja liga), o chip tira o relogio do BCK."
+   },
+   {
+    "nome": "BCK",
+    "x": 17.16,
+    "y": 115.28,
+    "sinais": [],
+    "descricao": "Relogio de bit do I2S (o BCLK da placa)."
+   },
+   {
+    "nome": "DIN",
+    "x": 26.76,
+    "y": 115.28,
+    "sinais": [],
+    "descricao": "Dados do I2S (o DOUT da placa)."
+   },
+   {
+    "nome": "LCK",
+    "x": 36.36,
+    "y": 115.28,
+    "sinais": [],
+    "descricao": "Canal esquerdo/direito do I2S (o LRCK, ou WS, da placa)."
+   },
+   {
+    "nome": "GND",
+    "x": 45.96,
+    "y": 115.28,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Terra."
+   },
+   {
+    "nome": "VIN",
+    "x": 55.56,
+    "y": 115.28,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Alimentacao: 3,3 a 5 V (os reguladores do modulo fazem os 3,3 V)."
    }
   ],
   "variantes": [],

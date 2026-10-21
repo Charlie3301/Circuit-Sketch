@@ -379,7 +379,17 @@ public static class Catalogo
         return ponto > 0 && ponto < pino.Length - 1 && pino[(ponto + 1)..].All(char.IsAsciiDigit) ? pino[..ponto] : pino;
     }
 
+    /// <summary>
+    /// As ligacoes de dentro de cada tipo de peca, guardadas: so dependem do
+    /// catalogo, e o netlist pede a mesma lista a cada vez que e refeito (no
+    /// arrastar de uma peca, a cada quadro).
+    /// </summary>
+    static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (string a, string b)[]> ligacoesInternas = new();
+
     public static IEnumerable<(string a, string b)> LigacoesInternas(string idPeca)
+        => idPeca is null ? [] : ligacoesInternas.GetOrAdd(idPeca, id => [.. CalcularLigacoesInternas(id)]);
+
+    static IEnumerable<(string a, string b)> CalcularLigacoesInternas(string idPeca)
     {
         // A juncao e um no so com quatro bordas: e para isso que ela
         // existe, juntar tres fios sem empilhar um por cima do outro.
@@ -433,6 +443,8 @@ public static class Catalogo
         if (idPeca == "lm2596") { yield return ("IN-", "OUT-"); yield break; }
         if (idPeca == "mt3608") { yield return ("VIN-", "VOUT-"); yield break; }
         if (idPeca is "a4988" or "drv8825") { yield return ("GND", "GND.2"); yield break; }
+        // O PCM5102A: o GND da barra e os dois AGND da lateral sao o mesmo terra.
+        if (idPeca == "pcm5102a") { yield return ("GND", "AGND"); yield return ("GND", "AGND.2"); yield break; }
         if (DriverDeMotor.De(idPeca) is not null && Obter(idPeca) is { } driver)
         {
             foreach (var grupo in driver.Pinos.GroupBy(p => p.Nome.Split('.')[0]).Where(g => g.Count() > 1))

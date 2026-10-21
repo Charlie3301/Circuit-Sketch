@@ -38,6 +38,10 @@ public partial class EditorCircuito
             (188.14, 141.66, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "canal3"),
             (255.34, 141.66, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "canal4"),
         ],
+        // Os LEDs de energia dos modulos (Alpha 25): o do adaptador I2C do LCD
+        // (modulo-i2c.py) e o do PCM5102A (pecas-pcm5102a.py).
+        ["modulo-i2c"] = [(22.3, 58.2, 0.6 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd")],
+        ["pcm5102a"] = [(58.6, 48.8, 0.6 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vin-gnd")],
         // O roteador (pecas-wifi-ap.py): energia, WiFi, clientes e internet.
         ["wifi-ap"] =
         [
@@ -128,6 +132,9 @@ public partial class EditorCircuito
         "rx" => ReceptorAlimentado(peca) && (ControleLigado() is not null || DateTime.Now.Millisecond < 500),
         "ir" => teclaDoControle.Count > 0 && EnergiaDoQuadro is { } conta
                 && conta.TensaoDoPino(peca.Id, "VCC") - conta.TensaoDoPino(peca.Id, "GND") >= 2.5,
+        // O LED de energia de um modulo: aceso com 2,5 V ou mais entre os pinos.
+        "vcc-gnd" => EnergiaDoQuadro is { } c1 && c1.TensaoDoPino(peca.Id, "VCC") - c1.TensaoDoPino(peca.Id, "GND") >= 2.5,
+        "vin-gnd" => EnergiaDoQuadro is { } c2 && c2.TensaoDoPino(peca.Id, "VIN") - c2.TensaoDoPino(peca.Id, "GND") >= 2.5,
         // O roteador: ligado com a simulacao rodando; o WiFi com a rede nomeada;
         // clientes com alguma placa conectada nela; internet com o "Usar internet".
         "ap-energia" => EmSimulacao,

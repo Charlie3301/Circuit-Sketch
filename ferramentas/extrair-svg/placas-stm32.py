@@ -110,7 +110,8 @@ def lqfp(d, cx, cy, corpo, n, passo, linhas, ang=0.0, perna=1.0):
         d.ret(o - larg / 2, m, larg, perna, 'url(#metal-h)')
         d.ret(-m - perna, o - larg / 2, perna, larg, 'url(#metal)')
         d.ret(m, o - larg / 2, perna, larg, 'url(#metal)')
-    pa.ci(d, corpo, corpo, linhas, pino1=(-m + corpo * 0.14, -m + corpo * 0.14))
+    # (o ci() conta as linhas de baixo para cima, como no Eagle; aqui o y desce)
+    pa.ci(d, corpo, corpo, list(reversed(linhas)), pino1=(-m + corpo * 0.14, -m + corpo * 0.14))
     d.sair()
 
 

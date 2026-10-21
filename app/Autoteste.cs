@@ -198,6 +198,7 @@ public static partial class Autoteste
         Bloco("Placas_Stm32", Placas_Stm32);
         Bloco("Rede_Roteador", Rede_Roteador);
         Bloco("Anotacao_TextoEJuncao", Anotacao_TextoEJuncao);
+        Bloco("Modulos_Desenho", Modulos_Desenho);
         Bloco("Leds_Familia", Leds_Familia);
         Bloco("Passivos_Desenho", Passivos_Desenho);
         Bloco("Outros_Desenho", Outros_Desenho);

@@ -496,6 +496,24 @@ def corpo(d, el):
         d.ret_c(2.0, 0, 3.2, 2.7, '#e6e2d6', rx=0.15, stroke='#8e8b82', sw=0.05)
         d.ret_c(2.0, 0, 2.6, 2.2, 'url(#metal)', rx=0.2)
         d.circ(2.0, 0, 0.85, '#f1efe8', stroke='#9a978e', sw=0.06)
+    elif nome == 'QFN16-3MM':
+        # o MAX98357A: o QFN de 3 mm, preto, sem pernas
+        ci(d, 3.0, 3.0, [('AKK', 0.5)], pino1=(-1.05, 1.05))
+    elif nome.startswith('TERMBLOCK-1X2'):
+        # o borne azul montado: cobre o contorno da serigrafia; os parafusos
+        # em cima de cada pino, e as bocas dos fios na frente (o lado -y)
+        xs = [v for w in pk.findall('wire') if w.get('layer') == '21' for v in (num(w, 'x1'), num(w, 'x2'))]
+        ys = [v for w in pk.findall('wire') if w.get('layer') == '21' for v in (num(w, 'y1'), num(w, 'y2'))]
+        x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+        d.ret(x0, y0, x1 - x0, y1 - y0, '#2f7fd6', rx=0.3, stroke='#1d5aa0', sw=0.1)
+        d.ret(x0, y0, x1 - x0, y1 - y0, 'url(#luz)', rx=0.3)
+        d.ret(x0 + 0.2, y0 + 0.1, x1 - x0 - 0.4, 1.4, '#2569b8', rx=0.2)
+        for pad in pk.findall('pad'):
+            x, y = num(pad, 'x'), num(pad, 'y')
+            d.ret_c(x, y0 + 0.75, 2.3, 1.0, '#0f1114', rx=0.2)
+            d.ret_c(x, y0 + 0.75, 1.6, 0.5, 'url(#metal)', rx=0.1)
+            d.circ(x, y, 1.25, 'url(#lata)', stroke='#6d747b', sw=0.08)
+            d.ret_c(x, y, 0.35, 1.9, '#5b6168', rx=0.1)
     elif nome == 'MLF32':
         pernas_smd(d, pk, 2.5, 2.5)
         ci(d, 5.0, 5.0, [('MEGA16U2', 0.62), ('-MU', 0.5), ('1925', 0.45)], pino1=(-1.9, 1.9))
@@ -619,10 +637,11 @@ def pinos_reais(placa, peca, cfg):
     sao achatados na horizontal). Os nomes saem da ordem dos pads de cada
     barra; o resto de cada pino (sinais, descricao) fica como estava."""
     a = 96 / 25.4
+    antes = cfg.get('antes_mm', 4)          # a caixa comeca antes da placa (4 mm no Uno; 0 nos modulos)
     xs = [num(w, k) for w in placa.plain if w.tag == 'wire' and w.get('layer') == '20' for k in ('x1', 'x2')]
     ys = [num(w, k) for w in placa.plain if w.tag == 'wire' and w.get('layer') == '20' for k in ('y1', 'y2')]
-    tx, ty = a * (4 - min(xs)), a * max(ys)
-    largura, altura = round(a * (max(xs) - min(xs) + 4)), round(a * (max(ys) - min(ys)))
+    tx, ty = a * (antes - min(xs)), a * max(ys)
+    largura, altura = round(a * (max(xs) - min(xs) + antes)), round(a * (max(ys) - min(ys)))
     antigos = {q['nome']: q for q in peca['pinos']}
     novos = []
     for el in placa.elementos:
@@ -851,6 +870,9 @@ def gerar(id_peca, cfg):
             if not t or eh_marca(t) or x < 0 or y < 0 or '\n' in t or esp or t in cfg.get('excluir', ()):
                 continue
             d.texto(x, y, t, num(e, 'size'), SERIGRAFIA, ang, alinhar=e.get('align'))
+    # os textos de mais de uma linha, no lugar medido na foto (o MAX98357A)
+    for t, x, y, tam in cfg.get('textos_extra', ()):
+        d.texto(x, y, t, tam, SERIGRAFIA)
 
     # ---- os corpos dos componentes ----
     centros = {}
@@ -1394,6 +1416,12 @@ PLACAS = {
     'ds1307': dict(brd='../outros-cad/DS1307_RevB.brd', girar90=True, barra='JP2', sem_barra=True,
                    cores=('#1f63c0', '#174f9c', '#2c72cf'), sem_elementos=('U$2', 'U$3', 'U$5'),
                    marcos=['B1', 'U1', 'Q1']),
+    # O amplificador I2S da Adafruit (produto 3006, Alpha 25): o borne
+    # montado em cima (o - a esquerda, o + a direita, como na placa).
+    'max98357a': dict(brd='../modulos-cad/MAX98357_Breakout.brd', antes_mm=0, sem_barra=True,
+                      pinos_reais={'JP1': ['VIN', 'GND', 'SD', 'GAIN', 'DIN', 'BCLK', 'LRC'], 'X1': ['OUT-', 'OUT+']},
+                      cores=('#1f63c0', '#174f9c', '#2c72cf'), sem_elementos=('U$14', 'U$15'), marcos=['U1'],
+                      textos_extra=[('MAX', 0.55, 8.74, 1.143), ('98357A', 0.55, 7.28, 1.143), ('I2S Amp.', 0.55, 5.83, 1.143)]),
     'microsd-card': dict(brd='../outros-cad/SparkFun_microSD_Breakout.brd', chute=(3.78, 0.0, 77.0), sem_barra=True,
                          cores=('#c8102e', '#9a0c22', '#d8283f'), sem_elementos=('U$1',), marcos=['U1']),
 }

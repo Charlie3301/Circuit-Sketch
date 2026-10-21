@@ -2693,6 +2693,10 @@ public partial class EditorCircuito : Border
             if (dac.Tipo != "pcm5102a") continue;
             if (!ChegaEm(rede, dac.Id, "VIN", terra: false) || !ChegaEm(rede, dac.Id, "GND", terra: true)) continue;
             if (ChegaEm(rede, dac.Id, "SCK", terra: false)) continue;   // o SCK no VCC: sem clock, mudo
+            // O XSMT em LOW (no GND, ou num pino da placa em LOW) e o mudo suave;
+            // o FMT em HIGH le o audio como left-justified: o som sai errado.
+            if (ChegaEm(rede, dac.Id, "XSMT", terra: true) || PinoDaPlacaEm(bancada, rede, dac.Id, "XSMT", 0)) continue;
+            if (ChegaEm(rede, dac.Id, "FMT", terra: false) || PinoDaPlacaEm(bancada, rede, dac.Id, "FMT", 1)) continue;
             var (placa, bck) = rede.PinoDe(Atual, dac.Id, "BCK");
             if (placa is null) continue;
             var maq = bancada.De(placa);
@@ -2702,6 +2706,14 @@ public partial class EditorCircuito : Border
             return audio;
         }
         return null;
+    }
+
+    /// <summary>O pino da peca esta ligado num pino de saida de uma placa, nesse nivel agora?</summary>
+    bool PinoDaPlacaEm(Bancada bancada, Netlist rede, string idDaPeca, string pino, int nivel)
+    {
+        var (placa, gpio) = rede.PinoDe(Atual, idDaPeca, pino);
+        return placa is not null && gpio >= 0 && bancada.De(placa) is { } maq
+               && gpio < maq.Modo.Length && maq.Modo[gpio] == 1 && maq.Digital[gpio] == nivel;
     }
 
     /// <summary>
