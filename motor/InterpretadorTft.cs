@@ -11,7 +11,12 @@ public partial class Interpretador
 {
     Valor ChamarTft(Objeto obj, string metodo, Chamada c, Ambiente amb)
     {
-        var tela = obj.Tela ?? maq.CriarTela(240, obj.Classe == "Adafruit_ST7789" ? 240 : 320);
+        var tela = obj.Tela ?? (obj.Classe switch
+        {
+            "Adafruit_ST7789" => maq.CriarTela(240, 240),
+            "Adafruit_ST7735" => maq.CriarTela(128, 160),
+            _ => maq.CriarTela(240, 320),
+        });
 
         var avaliados = new Valor[c.Args.Count];
         var prontos = new bool[c.Args.Count];
@@ -36,6 +41,16 @@ public partial class Interpretador
             case "begin": case "init":
                 tela.Iniciar();
                 return Valor.DeBool(true);
+
+            // O ST7735: initR(INITR_BLACKTAB) e o de 1,8"; o INITR_144GREENTAB, o
+            // de 1,44" (128 x 128); o INITR_MINI160x80, o de 0,96" (80 x 160).
+            case "initR": case "initB":
+            {
+                var (l, a) = metodo == "initR" ? A(0) switch { 0x101 => (128, 128), 0x04 => (80, 160), _ => (128, 160) } : (128, 160);
+                if (tela.LarguraFisica != l || tela.AlturaFisica != a) obj.Tela = tela = maq.TrocarTela(l, a);
+                tela.Iniciar();
+                return Valor.Vazio;
+            }
             case "display":
                 return Valor.DeBool(true);
 

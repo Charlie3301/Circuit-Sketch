@@ -442,6 +442,12 @@ public static class Catalogo
         // Os modulos chaveados: o - da entrada e o da saida sao a mesma trilha.
         if (idPeca == "lm2596") { yield return ("IN-", "OUT-"); yield break; }
         if (idPeca == "mt3608") { yield return ("VIN-", "VOUT-"); yield break; }
+        // A matriz do MAX7219: a barra de saida repete o VCC, o GND, o CS e o CLK da entrada.
+        if (idPeca == "max7219-matriz")
+        {
+            yield return ("VCC", "VCC.2"); yield return ("GND", "GND.2"); yield return ("CS", "CS.2"); yield return ("CLK", "CLK.2");
+            yield break;
+        }
         // O modulo do AMS1117: o GND da entrada e o da saida (as duas barras) sao a mesma trilha.
         if (idPeca == "ams1117") { yield return ("GND", "GND.2"); yield break; }
         if (idPeca is "a4988" or "drv8825") { yield return ("GND", "GND.2"); yield break; }
@@ -500,7 +506,8 @@ public static class Catalogo
         "junction" => "Juncao de fios",
         "vcc-symbol" => "Simbolo VCC",
         "gnd-symbol" => "Simbolo GND",
-        "st7789" => "Display 240x240 (ST7789)",
+        "st7789" => "Display IPS 1,54\" 240x240 (ST7789)",
+        "st7735" => "Display TFT 1,8\" 128x160 (ST7735)",
         "not-gate" => "Porta NOT",
         "and-gate" => "Porta AND",
         "or-gate" => "Porta OR",
@@ -536,6 +543,11 @@ public static class Catalogo
         // turma compra, tem quatro -- GND, VCC, SCL e SDA -- e agora e
         // ela que se chama so "Display OLED".
         "ssd1306" => "Display OLED SPI (8 pinos)",
+        "ssd1306-128x32" => "Display OLED 0,91\" 128x32 (I2C)",
+        "sh1106" => "Display OLED 1,3\" 128x64 (SH1106, I2C)",
+        "tm1637" => "Display de 4 dígitos TM1637 (relógio)",
+        "max7219-matriz" => "Matriz de LED 8x8 (MAX7219)",
+        "modulo-semaforo" => "Módulo semáforo (3 LEDs)",
         "ssd1306-i2c" => "Display OLED 128x64 (I2C)",
         "bateria" => "Bateria personalizada",
         _ when Baterias.PacoteDe(id) is { } pacote => pacote.Nome,
@@ -565,7 +577,7 @@ public static class Catalogo
         "mpu6050" => "Acelerometro MPU6050",
         "ds1307" => "Relogio DS1307",
         "hx711" => "Celula de carga HX711",
-        "ili9341" => "Display TFT ILI9341",
+        "ili9341" => "Display TFT 2,2\" 240x320 (ILI9341)",
         "biaxial-stepper" => "Motor de passo biaxial",
         "rotary-dialer" => "Disco de telefone",
         "led-ring" => "Anel de LEDs",
@@ -639,7 +651,8 @@ public static class Catalogo
         "led" or "rgb-led" or "led-bar-graph" or "led-ring" or "neopixel"
             or "neopixel-matrix" or "7segment" or "lcd1602" or "lcd2004"
             or "lcd1602-i2c" or "lcd2004-i2c"
-            or "ssd1306" or "ssd1306-i2c" or "ili9341" or "st7789" => "Saida",
+            or "ssd1306" or "ssd1306-i2c" or "ssd1306-128x32" or "sh1106" or "ili9341" or "st7789" or "st7735"
+            or "tm1637" or "max7219-matriz" or "modulo-semaforo" => "Saida",
 
         "pushbutton" or "pushbutton-6mm" or "potentiometer" or "slide-potentiometer"
             or "slide-switch" or "dip-switch-8" or "membrane-keypad"

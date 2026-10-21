@@ -113,6 +113,8 @@
     <Compile Include="..\motor\InterpretadorClasses.cs" />
     <Compile Include="..\motor\Sono.cs" />
     <Compile Include="..\motor\InterpretadorTft.cs" />
+    <Compile Include="..\motor\InterpretadorMostradores.cs" />
+    <Compile Include="..\motor\Mostradores.cs" />
     <Compile Include="..\motor\Cabecalhos.cs" />
     <Compile Include="..\motor\InterpretadorRede.cs" />
     <Compile Include="..\motor\InterpretadorBle.cs" />

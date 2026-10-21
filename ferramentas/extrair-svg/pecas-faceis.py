@@ -20,9 +20,15 @@ PX = 96 / 25.4                      # mm -> px de 96 dpi
 PASSO = 2.54
 
 pecas = []
+# O ST7789 foi redesenhado na Alpha 25 (o de 1,54", em pecas-tft.py): rodar este
+# script nao o desfaz.
+REFEITAS_NA_ALPHA_25 = {'st7789'}
 
 
 def guardar(id_peca, svg, larg_mm, alt_mm, pinos):
+    if id_peca in REFEITAS_NA_ALPHA_25:
+        print(f'{id_peca}: refeita na Alpha 25, fica como esta')
+        return
     io.open(BASE + f'app/assets/{id_peca}.svg', 'w', encoding='utf-8', newline='').write(svg)
     pecas.append({
         'id': id_peca,

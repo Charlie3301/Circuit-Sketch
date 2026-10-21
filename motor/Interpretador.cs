@@ -813,9 +813,19 @@ public partial class Interpretador(Programa prog, Maquina maq)
                     break;
 
                 case "Adafruit_SSD1306":
+                // O SH1106 de 1,3" (a Adafruit_SH110X): a mesma Adafruit_GFX num buffer de 1 bit.
+                case "Adafruit_SH1106G":
                     obj.Lcd = maq.CriarOled();
                     MontarOled(obj, args);
                     if (!obj.Campos["_spi"].Verdadeiro) RegistrarNoI2c(obj, -1, (int)obj.Campos["_wire"].Num);
+                    break;
+
+                // "TM1637Display display(CLK, DIO);" e "LedControl lc = LedControl(DIN, CLK, CS, 1);"
+                case "TM1637Display":
+                    MontarTm1637(obj, args);
+                    break;
+                case "LedControl":
+                    MontarMax7219(obj, args);
                     break;
 
                 // "MPU6050 mpu(0x69);": o endereco vem do construtor (o AD0 em 3V3).
@@ -865,6 +875,11 @@ public partial class Interpretador(Programa prog, Maquina maq)
 
                 case "Adafruit_ST7789":
                     obj.Tela = maq.CriarTela(240, 240);
+                    break;
+
+                // O de 1,8" (128 x 160); o initR() troca para o 1,44" ou o mini, se o sketch pedir.
+                case "Adafruit_ST7735":
+                    obj.Tela = maq.CriarTela(128, 160);
                     break;
 
                 case "File":
@@ -2160,6 +2175,28 @@ public partial class Interpretador(Programa prog, Maquina maq)
         ["SSD1306_WHITE"] = Valor.DeInt(1),
         ["SSD1306_BLACK"] = Valor.DeInt(0),
         ["SSD1306_INVERSE"] = Valor.DeInt(2),
+        // a Adafruit_SH110X (o OLED de 1,3")
+        ["SH110X_WHITE"] = Valor.DeInt(1),
+        ["SH110X_BLACK"] = Valor.DeInt(0),
+        ["SH110X_INVERSE"] = Valor.DeInt(2),
+        // o initR() da Adafruit_ST7735 (a cor da etiqueta da pelicula diz a versao)
+        ["INITR_GREENTAB"] = Valor.DeInt(0x00),
+        ["INITR_REDTAB"] = Valor.DeInt(0x01),
+        ["INITR_BLACKTAB"] = Valor.DeInt(0x02),
+        ["INITR_18GREENTAB"] = Valor.DeInt(0x00),
+        ["INITR_18REDTAB"] = Valor.DeInt(0x01),
+        ["INITR_18BLACKTAB"] = Valor.DeInt(0x02),
+        ["INITR_144GREENTAB"] = Valor.DeInt(0x01 | 0x100),
+        ["INITR_MINI160x80"] = Valor.DeInt(0x04),
+        // os segmentos da TM1637Display
+        ["SEG_A"] = Valor.DeInt(0x01),
+        ["SEG_B"] = Valor.DeInt(0x02),
+        ["SEG_C"] = Valor.DeInt(0x04),
+        ["SEG_D"] = Valor.DeInt(0x08),
+        ["SEG_E"] = Valor.DeInt(0x10),
+        ["SEG_F"] = Valor.DeInt(0x20),
+        ["SEG_G"] = Valor.DeInt(0x40),
+        ["SEG_DP"] = Valor.DeInt(0x80),
         ["WHITE"] = Valor.DeInt(1),
         ["BLACK"] = Valor.DeInt(0),
         ["INVERSE"] = Valor.DeInt(2),
@@ -3254,8 +3291,10 @@ public partial class Interpretador(Programa prog, Maquina maq)
 
         if (obj.Classe == "RF24") return ChamarRf24(obj, metodo, c, amb);
         if (obj.Classe == "SPIClass" && obj.Rede is BarramentoDoSketch barramento) return ChamarSpi(barramento, metodo, c, amb);
-        if (obj.Classe is "Adafruit_ILI9341" or "Adafruit_ST7789") return ChamarTft(obj, metodo, c, amb);
-        if (obj.Classe == "Adafruit_SSD1306") return ChamarOled(obj, metodo, c, amb);
+        if (obj.Classe is "Adafruit_ILI9341" or "Adafruit_ST7789" or "Adafruit_ST7735") return ChamarTft(obj, metodo, c, amb);
+        if (obj.Classe is "Adafruit_SSD1306" or "Adafruit_SH1106G") return ChamarOled(obj, metodo, c, amb);
+        if (obj.Classe == "TM1637Display") return ChamarTm1637(obj, metodo, c, amb);
+        if (obj.Classe == "LedControl") return ChamarMax7219(obj, metodo, c, amb);
         if (obj.Classe == "Keypad") return ChamarTeclado(obj, metodo, c, amb);
         if (obj.Classe == "Stepper") return ChamarMotorDePasso(obj, metodo, c, amb);
         if (obj.Classe == "UniversalTelegramBot") return ChamarTelegram(obj, metodo, c, amb);
@@ -3615,9 +3654,27 @@ public partial class Interpretador(Programa prog, Maquina maq)
             case "print":
                 obj.Lcd.Escrever(Imprimivel(args));
                 return Valor.Vazio;
+            // "lcd.write(0)" escreve o CARACTERE 0 (o primeiro do createChar),
+            // e nao o texto "0"; "lcd.write("oi")" escreve o texto.
             case "write":
-                obj.Lcd.Escrever(args.Count > 0 ? args[0].Mostrar() : "");
+                if (args.Count > 0 && !args[0].EhTexto) obj.Lcd.Escrever(((char)((long)args[0].Num & 0xFF)).ToString());
+                else obj.Lcd.Escrever(args.Count > 0 ? args[0].Mostrar() : "");
                 return Valor.Vazio;
+
+            // "lcd.createChar(0, coracao)": as oito linhas do desenho (5 bits cada).
+            case "createChar":
+            {
+                if (c.Args.Count < 2 || !VetorDoArgumento(c.Args[1], amb, out var linhas))
+                    throw new ErroDeExecucao("lcd.createChar(n, desenho): o desenho tem que ser um vetor de 8 bytes", c.Linha);
+                obj.Lcd.DefinirGlifo((int)A(0), [.. linhas.Select(v => (int)(long)v.Num)]);
+                return Valor.Vazio;
+            }
+
+            case "backlight": obj.Lcd.Luz(true); return Valor.Vazio;
+            case "noBacklight": obj.Lcd.Luz(false); return Valor.Vazio;
+            case "setBacklight": obj.Lcd.Luz(args.Count == 0 || A(0) != 0); return Valor.Vazio;
+            case "display": obj.Lcd.Mostrar(true); return Valor.Vazio;
+            case "noDisplay": obj.Lcd.Mostrar(false); return Valor.Vazio;
 
             // O println() do display desce o cursor para a linha
             // seguinte, como o Print do Arduino faz. O relogio de NTP
@@ -3635,9 +3692,8 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 obj.Lcd.Begin(0, 0);
                 return Valor.Vazio;
 
-            case "backlight": case "noBacklight":
-            case "display": case "noDisplay": case "cursor": case "noCursor":
-            case "blink": case "noBlink": case "createChar":
+            case "cursor": case "noCursor":
+            case "blink": case "noBlink":
                 return Valor.Vazio;
             default:
                 throw new ErroDeExecucao(

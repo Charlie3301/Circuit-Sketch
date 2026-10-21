@@ -91,31 +91,9 @@ public partial class EditorCircuito : Border
         Canvas.SetTop(marca, centro.Y - marca.DesiredSize.Height / 2);
     }
     readonly Dictionary<string, TextBlock> rotulosDePeca = [];
-    readonly Dictionary<string, TextBlock[,]> telasLcd = [];
+    readonly Dictionary<string, TelaLcd> telasLcd = [];
     readonly Dictionary<string, FrameworkElement> bracosServo = [];
 
-    /// <summary>
-    /// Grade de caracteres de cada display, ja em coordenadas da CAIXA da
-    /// peca. Vem do pattern "characters" do proprio SVG, convertido pela
-    /// escala do encaixe proporcional.
-    /// </summary>
-    record GradeLcd(int Colunas, int Linhas, double X, double Y,
-                    double Larg, double Alt, double Fonte);
-
-    // As duas telas tem o MESMO passo em milimetros, entao a grade em
-    // pixels e a mesma; muda so quantas colunas e linhas cabem.
-    // Do pattern "characters": 3,55 x 5,95 em (12,45 / 12,55) no viewBox,
-    // vezes a escala 3,775 do encaixe proporcional.
-    static readonly Dictionary<string, GradeLcd> Grades = new()
-    {
-        ["lcd1602"] = new(16, 2, 47.0, 47.4, 13.40, 22.46, 18.6),
-        ["lcd2004"] = new(20, 4, 47.0, 47.7, 13.40, 22.46, 18.6),
-
-        // A versao de I2C e a MESMA placa: muda so o conector. A tela
-        // fica no mesmo lugar, entao a grade e a mesma.
-        ["lcd1602-i2c"] = new(16, 2, 47.0, 47.4, 13.40, 22.46, 18.6),
-        ["lcd2004-i2c"] = new(20, 4, 47.0, 47.7, 13.40, 22.46, 18.6),
-    };
     readonly List<Path> visuaisFios = [];
 
     readonly Ellipse marcadorPino = new();
@@ -1206,7 +1184,7 @@ public partial class EditorCircuito : Border
         tracosDoAnalisador.Clear();
         ondasDoAnalisador.Clear();
         foreach (var v in brilhos.Values) mundo.Children.Remove(v);
-        foreach (var tela in telasLcd.Values) foreach (var t in tela) mundo.Children.Remove(t);
+        foreach (var tela in telasLcd.Values) RemoverTelaLcd(tela);
         foreach (var b in bracosServo.Values) mundo.Children.Remove(b);
         foreach (var luzes in ledsDePlaca.Values)
             foreach (var l in luzes) mundo.Children.Remove(l);
@@ -1326,7 +1304,7 @@ public partial class EditorCircuito : Border
 
         if (LedsPorPlaca.ContainsKey(peca.Tipo)) CriarLedsDaPlaca(peca, def);
         CriarLuzesDeModulo(peca, def);
-        if (Grades.TryGetValue(peca.Tipo, out var grade)) CriarTelaLcd(peca, grade);
+        if (GradeDoLcd(peca.Tipo) is { } grade) CriarTelaLcd(peca, grade);
         if (AreasDeTela.ContainsKey(peca.Tipo)) CriarTelaTft(peca, def);
         if (TemBraco(peca.Tipo)) CriarBracoServo(peca, def);
 
@@ -1772,14 +1750,18 @@ public partial class EditorCircuito : Border
     static readonly Dictionary<string, (double X, double Y, double Larg, double Alt)>
         AreasDeTela = new()
     {
-        ["ili9341"] = (0.034, 0.065, 0.937, 0.816),
-        ["st7789"] = (0.1625, 0.2208, 0.675, 0.7013),
+        ["ili9341"] = (0.0781, 0.1250, 0.8439, 0.6714),
+        ["st7789"] = (0.0669, 0.1404, 0.8662, 0.6340),
+        ["st7735"] = (0.0938, 0.1414, 0.8125, 0.6041),
 
         // O OLED: o retangulo de 128x64 de cada desenho (o SVG do de 8 pinos
         // tem a tela em 11.4,26 de 150x116; o I2C, a area acesa em 2.8,9.7
         // de 27.3x27.8 mm).
         ["ssd1306"] = (0.076, 0.2241, 0.8533, 0.5517),
-        ["ssd1306-i2c"] = (0.1026, 0.3489, 0.7949, 0.3921),
+        ["ssd1306-i2c"] = (0.1018, 0.2158, 0.7965, 0.3908),
+        // O 0,91" (128 x 32) e o 1,3" (o SH1106), da Alpha 25 (pecas-oled.py).
+        ["ssd1306-128x32"] = (0.1837, 0.2655, 0.5875, 0.4690),
+        ["sh1106"] = (0.0609, 0.2203, 0.8782, 0.4153),
     };
 
     void CriarTelaTft(PecaNoCircuito peca, PecaDef def)
@@ -1876,6 +1858,16 @@ public partial class EditorCircuito : Border
     /// anda sozinha, e por isso redesenha mesmo sem mudanca). Sem begin(),
     /// ou sem energia, o vidro fica preto -- OLED nao tem luz de fundo.
     /// </summary>
+    public static bool EhOled(string tipo) => tipo is "ssd1306" or "ssd1306-i2c" or "ssd1306-128x32" or "sh1106";
+
+    /// <summary>As cores de cada OLED (o modelo da peca): o de duas cores so existe no 0,96" de 128 x 64.</summary>
+    public static string[] CoresDoOled(string tipo)
+        => tipo is "ssd1306" or "ssd1306-i2c" ? ["branco", "azul", "amarelo-azul"] : ["branco", "azul"];
+
+    public static string CorDoOled(PecaNoCircuito peca) => CoresDoOled(peca.Tipo).Contains(peca.Modelo) ? peca.Modelo : "branco";
+
+    const int OledAzul = unchecked((int)0xFF5AC8FA), OledAmarelo = unchecked((int)0xFFFFD84A);
+
     void DesenharOled(PecaNoCircuito peca, Maquina maq, Netlist rede)
     {
         if (!telasTft.TryGetValue(peca.Id, out var alvo)) return;
@@ -1884,8 +1876,11 @@ public partial class EditorCircuito : Border
         AjustarLuzDaTft(alvo.letras, aceso, aceso ? (painel.Escurecido ? 0.45 : 1) : 0);
         if (painel is null) return;
 
-        if (!painel.Rolando && versaoDaTft.GetValueOrDefault(peca.Id, -1) == painel.Versao) return;
-        versaoDaTft[peca.Id] = painel.Versao;
+        // A cor tambem conta: trocar o modelo redesenha o que ja esta no vidro.
+        string cor = CorDoOled(peca);
+        int versao = painel.Versao * 4 + Array.IndexOf(CoresDoOled(peca.Tipo), cor);
+        if (!painel.Rolando && versaoDaTft.GetValueOrDefault(peca.Id, -1) == versao) return;
+        versaoDaTft[peca.Id] = versao;
 
         if (alvo.imagem.Source is not WriteableBitmap mapa
             || mapa.PixelWidth != painel.LarguraFisica || mapa.PixelHeight != painel.AlturaFisica)
@@ -1900,6 +1895,14 @@ public partial class EditorCircuito : Border
             pontos = (int[])pontos.Clone();
             for (int i = 0; i < pontos.Length; i++)
                 pontos[i] = pontos[i] == painel.CorAcesa ? TelaGrafica.CorApagada : painel.CorAcesa;
+        }
+        if (cor != "branco")
+        {
+            // O azul e o amarelo e azul (as 16 primeiras linhas amarelas, como o painel de duas cores).
+            pontos = (int[])pontos.Clone();
+            int largura = painel.LarguraFisica;
+            for (int i = 0; i < pontos.Length; i++)
+                if (pontos[i] == painel.CorAcesa) pontos[i] = cor == "amarelo-azul" && i / largura < 16 ? OledAmarelo : OledAzul;
         }
         mapa.WritePixels(new Int32Rect(0, 0, painel.LarguraFisica, painel.AlturaFisica), pontos, painel.LarguraFisica * 4, 0);
     }
@@ -2011,34 +2014,6 @@ public partial class EditorCircuito : Border
             ? vidro.Opacity : 0;
 
         return (true, mapa is not null, mapa?.PixelWidth ?? 0, mapa?.PixelHeight ?? 0, brancos, escuro);
-    }
-
-    void CriarTelaLcd(PecaNoCircuito peca, GradeLcd g)
-    {
-        var celulas = new TextBlock[g.Linhas, g.Colunas];
-
-        for (int lin = 0; lin < g.Linhas; lin++)
-        {
-            for (int col = 0; col < g.Colunas; col++)
-            {
-                var tb = new TextBlock
-                {
-                    Text = " ",
-                    FontFamily = new FontFamily("Consolas"),
-                    FontSize = g.Fonte,
-                    Foreground = new SolidColorBrush(Color.FromRgb(0x10, 0x28, 0x08)),
-                    Width = g.Larg,
-                    TextAlignment = TextAlignment.Center,
-                    IsHitTestVisible = false
-                };
-                Canvas.SetLeft(tb, peca.X + g.X + col * g.Larg);
-                Canvas.SetTop(tb, peca.Y + g.Y + lin * g.Alt - g.Fonte * 0.08);
-                Panel.SetZIndex(tb, 130);
-                mundo.Children.Add(tb);
-                celulas[lin, col] = tb;
-            }
-        }
-        telasLcd[peca.Id] = celulas;
     }
 
     /// <summary>
@@ -2290,6 +2265,7 @@ public partial class EditorCircuito : Border
         if (EhEsc(peca.Tipo) && (peca.Amperes > 0 || peca.Acabamento is not null)) return NomeSvgDoEsc(peca);
         if (Reguladores.EhRegulador(peca.Tipo)) return NomeSvgDoRegulador(peca);
         if (Diodos.EhDiodo(peca.Tipo)) return Diodos.Da(peca).Svg ?? peca.Tipo;
+        if (EhLcd(peca.Tipo) && CorDoLcd(peca) == "azul") return $"{peca.Tipo}-azul";
         // Os passivos com valor, o fusivel e o varistor: um desenho por modelo (pecas-passivos.py).
         if (Passivos.EhPassivoComValor(peca.Tipo) && Passivos.Da(peca) is { } passivo) return $"{peca.Tipo}-{passivo.Modelo}";
         if (peca.Tipo is "fusivel" or "varistor") return $"{peca.Tipo}-{Semicondutores.Protecao(peca).Modelo}";
@@ -4457,16 +4433,7 @@ public partial class EditorCircuito : Border
         if (def is not null) PosicionarLuzesDeModulo(peca, def);
         if (peca.Tipo == "radio-controle") AtualizarRadio(peca);
 
-        if (Grades.TryGetValue(peca.Tipo, out var g)
-            && telasLcd.TryGetValue(peca.Id, out var tela))
-        {
-            for (int lin = 0; lin < g.Linhas; lin++)
-                for (int col = 0; col < g.Colunas; col++)
-                {
-                    Canvas.SetLeft(tela[lin, col], peca.X + g.X + col * g.Larg);
-                    Canvas.SetTop(tela[lin, col], peca.Y + g.Y + lin * g.Alt - g.Fonte * 0.08);
-                }
-        }
+        if (EhLcd(peca.Tipo)) PosicionarTelaLcd(peca);
 
         // Os aneis de BOOT/EN sao desenhados a parte: sem isto ficavam
         // para tras quando a placa era arrastada.
@@ -6685,11 +6652,14 @@ public partial class EditorCircuito : Border
 
                 case "ili9341":
                 case "st7789":
+                case "st7735":
                     DesenharTft(peca, maq.Tela, LuzDaTft(peca, maq, rede));
                     break;
 
                 case "ssd1306":
                 case "ssd1306-i2c":
+                case "ssd1306-128x32":
+                case "sh1106":
                     DesenharOled(peca, maq, rede);
                     break;
 
@@ -6699,21 +6669,9 @@ public partial class EditorCircuito : Border
                 case "lcd2004-i2c":
                 {
                     // O modulo de I2C so recebe o texto se o fio dele chega no Wire.
-                    if (maq.Lcd is not { Ligado: true } lcd
-                        || peca.Tipo.EndsWith("-i2c", StringComparison.Ordinal) && maq.I2c.Ligado
-                           && !NoFioDoBarramento(maq.I2c, rede.GpioDe(Atual, peca.Id, "SDA"), rede.GpioDe(Atual, peca.Id, "SCL"))
-                        || !telasLcd.TryGetValue(peca.Id, out var tela)
-                        || !Grades.TryGetValue(peca.Tipo, out var g)) break;
-
-                    for (int lin = 0; lin < g.Linhas && lin < lcd.Linhas; lin++)
-                    {
-                        string texto = lcd.LinhaTexto(lin);
-                        for (int col = 0; col < g.Colunas && col < texto.Length; col++)
-                        {
-                            string ch = texto[col].ToString();
-                            if (tela[lin, col].Text != ch) tela[lin, col].Text = ch;
-                        }
-                    }
+                    bool recebe = !(peca.Tipo.EndsWith("-i2c", StringComparison.Ordinal) && maq.I2c.Ligado
+                                    && !NoFioDoBarramento(maq.I2c, rede.GpioDe(Atual, peca.Id, "SDA"), rede.GpioDe(Atual, peca.Id, "SCL")));
+                    AtualizarTelaLcd(peca, maq.Lcd, recebe);
                     break;
                 }
 

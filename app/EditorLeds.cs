@@ -55,6 +55,7 @@ public partial class EditorCircuito
         foreach (var peca in Atual.Pecas)
         {
             if (Catalogo.Obter(peca.Tipo) is not { } def) continue;
+            if (DesenharMostrador(peca, def, bancada, rede)) continue;
             if (DesenhoDosLeds.Segmentos.TryGetValue(peca.Tipo, out var segmentos))
                 AcenderSegmentos(peca, def, segmentos, MaquinaDaPeca(bancada, rede, peca), rede, bancadaLigada);
             else if (DesenhoDosLeds.Pixels.TryGetValue(peca.Tipo, out var pixels))

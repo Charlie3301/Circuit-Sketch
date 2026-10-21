@@ -23,7 +23,7 @@ public partial class Interpretador
     public static int EnderecoPadraoDe(string classe) => classe switch
     {
         "LiquidCrystal_I2C" => 0x27,
-        "Adafruit_SSD1306" => 0x3C,
+        "Adafruit_SSD1306" or "Adafruit_SH1106G" => 0x3C,
         "Adafruit_MPU6050" or "MPU6050" => 0x68,
         "RTC_DS1307" => 0x68,
         _ => -1,

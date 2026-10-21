@@ -479,6 +479,9 @@ public sealed class TelaGrafica(int largura, int altura)
         Versao++;
     }
 
+    /// <summary>As 5 colunas de um caractere da fonte classica (o bit de baixo em cima): o LCD de caracteres usa a mesma.</summary>
+    public static ReadOnlySpan<byte> ColunasDaLetra(int c) => Fonte.AsSpan((c & 0xFF) * 5, 5);
+
     /// <summary>
     /// O drawChar da biblioteca: 5 colunas de 8 pontos, e a sexta coluna
     /// e o espaco entre letras -- que so e pintado com fundo opaco.

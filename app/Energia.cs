@@ -673,6 +673,17 @@ public sealed partial class Energia
                 yield break;
             }
 
+            // O semaforo: cada LED com o resistor dele (330, 220 e 470 ohms), o catodo no GND.
+            case "modulo-semaforo":
+            {
+                foreach (var (pino, ohms, queda) in new[] { ("R", 330.0, 1.9), ("Y", 220.0, 2.0), ("G", 470.0, 2.2) })
+                {
+                    var r = Entre(pino, "GND", ohms, queda, 0.009, 0.030);
+                    if (r is not null) yield return r with { Rotulo = pino };
+                }
+                yield break;
+            }
+
             // O comum no positivo (uma placa ligada, ou o + de uma bateria)
             // e o RGB de anodo comum: os tres diodos vao do comum para a cor.
             case "rgb-led":
@@ -945,9 +956,12 @@ public sealed partial class Energia
         "led-ring" => 40,
         "neopixel" => 90,
         "lcd1602" or "lcd2004" or "lcd1602-i2c" or "lcd2004-i2c" => 180,
-        "ssd1306" or "ssd1306-i2c" or "ili9341" or "st7789" => 250,
+        "ssd1306" or "ssd1306-i2c" or "ssd1306-128x32" or "sh1106" or "ili9341" or "st7789" or "st7735" => 250,
         // O nRF24L01 com amplificador: ~115 mA transmitindo, ~45 mA na media.
         "nrf24l01-pa-lna" => 75,
+        // O TM1637 aceso (~35 mA) e a matriz do MAX7219 (~100 mA, a meia luz).
+        "tm1637" => 150,
+        "max7219-matriz" => 50,
         _ => 400,
     };
 

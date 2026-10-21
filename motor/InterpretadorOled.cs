@@ -69,7 +69,9 @@ public partial class Interpretador
                 if (!spi)
                 {
                     var bus = BarramentoDoOled(obj);
-                    endereco = a.Count > 1 && a[1].Num > 0 ? (int)a[1].Num & 0x7F : buffer.AlturaFisica == 32 ? 0x3C : 0x3D;
+                    // O SH1106 e begin(endereco, reset), com o 0x3C de padrao.
+                    endereco = obj.Classe == "Adafruit_SH1106G" ? (a.Count > 0 && a[0].Num > 0 ? (int)a[0].Num & 0x7F : 0x3C)
+                             : a.Count > 1 && a[1].Num > 0 ? (int)a[1].Num & 0x7F : buffer.AlturaFisica == 32 ? 0x3C : 0x3D;
                     numero = bus.Numero;
                     RegistrarNoI2c(obj, endereco, numero);
                     if (a.Count < 4 || a[3].Verdadeiro) ComecarBarramento(bus, NomeDoBarramento(bus));

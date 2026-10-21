@@ -139,17 +139,18 @@ public static partial class Autoteste
                 }
             });
 
-        foreach (string tipo in new[] { "ssd1306", "ssd1306-i2c", "ili9341", "st7789" })
+        foreach (string tipo in new[] { "ssd1306", "ssd1306-i2c", "ssd1306-128x32", "sh1106", "ili9341", "st7789", "st7735" })
             Peca(tipo, t =>
             {
-                bool oled = tipo.StartsWith("ssd1306"), i2c = tipo.EndsWith("-i2c");
+                bool oled = EditorCircuito.EhOled(tipo), i2c = oled && tipo != "ssd1306";
                 t.Ligar(tipo == "ssd1306" ? "3V3" : "VCC", "3V3"); t.Ligar("GND", "GND.1");
-                string[] sinais = tipo switch { "ssd1306" => ["DATA", "CLK", "DC", "RST", "CS"], "ssd1306-i2c" => ["SDA", "SCL"], "ili9341" => ["MOSI", "SCK", "D/C", "RST", "CS"], _ => ["SDA", "SCL", "DC", "RES", "CS"] };
+                string[] sinais = tipo switch { "ssd1306" => ["DATA", "CLK", "DC", "RST", "CS"], "ssd1306-i2c" or "ssd1306-128x32" or "sh1106" => ["SDA", "SCL"], "ili9341" => ["MOSI", "SCK", "D/C", "RST", "CS"], "st7735" => ["SDA", "SCK", "A0", "RESET", "CS"], _ => ["SDA", "SCL", "DC", "RES", "CS"] };
                 int[] gpios = i2c ? [21, 22] : [23, 18, 25, 26, 27];
                 for (int k = 0; k < sinais.Length; k++) t.Sinal(sinais[k], gpios[k]);
                 if (i2c) t.M.I2c.Begin(21, 22);
                 if (!oled) { t.Sinal(tipo == "st7789" ? "BLK" : "LED", 13); t.M.DigitalWrite(13, 1); }
-                var tela = oled ? t.M.CriarPainelOled(128, 64, spi: !i2c) : t.M.CriarTela(240, tipo == "st7789" ? 240 : 320);
+                var tela = oled ? t.M.CriarPainelOled(128, tipo == "ssd1306-128x32" ? 32 : 64, spi: !i2c)
+                         : tipo == "st7735" ? t.M.CriarTela(128, 160) : t.M.CriarTela(240, tipo == "st7789" ? 240 : 320);
                 foreach (int cor in new[] { 0, oled ? 1 : 65535, 0 })
                 {
                     tela.Limpar(cor); t.Quadro(); int acesos = t.Ed.AcesosNaTelaParaTeste(t.P.Id);

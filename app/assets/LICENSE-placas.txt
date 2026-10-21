@@ -82,4 +82,15 @@ Commons (Matthew Berardi, CC BY-SA 4.0); o do rele SRD-05VDC-SL-C, na foto
 foto do modulo de 25 x 11 mm. Nenhuma foto e reproduzida. Os nomes dos
 fabricantes dos reles nao sao desenhados; aparece so o modelo.
 
+Os displays (lcd1602*.svg, lcd2004*.svg, ili9341.svg, st7789.svg, st7735.svg,
+ssd1306*.svg e sh1106.svg) e as saidas novas (tm1637.svg, max7219-matriz.svg e
+modulo-semaforo.svg) tambem sao desenhos proprios do CircuitSketch. As medidas
+vieram dos desenhos de contorno publicados pelos fabricantes: o do ADM1602K (o
+16x2 de 80 x 36 mm), o do 2004A da EONE (o 20x4 de 98 x 60 mm), e os do lcdwiki
+para os modulos de TFT e de OLED (MSP2202, MSP1541, MSP1803, MC096, MC091GX,
+MC130GX, com a ficha do painel TFT1541); o lugar dos furos e dos pinos que os
+desenhos nao dao foi medido nas fotos dos mesmos fabricantes. O TM1637, a
+matriz do MAX7219 e o semaforo seguem as medidas dos vendedores. Nenhuma foto
+e reproduzida, e nenhuma marca e desenhada.
+
 O restante do CircuitSketch nao e afetado por esta licenca.

@@ -341,7 +341,8 @@ public static class FormatoWokwi
     /// <summary>Este atributo o simulador entende nesta peca? (Os outros sao guardados como vieram.)</summary>
     public static bool AtributoConhecido(string tipo, string chave) => chave switch
     {
-        "color" => tipo == "led",
+        "color" => tipo == "led" || EditorCircuito.EhLcd(tipo),
+        "background" => EditorCircuito.EhLcd(tipo),
         "value" => tipo == "resistor",
         "pins" => tipo is "lcd1602-i2c" or "lcd2004-i2c",
         "horn" => tipo == "servo",

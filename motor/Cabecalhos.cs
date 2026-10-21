@@ -139,6 +139,7 @@ public static class Cabecalhos
         ["Adafruit_ILI9341.h"] = Ili9341,
         ["Adafruit_ST77xx.h"] = St77xx,
         ["Adafruit_ST7789.h"] = "#pragma once\n#include <Adafruit_ST77xx.h>\n",
+        ["Adafruit_ST7735.h"] = "#pragma once\n#include <Adafruit_ST77xx.h>\n",
         ["wdt.h"] = WdtDoAvr,
     };
 

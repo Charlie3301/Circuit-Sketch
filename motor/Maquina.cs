@@ -568,6 +568,33 @@ public class Lcd(int colunas = 16, int linhas = 2)
     public int Lin { get; private set; }
     public bool Ligado { get; private set; }
 
+    /// <summary>
+    /// Os 8 caracteres do createChar() (a CGRAM do HD44780): oito linhas de
+    /// 5 pontos cada, o bit 4 a esquerda. Aparecem com os codigos 0 a 7
+    /// (e 8 a 15, o mesmo de novo), como no chip.
+    /// </summary>
+    public byte[][] Glifos { get; } = [.. Enumerable.Range(0, 8).Select(_ => new byte[8])];
+
+    /// <summary>A luz de fundo (backlight()/noBacklight() do modulo I2C).</summary>
+    public bool LuzDeFundo { get; private set; } = true;
+
+    /// <summary>display()/noDisplay(): os caracteres somem, a memoria fica.</summary>
+    public bool Mostrando { get; private set; } = true;
+
+    /// <summary>Muda a cada coisa que muda no vidro: o editor so redesenha quando ela anda.</summary>
+    public int Versao { get; private set; }
+
+    public void DefinirGlifo(int n, IReadOnlyList<int> linhas)
+    {
+        var g = Glifos[n & 7];
+        for (int i = 0; i < 8; i++) g[i] = (byte)(i < linhas.Count ? linhas[i] & 0x1F : 0);
+        Versao++;
+    }
+
+    public void Luz(bool acesa) { LuzDeFundo = acesa; Versao++; }
+
+    public void Mostrar(bool sim) { Mostrando = sim; Versao++; }
+
     static char[,] Vazia(int c, int l)
     {
         var t = new char[l, c];
@@ -583,6 +610,8 @@ public class Lcd(int colunas = 16, int linhas = 2)
         Tela = Vazia(Colunas, Linhas);
         Col = Lin = 0;
         Ligado = true;
+        Mostrando = true;
+        Versao++;
     }
 
     /// <summary>
@@ -601,10 +630,11 @@ public class Lcd(int colunas = 16, int linhas = 2)
     {
         Tela = Vazia(Colunas, Linhas);
         Col = Lin = 0;
+        Versao++;
     }
 
     /// <summary>Sem energia o display apaga o fundo tambem.</summary>
-    public void Desligar() => Ligado = false;
+    public void Desligar() { Ligado = false; Versao++; }
 
     public void PosicionarCursor(int col, int lin)
     {
@@ -639,6 +669,7 @@ public class Lcd(int colunas = 16, int linhas = 2)
             Tela[Lin, Col] = ch;
             Col++;
         }
+        Versao++;
     }
 
     public string LinhaTexto(int i)
@@ -905,6 +936,12 @@ public class Maquina
 
     /// <summary>Fitas de LED enderecavel, por pino de dados.</summary>
     public readonly Dictionary<int, Fita> Fitas = [];
+
+    /// <summary>Os mostradores TM1637 do sketch, pelos pinos CLK e DIO.</summary>
+    public readonly Dictionary<(int Clk, int Dio), Tm1637> Mostradores = [];
+
+    /// <summary>As matrizes do MAX7219 (a LedControl), pelos pinos DIN, CLK e CS.</summary>
+    public readonly Dictionary<(int Din, int Clk, int Cs), Max7219> Matrizes = [];
 
     /// <summary>Telas de texto por barramento (SSD1306).</summary>
     public Lcd Oled { get; private set; }
@@ -1184,6 +1221,9 @@ public class Maquina
     /// </summary>
     public TelaGrafica CriarTela(int largura = 240, int altura = 320)
         => Tela ??= new TelaGrafica(largura, altura);
+
+    /// <summary>Outro tamanho de painel (o initR() do ST7735 que escolhe o de 1,44").</summary>
+    public TelaGrafica TrocarTela(int largura, int altura) => Tela = new TelaGrafica(largura, altura);
 
     public readonly List<EventoPino> Eventos = [];
 
@@ -2079,6 +2119,8 @@ public class Maquina
         lock (Trava)
         {
             Fitas.Clear();
+            lock (Mostradores) Mostradores.Clear();
+            lock (Matrizes) Matrizes.Clear();
             LimparNiveis();
             Array.Clear(Modo); Array.Clear(Digital); Array.Clear(Pwm);
             Array.Clear(Frequencia); Array.Clear(Pressionado);

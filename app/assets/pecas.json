@@ -7291,83 +7291,75 @@
  },
  {
   "id": "ili9341",
-  "largura": 176,
-  "altura": 293,
+  "largura": 152,
+  "altura": 254,
   "pinos": [
    {
     "nome": "VCC",
-    "x": 48.3,
-    "y": 287.2,
+    "x": 37.38,
+    "y": 248.31,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao: 3,3 a 5 V (o modulo tem regulador)"
    },
    {
     "nome": "GND",
-    "x": 57.9012,
-    "y": 287.2,
+    "x": 46.98,
+    "y": 248.31,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    },
    {
     "nome": "CS",
-    "x": 67.5024,
-    "y": 287.2,
-    "sinais": [
-     "spi"
-    ],
-    "descricao": ""
+    "x": 56.58,
+    "y": 248.31,
+    "sinais": [],
+    "descricao": "Chip select do SPI (LOW: o display escuta)"
    },
    {
     "nome": "RST",
-    "x": 77.1036,
-    "y": 287.2,
+    "x": 66.18,
+    "y": 248.31,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Reset (LOW reinicia o ILI9341)"
    },
    {
     "nome": "D/C",
-    "x": 86.7048,
-    "y": 287.2,
+    "x": 75.78,
+    "y": 248.31,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado/comando: LOW e comando, HIGH e dado"
    },
    {
     "nome": "MOSI",
-    "x": 96.306,
-    "y": 287.2,
-    "sinais": [
-     "spi"
-    ],
-    "descricao": ""
+    "x": 85.38,
+    "y": 248.31,
+    "sinais": [],
+    "descricao": "MOSI (SDI): os dados do SPI"
    },
    {
     "nome": "SCK",
-    "x": 105.9072,
-    "y": 287.2,
-    "sinais": [
-     "spi"
-    ],
-    "descricao": ""
+    "x": 94.98,
+    "y": 248.31,
+    "sinais": [],
+    "descricao": "O relogio do SPI"
    },
    {
     "nome": "LED",
-    "x": 115.5084,
-    "y": 287.2,
+    "x": 104.58,
+    "y": 248.31,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Luz de fundo: no 3,3 V acesa; num pino, HIGH acende e o PWM faz a meia luz"
    },
    {
     "nome": "MISO",
-    "x": 125.1096,
-    "y": 287.2,
-    "sinais": [
-     "spi"
-    ],
-    "descricao": ""
+    "x": 114.18,
+    "y": 248.31,
+    "sinais": [],
+    "descricao": "MISO (SDO): a leitura do display (pode ficar solto)"
    }
   ],
   "variantes": [],
@@ -7919,119 +7911,119 @@
   "pinos": [
    {
     "nome": "VSS",
-    "x": 32,
-    "y": 130.97,
+    "x": 30.24,
+    "y": 9.45,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    },
    {
     "nome": "VDD",
-    "x": 41.5,
-    "y": 130.97,
+    "x": 39.84,
+    "y": 9.45,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "5 V (o VCC do display)"
    },
    {
     "nome": "V0",
-    "x": 51.5,
-    "y": 130.97,
+    "x": 49.44,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Contraste: o meio de um potenciometro de 10 kohm entre o 5 V e o GND"
    },
    {
     "nome": "RS",
-    "x": 60.5,
-    "y": 130.97,
+    "x": 59.04,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "RS: LOW e comando, HIGH e caractere"
    },
    {
     "nome": "RW",
-    "x": 70.5,
-    "y": 130.97,
+    "x": 68.64,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "RW: no GND (so escrever)"
    },
    {
     "nome": "E",
-    "x": 80,
-    "y": 130.97,
+    "x": 78.24,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Enable: o pulso que faz o display ler"
    },
    {
     "nome": "D0",
-    "x": 89.5,
-    "y": 130.97,
+    "x": 87.84,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 0 (no modo de 4 bits fica solto)"
    },
    {
     "nome": "D1",
-    "x": 99.5,
-    "y": 130.97,
+    "x": 97.44,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 1 (no modo de 4 bits fica solto)"
    },
    {
     "nome": "D2",
-    "x": 109,
-    "y": 130.97,
+    "x": 107.04,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 2 (no modo de 4 bits fica solto)"
    },
    {
     "nome": "D3",
-    "x": 118.5,
-    "y": 130.97,
+    "x": 116.64,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 3 (no modo de 4 bits fica solto)"
    },
    {
     "nome": "D4",
-    "x": 128,
-    "y": 130.97,
+    "x": 126.24,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 4"
    },
    {
     "nome": "D5",
-    "x": 137.5,
-    "y": 130.97,
+    "x": 135.84,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 5"
    },
    {
     "nome": "D6",
-    "x": 147,
-    "y": 130.97,
+    "x": 145.44,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 6"
    },
    {
     "nome": "D7",
-    "x": 156.5,
-    "y": 130.97,
+    "x": 155.04,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 7"
    },
    {
     "nome": "A",
-    "x": 166.5,
-    "y": 130.97,
+    "x": 164.64,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Anodo da luz de fundo: 5 V (pelo resistor, se o modulo nao tiver)"
    },
    {
     "nome": "K",
-    "x": 176,
-    "y": 130.97,
+    "x": 174.24,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Catodo da luz de fundo: GND"
    }
   ],
   "variantes": [],
@@ -8044,35 +8036,35 @@
   "pinos": [
    {
     "nome": "GND",
-    "x": 34.02,
-    "y": 125.1,
+    "x": 30.24,
+    "y": 9.45,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    },
    {
     "nome": "VCC",
-    "x": 43.62,
-    "y": 125.1,
+    "x": 39.84,
+    "y": 9.45,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "5 V"
    },
    {
     "nome": "SDA",
-    "x": 53.22,
-    "y": 125.1,
+    "x": 49.44,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "SDA do I2C (o D21 na ESP32, o A4 no Uno)"
    },
    {
     "nome": "SCL",
-    "x": 62.82,
-    "y": 125.1,
+    "x": 59.04,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "SCL do I2C (o D22 na ESP32, o A5 no Uno)"
    }
   ],
   "variantes": [],
@@ -8080,124 +8072,124 @@
  },
  {
   "id": "lcd2004",
-  "largura": 355,
-  "altura": 180,
+  "largura": 370,
+  "altura": 227,
   "pinos": [
    {
     "nome": "VSS",
-    "x": 32,
-    "y": 174.44,
+    "x": 37.8,
+    "y": 9.45,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    },
    {
     "nome": "VDD",
-    "x": 41.5,
-    "y": 174.44,
+    "x": 47.4,
+    "y": 9.45,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "5 V (o VCC do display)"
    },
    {
     "nome": "V0",
-    "x": 51.5,
-    "y": 174.44,
+    "x": 57.0,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Contraste: o meio de um potenciometro de 10 kohm entre o 5 V e o GND"
    },
    {
     "nome": "RS",
-    "x": 60.5,
-    "y": 174.44,
+    "x": 66.6,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "RS: LOW e comando, HIGH e caractere"
    },
    {
     "nome": "RW",
-    "x": 70.5,
-    "y": 174.44,
+    "x": 76.2,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "RW: no GND (so escrever)"
    },
    {
     "nome": "E",
-    "x": 80,
-    "y": 174.44,
+    "x": 85.8,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Enable: o pulso que faz o display ler"
    },
    {
     "nome": "D0",
-    "x": 89.5,
-    "y": 174.44,
+    "x": 95.4,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 0 (no modo de 4 bits fica solto)"
    },
    {
     "nome": "D1",
-    "x": 99.5,
-    "y": 174.44,
+    "x": 105.0,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 1 (no modo de 4 bits fica solto)"
    },
    {
     "nome": "D2",
-    "x": 109,
-    "y": 174.44,
+    "x": 114.6,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 2 (no modo de 4 bits fica solto)"
    },
    {
     "nome": "D3",
-    "x": 118.5,
-    "y": 174.44,
+    "x": 124.2,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 3 (no modo de 4 bits fica solto)"
    },
    {
     "nome": "D4",
-    "x": 128,
-    "y": 174.44,
+    "x": 133.8,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 4"
    },
    {
     "nome": "D5",
-    "x": 137.5,
-    "y": 174.44,
+    "x": 143.4,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 5"
    },
    {
     "nome": "D6",
-    "x": 147,
-    "y": 174.44,
+    "x": 153.0,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 6"
    },
    {
     "nome": "D7",
-    "x": 156.5,
-    "y": 174.44,
+    "x": 162.6,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado 7"
    },
    {
     "nome": "A",
-    "x": 166.5,
-    "y": 174.44,
+    "x": 172.2,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Anodo da luz de fundo: 5 V (pelo resistor, se o modulo nao tiver)"
    },
    {
     "nome": "K",
-    "x": 176,
-    "y": 174.44,
+    "x": 181.8,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Catodo da luz de fundo: GND"
    }
   ],
   "variantes": [],
@@ -8205,40 +8197,40 @@
  },
  {
   "id": "lcd2004-i2c",
-  "largura": 355,
-  "altura": 180,
+  "largura": 370,
+  "altura": 227,
   "pinos": [
    {
     "nome": "GND",
-    "x": 34.02,
-    "y": 168.57,
+    "x": 37.8,
+    "y": 9.45,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
    },
    {
     "nome": "VCC",
-    "x": 43.62,
-    "y": 168.57,
+    "x": 47.4,
+    "y": 9.45,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "5 V"
    },
    {
     "nome": "SDA",
-    "x": 53.22,
-    "y": 168.57,
+    "x": 57.0,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "SDA do I2C (o D21 na ESP32, o A4 no Uno)"
    },
    {
     "nome": "SCL",
-    "x": 62.82,
-    "y": 168.57,
+    "x": 66.6,
+    "y": 9.45,
     "sinais": [],
-    "descricao": ""
+    "descricao": "SCL do I2C (o D22 na ESP32, o A5 no Uno)"
    }
   ],
   "variantes": [],
@@ -8738,6 +8730,93 @@
     "y": 88.32,
     "sinais": [],
     "descricao": ""
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "max7219-matriz",
+  "largura": 189,
+  "altura": 121,
+  "pinos": [
+   {
+    "nome": "VCC",
+    "x": 9.07,
+    "y": 41.27,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Alimentacao: 5 V (a matriz toda acesa puxa ~300 mA)"
+   },
+   {
+    "nome": "GND",
+    "x": 9.07,
+    "y": 50.87,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND"
+   },
+   {
+    "nome": "DIN",
+    "x": 9.07,
+    "y": 60.47,
+    "sinais": [],
+    "descricao": "Os dados (o DIN da LedControl)"
+   },
+   {
+    "nome": "CS",
+    "x": 9.07,
+    "y": 70.07,
+    "sinais": [],
+    "descricao": "O chip select (o CS da LedControl)"
+   },
+   {
+    "nome": "CLK",
+    "x": 9.07,
+    "y": 79.67,
+    "sinais": [],
+    "descricao": "O relogio (o CLK da LedControl)"
+   },
+   {
+    "nome": "VCC.2",
+    "x": 179.91,
+    "y": 41.27,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "O VCC, para a proxima matriz"
+   },
+   {
+    "nome": "GND.2",
+    "x": 179.91,
+    "y": 50.87,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "O GND, para a proxima matriz"
+   },
+   {
+    "nome": "DOUT",
+    "x": 179.91,
+    "y": 60.47,
+    "sinais": [],
+    "descricao": "Os dados para o DIN da proxima matriz (a cadeia da LedControl)"
+   },
+   {
+    "nome": "CS.2",
+    "x": 179.91,
+    "y": 70.07,
+    "sinais": [],
+    "descricao": "O CS, para a proxima matriz"
+   },
+   {
+    "nome": "CLK.2",
+    "x": 179.91,
+    "y": 79.67,
+    "sinais": [],
+    "descricao": "O CLK, para a proxima matriz"
    }
   ],
   "variantes": [],
@@ -9413,6 +9492,45 @@
      "power"
     ],
     "descricao": "VCC: 5 V (o 5V da placa ou uma fonte). A bobina do rele puxa ~70 mA daqui por canal ligado"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "modulo-semaforo",
+  "largura": 49,
+  "altura": 231,
+  "pinos": [
+   {
+    "nome": "G",
+    "x": 10.1,
+    "y": 227.98,
+    "sinais": [],
+    "descricao": "O LED verde (com o resistor de 470 ohms dentro): HIGH acende"
+   },
+   {
+    "nome": "Y",
+    "x": 19.7,
+    "y": 227.98,
+    "sinais": [],
+    "descricao": "O LED amarelo (com o resistor de 220 ohms dentro): HIGH acende"
+   },
+   {
+    "nome": "R",
+    "x": 29.3,
+    "y": 227.98,
+    "sinais": [],
+    "descricao": "O LED vermelho (com o resistor de 330 ohms dentro): HIGH acende"
+   },
+   {
+    "nome": "GND",
+    "x": 38.9,
+    "y": 227.98,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND (o catodo comum dos tres)"
    }
   ],
   "variantes": [],
@@ -11911,6 +12029,47 @@
   "metades": false
  },
  {
+  "id": "sh1106",
+  "largura": 127,
+  "altura": 134,
+  "pinos": [
+   {
+    "nome": "GND",
+    "x": 48.91,
+    "y": 7.56,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND"
+   },
+   {
+    "nome": "VCC",
+    "x": 58.51,
+    "y": 7.56,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Alimentacao: 3,3 a 5 V (o modulo tem regulador)"
+   },
+   {
+    "nome": "SCL",
+    "x": 68.11,
+    "y": 7.56,
+    "sinais": [],
+    "descricao": "SCL do I2C (o D22 na ESP32, o A5 no Uno)"
+   },
+   {
+    "nome": "SDA",
+    "x": 77.71,
+    "y": 7.56,
+    "sinais": [],
+    "descricao": "SDA do I2C (o D21 na ESP32, o A4 no Uno)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "slide-potentiometer",
   "largura": 208,
   "altura": 110,
@@ -12024,69 +12183,106 @@
   "pinos": [
    {
     "nome": "DATA",
-    "x": 36.5,
-    "y": 12.5,
-    "sinais": [
-     "i2c"
-    ],
-    "descricao": ""
+    "x": 36.51,
+    "y": 12.51,
+    "sinais": [],
+    "descricao": "Dados do SPI (o MOSI da placa)"
    },
    {
     "nome": "CLK",
-    "x": 45.5,
-    "y": 12.5,
-    "sinais": [
-     "i2c"
-    ],
-    "descricao": ""
+    "x": 45.51,
+    "y": 12.51,
+    "sinais": [],
+    "descricao": "O relogio do SPI (o SCK da placa)"
    },
    {
     "nome": "DC",
     "x": 54.5,
-    "y": 12.5,
+    "y": 12.51,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Dado/comando: LOW e comando, HIGH e dado"
    },
    {
     "nome": "RST",
-    "x": 64.5,
-    "y": 12.5,
+    "x": 64.52,
+    "y": 12.51,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Reset (LOW reinicia o SSD1306)"
    },
    {
     "nome": "CS",
-    "x": 74.5,
-    "y": 12.5,
+    "x": 74.49,
+    "y": 12.51,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chip select do SPI (LOW: o display escuta)"
    },
    {
     "nome": "3V3",
-    "x": 83.5,
-    "y": 12.5,
+    "x": 83.49,
+    "y": 12.51,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Saida de 3,3 V do regulador do modulo"
    },
    {
     "nome": "VIN",
-    "x": 93.5,
-    "y": 12.5,
+    "x": 93.51,
+    "y": 12.51,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao: 3 a 5 V"
    },
    {
     "nome": "GND",
-    "x": 103.5,
-    "y": 12,
+    "x": 103.48,
+    "y": 12.02,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "GND"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "ssd1306-128x32",
+  "largura": 144,
+  "altura": 45,
+  "pinos": [
+   {
+    "nome": "SDA",
+    "x": 6.05,
+    "y": 8.1,
+    "sinais": [],
+    "descricao": "SDA do I2C (o D21 na ESP32, o A4 no Uno)"
+   },
+   {
+    "nome": "SCL",
+    "x": 6.05,
+    "y": 17.7,
+    "sinais": [],
+    "descricao": "SCL do I2C (o D22 na ESP32, o A5 no Uno)"
+   },
+   {
+    "nome": "VCC",
+    "x": 6.05,
+    "y": 27.3,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Alimentacao: 3,3 a 5 V (o modulo tem regulador)"
+   },
+   {
+    "nome": "GND",
+    "x": 6.05,
+    "y": 36.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND"
    }
   ],
   "variantes": [],
@@ -12100,38 +12296,34 @@
    {
     "nome": "GND",
     "x": 37.19,
-    "y": 7.18,
+    "y": 6.05,
     "sinais": [
      "power"
     ],
-    "descricao": "Terra"
+    "descricao": "GND"
    },
    {
     "nome": "VCC",
     "x": 46.79,
-    "y": 7.18,
+    "y": 6.05,
     "sinais": [
      "power"
     ],
-    "descricao": "Alimentacao (3,3 ou 5 V)"
+    "descricao": "Alimentacao: 3,3 a 5 V (o modulo tem regulador)"
    },
    {
     "nome": "SCL",
     "x": 56.39,
-    "y": 7.18,
-    "sinais": [
-     "i2c"
-    ],
-    "descricao": "Relogio do I2C"
+    "y": 6.05,
+    "sinais": [],
+    "descricao": "SCL do I2C (o D22 na ESP32, o A5 no Uno)"
    },
    {
     "nome": "SDA",
     "x": 65.99,
-    "y": 7.18,
-    "sinais": [
-     "i2c"
-    ],
-    "descricao": "Dados do I2C"
+    "y": 6.05,
+    "sinais": [],
+    "descricao": "SDA do I2C (o D21 na ESP32, o A4 no Uno)"
    }
   ],
   "variantes": [],
@@ -13182,69 +13374,138 @@
   "metades": false
  },
  {
-  "id": "st7789",
-  "largura": 151,
-  "altura": 146,
+  "id": "st7735",
+  "largura": 130,
+  "altura": 219,
   "pinos": [
    {
-    "nome": "GND",
-    "x": 41.99,
-    "y": 6.43,
-    "sinais": [
-     "power"
-    ],
-    "descricao": ""
-   },
-   {
     "nome": "VCC",
-    "x": 51.59,
-    "y": 6.43,
+    "x": 32.88,
+    "y": 210.29,
     "sinais": [
      "power"
     ],
-    "descricao": ""
+    "descricao": "Alimentacao: 3,3 a 5 V (o modulo tem regulador)"
    },
    {
-    "nome": "SCL",
-    "x": 61.19,
-    "y": 6.43,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "SDA",
-    "x": 70.79,
-    "y": 6.43,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "RES",
-    "x": 80.39,
-    "y": 6.43,
-    "sinais": [],
-    "descricao": ""
-   },
-   {
-    "nome": "DC",
-    "x": 89.99,
-    "y": 6.43,
-    "sinais": [],
-    "descricao": ""
+    "nome": "GND",
+    "x": 42.48,
+    "y": 210.29,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND"
    },
    {
     "nome": "CS",
-    "x": 99.59,
-    "y": 6.43,
+    "x": 52.08,
+    "y": 210.29,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Chip select do SPI (LOW: o display escuta)"
+   },
+   {
+    "nome": "RESET",
+    "x": 61.68,
+    "y": 210.29,
+    "sinais": [],
+    "descricao": "Reset (LOW reinicia o ST7735)"
+   },
+   {
+    "nome": "A0",
+    "x": 71.28,
+    "y": 210.29,
+    "sinais": [],
+    "descricao": "Dado/comando (o DC): LOW e comando, HIGH e dado"
+   },
+   {
+    "nome": "SDA",
+    "x": 80.88,
+    "y": 210.29,
+    "sinais": [],
+    "descricao": "Os dados do SPI (o MOSI da placa)"
+   },
+   {
+    "nome": "SCK",
+    "x": 90.48,
+    "y": 210.29,
+    "sinais": [],
+    "descricao": "O relogio do SPI"
+   },
+   {
+    "nome": "LED",
+    "x": 100.08,
+    "y": 210.29,
+    "sinais": [],
+    "descricao": "Luz de fundo: no 3,3 V acesa; num pino, HIGH acende e o PWM faz a meia luz"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "st7789",
+  "largura": 121,
+  "altura": 165,
+  "pinos": [
+   {
+    "nome": "GND",
+    "x": 26.87,
+    "y": 7.56,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND"
+   },
+   {
+    "nome": "VCC",
+    "x": 36.47,
+    "y": 7.56,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Alimentacao: 3,3 V"
+   },
+   {
+    "nome": "SCL",
+    "x": 46.07,
+    "y": 7.56,
+    "sinais": [],
+    "descricao": "O relogio do SPI (o SCK da placa)"
+   },
+   {
+    "nome": "SDA",
+    "x": 55.67,
+    "y": 7.56,
+    "sinais": [],
+    "descricao": "Os dados do SPI (o MOSI da placa)"
+   },
+   {
+    "nome": "RES",
+    "x": 65.27,
+    "y": 7.56,
+    "sinais": [],
+    "descricao": "Reset (LOW reinicia o ST7789)"
+   },
+   {
+    "nome": "DC",
+    "x": 74.87,
+    "y": 7.56,
+    "sinais": [],
+    "descricao": "Dado/comando: LOW e comando, HIGH e dado"
+   },
+   {
+    "nome": "CS",
+    "x": 84.47,
+    "y": 7.56,
+    "sinais": [],
+    "descricao": "Chip select do SPI (LOW: o display escuta)"
    },
    {
     "nome": "BLK",
-    "x": 109.19,
-    "y": 6.43,
+    "x": 94.07,
+    "y": 7.56,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Luz de fundo: solto ou no 3,3 V acesa; num pino, HIGH acende e o PWM faz a meia luz"
    }
   ],
   "variantes": [],
@@ -13794,6 +14055,47 @@
     "y": 37.5,
     "sinais": [],
     "descricao": ""
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "tm1637",
+  "largura": 159,
+  "altura": 91,
+  "pinos": [
+   {
+    "nome": "CLK",
+    "x": 151.18,
+    "y": 31.1,
+    "sinais": [],
+    "descricao": "O relogio do TM1637 (qualquer pino digital: o CLK do TM1637Display)"
+   },
+   {
+    "nome": "DIO",
+    "x": 151.18,
+    "y": 40.7,
+    "sinais": [],
+    "descricao": "Os dados do TM1637 (qualquer pino digital: o DIO do TM1637Display)"
+   },
+   {
+    "nome": "VCC",
+    "x": 151.18,
+    "y": 50.3,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Alimentacao: 3,3 a 5 V"
+   },
+   {
+    "nome": "GND",
+    "x": 151.18,
+    "y": 59.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND"
    }
   ],
   "variantes": [],

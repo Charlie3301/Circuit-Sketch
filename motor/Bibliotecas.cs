@@ -21,7 +21,7 @@ public static class Bibliotecas
         "DHT", "Adafruit_NeoPixel", "Stepper", "Keypad",
         "Adafruit_MPU6050", "MPU6050", "sensors_event_t", "RTC_DS1307", "DateTime", "HX711",
         "Adafruit_SSD1306", "IRrecv", "decode_results", "Adafruit_ILI9341",
-        "Adafruit_ST7789",
+        "Adafruit_ST7789", "Adafruit_ST7735", "Adafruit_SH1106G", "TM1637Display", "LedControl",
         "File", "RF24",
 
         // Rede: WiFi, HTTP, MQTT e Bluetooth.

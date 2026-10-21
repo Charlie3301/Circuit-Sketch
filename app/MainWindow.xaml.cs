@@ -2055,6 +2055,53 @@ public partial class MainWindow : Window
                 AtualizarBarraObjeto();
             });
         }
+        else if (peca.Tipo == "tm1637")
+        {
+            // A cor do display: o vermelho, o verde, o azul, o branco ou o amarelo.
+            opcoesObjeto.Children.Add(new TextBlock
+            {
+                Text = Idioma.T("Cor"), Foreground = Cinza, FontSize = 10,
+                VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
+            });
+            string[] cores = EditorCircuito.OpcoesDeCorDoTm1637;
+            Escolha([.. cores.Select(c => Idioma.T(char.ToUpper(c[0]) + c[1..]))], Array.IndexOf(cores, EditorCircuito.CorDoTm1637(peca)), i =>
+            {
+                editor.DefinirModeloSimples(cores[i]);
+                AtualizarBarraObjeto();
+            });
+        }
+        else if (EditorCircuito.EhOled(peca.Tipo))
+        {
+            // A cor dos pontos: branco, azul, ou o de duas cores (amarelo em cima).
+            opcoesObjeto.Children.Add(new TextBlock
+            {
+                Text = Idioma.T("Cor"), Foreground = Cinza, FontSize = 10,
+                VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
+            });
+            string[] cores = EditorCircuito.CoresDoOled(peca.Tipo);
+            Escolha([.. cores.Select(c => c switch { "azul" => Idioma.T("Azul"), "amarelo-azul" => Idioma.T("Amarelo e azul"), _ => Idioma.T("Branco") })],
+                    Array.IndexOf(cores, EditorCircuito.CorDoOled(peca)), i =>
+            {
+                editor.DefinirModeloSimples(cores[i]);
+                AtualizarBarraObjeto();
+            });
+        }
+        else if (EditorCircuito.EhLcd(peca.Tipo))
+        {
+            // A cor do vidro: o verde de letras escuras ou o azul de letras brancas.
+            opcoesObjeto.Children.Add(new TextBlock
+            {
+                Text = Idioma.T("Cor"), Foreground = Cinza, FontSize = 10,
+                VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
+            });
+            string[] cores = ["verde", "azul"];
+            Escolha([Idioma.T("Verde (letras escuras)"), Idioma.T("Azul (letras brancas)")],
+                    Array.IndexOf(cores, EditorCircuito.CorDoLcd(peca)), i =>
+            {
+                editor.DefinirModeloSimples(cores[i]);
+                AtualizarBarraObjeto();
+            });
+        }
         else if (Diodos.EhDiodo(peca.Tipo))
         {
             var modelos = Diodos.ModelosDe(peca.Tipo);

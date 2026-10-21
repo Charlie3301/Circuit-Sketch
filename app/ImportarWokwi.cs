@@ -252,6 +252,8 @@ public static class ImportarWokwi
         p.MiliAmperes = N("corrente", fabrica?.MiliAmperes ?? 500);
         p.MiliAmperesHora = N("capacidade", fabrica?.MiliAmperesHora ?? 500);
         p.Modelo = A("modelo");
+        // O LCD azul do Wokwi (background="blue") e o nosso modelo azul.
+        if (p.Modelo is null && EditorCircuito.EhLcd(p.Tipo) && A("background") == "blue") p.Modelo = "azul";
         p.Ficha = p.Modelo == "personalizado"
             ? new FichaPersonalizada
             {

@@ -152,6 +152,12 @@ public static class ExportarWokwi
         if (p.MiliAmperes != (fabrica?.MiliAmperes ?? 500)) Por("corrente", Exato(p.MiliAmperes));
         if (p.MiliAmperesHora != (fabrica?.MiliAmperesHora ?? 500)) Por("capacidade", Exato(p.MiliAmperesHora));
         if (p.Modelo is not null) Por("modelo", p.Modelo);
+        // E o Wokwi desenha o LCD azul pelos atributos dele.
+        if (EditorCircuito.EhLcd(p.Tipo) && p.Modelo == "azul")
+        {
+            Por("background", "blue");
+            Por("color", "white");
+        }
         if (p.Modelo == "personalizado" && p.Ficha is { } f)
         {
             Por("ficha-volts", Exato(f.Volts));
