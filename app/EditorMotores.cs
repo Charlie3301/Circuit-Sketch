@@ -96,7 +96,8 @@ public partial class EditorCircuito
 
         return Energia.Calcular(Atual, bancada, redeDaEnergia,
                                 rede is null ? null : ContatosFechados(bancada, rede), forcas, CargasDinamicas(),
-                                PlacasSemCabo(), ReguladoresDesligados(), memoriaDaEnergia, passoTransitorio);
+                                PlacasSemCabo(), ReguladoresDesligados(), memoriaDaEnergia, passoTransitorio,
+                                LogicaAtual?.Saidas);
     }
 
     // =====================================================================
@@ -310,7 +311,9 @@ public partial class EditorCircuito
                                                        || Semicondutores.EhControlado(p.Tipo) || p.Tipo is "fusivel" or "varistor"
                                                        || DriverDePasso.De(p.Tipo) is not null || p.Tipo == "motor-28byj48"
                                                        || ModeloDeServo.De(p.Tipo) is not null || EhEsc(p.Tipo) || p.Tipo == "receptor-rc"
-                                                       || Reguladores.EhRegulador(p.Tipo) || ModulosDeRele.EhModulo(p.Tipo));
+                                                       || Reguladores.EhRegulador(p.Tipo) || ModulosDeRele.EhModulo(p.Tipo)
+                                                       // as saidas da logica acendem LED pela conta (Alpha 25)
+                                                       || Logica.EhPecaDeLogica(p.Tipo));
         if (!energia)
         {
             relogioDosMotores.Reset();

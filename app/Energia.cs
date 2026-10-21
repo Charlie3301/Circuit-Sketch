@@ -53,6 +53,9 @@ public sealed partial class Energia
 
     sealed record Fonte(int No, double Tensao, double Resistencia);
 
+    /// <summary>O nivel de cada saida das pecas de logica nesta conta (Logica.Saidas).</summary>
+    IReadOnlyDictionary<(string Peca, string Pino), int> saidasLogicas;
+
     readonly List<Ramo> ramos = [];
     readonly List<Fonte> fontes = [];
     readonly HashSet<string> resistores = [];
@@ -88,7 +91,8 @@ public sealed partial class Energia
                                    IReadOnlyDictionary<string, double> cargasDinamicas = null,
                                    IReadOnlySet<string> placasSemCabo = null,
                                    IReadOnlySet<string> reguladoresDesligados = null,
-                                   MemoriaDaEnergia memoria = null, double passo = 0)
+                                   MemoriaDaEnergia memoria = null, double passo = 0,
+                                   IReadOnlyDictionary<(string Peca, string Pino), int> saidasLogicas = null)
     {
         if (circuito is null) return new Energia();
         var rede = semResistor ?? new Netlist(circuito, resistorConduz: false);
@@ -101,23 +105,25 @@ public sealed partial class Energia
             var contatosFixos = contatos?.ToList();
             var trechos = TrechosDoPeriodo(emPwm)
                 .Select(t => (Um(circuito, bancada, rede, contatosFixos, forcasDosMotores, cargasDinamicas, placasSemCabo,
-                                 reguladoresDesligados, memoria, passo, t.Altos, lembrar: false), t.Peso))
+                                 reguladoresDesligados, memoria, passo, t.Altos, lembrar: false, saidasLogicas), t.Peso))
                 .ToList();
             var media = Media(trechos);
             media.Lembrar(circuito);
             return media;
         }
         return Um(circuito, bancada, rede, contatos, forcasDosMotores, cargasDinamicas, placasSemCabo,
-                  reguladoresDesligados, memoria, passo, null, lembrar: true);
+                  reguladoresDesligados, memoria, passo, null, lembrar: true, saidasLogicas);
     }
 
     /// <summary>Uma conta, com o PWM de cada pino em HIGH ou em LOW (ou na media, sem trechos).</summary>
     static Energia Um(Circuito circuito, Bancada bancada, Netlist rede, IEnumerable<Contato> contatos,
                       IReadOnlyDictionary<string, double> forcasDosMotores, IReadOnlyDictionary<string, double> cargasDinamicas,
                       IReadOnlySet<string> placasSemCabo, IReadOnlySet<string> reguladoresDesligados,
-                      MemoriaDaEnergia memoria, double passo, IReadOnlyDictionary<(string, int), bool> pwmNoTrecho, bool lembrar)
+                      MemoriaDaEnergia memoria, double passo, IReadOnlyDictionary<(string, int), bool> pwmNoTrecho, bool lembrar,
+                      IReadOnlyDictionary<(string Peca, string Pino), int> saidasLogicas)
     {
         var conta = new Energia();
+        conta.saidasLogicas = saidasLogicas;
         conta.pwmNoTrecho = pwmNoTrecho;
         conta.memoria = memoria;
         conta.passo = passo;
@@ -505,6 +511,20 @@ public sealed partial class Energia
             }
         }
 
+        // As saidas das portas ideais (Alpha 25): uma fonte no nivel da placa,
+        // com a resistencia de um GPIO. As dos chips 74HC vao nos ramos (pelo
+        // VCC e pelo GND do proprio chip).
+        if (saidasLogicas is not null)
+        {
+            double alto = perfilDoCircuito?.TensaoDeOperacao ?? 5.0;
+            foreach (var ((idPeca, pino), nivel) in saidasLogicas)
+            {
+                if (circuito.Achar(idPeca) is not { } logica || Logica.EhChip(logica.Tipo)) continue;
+                int no = No(rede, idPeca, pino);
+                if (no >= 0) fontes.Add(new Fonte(no, nivel == 1 ? alto : 0, 25));
+            }
+        }
+
         foreach (var peca in circuito.Pecas)
         {
             var def = Catalogo.Obter(peca.Tipo);
@@ -574,6 +594,17 @@ public sealed partial class Energia
             return na < 0 || nb < 0 ? null
                 : new Ramo(peca.Id, na, nb, Math.Max(resistencia, 0.001), queda, ideal, maximo);
         }
+
+        // A saida do chip 74HC e um transistor do proprio chip: em HIGH ela liga
+        // o pino ao VCC dele, em LOW ao GND, por uns 50 ohms (a ficha, em 4,5 V).
+        // Passar de 35 mA por saida estoura o chip (o maximo absoluto e 25 mA).
+        if (Logica.EhChip(peca.Tipo) && saidasLogicas is not null)
+            foreach (var pino in def.Pinos)
+            {
+                if (!saidasLogicas.TryGetValue((peca.Id, pino.Nome), out int nivel)) continue;
+                var saida = nivel == 1 ? Entre("VCC", pino.Nome, 50, 0, 0.004, 0.035) : Entre(pino.Nome, "GND", 50, 0, 0.004, 0.035);
+                if (saida is not null) yield return saida with { Rotulo = pino.Nome };
+            }
 
         // Todas as baterias -- a personalizada, as prontas e os suportes de
         // pilhas -- sao o mesmo ramo; o suporte com um slot vazio nao liga nada.
@@ -952,6 +983,8 @@ public sealed partial class Energia
 
     static double ResistenciaDeModulo(string tipo) => tipo switch
     {
+        // O 74HC parado gasta microampères: a corrente e a das saidas (os ramos delas).
+        _ when Logica.EhChip(tipo) => 100_000,
         "neopixel-matrix" => 20,
         "led-ring" => 40,
         "neopixel" => 90,

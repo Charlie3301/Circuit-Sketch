@@ -1,25 +1,59 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-     width="230.40000000000003" height="105.60000000000002" viewBox="0 0 230.40000000000003 105.60000000000002"
-     font-family="sans-serif" text-anchor="middle">
-  <rect x="0" y="0" width="230.40000000000003" height="105.60000000000002" rx="4" fill="#1B2430" stroke="#4E6274" stroke-width="1.6"/>
-  <rect x="48.00000000000001" y="11.520000000000001" width="172.80000000000004" height="82.56000000000002" rx="2" fill="#0A0E14" stroke="#2E3B4A" stroke-width="1"/>
-  <path d="M0 11.520000000000001 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="32.64" y="14.720000000000002" fill="#E6EDF3" font-size="8">D0</text>
-  <path d="M0 21.120000000000005 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="32.64" y="24.320000000000004" fill="#E6EDF3" font-size="8">D1</text>
-  <path d="M0 30.720000000000006 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="32.64" y="33.92000000000001" fill="#E6EDF3" font-size="8">D2</text>
-  <path d="M0 40.32000000000001 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="32.64" y="43.52000000000001" fill="#E6EDF3" font-size="8">D3</text>
-  <path d="M0 49.92000000000001 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="32.64" y="53.12000000000001" fill="#E6EDF3" font-size="8">D4</text>
-  <path d="M0 59.52000000000001 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="32.64" y="62.72000000000001" fill="#E6EDF3" font-size="8">D5</text>
-  <path d="M0 69.12000000000002 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="32.64" y="72.32000000000002" fill="#E6EDF3" font-size="8">D6</text>
-  <path d="M0 78.72 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="32.64" y="81.92" fill="#E6EDF3" font-size="8">D7</text>
-  <path d="M0 88.32000000000001 H21.120000000000005" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="32.64" y="91.52000000000001" fill="#E6EDF3" font-size="8">GND</text>
-  <text x="115.20000000000002" y="102.60000000000002" fill="#7C8B9A" font-size="8">ANALISADOR LOGICO</text>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="230px" height="106px" viewBox="0 0 230 106">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+</defs>
+<rect x="1.134" y="1.134" width="227.732" height="103.732" rx="5.291" fill="#2b2e34" stroke="#0c0d0f" stroke-width="0.756"/>
+<rect x="1.134" y="1.134" width="227.732" height="103.732" rx="5.291" fill="url(#luz)"/>
+<rect x="1.134" y="5.48" width="10.205" height="88.894" rx="1.134" fill="#16171a"/>
+<rect x="0" y="10.318" width="9.071" height="2.419" fill="url(#metal)"/>
+<rect x="12.85" y="9.26" width="4.535" height="4.535" rx="0.756" fill="#1d1d1f" stroke="#55595f" stroke-width="0.302"/>
+<text transform="translate(19.654 11.528) rotate(0)" x="0" y="2.079" font-family="Arial" font-weight="bold" font-size="5.197" fill="#eaf0f5" text-anchor="start">D0</text>
+<rect x="0" y="19.918" width="9.071" height="2.419" fill="url(#metal)"/>
+<rect x="12.85" y="18.86" width="4.535" height="4.535" rx="0.756" fill="#7a4a1e" stroke="#55595f" stroke-width="0.302"/>
+<text transform="translate(19.654 21.128) rotate(0)" x="0" y="2.079" font-family="Arial" font-weight="bold" font-size="5.197" fill="#eaf0f5" text-anchor="start">D1</text>
+<rect x="0" y="29.518" width="9.071" height="2.419" fill="url(#metal)"/>
+<rect x="12.85" y="28.46" width="4.535" height="4.535" rx="0.756" fill="#d0312d" stroke="#55595f" stroke-width="0.302"/>
+<text transform="translate(19.654 30.728) rotate(0)" x="0" y="2.079" font-family="Arial" font-weight="bold" font-size="5.197" fill="#eaf0f5" text-anchor="start">D2</text>
+<rect x="0" y="39.118" width="9.071" height="2.419" fill="url(#metal)"/>
+<rect x="12.85" y="38.06" width="4.535" height="4.535" rx="0.756" fill="#f07c1e" stroke="#55595f" stroke-width="0.302"/>
+<text transform="translate(19.654 40.328) rotate(0)" x="0" y="2.079" font-family="Arial" font-weight="bold" font-size="5.197" fill="#eaf0f5" text-anchor="start">D3</text>
+<rect x="0" y="48.718" width="9.071" height="2.419" fill="url(#metal)"/>
+<rect x="12.85" y="47.66" width="4.535" height="4.535" rx="0.756" fill="#f2d22e" stroke="#55595f" stroke-width="0.302"/>
+<text transform="translate(19.654 49.928) rotate(0)" x="0" y="2.079" font-family="Arial" font-weight="bold" font-size="5.197" fill="#eaf0f5" text-anchor="start">D4</text>
+<rect x="0" y="58.318" width="9.071" height="2.419" fill="url(#metal)"/>
+<rect x="12.85" y="57.26" width="4.535" height="4.535" rx="0.756" fill="#2e9a3e" stroke="#55595f" stroke-width="0.302"/>
+<text transform="translate(19.654 59.528) rotate(0)" x="0" y="2.079" font-family="Arial" font-weight="bold" font-size="5.197" fill="#eaf0f5" text-anchor="start">D5</text>
+<rect x="0" y="67.918" width="9.071" height="2.419" fill="url(#metal)"/>
+<rect x="12.85" y="66.86" width="4.535" height="4.535" rx="0.756" fill="#2a62c9" stroke="#55595f" stroke-width="0.302"/>
+<text transform="translate(19.654 69.128) rotate(0)" x="0" y="2.079" font-family="Arial" font-weight="bold" font-size="5.197" fill="#eaf0f5" text-anchor="start">D6</text>
+<rect x="0" y="77.518" width="9.071" height="2.419" fill="url(#metal)"/>
+<rect x="12.85" y="76.46" width="4.535" height="4.535" rx="0.756" fill="#7a3fb0" stroke="#55595f" stroke-width="0.302"/>
+<text transform="translate(19.654 78.728) rotate(0)" x="0" y="2.079" font-family="Arial" font-weight="bold" font-size="5.197" fill="#eaf0f5" text-anchor="start">D7</text>
+<rect x="0" y="87.118" width="9.071" height="2.419" fill="url(#metal)"/>
+<rect x="12.85" y="86.06" width="4.535" height="4.535" rx="0.756" fill="#9a9ea4" stroke="#55595f" stroke-width="0.302"/>
+<text transform="translate(19.654 88.328) rotate(0)" x="0" y="2.079" font-family="Arial" font-weight="bold" font-size="5.197" fill="#eaf0f5" text-anchor="start">GND</text>
+<rect x="45.641" y="9.297" width="177.035" height="87.406" rx="2.268" fill="#15171b"/>
+<rect x="47.909" y="11.565" width="172.5" height="82.871" rx="1.134" fill="#090d11"/>
+<path d="M49.421 21.923 L218.897 21.923" fill="none" stroke="#18222b" stroke-width="0.378" stroke-linecap="butt"/>
+<path d="M49.421 32.282 L218.897 32.282" fill="none" stroke="#18222b" stroke-width="0.378" stroke-linecap="butt"/>
+<path d="M49.421 42.641 L218.897 42.641" fill="none" stroke="#18222b" stroke-width="0.378" stroke-linecap="butt"/>
+<path d="M49.421 53 L218.897 53" fill="none" stroke="#18222b" stroke-width="0.378" stroke-linecap="butt"/>
+<path d="M49.421 63.359 L218.897 63.359" fill="none" stroke="#18222b" stroke-width="0.378" stroke-linecap="butt"/>
+<path d="M49.421 73.718 L218.897 73.718" fill="none" stroke="#18222b" stroke-width="0.378" stroke-linecap="butt"/>
+<path d="M49.421 84.077 L218.897 84.077" fill="none" stroke="#18222b" stroke-width="0.378" stroke-linecap="butt"/>
+<path d="M65.159 12.698 L65.159 93.302" fill="none" stroke="#121a21" stroke-width="0.302" stroke-linecap="butt"/>
+<path d="M82.409 12.698 L82.409 93.302" fill="none" stroke="#121a21" stroke-width="0.302" stroke-linecap="butt"/>
+<path d="M99.659 12.698 L99.659 93.302" fill="none" stroke="#121a21" stroke-width="0.302" stroke-linecap="butt"/>
+<path d="M116.909 12.698 L116.909 93.302" fill="none" stroke="#121a21" stroke-width="0.302" stroke-linecap="butt"/>
+<path d="M134.159 12.698 L134.159 93.302" fill="none" stroke="#121a21" stroke-width="0.302" stroke-linecap="butt"/>
+<path d="M151.409 12.698 L151.409 93.302" fill="none" stroke="#121a21" stroke-width="0.302" stroke-linecap="butt"/>
+<path d="M168.659 12.698 L168.659 93.302" fill="none" stroke="#121a21" stroke-width="0.302" stroke-linecap="butt"/>
+<path d="M185.909 12.698 L185.909 93.302" fill="none" stroke="#121a21" stroke-width="0.302" stroke-linecap="butt"/>
+<path d="M203.159 12.698 L203.159 93.302" fill="none" stroke="#121a21" stroke-width="0.302" stroke-linecap="butt"/>
+<text transform="translate(134.159 99.651) rotate(0)" x="0" y="1.795" font-family="Arial" font-weight="bold" font-size="4.488" fill="#93a6b8" text-anchor="middle">ANALISADOR LÓGICO · 8 CANAIS</text>
 </svg>

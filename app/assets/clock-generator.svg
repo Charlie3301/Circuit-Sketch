@@ -1,9 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-     width="67.20000000000002" height="38.400000000000006" viewBox="0 0 67.20000000000002 38.400000000000006"
-     font-family="sans-serif" text-anchor="middle">
-  <rect x="9.600000000000001" y="4.800000000000001" width="48.00000000000001" height="28.800000000000004" rx="3" fill="#243447" stroke="#4E6274" stroke-width="1.6"/>
-  <path d="M57.60000000000001 14.400000000000002 H67.20000000000002" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="46.60000000000001" y="17.8" fill="#E6EDF3" font-size="8">CLK</text>
-  <text x="33.60000000000001" y="34.400000000000006" fill="#E6EDF3" font-size="8.5">CLOCK</text>
-  <path d="M15.360000000000003 24.960000000000004 h8 v-12 h9 v12 h9 v-12 h8" fill="none" stroke="#FFD54F" stroke-width="2"/>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="67px" height="38px" viewBox="0 0 67 38">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+</defs>
+<rect x="57.449" y="13.417" width="9.751" height="1.965" rx="0.378" fill="#c9ced4"/>
+<rect x="1.512" y="1.89" width="56.315" height="34.22" rx="3.024" fill="#2c3036" stroke="#0d0e10" stroke-width="0.68"/>
+<rect x="1.512" y="1.89" width="56.315" height="34.22" rx="3.024" fill="url(#luz)"/>
+<rect x="4.913" y="5.291" width="35.15" height="18.52" rx="1.512" fill="#0b1410" stroke="#454b53" stroke-width="0.567"/>
+<path d="M13.701 6.047 L13.701 23.055" fill="none" stroke="#16261d" stroke-width="0.302" stroke-linecap="round"/>
+<path d="M22.488 6.047 L22.488 23.055" fill="none" stroke="#16261d" stroke-width="0.302" stroke-linecap="round"/>
+<path d="M31.276 6.047 L31.276 23.055" fill="none" stroke="#16261d" stroke-width="0.302" stroke-linecap="round"/>
+<path d="M6.803 19.654 L12.472 19.654 L12.472 9.449 L21.165 9.449 L21.165 19.654 L29.858 19.654 L29.858 9.449 L38.173 9.449" fill="none" stroke="#7fe06e" stroke-width="1.058"/>
+<text transform="translate(22.488 29.858) rotate(0)" x="0" y="1.606" font-family="Arial" font-weight="bold" font-size="4.016" fill="#93a6b8" text-anchor="middle">0,5 a 20 Hz</text>
+<text transform="translate(48.945 14.4) rotate(0)" x="0" y="1.984" font-family="Arial" font-weight="bold" font-size="4.961" fill="#eaf0f5" text-anchor="middle">CLK</text>
+<circle cx="48.945" cy="24.945" r="5.858" fill="#1b1c1f" stroke="#55595f" stroke-width="0.567"/>
+<circle cx="48.945" cy="24.945" r="4.346" fill="url(#plastico)"/>
+<path d="M48.945 24.945 L48.945 20.976" fill="none" stroke="#e8e8e4" stroke-width="0.831" stroke-linecap="round"/>
 </svg>

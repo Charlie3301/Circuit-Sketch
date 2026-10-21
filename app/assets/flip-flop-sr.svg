@@ -1,16 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-     width="67.20000000000002" height="48.00000000000001" viewBox="0 0 67.20000000000002 48.00000000000001"
-     font-family="sans-serif" text-anchor="middle">
-  <rect x="9.600000000000001" y="4.800000000000001" width="48.00000000000001" height="38.400000000000006" rx="3" fill="#243447" stroke="#4E6274" stroke-width="1.6"/>
-  <path d="M0 14.400000000000002 H9.600000000000001" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="20.6" y="17.8" fill="#E6EDF3" font-size="8">S</text>
-  <path d="M0 24.000000000000004 H9.600000000000001" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="20.6" y="27.400000000000002" fill="#E6EDF3" font-size="8">R</text>
-  <path d="M0 33.60000000000001 H9.600000000000001" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="20.6" y="37.00000000000001" fill="#E6EDF3" font-size="8">CLK</text>
-  <path d="M57.60000000000001 14.400000000000002 H67.20000000000002" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="46.60000000000001" y="17.8" fill="#E6EDF3" font-size="8">Q</text>
-  <path d="M57.60000000000001 24.000000000000004 H67.20000000000002" stroke="#C8D4DE" stroke-width="2"/>
-  <text x="46.60000000000001" y="27.400000000000002" fill="#E6EDF3" font-size="8">NQ</text>
-  <text x="33.60000000000001" y="44.00000000000001" fill="#E6EDF3" font-size="8.5">FF SR</text>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="67px" height="48px" viewBox="0 0 67 48">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+</defs>
+<rect x="0" y="13.417" width="9.978" height="1.965" rx="0.378" fill="#c9ced4"/>
+<rect x="0" y="23.017" width="9.978" height="1.965" rx="0.378" fill="#c9ced4"/>
+<rect x="0" y="32.617" width="9.978" height="1.965" rx="0.378" fill="#c9ced4"/>
+<rect x="57.222" y="13.417" width="9.978" height="1.965" rx="0.378" fill="#c9ced4"/>
+<rect x="57.222" y="23.017" width="9.978" height="1.965" rx="0.378" fill="#c9ced4"/>
+<path d="M9.6 3.024 L57.6 3.024 L57.6 44.976 L9.6 44.976 Z" fill="#263241" stroke="#a9bccd" stroke-width="0.907"/>
+<path d="M9.6 3.024 L57.6 3.024 L57.6 44.976 L9.6 44.976 Z" fill="url(#luz)"/>
+<text transform="translate(12.435 14.4) rotate(0)" x="0" y="2.362" font-family="Arial" font-weight="bold" font-size="5.906" fill="#eaf0f5" text-anchor="start">S</text>
+<text transform="translate(12.435 24) rotate(0)" x="0" y="2.362" font-family="Arial" font-weight="bold" font-size="5.906" fill="#eaf0f5" text-anchor="start">R</text>
+<path d="M9.6 30.765 L13.569 33.6 L9.6 36.435 Z" fill="none" stroke="#a9bccd" stroke-width="0.756"/>
+<text transform="translate(14.702 33.6) rotate(0)" x="0" y="2.079" font-family="Arial" font-weight="bold" font-size="5.197" fill="#eaf0f5" text-anchor="start">CLK</text>
+<text transform="translate(54.765 14.4) rotate(0)" x="0" y="2.362" font-family="Arial" font-weight="bold" font-size="5.906" fill="#eaf0f5" text-anchor="end">Q</text>
+<text transform="translate(54.765 24) rotate(0)" x="0" y="2.362" font-family="Arial" font-weight="bold" font-size="5.906" fill="#eaf0f5" text-anchor="end">Q</text>
+<path d="M50.466 20.457 L54.576 20.457" fill="none" stroke="#eaf0f5" stroke-width="0.491" stroke-linecap="butt"/>
+<text transform="translate(37.002 24) rotate(0)" x="0" y="1.984" font-family="Arial" font-weight="bold" font-size="4.961" fill="#93a6b8" text-anchor="middle">FF SR</text>
 </svg>

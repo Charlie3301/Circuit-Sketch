@@ -1,5 +1,1795 @@
 [
  {
+  "id": "74hc00",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1A",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Entrada A da porta 1"
+   },
+   {
+    "nome": "1B",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Entrada B da porta 1"
+   },
+   {
+    "nome": "1Y",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Saida da porta 1: nao (A e B)"
+   },
+   {
+    "nome": "2A",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Entrada A da porta 2"
+   },
+   {
+    "nome": "2B",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada B da porta 2"
+   },
+   {
+    "nome": "2Y",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida da porta 2: nao (A e B)"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "3Y",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Saida da porta 3: nao (A e B)"
+   },
+   {
+    "nome": "3A",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada A da porta 3"
+   },
+   {
+    "nome": "3B",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Entrada B da porta 3"
+   },
+   {
+    "nome": "4Y",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Saida da porta 4: nao (A e B)"
+   },
+   {
+    "nome": "4A",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Entrada A da porta 4"
+   },
+   {
+    "nome": "4B",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Entrada B da porta 4"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc02",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1Y",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Saida da porta 1: nao (A ou B)"
+   },
+   {
+    "nome": "1A",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Entrada A da porta 1"
+   },
+   {
+    "nome": "1B",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Entrada B da porta 1"
+   },
+   {
+    "nome": "2Y",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Saida da porta 2: nao (A ou B)"
+   },
+   {
+    "nome": "2A",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada A da porta 2"
+   },
+   {
+    "nome": "2B",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Entrada B da porta 2"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "3A",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Entrada A da porta 3"
+   },
+   {
+    "nome": "3B",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada B da porta 3"
+   },
+   {
+    "nome": "3Y",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Saida da porta 3: nao (A ou B)"
+   },
+   {
+    "nome": "4A",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Entrada A da porta 4"
+   },
+   {
+    "nome": "4B",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Entrada B da porta 4"
+   },
+   {
+    "nome": "4Y",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Saida da porta 4: nao (A ou B)"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc04",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1A",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Entrada da porta 1"
+   },
+   {
+    "nome": "1Y",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Saida da porta 1: o contrario do 1A"
+   },
+   {
+    "nome": "2A",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Entrada da porta 2"
+   },
+   {
+    "nome": "2Y",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Saida da porta 2: o contrario do 2A"
+   },
+   {
+    "nome": "3A",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada da porta 3"
+   },
+   {
+    "nome": "3Y",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida da porta 3: o contrario do 3A"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "4Y",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Saida da porta 4: o contrario do 4A"
+   },
+   {
+    "nome": "4A",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada da porta 4"
+   },
+   {
+    "nome": "5Y",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Saida da porta 5: o contrario do 5A"
+   },
+   {
+    "nome": "5A",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Entrada da porta 5"
+   },
+   {
+    "nome": "6Y",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Saida da porta 6: o contrario do 6A"
+   },
+   {
+    "nome": "6A",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Entrada da porta 6"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc08",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1A",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Entrada A da porta 1"
+   },
+   {
+    "nome": "1B",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Entrada B da porta 1"
+   },
+   {
+    "nome": "1Y",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Saida da porta 1: A e B"
+   },
+   {
+    "nome": "2A",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Entrada A da porta 2"
+   },
+   {
+    "nome": "2B",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada B da porta 2"
+   },
+   {
+    "nome": "2Y",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida da porta 2: A e B"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "3Y",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Saida da porta 3: A e B"
+   },
+   {
+    "nome": "3A",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada A da porta 3"
+   },
+   {
+    "nome": "3B",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Entrada B da porta 3"
+   },
+   {
+    "nome": "4Y",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Saida da porta 4: A e B"
+   },
+   {
+    "nome": "4A",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Entrada A da porta 4"
+   },
+   {
+    "nome": "4B",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Entrada B da porta 4"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc10",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1A",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Entrada A da porta 1"
+   },
+   {
+    "nome": "1B",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Entrada B da porta 1"
+   },
+   {
+    "nome": "2A",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Entrada A da porta 2"
+   },
+   {
+    "nome": "2B",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Entrada B da porta 2"
+   },
+   {
+    "nome": "2C",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada C da porta 2"
+   },
+   {
+    "nome": "2Y",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida da porta 2: nao (A e B e C)"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "3Y",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Saida da porta 3: nao (A e B e C)"
+   },
+   {
+    "nome": "3A",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada A da porta 3"
+   },
+   {
+    "nome": "3B",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Entrada B da porta 3"
+   },
+   {
+    "nome": "3C",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Entrada C da porta 3"
+   },
+   {
+    "nome": "1Y",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Saida da porta 1: nao (A e B e C)"
+   },
+   {
+    "nome": "1C",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Entrada C da porta 1"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc11",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1A",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Entrada A da porta 1"
+   },
+   {
+    "nome": "1B",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Entrada B da porta 1"
+   },
+   {
+    "nome": "2A",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Entrada A da porta 2"
+   },
+   {
+    "nome": "2B",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Entrada B da porta 2"
+   },
+   {
+    "nome": "2C",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada C da porta 2"
+   },
+   {
+    "nome": "2Y",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida da porta 2: A e B e C"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "3Y",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Saida da porta 3: A e B e C"
+   },
+   {
+    "nome": "3A",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada A da porta 3"
+   },
+   {
+    "nome": "3B",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Entrada B da porta 3"
+   },
+   {
+    "nome": "3C",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Entrada C da porta 3"
+   },
+   {
+    "nome": "1Y",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Saida da porta 1: A e B e C"
+   },
+   {
+    "nome": "1C",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Entrada C da porta 1"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc125",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1OE",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Habilita o buffer 1 (ativo em LOW): em HIGH o 1Y se solta. Sem uso, no GND"
+   },
+   {
+    "nome": "1A",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Entrada do buffer 1"
+   },
+   {
+    "nome": "1Y",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Saida do buffer 1 (o 1A, ou solta com o 1OE em HIGH)"
+   },
+   {
+    "nome": "2OE",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Habilita o buffer 2 (ativo em LOW): em HIGH o 2Y se solta. Sem uso, no GND"
+   },
+   {
+    "nome": "2A",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada do buffer 2"
+   },
+   {
+    "nome": "2Y",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida do buffer 2 (o 2A, ou solta com o 2OE em HIGH)"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "3Y",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Saida do buffer 3 (o 3A, ou solta com o 3OE em HIGH)"
+   },
+   {
+    "nome": "3A",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada do buffer 3"
+   },
+   {
+    "nome": "3OE",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Habilita o buffer 3 (ativo em LOW): em HIGH o 3Y se solta. Sem uso, no GND"
+   },
+   {
+    "nome": "4Y",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Saida do buffer 4 (o 4A, ou solta com o 4OE em HIGH)"
+   },
+   {
+    "nome": "4A",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Entrada do buffer 4"
+   },
+   {
+    "nome": "4OE",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Habilita o buffer 4 (ativo em LOW): em HIGH o 4Y se solta. Sem uso, no GND"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc14",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1A",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Entrada da porta 1"
+   },
+   {
+    "nome": "1Y",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Saida da porta 1: o contrario do 1A (com histerese: Schmitt-trigger)"
+   },
+   {
+    "nome": "2A",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Entrada da porta 2"
+   },
+   {
+    "nome": "2Y",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Saida da porta 2: o contrario do 2A (com histerese: Schmitt-trigger)"
+   },
+   {
+    "nome": "3A",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada da porta 3"
+   },
+   {
+    "nome": "3Y",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida da porta 3: o contrario do 3A (com histerese: Schmitt-trigger)"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "4Y",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Saida da porta 4: o contrario do 4A (com histerese: Schmitt-trigger)"
+   },
+   {
+    "nome": "4A",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada da porta 4"
+   },
+   {
+    "nome": "5Y",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Saida da porta 5: o contrario do 5A (com histerese: Schmitt-trigger)"
+   },
+   {
+    "nome": "5A",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Entrada da porta 5"
+   },
+   {
+    "nome": "6Y",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Saida da porta 6: o contrario do 6A (com histerese: Schmitt-trigger)"
+   },
+   {
+    "nome": "6A",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Entrada da porta 6"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc157",
+  "largura": 75,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "S",
+    "x": 3.9,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: A escolha dos quatro: LOW passa os A, HIGH passa os B"
+   },
+   {
+    "nome": "1A",
+    "x": 13.5,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Entrada A do multiplexador 1: vai ao 1Y com o S em LOW"
+   },
+   {
+    "nome": "1B",
+    "x": 23.1,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Entrada B do multiplexador 1: vai ao 1Y com o S em HIGH"
+   },
+   {
+    "nome": "1Y",
+    "x": 32.7,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Saida do multiplexador 1"
+   },
+   {
+    "nome": "2A",
+    "x": 42.3,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada A do multiplexador 2: vai ao 2Y com o S em LOW"
+   },
+   {
+    "nome": "2B",
+    "x": 51.9,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Entrada B do multiplexador 2: vai ao 2Y com o S em HIGH"
+   },
+   {
+    "nome": "2Y",
+    "x": 61.5,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 7: Saida do multiplexador 2"
+   },
+   {
+    "nome": "GND",
+    "x": 71.1,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 8: GND"
+   },
+   {
+    "nome": "3Y",
+    "x": 71.1,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Saida do multiplexador 3"
+   },
+   {
+    "nome": "3B",
+    "x": 61.5,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Entrada B do multiplexador 3: vai ao 3Y com o S em HIGH"
+   },
+   {
+    "nome": "3A",
+    "x": 51.9,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Entrada A do multiplexador 3: vai ao 3Y com o S em LOW"
+   },
+   {
+    "nome": "4Y",
+    "x": 42.3,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Saida do multiplexador 4"
+   },
+   {
+    "nome": "4B",
+    "x": 32.7,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Entrada B do multiplexador 4: vai ao 4Y com o S em HIGH"
+   },
+   {
+    "nome": "4A",
+    "x": 23.1,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 14: Entrada A do multiplexador 4: vai ao 4Y com o S em LOW"
+   },
+   {
+    "nome": "G",
+    "x": 13.5,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 15: Habilita (ativo em LOW): em HIGH as quatro saidas vao a LOW. Sem uso, no GND"
+   },
+   {
+    "nome": "VCC",
+    "x": 3.9,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 16: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc20",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1A",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Entrada A da porta 1"
+   },
+   {
+    "nome": "1B",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Entrada B da porta 1"
+   },
+   {
+    "nome": "NC",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Nao ligado por dentro"
+   },
+   {
+    "nome": "1C",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Entrada C da porta 1"
+   },
+   {
+    "nome": "1D",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada D da porta 1"
+   },
+   {
+    "nome": "1Y",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida da porta 1: nao (A e B e C e D)"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "2Y",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Saida da porta 2: nao (A e B e C e D)"
+   },
+   {
+    "nome": "2A",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada A da porta 2"
+   },
+   {
+    "nome": "2B",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Entrada B da porta 2"
+   },
+   {
+    "nome": "NC.2",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Nao ligado por dentro"
+   },
+   {
+    "nome": "2C",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Entrada C da porta 2"
+   },
+   {
+    "nome": "2D",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Entrada D da porta 2"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc21",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1A",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Entrada A da porta 1"
+   },
+   {
+    "nome": "1B",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Entrada B da porta 1"
+   },
+   {
+    "nome": "NC",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Nao ligado por dentro"
+   },
+   {
+    "nome": "1C",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Entrada C da porta 1"
+   },
+   {
+    "nome": "1D",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada D da porta 1"
+   },
+   {
+    "nome": "1Y",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida da porta 1: A e B e C e D"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "2Y",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Saida da porta 2: A e B e C e D"
+   },
+   {
+    "nome": "2A",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada A da porta 2"
+   },
+   {
+    "nome": "2B",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Entrada B da porta 2"
+   },
+   {
+    "nome": "NC.2",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Nao ligado por dentro"
+   },
+   {
+    "nome": "2C",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Entrada C da porta 2"
+   },
+   {
+    "nome": "2D",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Entrada D da porta 2"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc27",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1A",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Entrada A da porta 1"
+   },
+   {
+    "nome": "1B",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Entrada B da porta 1"
+   },
+   {
+    "nome": "2A",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Entrada A da porta 2"
+   },
+   {
+    "nome": "2B",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Entrada B da porta 2"
+   },
+   {
+    "nome": "2C",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada C da porta 2"
+   },
+   {
+    "nome": "2Y",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida da porta 2: nao (A ou B ou C)"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "3Y",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Saida da porta 3: nao (A ou B ou C)"
+   },
+   {
+    "nome": "3A",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada A da porta 3"
+   },
+   {
+    "nome": "3B",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Entrada B da porta 3"
+   },
+   {
+    "nome": "3C",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Entrada C da porta 3"
+   },
+   {
+    "nome": "1Y",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Saida da porta 1: nao (A ou B ou C)"
+   },
+   {
+    "nome": "1C",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Entrada C da porta 1"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc32",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1A",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Entrada A da porta 1"
+   },
+   {
+    "nome": "1B",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Entrada B da porta 1"
+   },
+   {
+    "nome": "1Y",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Saida da porta 1: A ou B"
+   },
+   {
+    "nome": "2A",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Entrada A da porta 2"
+   },
+   {
+    "nome": "2B",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada B da porta 2"
+   },
+   {
+    "nome": "2Y",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida da porta 2: A ou B"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "3Y",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Saida da porta 3: A ou B"
+   },
+   {
+    "nome": "3A",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada A da porta 3"
+   },
+   {
+    "nome": "3B",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Entrada B da porta 3"
+   },
+   {
+    "nome": "4Y",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Saida da porta 4: A ou B"
+   },
+   {
+    "nome": "4A",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Entrada A da porta 4"
+   },
+   {
+    "nome": "4B",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Entrada B da porta 4"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc7266",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1A",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Entrada A da porta 1"
+   },
+   {
+    "nome": "1B",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Entrada B da porta 1"
+   },
+   {
+    "nome": "1Y",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Saida da porta 1: A igual a B"
+   },
+   {
+    "nome": "2Y",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Saida da porta 2: A igual a B"
+   },
+   {
+    "nome": "2A",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada A da porta 2"
+   },
+   {
+    "nome": "2B",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Entrada B da porta 2"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "3A",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Entrada A da porta 3"
+   },
+   {
+    "nome": "3B",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada B da porta 3"
+   },
+   {
+    "nome": "3Y",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Saida da porta 3: A igual a B"
+   },
+   {
+    "nome": "4Y",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Saida da porta 4: A igual a B"
+   },
+   {
+    "nome": "4A",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Entrada A da porta 4"
+   },
+   {
+    "nome": "4B",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Entrada B da porta 4"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc74",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1CLR",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Clear do flip-flop 1 (ativo em LOW: leva o 1Q a LOW). Sem uso, no VCC"
+   },
+   {
+    "nome": "1D",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: O dado do flip-flop 1: entra no 1Q na subida do 1CLK"
+   },
+   {
+    "nome": "1CLK",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: O relogio do flip-flop 1 (borda de subida)"
+   },
+   {
+    "nome": "1PRE",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Preset do flip-flop 1 (ativo em LOW: leva o 1Q a HIGH). Sem uso, no VCC"
+   },
+   {
+    "nome": "1Q",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Saida do flip-flop 1"
+   },
+   {
+    "nome": "1NQ",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida invertida do flip-flop 1 (Q barrado)"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "2NQ",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Saida invertida do flip-flop 2 (Q barrado)"
+   },
+   {
+    "nome": "2Q",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Saida do flip-flop 2"
+   },
+   {
+    "nome": "2PRE",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Preset do flip-flop 2 (ativo em LOW: leva o 2Q a HIGH). Sem uso, no VCC"
+   },
+   {
+    "nome": "2CLK",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: O relogio do flip-flop 2 (borda de subida)"
+   },
+   {
+    "nome": "2D",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: O dado do flip-flop 2: entra no 2Q na subida do 2CLK"
+   },
+   {
+    "nome": "2CLR",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Clear do flip-flop 2 (ativo em LOW: leva o 2Q a LOW). Sem uso, no VCC"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "74hc86",
+  "largura": 74,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "1A",
+    "x": 8.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Entrada A da porta 1"
+   },
+   {
+    "nome": "1B",
+    "x": 17.8,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Entrada B da porta 1"
+   },
+   {
+    "nome": "1Y",
+    "x": 27.4,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Saida da porta 1: A ou B, mas nao os dois"
+   },
+   {
+    "nome": "2A",
+    "x": 37.0,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Entrada A da porta 2"
+   },
+   {
+    "nome": "2B",
+    "x": 46.6,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Entrada B da porta 2"
+   },
+   {
+    "nome": "2Y",
+    "x": 56.2,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida da porta 2: A ou B, mas nao os dois"
+   },
+   {
+    "nome": "GND",
+    "x": 65.8,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 7: GND"
+   },
+   {
+    "nome": "3Y",
+    "x": 65.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 8: Saida da porta 3: A ou B, mas nao os dois"
+   },
+   {
+    "nome": "3A",
+    "x": 56.2,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Entrada A da porta 3"
+   },
+   {
+    "nome": "3B",
+    "x": 46.6,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Entrada B da porta 3"
+   },
+   {
+    "nome": "4Y",
+    "x": 37.0,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: Saida da porta 4: A ou B, mas nao os dois"
+   },
+   {
+    "nome": "4A",
+    "x": 27.4,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: Entrada A da porta 4"
+   },
+   {
+    "nome": "4B",
+    "x": 17.8,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Entrada B da porta 4"
+   },
+   {
+    "nome": "VCC",
+    "x": 8.2,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 14: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "7segment",
   "largura": 47,
   "altura": 76,
@@ -334,24 +2124,61 @@
   "pinos": [
    {
     "nome": "A",
-    "x": 0,
+    "x": 0.0,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada A"
    },
    {
     "nome": "B",
-    "x": 0,
+    "x": 0.0,
     "y": 33.6,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada B"
    },
    {
     "nome": "Q",
     "x": 67.2,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida: HIGH so com A e B em HIGH (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "and-gate-3",
+  "largura": 67,
+  "altura": 48,
+  "pinos": [
+   {
+    "nome": "A",
+    "x": 0.0,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "Entrada A"
+   },
+   {
+    "nome": "B",
+    "x": 0.0,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Entrada B"
+   },
+   {
+    "nome": "C",
+    "x": 0.0,
+    "y": 33.6,
+    "sinais": [],
+    "descricao": "Entrada C"
+   },
+   {
+    "nome": "Q",
+    "x": 67.2,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Saida: HIGH so com A, B e C em HIGH (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
    }
   ],
   "variantes": [],
@@ -2234,6 +4061,59 @@
   "metades": false
  },
  {
+  "id": "buffer-gate",
+  "largura": 67,
+  "altura": 48,
+  "pinos": [
+   {
+    "nome": "A",
+    "x": 0.0,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Entrada A"
+   },
+   {
+    "nome": "Q",
+    "x": 67.2,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Saida: o mesmo nivel do A (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "buffer-tristate",
+  "largura": 67,
+  "altura": 48,
+  "pinos": [
+   {
+    "nome": "A",
+    "x": 0.0,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Entrada A"
+   },
+   {
+    "nome": "EN",
+    "x": 28.8,
+    "y": 48.0,
+    "sinais": [],
+    "descricao": "Habilita: em HIGH a saida segue o A; em LOW ela se solta"
+   },
+   {
+    "nome": "Q",
+    "x": 67.2,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Saida: o A, com o EN em HIGH; com o EN em LOW a saida fica solta (alta impedancia) (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "buzzer",
   "largura": 46,
   "altura": 63,
@@ -2312,7 +4192,7 @@
     "x": 67.2,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "A onda quadrada (a frequencia e o controle da peca, de 0,5 a 20 Hz)"
    }
   ],
   "variantes": [],
@@ -6828,31 +8708,31 @@
   "pinos": [
    {
     "nome": "D",
-    "x": 0,
+    "x": 0.0,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "O dado: entra no Q na subida do CLK"
    },
    {
     "nome": "CLK",
-    "x": 0,
+    "x": 0.0,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "O relogio: o flip-flop muda na borda de subida"
    },
    {
     "nome": "Q",
     "x": 67.2,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida (acende um LED pelo resistor)"
    },
    {
     "nome": "NQ",
     "x": 67.2,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida invertida (Q barrado)"
    }
   ],
   "variantes": [],
@@ -6865,45 +8745,89 @@
   "pinos": [
    {
     "nome": "D",
-    "x": 0,
+    "x": 0.0,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "O dado: entra no Q na subida do CLK"
    },
    {
     "nome": "S",
-    "x": 0,
+    "x": 0.0,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Set assincrono: em HIGH, o Q vai a HIGH na hora"
    },
    {
     "nome": "R",
-    "x": 0,
+    "x": 0.0,
     "y": 33.6,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Reset assincrono: em HIGH, o Q vai a LOW na hora"
    },
    {
     "nome": "CLK",
-    "x": 0,
+    "x": 0.0,
     "y": 43.2,
     "sinais": [],
-    "descricao": ""
+    "descricao": "O relogio: o flip-flop muda na borda de subida"
    },
    {
     "nome": "Q",
     "x": 67.2,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida (acende um LED pelo resistor)"
    },
    {
     "nome": "NQ",
     "x": 67.2,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida invertida (Q barrado)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "flip-flop-jk",
+  "largura": 67,
+  "altura": 48,
+  "pinos": [
+   {
+    "nome": "J",
+    "x": 0.0,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "J: com o K em LOW, o Q vai a HIGH na subida do CLK; J e K em HIGH invertem o Q"
+   },
+   {
+    "nome": "CLK",
+    "x": 0.0,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "O relogio: o flip-flop muda na borda de subida"
+   },
+   {
+    "nome": "K",
+    "x": 0.0,
+    "y": 33.6,
+    "sinais": [],
+    "descricao": "K: com o J em LOW, o Q vai a LOW na subida do CLK"
+   },
+   {
+    "nome": "Q",
+    "x": 67.2,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "Saida (acende um LED pelo resistor)"
+   },
+   {
+    "nome": "NQ",
+    "x": 67.2,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Saida invertida (Q barrado)"
    }
   ],
   "variantes": [],
@@ -6916,38 +8840,75 @@
   "pinos": [
    {
     "nome": "S",
-    "x": 0,
+    "x": 0.0,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Set (na subida do CLK): leva o Q a HIGH; S e R juntos invertem o Q"
    },
    {
     "nome": "R",
-    "x": 0,
+    "x": 0.0,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Reset (na subida do CLK): leva o Q a LOW"
    },
    {
     "nome": "CLK",
-    "x": 0,
+    "x": 0.0,
     "y": 33.6,
     "sinais": [],
-    "descricao": ""
+    "descricao": "O relogio: o flip-flop muda na borda de subida"
    },
    {
     "nome": "Q",
     "x": 67.2,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida (acende um LED pelo resistor)"
    },
    {
     "nome": "NQ",
     "x": 67.2,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida invertida (Q barrado)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "flip-flop-t",
+  "largura": 67,
+  "altura": 38,
+  "pinos": [
+   {
+    "nome": "T",
+    "x": 0.0,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "Toggle: em HIGH, o Q inverte a cada subida do CLK (divide a frequencia por 2)"
+   },
+   {
+    "nome": "CLK",
+    "x": 0.0,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "O relogio: o flip-flop muda na borda de subida"
+   },
+   {
+    "nome": "Q",
+    "x": 67.2,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "Saida (acende um LED pelo resistor)"
+   },
+   {
+    "nome": "NQ",
+    "x": 67.2,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Saida invertida (Q barrado)"
    }
   ],
   "variantes": [],
@@ -7905,6 +9866,80 @@
   "metades": false
  },
  {
+  "id": "latch-d",
+  "largura": 67,
+  "altura": 38,
+  "pinos": [
+   {
+    "nome": "D",
+    "x": 0.0,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "O dado: passa para o Q enquanto o EN estiver em HIGH"
+   },
+   {
+    "nome": "EN",
+    "x": 0.0,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Habilita: em HIGH o Q segue o D; em LOW o Q guarda o ultimo valor"
+   },
+   {
+    "nome": "Q",
+    "x": 67.2,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "Saida (acende um LED pelo resistor)"
+   },
+   {
+    "nome": "NQ",
+    "x": 67.2,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Saida invertida (Q barrado)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "latch-sr",
+  "largura": 67,
+  "altura": 38,
+  "pinos": [
+   {
+    "nome": "S",
+    "x": 0.0,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "Set: em HIGH, o Q vai a HIGH na hora (sem relogio)"
+   },
+   {
+    "nome": "R",
+    "x": 0.0,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Reset: em HIGH, o Q vai a LOW na hora; S e R em HIGH juntos poem Q e Q barrado em LOW"
+   },
+   {
+    "nome": "Q",
+    "x": 67.2,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "Saida (acende um LED pelo resistor)"
+   },
+   {
+    "nome": "NQ",
+    "x": 67.2,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Saida invertida (Q barrado)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "lcd1602",
   "largura": 302,
   "altura": 136,
@@ -8670,66 +10705,68 @@
   "pinos": [
    {
     "nome": "D0",
-    "x": 0,
-    "y": 11.52,
+    "x": 0.0,
+    "y": 11.53,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Canal 0: desenha o nivel do fio na tela"
    },
    {
     "nome": "D1",
-    "x": 0,
-    "y": 21.12,
+    "x": 0.0,
+    "y": 21.13,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Canal 1: desenha o nivel do fio na tela"
    },
    {
     "nome": "D2",
-    "x": 0,
-    "y": 30.72,
+    "x": 0.0,
+    "y": 30.73,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Canal 2: desenha o nivel do fio na tela"
    },
    {
     "nome": "D3",
-    "x": 0,
-    "y": 40.32,
+    "x": 0.0,
+    "y": 40.33,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Canal 3: desenha o nivel do fio na tela"
    },
    {
     "nome": "D4",
-    "x": 0,
-    "y": 49.92,
+    "x": 0.0,
+    "y": 49.93,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Canal 4: desenha o nivel do fio na tela"
    },
    {
     "nome": "D5",
-    "x": 0,
-    "y": 59.52,
+    "x": 0.0,
+    "y": 59.53,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Canal 5: desenha o nivel do fio na tela"
    },
    {
     "nome": "D6",
-    "x": 0,
-    "y": 69.12,
+    "x": 0.0,
+    "y": 69.13,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Canal 6: desenha o nivel do fio na tela"
    },
    {
     "nome": "D7",
-    "x": 0,
-    "y": 78.72,
+    "x": 0.0,
+    "y": 78.73,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Canal 7: desenha o nivel do fio na tela"
    },
    {
     "nome": "GND",
-    "x": 0,
-    "y": 88.32,
-    "sinais": [],
-    "descricao": ""
+    "x": 0.0,
+    "y": 88.33,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND: o terra do circuito medido"
    }
   ],
   "variantes": [],
@@ -9843,31 +11880,31 @@
   "pinos": [
    {
     "nome": "A",
-    "x": 0,
+    "x": 0.0,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada 0: vai ao Q com o SEL em LOW"
    },
    {
     "nome": "B",
-    "x": 0,
+    "x": 0.0,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada 1: vai ao Q com o SEL em HIGH"
    },
    {
     "nome": "SEL",
-    "x": 0,
+    "x": 0.0,
     "y": 33.6,
     "sinais": [],
-    "descricao": ""
+    "descricao": "A escolha: LOW passa o A, HIGH passa o B"
    },
    {
     "nome": "Q",
     "x": 67.2,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida (porta ideal: acende um LED pelo resistor)"
    }
   ],
   "variantes": [],
@@ -9880,24 +11917,61 @@
   "pinos": [
    {
     "nome": "A",
-    "x": 0,
+    "x": 0.0,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada A"
    },
    {
     "nome": "B",
-    "x": 0,
+    "x": 0.0,
     "y": 33.6,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada B"
    },
    {
     "nome": "Q",
     "x": 67.2,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida: LOW so com A e B em HIGH (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "nand-gate-3",
+  "largura": 67,
+  "altura": 48,
+  "pinos": [
+   {
+    "nome": "A",
+    "x": 0.0,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "Entrada A"
+   },
+   {
+    "nome": "B",
+    "x": 0.0,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Entrada B"
+   },
+   {
+    "nome": "C",
+    "x": 0.0,
+    "y": 33.6,
+    "sinais": [],
+    "descricao": "Entrada C"
+   },
+   {
+    "nome": "Q",
+    "x": 67.2,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Saida: LOW so com A, B e C em HIGH (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
    }
   ],
   "variantes": [],
@@ -10269,24 +12343,61 @@
   "pinos": [
    {
     "nome": "A",
-    "x": 0,
+    "x": 0.0,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada A"
    },
    {
     "nome": "B",
-    "x": 0,
+    "x": 0.0,
     "y": 33.6,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada B"
    },
    {
     "nome": "Q",
     "x": 67.2,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida: HIGH so com A e B em LOW (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "nor-gate-3",
+  "largura": 67,
+  "altura": 48,
+  "pinos": [
+   {
+    "nome": "A",
+    "x": 0.0,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "Entrada A"
+   },
+   {
+    "nome": "B",
+    "x": 0.0,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Entrada B"
+   },
+   {
+    "nome": "C",
+    "x": 0.0,
+    "y": 33.6,
+    "sinais": [],
+    "descricao": "Entrada C"
+   },
+   {
+    "nome": "Q",
+    "x": 67.2,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Saida: HIGH so com A, B e C em LOW (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
    }
   ],
   "variantes": [],
@@ -10299,17 +12410,17 @@
   "pinos": [
    {
     "nome": "A",
-    "x": 0,
+    "x": 0.0,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada A"
    },
    {
     "nome": "Q",
     "x": 67.2,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida: o contrario de A (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
    }
   ],
   "variantes": [],
@@ -10608,24 +12719,61 @@
   "pinos": [
    {
     "nome": "A",
-    "x": 0,
+    "x": 0.0,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada A"
    },
    {
     "nome": "B",
-    "x": 0,
+    "x": 0.0,
     "y": 33.6,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada B"
    },
    {
     "nome": "Q",
     "x": 67.2,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida: HIGH com qualquer um (A e B) em HIGH (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "or-gate-3",
+  "largura": 67,
+  "altura": 48,
+  "pinos": [
+   {
+    "nome": "A",
+    "x": 0.0,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "Entrada A"
+   },
+   {
+    "nome": "B",
+    "x": 0.0,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Entrada B"
+   },
+   {
+    "nome": "C",
+    "x": 0.0,
+    "y": 33.6,
+    "sinais": [],
+    "descricao": "Entrada C"
+   },
+   {
+    "nome": "Q",
+    "x": 67.2,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Saida: HIGH com qualquer um (A, B e C) em HIGH (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
    }
   ],
   "variantes": [],
@@ -14430,24 +16578,61 @@
   "pinos": [
    {
     "nome": "A",
-    "x": 0,
+    "x": 0.0,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada A"
    },
    {
     "nome": "B",
-    "x": 0,
+    "x": 0.0,
     "y": 33.6,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada B"
    },
    {
     "nome": "Q",
     "x": 67.2,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida: HIGH com um numero par de entradas em HIGH (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "xnor-gate-3",
+  "largura": 67,
+  "altura": 48,
+  "pinos": [
+   {
+    "nome": "A",
+    "x": 0.0,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "Entrada A"
+   },
+   {
+    "nome": "B",
+    "x": 0.0,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Entrada B"
+   },
+   {
+    "nome": "C",
+    "x": 0.0,
+    "y": 33.6,
+    "sinais": [],
+    "descricao": "Entrada C"
+   },
+   {
+    "nome": "Q",
+    "x": 67.2,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Saida: HIGH com um numero par de entradas em HIGH (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
    }
   ],
   "variantes": [],
@@ -14460,24 +16645,61 @@
   "pinos": [
    {
     "nome": "A",
-    "x": 0,
+    "x": 0.0,
     "y": 14.4,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada A"
    },
    {
     "nome": "B",
-    "x": 0,
+    "x": 0.0,
     "y": 33.6,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Entrada B"
    },
    {
     "nome": "Q",
     "x": 67.2,
     "y": 24.0,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Saida: HIGH com um numero impar de entradas em HIGH (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "xor-gate-3",
+  "largura": 67,
+  "altura": 48,
+  "pinos": [
+   {
+    "nome": "A",
+    "x": 0.0,
+    "y": 14.4,
+    "sinais": [],
+    "descricao": "Entrada A"
+   },
+   {
+    "nome": "B",
+    "x": 0.0,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Entrada B"
+   },
+   {
+    "nome": "C",
+    "x": 0.0,
+    "y": 33.6,
+    "sinais": [],
+    "descricao": "Entrada C"
+   },
+   {
+    "nome": "Q",
+    "x": 67.2,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "Saida: HIGH com um numero impar de entradas em HIGH (porta ideal, sem VCC nem GND: acende um LED pelo resistor)"
    }
   ],
   "variantes": [],

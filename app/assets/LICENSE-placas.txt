@@ -104,4 +104,11 @@ potenciometro WH148, da chave SS12D00, da DIP de 8 vias, do teclado de
 membrana 4 x 4 e dos modulos KY-023, KY-040 e KY-020 sao as dos vendedores.
 Nenhuma foto e reproduzida, e nenhuma marca e desenhada.
 
+A logica (as portas de uma, duas e tres entradas, os buffers, o
+multiplexador, os flip-flops e os latches, o gerador de clock, o analisador
+logico e os chips 74hc*.svg) tambem e desenho proprio do CircuitSketch. Os
+chips seguem o DIP de 0,3" da JEDEC (MS-001) e a pinagem das fichas da
+Texas Instruments de cada um; o codigo na tampa e so o do tipo, sem o
+prefixo de fabricante.
+
 O restante do CircuitSketch nao e afetado por esta licenca.

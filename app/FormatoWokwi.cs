@@ -78,6 +78,7 @@ public static class FormatoWokwi
         ["nor-gate"] = "wokwi-gate-nor-2",
         ["xnor-gate"] = "wokwi-gate-xnor-2",
         ["not-gate"] = "wokwi-gate-not",
+        ["buffer-gate"] = "wokwi-gate-buffer",
         ["mux-2"] = "wokwi-mux-2",
         ["flip-flop-d"] = "wokwi-flip-flop-d",
         ["flip-flop-dsr"] = "wokwi-flip-flop-dsr",
@@ -156,7 +157,7 @@ public static class FormatoWokwi
         ["esp32-h2-devkit"] = new() { ["EN"] = "RST", ["GND"] = "GND.1" },
         ["and-gate"] = Portas("OUT"), ["or-gate"] = Portas("OUT"), ["xor-gate"] = Portas("OUT"),
         ["nand-gate"] = Portas("OUT"), ["nor-gate"] = Portas("OUT"), ["xnor-gate"] = Portas("OUT"),
-        ["not-gate"] = Portas("OUT"), ["mux-2"] = Portas("OUT"),
+        ["not-gate"] = Portas("OUT"), ["mux-2"] = Portas("OUT"), ["buffer-gate"] = Portas("OUT"),
         ["flip-flop-d"] = new() { ["NQ"] = "NOTQ" },
         ["flip-flop-dsr"] = new() { ["NQ"] = "NOTQ" },
         // A Pico deles numera todos os GND (o primeiro e GND.1).
