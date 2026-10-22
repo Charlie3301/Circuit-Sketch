@@ -131,7 +131,12 @@ desenhos proprios do CircuitSketch; a posicao das ilhas do ESP-01, 03, 06,
 (github.com/jdunmire/kicad-ESP8266), sob a licenca Creative Commons
 Atribuicao-CompartilhaIgual 4.0 Internacional (CC BY-SA 4.0); as medidas e
 a pinagem dos outros vem dos desenhos com cota publicados pela comunidade
-(o guia de modulos da l0l.org.uk e o wiki do esp8266.com). Nenhuma foto e
-reproduzida, e nenhuma marca e desenhada.
+(o guia de modulos da l0l.org.uk e o wiki do esp8266.com). O cobre do
+ESP-02, 04, 08, 09, 10 e 11 foi vetorizado desses desenhos da placa; o
+tracado das pecas, das antenas e das cores foi medido em fotos: as do wiki
+do esp8266.com e, no Wikimedia Commons (CC BY-SA 4.0), "NodeMCU DEVKIT
+1.0" (NodeMCU Team), "ESP8266 E-01 (top)", "AI-thinker ESP-012 module",
+"Wemos LoLin NodeMCU V3 - AI-Thinker ESP8266MOD" e "ESP-WROOM-02(ESP8266)".
+Nenhuma foto e reproduzida, e nenhuma marca e desenhada.
 
 O restante do CircuitSketch nao e afetado por esta licenca.

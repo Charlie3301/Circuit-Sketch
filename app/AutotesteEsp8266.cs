@@ -23,16 +23,16 @@ public static partial class Autoteste
         // ---- o tamanho de cada placa (a caixa tem 0,2 mm de folga em volta) ----
         var tamanhos = new (string Tipo, double L, double A)[]
         {
-            ("esp8266-nodemcu", 25.4, 48.26), ("esp-01", 14.3, 24.8), ("esp-02", 14.2, 14.2), ("esp-03", 12.2, 17.3),
-            ("esp-04", 14.7, 12.1), ("esp-05", 14.2, 14.2), ("esp-06", 16.3, 13.1), ("esp-07", 16.0, 22.0),
-            ("esp-08", 16.0, 18.0), ("esp-09", 10.0, 10.0), ("esp-10", 14.2, 10.0), ("esp-11", 17.3, 12.1),
+            ("esp8266-nodemcu", 25.4, 48.26), ("esp-01", 14.3, 24.8), ("esp-02", 14.2, 14.2), ("esp-03", 12.2, 16.8),
+            ("esp-04", 14.75, 12.67), ("esp-05", 14.2, 14.2), ("esp-06", 16.3, 13.1), ("esp-07", 16.0, 22.0),
+            ("esp-08", 17.0, 16.0), ("esp-09", 10.0, 10.0), ("esp-10", 15.4, 10.0), ("esp-11", 18.1, 13.05),
             ("esp-12", 16.0, 24.0), ("esp-12e", 16.0, 24.0), ("esp-12f", 16.0, 24.0), ("esp-13", 18.0, 20.0), ("esp-14", 16.0, 24.0),
         };
         var errados = tamanhos.Where(t => !Pecas.Existe(t.Tipo)
                                           || !Perto(Catalogo.Obter(t.Tipo).Largura / mm - 0.4, t.L, 0.3)
                                           || !Perto(Catalogo.Obter(t.Tipo).Altura / mm - 0.4, t.A, 0.3))
             .Select(t => $"{t.Tipo} {Catalogo.Obter(t.Tipo).Largura / mm - 0.4:0.0}x{Catalogo.Obter(t.Tipo).Altura / mm - 0.4:0.0}").ToList();
-        Conferir("esp8266: as 17 placas no tamanho real (a NodeMCU de 25,4 x 48,3, o ESP-01 de 14,3 x 24,8, o ESP-12 de 16 x 24, o ESP-09 de 10 x 10)",
+        Conferir("esp8266: as 17 placas no tamanho real (a NodeMCU de 25,4 x 48,3, o ESP-01 de 14,3 x 24,8, o ESP-12 de 16 x 24, o ESP-08 de 17 x 16, o ESP-09 de 10 x 10)",
             errados.Count == 0, string.Join(", ", errados));
 
         // ---- as filas de ilhas: o passo e a ordem de cada modulo ----
@@ -48,7 +48,9 @@ public static partial class Autoteste
             ("esp-04", 2.0, ["ANT", "CH_PD", "GPIO16", "RXD", "TXD", "NC", "GND"]),
             ("esp-04", 2.0, ["VCC", "GPIO14", "GPIO12", "GPIO13", "GPIO15", "GPIO2", "GPIO0"]),
             ("esp-05", 2.54, ["VCC", "TXD", "RXD", "GND", "RST"]),
-            ("esp-07", 2.0, esq12), ("esp-07", 2.0, dir12), ("esp-08", 2.0, esq12), ("esp-08", 2.0, dir12),
+            ("esp-07", 2.0, esq12), ("esp-07", 2.0, dir12),
+            ("esp-08", 2.0, ["ANT", "CH_PD", "GPIO16", "RXD", "TXD", "NC", "GND"]),
+            ("esp-08", 2.0, ["VCC", "GPIO14", "GPIO12", "GPIO13", "GPIO15", "GPIO2", "GPIO0"]),
             ("esp-10", 2.0, ["RST", "VCC", "TXD", "RXD", "GND"]),
             ("esp-11", 1.27, ["GND", "CH_PD", "RST", "RXD", "TXD", "GPIO0", "GPIO1", "VCC"]),
             ("esp-12", 2.0, esq12), ("esp-12", 2.0, dir12),
@@ -77,7 +79,6 @@ public static partial class Autoteste
         {
             var esperados = g.SelectMany(f => f.Pinos).ToHashSet();
             if (g.Key == "esp-05") esperados.Add("GND.2");
-            if (g.Key == "esp-08") esperados.Add("ANT");
             var nomes = Catalogo.Obter(g.Key).Pinos.Select(p => p.Nome).ToHashSet();
             return nomes.SetEquals(esperados) ? null : $"{g.Key}: {string.Join("/", nomes.Except(esperados))}|{string.Join("/", esperados.Except(nomes))}";
         }).Where(e => e is not null).ToList();
@@ -96,12 +97,13 @@ public static partial class Autoteste
         {
             ("esp-03", [0, 1, 2, 3, 12, 13, 14, 15, 16]), ("esp-04", [0, 1, 2, 3, 12, 13, 14, 15, 16]),
             ("esp-06", [0, 1, 2, 3, 12, 13, 14, 15, 16]), ("esp-09", [0, 1, 2, 3, 12, 13, 14, 15]),
+            ("esp-08", [0, 1, 2, 3, 12, 13, 14, 15, 16]),
             ("esp-11", [0, 1, 3]), ("esp-14", [0]), ("esp-05", [1, 3]), ("esp-10", [1, 3]), ("esp-01", [0, 1, 2, 3]),
             ("esp-12f", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]),
         };
         var trocados = gpios.Where(g => !Gpios(g.Tipo).SetEquals(g.Esperados))
             .Select(g => $"{g.Tipo}: {string.Join(",", Gpios(g.Tipo).Order())}").ToList();
-        Conferir("esp8266: os GPIO de fora sao os do modulo de verdade (o ESP-03/04/06/09 sem GPIO4 e GPIO5, o ESP-11 com GPIO0 e GPIO1, do ESP-14 so o GPIO0)",
+        Conferir("esp8266: os GPIO de fora sao os do modulo de verdade (o ESP-03/04/06/08/09 sem GPIO4 e GPIO5, o ESP-11 com GPIO0 e GPIO1, do ESP-14 so o GPIO0)",
             trocados.Count == 0, string.Join("; ", trocados));
 
         // ---- os LEDs soldados ----

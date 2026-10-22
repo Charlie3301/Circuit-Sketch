@@ -4999,7 +4999,7 @@
   "pinos": [
    {
     "nome": "VCC",
-    "x": 14.36,
+    "x": 13.38,
     "y": 4.91,
     "sinais": [
      "power"
@@ -5008,21 +5008,21 @@
    },
    {
     "nome": "RST",
-    "x": 23.96,
+    "x": 22.98,
     "y": 4.91,
     "sinais": [],
     "descricao": "Reset (ativo em LOW): solto ou em HIGH, roda"
    },
    {
     "nome": "CH_PD",
-    "x": 33.56,
+    "x": 32.58,
     "y": 4.91,
     "sinais": [],
     "descricao": "Liga o chip (EN/CH_PD): precisa estar em HIGH para funcionar"
    },
    {
     "nome": "TXD",
-    "x": 43.16,
+    "x": 42.18,
     "y": 4.91,
     "sinais": [
      "usart"
@@ -5031,7 +5031,7 @@
    },
    {
     "nome": "RXD",
-    "x": 14.36,
+    "x": 13.38,
     "y": 14.51,
     "sinais": [
      "usart"
@@ -5040,7 +5040,7 @@
    },
    {
     "nome": "GPIO0",
-    "x": 23.96,
+    "x": 22.98,
     "y": 14.51,
     "sinais": [
      "pwm"
@@ -5049,7 +5049,7 @@
    },
    {
     "nome": "GPIO2",
-    "x": 33.56,
+    "x": 32.58,
     "y": 14.51,
     "sinais": [
      "pwm"
@@ -5058,7 +5058,7 @@
    },
    {
     "nome": "GND",
-    "x": 43.16,
+    "x": 42.18,
     "y": 14.51,
     "sinais": [
      "power"
@@ -5076,14 +5076,14 @@
   "pinos": [
    {
     "nome": "RST",
-    "x": 21.92,
+    "x": 22.49,
     "y": 0.76,
     "sinais": [],
     "descricao": "Reset (ativo em LOW): solto ou em HIGH, roda"
    },
    {
     "nome": "GPIO2",
-    "x": 31.52,
+    "x": 32.09,
     "y": 0.76,
     "sinais": [
      "pwm"
@@ -5092,7 +5092,7 @@
    },
    {
     "nome": "GPIO0",
-    "x": 41.12,
+    "x": 41.69,
     "y": 0.76,
     "sinais": [
      "pwm"
@@ -5101,7 +5101,7 @@
    },
    {
     "nome": "GPIO15",
-    "x": 50.72,
+    "x": 51.29,
     "y": 0.76,
     "sinais": [
      "spi",
@@ -5111,7 +5111,7 @@
    },
    {
     "nome": "GND",
-    "x": 21.92,
+    "x": 22.68,
     "y": 54.43,
     "sinais": [
      "power"
@@ -5120,7 +5120,7 @@
    },
    {
     "nome": "RXD",
-    "x": 31.52,
+    "x": 32.28,
     "y": 54.43,
     "sinais": [
      "usart"
@@ -5129,7 +5129,7 @@
    },
    {
     "nome": "TXD",
-    "x": 41.12,
+    "x": 41.88,
     "y": 54.43,
     "sinais": [
      "usart"
@@ -5138,7 +5138,7 @@
    },
    {
     "nome": "VCC",
-    "x": 50.72,
+    "x": 51.48,
     "y": 54.43,
     "sinais": [
      "power"
@@ -5152,12 +5152,12 @@
  {
   "id": "esp-03",
   "largura": 48,
-  "altura": 67,
+  "altura": 65,
   "pinos": [
    {
     "nome": "VCC",
     "x": 0.76,
-    "y": 16.06,
+    "y": 14.17,
     "sinais": [
      "power"
     ],
@@ -5166,7 +5166,7 @@
    {
     "nome": "GPIO14",
     "x": 0.76,
-    "y": 23.62,
+    "y": 21.73,
     "sinais": [
      "spi",
      "pwm"
@@ -5176,7 +5176,7 @@
    {
     "nome": "GPIO12",
     "x": 0.76,
-    "y": 31.18,
+    "y": 29.29,
     "sinais": [
      "spi",
      "pwm"
@@ -5186,7 +5186,7 @@
    {
     "nome": "GPIO13",
     "x": 0.76,
-    "y": 38.74,
+    "y": 36.85,
     "sinais": [
      "spi",
      "pwm"
@@ -5196,7 +5196,7 @@
    {
     "nome": "GPIO15",
     "x": 0.76,
-    "y": 46.3,
+    "y": 44.41,
     "sinais": [
      "spi",
      "pwm"
@@ -5206,7 +5206,7 @@
    {
     "nome": "GPIO2",
     "x": 0.76,
-    "y": 53.86,
+    "y": 51.97,
     "sinais": [
      "pwm"
     ],
@@ -5215,7 +5215,7 @@
    {
     "nome": "GPIO0",
     "x": 0.76,
-    "y": 61.42,
+    "y": 59.53,
     "sinais": [
      "pwm"
     ],
@@ -5224,28 +5224,28 @@
    {
     "nome": "ANT",
     "x": 46.87,
-    "y": 16.06,
+    "y": 14.17,
     "sinais": [],
     "descricao": "A saída para a antena de fora (não ligar)"
    },
    {
     "nome": "CH_PD",
     "x": 46.87,
-    "y": 23.62,
+    "y": 21.73,
     "sinais": [],
     "descricao": "Liga o chip (EN/CH_PD): precisa estar em HIGH para funcionar"
    },
    {
     "nome": "GPIO16",
     "x": 46.87,
-    "y": 31.18,
+    "y": 29.29,
     "sinais": [],
     "descricao": "GPIO16 (o que acorda do deep sleep, ligado ao RST)"
    },
    {
     "nome": "RXD",
     "x": 46.87,
-    "y": 38.74,
+    "y": 36.85,
     "sinais": [
      "usart"
     ],
@@ -5254,7 +5254,7 @@
    {
     "nome": "TXD",
     "x": 46.87,
-    "y": 46.3,
+    "y": 44.41,
     "sinais": [
      "usart"
     ],
@@ -5263,14 +5263,14 @@
    {
     "nome": "NC",
     "x": 46.87,
-    "y": 53.86,
+    "y": 51.97,
     "sinais": [],
     "descricao": "Não ligado"
    },
    {
     "nome": "GND",
     "x": 46.87,
-    "y": 61.42,
+    "y": 59.53,
     "sinais": [
      "power"
     ],
@@ -5283,32 +5283,32 @@
  {
   "id": "esp-04",
   "largura": 57,
-  "altura": 47,
+  "altura": 49,
   "pinos": [
    {
     "nome": "ANT",
-    "x": 5.86,
+    "x": 6.35,
     "y": 0.76,
     "sinais": [],
     "descricao": "A saída para a antena de fora (não ligar)"
    },
    {
     "nome": "CH_PD",
-    "x": 13.42,
+    "x": 13.91,
     "y": 0.76,
     "sinais": [],
     "descricao": "Liga o chip (EN/CH_PD): precisa estar em HIGH para funcionar"
    },
    {
     "nome": "GPIO16",
-    "x": 20.98,
+    "x": 21.47,
     "y": 0.76,
     "sinais": [],
     "descricao": "GPIO16 (o que acorda do deep sleep, ligado ao RST)"
    },
    {
     "nome": "RXD",
-    "x": 28.54,
+    "x": 29.03,
     "y": 0.76,
     "sinais": [
      "usart"
@@ -5317,7 +5317,7 @@
    },
    {
     "nome": "TXD",
-    "x": 36.09,
+    "x": 36.59,
     "y": 0.76,
     "sinais": [
      "usart"
@@ -5326,14 +5326,14 @@
    },
    {
     "nome": "NC",
-    "x": 43.65,
+    "x": 44.14,
     "y": 0.76,
     "sinais": [],
     "descricao": "Não ligado"
    },
    {
     "nome": "GND",
-    "x": 51.21,
+    "x": 51.7,
     "y": 0.76,
     "sinais": [
      "power"
@@ -5342,8 +5342,8 @@
    },
    {
     "nome": "VCC",
-    "x": 5.86,
-    "y": 46.49,
+    "x": 6.43,
+    "y": 48.64,
     "sinais": [
      "power"
     ],
@@ -5351,8 +5351,8 @@
    },
    {
     "nome": "GPIO14",
-    "x": 13.42,
-    "y": 46.49,
+    "x": 13.98,
+    "y": 48.64,
     "sinais": [
      "spi",
      "pwm"
@@ -5361,8 +5361,8 @@
    },
    {
     "nome": "GPIO12",
-    "x": 20.98,
-    "y": 46.49,
+    "x": 21.54,
+    "y": 48.64,
     "sinais": [
      "spi",
      "pwm"
@@ -5371,8 +5371,8 @@
    },
    {
     "nome": "GPIO13",
-    "x": 28.54,
-    "y": 46.49,
+    "x": 29.1,
+    "y": 48.64,
     "sinais": [
      "spi",
      "pwm"
@@ -5381,8 +5381,8 @@
    },
    {
     "nome": "GPIO15",
-    "x": 36.09,
-    "y": 46.49,
+    "x": 36.66,
+    "y": 48.64,
     "sinais": [
      "spi",
      "pwm"
@@ -5391,8 +5391,8 @@
    },
    {
     "nome": "GPIO2",
-    "x": 43.65,
-    "y": 46.49,
+    "x": 44.22,
+    "y": 48.64,
     "sinais": [
      "pwm"
     ],
@@ -5400,8 +5400,8 @@
    },
    {
     "nome": "GPIO0",
-    "x": 51.21,
-    "y": 46.49,
+    "x": 51.78,
+    "y": 48.64,
     "sinais": [
      "pwm"
     ],
@@ -5418,8 +5418,8 @@
   "pinos": [
    {
     "nome": "VCC",
-    "x": 7.94,
-    "y": 6.43,
+    "x": 8.39,
+    "y": 5.1,
     "sinais": [
      "power"
     ],
@@ -5427,8 +5427,8 @@
    },
    {
     "nome": "TXD",
-    "x": 17.54,
-    "y": 6.43,
+    "x": 17.99,
+    "y": 5.1,
     "sinais": [
      "usart"
     ],
@@ -5436,8 +5436,8 @@
    },
    {
     "nome": "RXD",
-    "x": 27.14,
-    "y": 6.43,
+    "x": 27.59,
+    "y": 5.1,
     "sinais": [
      "usart"
     ],
@@ -5445,8 +5445,8 @@
    },
    {
     "nome": "GND",
-    "x": 36.74,
-    "y": 6.43,
+    "x": 37.19,
+    "y": 5.1,
     "sinais": [
      "power"
     ],
@@ -5454,15 +5454,15 @@
    },
    {
     "nome": "RST",
-    "x": 46.34,
-    "y": 6.43,
+    "x": 46.79,
+    "y": 5.1,
     "sinais": [],
     "descricao": "Reset (ativo em LOW): solto ou em HIGH, roda"
    },
    {
     "nome": "GND.2",
-    "x": 8.31,
-    "y": 47.62,
+    "x": 7.18,
+    "y": 46.87,
     "sinais": [
      "power"
     ],
@@ -5631,14 +5631,14 @@
    {
     "nome": "RST",
     "x": 0.76,
-    "y": 24.94,
+    "y": 25.13,
     "sinais": [],
     "descricao": "Reset (ativo em LOW): solto ou em HIGH, roda"
    },
    {
     "nome": "ADC",
     "x": 0.76,
-    "y": 32.5,
+    "y": 32.69,
     "sinais": [
      "analog"
     ],
@@ -5647,21 +5647,21 @@
    {
     "nome": "CH_PD",
     "x": 0.76,
-    "y": 40.06,
+    "y": 40.25,
     "sinais": [],
     "descricao": "Liga o chip (EN/CH_PD): precisa estar em HIGH para funcionar"
    },
    {
     "nome": "GPIO16",
     "x": 0.76,
-    "y": 47.62,
+    "y": 47.81,
     "sinais": [],
     "descricao": "GPIO16 (o que acorda do deep sleep, ligado ao RST)"
    },
    {
     "nome": "GPIO14",
     "x": 0.76,
-    "y": 55.18,
+    "y": 55.37,
     "sinais": [
      "spi",
      "pwm"
@@ -5671,7 +5671,7 @@
    {
     "nome": "GPIO12",
     "x": 0.76,
-    "y": 62.74,
+    "y": 62.93,
     "sinais": [
      "spi",
      "pwm"
@@ -5681,7 +5681,7 @@
    {
     "nome": "GPIO13",
     "x": 0.76,
-    "y": 70.3,
+    "y": 70.49,
     "sinais": [
      "spi",
      "pwm"
@@ -5691,7 +5691,7 @@
    {
     "nome": "VCC",
     "x": 0.76,
-    "y": 77.86,
+    "y": 78.05,
     "sinais": [
      "power"
     ],
@@ -5700,7 +5700,7 @@
    {
     "nome": "TXD",
     "x": 61.23,
-    "y": 24.94,
+    "y": 25.13,
     "sinais": [
      "usart"
     ],
@@ -5709,7 +5709,7 @@
    {
     "nome": "RXD",
     "x": 61.23,
-    "y": 32.5,
+    "y": 32.69,
     "sinais": [
      "usart"
     ],
@@ -5718,7 +5718,7 @@
    {
     "nome": "GPIO5",
     "x": 61.23,
-    "y": 40.06,
+    "y": 40.25,
     "sinais": [
      "i2c",
      "pwm"
@@ -5728,7 +5728,7 @@
    {
     "nome": "GPIO4",
     "x": 61.23,
-    "y": 47.62,
+    "y": 47.81,
     "sinais": [
      "i2c",
      "pwm"
@@ -5738,7 +5738,7 @@
    {
     "nome": "GPIO0",
     "x": 61.23,
-    "y": 55.18,
+    "y": 55.37,
     "sinais": [
      "pwm"
     ],
@@ -5747,7 +5747,7 @@
    {
     "nome": "GPIO2",
     "x": 61.23,
-    "y": 62.74,
+    "y": 62.93,
     "sinais": [
      "pwm"
     ],
@@ -5756,7 +5756,7 @@
    {
     "nome": "GPIO15",
     "x": 61.23,
-    "y": 70.3,
+    "y": 70.49,
     "sinais": [
      "spi",
      "pwm"
@@ -5766,7 +5766,7 @@
    {
     "nome": "GND",
     "x": 61.23,
-    "y": 77.86,
+    "y": 78.05,
     "sinais": [
      "power"
     ],
@@ -5778,43 +5778,77 @@
  },
  {
   "id": "esp-08",
-  "largura": 62,
-  "altura": 70,
+  "largura": 66,
+  "altura": 62,
   "pinos": [
    {
-    "nome": "RST",
-    "x": 0.76,
-    "y": 9.83,
+    "nome": "ANT",
+    "x": 10.58,
+    "y": 0.76,
     "sinais": [],
-    "descricao": "Reset (ativo em LOW): solto ou em HIGH, roda"
-   },
-   {
-    "nome": "ADC",
-    "x": 0.76,
-    "y": 17.39,
-    "sinais": [
-     "analog"
-    ],
-    "descricao": "Entrada analógica (TOUT): 0 a 1 V"
+    "descricao": "A saída para a antena de fora (WIFI_ANT, não ligar)"
    },
    {
     "nome": "CH_PD",
-    "x": 0.76,
-    "y": 24.94,
+    "x": 18.14,
+    "y": 0.76,
     "sinais": [],
     "descricao": "Liga o chip (EN/CH_PD): precisa estar em HIGH para funcionar"
    },
    {
     "nome": "GPIO16",
-    "x": 0.76,
-    "y": 32.5,
+    "x": 25.7,
+    "y": 0.76,
     "sinais": [],
     "descricao": "GPIO16 (o que acorda do deep sleep, ligado ao RST)"
    },
    {
+    "nome": "RXD",
+    "x": 33.26,
+    "y": 0.76,
+    "sinais": [
+     "usart"
+    ],
+    "descricao": "Serial: RX (GPIO3)"
+   },
+   {
+    "nome": "TXD",
+    "x": 40.82,
+    "y": 0.76,
+    "sinais": [
+     "usart"
+    ],
+    "descricao": "Serial: TX (GPIO1)"
+   },
+   {
+    "nome": "NC",
+    "x": 48.38,
+    "y": 0.76,
+    "sinais": [],
+    "descricao": "Não ligado"
+   },
+   {
+    "nome": "GND",
+    "x": 55.94,
+    "y": 0.76,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND"
+   },
+   {
+    "nome": "VCC",
+    "x": 10.58,
+    "y": 61.23,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Alimentação: 3,3 V (não aguenta 5 V)"
+   },
+   {
     "nome": "GPIO14",
-    "x": 0.76,
-    "y": 40.06,
+    "x": 18.14,
+    "y": 61.23,
     "sinais": [
      "spi",
      "pwm"
@@ -5823,8 +5857,8 @@
    },
    {
     "nome": "GPIO12",
-    "x": 0.76,
-    "y": 47.62,
+    "x": 25.7,
+    "y": 61.23,
     "sinais": [
      "spi",
      "pwm"
@@ -5833,8 +5867,8 @@
    },
    {
     "nome": "GPIO13",
-    "x": 0.76,
-    "y": 55.18,
+    "x": 33.26,
+    "y": 61.23,
     "sinais": [
      "spi",
      "pwm"
@@ -5842,74 +5876,9 @@
     "descricao": "GPIO13 (MOSI da HSPI)"
    },
    {
-    "nome": "VCC",
-    "x": 0.76,
-    "y": 62.74,
-    "sinais": [
-     "power"
-    ],
-    "descricao": "Alimentação: 3,3 V (não aguenta 5 V)"
-   },
-   {
-    "nome": "TXD",
-    "x": 61.23,
-    "y": 9.83,
-    "sinais": [
-     "usart"
-    ],
-    "descricao": "Serial: TX (GPIO1)"
-   },
-   {
-    "nome": "RXD",
-    "x": 61.23,
-    "y": 17.39,
-    "sinais": [
-     "usart"
-    ],
-    "descricao": "Serial: RX (GPIO3)"
-   },
-   {
-    "nome": "GPIO5",
-    "x": 61.23,
-    "y": 24.94,
-    "sinais": [
-     "i2c",
-     "pwm"
-    ],
-    "descricao": "GPIO5 (o SCL de costume)"
-   },
-   {
-    "nome": "GPIO4",
-    "x": 61.23,
-    "y": 32.5,
-    "sinais": [
-     "i2c",
-     "pwm"
-    ],
-    "descricao": "GPIO4 (o SDA de costume)"
-   },
-   {
-    "nome": "GPIO0",
-    "x": 61.23,
-    "y": 40.06,
-    "sinais": [
-     "pwm"
-    ],
-    "descricao": "GPIO0: em LOW no boot entra no modo de gravação"
-   },
-   {
-    "nome": "GPIO2",
-    "x": 61.23,
-    "y": 47.62,
-    "sinais": [
-     "pwm"
-    ],
-    "descricao": "GPIO2: precisa estar em HIGH no boot"
-   },
-   {
     "nome": "GPIO15",
-    "x": 61.23,
-    "y": 55.18,
+    "x": 40.82,
+    "y": 61.23,
     "sinais": [
      "spi",
      "pwm"
@@ -5917,20 +5886,22 @@
     "descricao": "GPIO15 (CS da HSPI): precisa estar em LOW no boot"
    },
    {
-    "nome": "GND",
-    "x": 61.23,
-    "y": 62.74,
+    "nome": "GPIO2",
+    "x": 48.38,
+    "y": 61.23,
     "sinais": [
-     "power"
+     "pwm"
     ],
-    "descricao": "GND"
+    "descricao": "GPIO2: precisa estar em HIGH no boot"
    },
    {
-    "nome": "ANT",
-    "x": 30.99,
-    "y": 0.76,
-    "sinais": [],
-    "descricao": "A saída para a antena de fora (não ligar)"
+    "nome": "GPIO0",
+    "x": 55.94,
+    "y": 61.23,
+    "sinais": [
+     "pwm"
+    ],
+    "descricao": "GPIO0: em LOW no boot entra no modo de gravação"
    }
   ],
   "variantes": [],
@@ -6089,20 +6060,20 @@
  },
  {
   "id": "esp-10",
-  "largura": 55,
+  "largura": 60,
   "altura": 39,
   "pinos": [
    {
     "nome": "RST",
-    "x": 54.43,
-    "y": 4.54,
+    "x": 58.96,
+    "y": 5.22,
     "sinais": [],
     "descricao": "Reset (ativo em LOW): solto ou em HIGH, roda"
    },
    {
     "nome": "VCC",
-    "x": 54.43,
-    "y": 12.09,
+    "x": 58.96,
+    "y": 12.77,
     "sinais": [
      "power"
     ],
@@ -6110,8 +6081,8 @@
    },
    {
     "nome": "TXD",
-    "x": 54.43,
-    "y": 19.65,
+    "x": 58.96,
+    "y": 20.33,
     "sinais": [
      "usart"
     ],
@@ -6119,8 +6090,8 @@
    },
    {
     "nome": "RXD",
-    "x": 54.43,
-    "y": 27.21,
+    "x": 58.96,
+    "y": 27.89,
     "sinais": [
      "usart"
     ],
@@ -6128,8 +6099,8 @@
    },
    {
     "nome": "GND",
-    "x": 54.43,
-    "y": 34.77,
+    "x": 58.96,
+    "y": 35.45,
     "sinais": [
      "power"
     ],
@@ -6141,13 +6112,13 @@
  },
  {
   "id": "esp-11",
-  "largura": 67,
-  "altura": 47,
+  "largura": 70,
+  "altura": 51,
   "pinos": [
    {
     "nome": "GND",
-    "x": 61.98,
-    "y": 6.8,
+    "x": 65.95,
+    "y": 8.16,
     "sinais": [
      "power"
     ],
@@ -6155,22 +6126,22 @@
    },
    {
     "nome": "CH_PD",
-    "x": 61.98,
-    "y": 11.6,
+    "x": 65.95,
+    "y": 12.96,
     "sinais": [],
     "descricao": "Liga o chip (EN/CH_PD): precisa estar em HIGH para funcionar"
    },
    {
     "nome": "RST",
-    "x": 61.98,
-    "y": 16.4,
+    "x": 65.95,
+    "y": 17.76,
     "sinais": [],
     "descricao": "Reset (ativo em LOW): solto ou em HIGH, roda"
    },
    {
     "nome": "RXD",
-    "x": 61.98,
-    "y": 21.2,
+    "x": 65.95,
+    "y": 22.56,
     "sinais": [
      "usart"
     ],
@@ -6178,8 +6149,8 @@
    },
    {
     "nome": "TXD",
-    "x": 61.98,
-    "y": 26.0,
+    "x": 65.95,
+    "y": 27.36,
     "sinais": [
      "usart"
     ],
@@ -6187,8 +6158,8 @@
    },
    {
     "nome": "GPIO0",
-    "x": 61.98,
-    "y": 30.8,
+    "x": 65.95,
+    "y": 32.16,
     "sinais": [
      "pwm"
     ],
@@ -6196,8 +6167,8 @@
    },
    {
     "nome": "GPIO1",
-    "x": 61.98,
-    "y": 35.6,
+    "x": 65.95,
+    "y": 36.96,
     "sinais": [
      "usart"
     ],
@@ -6205,8 +6176,8 @@
    },
    {
     "nome": "VCC",
-    "x": 61.98,
-    "y": 40.4,
+    "x": 65.95,
+    "y": 41.76,
     "sinais": [
      "power"
     ],
@@ -6224,14 +6195,14 @@
    {
     "nome": "RST",
     "x": 0.76,
-    "y": 32.5,
+    "y": 32.24,
     "sinais": [],
     "descricao": "Reset (ativo em LOW): solto ou em HIGH, roda"
    },
    {
     "nome": "ADC",
     "x": 0.76,
-    "y": 40.06,
+    "y": 39.8,
     "sinais": [
      "analog"
     ],
@@ -6240,21 +6211,21 @@
    {
     "nome": "CH_PD",
     "x": 0.76,
-    "y": 47.62,
+    "y": 47.36,
     "sinais": [],
     "descricao": "Liga o chip (EN/CH_PD): precisa estar em HIGH para funcionar"
    },
    {
     "nome": "GPIO16",
     "x": 0.76,
-    "y": 55.18,
+    "y": 54.92,
     "sinais": [],
     "descricao": "GPIO16 (o que acorda do deep sleep, ligado ao RST)"
    },
    {
     "nome": "GPIO14",
     "x": 0.76,
-    "y": 62.74,
+    "y": 62.48,
     "sinais": [
      "spi",
      "pwm"
@@ -6264,7 +6235,7 @@
    {
     "nome": "GPIO12",
     "x": 0.76,
-    "y": 70.3,
+    "y": 70.03,
     "sinais": [
      "spi",
      "pwm"
@@ -6274,7 +6245,7 @@
    {
     "nome": "GPIO13",
     "x": 0.76,
-    "y": 77.86,
+    "y": 77.59,
     "sinais": [
      "spi",
      "pwm"
@@ -6284,7 +6255,7 @@
    {
     "nome": "VCC",
     "x": 0.76,
-    "y": 85.42,
+    "y": 85.15,
     "sinais": [
      "power"
     ],
@@ -6293,7 +6264,7 @@
    {
     "nome": "TXD",
     "x": 61.23,
-    "y": 32.5,
+    "y": 32.24,
     "sinais": [
      "usart"
     ],
@@ -6302,7 +6273,7 @@
    {
     "nome": "RXD",
     "x": 61.23,
-    "y": 40.06,
+    "y": 39.8,
     "sinais": [
      "usart"
     ],
@@ -6311,7 +6282,7 @@
    {
     "nome": "GPIO5",
     "x": 61.23,
-    "y": 47.62,
+    "y": 47.36,
     "sinais": [
      "i2c",
      "pwm"
@@ -6321,7 +6292,7 @@
    {
     "nome": "GPIO4",
     "x": 61.23,
-    "y": 55.18,
+    "y": 54.92,
     "sinais": [
      "i2c",
      "pwm"
@@ -6331,7 +6302,7 @@
    {
     "nome": "GPIO0",
     "x": 61.23,
-    "y": 62.74,
+    "y": 62.48,
     "sinais": [
      "pwm"
     ],
@@ -6340,7 +6311,7 @@
    {
     "nome": "GPIO2",
     "x": 61.23,
-    "y": 70.3,
+    "y": 70.03,
     "sinais": [
      "pwm"
     ],
@@ -6349,7 +6320,7 @@
    {
     "nome": "GPIO15",
     "x": 61.23,
-    "y": 77.86,
+    "y": 77.59,
     "sinais": [
      "spi",
      "pwm"
@@ -6359,7 +6330,7 @@
    {
     "nome": "GND",
     "x": 61.23,
-    "y": 85.42,
+    "y": 85.15,
     "sinais": [
      "power"
     ],
@@ -6377,14 +6348,14 @@
    {
     "nome": "RST",
     "x": 0.76,
-    "y": 32.5,
+    "y": 32.24,
     "sinais": [],
     "descricao": "Reset (ativo em LOW): solto ou em HIGH, roda"
    },
    {
     "nome": "ADC",
     "x": 0.76,
-    "y": 40.06,
+    "y": 39.8,
     "sinais": [
      "analog"
     ],
@@ -6393,21 +6364,21 @@
    {
     "nome": "CH_PD",
     "x": 0.76,
-    "y": 47.62,
+    "y": 47.36,
     "sinais": [],
     "descricao": "Liga o chip (EN/CH_PD): precisa estar em HIGH para funcionar"
    },
    {
     "nome": "GPIO16",
     "x": 0.76,
-    "y": 55.18,
+    "y": 54.92,
     "sinais": [],
     "descricao": "GPIO16 (o que acorda do deep sleep, ligado ao RST)"
    },
    {
     "nome": "GPIO14",
     "x": 0.76,
-    "y": 62.74,
+    "y": 62.48,
     "sinais": [
      "spi",
      "pwm"
@@ -6417,7 +6388,7 @@
    {
     "nome": "GPIO12",
     "x": 0.76,
-    "y": 70.3,
+    "y": 70.03,
     "sinais": [
      "spi",
      "pwm"
@@ -6427,7 +6398,7 @@
    {
     "nome": "GPIO13",
     "x": 0.76,
-    "y": 77.86,
+    "y": 77.59,
     "sinais": [
      "spi",
      "pwm"
@@ -6437,7 +6408,7 @@
    {
     "nome": "VCC",
     "x": 0.76,
-    "y": 85.42,
+    "y": 85.15,
     "sinais": [
      "power"
     ],
@@ -6446,7 +6417,7 @@
    {
     "nome": "TXD",
     "x": 61.23,
-    "y": 32.5,
+    "y": 32.24,
     "sinais": [
      "usart"
     ],
@@ -6455,7 +6426,7 @@
    {
     "nome": "RXD",
     "x": 61.23,
-    "y": 40.06,
+    "y": 39.8,
     "sinais": [
      "usart"
     ],
@@ -6464,7 +6435,7 @@
    {
     "nome": "GPIO5",
     "x": 61.23,
-    "y": 47.62,
+    "y": 47.36,
     "sinais": [
      "i2c",
      "pwm"
@@ -6474,7 +6445,7 @@
    {
     "nome": "GPIO4",
     "x": 61.23,
-    "y": 55.18,
+    "y": 54.92,
     "sinais": [
      "i2c",
      "pwm"
@@ -6484,7 +6455,7 @@
    {
     "nome": "GPIO0",
     "x": 61.23,
-    "y": 62.74,
+    "y": 62.48,
     "sinais": [
      "pwm"
     ],
@@ -6493,7 +6464,7 @@
    {
     "nome": "GPIO2",
     "x": 61.23,
-    "y": 70.3,
+    "y": 70.03,
     "sinais": [
      "pwm"
     ],
@@ -6502,7 +6473,7 @@
    {
     "nome": "GPIO15",
     "x": 61.23,
-    "y": 77.86,
+    "y": 77.59,
     "sinais": [
      "spi",
      "pwm"
@@ -6512,7 +6483,7 @@
    {
     "nome": "GND",
     "x": 61.23,
-    "y": 85.42,
+    "y": 85.15,
     "sinais": [
      "power"
     ],
@@ -6572,14 +6543,14 @@
    {
     "nome": "RST",
     "x": 0.76,
-    "y": 32.5,
+    "y": 32.24,
     "sinais": [],
     "descricao": "Reset (ativo em LOW): solto ou em HIGH, roda"
    },
    {
     "nome": "ADC",
     "x": 0.76,
-    "y": 40.06,
+    "y": 39.8,
     "sinais": [
      "analog"
     ],
@@ -6588,21 +6559,21 @@
    {
     "nome": "CH_PD",
     "x": 0.76,
-    "y": 47.62,
+    "y": 47.36,
     "sinais": [],
     "descricao": "Liga o chip (EN/CH_PD): precisa estar em HIGH para funcionar"
    },
    {
     "nome": "GPIO16",
     "x": 0.76,
-    "y": 55.18,
+    "y": 54.92,
     "sinais": [],
     "descricao": "GPIO16 (o que acorda do deep sleep, ligado ao RST)"
    },
    {
     "nome": "GPIO14",
     "x": 0.76,
-    "y": 62.74,
+    "y": 62.48,
     "sinais": [
      "spi",
      "pwm"
@@ -6612,7 +6583,7 @@
    {
     "nome": "GPIO12",
     "x": 0.76,
-    "y": 70.3,
+    "y": 70.03,
     "sinais": [
      "spi",
      "pwm"
@@ -6622,7 +6593,7 @@
    {
     "nome": "GPIO13",
     "x": 0.76,
-    "y": 77.86,
+    "y": 77.59,
     "sinais": [
      "spi",
      "pwm"
@@ -6632,7 +6603,7 @@
    {
     "nome": "VCC",
     "x": 0.76,
-    "y": 85.42,
+    "y": 85.15,
     "sinais": [
      "power"
     ],
@@ -6641,7 +6612,7 @@
    {
     "nome": "TXD",
     "x": 61.23,
-    "y": 32.5,
+    "y": 32.24,
     "sinais": [
      "usart"
     ],
@@ -6650,7 +6621,7 @@
    {
     "nome": "RXD",
     "x": 61.23,
-    "y": 40.06,
+    "y": 39.8,
     "sinais": [
      "usart"
     ],
@@ -6659,7 +6630,7 @@
    {
     "nome": "GPIO5",
     "x": 61.23,
-    "y": 47.62,
+    "y": 47.36,
     "sinais": [
      "i2c",
      "pwm"
@@ -6669,7 +6640,7 @@
    {
     "nome": "GPIO4",
     "x": 61.23,
-    "y": 55.18,
+    "y": 54.92,
     "sinais": [
      "i2c",
      "pwm"
@@ -6679,7 +6650,7 @@
    {
     "nome": "GPIO0",
     "x": 61.23,
-    "y": 62.74,
+    "y": 62.48,
     "sinais": [
      "pwm"
     ],
@@ -6688,7 +6659,7 @@
    {
     "nome": "GPIO2",
     "x": 61.23,
-    "y": 70.3,
+    "y": 70.03,
     "sinais": [
      "pwm"
     ],
@@ -6697,7 +6668,7 @@
    {
     "nome": "GPIO15",
     "x": 61.23,
-    "y": 77.86,
+    "y": 77.59,
     "sinais": [
      "spi",
      "pwm"
@@ -6707,7 +6678,7 @@
    {
     "nome": "GND",
     "x": 61.23,
-    "y": 85.42,
+    "y": 85.15,
     "sinais": [
      "power"
     ],
@@ -6938,56 +6909,56 @@
    {
     "nome": "PC5",
     "x": 0.76,
-    "y": 32.5,
+    "y": 32.24,
     "sinais": [],
     "descricao": "Pino do STM8S003 de dentro do ESP-14 (o microcontrolador que conversa com o ESP8266 pela serial)"
    },
    {
     "nome": "PC6",
     "x": 0.76,
-    "y": 40.06,
+    "y": 39.8,
     "sinais": [],
     "descricao": "Pino do STM8S003 de dentro do ESP-14 (o microcontrolador que conversa com o ESP8266 pela serial)"
    },
    {
     "nome": "PC7",
     "x": 0.76,
-    "y": 47.62,
+    "y": 47.36,
     "sinais": [],
     "descricao": "Pino do STM8S003 de dentro do ESP-14 (o microcontrolador que conversa com o ESP8266 pela serial)"
    },
    {
     "nome": "SWIM",
     "x": 0.76,
-    "y": 55.18,
+    "y": 54.92,
     "sinais": [],
     "descricao": "A programação do STM8S003 (SWIM)"
    },
    {
     "nome": "PD3",
     "x": 0.76,
-    "y": 62.74,
+    "y": 62.48,
     "sinais": [],
     "descricao": "Pino do STM8S003 de dentro do ESP-14 (o microcontrolador que conversa com o ESP8266 pela serial)"
    },
    {
     "nome": "PD4",
     "x": 0.76,
-    "y": 70.3,
+    "y": 70.03,
     "sinais": [],
     "descricao": "Pino do STM8S003 de dentro do ESP-14 (o microcontrolador que conversa com o ESP8266 pela serial)"
    },
    {
     "nome": "NRST",
     "x": 0.76,
-    "y": 77.86,
+    "y": 77.59,
     "sinais": [],
     "descricao": "Reset do STM8S003"
    },
    {
     "nome": "GND",
     "x": 0.76,
-    "y": 85.42,
+    "y": 85.15,
     "sinais": [
      "power"
     ],
@@ -6996,42 +6967,42 @@
    {
     "nome": "PC4",
     "x": 61.23,
-    "y": 32.5,
+    "y": 32.24,
     "sinais": [],
     "descricao": "Pino do STM8S003 de dentro do ESP-14 (o microcontrolador que conversa com o ESP8266 pela serial)"
    },
    {
     "nome": "PC3",
     "x": 61.23,
-    "y": 40.06,
+    "y": 39.8,
     "sinais": [],
     "descricao": "Pino do STM8S003 de dentro do ESP-14 (o microcontrolador que conversa com o ESP8266 pela serial)"
    },
    {
     "nome": "PB4",
     "x": 61.23,
-    "y": 47.62,
+    "y": 47.36,
     "sinais": [],
     "descricao": "Pino do STM8S003 de dentro do ESP-14 (o microcontrolador que conversa com o ESP8266 pela serial)"
    },
    {
     "nome": "PB5",
     "x": 61.23,
-    "y": 55.18,
+    "y": 54.92,
     "sinais": [],
     "descricao": "Pino do STM8S003 de dentro do ESP-14 (o microcontrolador que conversa com o ESP8266 pela serial)"
    },
    {
     "nome": "PA3",
     "x": 61.23,
-    "y": 62.74,
+    "y": 62.48,
     "sinais": [],
     "descricao": "Pino do STM8S003 de dentro do ESP-14 (o microcontrolador que conversa com o ESP8266 pela serial)"
    },
    {
     "nome": "VCC",
     "x": 61.23,
-    "y": 70.3,
+    "y": 70.03,
     "sinais": [
      "power"
     ],
@@ -7040,14 +7011,14 @@
    {
     "nome": "VDD",
     "x": 61.23,
-    "y": 77.86,
+    "y": 77.59,
     "sinais": [],
     "descricao": "Alimentação do STM8S003 (M_VDD): 3,3 V"
    },
    {
     "nome": "VCAP",
     "x": 61.23,
-    "y": 85.42,
+    "y": 85.15,
     "sinais": [],
     "descricao": "O capacitor do regulador do STM8S003"
    },

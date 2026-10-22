@@ -120,10 +120,10 @@ for modulo in ('esp-11', 'esp-14'):
     PINO_DA_PLACA[modulo] = ('GPIO0', 0)
 
 # Os sem GPIO4: o GPIO14, que nao manda na partida.
-for modulo in ('esp-03', 'esp-04', 'esp-06', 'esp-09'):
+for modulo in ('esp-03', 'esp-04', 'esp-06', 'esp-08', 'esp-09'):
     PINO_DA_PLACA[modulo] = ('GPIO14', 14)
 
-for modulo in ('esp-07', 'esp-08', 'esp-12', 'esp-12e', 'esp-12f', 'esp-13'):
+for modulo in ('esp-07', 'esp-12', 'esp-12e', 'esp-12f', 'esp-13'):
     PINO_DA_PLACA[modulo] = ('GPIO4', 4)
 
 

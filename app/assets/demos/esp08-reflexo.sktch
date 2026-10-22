@@ -22,7 +22,7 @@
   "const int PREPARA = 12;",
   "const int VAI = 14;",
   "const int BOTAO = 13;",
-  "const int BUZZER = 5;",
+  "const int BUZZER = 16;   // o ESP-08 nao traz o GPIO4 nem o GPIO5",
   "",
   "unsigned long recorde = 0;",
   "",
@@ -194,7 +194,7 @@
    },
    {
     "DePeca": "placa",
-    "DePino": "GPIO5",
+    "DePino": "GPIO16",
     "ParaPeca": "buzzer",
     "ParaPino": "2",
     "Cor": "#F28C28",

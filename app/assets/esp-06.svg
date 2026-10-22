@@ -10,30 +10,30 @@
   <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
   <linearGradient id="ceramica" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f1e8"/><stop offset="1" stop-color="#cfc9b8"/></linearGradient>
 </defs>
-<path fill-rule="evenodd" d="M1.89 0.756 L61.228 0.756 A1.134 1.134 0 0 1 62.362 1.89 L62.362 49.134 A1.134 1.134 0 0 1 61.228 50.268 L1.89 50.268 A1.134 1.134 0 0 1 0.756 49.134 L0.756 1.89 A1.134 1.134 0 0 1 1.89 0.756 Z" fill="#1b1d21" stroke="#0a0b0d" stroke-width="0.756"/>
-<path fill-rule="evenodd" d="M1.89 0.756 L61.228 0.756 A1.134 1.134 0 0 1 62.362 1.89 L62.362 49.134 A1.134 1.134 0 0 1 61.228 50.268 L1.89 50.268 A1.134 1.134 0 0 1 0.756 49.134 L0.756 1.89 A1.134 1.134 0 0 1 1.89 0.756 Z" fill="url(#luz)"/>
-<rect x="0.756" y="12.85" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
-<rect x="0.756" y="23.811" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
-<rect x="0.756" y="34.772" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
-<rect x="19.276" y="0.756" width="3.402" height="2.646" rx="0.302" fill="#d8b45a"/>
-<rect x="29.858" y="0.756" width="3.402" height="2.646" rx="0.302" fill="#d8b45a"/>
-<rect x="40.441" y="0.756" width="3.402" height="2.646" rx="0.302" fill="#d8b45a"/>
-<rect x="59.717" y="12.85" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
-<rect x="59.717" y="23.811" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
-<rect x="59.717" y="34.772" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
-<rect x="19.276" y="47.622" width="3.402" height="2.646" rx="0.302" fill="#d8b45a"/>
-<rect x="29.858" y="47.622" width="3.402" height="2.646" rx="0.302" fill="#d8b45a"/>
-<rect x="40.441" y="47.622" width="3.402" height="2.646" rx="0.302" fill="#d8b45a"/>
-<rect x="0.756" y="2.457" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
-<rect x="59.717" y="2.457" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
-<rect x="59.717" y="45.165" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
-<rect x="0.756" y="45.165" width="2.646" height="3.402" rx="0.302" fill="#d8b45a"/>
-<rect x="4.724" y="4.913" width="54.803" height="42.709" rx="1.512" fill="#000000" fill-opacity="0.3"/>
-<rect x="4.157" y="4.157" width="54.803" height="42.709" rx="1.512" fill="url(#blindagem)" stroke="#7f868d" stroke-width="0.567"/>
-<rect x="6.047" y="6.047" width="51.024" height="38.929" rx="1.134" fill="none" stroke="#a9b0b6" stroke-width="0.567"/>
-<text transform="translate(31.559 16.063) rotate(0)" x="0" y="1.89" font-family="Arial" font-weight="bold" font-size="4.724" fill="#5b6168" text-anchor="middle">ESP8266MOD</text>
-<text transform="translate(31.559 20.787) rotate(0)" x="0" y="1.512" font-family="Arial" font-weight="normal" font-size="3.78" fill="#5b6168" text-anchor="middle">ESP-06</text>
-<text transform="translate(31.559 25.512) rotate(0)" x="0" y="1.323" font-family="Arial" font-weight="normal" font-size="3.307" fill="#5b6168" text-anchor="middle">ISM 2.4GHz</text>
-<text transform="translate(31.559 30.236) rotate(0)" x="0" y="1.323" font-family="Arial" font-weight="normal" font-size="3.307" fill="#5b6168" text-anchor="middle">PA +25dBm</text>
-<text transform="translate(31.559 34.961) rotate(0)" x="0" y="1.323" font-family="Arial" font-weight="normal" font-size="3.307" fill="#5b6168" text-anchor="middle">802.11b/g/n</text>
+<path fill-rule="evenodd" d="M1.512 0.756 L61.606 0.756 A0.756 0.756 0 0 1 62.362 1.512 L62.362 49.512 A0.756 0.756 0 0 1 61.606 50.268 L1.512 50.268 A0.756 0.756 0 0 1 0.756 49.512 L0.756 1.512 A0.756 0.756 0 0 1 1.512 0.756 Z" fill="#14486c" stroke="#0b2c44" stroke-width="0.756"/>
+<path fill-rule="evenodd" d="M1.512 0.756 L61.606 0.756 A0.756 0.756 0 0 1 62.362 1.512 L62.362 49.512 A0.756 0.756 0 0 1 61.606 50.268 L1.512 50.268 A0.756 0.756 0 0 1 0.756 49.512 L0.756 1.512 A0.756 0.756 0 0 1 1.512 0.756 Z" fill="url(#luz)"/>
+<rect x="0.756" y="12.85" width="1.323" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="0.756" y="23.811" width="1.323" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="0.756" y="34.772" width="1.323" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="19.276" y="0.756" width="3.402" height="1.323" rx="0.302" fill="#d8b45a"/>
+<rect x="29.858" y="0.756" width="3.402" height="1.323" rx="0.302" fill="#d8b45a"/>
+<rect x="40.441" y="0.756" width="3.402" height="1.323" rx="0.302" fill="#d8b45a"/>
+<rect x="61.039" y="12.85" width="1.323" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="61.039" y="23.811" width="1.323" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="61.039" y="34.772" width="1.323" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="19.276" y="48.945" width="3.402" height="1.323" rx="0.302" fill="#d8b45a"/>
+<rect x="29.858" y="48.945" width="3.402" height="1.323" rx="0.302" fill="#d8b45a"/>
+<rect x="40.441" y="48.945" width="3.402" height="1.323" rx="0.302" fill="#d8b45a"/>
+<rect x="0.756" y="2.457" width="1.323" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="61.039" y="2.457" width="1.323" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="61.039" y="45.165" width="1.323" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="0.756" y="45.165" width="1.323" height="3.402" rx="0.302" fill="#d8b45a"/>
+<rect x="3.024" y="3.213" width="58.205" height="46.11" rx="1.323" fill="#000000" fill-opacity="0.32"/>
+<rect x="2.457" y="2.457" width="58.205" height="46.11" rx="1.323" fill="url(#blindagem)" stroke="#7f868d" stroke-width="0.454"/>
+<rect x="3.78" y="3.78" width="55.559" height="43.465" rx="0.945" fill="none" stroke="#b4bac0" stroke-width="0.454"/>
+<text transform="translate(6.803 21.165) rotate(0)" x="0" y="0" font-family="Arial" font-weight="bold" font-size="4.016" fill="#62676e" text-anchor="start">MODEL</text>
+<text transform="translate(27.969 27.969) rotate(0)" x="0" y="0" font-family="Arial" font-weight="bold" font-size="4.488" fill="#62676e" text-anchor="start">ESP8266MOD</text>
+<text transform="translate(27.969 34.016) rotate(0)" x="0" y="0" font-family="Arial" font-weight="bold" font-size="4.016" fill="#62676e" text-anchor="start">ISM  2.4GHz</text>
+<text transform="translate(27.969 39.307) rotate(0)" x="0" y="0" font-family="Arial" font-weight="bold" font-size="4.016" fill="#62676e" text-anchor="start">PA  +25dBm</text>
+<text transform="translate(27.969 44.598) rotate(0)" x="0" y="0" font-family="Arial" font-weight="bold" font-size="4.016" fill="#62676e" text-anchor="start">802.11b/g/n</text>
 </svg>

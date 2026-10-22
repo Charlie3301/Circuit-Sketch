@@ -1325,7 +1325,7 @@ c = Circuito('placa', 'esp-08', 80, 100)
 c.led('prepara', 'GPIO12', 'GND', 'vermelho', 330, 30, VERMELHO)
 c.led('vai', 'GPIO14', 'GND', 'verde', 430, 30, VERDE)
 c.botao('botao', 'GPIO13', 'GND', 320, 150)
-c.buzzer('buzzer', 'GPIO5', 'GND', 460, 150)
+c.buzzer('buzzer', 'GPIO16', 'GND', 460, 150)
 
 gravar('esp08-reflexo', r'''
 // Jogo de reflexo, num ESP-08.
@@ -1338,7 +1338,7 @@ gravar('esp08-reflexo', r'''
 const int PREPARA = 12;
 const int VAI = 14;
 const int BOTAO = 13;
-const int BUZZER = 5;
+const int BUZZER = 16;   // o ESP-08 nao traz o GPIO4 nem o GPIO5
 
 unsigned long recorde = 0;
 

@@ -605,22 +605,22 @@ public partial class EditorCircuito : Border
         // o azul no TX, que pisca com a serial; o ESP-07, o de energia e o do GPIO2.
         ["esp8266-nodemcu"] =
         [
-            (69.4, 26.3, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF)),
+            (72.1, 25.2, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF)),
             (33.5, 137.8, 3.0, LedInvertido + 16, Color.FromRgb(0x3B, 0x8C, 0xFF)),
         ],
         ["esp-01"] =
         [
-            (4.9, 66.1, 3.0, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)),
-            (17.0, 66.1, 3.0, LedTx, Color.FromRgb(0x3B, 0x8C, 0xFF)),
+            (52.2, 67.3, 3.0, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)),
+            (39.7, 67.3, 3.0, LedTx, Color.FromRgb(0x3B, 0x8C, 0xFF)),
         ],
         ["esp-07"] =
         [
-            (53.7, 16.6, 3.0, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)),
-            (29.9, 17.4, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF)),
+            (52.2, 16.6, 3.4, LedDeEnergia, Color.FromRgb(0xFF, 0x3B, 0x30)),
+            (31.2, 16.6, 3.4, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF)),
         ],
-        ["esp-12"] = [(51.4, 26.3, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF))],
-        ["esp-12e"] = [(51.4, 26.3, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF))],
-        ["esp-12f"] = [(51.4, 26.3, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF))],
+        ["esp-12"] = [(54.0, 25.1, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF))],
+        ["esp-12e"] = [(54.0, 25.1, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF))],
+        ["esp-12f"] = [(54.0, 25.1, 3.0, LedInvertido + 2, Color.FromRgb(0x3B, 0x8C, 0xFF))],
     };
 
     /// <summary>O LED da placa que acende so por ela estar ligada; o TX e o RX, que piscam com a serial.</summary>

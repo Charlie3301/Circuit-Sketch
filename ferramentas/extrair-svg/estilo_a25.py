@@ -35,11 +35,24 @@ PRETO_CI, MARCA_CI = pa.PRETO_CI, pa.MARCA_CI
 # a mascara de cada cor de placa: (mascara, borda, trilha por baixo)
 MASCARAS = {
     'azul': ('#1d55a8', '#123a78', '#2d6cc6'),
-    'azul-esp': ('#1b4f9a', '#10356e', '#2a64b6'),
+    'azul-esp': ('#1b4f9a', '#10356e', '#3070c4'),
     'preta': ('#1b1d21', '#0a0b0d', '#2a2e35'),
-    'vermelha': ('#ad2328', '#6c1216', '#c4373c'),
+    'vermelha': ('#b0352a', '#6c1d16', '#cc5242'),
     'verde': ('#1d7a3d', '#114c25', '#2c9050'),
     'roxa': ('#5a2a8a', '#3a1a5a', '#6e3aa0'),
+    'petroleo': ('#1a363e', '#0f2328', '#24505c'),
+    'grafite': ('#2e3033', '#18191b', '#3b3e42'),
+    # o azul da foto do ESP-03 (a mascara sobre a placa e sobre o cobre)
+    'azul-petroleo': ('#14486c', '#0b2c44', '#1d6690'),
+    # o verde da foto do ESP-08
+    'verde-escura': ('#1e4d2a', '#10301a', '#2b6a3a'),
+    # o azul mais claro do ESP-11 (a foto do wiki)
+    'azul-claro': ('#4a7894', '#305a74', '#6492ae'),
+    # as cores medidas nas fotos: o azul-marinho do ESP-01, o azul-aco do
+    # ESP-05 e o azul acinzentado do ESP-07
+    'azul-marinho': ('#13285e', '#0a1838', '#24428c'),
+    'azul-aco': ('#3d6a88', '#26475e', '#5a8aa8'),
+    'azul-cinza': ('#2c5468', '#1a3644', '#3f7088'),
 }
 
 DEFS = pa.DEFS + '''  <linearGradient id="blindagem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset="0.45" stop-color="#c8cdd2"/><stop offset="1" stop-color="#9aa1a8"/></linearGradient>
@@ -72,7 +85,7 @@ class Placa:
         self.d = d
         self.mascara, self.borda, self.trilha_cor = MASCARAS[cor]
 
-    def contorno(self, x, y, w, h, rx=0.5, furos=(), cortes=()):
+    def contorno(self, x, y, w, h, rx=0.5, furos=(), cortes=(), anel=OURO):
         """A mascara com os furos de fixacao vazados (e o anel de cada um).
         cortes: retangulos (x, y, w, h) tirados da placa (o recorte da antena)."""
         d = self.d
@@ -86,7 +99,7 @@ class Placa:
         d.caminho(cmds, 'url(#luz)')
         d.partes[-1] = d.partes[-1].replace('<path ', '<path fill-rule="evenodd" ', 1)
         for cx, cy, r in furos:
-            d.circ(cx, cy, r + 0.35, None, OURO, 0.6)
+            d.circ(cx, cy, r + 0.35, None, anel, 0.6)
 
     def trilha(self, pts, larg=0.25):
         """Uma trilha de cobre por baixo da mascara (um tom mais claro)."""
