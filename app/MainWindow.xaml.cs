@@ -122,9 +122,9 @@ public partial class MainWindow : Window
 
     static readonly (string nome, string hex)[] CoresDeFio =
     [
-        ("Verde", "#00A651"), ("Vermelho", "#D6202A"), ("Preto", "#000000"),
-        ("Azul", "#1668C1"), ("Amarelo", "#F2C300"), ("Branco", "#F2F2F2"),
-        ("Laranja", "#F07C1E"), ("Roxo", "#8A4FBE"), ("Cinza", "#8C8C8C"),
+        ("Preto", "#000000"), ("Branco", "#F2F2F2"), ("Cinza", "#8C8C8C"), ("Roxo", "#8A4FBE"),
+        ("Azul", "#1668C1"), ("Verde", "#00A651"), ("Amarelo", "#F2C300"), ("Laranja", "#F07C1E"),
+        ("Vermelho", "#D6202A"), ("Marrom", "#8B4A1B"),
     ];
 
     public MainWindow()

@@ -475,6 +475,12 @@ public static partial class Autoteste
     /// </summary>
     static void FotografarEditor(EditorCircuito ed, string destino, int largura, int altura)
     {
+        // CS_FOTOS_ZOOM: a foto maior (2, 3...), para olhar os detalhes do desenho.
+        if (int.TryParse(Environment.GetEnvironmentVariable("CS_FOTOS_ZOOM"), out int zoom) && zoom > 1)
+        {
+            largura *= zoom;
+            altura *= zoom;
+        }
         try
         {
             ed.Measure(new System.Windows.Size(largura, altura));

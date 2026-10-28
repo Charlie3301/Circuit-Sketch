@@ -94,7 +94,7 @@ public partial class EditorCircuito : Border
     readonly Dictionary<string, TelaLcd> telasLcd = [];
     readonly Dictionary<string, FrameworkElement> bracosServo = [];
 
-    readonly List<Path> visuaisFios = [];
+    readonly List<FrameworkElement> visuaisFios = [];
 
     readonly Ellipse marcadorPino = new();
     readonly Border rotuloPino = new();
@@ -1008,7 +1008,7 @@ public partial class EditorCircuito : Border
         rotuloPino.IsHitTestVisible = false;
         Panel.SetZIndex(rotuloPino, 901);
 
-        fioEmCurso.StrokeThickness = 3;
+        fioEmCurso.StrokeThickness = DesenhoDoFio.Largura;
         fioEmCurso.StrokeStartLineCap = PenLineCap.Round;
         fioEmCurso.StrokeEndLineCap = PenLineCap.Round;
         fioEmCurso.Visibility = Visibility.Collapsed;
@@ -1029,7 +1029,8 @@ public partial class EditorCircuito : Border
         pinosLigados.StrokeThickness = 1.8;
         pinosLigados.Fill = new SolidColorBrush(Color.FromArgb(0x70, 0xFF, 0xC1, 0x07));
         pinosLigados.IsHitTestVisible = false;
-        Panel.SetZIndex(pinosLigados, 700);
+        // Por baixo dos fios: o anel fica em volta da ponta desencapada, sem cobri-la.
+        Panel.SetZIndex(pinosLigados, 490);
         mundo.Children.Add(pinosLigados);
 
         // Botoes fisicos por cima da placa, para serem visiveis e clicaveis.
@@ -2859,34 +2860,11 @@ public partial class EditorCircuito : Border
             grossuraDesenhada[i] = escolhido ? 4.5 : 3;
             var forma = Curva(fio, a.Value, b.Value, DesvioDe(i));
 
-            // Contorno escuro por baixo: onde dois fios se cruzam, e ele
-            // que diz qual passa por cima. Um traco mais grosso custa
-            // quase nada, diferente de um borrao de sombra por fio, que
-            // seria refeito a cada movimento do arraste.
-            var contorno = new Path
-            {
-                Data = forma,
-                Stroke = new SolidColorBrush(Color.FromArgb(0x8C, 0x08, 0x08, 0x0A)),
-                StrokeThickness = (escolhido ? 4.5 : 3) * fatorDosFios + 2.4,
-                StrokeStartLineCap = PenLineCap.Round,
-                StrokeEndLineCap = PenLineCap.Round,
-                StrokeLineJoin = PenLineJoin.Round,
-                IsHitTestVisible = false
-            };
-            Panel.SetZIndex(contorno, escolhido ? 519 : 499);
-            mundo.Children.Add(contorno);
-            visuaisFios.Add(contorno);
-
-            var traco = new Path
-            {
-                Data = forma,
-                Stroke = visaoDeEnergia ? PincelDaEnergia(fio) : Pincel(fio.Cor),
-                StrokeThickness = (escolhido ? 4.5 : 3) * fatorDosFios,
-                StrokeStartLineCap = PenLineCap.Round,
-                StrokeEndLineCap = PenLineCap.Round,
-                StrokeLineJoin = PenLineJoin.Round,
-                IsHitTestVisible = false
-            };
+            // O cabinho de protoboard de verdade (DesenhoDoFio): a capa com
+            // volume e as pontas desencapadas; a trilha de baixo da PCB e
+            // estanho puro, sem capa.
+            var traco = new DesenhoDoFio(forma, visaoDeEnergia ? PincelDaEnergia(fio) : Pincel(fio.Cor),
+                                         (escolhido ? 1.3 : 1.0) * fatorDosFios, fio.Lado != Fio.LadoDeBaixo);
             if (escolhido)
             {
                 traco.Effect = new System.Windows.Media.Effects.DropShadowEffect
@@ -2898,7 +2876,7 @@ public partial class EditorCircuito : Border
                 };
             }
             // O fio do outro lado da PCB: apagado, como visto atraves da placa.
-            if (FioDoOutroLado(fio)) { traco.Opacity = 0.18; contorno.Opacity = 0.1; }
+            if (FioDoOutroLado(fio)) traco.Opacity = 0.18;
             Panel.SetZIndex(traco, escolhido ? 520 : 500);
             mundo.Children.Add(traco);
             visuaisFios.Add(traco);
