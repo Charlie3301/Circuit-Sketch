@@ -1,26 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-     width="36.0mm" height="44.0mm" viewBox="0 0 36.0 44.0">
-  <defs>
-    <radialGradient id="sinoBL" cx="0.42" cy="0.38" r="0.7">
-      <stop offset="0" stop-color="#4a4d55"/>
-      <stop offset="1" stop-color="#1d1f23"/>
-    </radialGradient>
-  </defs>
-
-  <circle cx="18.0" cy="18.0" r="13.75" fill="url(#sinoBL)" stroke="#0e0f11" stroke-width="0.4"/>
-  <circle cx="18.0" cy="18.0" r="12.85" fill="none" stroke="#5b5f68" stroke-width="0.35"/>
-  <path d="M12.073 9.212 A10.6 10.6 0 0 1 23.927 9.212 L21.131 13.357 A5.6 5.6 0 0 0 14.869 13.357 Z" fill="#a8641f" stroke="#0e0f11" stroke-width="0.35"/>
-  <path d="M15.230 10.388 A8.1 8.1 0 0 1 20.770 10.388" fill="none" stroke="#d58a3c" stroke-width="0.5"/>
-  <path d="M28.574 17.261 A10.6 10.6 0 0 1 22.647 27.527 L20.455 23.033 A5.6 5.6 0 0 0 23.586 17.609 Z" fill="#a8641f" stroke="#0e0f11" stroke-width="0.35"/>
-  <path d="M25.977 19.407 A8.1 8.1 0 0 1 23.207 24.205" fill="none" stroke="#d58a3c" stroke-width="0.5"/>
-  <path d="M13.353 27.527 A10.6 10.6 0 0 1 7.426 17.261 L12.414 17.609 A5.6 5.6 0 0 0 15.545 23.033 Z" fill="#a8641f" stroke="#0e0f11" stroke-width="0.35"/>
-  <path d="M12.793 24.205 A8.1 8.1 0 0 1 10.023 19.407" fill="none" stroke="#d58a3c" stroke-width="0.5"/>
-  <circle cx="21.377" cy="16.050" r="0.45" fill="#0e0f11"/>
-  <circle cx="18.000" cy="21.900" r="0.45" fill="#0e0f11"/>
-  <circle cx="14.623" cy="16.050" r="0.45" fill="#0e0f11"/>
-  <path d="M18.00 4.85 l-0.9 1.7 h1.8 Z" fill="#e2473d"/>
-  <text x="18.00" y="29.20" fill="#c7ccd4" font-size="1.45px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">3650 3100KV</text>
-  <circle cx="18.0" cy="18.0" r="2.6" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.3"/>
-  <circle cx="18.0" cy="18.0" r="1.58" fill="#9aa0a8" stroke="#5a6068" stroke-width="0.2"/>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="136px" height="166px" viewBox="0 0 136 166">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <linearGradient id="blindagem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset="0.45" stop-color="#c8cdd2"/><stop offset="1" stop-color="#9aa1a8"/></linearGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
+  <linearGradient id="ceramica" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f1e8"/><stop offset="1" stop-color="#cfc9b8"/></linearGradient>
+  <radialGradient id="lata-topo" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#f1f3f5"/><stop offset="0.6" stop-color="#c3c8ce"/><stop offset="1" stop-color="#8a9097"/></radialGradient>
+  <radialGradient id="aluminio" cx="0.35" cy="0.3" r="0.9"><stop offset="0" stop-color="#eef0f2"/><stop offset="0.55" stop-color="#cdd1d5"/><stop offset="1" stop-color="#9ca2a8"/></radialGradient>
+  <radialGradient id="zinco" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#eef0d2"/><stop offset="0.55" stop-color="#bfc08e"/><stop offset="1" stop-color="#7d7f55"/></radialGradient>
+  <radialGradient id="dourado" cx="0.38" cy="0.32" r="0.85"><stop offset="0" stop-color="#ffe7a0"/><stop offset="0.5" stop-color="#e6b04a"/><stop offset="1" stop-color="#a8701c"/></radialGradient>
+  <radialGradient id="latao" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#fbe9a8"/><stop offset="0.55" stop-color="#d4ab52"/><stop offset="1" stop-color="#93702a"/></radialGradient>
+  <radialGradient id="aco" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#f7f8f9"/><stop offset="0.55" stop-color="#b8bec5"/><stop offset="1" stop-color="#7a8189"/></radialGradient>
+  <radialGradient id="cobre-bob" cx="0.5" cy="0.5" r="0.6"><stop offset="0" stop-color="#d98a4a"/><stop offset="1" stop-color="#7a3d16"/></radialGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
+  <linearGradient id="lata-lado" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8e959c"/><stop offset="0.25" stop-color="#eef1f4"/><stop offset="0.6" stop-color="#c2c8ce"/><stop offset="1" stop-color="#727980"/></linearGradient>
+  <linearGradient id="amarelo-tt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe066"/><stop offset="0.5" stop-color="#f6c72c"/><stop offset="1" stop-color="#d9a514"/></linearGradient>
+</defs>
+<path stroke-linejoin="round" d="M78.899 68.485 L78.876 69.182 L82.059 70.107 L81.84 71.409 L78.53 71.244 L78.191 72.274 L77.918 72.916 L80.551 74.928 L79.877 76.063 L76.85 74.713 L76.162 75.552 L75.675 76.052 L77.404 78.879 L76.365 79.694 L74.03 77.342 L73.085 77.875 L72.451 78.165 L73.042 81.427 L71.779 81.811 L70.451 78.774 L69.377 78.93 L68.681 78.972 L68.054 82.226 L66.737 82.128 L66.596 78.817 L65.539 78.575 L64.874 78.361 L63.114 81.17 L61.921 80.603 L62.986 77.465 L62.088 76.856 L61.545 76.417 L58.889 78.4 L57.982 77.441 L60.109 74.899 L59.491 74.007 L59.143 73.402 L55.951 74.292 L55.451 73.069 L58.352 71.467 L58.098 70.413 L57.993 69.723 L54.694 69.399 L54.67 68.079 L57.954 67.633 L58.098 66.558 L58.249 65.876 L55.29 64.383 L55.745 63.143 L58.968 63.914 L59.491 62.963 L59.877 62.382 L57.658 59.921 L58.53 58.928 L61.257 60.812 L62.088 60.114 L62.658 59.712 L61.478 56.615 L62.649 56.005 L64.512 58.746 L65.539 58.395 L66.216 58.227 L66.234 54.913 L67.546 54.767 L68.293 57.996 L69.377 58.04 L70.07 58.127 L71.284 55.043 L72.56 55.381 L72.09 58.662 L73.085 59.095 L73.699 59.426 L75.945 56.989 L77.014 57.766 L75.39 60.655 L76.162 61.418 L76.614 61.949 L79.589 60.488 L80.305 61.598 L77.747 63.705 L78.191 64.696 L78.421 65.354 L81.723 65.067 L81.99 66.36 L78.843 67.401 Z" fill="#000000" fill-opacity="0.35"/>
+<path stroke-linejoin="round" d="M78.522 68.031 L78.498 68.729 L81.681 69.653 L81.462 70.956 L78.152 70.79 L77.813 71.821 L77.54 72.463 L80.173 74.475 L79.499 75.61 L76.472 74.26 L75.784 75.099 L75.297 75.598 L77.026 78.426 L75.987 79.241 L73.652 76.889 L72.707 77.422 L72.073 77.712 L72.664 80.973 L71.401 81.358 L70.073 78.321 L68.999 78.477 L68.303 78.518 L67.676 81.772 L66.359 81.675 L66.218 78.364 L65.161 78.121 L64.496 77.908 L62.736 80.716 L61.543 80.149 L62.608 77.011 L61.71 76.403 L61.167 75.964 L58.512 77.947 L57.604 76.987 L59.731 74.446 L59.113 73.554 L58.765 72.949 L55.573 73.838 L55.073 72.616 L57.974 71.014 L57.72 69.959 L57.615 69.269 L54.316 68.945 L54.292 67.625 L57.576 67.179 L57.72 66.104 L57.871 65.423 L54.912 63.929 L55.367 62.689 L58.59 63.46 L59.113 62.509 L59.5 61.929 L57.28 59.467 L58.152 58.475 L60.879 60.358 L61.71 59.66 L62.28 59.259 L61.1 56.162 L62.271 55.551 L64.134 58.292 L65.161 57.942 L65.838 57.773 L65.856 54.459 L67.168 54.313 L67.915 57.542 L68.999 57.586 L69.692 57.674 L70.906 54.59 L72.182 54.928 L71.712 58.208 L72.707 58.641 L73.321 58.973 L75.567 56.536 L76.636 57.312 L75.012 60.201 L75.784 60.964 L76.236 61.495 L79.211 60.034 L79.927 61.144 L77.369 63.252 L77.813 64.242 L78.043 64.901 L81.345 64.613 L81.612 65.906 L78.465 66.948 Z" fill="url(#aco)" stroke="#5d646b" stroke-width="0.302"/>
+<circle cx="68.031" cy="68.031" r="8.602" fill="none" stroke="#ffffff" stroke-width="0.378"/>
+<circle cx="68.031" cy="68.031" r="3.828" fill="url(#aco)" stroke="#5d646b" stroke-width="0.302"/>
+<circle cx="67.113" cy="67.113" r="0.919" fill="#ffffff" fill-opacity="0.6"/>
+<circle cx="68.031" cy="58.59" r="1.302" fill="#2a2c30"/>
 </svg>

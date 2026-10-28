@@ -606,6 +606,28 @@ def corpo(d, el):
         for k in range(3):
             d.linha(cx - (w - 2.4) / 2, cy - h / 4 + k * h / 4, cx + (w - 2.4) / 2, cy - h / 4 + k * h / 4, '#9aa1a8', 0.12)
         d.ret_c(cx, cy, w * 0.42, h * 0.22, None, rx=0.3, stroke='#8d949b', sw=0.1)
+    elif nome in ('SSOP24', 'HTSSOP16'):
+        # o TB6612FNG (SSOP24, 7,8 x 5,6 mm) e o DRV8833 (HTSSOP16, 5,0 x 4,4 mm):
+        # o corpo no meio das duas fileiras de pernas de 0,65 mm
+        xs, ys = [x for x, _ in pads_smd(pk)], [y for _, y in pads_smd(pk)]
+        deitado = max(xs) - min(xs) > max(ys) - min(ys)
+        comp, larg = (7.8, 5.6) if nome == 'SSOP24' else (5.0, 4.4)
+        cw, ch = (comp, larg) if deitado else (larg, comp)
+        pernas_smd(d, pk, cw / 2, ch / 2)
+        linhas = [('TB6612', 0.7), ('FNG', 0.6), ('5K215', 0.5)] if nome == 'SSOP24' else [('DRV8833', 0.55), ('TI 79Z', 0.45)]
+        d.entrar(rodar(0 if deitado else 90))
+        ci(d, comp, larg, linhas, pino1=(-comp / 2 + 0.55, -larg / 2 + 0.55))
+        d.sair()
+    elif nome == 'EIA3528':
+        # o tantalo de 10 uF: o corpo laranja-amarelo e a faixa do + (o pad 1)
+        chip2(d, pk, 3.5, 2.8, '#d9822b', terminal=False, banda=-1, marca='106', cor_marca='#5a3410')
+    elif nome == '0402':
+        chip2(d, pk, 1.0, 0.5, '#b7956a')
+    elif nome == '-1206':
+        chip2(d, pk, 3.2, 1.6, '#1c1c1e', marca='R200')
+    elif nome == 'SOT23-WIDE':
+        pernas_smd(d, pk, 1.45, 0.8)
+        ci(d, 2.9, 1.6, [('415U', 0.5)])
     elif nome == 'MINIMELF':
         catodo = 1 if [p.get('name') for p in pk.findall('smd')][1] == 'C' else -1
         chip2(d, pk, 3.5, 1.5, '#c8553a', frac=0.12, banda=catodo)
@@ -867,7 +889,8 @@ def gerar(id_peca, cfg):
             t = (e.text or '').strip()
             x, y = num(e, 'x'), num(e, 'y')
             esp, ang = giro(e.get('rot'))
-            if not t or eh_marca(t) or x < 0 or y < 0 or '\n' in t or esp or t in cfg.get('excluir', ()):
+            if not t or eh_marca(t) or (not cfg.get('texto_negativo') and (x < 0 or y < 0)) or '\n' in t or esp \
+                    or t in cfg.get('excluir', ()):
                 continue
             d.texto(x, y, t, num(e, 'size'), SERIGRAFIA, ang, alinhar=e.get('align'))
     # os textos de mais de uma linha, no lugar medido na foto (o MAX98357A)
@@ -1422,6 +1445,19 @@ PLACAS = {
                       pinos_reais={'JP1': ['VIN', 'GND', 'SD', 'GAIN', 'DIN', 'BCLK', 'LRC'], 'X1': ['OUT-', 'OUT+']},
                       cores=('#1f63c0', '#174f9c', '#2c72cf'), sem_elementos=('U$14', 'U$15'), marcos=['U1'],
                       textos_extra=[('MAX', 0.55, 8.74, 1.143), ('98357A', 0.55, 7.28, 1.143), ('I2S Amp.', 0.55, 5.83, 1.143)]),
+    # Os drivers de motor de placa aberta (Alpha 25): o TB6612FNG da SparkFun
+    # (ROB-14451/09457, CC BY-SA 4.0) -- o mesmo desenho das placas vermelhas
+    # que se vendem -- e o DRV8833 da Adafruit (produto 3297, CC BY-SA 3.0),
+    # com o borne de 3,5 mm do VMotor. Os logotipos ficam de fora.
+    'tb6612fng': dict(brd='../motores-cad/SparkFun_Motor_Driver-TB6612FNG_v11.brd', antes_mm=0, sem_barra=True,
+                      pinos_reais={'JP1': ['GND.3', 'BO1', 'BO2', 'AO2', 'AO1', 'GND.2', 'VCC', 'VM'],
+                                   'JP2': ['PWMA', 'AIN2', 'AIN1', 'STBY', 'BIN1', 'BIN2', 'PWMB', 'GND']},
+                      cores=('#c8102e', '#9a0c22', '#d8283f'), sem_elementos=('LOGO1', 'LOGO2', 'LOGO4', 'FRAME1'),
+                      marcos=['U1']),
+    'drv8833': dict(brd='../motores-cad/Adafruit_DRV8833.brd', antes_mm=0, sem_barra=True, texto_negativo=True,
+                    pinos_reais={'JP5': ['VM', 'GND', 'FLT', 'BIN1', 'BIN2', 'SLP', 'AIN2', 'AIN1'],
+                                 'JP2': ['AO2', 'AO1'], 'JP3': ['BO1', 'BO2'], 'JP4': ['AS', 'BS'], 'J1': ['VM.2', 'GND.2']},
+                    cores=('#1f63c0', '#174f9c', '#2c72cf'), sem_elementos=('U$17',), marcos=['U1']),
     'microsd-card': dict(brd='../outros-cad/SparkFun_microSD_Breakout.brd', chute=(3.78, 0.0, 77.0), sem_barra=True,
                          cores=('#c8102e', '#9a0c22', '#d8283f'), sem_elementos=('U$1',), marcos=['U1']),
 }

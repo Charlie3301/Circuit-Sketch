@@ -139,4 +139,34 @@ do esp8266.com e, no Wikimedia Commons (CC BY-SA 4.0), "NodeMCU DEVKIT
 "Wemos LoLin NodeMCU V3 - AI-Thinker ESP8266MOD" e "ESP-WROOM-02(ESP8266)".
 Nenhuma foto e reproduzida, e nenhuma marca e desenhada.
 
+Os drivers de motor: o TB6612FNG (tb6612fng.svg) sai do projeto aberto da
+SparkFun (SparkFun Motor Driver - Dual TB6612FNG, v1.1), sob a licenca
+Creative Commons Atribuicao-CompartilhaIgual 4.0 (CC BY-SA 4.0), e o DRV8833
+(drv8833.svg) do da Adafruit (Adafruit DRV8833 DC/Stepper Motor Driver
+Breakout, produto 3297), sob a CC BY-SA 3.0: o contorno, as trilhas, as
+ilhas, a serigrafia e a posicao dos componentes sao os dos arquivos do Eagle
+(motores-cad/). O A4988 e o DRV8825 (a4988.svg, drv8825.svg) seguem as placas
+da Pololu (0,6 x 0,8"), com o cobre vetorizado das fotos de cima publicadas
+por ela; o L298N, o L9110S, o IBT-2 (BTS7960) e a placa do ULN2003
+(l298n.svg, l9110s.svg, bts7960.svg, uln2003.svg) foram tracados das fotos de
+cima e dos desenhos com cota dos vendedores (Handsontec, SunFounder e as
+fichas dos modulos), e o L293D segue o PDIP-16 e a pinagem da ficha da Texas
+Instruments.
+
+Os motores (stepper-motor.svg, biaxial-stepper.svg, motor-28byj48*.svg,
+motor-dc*.svg, motor-tt*.svg, motor-brushless*.svg) sao desenhos proprios do
+CircuitSketch nas medidas das fichas: o NEMA 17 (42,3 mm, furos a 31 mm), o
+VID28-05 pela planta do fabricante, o 28BYJ-48 pelo desenho com cota, a
+frente de cada motor de escovas pelas fichas da Mabuchi (FA-130RA, RS-360SH,
+RS-380PH, RS-540SH, RS-545SH, RS-550) e o RS-775 pelo desenho do vendedor, o
+motor TT pelo desenho com cota de 70 x 22,4 mm e os sem escova pelos
+desenhos com cota de cada familia (A2212, MN3508, 2207, 1105, 3650). As
+rodas e as helices (roda-tt.svg, helice-*.svg) seguem o desenho com cota da
+roda de 65 mm e o contorno das pas medido em fotos de cima; a da helice 10 x
+4,5" na foto "Propeller of a Quadcopter - Top view" do Wikimedia Commons (CC BY-SA 4.0). O controle
+FS-i6 (radio-controle.svg) e o receptor FS-iA6B (receptor-rc.svg) seguem as
+fotos de frente e as medidas publicadas pelo fabricante (174 mm de largura;
+47 x 26,2 mm), e os ESC (esc*.svg) as medidas da linha Skywalker de cada
+corrente. Nenhuma foto e reproduzida, e nenhuma marca e desenhada.
+
 O restante do CircuitSketch nao e afetado por esta licenca.

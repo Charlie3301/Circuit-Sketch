@@ -19,6 +19,11 @@ em fracao da caixa, para a tabela Animadas do editor.
 
 O desenho e simples de proposito, como o das pecas de som da Alpha 19.
 """
+
+# Aposentado na Alpha 25: os desenhos foram refeitos das referencias de
+# verdade em pecas-motores-a25.py. O codigo fica como historico; rodar este
+# arquivo sobrescreveria os desenhos novos.
+raise SystemExit('aposentado: use ferramentas/extrair-svg/pecas-motores-a25.py')
 import io
 import json
 import math

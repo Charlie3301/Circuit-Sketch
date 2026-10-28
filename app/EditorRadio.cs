@@ -17,18 +17,24 @@ public partial class EditorCircuito
 {
     const double MmRadio = 96 / 25.4;
 
-    /// <summary>As areas que o clique pega, em mm da peca (90 x 66).</summary>
+    /// <summary>
+    /// As areas que o clique pega, em mm da peca: o FS-i6 de frente, 174 x 194
+    /// mm (as medidas da foto do fabricante, as mesmas do pecas-rc-a25.py).
+    /// </summary>
     static readonly (double X, double Y, double R, string Nome)[] RegioesDoRadio =
     [
-        (24.0, 38.0, 11.0, "manche-esq"),
-        (66.0, 38.0, 11.0, "manche-dir"),
-        (12.0, 9.5, 4.0, "SWA"),
-        (78.0, 9.5, 4.0, "SWB"),
-        (45.0, 56.5, 5.0, "liga"),
+        (33.5, 103.0, 22.0, "manche-esq"),
+        (140.5, 103.0, 22.0, "manche-dir"),
+        (21.5, 65.5, 5.0, "SWA"),
+        (42.0, 61.5, 5.0, "SWB"),
+        (134.9, 175.7, 8.0, "liga"),
     ];
 
+    /// <summary>O centro de cada manche (o meio do gimbal), em mm.</summary>
+    static readonly (double X, double Y) MancheEsq = (33.5, 103.0), MancheDir = (140.5, 103.0);
+
     /// <summary>Quanto o manche anda do centro ate o batente, em mm.</summary>
-    const double CursoDoRadio = 8.0;
+    const double CursoDoRadio = 11.0;
 
     /// <summary>O manche que o mouse esta segurando: a peca e o lado.</summary>
     (string Peca, string Lado)? mancheDoRadio;
@@ -82,7 +88,8 @@ public partial class EditorCircuito
         if (def is null) return true;
 
         var local = Geometria.PontoLocal(peca, def, p);
-        double cx = (segurado.Lado == "manche-esq" ? 24.0 : 66.0) * MmRadio, cy = 38.0 * MmRadio;
+        var centro = segurado.Lado == "manche-esq" ? MancheEsq : MancheDir;
+        double cx = centro.X * MmRadio, cy = centro.Y * MmRadio;
         double x = Math.Clamp((local.X - cx) / (CursoDoRadio * MmRadio), -1, 1);
         double y = Math.Clamp(-(local.Y - cy) / (CursoDoRadio * MmRadio), -1, 1);
         if (segurado.Lado == "manche-esq") { peca.Giro4 = 0.5 + x / 2; peca.Giro = 0.5 + y / 2; }
@@ -113,28 +120,33 @@ public partial class EditorCircuito
         {
             d.Hastes[i] = new Line
             {
-                Stroke = new SolidColorBrush(Color.FromRgb(0x9A, 0xA0, 0xA8)),
-                StrokeThickness = 4, StrokeStartLineCap = PenLineCap.Round, StrokeEndLineCap = PenLineCap.Round,
+                Stroke = new SolidColorBrush(Color.FromRgb(0xB9, 0xBF, 0xC6)),
+                StrokeThickness = 3.0 * MmRadio, StrokeStartLineCap = PenLineCap.Round, StrokeEndLineCap = PenLineCap.Round,
                 IsHitTestVisible = false,
             };
+            // A ponta do manche do FS-i6: o cilindro de aluminio vermelho serrilhado (8 mm).
             d.Manches[i] = new Ellipse
             {
-                Width = 7 * MmRadio, Height = 7 * MmRadio,
-                Fill = new RadialGradientBrush(Color.FromRgb(0x6A, 0x6E, 0x76), Color.FromRgb(0x2A, 0x2C, 0x31)),
-                Stroke = new SolidColorBrush(Color.FromRgb(0xC9, 0xCD, 0xD3)), StrokeThickness = 1.2,
+                Width = 8 * MmRadio, Height = 8 * MmRadio,
+                Fill = new RadialGradientBrush(Color.FromRgb(0xE2, 0x4A, 0x44), Color.FromRgb(0x7A, 0x14, 0x12)),
+                Stroke = new SolidColorBrush(Color.FromRgb(0xF2, 0xC9, 0xC6)), StrokeThickness = 1.2,
                 IsHitTestVisible = false,
             };
+            // A alavanca cromada da chave.
             d.Chaves[i] = new Rectangle
             {
-                Width = 2.2 * MmRadio, Height = 4.2 * MmRadio, RadiusX = 2, RadiusY = 2,
-                Fill = new SolidColorBrush(Color.FromRgb(0xE6, 0xE6, 0xE2)), IsHitTestVisible = false,
+                Width = 2.4 * MmRadio, Height = 5.2 * MmRadio, RadiusX = 3, RadiusY = 3,
+                Fill = new LinearGradientBrush(Color.FromRgb(0xF4, 0xF6, 0xF8), Color.FromRgb(0x8A, 0x91, 0x99), 0),
+                Stroke = new SolidColorBrush(Color.FromRgb(0x5D, 0x64, 0x6B)), StrokeThickness = 0.8,
+                IsHitTestVisible = false,
             };
         }
         d.Luz = new Ellipse { Width = 2.4 * MmRadio, Height = 2.4 * MmRadio, IsHitTestVisible = false };
         d.Tela = new TextBlock
         {
-            FontFamily = new FontFamily("Consolas"), FontSize = 9.5,
-            Foreground = new SolidColorBrush(Color.FromRgb(0xEA, 0xF4, 0xFF)), IsHitTestVisible = false,
+            // o visor do FS-i6: o cristal liquido verde-claro com os caracteres escuros
+            FontFamily = new FontFamily("Consolas"), FontSize = 17, FontWeight = FontWeights.Bold,
+            Foreground = new SolidColorBrush(Color.FromRgb(0x22, 0x33, 0x24)), IsHitTestVisible = false,
         };
         foreach (UIElement e in new UIElement[] { d.Hastes[0], d.Hastes[1], d.Manches[0], d.Manches[1], d.Chaves[0], d.Chaves[1], d.Luz, d.Tela })
         {
@@ -167,12 +179,12 @@ public partial class EditorCircuito
 
         (double X, double Y)[] manches =
         [
-            (24.0 + (peca.Giro4 - 0.5) * 2 * CursoDoRadio, 38.0 - (peca.Giro - 0.5) * 2 * CursoDoRadio),
-            (66.0 + (peca.Giro3 - 0.5) * 2 * CursoDoRadio, 38.0 - (peca.Giro2 - 0.5) * 2 * CursoDoRadio),
+            (MancheEsq.X + (peca.Giro4 - 0.5) * 2 * CursoDoRadio, MancheEsq.Y - (peca.Giro - 0.5) * 2 * CursoDoRadio),
+            (MancheDir.X + (peca.Giro3 - 0.5) * 2 * CursoDoRadio, MancheDir.Y - (peca.Giro2 - 0.5) * 2 * CursoDoRadio),
         ];
         for (int i = 0; i < 2; i++)
         {
-            var centro = Local(i == 0 ? 24.0 : 66.0, 38.0);
+            var centro = Local(i == 0 ? MancheEsq.X : MancheDir.X, i == 0 ? MancheEsq.Y : MancheDir.Y);
             var ponta = Local(manches[i].X, manches[i].Y);
             d.Hastes[i].X1 = centro.X; d.Hastes[i].Y1 = centro.Y;
             d.Hastes[i].X2 = ponta.X; d.Hastes[i].Y2 = ponta.Y;
@@ -184,14 +196,15 @@ public partial class EditorCircuito
         for (int i = 0; i < 2; i++)
         {
             bool baixo = (peca.Bits & (1 << i)) != 0;
-            var c = Local(i == 0 ? 12.0 : 78.0, baixo ? 10.6 : 8.4);
+            var (cxm, cym) = i == 0 ? (21.5, 65.5) : (42.0, 61.5);
+            var c = Local(cxm, cym + (baixo ? 2.6 : -2.6));
             Canvas.SetLeft(d.Chaves[i], c.X - d.Chaves[i].Width / 2);
             Canvas.SetTop(d.Chaves[i], c.Y - d.Chaves[i].Height / 2);
         }
 
         bool ligado = !ControleDesligado(peca);
         d.Luz.Fill = new SolidColorBrush(ligado ? Color.FromRgb(0x3C, 0xD0, 0x6A) : Color.FromRgb(0x3A, 0x1A, 0x1A));
-        var luz = Local(45.0, 52.4);
+        var luz = Local(134.9, 163.2);
         Canvas.SetLeft(d.Luz, luz.X - d.Luz.Width / 2);
         Canvas.SetTop(d.Luz, luz.Y - d.Luz.Height / 2);
 
@@ -201,7 +214,7 @@ public partial class EditorCircuito
             : "\n  desligado";
         if (d.Tela.Text != texto) d.Tela.Text = texto;
         d.Tela.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        var tela = Local(45.0, 16.5);
+        var tela = Local(85.6, 163.3);
         Canvas.SetLeft(d.Tela, tela.X - d.Tela.DesiredSize.Width / 2);
         Canvas.SetTop(d.Tela, tela.Y - d.Tela.DesiredSize.Height / 2);
     }

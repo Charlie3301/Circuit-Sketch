@@ -12,6 +12,11 @@ Elas giram inteiras: o desenho todo e a parte "-movel", e o "-corpo" fica
 vazio. Encaixadas no eixo de um motor (o editor encaixa ao soltar perto),
 giram com ele.
 """
+
+# Aposentado na Alpha 25: os desenhos foram refeitos das referencias de
+# verdade em pecas-acessorios-a25.py. O codigo fica como historico; rodar este
+# arquivo sobrescreveria os desenhos novos.
+raise SystemExit('aposentado: use ferramentas/extrair-svg/pecas-acessorios-a25.py')
 import io
 import json
 import math

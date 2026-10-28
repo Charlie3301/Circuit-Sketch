@@ -15,6 +15,11 @@ o corpo e o movel de cada uma); aqui ficou so o motor de passo do Wokwi.
 
     python ferramentas/extrair-svg/animar.py
 """
+
+# Aposentado na Alpha 25: os desenhos foram refeitos das referencias de
+# verdade em pecas-motores-a25.py. O codigo fica como historico; rodar este
+# arquivo sobrescreveria os desenhos novos.
+raise SystemExit('aposentado: use ferramentas/extrair-svg/pecas-motores-a25.py')
 import io
 import re
 import xml.etree.ElementTree as ET

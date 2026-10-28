@@ -1357,7 +1357,7 @@ public partial class EditorCircuito : Border
         ["potentiometer"] = new(DesenhoDasEntradas.PotEixoX, DesenhoDasEntradas.PotEixoY),
         ["ky-040"] = new(DesenhoDasEntradas.EncoderEixoX, DesenhoDasEntradas.EncoderEixoY),
         ["rotary-dialer"] = new(DesenhoDasEntradas.DiscoEixoX, DesenhoDasEntradas.DiscoEixoY),
-        ["stepper-motor"] = new(109.1 / 220, 109.1 / 235),
+        ["stepper-motor"] = new(0.50130, 0.36880),
 
         // ---- deslizam ----
         // A alavanca da chave anda 1,9 mm; o knob do deslizante, os 30 mm
@@ -1371,12 +1371,13 @@ public partial class EditorCircuito : Border
         // O pendrive sai do conector: 9 mm para a direita.
         ["pendrive-usb"] = new(0.5, 0.5, CursoX: 34.0),
 
-        // Os motores DC: o alvo no eixo do 130, o eixo branco do amarelo,
-        // o sino do brushless (os centros saem do pecas-motores.py).
-        ["motor-dc"] = new(0.5, 12.5 / 30.0),
-        ["motor-tt"] = new(12.0 / 74.0, 0.5),
-        ["motor-brushless"] = new(0.5, 18.0 / 44.0),
-        ["motor-28byj48"] = new(0.5, 12.0 / 46.0),
+        // Os motores DC: o pinhao no eixo do de escovas, o eixo branco do
+        // amarelo, o sino do brushless, o eixo de latao do 28BYJ-48 (os
+        // centros saem do pecas-motores-a25.py).
+        ["motor-dc"] = new(0.49918, 0.41809),
+        ["motor-tt"] = new(0.21697, 0.50137),
+        ["motor-brushless"] = new(0.50023, 0.40983),
+        ["motor-28byj48"] = new(0.50090, 0.15998),
 
         // Rodas e helices giram inteiras, no centro.
         ["roda-tt"] = new(0.5, 0.5),
@@ -6362,12 +6363,10 @@ public partial class EditorCircuito : Border
     /// desenho do componente e o mesmo parado ou andando.
     /// </summary>
     /// <summary>
-    /// Onde as duas hastes do biaxial giram, em pixels da peca.
-    ///
-    /// Vem do SVG: o grupo esta em translate(45 30) e a haste em
-    /// translate(60 86) dentro dele.
+    /// Onde as duas hastes do biaxial giram, em pixels da peca: o eixo do
+    /// VID28-05, a 9,5 mm do centro do oval (pecas-motores-a25.py).
     /// </summary>
-    static readonly Point EixoDoBiaxial = new(105, 116);
+    static readonly Point EixoDoBiaxial = new(160.63, 69.92);
 
     void MostrarBiaxial(PecaNoCircuito peca, EixoDePasso[] eixos)
     {
@@ -6398,9 +6397,8 @@ public partial class EditorCircuito : Border
         }
 
         // Os dois eixos sao CONCENTRICOS -- e um movimento de relogio,
-        // e nao dois motores empilhados. O ponto vem do proprio
-        // desenho: as hastes originais giravam em translate(60 86)
-        // dentro de um grupo em translate(45 30).
+        // e nao dois motores empilhados (o eixo de dentro e o de fora
+        // do VID28-05).
         var centro = Geometria.PosicaoLocal(peca, def, EixoDoBiaxial.X, EixoDoBiaxial.Y);
 
         for (int i = 0; i < 2; i++)

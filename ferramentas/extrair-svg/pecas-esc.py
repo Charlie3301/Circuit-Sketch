@@ -12,6 +12,11 @@ As ESCs, com a cor e a corrente escolhidas na barra da peca:
 
 So as variantes de desenho; o catalogo ganha so a esc-4em1.
 """
+
+# Aposentado na Alpha 25: os desenhos foram refeitos das referencias de
+# verdade em pecas-rc-a25.py. O codigo fica como historico; rodar este
+# arquivo sobrescreveria os desenhos novos.
+raise SystemExit('aposentado: use ferramentas/extrair-svg/pecas-rc-a25.py')
 import io
 import json
 

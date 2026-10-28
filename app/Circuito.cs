@@ -391,6 +391,34 @@ public class Circuito
             f.DePino = Novo(f.DePeca, f.DePino);
             f.ParaPino = Novo(f.ParaPeca, f.ParaPino);
         }
+        LevarAcessoriosParaOEixoNovo();
+    }
+
+    /// <summary>
+    /// O motor TT da Alpha 25 tem a orelha e o desenho com cota: o eixo saiu
+    /// de 12 para 17,05 mm da borda, numa caixa de 280 para 297 px. A roda que
+    /// um projeto antigo deixou encaixada no eixo velho vai para o novo.
+    /// </summary>
+    void LevarAcessoriosParaOEixoNovo()
+    {
+        const double mm = 96 / 25.4;
+        if (Pecas is null || Catalogo.Obter("motor-tt") is not { } novo) return;
+        foreach (var motor in Pecas.Where(p => p.Tipo == "motor-tt"))
+        {
+            var antigo = novo with { Largura = 280, Altura = 98 };
+            var eixoVelho = Geometria.PosicaoLocal(motor, antigo, 12.0 * mm, 13.0 * mm);
+            var eixoNovo = Geometria.PosicaoLocal(motor, novo, 17.05 * mm, 13.0 * mm);
+            foreach (var acc in Pecas.Where(p => p.Tipo is "roda-tt"))
+            {
+                if (Catalogo.Obter(acc.Tipo) is not { } def) continue;
+                var centro = new System.Windows.Point(acc.X + def.Largura / 2.0, acc.Y + def.Altura / 2.0);
+                if ((centro - eixoVelho).Length < 6 && (centro - eixoNovo).Length >= 6)
+                {
+                    acc.X += eixoNovo.X - eixoVelho.X;
+                    acc.Y += eixoNovo.Y - eixoVelho.Y;
+                }
+            }
+        }
     }
 
     /// <summary>As placas de desenvolvimento, na ordem em que entraram.</summary>

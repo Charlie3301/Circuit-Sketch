@@ -18,7 +18,7 @@ public partial class EditorCircuito
     static readonly Dictionary<string, (double X, double Y)> EixosDosMotores = new()
     {
         ["motor-dc"] = (14.0, 12.5),
-        ["motor-tt"] = (12.0, 13.0),
+        ["motor-tt"] = (17.05, 13.0),
         ["motor-brushless"] = (18.0, 18.0),
         ["servo-360"] = (23.15, 12.0),
     };

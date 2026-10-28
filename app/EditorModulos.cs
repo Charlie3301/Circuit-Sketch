@@ -15,10 +15,11 @@ public partial class EditorCircuito
     /// <summary>Onde fica cada luz (pixels da peca), o raio, a cor e o que a acende.</summary>
     static readonly Dictionary<string, (double X, double Y, double R, Color Cor, string Chave)[]> LuzesDosModulos = new()
     {
-        ["l298n"] = [(24.0 * Mm, 31.0 * Mm, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "energia")],
-        ["l9110s"] = [(26.0 * Mm, 11.4 * Mm, 0.8 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "energia")],
+        // Os LEDs de energia dos drivers (pecas-drivers-a25.py, nas posicoes da foto de cada placa).
+        ["l298n"] = [(82.96, 123.40, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "energia")],
+        ["l9110s"] = [(36.47, 55.94, 0.75 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "energia")],
         // A luz do receptor: acesa com o controle ligado, piscando sem ele.
-        ["receptor-rc"] = [(8.0 * Mm, 22.6 * Mm, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "rx")],
+        ["receptor-rc"] = [(74.46, 18.90, 0.75 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "rx")],
         // O LED de sinal do receptor infravermelho (KY-022, pecas-outros.py):
         // acende enquanto chega o sinal do controle.
         ["ir-receiver"] = [(47.2, 42.3, 0.6 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "ir")],
@@ -62,10 +63,11 @@ public partial class EditorCircuito
         ],
         ["uln2003"] =
         [
-            (26.0 * Mm, 12.5 * Mm, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "A"),
-            (26.0 * Mm, 15.5 * Mm, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "B"),
-            (26.0 * Mm, 18.5 * Mm, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "C"),
-            (26.0 * Mm, 21.5 * Mm, 0.9 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "D"),
+            // Os LEDs de 3 mm da placa verde (A..D de cima para baixo, ao lado do conector).
+            (103.56, 15.69, 1.5 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "A"),
+            (103.56, 33.90, 1.5 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "B"),
+            (103.56, 52.12, 1.5 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "C"),
+            (103.56, 70.34, 1.5 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "D"),
         ],
     };
 

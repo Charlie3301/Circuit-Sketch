@@ -1,26 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-     width="36.0mm" height="44.0mm" viewBox="0 0 36.0 44.0">
-  <defs>
-    <radialGradient id="sinoBL" cx="0.42" cy="0.38" r="0.7">
-      <stop offset="0" stop-color="#4a4d55"/>
-      <stop offset="1" stop-color="#1d1f23"/>
-    </radialGradient>
-  </defs>
-
-  <circle cx="18.0" cy="18.0" r="13.75" fill="url(#sinoBL)" stroke="#0e0f11" stroke-width="0.4"/>
-  <circle cx="18.0" cy="18.0" r="12.85" fill="none" stroke="#5b5f68" stroke-width="0.35"/>
-  <path d="M12.073 9.212 A10.6 10.6 0 0 1 23.927 9.212 L21.131 13.357 A5.6 5.6 0 0 0 14.869 13.357 Z" fill="#a8641f" stroke="#0e0f11" stroke-width="0.35"/>
-  <path d="M15.230 10.388 A8.1 8.1 0 0 1 20.770 10.388" fill="none" stroke="#d58a3c" stroke-width="0.5"/>
-  <path d="M28.574 17.261 A10.6 10.6 0 0 1 22.647 27.527 L20.455 23.033 A5.6 5.6 0 0 0 23.586 17.609 Z" fill="#a8641f" stroke="#0e0f11" stroke-width="0.35"/>
-  <path d="M25.977 19.407 A8.1 8.1 0 0 1 23.207 24.205" fill="none" stroke="#d58a3c" stroke-width="0.5"/>
-  <path d="M13.353 27.527 A10.6 10.6 0 0 1 7.426 17.261 L12.414 17.609 A5.6 5.6 0 0 0 15.545 23.033 Z" fill="#a8641f" stroke="#0e0f11" stroke-width="0.35"/>
-  <path d="M12.793 24.205 A8.1 8.1 0 0 1 10.023 19.407" fill="none" stroke="#d58a3c" stroke-width="0.5"/>
-  <circle cx="21.377" cy="16.050" r="0.45" fill="#0e0f11"/>
-  <circle cx="18.000" cy="21.900" r="0.45" fill="#0e0f11"/>
-  <circle cx="14.623" cy="16.050" r="0.45" fill="#0e0f11"/>
-  <path d="M18.00 4.85 l-0.9 1.7 h1.8 Z" fill="#e2473d"/>
-  <text x="18.00" y="29.20" fill="#c7ccd4" font-size="1.45px" text-anchor="middle"
-        font-family="Verdana" font-weight="bold">A2212 1400KV</text>
-  <circle cx="18.0" cy="18.0" r="2.6" fill="#c9cdd3" stroke="#6d737c" stroke-width="0.3"/>
-  <circle cx="18.0" cy="18.0" r="1.58" fill="#9aa0a8" stroke="#5a6068" stroke-width="0.2"/>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="136px" height="166px" viewBox="0 0 136 166">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <linearGradient id="blindagem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset="0.45" stop-color="#c8cdd2"/><stop offset="1" stop-color="#9aa1a8"/></linearGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
+  <linearGradient id="ceramica" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f1e8"/><stop offset="1" stop-color="#cfc9b8"/></linearGradient>
+  <radialGradient id="lata-topo" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#f1f3f5"/><stop offset="0.6" stop-color="#c3c8ce"/><stop offset="1" stop-color="#8a9097"/></radialGradient>
+  <radialGradient id="aluminio" cx="0.35" cy="0.3" r="0.9"><stop offset="0" stop-color="#eef0f2"/><stop offset="0.55" stop-color="#cdd1d5"/><stop offset="1" stop-color="#9ca2a8"/></radialGradient>
+  <radialGradient id="zinco" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#eef0d2"/><stop offset="0.55" stop-color="#bfc08e"/><stop offset="1" stop-color="#7d7f55"/></radialGradient>
+  <radialGradient id="dourado" cx="0.38" cy="0.32" r="0.85"><stop offset="0" stop-color="#ffe7a0"/><stop offset="0.5" stop-color="#e6b04a"/><stop offset="1" stop-color="#a8701c"/></radialGradient>
+  <radialGradient id="latao" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#fbe9a8"/><stop offset="0.55" stop-color="#d4ab52"/><stop offset="1" stop-color="#93702a"/></radialGradient>
+  <radialGradient id="aco" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#f7f8f9"/><stop offset="0.55" stop-color="#b8bec5"/><stop offset="1" stop-color="#7a8189"/></radialGradient>
+  <radialGradient id="cobre-bob" cx="0.5" cy="0.5" r="0.6"><stop offset="0" stop-color="#d98a4a"/><stop offset="1" stop-color="#7a3d16"/></radialGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
+  <linearGradient id="lata-lado" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8e959c"/><stop offset="0.25" stop-color="#eef1f4"/><stop offset="0.6" stop-color="#c2c8ce"/><stop offset="1" stop-color="#727980"/></linearGradient>
+  <linearGradient id="amarelo-tt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe066"/><stop offset="0.5" stop-color="#f6c72c"/><stop offset="1" stop-color="#d9a514"/></linearGradient>
+</defs>
+<circle cx="68.976" cy="69.165" r="52.233" fill="#000000" fill-opacity="0.35"/>
+<circle cx="68.031" cy="68.031" r="52.233" fill="url(#dourado)" stroke="#8a5a14" stroke-width="0.68"/>
+<circle cx="68.031" cy="68.031" r="49.587" fill="none" stroke="#ffe9a8" stroke-width="0.945"/>
+<circle cx="98.268" cy="68.031" r="13.228" fill="#1c140d" stroke="#7a4f12" stroke-width="0.605"/>
+<circle cx="100.535" cy="68.031" r="8.693" fill="url(#cobre-bob)"/>
+<circle cx="100.535" cy="68.031" r="4.157" fill="#3a2414" fill-opacity="0.6"/>
+<circle cx="98.268" cy="68.031" r="13.228" fill="none" stroke="#000000" stroke-width="1.89"/>
+<circle cx="68.031" cy="98.268" r="13.228" fill="#1c140d" stroke="#7a4f12" stroke-width="0.605"/>
+<circle cx="68.031" cy="100.535" r="8.693" fill="url(#cobre-bob)"/>
+<circle cx="68.031" cy="100.535" r="4.157" fill="#3a2414" fill-opacity="0.6"/>
+<circle cx="68.031" cy="98.268" r="13.228" fill="none" stroke="#000000" stroke-width="1.89"/>
+<circle cx="37.795" cy="68.031" r="13.228" fill="#1c140d" stroke="#7a4f12" stroke-width="0.605"/>
+<circle cx="35.528" cy="68.031" r="8.693" fill="url(#cobre-bob)"/>
+<circle cx="35.528" cy="68.031" r="4.157" fill="#3a2414" fill-opacity="0.6"/>
+<circle cx="37.795" cy="68.031" r="13.228" fill="none" stroke="#000000" stroke-width="1.89"/>
+<circle cx="68.031" cy="37.795" r="13.228" fill="#1c140d" stroke="#7a4f12" stroke-width="0.605"/>
+<circle cx="68.031" cy="35.528" r="8.693" fill="url(#cobre-bob)"/>
+<circle cx="68.031" cy="35.528" r="4.157" fill="#3a2414" fill-opacity="0.6"/>
+<circle cx="68.031" cy="37.795" r="13.228" fill="none" stroke="#000000" stroke-width="1.89"/>
+<circle cx="68.485" cy="68.598" r="15.118" fill="#000000" fill-opacity="0.3"/>
+<circle cx="68.031" cy="68.031" r="15.118" fill="url(#dourado)" stroke="#8a5a14" stroke-width="0.529"/>
+<circle cx="68.031" cy="68.031" r="12.472" fill="none" stroke="#ffe9a8" stroke-width="0.567"/>
+<circle cx="68.409" cy="68.485" r="5.991" fill="#000000" fill-opacity="0.35"/>
+<circle cx="68.031" cy="68.031" r="5.991" fill="url(#aco)" stroke="#5d646b" stroke-width="0.302"/>
+<circle cx="68.031" cy="68.031" r="4.313" fill="none" stroke="#ffffff" stroke-width="0.302"/>
+<circle cx="68.031" cy="68.031" r="1.498" fill="#8a9199"/>
+<rect x="67.087" y="54.803" width="1.89" height="4.535" rx="0.567" fill="#7a4f12"/>
 </svg>

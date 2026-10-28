@@ -18,6 +18,11 @@ Os bornes tem passo de 5,08 mm e os conectores de 2,54: tudo no passo de
 0,1", como o autoteste confere. O que acende (a luz de energia dos modulos)
 o editor desenha por cima; aqui fica so o desenho parado.
 """
+
+# Aposentado na Alpha 25: os desenhos foram refeitos das referencias de
+# verdade em pecas-drivers-a25.py (e o tb6612fng/drv8833 no placas-arduino.py). O codigo fica como historico; rodar este
+# arquivo sobrescreveria os desenhos novos.
+raise SystemExit('aposentado: use ferramentas/extrair-svg/pecas-drivers-a25.py')
 import io
 import json
 

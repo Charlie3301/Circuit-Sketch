@@ -805,7 +805,7 @@ def fonte(volts, corrente, capacidade, nome, x=300, y=300, id_='pilhas'):
 
 def no_eixo(acessorio, motor, x, y):
     """O acessorio com o centro no eixo do motor (que esta em x, y): encaixado."""
-    eixo = {'motor-tt': (12, 13), 'motor-dc': (14, 12.5), 'motor-brushless': (18, 18)}[motor]
+    eixo = {'motor-tt': (17.05, 13), 'motor-dc': (14, 12.5), 'motor-brushless': (18, 18)}[motor]
     centro = {'roda-tt': (33, 33), 'helice-130': (38, 38), 'helice-1045': (128, 17), 'helice-5045': (64, 64)}[acessorio]
     return (round(x + (eixo[0] - centro[0]) * MM, 2), round(y + (eixo[1] - centro[1]) * MM, 2))
 

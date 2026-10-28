@@ -7,6 +7,11 @@ As pecas de aeromodelo da Alpha 23:
           da bateria (BAT+ vermelho, BAT- preto) e o cabo de servo (SINAL,
           5V do BEC, GND), como na peca de verdade.
 """
+
+# Aposentado na Alpha 25: os desenhos foram refeitos das referencias de
+# verdade em pecas-rc-a25.py. O codigo fica como historico; rodar este
+# arquivo sobrescreveria os desenhos novos.
+raise SystemExit('aposentado: use ferramentas/extrair-svg/pecas-rc-a25.py')
 import io
 import json
 

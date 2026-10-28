@@ -15,6 +15,11 @@ Os drivers de motor de passo da Alpha 23, e o motor que faltava:
 O motor de passo do Wokwi ("stepper-motor") continua o mesmo desenho: e o
 NEMA 17 que estes drivers acionam.
 """
+
+# Aposentado na Alpha 25: os desenhos foram refeitos das referencias de
+# verdade em pecas-drivers-a25.py e pecas-motores-a25.py. O codigo fica como historico; rodar este
+# arquivo sobrescreveria os desenhos novos.
+raise SystemExit('aposentado: use ferramentas/extrair-svg/pecas-drivers-a25.py')
 import io
 import json
 import math

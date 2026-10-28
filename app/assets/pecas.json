@@ -3855,62 +3855,62 @@
  },
  {
   "id": "biaxial-stepper",
-  "largura": 212,
-  "altura": 255,
+  "largura": 249,
+  "altura": 140,
   "pinos": [
    {
     "nome": "A1-",
-    "x": 45,
-    "y": 109.24199999999999,
+    "x": 51.48,
+    "y": 26.72,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A1+",
-    "x": 45,
-    "y": 118.84319999999998,
+    "x": 80.81,
+    "y": 26.72,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "B1+",
-    "x": 45,
-    "y": 128.44439999999997,
+    "x": 80.81,
+    "y": 113.12,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "B1-",
-    "x": 45,
-    "y": 138.04559999999998,
+    "x": 51.48,
+    "y": 113.12,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A2-",
-    "x": 45,
-    "y": 147.6468,
+    "x": 197.97,
+    "y": 26.72,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "A2+",
-    "x": 45,
-    "y": 157.24799999999996,
+    "x": 168.64,
+    "y": 26.72,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "B2+",
-    "x": 45,
-    "y": 166.8492,
+    "x": 168.64,
+    "y": 113.12,
     "sinais": [],
     "descricao": ""
    },
    {
     "nome": "B2-",
-    "x": 45,
-    "y": 176.4504,
+    "x": 197.97,
+    "y": 113.12,
     "sinais": [],
     "descricao": ""
    }
@@ -3963,55 +3963,87 @@
  },
  {
   "id": "bts7960",
-  "largura": 189,
-  "altura": 189,
+  "largura": 188,
+  "altura": 187,
   "pinos": [
    {
+    "nome": "B-",
+    "x": 87.84,
+    "y": 13.8,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Bateria -"
+   },
+   {
+    "nome": "B+",
+    "x": 107.04,
+    "y": 13.8,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Bateria +, 5,5 a 27 V (motor grande: ate 43 A)"
+   },
+   {
+    "nome": "M+",
+    "x": 126.24,
+    "y": 13.8,
+    "sinais": [],
+    "descricao": "Um fio do motor"
+   },
+   {
+    "nome": "M-",
+    "x": 145.44,
+    "y": 13.8,
+    "sinais": [],
+    "descricao": "O outro fio do motor"
+   },
+   {
     "nome": "RPWM",
-    "x": 6.05,
-    "y": 56.69,
+    "x": 144.0,
+    "y": 171.78,
     "sinais": [],
     "descricao": "PWM do lado \"R\": com R_EN em HIGH, o M+ segue este pino (velocidade para um lado)"
    },
    {
     "nome": "LPWM",
-    "x": 6.05,
-    "y": 66.29,
+    "x": 144.0,
+    "y": 181.38,
     "sinais": [],
     "descricao": "PWM do lado \"L\": com L_EN em HIGH, o M- segue este pino (velocidade para o outro lado)"
    },
    {
     "nome": "R_EN",
-    "x": 6.05,
-    "y": 75.89,
+    "x": 134.4,
+    "y": 171.78,
     "sinais": [],
     "descricao": "Liga a meia ponte do M+ (HIGH). Em LOW ela desliga"
    },
    {
     "nome": "L_EN",
-    "x": 6.05,
-    "y": 85.49,
+    "x": 134.4,
+    "y": 181.38,
     "sinais": [],
     "descricao": "Liga a meia ponte do M- (HIGH). Em LOW ela desliga"
    },
    {
     "nome": "R_IS",
-    "x": 6.05,
-    "y": 95.09,
+    "x": 124.8,
+    "y": 171.78,
     "sinais": [],
     "descricao": "Sensor de corrente do lado R (saida analogica)"
    },
    {
     "nome": "L_IS",
-    "x": 6.05,
-    "y": 104.69,
+    "x": 124.8,
+    "y": 181.38,
     "sinais": [],
     "descricao": "Sensor de corrente do lado L (saida analogica)"
    },
    {
     "nome": "VCC",
-    "x": 6.05,
-    "y": 114.29,
+    "x": 115.2,
+    "y": 171.78,
     "sinais": [
      "power"
     ],
@@ -4019,44 +4051,12 @@
    },
    {
     "nome": "GND",
-    "x": 6.05,
-    "y": 123.89,
+    "x": 115.2,
+    "y": 181.38,
     "sinais": [
      "power"
     ],
     "descricao": "GND da logica: o GND da placa (e o B- da bateria)"
-   },
-   {
-    "nome": "B+",
-    "x": 172.35,
-    "y": 37.57,
-    "sinais": [
-     "power"
-    ],
-    "descricao": "Bateria +, 5,5 a 27 V (motor grande: ate 43 A)"
-   },
-   {
-    "nome": "B-",
-    "x": 172.35,
-    "y": 56.77,
-    "sinais": [
-     "power"
-    ],
-    "descricao": "Bateria -"
-   },
-   {
-    "nome": "M+",
-    "x": 172.35,
-    "y": 114.37,
-    "sinais": [],
-    "descricao": "Um fio do motor"
-   },
-   {
-    "nome": "M-",
-    "x": 172.35,
-    "y": 133.57,
-    "sinais": [],
-    "descricao": "O outro fio do motor"
    }
   ],
   "variantes": [],
@@ -4624,41 +4624,41 @@
  },
  {
   "id": "drv8833",
-  "largura": 58,
-  "altura": 67,
+  "largura": 67,
+  "altura": 96,
   "pinos": [
    {
     "nome": "AO1",
-    "x": 4.8,
-    "y": 4.8,
+    "x": 57.6,
+    "y": 72.0,
     "sinais": [],
     "descricao": "Saida A: um fio do motor A"
    },
    {
     "nome": "AO2",
-    "x": 14.4,
-    "y": 4.8,
+    "x": 57.6,
+    "y": 62.4,
     "sinais": [],
     "descricao": "Saida A: o outro fio do motor A"
    },
    {
     "nome": "BO1",
-    "x": 24.0,
-    "y": 4.8,
+    "x": 57.6,
+    "y": 43.2,
     "sinais": [],
     "descricao": "Saida B: um fio do motor B"
    },
    {
     "nome": "BO2",
-    "x": 33.6,
-    "y": 4.8,
+    "x": 57.6,
+    "y": 52.8,
     "sinais": [],
     "descricao": "Saida B: o outro fio do motor B"
    },
    {
     "nome": "VM",
-    "x": 43.2,
-    "y": 4.8,
+    "x": 9.6,
+    "y": 14.4,
     "sinais": [
      "power"
     ],
@@ -4666,8 +4666,8 @@
    },
    {
     "nome": "GND",
-    "x": 52.8,
-    "y": 4.8,
+    "x": 9.6,
+    "y": 24.0,
     "sinais": [
      "power"
     ],
@@ -4675,45 +4675,77 @@
    },
    {
     "nome": "AIN1",
-    "x": 4.8,
-    "y": 62.4,
+    "x": 9.6,
+    "y": 81.6,
     "sinais": [],
     "descricao": "Motor A: AIN1 HIGH e AIN2 LOW gira para um lado; os dois LOW = roda livre; os dois HIGH = freio. PWM aqui = velocidade"
    },
    {
     "nome": "AIN2",
-    "x": 14.4,
-    "y": 62.4,
+    "x": 9.6,
+    "y": 72.0,
     "sinais": [],
     "descricao": "Motor A (par do AIN1)"
    },
    {
     "nome": "BIN1",
-    "x": 24.0,
-    "y": 62.4,
+    "x": 9.6,
+    "y": 43.2,
     "sinais": [],
     "descricao": "Motor B: como o AIN1"
    },
    {
     "nome": "BIN2",
-    "x": 33.6,
-    "y": 62.4,
+    "x": 9.6,
+    "y": 52.8,
     "sinais": [],
     "descricao": "Motor B (par do BIN1)"
    },
    {
     "nome": "SLP",
-    "x": 43.2,
+    "x": 9.6,
     "y": 62.4,
     "sinais": [],
     "descricao": "Sleep: a placa ja puxa para HIGH (acordado). Em LOW, tudo desliga"
    },
    {
     "nome": "FLT",
-    "x": 52.8,
-    "y": 62.4,
+    "x": 9.6,
+    "y": 33.6,
     "sinais": [],
     "descricao": "Fault: vai a LOW quando o driver se protege (curto ou calor)"
+   },
+   {
+    "nome": "VM.2",
+    "x": 28.72,
+    "y": 14.4,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "O + do borne VMotor (o mesmo VM da barra): 2,7 a 10,8 V"
+   },
+   {
+    "nome": "GND.2",
+    "x": 41.95,
+    "y": 14.4,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "O - do borne VMotor (o mesmo GND)"
+   },
+   {
+    "nome": "AS",
+    "x": 57.6,
+    "y": 33.6,
+    "sinais": [],
+    "descricao": "AISEN: o sensor de corrente da ponte A (0,2 ohm ao GND; limita em ~1 A)"
+   },
+   {
+    "nome": "BS",
+    "x": 57.6,
+    "y": 24.0,
+    "sinais": [],
+    "descricao": "BISEN: o sensor de corrente da ponte B (0,2 ohm ao GND; limita em ~1 A)"
    }
   ],
   "variantes": [],
@@ -4773,34 +4805,34 @@
  },
  {
   "id": "esc",
-  "largura": 249,
-  "altura": 113,
+  "largura": 378,
+  "altura": 151,
   "pinos": [
    {
     "nome": "A",
-    "x": 5.67,
-    "y": 37.49,
+    "x": 6.05,
+    "y": 56.39,
     "sinais": [],
     "descricao": "Fase A do motor brushless (os tres fios nao tem ordem: trocar dois inverte o giro)"
    },
    {
     "nome": "B",
-    "x": 5.67,
-    "y": 56.69,
+    "x": 6.05,
+    "y": 75.59,
     "sinais": [],
     "descricao": "Fase B do motor brushless"
    },
    {
     "nome": "C",
-    "x": 5.67,
-    "y": 75.89,
+    "x": 6.05,
+    "y": 94.79,
     "sinais": [],
     "descricao": "Fase C do motor brushless"
    },
    {
     "nome": "BAT+",
-    "x": 243.78,
-    "y": 22.68,
+    "x": 371.91,
+    "y": 27.59,
     "sinais": [
      "power"
     ],
@@ -4808,8 +4840,8 @@
    },
    {
     "nome": "BAT-",
-    "x": 243.78,
-    "y": 41.88,
+    "x": 371.91,
+    "y": 46.79,
     "sinais": [
      "power"
     ],
@@ -4817,15 +4849,15 @@
    },
    {
     "nome": "SINAL",
-    "x": 243.78,
-    "y": 70.68,
+    "x": 371.91,
+    "y": 85.19,
     "sinais": [],
     "descricao": "Fio branco: o sinal de servo (1000 us parado, 2000 us maximo), de um GPIO ou do receptor"
    },
    {
     "nome": "5V",
-    "x": 243.78,
-    "y": 80.28,
+    "x": 371.91,
+    "y": 94.79,
     "sinais": [
      "power"
     ],
@@ -4833,8 +4865,8 @@
    },
    {
     "nome": "GND",
-    "x": 243.78,
-    "y": 89.88,
+    "x": 371.91,
+    "y": 104.39,
     "sinais": [
      "power"
     ],
@@ -4846,8 +4878,8 @@
  },
  {
   "id": "esc-4em1",
-  "largura": 151,
-  "altura": 151,
+  "largura": 157,
+  "altura": 153,
   "pinos": [
    {
     "nome": "M1A",
@@ -4872,42 +4904,42 @@
    },
    {
     "nome": "M2A",
-    "x": 145.51,
+    "x": 151.56,
     "y": 22.68,
     "sinais": [],
     "descricao": "Motor 2, fase A (as tres fases nao tem ordem: trocar duas inverte o giro)"
    },
    {
     "nome": "M2B",
-    "x": 145.51,
+    "x": 151.56,
     "y": 32.28,
     "sinais": [],
     "descricao": "Motor 2, fase B (as tres fases nao tem ordem: trocar duas inverte o giro)"
    },
    {
     "nome": "M2C",
-    "x": 145.51,
+    "x": 151.56,
     "y": 41.88,
     "sinais": [],
     "descricao": "Motor 2, fase C (as tres fases nao tem ordem: trocar duas inverte o giro)"
    },
    {
     "nome": "M3A",
-    "x": 145.51,
+    "x": 151.56,
     "y": 109.3,
     "sinais": [],
     "descricao": "Motor 3, fase A (as tres fases nao tem ordem: trocar duas inverte o giro)"
    },
    {
     "nome": "M3B",
-    "x": 145.51,
+    "x": 151.56,
     "y": 118.9,
     "sinais": [],
     "descricao": "Motor 3, fase B (as tres fases nao tem ordem: trocar duas inverte o giro)"
    },
    {
     "nome": "M3C",
-    "x": 145.51,
+    "x": 151.56,
     "y": 128.5,
     "sinais": [],
     "descricao": "Motor 3, fase C (as tres fases nao tem ordem: trocar duas inverte o giro)"
@@ -4932,6 +4964,24 @@
     "y": 128.5,
     "sinais": [],
     "descricao": "Motor 4, fase C (as tres fases nao tem ordem: trocar duas inverte o giro)"
+   },
+   {
+    "nome": "BAT+",
+    "x": 64.25,
+    "y": 145.51,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Bateria + (LiPo de 3S a 6S: 11,1 a 22,2 V)"
+   },
+   {
+    "nome": "BAT-",
+    "x": 86.93,
+    "y": 145.51,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Bateria - (e o mesmo GND do conector de sinal)"
    },
    {
     "nome": "S1",
@@ -4969,24 +5019,6 @@
      "power"
     ],
     "descricao": "GND do sinal (o mesmo da bateria; ligue no GND da placa)"
-   },
-   {
-    "nome": "BAT+",
-    "x": 64.25,
-    "y": 145.51,
-    "sinais": [
-     "power"
-    ],
-    "descricao": "Bateria + (LiPo de 3S a 6S: 11,1 a 22,2 V)"
-   },
-   {
-    "nome": "BAT-",
-    "x": 86.93,
-    "y": 145.51,
-    "sinais": [
-     "power"
-    ],
-    "descricao": "Bateria - (e o mesmo GND do conector de sinal)"
    }
   ],
   "variantes": [],
@@ -9898,34 +9930,34 @@
  },
  {
   "id": "l293d",
-  "largura": 81,
-  "altura": 36,
+  "largura": 75,
+  "altura": 35,
   "pinos": [
    {
     "nome": "1,2EN",
-    "x": 5.67,
-    "y": 32.4,
+    "x": 3.9,
+    "y": 31.9,
     "sinais": [],
     "descricao": "Pino 1: liga as saidas 1Y e 2Y (HIGH ou PWM). Em LOW (ou solto) elas desligam e o motor roda livre"
    },
    {
     "nome": "1A",
-    "x": 15.27,
-    "y": 32.4,
+    "x": 13.5,
+    "y": 31.9,
     "sinais": [],
     "descricao": "Pino 2: entrada da saida 1Y"
    },
    {
     "nome": "1Y",
-    "x": 24.87,
-    "y": 32.4,
+    "x": 23.1,
+    "y": 31.9,
     "sinais": [],
     "descricao": "Pino 3: saida 1 (um fio do motor 1)"
    },
    {
     "nome": "GND.1",
-    "x": 34.47,
-    "y": 32.4,
+    "x": 32.7,
+    "y": 31.9,
     "sinais": [
      "power"
     ],
@@ -9933,8 +9965,8 @@
    },
    {
     "nome": "GND.2",
-    "x": 44.07,
-    "y": 32.4,
+    "x": 42.3,
+    "y": 31.9,
     "sinais": [
      "power"
     ],
@@ -9942,88 +9974,88 @@
    },
    {
     "nome": "2Y",
-    "x": 53.67,
-    "y": 32.4,
+    "x": 51.9,
+    "y": 31.9,
     "sinais": [],
     "descricao": "Pino 6: saida 2 (o outro fio do motor 1)"
    },
    {
     "nome": "2A",
-    "x": 63.27,
-    "y": 32.4,
+    "x": 61.5,
+    "y": 31.9,
     "sinais": [],
     "descricao": "Pino 7: entrada da saida 2Y"
    },
    {
     "nome": "VCC2",
-    "x": 72.87,
-    "y": 32.4,
+    "x": 71.1,
+    "y": 31.9,
     "sinais": [
      "power"
     ],
     "descricao": "Pino 8: alimentacao dos motores, 4,5 a 36 V (o + da bateria)"
    },
    {
-    "nome": "VCC1",
-    "x": 5.67,
-    "y": 3.6,
-    "sinais": [
-     "power"
-    ],
-    "descricao": "Pino 16: alimentacao da logica, 5 V (o 5V da placa)"
-   },
-   {
-    "nome": "4A",
-    "x": 15.27,
-    "y": 3.6,
+    "nome": "3,4EN",
+    "x": 71.1,
+    "y": 3.1,
     "sinais": [],
-    "descricao": "Pino 15: entrada da saida 4Y"
+    "descricao": "Pino 9: liga as saidas 3Y e 4Y (HIGH ou PWM)"
    },
    {
-    "nome": "4Y",
-    "x": 24.87,
-    "y": 3.6,
+    "nome": "3A",
+    "x": 61.5,
+    "y": 3.1,
     "sinais": [],
-    "descricao": "Pino 14: saida 4 (o outro fio do motor 2)"
+    "descricao": "Pino 10: entrada da saida 3Y"
    },
    {
-    "nome": "GND.4",
-    "x": 34.47,
-    "y": 3.6,
-    "sinais": [
-     "power"
-    ],
-    "descricao": "Pino 13: GND"
+    "nome": "3Y",
+    "x": 51.9,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: saida 3 (um fio do motor 2)"
    },
    {
     "nome": "GND.3",
-    "x": 44.07,
-    "y": 3.6,
+    "x": 42.3,
+    "y": 3.1,
     "sinais": [
      "power"
     ],
     "descricao": "Pino 12: GND"
    },
    {
-    "nome": "3Y",
-    "x": 53.67,
-    "y": 3.6,
-    "sinais": [],
-    "descricao": "Pino 11: saida 3 (um fio do motor 2)"
+    "nome": "GND.4",
+    "x": 32.7,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 13: GND"
    },
    {
-    "nome": "3A",
-    "x": 63.27,
-    "y": 3.6,
+    "nome": "4Y",
+    "x": 23.1,
+    "y": 3.1,
     "sinais": [],
-    "descricao": "Pino 10: entrada da saida 3Y"
+    "descricao": "Pino 14: saida 4 (o outro fio do motor 2)"
    },
    {
-    "nome": "3,4EN",
-    "x": 72.87,
-    "y": 3.6,
+    "nome": "4A",
+    "x": 13.5,
+    "y": 3.1,
     "sinais": [],
-    "descricao": "Pino 9: liga as saidas 3Y e 4Y (HIGH ou PWM)"
+    "descricao": "Pino 15: entrada da saida 4Y"
+   },
+   {
+    "nome": "VCC1",
+    "x": 3.9,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 16: alimentacao da logica, 5 V (o 5V da placa)"
    }
   ],
   "variantes": [],
@@ -10036,36 +10068,36 @@
   "pinos": [
    {
     "nome": "OUT1",
-    "x": 12.85,
-    "y": 58.36,
+    "x": 14.55,
+    "y": 103.79,
     "sinais": [],
     "descricao": "Saida do canal A: um fio do motor A"
    },
    {
     "nome": "OUT2",
-    "x": 12.85,
-    "y": 77.56,
+    "x": 14.55,
+    "y": 122.99,
     "sinais": [],
     "descricao": "Saida do canal A: o outro fio do motor A"
    },
    {
-    "nome": "OUT3",
-    "x": 149.67,
-    "y": 58.36,
-    "sinais": [],
-    "descricao": "Saida do canal B: um fio do motor B"
-   },
-   {
     "nome": "OUT4",
-    "x": 149.67,
-    "y": 77.56,
+    "x": 147.4,
+    "y": 103.79,
     "sinais": [],
     "descricao": "Saida do canal B: o outro fio do motor B"
    },
    {
+    "nome": "OUT3",
+    "x": 147.4,
+    "y": 122.99,
+    "sinais": [],
+    "descricao": "Saida do canal B: um fio do motor B"
+   },
+   {
     "nome": "12V",
-    "x": 26.46,
-    "y": 143.62,
+    "x": 32.09,
+    "y": 148.72,
     "sinais": [
      "power"
     ],
@@ -10073,8 +10105,8 @@
    },
    {
     "nome": "GND",
-    "x": 45.66,
-    "y": 143.62,
+    "x": 51.29,
+    "y": 148.72,
     "sinais": [
      "power"
     ],
@@ -10082,54 +10114,72 @@
    },
    {
     "nome": "5V",
-    "x": 64.86,
-    "y": 143.62,
+    "x": 70.49,
+    "y": 148.72,
     "sinais": [
      "power"
     ],
     "descricao": "Com 7 V ou mais no 12V, e SAIDA de 5 V (da para alimentar a placa). Abaixo disso, ligue aqui os 5 V da placa"
    },
    {
-    "nome": "ENA",
-    "x": 84.06,
-    "y": 156.85,
+    "nome": "ENB",
+    "x": 135.31,
+    "y": 154.58,
     "sinais": [],
-    "descricao": "Liga o canal A (OUT1/OUT2). Solto = o jumper no lugar (sempre ligado); num pino com PWM, controla a velocidade"
-   },
-   {
-    "nome": "IN1",
-    "x": 93.66,
-    "y": 156.85,
-    "sinais": [],
-    "descricao": "Sentido do canal A: IN1 HIGH e IN2 LOW gira para um lado, o contrario para o outro, iguais freiam"
-   },
-   {
-    "nome": "IN2",
-    "x": 103.26,
-    "y": 156.85,
-    "sinais": [],
-    "descricao": "Sentido do canal A (par do IN1)"
-   },
-   {
-    "nome": "IN3",
-    "x": 112.86,
-    "y": 156.85,
-    "sinais": [],
-    "descricao": "Sentido do canal B: IN3 HIGH e IN4 LOW gira para um lado, o contrario para o outro, iguais freiam"
+    "descricao": "Liga o canal B (OUT3/OUT4). Solto = o jumper no lugar (sempre ligado); num pino com PWM, controla a velocidade"
    },
    {
     "nome": "IN4",
-    "x": 122.46,
-    "y": 156.85,
+    "x": 125.71,
+    "y": 154.58,
     "sinais": [],
     "descricao": "Sentido do canal B (par do IN3)"
    },
    {
-    "nome": "ENB",
-    "x": 132.06,
-    "y": 156.85,
+    "nome": "IN3",
+    "x": 116.11,
+    "y": 154.58,
     "sinais": [],
-    "descricao": "Liga o canal B (OUT3/OUT4). Solto = o jumper no lugar (sempre ligado); num pino com PWM, controla a velocidade"
+    "descricao": "Sentido do canal B: IN3 HIGH e IN4 LOW gira para um lado, o contrario para o outro, iguais freiam"
+   },
+   {
+    "nome": "IN2",
+    "x": 106.51,
+    "y": 154.58,
+    "sinais": [],
+    "descricao": "Sentido do canal A (par do IN1)"
+   },
+   {
+    "nome": "IN1",
+    "x": 96.91,
+    "y": 154.58,
+    "sinais": [],
+    "descricao": "Sentido do canal A: IN1 HIGH e IN2 LOW gira para um lado, o contrario para o outro, iguais freiam"
+   },
+   {
+    "nome": "ENA",
+    "x": 87.31,
+    "y": 154.58,
+    "sinais": [],
+    "descricao": "Liga o canal A (OUT1/OUT2). Solto = o jumper no lugar (sempre ligado); num pino com PWM, controla a velocidade"
+   },
+   {
+    "nome": "5V.2",
+    "x": 87.31,
+    "y": 144.98,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "O +5V do jumper do ENA (o mesmo 5V): com o jumper no lugar, o canal A fica sempre ligado"
+   },
+   {
+    "nome": "5V.3",
+    "x": 135.31,
+    "y": 144.98,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "O +5V do jumper do ENB (o mesmo 5V): com o jumper no lugar, o canal B fica sempre ligado"
    }
   ],
   "variantes": [],
@@ -10137,55 +10187,55 @@
  },
  {
   "id": "l9110s",
-  "largura": 110,
-  "altura": 83,
+  "largura": 87,
+  "altura": 111,
   "pinos": [
    {
-    "nome": "A1",
-    "x": 12.21,
-    "y": 12.85,
-    "sinais": [],
-    "descricao": "MOTOR A: um fio do motor"
-   },
-   {
-    "nome": "A2",
-    "x": 31.41,
-    "y": 12.85,
-    "sinais": [],
-    "descricao": "MOTOR A: o outro fio"
-   },
-   {
-    "nome": "B1",
-    "x": 69.81,
-    "y": 12.85,
-    "sinais": [],
-    "descricao": "MOTOR B: um fio do motor"
-   },
-   {
     "nome": "B2",
-    "x": 89.01,
-    "y": 12.85,
+    "x": 9.6,
+    "y": 11.34,
     "sinais": [],
     "descricao": "MOTOR B: o outro fio"
    },
    {
+    "nome": "B1",
+    "x": 28.8,
+    "y": 11.34,
+    "sinais": [],
+    "descricao": "MOTOR B: um fio do motor"
+   },
+   {
+    "nome": "A2",
+    "x": 55.94,
+    "y": 11.34,
+    "sinais": [],
+    "descricao": "MOTOR A: o outro fio"
+   },
+   {
+    "nome": "A1",
+    "x": 75.14,
+    "y": 11.34,
+    "sinais": [],
+    "descricao": "MOTOR A: um fio do motor"
+   },
+   {
     "nome": "B-IA",
-    "x": 30.8,
-    "y": 77.86,
+    "x": 17.57,
+    "y": 105.07,
     "sinais": [],
     "descricao": "Entrada do motor B (par do B-IB): as saidas seguem as entradas"
    },
    {
     "nome": "B-IB",
-    "x": 40.4,
-    "y": 77.86,
+    "x": 27.17,
+    "y": 105.07,
     "sinais": [],
     "descricao": "Entrada do motor B: B-IA HIGH e B-IB LOW gira para um lado; iguais freiam"
    },
    {
     "nome": "GND",
-    "x": 50.0,
-    "y": 77.86,
+    "x": 36.77,
+    "y": 105.07,
     "sinais": [
      "power"
     ],
@@ -10193,8 +10243,8 @@
    },
    {
     "nome": "VCC",
-    "x": 59.6,
-    "y": 77.86,
+    "x": 46.37,
+    "y": 105.07,
     "sinais": [
      "power"
     ],
@@ -10202,15 +10252,15 @@
    },
    {
     "nome": "A-IA",
-    "x": 69.2,
-    "y": 77.86,
+    "x": 55.97,
+    "y": 105.07,
     "sinais": [],
     "descricao": "Entrada do motor A: num pino com PWM, a velocidade"
    },
    {
     "nome": "A-IB",
-    "x": 78.8,
-    "y": 77.86,
+    "x": 65.57,
+    "y": 105.07,
     "sinais": [],
     "descricao": "Entrada do motor A (par do A-IA)"
    }
@@ -11989,40 +12039,40 @@
  {
   "id": "motor-28byj48",
   "largura": 166,
-  "altura": 174,
+  "altura": 189,
   "pinos": [
    {
     "nome": "azul",
-    "x": 63.95,
-    "y": 168.94,
+    "x": 64.25,
+    "y": 177.45,
     "sinais": [],
     "descricao": "Fio azul: fase D (o IN4 do ULN2003)"
    },
    {
     "nome": "rosa",
-    "x": 73.55,
-    "y": 168.94,
+    "x": 73.7,
+    "y": 177.45,
     "sinais": [],
     "descricao": "Fio rosa: fase C (o IN3)"
    },
    {
     "nome": "amarelo",
     "x": 83.15,
-    "y": 168.94,
+    "y": 177.45,
     "sinais": [],
     "descricao": "Fio amarelo: fase B (o IN2)"
    },
    {
     "nome": "laranja",
-    "x": 92.75,
-    "y": 168.94,
+    "x": 92.6,
+    "y": 177.45,
     "sinais": [],
     "descricao": "Fio laranja: fase A (o IN1)"
    },
    {
     "nome": "vermelho",
-    "x": 102.35,
-    "y": 168.94,
+    "x": 102.05,
+    "y": 177.45,
     "sinais": [
      "power"
     ],
@@ -12039,7 +12089,7 @@
   "pinos": [
    {
     "nome": "A",
-    "x": 58.43,
+    "x": 48.83,
     "y": 161.39,
     "sinais": [],
     "descricao": "Fase A. Os tres fios nao tem polaridade: trocar dois deles inverte o giro"
@@ -12053,7 +12103,7 @@
    },
    {
     "nome": "C",
-    "x": 77.63,
+    "x": 87.23,
     "y": 161.39,
     "sinais": [],
     "descricao": "Fase C. Dois fios trocados de lugar = o motor gira para o outro lado"
@@ -12087,19 +12137,19 @@
  },
  {
   "id": "motor-tt",
-  "largura": 280,
+  "largura": 297,
   "altura": 98,
   "pinos": [
    {
     "nome": "+",
-    "x": 274.77,
+    "x": 291.78,
     "y": 44.33,
     "sinais": [],
     "descricao": "Fio vermelho. Corrente entrando aqui gira o eixo no sentido horario"
    },
    {
     "nome": "-",
-    "x": 274.77,
+    "x": 291.78,
     "y": 53.93,
     "sinais": [],
     "descricao": "Fio preto. Invertido (+ no terra), o motor gira para o outro lado"
@@ -14199,77 +14249,28 @@
  },
  {
   "id": "radio-controle",
-  "largura": 340,
-  "altura": 249,
+  "largura": 658,
+  "altura": 733,
   "pinos": [],
   "variantes": [],
   "metades": false
  },
  {
   "id": "receptor-rc",
-  "largura": 174,
-  "altura": 106,
+  "largura": 234,
+  "altura": 110,
   "pinos": [
    {
-    "nome": "CH1",
-    "x": 167.81,
-    "y": 6.05,
-    "sinais": [],
-    "descricao": "Canal 1: pulso de servo, 1000 a 2000 us a cada 20 ms (aileron, o manche direito para os lados)"
-   },
-   {
-    "nome": "CH2",
-    "x": 167.81,
-    "y": 15.65,
-    "sinais": [],
-    "descricao": "Canal 2: pulso de servo, 1000 a 2000 us a cada 20 ms (profundor, o manche direito para cima e baixo)"
-   },
-   {
-    "nome": "CH3",
-    "x": 167.81,
-    "y": 25.25,
-    "sinais": [],
-    "descricao": "Canal 3: pulso de servo, 1000 a 2000 us a cada 20 ms (acelerador, o manche esquerdo para cima e baixo)"
-   },
-   {
-    "nome": "CH4",
-    "x": 167.81,
-    "y": 34.85,
-    "sinais": [],
-    "descricao": "Canal 4: pulso de servo, 1000 a 2000 us a cada 20 ms (leme, o manche esquerdo para os lados)"
-   },
-   {
-    "nome": "CH5",
-    "x": 167.81,
-    "y": 44.45,
-    "sinais": [],
-    "descricao": "Canal 5: pulso de servo, 1000 a 2000 us a cada 20 ms (chave SWA)"
-   },
-   {
-    "nome": "CH6",
-    "x": 167.81,
-    "y": 54.05,
-    "sinais": [],
-    "descricao": "Canal 6: pulso de servo, 1000 a 2000 us a cada 20 ms (chave SWB)"
-   },
-   {
-    "nome": "PPM",
-    "x": 167.81,
-    "y": 63.65,
-    "sinais": [],
-    "descricao": "Os 8 canais num fio so (PPM): um pulso por canal, o quadro a cada 22,5 ms"
-   },
-   {
     "nome": "IBUS",
-    "x": 167.81,
-    "y": 73.25,
+    "x": 230.93,
+    "y": 11.6,
     "sinais": [],
     "descricao": "iBUS: os 14 canais por serial (115200 baud, um quadro de 32 bytes a cada 7 ms) -- num RX da placa"
    },
    {
     "nome": "VCC",
-    "x": 167.81,
-    "y": 82.85,
+    "x": 230.93,
+    "y": 21.2,
     "sinais": [
      "power"
     ],
@@ -14277,12 +14278,61 @@
    },
    {
     "nome": "GND",
-    "x": 167.81,
-    "y": 92.45,
+    "x": 230.93,
+    "y": 30.8,
     "sinais": [
      "power"
     ],
     "descricao": "GND (o mesmo da placa e dos servos)"
+   },
+   {
+    "nome": "CH6",
+    "x": 230.93,
+    "y": 40.4,
+    "sinais": [],
+    "descricao": "Canal 6: pulso de servo, 1000 a 2000 us a cada 20 ms (chave SWB)"
+   },
+   {
+    "nome": "CH5",
+    "x": 230.93,
+    "y": 50.0,
+    "sinais": [],
+    "descricao": "Canal 5: pulso de servo, 1000 a 2000 us a cada 20 ms (chave SWA)"
+   },
+   {
+    "nome": "CH4",
+    "x": 230.93,
+    "y": 59.6,
+    "sinais": [],
+    "descricao": "Canal 4: pulso de servo, 1000 a 2000 us a cada 20 ms (leme, o manche esquerdo para os lados)"
+   },
+   {
+    "nome": "CH3",
+    "x": 230.93,
+    "y": 69.2,
+    "sinais": [],
+    "descricao": "Canal 3: pulso de servo, 1000 a 2000 us a cada 20 ms (acelerador, o manche esquerdo para cima e baixo)"
+   },
+   {
+    "nome": "CH2",
+    "x": 230.93,
+    "y": 78.8,
+    "sinais": [],
+    "descricao": "Canal 2: pulso de servo, 1000 a 2000 us a cada 20 ms (profundor, o manche direito para cima e baixo)"
+   },
+   {
+    "nome": "CH1",
+    "x": 230.93,
+    "y": 88.4,
+    "sinais": [],
+    "descricao": "Canal 1: pulso de servo, 1000 a 2000 us a cada 20 ms (aileron, o manche direito para os lados)"
+   },
+   {
+    "nome": "PPM",
+    "x": 230.93,
+    "y": 98.0,
+    "sinais": [],
+    "descricao": "Os 8 canais num fio so (PPM): um pulso por canal, o quadro a cada 22,5 ms"
    }
   ],
   "variantes": [],
@@ -16015,36 +16065,36 @@
  },
  {
   "id": "stepper-motor",
-  "largura": 220,
-  "altura": 235,
+  "largura": 167,
+  "altura": 227,
   "pinos": [
    {
     "nome": "A-",
-    "x": 95.12199999999999,
-    "y": 235.49399999999997,
+    "x": 69.32,
+    "y": 219.97,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Bobina A, o fio verde (A-)"
    },
    {
     "nome": "A+",
-    "x": 104.72319999999999,
-    "y": 235.49399999999997,
+    "x": 78.92,
+    "y": 219.97,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Bobina A, o fio preto (A+)"
    },
    {
     "nome": "B+",
-    "x": 114.32439999999998,
-    "y": 235.49399999999997,
+    "x": 88.52,
+    "y": 219.97,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Bobina B, o fio vermelho (B+)"
    },
    {
     "nome": "B-",
-    "x": 123.92559999999999,
-    "y": 235.49399999999997,
+    "x": 98.12,
+    "y": 219.97,
     "sinais": [],
-    "descricao": ""
+    "descricao": "Bobina B, o fio azul (B-)"
    }
   ],
   "variantes": [],
@@ -16392,11 +16442,11 @@
  {
   "id": "tb6612fng",
   "largura": 77,
-  "altura": 67,
+  "altura": 77,
   "pinos": [
    {
     "nome": "VM",
-    "x": 4.8,
+    "x": 9.6,
     "y": 4.8,
     "sinais": [
      "power"
@@ -16405,8 +16455,8 @@
    },
    {
     "nome": "VCC",
-    "x": 14.4,
-    "y": 4.8,
+    "x": 9.6,
+    "y": 14.4,
     "sinais": [
      "power"
     ],
@@ -16414,8 +16464,8 @@
    },
    {
     "nome": "GND.2",
-    "x": 24.0,
-    "y": 4.8,
+    "x": 9.6,
+    "y": 24.0,
     "sinais": [
      "power"
     ],
@@ -16423,36 +16473,36 @@
    },
    {
     "nome": "AO1",
-    "x": 33.6,
-    "y": 4.8,
+    "x": 9.6,
+    "y": 33.6,
     "sinais": [],
     "descricao": "Saida A: um fio do motor A"
    },
    {
     "nome": "AO2",
-    "x": 43.2,
-    "y": 4.8,
+    "x": 9.6,
+    "y": 43.2,
     "sinais": [],
     "descricao": "Saida A: o outro fio do motor A"
    },
    {
     "nome": "BO2",
-    "x": 52.8,
-    "y": 4.8,
+    "x": 9.6,
+    "y": 52.8,
     "sinais": [],
     "descricao": "Saida B: o outro fio do motor B"
    },
    {
     "nome": "BO1",
-    "x": 62.4,
-    "y": 4.8,
+    "x": 9.6,
+    "y": 62.4,
     "sinais": [],
     "descricao": "Saida B: um fio do motor B"
    },
    {
     "nome": "GND.3",
-    "x": 72.0,
-    "y": 4.8,
+    "x": 9.6,
+    "y": 72.0,
     "sinais": [
      "power"
     ],
@@ -16460,57 +16510,57 @@
    },
    {
     "nome": "PWMA",
-    "x": 4.8,
-    "y": 62.4,
+    "x": 67.2,
+    "y": 4.8,
     "sinais": [],
     "descricao": "Velocidade do motor A (PWM). Em LOW, freio curto"
    },
    {
     "nome": "AIN2",
-    "x": 14.4,
-    "y": 62.4,
+    "x": 67.2,
+    "y": 14.4,
     "sinais": [],
     "descricao": "Sentido do motor A (par do AIN1)"
    },
    {
     "nome": "AIN1",
-    "x": 24.0,
-    "y": 62.4,
+    "x": 67.2,
+    "y": 24.0,
     "sinais": [],
     "descricao": "Sentido do motor A: AIN1 HIGH e AIN2 LOW gira para um lado; os dois LOW = roda livre; os dois HIGH = freio"
    },
    {
     "nome": "STBY",
-    "x": 33.6,
-    "y": 62.4,
+    "x": 67.2,
+    "y": 33.6,
     "sinais": [],
     "descricao": "Standby: precisa de HIGH para funcionar (solto ou em LOW, tudo desliga)"
    },
    {
     "nome": "BIN1",
-    "x": 43.2,
-    "y": 62.4,
+    "x": 67.2,
+    "y": 43.2,
     "sinais": [],
     "descricao": "Sentido do motor B: BIN1 HIGH e BIN2 LOW gira para um lado"
    },
    {
     "nome": "BIN2",
-    "x": 52.8,
-    "y": 62.4,
+    "x": 67.2,
+    "y": 52.8,
     "sinais": [],
     "descricao": "Sentido do motor B (par do BIN1)"
    },
    {
     "nome": "PWMB",
-    "x": 62.4,
+    "x": 67.2,
     "y": 62.4,
     "sinais": [],
     "descricao": "Velocidade do motor B (PWM). Em LOW, freio curto"
    },
    {
     "nome": "GND",
-    "x": 72.0,
-    "y": 62.4,
+    "x": 67.2,
+    "y": 72.0,
     "sinais": [
      "power"
     ],
@@ -16785,41 +16835,41 @@
  },
  {
   "id": "uln2003",
-  "largura": 132,
-  "altura": 121,
+  "largura": 128,
+  "altura": 115,
   "pinos": [
    {
     "nome": "IN1",
-    "x": 6.8,
-    "y": 34.02,
+    "x": 19.39,
+    "y": 18.63,
     "sinais": [],
-    "descricao": "Entrada 1: HIGH liga a fase A (fio laranja do motor) e o LED A"
+    "descricao": "Entrada 1: HIGH liga a saida A (o OUT1) e o LED A"
    },
    {
     "nome": "IN2",
-    "x": 6.8,
-    "y": 43.62,
+    "x": 19.39,
+    "y": 28.23,
     "sinais": [],
-    "descricao": "Entrada 2: fase B (fio amarelo)"
+    "descricao": "Entrada 2: a saida B (o OUT2) e o LED B"
    },
    {
     "nome": "IN3",
-    "x": 6.8,
-    "y": 53.22,
+    "x": 19.39,
+    "y": 37.83,
     "sinais": [],
-    "descricao": "Entrada 3: fase C (fio rosa)"
+    "descricao": "Entrada 3: a saida C (o OUT3) e o LED C"
    },
    {
     "nome": "IN4",
-    "x": 6.8,
-    "y": 62.82,
+    "x": 19.39,
+    "y": 47.43,
     "sinais": [],
-    "descricao": "Entrada 4: fase D (fio azul)"
+    "descricao": "Entrada 4: a saida D (o OUT4) e o LED D"
    },
    {
     "nome": "-",
-    "x": 94.19,
-    "y": 114.14,
+    "x": 31.71,
+    "y": 100.38,
     "sinais": [
      "power"
     ],
@@ -16827,47 +16877,47 @@
    },
    {
     "nome": "+",
-    "x": 103.79,
-    "y": 114.14,
+    "x": 41.31,
+    "y": 100.38,
     "sinais": [
      "power"
     ],
     "descricao": "Alimentacao do motor, 5 a 12 V (o 28BYJ-48 e de 5 V)"
    },
    {
-    "nome": "D",
-    "x": 43.16,
-    "y": 7.56,
+    "nome": "A",
+    "x": 78.05,
+    "y": 15.12,
     "sinais": [],
-    "descricao": "Conector do motor: fio azul"
-   },
-   {
-    "nome": "C",
-    "x": 52.76,
-    "y": 7.56,
-    "sinais": [],
-    "descricao": "Conector do motor: fio rosa"
+    "descricao": "Conector do motor, o OUT1 (o IN1): no plugue do 28BYJ-48 cai o fio azul"
    },
    {
     "nome": "B",
-    "x": 62.36,
-    "y": 7.56,
+    "x": 78.05,
+    "y": 24.57,
     "sinais": [],
-    "descricao": "Conector do motor: fio amarelo"
+    "descricao": "Conector do motor, o OUT2 (o IN2): o fio rosa"
    },
    {
-    "nome": "A",
-    "x": 71.96,
-    "y": 7.56,
+    "nome": "C",
+    "x": 78.05,
+    "y": 34.02,
     "sinais": [],
-    "descricao": "Conector do motor: fio laranja"
+    "descricao": "Conector do motor, o OUT3 (o IN3): o fio amarelo"
+   },
+   {
+    "nome": "D",
+    "x": 78.05,
+    "y": 43.46,
+    "sinais": [],
+    "descricao": "Conector do motor, o OUT4 (o IN4): o fio laranja"
    },
    {
     "nome": "COM",
-    "x": 81.56,
-    "y": 7.56,
+    "x": 78.05,
+    "y": 52.91,
     "sinais": [],
-    "descricao": "Conector do motor: fio vermelho (o comum, ligado no + da placa)"
+    "descricao": "Conector do motor: o fio vermelho (o comum, ligado no + da placa pelo jumper)"
    }
   ],
   "variantes": [],

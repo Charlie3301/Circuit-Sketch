@@ -382,11 +382,8 @@ public static class Pecas
     /// </summary>
     static readonly Dictionary<string, Vector> AjustesDeArte = new()
     {
-        // O corpo do motor comecava abaixo do topo da caixa. O ajuste
-        // e pequeno de proposito: a tinta medida inclui um elemento
-        // invisivel que desce mais que o desenho, e corrigir por ela
-        // levava os terminais 22 px acima dos pinos.
-        ["stepper-motor"] = new Vector(0, -4.0),
+        // (o motor de passo do Wokwi precisava de 4 px para cima; o NEMA 17
+        // da Alpha 25 e desenho proprio, com os pinos no lugar)
     };
 
     static Drawing Endireitar(DrawingGroup desenho, string svg, string nome)

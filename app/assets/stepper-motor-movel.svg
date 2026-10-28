@@ -1,29 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="58.3mm" height="62.3mm" viewBox="0 0 220.37399999999997 235.49399999999997">
-      <defs>
-        <linearGradient id="frame-gradient" gradientUnits="userSpaceOnUse" x1="-11.46" x2="114.6" y1="57.3" y2="57.3">
-          <stop stop-color="#666" offset="0" />
-          <stop stop-color="#fff" offset="1" />
-        </linearGradient>
-        <linearGradient id="shaft-gradient" x1="0" x2="0" y1="-5" y2="5" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#9d9d9d" offset="0" />
-          <stop stop-color="#9d9d9d" stop-opacity="0" offset="1" />
-        </linearGradient>
-        <linearGradient id="body-gradient" gradientUnits="userSpaceOnUse" x1="5.73" x2="40.10999999999999" y1="57.3" y2="57.3">
-          <stop stop-color="#9d9d9d" offset="0" />
-          <stop stop-color="#fdfafa" offset=".29501" />
-          <stop offset="1" stop-color="#2a2a2a" />
-        </linearGradient>
-      </defs>
-      
-      <g transform="translate(1,1)">
-        <g transform="scale(3.78)">
-          
-          <g>
-            <path id="arrow-path" transform="&#10;                rotate(0, 28.65,28.65) &#10;                translate(28.65 28.65)" fill="transparent" d="m 0 0 l -6.35 0 l 6.35 &#10;                -25.65 l 6.35 25.65 z" />
-            <path id="shaft-path" fill="#4d4d4d" stroke="url(#shaft-gradient)" stroke-width=".57968" transform="&#10;                translate(28.65, 28.65) &#10;                rotate(0) &#10;                translate(0, 0)" d="m -3.175 -5.499261314031186 a 6.35 6.35 0 1 0 6.35 0 z" />
-          </g>
-
-          
-          </g>
-      </g>
-    </svg>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="167px" height="227px" viewBox="0 0 167 227">
+<defs>
+  <linearGradient id="luz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.22"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.5" stop-color="#b9bfc6"/><stop offset="1" stop-color="#868d95"/></linearGradient>
+  <linearGradient id="metal-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a9199"/><stop offset="0.35" stop-color="#eef1f4"/><stop offset="0.7" stop-color="#b3b9c0"/><stop offset="1" stop-color="#7c838b"/></linearGradient>
+  <radialGradient id="lata" cx="0.4" cy="0.38" r="0.66"><stop offset="0" stop-color="#f6f8fa"/><stop offset="0.6" stop-color="#c3c9cf"/><stop offset="1" stop-color="#8c939b"/></radialGradient>
+  <linearGradient id="plastico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c40"/><stop offset="1" stop-color="#16171a"/></linearGradient>
+  <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8c"/><stop offset="1" stop-color="#b88a2c"/></linearGradient>
+  <linearGradient id="blindagem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset="0.45" stop-color="#c8cdd2"/><stop offset="1" stop-color="#9aa1a8"/></linearGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
+  <linearGradient id="ceramica" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f1e8"/><stop offset="1" stop-color="#cfc9b8"/></linearGradient>
+  <radialGradient id="lata-topo" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#f1f3f5"/><stop offset="0.6" stop-color="#c3c8ce"/><stop offset="1" stop-color="#8a9097"/></radialGradient>
+  <radialGradient id="aluminio" cx="0.35" cy="0.3" r="0.9"><stop offset="0" stop-color="#eef0f2"/><stop offset="0.55" stop-color="#cdd1d5"/><stop offset="1" stop-color="#9ca2a8"/></radialGradient>
+  <radialGradient id="zinco" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#eef0d2"/><stop offset="0.55" stop-color="#bfc08e"/><stop offset="1" stop-color="#7d7f55"/></radialGradient>
+  <radialGradient id="dourado" cx="0.38" cy="0.32" r="0.85"><stop offset="0" stop-color="#ffe7a0"/><stop offset="0.5" stop-color="#e6b04a"/><stop offset="1" stop-color="#a8701c"/></radialGradient>
+  <radialGradient id="latao" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#fbe9a8"/><stop offset="0.55" stop-color="#d4ab52"/><stop offset="1" stop-color="#93702a"/></radialGradient>
+  <radialGradient id="aco" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#f7f8f9"/><stop offset="0.55" stop-color="#b8bec5"/><stop offset="1" stop-color="#7a8189"/></radialGradient>
+  <radialGradient id="cobre-bob" cx="0.5" cy="0.5" r="0.6"><stop offset="0" stop-color="#d98a4a"/><stop offset="1" stop-color="#7a3d16"/></radialGradient>
+  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
+  <linearGradient id="lata-lado" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8e959c"/><stop offset="0.25" stop-color="#eef1f4"/><stop offset="0.6" stop-color="#c2c8ce"/><stop offset="1" stop-color="#727980"/></linearGradient>
+  <linearGradient id="amarelo-tt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe066"/><stop offset="0.5" stop-color="#f6c72c"/><stop offset="1" stop-color="#d9a514"/></linearGradient>
+</defs>
+<circle cx="84.17" cy="84.283" r="9.449" fill="#000000" fill-opacity="0.35"/>
+<path d="M78.047 76.157 A9.449 9.449 0 1 0 89.386 76.157 Z" fill="url(#aco)" stroke="#6b7279" stroke-width="0.378"/>
+<path d="M78.614 76.157 L88.819 76.157" fill="none" stroke="#ffffff" stroke-width="0.454" stroke-linecap="round" stroke-opacity="0.7"/>
+<circle cx="83.717" cy="83.717" r="3.024" fill="none" stroke="#9aa1a8" stroke-width="0.454"/>
+</svg>

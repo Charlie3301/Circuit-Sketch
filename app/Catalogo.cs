@@ -433,6 +433,9 @@ public static class Catalogo
         // Os drivers de motor tem varios GND (e o L293D quatro): o mesmo no.
         // No IBT-2 o GND do conector e o B- da bateria sao a mesma trilha.
         if (idPeca == "bts7960") yield return ("GND", "B-");
+        // No DRV8833 da Adafruit o AISEN e o BISEN vao ao GND pelos resistores de
+        // 0,2 ohm do sensor de corrente: para o circuito, o mesmo terra.
+        if (idPeca == "drv8833") { yield return ("GND", "AS"); yield return ("GND", "BS"); }
         // O fio vermelho do conector do motor e o + da placa do ULN2003.
         if (idPeca == "uln2003") yield return ("COM", "+");
         // Os dois comuns do display de 7 segmentos (os pinos 3 e 8) sao um so.

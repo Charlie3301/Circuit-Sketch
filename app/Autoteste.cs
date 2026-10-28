@@ -9334,14 +9334,12 @@ public static partial class Autoteste
         // As que estavam tortas. O canto da tinta e onde a peca comeca
         // de verdade: se voltar a andar, o ajuste de Pecas.cs quebrou.
         //
-        // No motor de passo o alvo NAO e zero: a tinta medida inclui um
-        // elemento invisivel que desce mais que o desenho, e o ajuste
-        // foi acertado pelos terminais -- que sao o que tem de encostar
-        // nos pinos.
+        // O motor de passo (o NEMA 17 da Alpha 25, desenho proprio) comeca a
+        // 1 mm do canto: a tampa de 42,3 mm na caixa de 44,3, sem ajuste.
         (string id, double x, double y)[] arrumadas =
         [
             ("arduino-mega", 0, 0),
-            ("stepper-motor", 6.7, 22),
+            ("stepper-motor", 3.4, 3.4),
         ];
 
         foreach (var (id, x, y) in arrumadas)
