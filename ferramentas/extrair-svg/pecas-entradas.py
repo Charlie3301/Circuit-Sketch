@@ -50,6 +50,10 @@ pa = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(pa)
 
 Desenho, T, f = pa.Desenho, pa.T, pa.f
+_spec_k = importlib.util.spec_from_file_location('keyes_a25', os.path.join(AQUI, 'keyes_a25.py'))
+KEYES = importlib.util.module_from_spec(_spec_k)
+_spec_k.loader.exec_module(KEYES)
+mover, rodar = pa.mover, pa.rodar
 ESTANHO = pa.ESTANHO
 A = 96 / 25.4
 PASSO = 2.54
@@ -509,36 +513,49 @@ cs_const('JoystickCurso', CURSO_J * A)
 # =====================================================================
 #  ky-040: o encoder rotativo
 # =====================================================================
-L, H = caixa(32.3, 19.05)
-X0, Y0 = 0.2, (H - 18.6) / 2
-CY = H / 2
-XE = X0 + 10.5
+# Pelo desenho com cota do modulo (26,2 x 18,63 mm): a barra 1,3 mm para dentro
+# da borda, os pinos na parte de cima (o CLK a 2 mm do topo), os dois furos de
+# 3,4 mm embaixo, o EC11 a esquerda com as tres pernas A-C-B saindo pela
+# esquerda e as abas do quadro de metal em cima e embaixo, os tres 10k dos
+# pull-ups e os rotulos grandes.
+LP_KY, HP_KY = 26.2, 18.63
+L, H = caixa(0.2 + LP_KY + 6.1, HP_KY + 0.4)
+X0, Y0 = 0.2, 0.2
+XE, CY = X0 + 9.5, Y0 + 7.65
 NOMES_KY = [('CLK', 'CLK', [], 'O canal A do encoder (CLK): pull-up de 10k no modulo'),
             ('DT', 'DT', [], 'O canal B do encoder (DT): pull-up de 10k no modulo'),
             ('SW', 'SW', [], 'O botao do eixo: vai ao GND apertado (use INPUT_PULLUP)'),
             ('VCC', '+', ['power'], 'Alimentacao (+ na placa): 3,3 V ou 5 V, para os pull-ups'),
             ('GND', 'GND', ['power'], 'GND')]
-YS_KY = [CY + (k - 2) * PASSO for k in range(5)]
+YS_KY = [Y0 + 2.0 + k * PASSO for k in range(5)]
 X_KY = L - 0.9
 corpo = Desenho(T(A, 0, 0, A, 0, 0))
-corpo.ret(X0, Y0, 26.0, 18.6, PCB_PRETA, rx=0.8, stroke=PCB_PRETA_BORDA, sw=0.15)
-corpo.ret(X0, Y0, 26.0, 18.6, 'url(#luz)', rx=0.8)
-for y in (CY - 6.875, CY + 6.875):
-    furo_m3(corpo, X0 + 2.2, y, r=1.45)
+corpo.ret(X0 + 0.15, Y0 + 0.2, LP_KY, HP_KY, '#000000', rx=0.5, op=0.35)
+corpo.ret(X0, Y0, LP_KY, HP_KY, KEYES.PRETA, rx=0.5, stroke=KEYES.PRETA_BORDA, sw=0.15)
+KEYES.textura(corpo, X0 + 0.2, Y0 + 0.2, LP_KY - 0.4, HP_KY - 0.4)
+corpo.ret(X0, Y0, LP_KY, HP_KY, 'url(#luz)', rx=0.5)
+for x in (X0 + 4.5, X0 + 21.7):                                                     # os furos de 3,4 mm
+    KEYES.ilha(corpo, x, Y0 + 16.8, 1.95, 1.7)
 for k, y in enumerate(YS_KY):
-    corpo.texto(X0 + 22.9, y, NOMES_KY[k][1], 0.85, BRANCO, alinhar='center-right')
-for y in (CY - 3.0, CY + 3.0):
-    smd(corpo, X0 + 18.3, y, 1.6, 0.8, '#1a1a1a', vertical=True)
-corpo.texto(X0 + 18.3, CY, '103', 0.6, '#c9ccd0', ang=90, alinhar='center')
-barra_90(corpo, X0 + 26.0, YS_KY, L - 0.15 - (X0 + 26.0))
-# o EC11: a base preta, as abas de fixacao, a tampa de metal e a bucha
-for s in (-1, 1):
-    corpo.ret_c(XE + s * 6.6, CY, 1.2, 3.0, 'url(#metal)', stroke='#6c737b', sw=0.08)
-corpo.ret_c(XE, CY, 12.5, 13.4, PLASTICO, rx=0.4, stroke='#0a0a0b', sw=0.12)
-corpo.ret_c(XE, CY, 11.6, 11.6, 'url(#aco)', rx=0.4, stroke='#727981', sw=0.1)
+    corpo.texto(X0 + 21.0, y, NOMES_KY[k][1], 1.35, BRANCO, alinhar='center-right', peso='bold')
+corpo.ret(X0 + 21.85, YS_KY[0] - 1.6, 3.2, YS_KY[-1] - YS_KY[0] + 3.2, None, rx=0.15, stroke=BRANCO, sw=0.15)
+E_ = KEYES.E
+for k in range(3):                                                                   # os pull-ups de 10k
+    E_.passivo(corpo, X0 + 11.4 + k * 2.0, Y0 + 16.4, '0603', 'R', '103', vertical=True)
+barra_90(corpo, X0 + 24.9, YS_KY, L - 0.15 - (X0 + 24.9))
+# o EC11: as pernas A-C-B pela esquerda, as abas do quadro, a base, a tampa de metal e a bucha
+for y in (Y0 + 4.7, Y0 + 7.3, Y0 + 9.9):
+    corpo.ret(X0 + 2.0, y - 0.35, 1.4, 0.7, 'url(#metal)', rx=0.1, stroke='#6c737b', sw=0.05)
+    corpo.circ(X0 + 2.15, y, 0.55, ESTANHO)
+for sy in (-1, 1):
+    corpo.ret_c(XE, CY + sy * 6.0, 1.6, 1.4, 'url(#metal)', rx=0.15, stroke='#6c737b', sw=0.08)
+E_.sombra(corpo, XE - 6.3, CY - 5.45, 12.6, 10.9, rx=0.8, op=0.4)
+corpo.ret_c(XE, CY, 12.6, 10.9, '#2a8a6a', rx=0.8, stroke='#145040', sw=0.12)          # a base verde do EC11
+corpo.ret_c(XE, CY, 11.6, 10.3, 'url(#aco)', rx=0.7, stroke='#727981', sw=0.1)        # o quadro de metal
+corpo.ret_c(XE, CY, 11.6, 10.3, 'url(#luz)', rx=0.7)
 for sx in (-1, 1):
     for sy in (-1, 1):
-        corpo.circ(XE + sx * 4.6, CY + sy * 4.6, 0.55, '#7c838b')
+        corpo.circ(XE + sx * 4.6, CY + sy * 4.0, 0.45, '#7c838b')
 corpo.circ(XE, CY, 3.5, '#d4d8dc', stroke='#7c838b', sw=0.12)
 for r in (3.1, 2.75, 2.4):                                                            # a rosca M7
     corpo.circ(XE, CY, r + 0.6, None, stroke='#9aa1a8', sw=0.1)
@@ -643,25 +660,20 @@ CY = H / 2
 YS_T = [CY - PASSO, CY, CY + PASSO]
 X_T = L - 0.9
 d = Desenho(T(A, 0, 0, A, 0, 0))
-d.ret(X0, Y0, 18.5, 15.0, PCB_PRETA, rx=0.8, stroke=PCB_PRETA_BORDA, sw=0.15)
-d.ret(X0, Y0, 18.5, 15.0, 'url(#luz)', rx=0.8)
-furo_m3(d, X0 + 2.6, CY, r=1.5)
-for k, y in enumerate(YS_T):
-    pino_soldado(d, X0 + 14.6, y, quadrado=k == 2)
-d.texto(X0 + 12.9, YS_T[0], '-', 1.1, BRANCO, alinhar='center')
-d.texto(X0 + 12.9, YS_T[2], 'S', 1.0, BRANCO, alinhar='center')
-smd(d, X0 + 10.5, CY + 4.6, 1.6, 0.8, '#1a1a1a')
-d.texto(X0 + 10.5, CY + 5.8, '10k', 0.55, '#c9ccd0', alinhar='center')
-d.texto(X0 + 6.0, Y0 + 14.0, 'KY-020', 0.65, BRANCO, alinhar='center')
-barra_90(d, X0 + 18.5, YS_T, L - 0.15 - (X0 + 18.5))
-# a chave de bolinha: o tubo de metal deitado, com as duas pernas
-for y in (CY - 1.0, CY + 1.0):                    # as pernas, soldadas nas ilhas
-    d.circ(X0 + 11.9, y, 0.6, ESTANHO)
-    d.linha(X0 + 10.6, y, X0 + 11.9, y, '#c3c8cd', 0.45)
-    d.circ(X0 + 11.9, y, 0.3, '#e3e6e9')
-d.ret(X0 + 4.6, CY - 2.5, 6.4, 5.0, 'url(#metal)', rx=2.5, stroke='#6d747c', sw=0.12)
-d.ret(X0 + 10.4, CY - 1.9, 0.9, 3.8, '#2b2d31', rx=0.3)
-d.ret(X0 + 5.1, CY - 1.7, 5.0, 0.7, '#ffffff', rx=0.35, op=0.35)
+# A placa universal dos KY (keyes_a25.py) e a chave de bolinha da foto de cima do
+# KY-020: o tubo com a capa de epoxi azul deitado na diagonal, a tampa branca do
+# lado das pernas, uma perna na oval de baixo e a outra na ilha de cima.
+KEYES.placa(d, X0, Y0, YS_T, L - 0.15 - (X0 + 18.5), simbolo=False)
+for (xa, ya), (xb, yb) in (((X0 + 5.4, Y0 + 9.4), (X0 + 5.4, Y0 + 10.0)), ((X0 + 10.9, Y0 + 5.0), (X0 + 11.9, Y0 + 5.1))):
+    KEYES.perna(d, xa, ya, xb, yb)
+d.entrar(mover(X0 + 8.1, Y0 + 7.3) * rodar(-33))
+d.ret_c(0.3, 0.45, 8.6, 4.6, '#000000', rx=1.6, op=0.35)
+d.ret_c(-3.6, 0, 1.8, 4.0, '#efeee8', rx=0.5, stroke='#b9b6a9', sw=0.1)        # a tampa branca
+d.ret_c(-3.6, 0, 0.7, 1.8, '#c8a75a', rx=0.15)                                 # a perna dobrada
+d.ret_c(0.9, 0, 7.2, 4.6, '#2f6fd0', rx=1.6, stroke='#1a4a92', sw=0.12)        # a capa de epoxi
+d.ret_c(0.9, -1.2, 6.2, 1.0, '#ffffff', rx=0.5, op=0.22)
+d.ret_c(0.9, 0, 7.2, 4.6, 'url(#luz)', rx=1.6)
+d.sair()
 gravar('tilt-switch', d.partes, L, H)
 guardar('tilt-switch', L, H, [
     ('GND', X_T, YS_T[0], ['power'], 'GND (- na placa)'),

@@ -41,6 +41,15 @@ pa = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(pa)
 
 Desenho, T, f = pa.Desenho, pa.T, pa.f
+_spec_e = importlib.util.spec_from_file_location('estilo_a25', os.path.join(AQUI, 'estilo_a25.py'))
+E = importlib.util.module_from_spec(_spec_e)
+_spec_e.loader.exec_module(E)
+mover, rodar = pa.mover, pa.rodar
+SERIGRAFIA, MARCA_CI, PRETO_CI = pa.SERIGRAFIA, pa.MARCA_CI, pa.PRETO_CI
+_spec_k = importlib.util.spec_from_file_location('keyes_a25', os.path.join(AQUI, 'keyes_a25.py'))
+KEYES = importlib.util.module_from_spec(_spec_k)
+_spec_k.loader.exec_module(KEYES)
+TRACADO = json.load(io.open(os.path.join(AQUI, 'modulos-cad', 'tracado-fotos.json'), encoding='utf-8'))
 ESTANHO = pa.ESTANHO
 A = 96 / 25.4
 PASSO = 2.54
@@ -53,6 +62,7 @@ VERDE, VERDE_BORDA = '#1f7a3c', '#0f4320'
 
 DEFS_EXTRA = '''  <radialGradient id="cupula" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/><stop offset="0.32" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#000000" stop-opacity="0.32"/></radialGradient>
   <radialGradient id="lente" cx="0.42" cy="0.36" r="0.7"><stop offset="0" stop-color="#ffffff"/><stop offset="0.7" stop-color="#eceeec"/><stop offset="1" stop-color="#c9cdcb"/></radialGradient>
+  <radialGradient id="latao" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#fbe9a8"/><stop offset="0.55" stop-color="#d4ab52"/><stop offset="1" stop-color="#93702a"/></radialGradient>
   <radialGradient id="tela-aco" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#e4e8eb"/><stop offset="0.75" stop-color="#a9b0b7"/><stop offset="1" stop-color="#7f868e"/></radialGradient>
 '''
 
@@ -119,25 +129,6 @@ def led_smd(d, cx, cy, vertical=False):
     d.ret_c(cx, cy, w * (0.7 if vertical else 0.4), h * (0.4 if vertical else 0.7), '#ffd9d4', op=0.6)
 
 
-def soic8(d, cx, cy, vertical=False):
-    for k in range(4):
-        for s in (-1, 1):
-            if vertical:
-                d.ret_c(cx + s * 2.95, cy - 1.905 + k * 1.27, 1.0, 0.42, ESTANHO)
-            else:
-                d.ret_c(cx - 1.905 + k * 1.27, cy + s * 2.95, 0.42, 1.0, ESTANHO)
-    d.ret_c(cx, cy, 3.9 if vertical else 4.9, 4.9 if vertical else 3.9, '#202124', rx=0.15)
-    d.circ(cx - (1.2 if vertical else 1.9), cy - (1.9 if vertical else 1.2), 0.3, '#3a3c40')
-
-
-def trimpot_3296(d, cx, cy):
-    """O trimpot azul 3296W de pe, visto de cima (9,5 x 4,8 mm, o parafuso de latao numa ponta)."""
-    d.ret_c(cx, cy, 9.5, 4.8, '#2a64c8', rx=0.3, stroke='#173d80', sw=0.12)
-    d.ret_c(cx, cy, 9.5, 4.8, 'url(#luz)', rx=0.3)
-    d.circ(cx + 3.3, cy, 1.35, '#d9b45a', stroke='#8a6d1f', sw=0.12)
-    d.linha(cx + 3.3 - 0.9, cy, cx + 3.3 + 0.9, cy, '#8a6d1f', 0.3)
-
-
 def barra_90(d, x_borda, ys, comp):
     """A barra de pinos a 90 graus na borda direita da placa (os pinos para fora)."""
     d.ret(x_borda - 2.5, min(ys) - 1.27, 2.5, max(ys) - min(ys) + 2.54, PLASTICO, rx=0.15, stroke='#0b0c0d', sw=0.1)
@@ -167,6 +158,124 @@ def barra_baixo(d, y_borda, xs, comp):
 
 def luz(id_peca, x, y, r, cor, chave):
     luzes.append((id_peca, x * A, y * A, r, cor, chave))
+
+
+# ---- o padrao das placas (Alpha 25): o cobre, as trilhas, as vias e as pecas com marcacao ----
+def cobre_da_foto(d, chave, x0, y0, cor):
+    """O cobre de cima vetorizado da foto retificada (modulos-cad/tracado-fotos.json)."""
+    for poli in TRACADO[chave]['cobre']:
+        cmds = []
+        for anel in poli:
+            cmds += [('M', x0 + anel[0][0], y0 + anel[0][1])] + [('L', x0 + x, y0 + y) for x, y in anel[1:]] + [('Z',)]
+        d.caminho(cmds, cor)
+        d.partes[-1] = d.partes[-1].replace('<path ', '<path fill-rule="evenodd" ', 1)
+
+
+def trilha(d, pts, cor, larg=0.32):
+    """Uma trilha medida na foto (as que a vetorizacao nao pegou inteiras)."""
+    d.poli(pts, None, stroke=cor, sw=larg, fechado=False, cap='round')
+    d.partes[-1] = d.partes[-1].replace('<path ', '<path stroke-linejoin="round" ', 1)
+
+
+def via(d, x, y, cor, fundo, r=0.32):
+    d.circ(x, y, r, cor)
+    d.circ(x, y, r * 0.5, fundo)
+
+
+def furo_metalizado(d, x, y, r_anel=0.78, r_furo=0.36):
+    d.circ(x, y, r_anel, ESTANHO)
+    d.circ(x, y, r_anel, 'url(#luz)')
+    d.circ(x, y, r_anel * 0.93, None, '#ffffff', 0.08, op=0.35)
+    d.circ(x, y, r_furo, '#0c0d0f')
+
+
+def texto_girado(d, x, y, t, tam, cor, graus, peso='bold'):
+    """Texto centrado em (x, y), girado de verdade (o d.texto deixa sempre legivel)."""
+    X, Y = d.t(x, y)
+    e = d.t.escala
+    d.partes.append(f'<text transform="translate({f(X)} {f(Y)}) rotate({graus})" x="0" y="{f(tam * 0.45 * e)}" '
+                    f'font-family="Arial" font-weight="{peso}" font-size="{f(tam * 1.25 * e)}" fill="{cor}" '
+                    f'text-anchor="middle">{t}</text>\n')
+
+
+def trimpot_3296(d, cx, cy, w=9.5, h=4.8, parafuso=-1, marca=('W 104', 'T 110')):
+    """O trimpot azul 3296W de pe, visto de cima: o corpo, a borda do molde, a marcacao e o
+    parafuso de latao com a fenda numa das pontas (parafuso: -1 a esquerda, 1 a direita)."""
+    E.sombra(d, cx - w / 2, cy - h / 2, w, h, rx=0.3, op=0.4)
+    d.ret_c(cx, cy, w, h, '#2b63c8', rx=0.3, stroke='#173d80', sw=0.12)
+    d.ret_c(cx, cy, w - 0.7, h - 0.7, None, rx=0.2, stroke='#4c84e0', sw=0.1)
+    d.ret_c(cx, cy, w, h, 'url(#luz)', rx=0.3)
+    px = cx + parafuso * (w / 2 - 1.55)
+    for k, t in enumerate(marca):
+        texto_girado(d, cx - parafuso * 1.2, cy + (k - 0.5) * 1.25, t, 0.75, '#163a7c', 0)
+    d.circ(px + 0.1, cy + 0.12, 1.3, '#000000', op=0.35)
+    d.circ(px, cy, 1.3, 'url(#latao)', stroke='#7d6420', sw=0.1)
+    d.linha(px - 1.0, cy, px + 1.0, cy, '#6b5418', 0.32)
+    d.circ(px - 0.35, cy - 0.4, 0.3, '#fff4c8', op=0.7)
+
+
+def caixa_silk(d, cx, cy, w, h, larg=0.15):
+    """O contorno da serigrafia em volta de um passivo (as pontas arredondadas, como nas placas)."""
+    d.ret_c(cx, cy, w, h, None, rx=min(w, h) * 0.3, stroke=SERIGRAFIA, sw=larg)
+
+
+def led_1206(d, cx, cy, vertical=False):
+    """O LED 1206 apagado: o corpo branco leitoso, o chip e a marca verde do catodo."""
+    w, h = (1.6, 3.2) if vertical else (3.2, 1.6)
+    E.sombra(d, cx - w / 2, cy - h / 2, w, h)
+    for s_ in (-1, 1):
+        if vertical:
+            d.ret_c(cx, cy + s_ * 1.25, 1.5, 0.7, ESTANHO, rx=0.08)
+        else:
+            d.ret_c(cx + s_ * 1.25, cy, 0.7, 1.5, ESTANHO, rx=0.08)
+    d.ret_c(cx, cy, w * (1 if vertical else 0.72), h * (0.72 if vertical else 1), '#f2efe6', rx=0.12)
+    d.ret_c(cx, cy, 0.7, 0.7, '#e8d9c6', rx=0.1)
+    d.ret_c(cx, cy, 0.28, 0.28, '#b79e76')
+    if vertical:
+        d.ret_c(cx, cy - h * 0.3, w * 0.9, 0.22, '#2fa37a', op=0.85)
+    else:
+        d.ret_c(cx - w * 0.3, cy, 0.22, h * 0.9, '#2fa37a', op=0.85)
+    d.ret_c(cx, cy, w, h, 'url(#luz)', rx=0.12)
+
+
+def sop8(d, cx, cy, linhas, corpo=(5.0, 5.1), passo=1.27, distancia=6.55, giro_texto=90):
+    """O LM393 em SOP-8 de pe (quatro pernas de cada lado, na esquerda e na direita)."""
+    w, h = corpo
+    for k in range(4):
+        y = cy + (k - 1.5) * passo
+        for s_ in (-1, 1):
+            d.ret_c(cx + s_ * distancia / 2, cy + (k - 1.5) * passo, 1.3, 0.62, ESTANHO, rx=0.06)
+            d.ret(cx + s_ * w / 2 - (0 if s_ > 0 else 0.9), y - 0.21, 0.9, 0.42, 'url(#metal)', rx=0.05)
+    E.sombra(d, cx - w / 2, cy - h / 2, w, h, rx=0.2)
+    d.ret_c(cx, cy, w, h, PRETO_CI, rx=0.2)
+    d.ret_c(cx, cy, w, h, 'url(#luz)', rx=0.2)
+    d.circ(cx - w / 2 + 0.7, cy + h / 2 - 0.7, 0.3, '#3a3c41')
+    n = len(linhas)
+    for k, (t, tam) in enumerate(linhas):
+        o = (k - (n - 1) / 2) * 1.0
+        d.entrar(mover(cx + o, cy) * rodar(giro_texto))
+        d.texto(0, 0, t, tam, MARCA_CI, alinhar='center', peso='normal')
+        d.sair()
+
+
+def trimpot_3362(d, cx, cy, w=7.0, h=7.6):
+    """O trimpot azul 3362 de uma volta, de cima: o corpo quadrado, o rotor com a fenda em cruz e a
+    marca do pino 1."""
+    E.sombra(d, cx - w / 2, cy - h / 2, w, h, rx=0.3, op=0.35)
+    d.ret_c(cx, cy, w, h, '#2f63c9', rx=0.3, stroke='#17408c', sw=0.12)
+    d.ret_c(cx, cy, w - 0.8, h - 0.8, None, rx=0.25, stroke='#4d81e0', sw=0.1)
+    d.ret_c(cx, cy, w, h, 'url(#luz)', rx=0.3)
+    for k in range(16):                                             # as nervuras em volta do rotor
+        a = math.radians(k * 22.5)
+        d.linha(cx + 2.55 * math.cos(a), cy + 2.55 * math.sin(a), cx + 2.95 * math.cos(a), cy + 2.95 * math.sin(a),
+                '#1f4fa8', 0.22)
+    d.circ(cx, cy, 2.3, '#2a5bbb', stroke='#183f88', sw=0.1)
+    d.circ(cx, cy, 1.75, '#c9ced4', stroke='#7c838b', sw=0.08)
+    d.ret_c(cx, cy, 2.9, 0.62, '#2b2e33', rx=0.12)
+    d.ret_c(cx, cy, 0.62, 2.9, '#2b2e33', rx=0.12)
+    d.circ(cx, cy, 2.3, 'url(#cupula)', op=0.4)
+    d.circ(cx + w / 2 - 1.0, cy - h / 2 + 1.5, 0.32, '#c9ced4', stroke='#2a2d31', sw=0.08)
+    d.texto(cx, cy - h / 2 + 0.95, '3362', 0.62, '#173d82', ang=180, alinhar='center', peso='bold')
 
 
 # =====================================================================
@@ -259,69 +368,126 @@ dht('dht11', 12.0, 15.5, '#2f7ccc', '#17457a', grade_dht11, 'DHT11', '#e8f0fa', 
 # =====================================================================
 
 
-def modulo_lm393(nome, sensor, nomes, descricoes, x_placa):
-    """A placa azul de 32 x 14 mm com a barra de quatro pinos na direita."""
-    L, H = caixa(x_placa + 32.0 + 6.2, 14.4)
-    X0, Y0 = x_placa, (H - 14.0) / 2
+def modulo_lm393(nome, sensor, nomes, descricoes, rotulos_sensor, X0):
+    """A placa azul de 32 x 14 mm do LM393 ("MH-Sensor-Series"), medida na foto
+    de cima do modulo do LDR (a do sensor de chama e a mesma placa): o sensor
+    deitado para fora da ponta, a coluna de passivos 1206, o trimpot 3362, o
+    LM393 em SOP-8, os 102 e os LEDs PWR e DO, o furo de 3 mm e a barra de
+    quatro pinos a 90 graus. O cobre vem da foto (vetorizado), mais as trilhas
+    medidas que a vetorizacao nao pegou inteiras."""
+    L, H = caixa(X0 + 32.0 + 6.2, 14.4)
+    Y0 = (H - 14.0) / 2
     cy = H / 2
     ys = [cy + (k - 1.5) * PASSO for k in range(4)]
+    mascara, borda, cor_cobre = '#163d84', '#0b2552', '#3570cc'
     d = Desenho(T(A, 0, 0, A, 0, 0))
-    placa(d, X0, Y0, 32.0, 14.0, AZUL, AZUL_BORDA)
-    furo(d, X0 + 9.6, cy, r=1.5)
-    sensor(d, X0, cy)
-    trimpot_3296(d, X0 + 16.4, Y0 + 3.4)
-    soic8(d, X0 + 16.6, Y0 + 10.2)
-    for k, y in enumerate((Y0 + 2.4, Y0 + 11.6)):
-        smd(d, X0 + 22.0, y, 1.6, 0.8, '#1a1a1a')
-    for y in (cy - 1.3, cy + 1.3):
-        smd(d, X0 + 22.0, y, 1.6, 0.8, '#a37a52')
-    led_smd(d, X0 + 25.2, Y0 + 2.4)
-    led_smd(d, X0 + 25.2, Y0 + 11.6)
-    d.texto(X0 + 25.2, Y0 + 4.2, 'PWR', 0.6, BRANCO, alinhar='center')
-    d.texto(X0 + 25.2, Y0 + 9.8, 'DO', 0.6, BRANCO, alinhar='center')
-    for n, y in zip(nomes, ys):
-        d.texto(X0 + 29.2, y, n, 0.75, BRANCO, alinhar='center-right')
+    if sensor is receptor_ir:
+        sensor(d, X0, Y0)                                               # deitado para fora, por baixo da ponta
+    E.sombra(d, X0, Y0, 32.0, 14.0, rx=0.5, op=0.35)
+    d.ret(X0, Y0, 32.0, 14.0, mascara, rx=0.5, stroke=borda, sw=0.15)
+    cobre_da_foto(d, 'ldr', X0, Y0, cor_cobre)
+    for pts in ([(2.05, 2.6), (2.3, 4.6)], [(2.3, 9.5), (2.05, 11.3)], [(6.35, 2.3), (6.35, 3.4)],
+                [(6.35, 4.8), (6.35, 5.8)], [(3.9, 5.9), (5.3, 7.15), (8.9, 7.15), (9.3, 6.7)],
+                [(9.2, 4.05), (12.9, 4.05)], [(9.3, 9.15), (13.2, 9.15)], [(9.3, 11.75), (13.2, 11.75)],
+                [(6.3, 12.2), (6.6, 13.0), (13.2, 13.0)], [(4.95, 9.95), (6.15, 9.95), (6.15, 9.5)],
+                [(21.4, 2.9), (21.4, 2.1), (26.7, 2.1), (28.3, 3.0)], [(21.9, 3.95), (23.8, 3.95)],
+                [(21.25, 7.95), (21.4, 9.1)], [(21.9, 11.25), (23.8, 11.25)], [(26.4, 3.95), (27.2, 3.95)],
+                [(26.4, 11.25), (27.0, 11.25), (28.3, 10.8)], [(19.8, 9.2), (20.6, 9.2), (20.6, 8.0)]):
+        trilha(d, [(X0 + x, Y0 + y) for x, y in pts], cor_cobre)
+    for x, y in ((6.35, 2.3), (4.95, 9.95), (10.8, 8.85), (21.25, 7.95)):
+        via(d, X0 + x, Y0 + y, cor_cobre, borda)
+    d.ret(X0, Y0, 32.0, 14.0, 'url(#luz)', rx=0.5)
+    # a serigrafia: o octogono das ilhas do sensor, os contornos, os rotulos
+    oct_ = [(1.4, 4.3), (3.3, 4.3), (4.0, 5.0), (4.0, 6.6), (3.6, 7.1), (4.0, 7.6), (4.0, 9.3), (3.3, 10.0),
+            (1.4, 10.0), (0.7, 9.3), (0.7, 7.6), (1.1, 7.1), (0.7, 6.6), (0.7, 5.0)]
+    d.poli([(X0 + x, Y0 + y) for x, y in oct_], None, stroke=SERIGRAFIA, sw=0.18)
+    for t, y in zip(rotulos_sensor, (3.3, 10.9)):
+        if t:
+            d.texto(X0 + 4.6, Y0 + y, t, 1.0, SERIGRAFIA, alinhar='center', peso='bold')
+    for y in (4.05, 6.55, 9.15, 11.6):
+        caixa_silk(d, X0 + 7.6, Y0 + y, 4.4, 2.0)
+    for y in (4.05, 10.45):
+        caixa_silk(d, X0 + 21.4, Y0 + y, 2.0, 3.6)
+    for y in (3.9, 11.3):
+        d.ret_c(X0 + 25.1, Y0 + y, 3.6, 2.0, None, rx=0.2, stroke=SERIGRAFIA, sw=0.15)
+    d.texto(X0 + 25.1, Y0 + 1.0, 'PWR-LED', 0.95, SERIGRAFIA, alinhar='center', peso='bold')
+    d.texto(X0 + 25.0, Y0 + 13.25, 'DO-LED', 0.95, SERIGRAFIA, alinhar='center', peso='bold')
+    for t, y in zip(('VCC', 'GND', 'DO', 'AO'), ys):
+        d.texto(X0 + 27.4, y, t, 0.82, SERIGRAFIA, ang=90, alinhar='center', peso='bold')
+    # os furos: os dois metalizados da ponta e o de 3 mm de fixacao
+    furo_metalizado(d, X0 + 2.05, Y0 + 1.85)
+    furo_metalizado(d, X0 + 2.05, Y0 + 12.05)
+    d.circ(X0 + 25.0, Y0 + 7.0, 1.55, '#0c0d0f')
+    d.circ(X0 + 25.0, Y0 + 7.0, 1.55, None, '#0a1f45', 0.15)
+    # as ilhas do sensor (as pernas ja vem soldadas, por cima)
+    for y in (5.65, 8.55):
+        furo_metalizado(d, X0 + 2.3, Y0 + y, 0.85, 0.42)
+    if sensor is ldr:
+        sensor(d, X0, Y0)                                               # em pe sobre as ilhas
+    # as pecas
+    E.passivo(d, X0 + 7.6, Y0 + 4.05, '1206', 'C')
+    E.passivo(d, X0 + 7.6, Y0 + 6.55, '1206', 'C')
+    E.passivo(d, X0 + 7.6, Y0 + 9.15, '1206', 'R', '103')
+    E.passivo(d, X0 + 7.6, Y0 + 11.6, '1206', 'R', '103')
+    E.passivo(d, X0 + 21.4, Y0 + 4.05, '1206', 'R', '102', vertical=True)
+    E.passivo(d, X0 + 21.4, Y0 + 10.45, '1206', 'R', '102', vertical=True)
+    led_1206(d, X0 + 25.1, Y0 + 3.9)
+    led_1206(d, X0 + 25.1, Y0 + 11.3)
+    sop8(d, X0 + 16.5, Y0 + 11.1, [('LM393', 0.9), ('98M', 0.75)])
+    trimpot_3362(d, X0 + 16.55, Y0 + 3.95)
     barra_90(d, X0 + 32.0, ys, L - 0.15 - (X0 + 32.0))
     gravar(nome, d, L, H)
     guardar(nome, L, H, [(n, L - 0.9, y, s, dsc) for n, y, (s, dsc) in zip(nomes, ys, descricoes)])
-    luz(nome, X0 + 25.2, Y0 + 2.4, 0.55, 'vermelho', 'vcc-gnd')
-    luz(nome, X0 + 25.2, Y0 + 11.6, 0.55, 'vermelho', 'sensor-do')
+    luz(nome, X0 + 25.1, Y0 + 3.9, 0.55, 'vermelho', 'vcc-gnd')
+    luz(nome, X0 + 25.1, Y0 + 11.3, 0.55, 'vermelho', 'sensor-do')
 
 
-def ldr(d, x0, cy):
-    """O LDR de 5 mm deitado na ponta da placa: a ceramica e a trilha em zigue-zague."""
-    cx = x0 + 3.6
-    d.circ(cx, cy, 2.6, '#d9c9a6', stroke='#9b8a68', sw=0.12)
+def pernas(d, x_pad, ys, x_fim):
+    """As duas pernas do sensor, das ilhas ate o corpo deitado fora da placa."""
+    for y in ys:
+        d.linha(x_pad, y, x_fim, y, '#7d848b', 0.62)
+        d.linha(x_pad, y, x_fim, y, '#d3d8dd', 0.42)
+        d.circ(x_pad, y, 0.55, ESTANHO)
+        d.circ(x_pad - 0.12, y - 0.12, 0.2, '#ffffff', op=0.7)
+
+
+def ldr(d, x0, y0):
+    """O LDR de 5 mm em pe sobre as duas ilhas da ponta, visto de cima: a ceramica e a trilha de CdS."""
+    cx, cy = x0 + 2.6, y0 + 7.1
+    d.circ(cx + 0.2, cy + 0.25, 2.6, '#000000', op=0.3)
+    d.circ(cx, cy, 2.6, '#c9653f', stroke='#7c3a20', sw=0.12)                         # a borda de epoxi
     d.circ(cx, cy, 2.25, '#efe4cc')
     pts = []
     for k in range(7):
         y = cy - 1.6 + k * 0.53
-        x_a, x_b = cx - 1.7, cx + 1.7
+        x_a, x_b = cx - 1.75, cx + 1.75
         pts += [(x_a, y), (x_b, y)] if k % 2 == 0 else [(x_b, y), (x_a, y)]
-    d.poli(pts, None, stroke='#b5452e', sw=0.28, fechado=False)
+    d.poli(pts, None, stroke='#b5452e', sw=0.3, fechado=False)
+    for s_ in (-1, 1):
+        d.caminho([('M', cx - 1.95, cy + s_ * 1.0), ('A', 2.25, 0, 1 if s_ < 0 else 0, cx + 1.95, cy + s_ * 1.0),
+                   ('Z',)], '#d7c39a')
     d.circ(cx, cy, 2.25, 'url(#cupula)', op=0.6)
 
 
-def receptor_ir(d, x0, cy):
-    """O fotodiodo infravermelho preto de 5 mm, deitado para fora da placa (para a esquerda)."""
-    for s in (-1, 1):
-        d.linha(x0 + 2.4, cy + s * 1.27, x0 - 1.2, cy + s * 1.27, '#c3c8cd', 0.45)
-        d.circ(x0 + 2.4, cy + s * 1.27, 0.75, ESTANHO)
-    d.ret(x0 - 1.4, cy - 2.9, 1.0, 5.8, '#121315', rx=0.2)                                 # o colar
-    d.caminho([('M', x0 - 1.4, cy - 2.5), ('L', x0 - 6.4, cy - 2.5), ('A', 2.5, 0, 0, x0 - 6.4, cy + 2.5),
+def receptor_ir(d, x0, y0):
+    """O fotodiodo infravermelho preto de 5 mm, deitado para fora da ponta."""
+    cy = y0 + 7.1
+    pernas(d, x0 + 2.3, (y0 + 5.65, y0 + 8.55), x0 - 1.0)
+    d.ret(x0 - 1.4, cy - 2.95, 1.0, 5.9, '#121315', rx=0.2)                                # o colar
+    d.caminho([('M', x0 - 1.4, cy - 2.5), ('L', x0 - 4.9, cy - 2.5), ('A', 2.5, 0, 0, x0 - 4.9, cy + 2.5),
                ('L', x0 - 1.4, cy + 2.5), ('Z',)], '#18191c', stroke='#050506', sw=0.1)
-    d.ret(x0 - 6.6, cy - 1.9, 4.6, 0.7, '#ffffff', rx=0.3, op=0.18)
+    d.ret(x0 - 5.6, cy - 1.9, 4.2, 0.7, '#ffffff', rx=0.3, op=0.18)
 
 
 desc_dig = 'Saida digital do comparador: muda quando passa do ponto do trimpot (o LED DO acende)'
 modulo_lm393('photoresistor-sensor', ldr, ['VCC', 'GND', 'DO', 'AO'],
              [(['power'], 'Alimentacao: 3,3 a 5 V'), (['power'], 'GND'),
               ([], 'Saida digital: LOW com a luz acima do ponto do trimpot (o LED DO acende)'),
-              (['analog'], 'Saida analogica: mais luz, menos tensao')], 0.2)
+              (['analog'], 'Saida analogica: mais luz, menos tensao')], ('', ''), 0.2)
 modulo_lm393('flame-sensor', receptor_ir, ['VCC', 'GND', 'DOUT', 'AOUT'],
              [(['power'], 'Alimentacao: 3,3 a 5 V'), (['power'], 'GND'),
               ([], 'Saida digital: LOW com chama (o LED DO acende)'),
-              (['analog'], 'Saida analogica: mais chama, menos tensao')], 9.4)
+              (['analog'], 'Saida analogica: mais chama, menos tensao')], ('+', '-'), 9.4)
 
 # =====================================================================
 #  gas-sensor: o modulo do MQ-2
@@ -369,44 +535,85 @@ luz('gas-sensor', X0 + 26.0, Y0 + 19.0, 0.55, 'vermelho', 'sensor-do')
 
 
 def ky_tres(nome, rotulo, desenho, descricoes):
+    """Os KY de 18,5 x 15 mm com a barra de tres pinos na direita."""
     L, H = caixa(24.6, 15.35)
     X0, Y0 = 0.2, (H - 15.0) / 2
     cy = H / 2
     ys = [cy - PASSO, cy, cy + PASSO]
     d = Desenho(T(A, 0, 0, A, 0, 0))
-    placa(d, X0, Y0, 18.5, 15.0, PRETA, PRETA_BORDA)
-    for k, y in enumerate(ys):
-        ilha(d, X0 + 14.6, y, quadrada=k == 2)
-    d.texto(X0 + 12.9, ys[0], '-', 1.1, BRANCO, alinhar='center')
-    d.texto(X0 + 12.9, ys[2], 'S', 1.0, BRANCO, alinhar='center')
-    d.texto(X0 + 5.0, Y0 + 14.0, rotulo, 0.65, BRANCO, alinhar='center')
-    desenho(d, X0, cy)
-    barra_90(d, X0 + 18.5, ys, L - 0.15 - (X0 + 18.5))
+    desenho(d, X0, Y0, ys, L)
     gravar(nome, d, L, H)
     guardar(nome, L, H, [(n, L - 0.9, y, s, dsc) for (n, s, dsc), y in zip(descricoes, ys)])
 
 
-def ntc(d, x0, cy):
-    furo(d, x0 + 2.6, cy - 4.4, r=1.3)
-    for y in (cy - 0.9, cy + 0.9):                                    # as pernas do NTC, soldadas
-        d.circ(x0 + 9.4, y, 0.6, ESTANHO)
-        d.circ(x0 + 9.4, y, 0.3, '#e3e6e9')
-    d.linha(x0 + 4.4, cy - 0.35, x0 + 9.4, cy - 0.9, '#c3c8cd', 0.3)
-    d.linha(x0 + 4.4, cy + 0.35, x0 + 9.4, cy + 0.9, '#c3c8cd', 0.3)
-    d.circ(x0 + 3.6, cy, 1.35, '#1a1b1d', stroke='#050506', sw=0.1)  # a gota de epoxi
-    d.circ(x0 + 3.2, cy - 0.45, 0.4, '#ffffff', op=0.25)
-    smd(d, x0 + 10.5, cy + 4.6, 1.6, 0.8, '#1a1a1a')
-    d.texto(x0 + 10.5, cy + 5.8, '10k', 0.55, '#c9ccd0', alinhar='center')
+def ntc(d, x0, y0, ys, L):
+    """O KY-013 pela foto de cima: a placa universal e o NTC de gota preta com as
+    pernas compridas, uma em cada ilha pequena do meio."""
+    KEYES.placa(d, x0, y0, ys, L - 0.15 - (x0 + 18.5))
+    texto_girado(d, x0 + 1.9, y0 + 7.8, 'A', 1.1, SERIGRAFIA, -90)
+    texto_girado(d, x0 + 4.0, y0 + 7.8, 'S', 1.1, SERIGRAFIA, -90)
+    gx, gy = x0 + 6.5, y0 + 10.0
+    for px, py in ((x0 + 8.8, y0 + 9.4), (x0 + 8.6, y0 + 5.6)):
+        KEYES.perna(d, gx + 0.3, gy - 0.3, px, py)
+    d.circ(gx + 0.15, gy + 0.2, 1.0, '#000000', op=0.35)
+    d.circ(gx, gy, 1.0, '#141518', stroke='#050506', sw=0.1)                 # a gota de epoxi
+    d.circ(gx - 0.35, gy - 0.35, 0.32, '#ffffff', op=0.35)
 
 
-def batimento(d, x0, cy):
-    """O LED infravermelho (transparente, 5 mm) e o fototransistor preto, de pe."""
-    for cx, cor in ((x0 + 4.4, '#dfe8f0'), (x0 + 10.2, '#202124')):
-        d.circ(cx + 0.25, cy + 0.3, 2.6, '#000000', op=0.3)
-        d.circ(cx, cy, 2.6, cor, stroke='#55595f', sw=0.12)
-        d.circ(cx, cy, 2.1, 'url(#cupula)', op=0.7)
-    d.circ(x0 + 4.4, cy, 0.8, '#a9b6c4', op=0.8)
-    smd(d, x0 + 10.5, cy + 4.9, 1.6, 0.8, '#1a1a1a')
+def batimento(d, x0, y0, ys, L):
+    """O KY-039 pela foto de cima (a placa em pe com a barra embaixo, deitada
+    aqui: P(u, v) = (x0 + v, y0 + 15 - u)): o LED infravermelho de 5 mm em pe
+    (o "Hr"), o fototransistor deitado na borda (o "Lcup"), o R1 (331) e o R2
+    (103) na caixa dupla, as ilhas e o furo de fixacao."""
+    def P(u, v):
+        return x0 + v, y0 + 15.0 - u
+    E.sombra(d, x0, y0, 18.5, 15.0, rx=0.4, op=0.35)
+    d.ret(x0, y0, 18.5, 15.0, KEYES.PRETA, rx=0.4, stroke=KEYES.PRETA_BORDA, sw=0.15)
+    KEYES.textura(d, x0 + 0.2, y0 + 0.2, 18.1, 14.6)
+    d.ret(x0, y0, 18.5, 15.0, 'url(#luz)', rx=0.4)
+    S = SERIGRAFIA
+    d.linha(*P(2.8, 4.4), *P(9.2, 4.4), S, 0.2, cap='butt')
+    d.linha(*P(3.2, 9.9), *P(12.3, 9.9), S, 0.2, cap='butt')
+    for t, u, v in (('R', 4.4, 3.7), ('Hr', 8.2, 3.7)):
+        texto_girado(d, *P(u, v), t, 1.2, S, -90)
+    for t, u, v in (('Lcup', 1.8, 12.6), ('R1_2', 5.4, 12.6), ('R2_1', 12.3, 12.6)):
+        texto_girado(d, *P(u, v), t, 0.95, S, 180)
+    (xa, ya), (xb, yb) = P(6.2, 10.3), P(11.4, 14.5)
+    d.ret(min(xa, xb), min(ya, yb), abs(xb - xa), abs(yb - ya), None, stroke=S, sw=0.18)
+    xm, ym = P(8.8, 10.3)
+    d.linha(xm, ym, xm, ym - 0.0 + (P(8.8, 14.5)[1] - ym), S, 0.18, cap='butt')
+    (xa, ya), (xb, yb) = P(3.4, 15.0), P(11.6, 18.5)                      # o contorno da barra
+    d.ret(min(xa, xb), min(ya, yb), abs(xb - xa), abs(yb - ya), None, stroke=S, sw=0.18)
+    KEYES.ilha(d, *P(2.6, 2.0), 1.15, 0.95)                              # o furo de fixacao
+    for u, v, r_a, r_f in ((5.6, 6.2, 0.95, 0.55), (8.5, 6.2, 0.85, 0.5), (11.1, 6.2, 0.9, 0.5),
+                           (5.6, 8.7, 0.95, 0.55), (11.1, 8.7, 0.9, 0.5)):
+        KEYES.ilha(d, *P(u, v), r_a, r_f)
+    # os resistores (0805, em pe na foto: deitados aqui)
+    E.passivo(d, *P(7.4, 12.1), '0805', 'R', '103')
+    E.passivo(d, *P(10.2, 12.1), '0805', 'R', '331')
+    # o fototransistor deitado na borda, as pernas nas ilhas da esquerda
+    for u, v in ((2.8, 6.2), (2.8, 8.7)):
+        KEYES.perna(d, *P(1.0, v), *P(u, v))
+    (xa, ya), (xb, yb) = P(-0.3, 4.6), P(1.4, 9.6)
+    d.ret(min(xa, xb), min(ya, yb), abs(xb - xa), abs(yb - ya), '#dfe7ec', rx=0.5, stroke='#9aa6ae', sw=0.1)
+    d.ret(min(xa, xb), min(ya, yb), abs(xb - xa), abs(yb - ya), 'url(#cupula)', rx=0.5, op=0.6)
+    # o LED infravermelho de 5 mm em pe (a lente transparente vista de cima) e a perna da direita
+    KEYES.perna(d, *P(12.0, 7.4), *P(13.4, 8.7))
+    lx, ly = P(12.6, 4.6)
+    d.circ(lx + 0.25, ly + 0.3, 2.95, '#000000', op=0.35)
+    d.circ(lx, ly, 2.95, '#e6eef2', stroke='#a9b6be', sw=0.12)            # a aba
+    d.circ(lx, ly, 2.5, '#f3f7f9', stroke='#c3cdd3', sw=0.1)
+    d.ret_c(lx - 0.4, ly, 0.9, 0.7, '#a3a9ad', rx=0.1)                     # o refletor
+    d.circ(lx, ly, 2.5, 'url(#cupula)')
+    d.circ(lx - 0.8, ly - 0.9, 0.5, '#ffffff', op=0.8)
+    # a barra de tres pinos (deitada na borda da direita)
+    xb = x0 + 18.5
+    E.sombra(d, xb - 2.5, min(ys) - 1.27, 2.5, max(ys) - min(ys) + 2.54, rx=0.15)
+    d.ret(xb - 2.5, min(ys) - 1.27, 2.5, max(ys) - min(ys) + 2.54, 'url(#plastico)', rx=0.15, stroke='#0b0c0d', sw=0.1)
+    comp = L - 0.15 - xb
+    for y in ys:
+        d.ret(xb - 1.0, y - 0.32, comp + 1.0, 0.64, 'url(#metal)', stroke='#80868d', sw=0.05)
+        d.ret(xb + comp - 0.5, y - 0.32, 0.5, 0.64, '#e9ecef')
 
 
 ky_tres('ntc-temperature-sensor', 'KY-013', ntc, [
@@ -424,41 +631,106 @@ ky_tres('heart-beat-sensor', 'KY-039', batimento, [
 
 
 def som(nome, rotulo, r_mic):
-    L, H = caixa(6.2 + 35.0 + 0.2, 15.4)
-    X0, Y0 = 6.2, (H - 15.0) / 2
+    """O KY-037/KY-038 (35 x 15 mm), medido na foto de cima do KY-038: o
+    recorte na ponta onde fica o microfone, as duas ilhas S e G dos bracos, o
+    3296W (VR1), o LM393 em SOP-8, os 0603 (R1 103, R2 104, R5 102, R6 104),
+    os LEDs L1 (energia) e L2 (o DO), o furo de 3 mm e a barra AO/G/+/DO. A
+    foto tem a placa em pe com a barra embaixo: P(u, v) a deita com a barra a
+    esquerda. O cobre nao aparece na foto (a mascara vermelha e opaca): so as
+    vias que se veem."""
+    X0 = 6.2
+    # o microfone grande do KY-037 passa da ponta da placa (fica em pe nas pernas)
+    sobra = 4.1 if r_mic > 4 else 0.0
+    L, H = caixa(X0 + 35.0 + 0.2 + sobra, 15.4)
+    Y0 = (H - 15.0) / 2
     cy = H / 2
     nomes = ['AOUT', 'GND', 'VCC', 'DOUT']
     ys = [cy + (k - 1.5) * PASSO for k in range(4)]
+
+    def P(u, v):
+        return X0 + 35.0 - v, Y0 + u
+    mascara, borda = '#d81b1f', '#7a0b0e'
     d = Desenho(T(A, 0, 0, A, 0, 0))
-    placa(d, X0, Y0, 35.0, 15.0, VERMELHA, VERMELHA_BORDA)
-    furo(d, X0 + 7.6, Y0 + 2.4, r=1.4)
-    furo(d, X0 + 7.6, Y0 + 12.6, r=1.4)
-    for n, y in zip(('AO', 'G', '+', 'DO'), ys):
-        d.texto(X0 + 3.2, y, n, 0.8, BRANCO, alinhar='center-left')
-    trimpot_3296(d, X0 + 15.6, Y0 + 3.3)
-    soic8(d, X0 + 15.4, Y0 + 10.6)
-    led_smd(d, X0 + 22.0, Y0 + 2.2)
-    led_smd(d, X0 + 22.0, Y0 + 12.8)
-    d.texto(X0 + 23.8, Y0 + 2.2, 'L1', 0.6, BRANCO, alinhar='center-left')
-    d.texto(X0 + 23.8, Y0 + 12.8, 'L2', 0.6, BRANCO, alinhar='center-left')
-    for y in (cy - 1.8, cy + 0.6):
-        smd(d, X0 + 22.0, y, 1.6, 0.8, '#1a1a1a')
-    cx = X0 + 35.0 - 1.4 - r_mic
-    d.circ(cx + 0.3, cy + 0.35, r_mic, '#000000', op=0.3)
-    d.circ(cx, cy, r_mic, 'url(#lata)', stroke='#6c737b', sw=0.15)                         # o microfone de eletreto
-    d.circ(cx, cy, r_mic - 0.55, '#1c1d20')
-    for k in range(int(r_mic * 2.2)):                                                       # o feltro
+    # a placa: o recorte de 8,7 x 5 mm na ponta do microfone
+    contorno = [P(0, 0), P(3.3, 0), P(3.3, 5.0), P(12.0, 5.0), P(12.0, 0), P(15, 0), P(15, 35), P(0, 35)]
+    d.poli([(x + 0.15, y + 0.2) for x, y in contorno], '#000000', op=0.35)
+    d.poli(contorno, mascara, stroke=borda, sw=0.15)
+    d.partes[-1] = d.partes[-1].replace('<path ', '<path stroke-linejoin="round" ', 1)
+    d.poli(contorno, 'url(#luz)')
+    for u, v in ((8.3, 11.0), (9.6, 12.2), (14.4, 12.2), (6.6, 20.4), (13.6, 33.3)):
+        via(d, *P(u, v), '#e8333a', '#5a0a0c', r=0.36)
+    # a serigrafia
+    S = SERIGRAFIA
+
+    def caixa_p(u0, v0, u1, v1):
+        (xa, ya), (xb, yb) = P(u0, v0), P(u1, v1)
+        d.ret(min(xa, xb), min(ya, yb), abs(xb - xa), abs(yb - ya), None, rx=0.15, stroke=S, sw=0.15)
+    for caixa_ in ((0.8, 27.5, 2.6, 30.0), (13.2, 27.5, 15.0, 30.3), (0.8, 22.6, 2.6, 25.3), (13.2, 22.6, 15.0, 25.3),
+                   (10.7, 8.4, 12.6, 11.3), (13.2, 8.4, 15.0, 11.3)):
+        caixa_p(*caixa_)
+    caixa_p(0.9, 6.5, 6.2, 22.4)                                        # o VR1
+    (xa, ya), (xb, yb) = P(8.3, 14.3), P(14.8, 18.3)                    # o LM393, com o chanfro
+    d.ret(min(xa, xb), min(ya, yb), abs(xb - xa), abs(yb - ya), None, stroke=S, sw=0.15)
+    d.caminho([('M', *P(14.8, 15.8)), ('A', 0.55, 0, 0, *P(14.8, 16.9))], None, S, 0.15)
+    for t, u, v, g in (('S', 2.5, 4.0, 90), ('+', 1.4, 5.5, 90), ('G', 13.4, 4.4, 90), ('+', 12.5, 6.4, 90),
+                       ('R1', 14.0, 7.3, 90), ('L2', 4.2, 25.6, 90), ('VR1', 5.3, 23.0, 90)):
+        texto_girado(d, *P(u, v), t, 0.9, S, g)
+    for t, u, v in (('R2', 10.0, 9.8), ('R3+', 7.4, 10.6), ('L1', 13.6, 26.3), ('R6', 1.0, 31.6), ('R5', 14.0, 31.6)):
+        texto_girado(d, *P(u, v), t, 0.9, S, 0)
+    for t, y in (('AO', ys[0]), ('DO', ys[3])):                         # o G e o + ficam sob a barra
+        d.texto(X0 + 4.6, y, t, 0.9, S, alinhar='center-left', peso='bold')
+    d.poli([(X0 + 6.7, ys[3] + 0.5), (X0 + 7.3, ys[3] + 0.5), (X0 + 7.0, ys[3] - 0.1)], S)
+    # os furos: as ilhas S e G dos bracos e o de fixacao de 3 mm
+    for u in (2.0, 13.4):
+        x, y = P(u, 2.3)
+        d.circ(x, y, 0.95, ESTANHO)
+        d.circ(x, y, 0.95, 'url(#luz)')
+        d.circ(x, y, 0.5, '#0c0d0f')
+    x, y = P(7.4, 25.6)
+    d.circ(x, y, 1.75, '#0c0d0f')
+    d.circ(x, y, 1.9, None, '#8e0f12', 0.25)
+    # as pecas
+    for u, v, cod in ((11.6, 9.8, '104'), (14.0, 9.8, '103'), (1.6, 28.7, '104'), (14.0, 29.0, '102')):
+        E.passivo(d, *P(u, v), '0603', 'R', cod)
+    for u in (1.6, 14.0):
+        E.led_smd(d, *P(u, 24.0), '#ff3b30')
+    # o LM393 (SOP-8): as pernas para a esquerda e a direita, o pino 1 no chanfro
+    cxi, cyi = P(12.0, 16.2)
+    for k in range(4):
+        y = Y0 + 10.2 + k * 1.27
+        for s_ in (-1, 1):
+            d.ret_c(cxi + s_ * 3.0, y, 1.2, 0.62, ESTANHO, rx=0.06)
+            d.ret_c(cxi + s_ * 2.35, y, 0.9, 0.42, 'url(#metal)', rx=0.05)
+    E.sombra(d, cxi - 1.95, cyi - 2.45, 3.9, 4.9, rx=0.2)
+    d.ret_c(cxi, cyi, 3.9, 4.9, PRETO_CI, rx=0.2)
+    d.ret_c(cxi, cyi, 3.9, 4.9, 'url(#luz)', rx=0.2)
+    d.circ(cxi - 1.3, cyi + 1.8, 0.28, '#3a3c41')
+    texto_girado(d, cxi - 0.5, cyi, 'LM393', 0.85, MARCA_CI, -90, peso='normal')
+    texto_girado(d, cxi + 0.6, cyi, '98M', 0.7, MARCA_CI, -90, peso='normal')
+    # o 3296W (de cima: a face de 9,5 x 4,8 mm, o parafuso perto do LM393)
+    trimpot_3296(d, *P(3.3, 11.75), parafuso=-1)
+    # o microfone de eletreto, em pe sobre o recorte: as duas pernas e a lata com o feltro
+    for u, v in ((8.0, 9.0), (12.3, 7.0)):
+        x, y = P(u, v)
+        d.ret_c(x, y, 1.2, 1.6, ESTANHO, rx=0.6)
+    cx = X0 + 35.0 - 1.0 if r_mic > 4 else P(8.0, 4.3)[0]
+    cym = Y0 + 8.0
+    d.circ(cx + 0.3, cym + 0.35, r_mic, '#000000', op=0.35)
+    d.circ(cx, cym, r_mic, 'url(#lata)', stroke='#6c737b', sw=0.15)
+    d.circ(cx, cym, r_mic - 0.55, '#1c1d20')
+    for k in range(int(r_mic * 2.2)):
         a = 2 * math.pi * k / int(r_mic * 2.2)
-        d.circ(cx + (r_mic - 1.3) * 0.5 * math.cos(a), cy + (r_mic - 1.3) * 0.5 * math.sin(a), 0.18, '#2b2d31')
-    d.texto(X0 + 9.3, Y0 + 7.5, rotulo, 0.6, BRANCO, ang=90, alinhar='center')
-    barra_90_esq(d, X0, ys, X0 - 0.15)
+        d.circ(cx + (r_mic - 1.3) * 0.5 * math.cos(a), cym + (r_mic - 1.3) * 0.5 * math.sin(a), 0.18, '#2b2d31')
+    d.circ(cx, cym, r_mic - 0.55, 'url(#cupula)', op=0.3)
+    # a barra a 90 graus, deitada sobre a placa
+    barra_90_esq(d, X0 + 1.2, ys, X0 + 1.2 - 0.15)
     gravar(nome, d, L, H)
     desc = {'AOUT': (['analog'], 'Saida analogica: o som do microfone'), 'GND': (['power'], 'GND (G na placa)'),
             'VCC': (['power'], 'Alimentacao (+ na placa): 3,3 V ou 5 V'),
             'DOUT': ([], 'Saida digital: HIGH com o som acima do ponto do trimpot (o L2 acende)')}
     guardar(nome, L, H, [(n, 0.9, y, *desc[n]) for n, y in zip(nomes, ys)])
-    luz(nome, X0 + 22.0, Y0 + 2.2, 0.55, 'vermelho', 'vcc-gnd')
-    luz(nome, X0 + 22.0, Y0 + 12.8, 0.55, 'vermelho', 'sensor-do')
+    luz(nome, *P(14.0, 24.0), 0.55, 'vermelho', 'vcc-gnd')
+    luz(nome, *P(1.6, 24.0), 0.55, 'vermelho', 'sensor-do')
 
 
 som('big-sound-sensor', 'KY-037', 4.85)
@@ -499,36 +771,109 @@ L, H = caixa(21.2, 16.2)
 X0, Y0 = 0.1, 0.1
 NOMES_GY = ['VCC', 'GND', 'SCL', 'SDA', 'XDA', 'XCL', 'AD0', 'INT']
 XS_GY = [X0 + 10.5 + (k - 3.5) * PASSO for k in range(8)]
-Y_GY = Y0 + 1.6
+Y_GY = Y0 + 14.4
+# Pela foto de cima do GY-521 (o lado dos componentes): com a barra embaixo, o VCC
+# fica na esquerda -- a foto tem a barra em cima e e girada 180 graus. A foto
+# mede 18,35 mm entre o INT e o VCC; os 17,78 de verdade dao a escala.
+ESC_GY = 17.78 / 18.35
+
+
+def G(u, v):
+    return X0 + 10.5 - (u - 10.425) * ESC_GY, Y0 + 8.0 - (v - 8.0) * ESC_GY
+
+
 d = Desenho(T(A, 0, 0, A, 0, 0))
-placa(d, X0, Y0, 21.0, 16.0, '#1f4fb0', '#102c6a', rx=0.6)
-for x in (X0 + 2.6, X0 + 18.4):
-    furo(d, x, Y0 + 13.4, r=1.5)
+E.sombra(d, X0, Y0, 21.0, 16.0, rx=0.5, op=0.35)
+d.ret(X0, Y0, 21.0, 16.0, '#1e56b8', rx=0.5, stroke='#0f2f6e', sw=0.15)
+cor_cobre = '#2f6ccf'
+for pts in (((10.2, 2.0), (10.2, 4.0)), ((11.7, 2.0), (12.9, 3.2), (12.9, 6.0)), ((14.3, 2.0), (15.6, 4.6)),
+            ((17.0, 2.0), (17.0, 4.8), (16.0, 5.6)), ((19.6, 2.0), (19.6, 5.4)), ((8.0, 3.2), (8.0, 6.6)),
+            ((6.4, 2.0), (7.4, 3.6), (7.4, 6.6)), ((5.5, 12.4), (8.6, 12.4)), ((12.0, 11.6), (13.2, 12.6))):
+    trilha(d, [G(u, v) for u, v in pts], cor_cobre, 0.36)
+for u, v in ((4.9, 4.0), (8.4, 4.5), (15.8, 5.1), (12.7, 4.2), (16.1, 9.6), (13.9, 13.2), (8.8, 11.9)):
+    via(d, *G(u, v), cor_cobre, '#0d2a63')
+d.ret(X0, Y0, 21.0, 16.0, 'url(#luz)', rx=0.5)
+S = SERIGRAFIA
+d.linha(*G(0.5, 2.6), *G(20.5, 2.6), S, 0.2, cap='butt')
 for k, (x, n) in enumerate(zip(XS_GY, NOMES_GY)):
-    ilha(d, x, Y_GY, quadrada=k == 0)
-    d.texto(x, Y0 + 4.2, n, 0.62, BRANCO, ang=90, alinhar='center')
-d.ret_c(X0 + 10.5, Y0 + 10.4, 4.0, 4.0, '#202124', rx=0.15)                                  # o MPU-6050 (QFN de 4 x 4)
+    texto_girado(d, x, Y0 + 11.7, n, 0.82, S, -90)
+for u0, v0, u1, v1 in ((3.2, 5.2, 7.2, 7.9), (4.0, 9.8, 7.2, 12.4), (12.8, 5.6, 17.6, 8.6), (12.8, 9.6, 16.1, 12.0),
+                       (17.6, 5.4, 20.9, 9.4), (18.2, 10.3, 20.8, 12.0), (7.6, 12.6, 13.2, 15.0)):
+    (xa, ya), (xb, yb) = G(u0, v0), G(u1, v1)
+    d.ret(min(xa, xb), min(ya, yb), abs(xb - xa), abs(yb - ya), None, rx=0.15, stroke=S, sw=0.15)
+texto_girado(d, *G(10.4, 15.4), 'ITG/MPU6050', 1.05, S, 180)
+for t, u, v, g in (('C12', 6.0, 8.6, 90), ('C13', 6.2, 13.0, 90), ('C102', 13.2, 15.0, 180), ('C10', 15.4, 12.6, 90),
+                   ('C11', 14.0, 12.6, 90), ('C3', 16.6, 9.4, 90)):
+    texto_girado(d, *G(u, v), t, 0.62, S, g)
+ax, ay = G(2.2, 10.4)                                                           # os eixos X e Y
+d.linha(ax, ay, ax, ay + 2.2, S, 0.18)
+d.linha(ax, ay, ax + 2.2, ay, S, 0.18)
+d.poli([(ax - 0.3, ay + 1.9), (ax + 0.3, ay + 1.9), (ax, ay + 2.4)], S)
+d.poli([(ax + 1.9, ay - 0.3), (ax + 1.9, ay + 0.3), (ax + 2.4, ay)], S)
+texto_girado(d, ax - 0.6, ay + 2.6, 'Y', 0.7, S, 180)
+texto_girado(d, ax + 2.6, ay - 0.6, 'X', 0.7, S, 180)
+for x in XS_GY:                                                                  # as ilhas da barra
+    d.circ(x, Y_GY, 0.95, '#c79b34')
+    d.circ(x, Y_GY, 0.95, 'url(#luz)')
+    d.circ(x, Y_GY, 0.5, '#0c0d0f')
+d.ret_c(XS_GY[0], Y_GY, 1.9, 1.9, None, stroke='#c79b34', sw=0.25)
+for u, v in ((2.9, 13.9), (18.4, 13.9)):                                         # os furos de fixacao, dourados
+    x, y = G(u, v)
+    d.circ(x, y, 1.6, '#c79b34')
+    d.circ(x, y, 1.6, 'url(#luz)')
+    d.circ(x, y, 1.3, '#0c0d0f')
+# as pecas
+E.led_smd(d, *G(4.0, 6.5), '#3aff6a', vertical=True)
+E.passivo(d, *G(5.0, 6.5), '0603', 'R', '472', vertical=True)
+E.passivo(d, *G(6.3, 6.5), '0603', 'C', vertical=True)
+E.passivo(d, *G(5.0, 11.0), '0603', 'R', '102', vertical=True)
+E.passivo(d, *G(6.3, 11.0), '0603', 'C', vertical=True)
+E.passivo(d, *G(13.7, 7.2), '0603', 'R', '222', vertical=True)
+E.passivo(d, *G(15.3, 7.2), '0603', 'R', '222', vertical=True)
+E.passivo(d, *G(16.8, 7.2), '0603', 'C', vertical=True, cor='#8a5a3a')
+E.passivo(d, *G(13.7, 11.0), '0603', 'C', vertical=True)
+E.passivo(d, *G(15.3, 11.0), '0603', 'C', vertical=True)
+E.passivo(d, *G(19.6, 11.2), '0805', 'C', cor='#8a5a3a')
+# o regulador (SOT-23-5, 4A2D): tres pernas de um lado, duas do outro
+rx_, ry_ = G(19.2, 7.2)
+for k, dx in enumerate((-0.95, 0.0, 0.95)):
+    d.ret_c(rx_ + dx, ry_ + 1.35, 0.42, 0.8, ESTANHO)
+for dx in (-0.95, 0.95):
+    d.ret_c(rx_ + dx, ry_ - 1.35, 0.42, 0.8, ESTANHO)
+E.sombra(d, rx_ - 1.45, ry_ - 0.8, 2.9, 1.6)
+d.ret_c(rx_, ry_, 2.9, 1.6, PRETO_CI, rx=0.1)
+d.ret_c(rx_, ry_, 2.9, 1.6, 'url(#luz)', rx=0.1)
+texto_girado(d, rx_, ry_, '4A2D', 0.55, MARCA_CI, 180, peso='normal')
+# o tantalo de 10 uF (106C), a faixa do + do lado do C102
+tx, ty = G(10.3, 14.0)
+for s_ in (-1, 1):
+    d.ret_c(tx + s_ * 1.9, ty, 1.2, 1.9, ESTANHO, rx=0.1)
+E.sombra(d, tx - 1.75, ty - 1.4, 3.5, 2.8, rx=0.2)
+d.ret_c(tx, ty, 3.5, 2.8, '#e0a43a', rx=0.25, stroke='#a8741e', sw=0.08)
+d.ret_c(tx + 1.3, ty, 0.5, 2.8, '#b77d20')
+d.ret_c(tx, ty, 3.5, 2.8, 'url(#luz)', rx=0.25)
+texto_girado(d, tx - 0.2, ty - 0.45, '106C', 0.6, '#5a3410', 180, peso='bold')
+texto_girado(d, tx - 0.2, ty + 0.45, '510N', 0.55, '#5a3410', 180, peso='normal')
+# o MPU-6050 (QFN-24 de 4 x 4 mm)
+qx, qy = G(10.0, 8.3)
 for k in range(6):
-    for s in (-1, 1):
-        d.ret_c(X0 + 10.5 - 1.25 + k * 0.5, Y0 + 10.4 + s * 2.15, 0.25, 0.3, ESTANHO)
-        d.ret_c(X0 + 10.5 + s * 2.15, Y0 + 10.4 - 1.25 + k * 0.5, 0.3, 0.25, ESTANHO)
-d.circ(X0 + 9.0, Y0 + 8.9, 0.22, '#3a3c40')
-d.ret_c(X0 + 5.2, Y0 + 9.0, 1.6, 2.9, '#202124')                                             # o regulador (SOT-23-5)
-for k in range(3):
-    d.ret_c(X0 + 3.95, Y0 + 8.05 + k * 0.95, 0.9, 0.4, ESTANHO)
-for k in range(2):
-    d.ret_c(X0 + 6.45, Y0 + 8.05 + k * 1.9, 0.9, 0.4, ESTANHO)
-for x, y, cor in ((X0 + 15.0, Y0 + 7.6, '#a37a52'), (X0 + 15.0, Y0 + 9.4, '#a37a52'), (X0 + 16.9, Y0 + 7.6, '#1a1a1a'),
-                  (X0 + 16.9, Y0 + 9.4, '#1a1a1a'), (X0 + 15.0, Y0 + 11.6, '#a37a52'), (X0 + 9.0, Y0 + 13.8, '#a37a52')):
-    smd(d, x, y, 1.2, 0.6, cor, vertical=True)
-led_smd(d, X0 + 6.6, Y0 + 13.8)
+    o = (k - 2.5) * 0.5
+    for s_ in (-1, 1):
+        d.ret_c(qx + o, qy + s_ * 2.2, 0.26, 0.5, ESTANHO)
+        d.ret_c(qx + s_ * 2.2, qy + o, 0.5, 0.26, ESTANHO)
+E.sombra(d, qx - 2.0, qy - 2.0, 4.0, 4.0, rx=0.12)
+d.ret_c(qx, qy, 4.0, 4.0, '#2a2c31', rx=0.12)
+d.ret_c(qx, qy, 4.0, 4.0, 'url(#luz)', rx=0.12)
+d.circ(qx + 1.45, qy + 1.45, 0.22, '#3a3c41')
+for k, t in enumerate(('MPU-6050', 'C3V18', 'EL1726')):
+    texto_girado(d, qx, qy + (k - 1) * 0.75, t, 0.5, MARCA_CI, 180, peso='normal')
 gravar('mpu6050', d, L, H)
 DESC_GY = {'VCC': (['power'], 'Alimentacao: 3,3 a 5 V (o regulador da placa faz os 3,3 V)'), 'GND': (['power'], 'GND'),
            'SCL': ([], 'I2C: o relogio (SCL da placa)'), 'SDA': ([], 'I2C: os dados (SDA da placa)'),
            'XDA': ([], 'I2C auxiliar: dados de um sensor de fora (magnetometro)'), 'XCL': ([], 'I2C auxiliar: o relogio'),
            'AD0': ([], 'O endereco: LOW (ou solto) = 0x68, HIGH = 0x69'), 'INT': ([], 'Interrupcao: avisa que ha dado novo')}
 guardar('mpu6050', L, H, [(n, x, Y_GY, *DESC_GY[n]) for n, x in zip(NOMES_GY, XS_GY)])
-luz('mpu6050', X0 + 6.6, Y0 + 13.8, 0.55, 'vermelho', 'vcc-gnd')
+luz('mpu6050', *G(4.0, 6.5), 0.55, 'verde', 'vcc-gnd')
 
 # =====================================================================
 #  hx711: o modulo verde comum (XFW-HX711, 24,2 x 15,7 mm)

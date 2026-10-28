@@ -20,6 +20,11 @@ de contorno dos fabricantes, no tamanho real e vistos de frente:
               peca de verdade o conector fica atras da placa, e de frente nao
               apareceria.
 
+O acabamento e o das fotos de frente dos modulos que se vendem (telas_a25.py):
+a moldura de metal pintada de preto (com os frisos e as abas torcidas), a
+sombra dela na placa (fica ~7 mm acima), os furos de fixacao vazados com o
+anel e as ilhas da barra douradas.
+
 Duas cores para cada um (o modelo da peca): "verde", o STN amarelo-esverdeado
 de letras escuras (o de fabrica), e "azul", o de letras brancas no azul. Os
 pontos apagados de cada caractere (5 x 8) estao no desenho; os acesos o editor
@@ -35,11 +40,16 @@ _spec = importlib.util.spec_from_file_location('placas_arduino', os.path.join(AQ
 pa = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(pa)
 
+_spec_t = importlib.util.spec_from_file_location('telas_a25', os.path.join(AQUI, 'telas_a25.py'))
+TL = importlib.util.module_from_spec(_spec_t)
+_spec_t.loader.exec_module(TL)
+
 Desenho, T, f = pa.Desenho, pa.T, pa.f
 SERIGRAFIA, ESTANHO = pa.SERIGRAFIA, pa.ESTANHO
 A = 96 / 25.4
 PASSO = 2.54
 PCB, PCB_BORDA = '#1f6a34', '#123f1f'
+OURO_ILHA = '#d3b25a'
 
 LCD16 = ['VSS', 'VDD', 'V0', 'RS', 'RW', 'E', 'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'A', 'K']
 DESC16 = {
@@ -86,41 +96,39 @@ def desenhar(tipo, i2c, cor):
     L, H = g['placa']
     claro, escuro, apagado, _, _, _ = CORES[cor]
     d = Desenho(T(A, 0, 0, A, 0, 0))
-    d.ret(0, 0, L, H, PCB, rx=0.6, stroke=PCB_BORDA, sw=0.15)
-    d.ret(0, 0, L, H, 'url(#luz)', rx=0.6)
     diam, fx, fy = g['furos']
-    for x in (fx, L - fx):                                            # os quatro furos de fixacao
-        for y in (fy, H - fy):
-            d.circ(x, y, diam / 2 + 0.6, ESTANHO)
-            d.circ(x, y, diam / 2, '#0d1a10')
+    TL.placa(d, 0, 0, L, H, 0.6, PCB, PCB_BORDA, [(x, y, diam, diam + 1.4) for x in (fx, L - fx) for y in (fy, H - fy)])
     # a barra de 16 furos (com a solda do adaptador, no de I2C)
     x1, y1 = g['pino1']
     for k in range(16):
         x = x1 + k * PASSO
-        if k == 0:
-            d.ret_c(x, y1, 1.8, 1.8, ESTANHO)
-        else:
-            d.circ(x, y1, 0.9, ESTANHO)
         if i2c and k >= 4:
-            d.circ(x, y1, 0.62, '#dfe3e7')                              # o pino do adaptador, soldado
-            d.circ(x - 0.15, y1 - 0.15, 0.22, '#ffffff', op=0.7)
-        elif not i2c:
+            TL.solda(d, x, y1)                                          # o pino do adaptador, soldado
+            continue
+        if k == 0:
+            d.ret_c(x, y1, 1.8, 1.8, OURO_ILHA, rx=0.1)
+        else:
+            d.circ(x, y1, 0.9, OURO_ILHA)
+        if not i2c:
             d.circ(x, y1, 0.5, '#0d1a10')
+            d.circ(x, y1, 0.5, None, '#8a6d22', 0.08)
     if not i2c:
         d.texto(x1, y1 + 1.9, '1', 0.9, SERIGRAFIA, alinhar='center')
         d.texto(x1 + 15 * PASSO, y1 + 1.9, '16', 0.9, SERIGRAFIA, alinhar='center')
     # a moldura de metal, com o friso de cima e o de baixo e as abas das pontas
     mx0, my0, mx1, my1 = g['moldura']
-    d.ret(mx0, my0, mx1 - mx0, my1 - my0, '#b9bec4', rx=0.5, stroke='#6d737a', sw=0.12)
+    TL.sombra_do_painel(d, mx0, my0, mx1, my1, rx=0.5, alto=2.5, op=0.42)
+    d.ret(mx0, my0, mx1 - mx0, my1 - my0, '#1c1d20', rx=0.5, stroke='#050506', sw=0.12)
     d.ret(mx0, my0, mx1 - mx0, my1 - my0, 'url(#luz)', rx=0.5)
+    d.ret(mx0 + 0.15, my0 + 0.12, mx1 - mx0 - 0.3, 0.3, '#ffffff', rx=0.15, op=0.12)          # o fio de luz da dobra
     for y in (my0 + 1.3, my1 - 1.3):
-        d.ret(mx0 + 1.6, y - 0.35, mx1 - mx0 - 3.2, 0.7, '#9ca2a9', rx=0.35)
-        d.ret(mx0 + 1.6, y - 0.35, mx1 - mx0 - 3.2, 0.25, '#e6e9ec', rx=0.12, op=0.8)
+        d.ret(mx0 + 1.6, y - 0.35, mx1 - mx0 - 3.2, 0.7, '#2a2c30', rx=0.35)
+        d.ret(mx0 + 1.6, y - 0.35, mx1 - mx0 - 3.2, 0.22, '#5a5e65', rx=0.11, op=0.8)
     for x in (mx0 + 0.6, mx1 - 0.6):                                   # as abas torcidas
-        d.ret_c(x, (my0 + my1) / 2, 0.7, 2.2, '#8a9097', rx=0.2)
+        d.ret_c(x, (my0 + my1) / 2, 0.7, 2.2, '#3a3c41', rx=0.2, stroke='#0a0a0b', sw=0.06)
     # o vidro
     vx0, vy0, vx1, vy1 = g['vidro']
-    d.ret(vx0 - 0.6, vy0 - 0.6, vx1 - vx0 + 1.2, vy1 - vy0 + 1.2, '#2a2d31', rx=0.4)        # a borda preta do vidro
+    d.ret(vx0 - 0.6, vy0 - 0.6, vx1 - vx0 + 1.2, vy1 - vy0 + 1.2, '#0c0d0f', rx=0.4)        # a borda preta do vidro
     d.ret(vx0, vy0, vx1 - vx0, vy1 - vy0, escuro, rx=0.3)
     d.ret(vx0 + 0.3, vy0 + 0.3, vx1 - vx0 - 0.6, vy1 - vy0 - 0.6, claro, rx=0.25, op=0.9)
     # os pontos apagados de cada caractere (um padrao de 5 x 8 no passo do caractere)
@@ -139,7 +147,7 @@ def desenhar(tipo, i2c, cor):
     for x in (mx1 + (L - mx1) / 2 if mx1 < L - 2 else None,):
         if x:
             for y in ((my0 + my1) / 2 - 2.6, (my0 + my1) / 2 + 2.6):
-                d.circ(x, y, 0.7, ESTANHO)
+                TL.solda(d, x, y)
     # o conector do adaptador I2C, no lugar dos pinos 1 a 4
     if i2c:
         for k in range(4):
@@ -150,7 +158,7 @@ def desenhar(tipo, i2c, cor):
             d.texto(x, y1 + 2.2, I2C4[k][0], 0.75, SERIGRAFIA, alinhar='center')
     w, h = L * A, H * A
     return (f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="{f(w)}px" height="{f(h)}px" '
-            f'viewBox="0 0 {f(w)} {f(h)}">\n<defs>\n{pa.DEFS}</defs>\n' + ''.join(d.partes) + '</svg>\n')
+            f'viewBox="0 0 {f(w)} {f(h)}">\n<defs>\n{pa.DEFS}{TL.DEFS}</defs>\n' + ''.join(d.partes) + '</svg>\n')
 
 
 for tipo in GEOMETRIA:

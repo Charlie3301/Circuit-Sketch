@@ -19,6 +19,11 @@ furos e dos pinos medido nas fotos de frente):
                      35,4 mm, os pinos em cima, o vidro de 34,7 mm (passa um
                      pouco da placa) e a area ativa de 29,42 x 14,7 mm.
 
+O acabamento e o das fotos de frente (telas_a25.py): os furos vazados com o
+anel de estanho, a solda brilhante de cada pino, a sombra do vidro, a borda do
+vidro e a faixa do chip com os dois blocos claros, e o flex preto de trama com
+as fitas amarelas.
+
 A cor dos pontos acesos (branco, azul ou amarelo e azul) e o modelo da peca: o
 editor pinta por cima. A area ativa sai em fracao da caixa, para o
 EditorCircuito.AreasDeTela.
@@ -33,11 +38,15 @@ _spec = importlib.util.spec_from_file_location('placas_arduino', os.path.join(AQ
 pa = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(pa)
 
+_spec_t = importlib.util.spec_from_file_location('telas_a25', os.path.join(AQUI, 'telas_a25.py'))
+TL = importlib.util.module_from_spec(_spec_t)
+_spec_t.loader.exec_module(TL)
+
 Desenho, T, f = pa.Desenho, pa.T, pa.f
 ESTANHO = pa.ESTANHO
 A = 96 / 25.4
 PASSO = 2.54
-AZUL, AZUL_BORDA, BRANCO = '#1d4fa6', '#0f2c66', '#f3f3f1'
+AZUL, AZUL_BORDA, BRANCO = '#1f58a8', '#0f2c66', '#f3f3f1'
 
 pecas = []
 
@@ -46,7 +55,7 @@ def svg_de(d, L, H, sobra_x=0.0):
     w, h = L * A + 2 * sobra_x, H * A
     extra = f' data-sobra="{f(sobra_x)} 0"' if sobra_x else ''
     return (f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="{f(w)}px" height="{f(h)}px"{extra} '
-            f'viewBox="0 0 {f(w)} {f(h)}">\n<defs>\n{pa.DEFS}</defs>\n' + ''.join(d.partes) + '</svg>\n')
+            f'viewBox="0 0 {f(w)} {f(h)}">\n<defs>\n{pa.DEFS}{TL.DEFS}</defs>\n' + ''.join(d.partes) + '</svg>\n')
 
 
 def gravar(nome, svg):
@@ -63,45 +72,34 @@ def guardar(id_peca, L, H, pinos, area):
           f'area ({ax0 / L:.4f}, {ay0 / H:.4f}, {(ax1 - ax0) / L:.4f}, {(ay1 - ay0) / H:.4f})')
 
 
-def placa(d, L, H, rx=0.6):
-    d.ret(0, 0, L, H, AZUL, rx=rx, stroke=AZUL_BORDA, sw=0.15)
-    d.ret(0, 0, L, H, 'url(#luz)', rx=rx)
-
-
-def furo(d, x, y, furo_d=1.9, anel_d=2.8):
-    d.circ(x, y, anel_d / 2, ESTANHO)
-    d.circ(x, y, furo_d / 2, '#0d1a2e')
-
-
-def pino_soldado(d, x, y, quadrado=False):
-    if quadrado:
-        d.ret_c(x, y, 1.7, 1.7, ESTANHO)
-    else:
-        d.circ(x, y, 0.85, ESTANHO)
-    d.circ(x, y, 0.55, '#dfe3e7')
-    d.circ(x - 0.15, y - 0.15, 0.2, '#ffffff', op=0.7)
+def placa(d, L, H, rx=0.6, furos=()):
+    """A placa azul com a sombra e os furos (x, y, furo, anel) vazados."""
+    TL.placa(d, 0, 0, L, H, rx, AZUL, AZUL_BORDA, furos)
 
 
 def vidro_oled(d, x0, y0, x1, y1, area, base_y, flex=None):
-    """O painel: o vidro escuro, a area ativa (preta, apagada), a faixa do chip
-    embaixo com as trilhas douradas, e o flex dobrado para tras da placa."""
+    """O painel: o flex preto dobrado para tras da placa (antes, sai de baixo do
+    vidro), a sombra do vidro, o vidro com a borda clara, a area ativa (preta,
+    apagada) e a faixa do chip embaixo com os dois blocos claros das pontas."""
     ax0, ay0, ax1, ay1 = area
-    if flex:                                                      # o flex, antes do vidro (sai de baixo dele)
+    if flex:
         fx0, fx1, fy1 = flex
-        d.ret(fx0, base_y - 1.0, fx1 - fx0, fy1 - base_y + 1.0, '#1a1410', rx=0.4)
-        d.ret(fx0 + 0.4, fy1 - 0.9, fx1 - fx0 - 0.8, 0.6, '#c98a2e', rx=0.2)
-        for k in range(int((fx1 - fx0 - 1.5) / 0.6)):
-            d.ret(fx0 + 0.8 + k * 0.6, base_y, 0.18, fy1 - base_y - 1.0, '#3a2c1c')
-    d.ret(x0, y0, x1 - x0, y1 - y0, '#16181d', rx=0.25, stroke='#2b2e35', sw=0.1)
-    d.ret(x0 + 0.3, y0 + 0.3, x1 - x0 - 0.6, base_y - y0 - 0.6, '#0b0c10', rx=0.2)
-    d.ret(ax0, ay0, ax1 - ax0, ay1 - ay0, '#050608')
-    d.ret(x0 + 0.3, base_y - 0.3, x1 - x0 - 0.6, y1 - base_y, '#1d1f24', rx=0.2)          # a faixa do chip
-    d.ret((x0 + x1) / 2 - (x1 - x0) * 0.22, base_y + 0.3, (x1 - x0) * 0.44, (y1 - base_y) * 0.55, '#0e0f12')
-    for lado in (-1, 1):                                                                  # as trilhas douradas
-        xa = (x0 + x1) / 2 + lado * (x1 - x0) * 0.24
-        xb = (x0 + x1) / 2 + lado * (x1 - x0) * 0.42
-        d.linha(xa, base_y + 0.5, xb, base_y + 0.5, '#b88a3a', 0.15)
-        d.linha(xb, base_y + 0.5, xb, y1 - 0.6, '#b88a3a', 0.15)
+        TL.flex_oled(d, fx0, fx1, base_y - 1.0, fy1)
+    TL.sombra_do_painel(d, x0, y0, x1, y1, rx=0.25, alto=1.2)
+    d.ret(x0, y0, x1 - x0, y1 - y0, '#14161b', rx=0.25, stroke='url(#vidro-borda)', sw=0.2)
+    d.ret(x0 + 0.3, y0 + 0.3, x1 - x0 - 0.6, base_y - y0 - 0.6, '#0b0d12', rx=0.2)
+    d.ret(ax0, ay0, ax1 - ax0, ay1 - ay0, '#04060a')
+    d.ret(x0 + 0.3, base_y - 0.3, x1 - x0 - 0.6, y1 - base_y, '#2b2c31', rx=0.2)          # a faixa do chip
+    w = x1 - x0
+    for xa in (x0 + 0.5, x1 - 0.5 - w * 0.2):                                             # os blocos claros
+        d.ret(xa, base_y + 0.1, w * 0.2, y1 - base_y - 0.7, '#44454b', rx=0.15)
+        d.ret(xa, base_y + 0.1, w * 0.2, 0.25, '#7b7d84', rx=0.1, op=0.7)
+    d.ret((x0 + x1) / 2 - w * 0.22, base_y + 0.3, w * 0.44, (y1 - base_y) * 0.55, '#141518', rx=0.1)
+    for lado in (-1, 1):                                                                  # as marcas de alinhamento
+        xa = (x0 + x1) / 2 + lado * w * 0.24
+        xb = (x0 + x1) / 2 + lado * w * 0.42
+        d.linha(xa, base_y + 0.5, xb, base_y + 0.5, '#9a9ca2', 0.12)
+        d.linha(xb, base_y + 0.5, xb, y1 - 0.6, '#9a9ca2', 0.12)
     d.ret(x0 + 0.3, y0 + 0.3, x1 - x0 - 0.6, (base_y - y0) * 0.22, '#ffffff', op=0.04)      # o reflexo
 
 
@@ -117,14 +115,11 @@ AREA = (L / 2 - 21.744 / 2, 6.0, L / 2 + 21.744 / 2, 6.0 + 10.864)
 XS = [9.84 + k * PASSO for k in range(4)]
 Y_PINO = 1.6
 d = Desenho(T(A, 0, 0, A, 0, 0))
-placa(d, L, H)
-for x in (2.0, L - 2.0):
-    for y in (2.0, H - 2.0):
-        furo(d, x, y, 1.7, 2.5)
+placa(d, L, H, furos=[(x, y, 2.2, 3.6) for x in (2.0, L - 2.0) for y in (2.0, H - 2.0)])
 for k, x in enumerate(XS):
-    pino_soldado(d, x, Y_PINO, quadrado=k == 0)
+    TL.solda(d, x, Y_PINO, quadrado=k == 0)
     d.texto(x, Y_PINO + 1.75, I2C[k][0], 0.7, BRANCO, alinhar='center')
-vidro_oled(d, 0.3, 4.3, L - 0.3, 23.1, AREA, 18.6, flex=(7.3, 19.9, 26.6))
+vidro_oled(d, 0.15, 4.1, L - 0.15, 23.1, AREA, 18.9, flex=(6.5, 19.2, 27.2))
 gravar('ssd1306-i2c', svg_de(d, L, H))
 guardar('ssd1306-i2c', L, H, [(n, XS[k], Y_PINO, s, dsc) for k, (n, s, dsc) in enumerate(I2C)], AREA)
 
@@ -142,12 +137,9 @@ XS_SPI = [9.66, 12.04, 14.42, 17.07, 19.71, 22.09, 24.74, 27.38]
 Y_SPI = 3.31
 AREA_SPI = (0.076 * L, 0.2241 * H, (0.076 + 0.8533) * L, (0.2241 + 0.5517) * H)
 d = Desenho(T(A, 0, 0, A, 0, 0))
-placa(d, L, H, rx=3.0)
-for x in (3.7, L - 3.7):
-    for y in (3.7, H - 3.7):
-        furo(d, x, y, 2.6, 3.6)
+placa(d, L, H, rx=3.0, furos=[(x, y, 2.6, 4.0) for x in (3.7, L - 3.7) for y in (3.7, H - 3.7)])
 for k, (x, n) in enumerate(zip(XS_SPI, NOMES_SPI)):
-    pino_soldado(d, x, Y_SPI, quadrado=k == 0)
+    TL.solda(d, x, Y_SPI, quadrado=k == 0)
     # as legendas alternadas, em cima e embaixo (as de baixo menores, antes do vidro)
     if k % 2 == 0:
         d.texto(x, Y_SPI - 1.95, n, 0.7, BRANCO, alinhar='center')
@@ -171,15 +163,18 @@ X_91 = 1.6
 d = Desenho(T(A, 0, 0, A, 0, 0))
 placa(d, L, H, rx=0.5)
 for k, y in enumerate(YS_91):
-    pino_soldado(d, X_91, y, quadrado=k == 3)
+    TL.solda(d, X_91, y, quadrado=k == 3)
     d.texto(X_91 + 1.55, y, NOMES_91[k], 0.62, BRANCO, alinhar='center-left')
-d.ret(34.4, 2.4, 3.2, 7.2, '#1a1410', rx=0.4)                                         # o flex dobrado na ponta
-d.ret(37.0, 2.8, 0.6, 6.4, '#c98a2e', rx=0.2)
-d.ret(5.0, 0.6, 30.0, 10.8, '#16181d', rx=0.25, stroke='#2b2e35', sw=0.1)            # o vidro
-d.ret(5.3, 0.9, 25.4, 10.2, '#0b0c10', rx=0.2)
-d.ret(*AREA_91[:2], AREA_91[2] - AREA_91[0], AREA_91[3] - AREA_91[1], '#050608')
-d.ret(30.7, 0.9, 4.0, 10.2, '#1d1f24', rx=0.2)                                        # a faixa do chip
-d.ret(31.4, 3.2, 2.0, 5.6, '#0e0f12')
+d.ret(34.4, 2.4, 3.2, 7.2, 'url(#trama)', rx=0.4, stroke='#0d0d0f', sw=0.1)           # o flex dobrado na ponta
+d.ret(36.9, 3.0, 0.7, 6.0, '#e0a43a', rx=0.2, stroke='#a8741e', sw=0.06)              # o reforco ambar
+TL.sombra_do_painel(d, 5.0, 0.6, 35.0, 11.4, rx=0.25, alto=1.0)
+d.ret(5.0, 0.6, 30.0, 10.8, '#14161b', rx=0.25, stroke='url(#vidro-borda)', sw=0.2)  # o vidro
+d.ret(5.3, 0.9, 25.4, 10.2, '#0b0d12', rx=0.2)
+d.ret(*AREA_91[:2], AREA_91[2] - AREA_91[0], AREA_91[3] - AREA_91[1], '#04060a')
+d.ret(30.7, 0.9, 4.0, 10.2, '#2b2c31', rx=0.2)                                        # a faixa do chip
+for ya in (1.2, 8.3):
+    d.ret(30.9, ya, 3.6, 1.5, '#44454b', rx=0.15)
+d.ret(31.4, 3.2, 2.0, 5.6, '#141518', rx=0.1)
 d.ret(5.3, 0.9, 25.4, 2.0, '#ffffff', op=0.04)
 gravar('ssd1306-128x32', svg_de(d, L, H))
 dsc_91 = {n: dsc for n, _, dsc in I2C}
@@ -196,12 +191,9 @@ AREA_13 = (L / 2 - 29.42 / 2, 7.8, L / 2 + 29.42 / 2, 7.8 + 14.7)
 XS_13 = [L / 2 + (k - 1.5) * PASSO for k in range(4)]
 Y_13 = 2.0
 d = Desenho(T(A, 0, 0, A, SOBRA * A, 0))
-placa(d, L, H)
-for x in (2.4, L - 2.4):
-    for y in (2.2, H - 2.8):
-        furo(d, x, y, 2.4, 3.4)
+placa(d, L, H, furos=[(x, y, 2.4, 3.8) for x in (2.4, L - 2.4) for y in (2.2, H - 2.8)])
 for k, x in enumerate(XS_13):
-    pino_soldado(d, x, Y_13, quadrado=k == 0)
+    TL.solda(d, x, Y_13, quadrado=k == 0)
     d.texto(x, Y_13 + 1.9, I2C[k][0], 0.7, BRANCO, alinhar='center')
 vidro_oled(d, -SOBRA, 5.4, L + SOBRA, 30.0, AREA_13, 25.2, flex=(11.3, 22.2, 32.6))
 gravar('sh1106', svg_de(d, L, H, SOBRA * A))

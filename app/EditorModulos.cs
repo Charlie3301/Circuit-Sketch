@@ -45,12 +45,12 @@ public partial class EditorCircuito
         ["pcm5102a"] = [(58.6, 48.8, 0.6 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vin-gnd")],
         // Os sensores (pecas-sensores.py): o PWR acende com o VCC, o DO quando o
         // sensor detecta (a saida do comparador).
-        ["photoresistor-sensor"] = [(96.00, 9.61, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (96.00, 44.39, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
-        ["flame-sensor"] = [(130.77, 9.61, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (130.77, 44.39, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
+        ["photoresistor-sensor"] = [(95.62, 15.28, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (95.62, 43.25, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
+        ["flame-sensor"] = [(130.39, 15.28, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (130.39, 43.25, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
         ["gas-sensor"] = [(99.02, 12.26, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (99.02, 72.74, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
-        ["big-sound-sensor"] = [(106.58, 8.97, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (106.58, 49.03, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
-        ["small-sound-sensor"] = [(106.58, 8.97, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (106.58, 49.03, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
-        ["mpu6050"] = [(25.32, 52.54, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd")],
+        ["big-sound-sensor"] = [(65.01, 53.57, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (65.01, 6.70, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
+        ["small-sound-sensor"] = [(65.01, 53.57, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (65.01, 6.70, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
+        ["mpu6050"] = [(63.59, 36.11, 0.55 * Mm, Color.FromRgb(0x3A, 0xFF, 0x6A), "vcc-gnd")],
         // O LED do modulo do AMS1117 (pecas-reguladores.py): fica na saida, acende com o VOUT.
         ["ams1117"] = [(28.7, 35.1, 0.5 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vout-gnd")],
         // O roteador (pecas-wifi-ap.py): energia, WiFi, clientes e internet.

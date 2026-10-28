@@ -3920,7 +3920,7 @@
  },
  {
   "id": "big-sound-sensor",
-  "largura": 156,
+  "largura": 172,
   "altura": 58,
   "pinos": [
    {
@@ -9882,34 +9882,34 @@
  },
  {
   "id": "ky-040",
-  "largura": 122,
+  "largura": 123,
   "altura": 72,
   "pinos": [
    {
     "nome": "CLK",
-    "x": 118.6,
-    "y": 16.8,
+    "x": 119.6,
+    "y": 8.31,
     "sinais": [],
     "descricao": "O canal A do encoder (CLK): pull-up de 10k no modulo"
    },
    {
     "nome": "DT",
-    "x": 118.6,
-    "y": 26.4,
+    "x": 119.6,
+    "y": 17.91,
     "sinais": [],
     "descricao": "O canal B do encoder (DT): pull-up de 10k no modulo"
    },
    {
     "nome": "SW",
-    "x": 118.6,
-    "y": 36.0,
+    "x": 119.6,
+    "y": 27.51,
     "sinais": [],
     "descricao": "O botao do eixo: vai ao GND apertado (use INPUT_PULLUP)"
    },
    {
     "nome": "VCC",
-    "x": 118.6,
-    "y": 45.6,
+    "x": 119.6,
+    "y": 37.11,
     "sinais": [
      "power"
     ],
@@ -9917,8 +9917,8 @@
    },
    {
     "nome": "GND",
-    "x": 118.6,
-    "y": 55.2,
+    "x": 119.6,
+    "y": 46.71,
     "sinais": [
      "power"
     ],
@@ -11939,33 +11939,33 @@
  },
  {
   "id": "modulo-semaforo",
-  "largura": 49,
+  "largura": 80,
   "altura": 231,
   "pinos": [
    {
     "nome": "G",
-    "x": 10.1,
+    "x": 25.6,
     "y": 227.98,
     "sinais": [],
     "descricao": "O LED verde (com o resistor de 470 ohms dentro): HIGH acende"
    },
    {
     "nome": "Y",
-    "x": 19.7,
+    "x": 35.2,
     "y": 227.98,
     "sinais": [],
     "descricao": "O LED amarelo (com o resistor de 220 ohms dentro): HIGH acende"
    },
    {
     "nome": "R",
-    "x": 29.3,
+    "x": 44.8,
     "y": 227.98,
     "sinais": [],
     "descricao": "O LED vermelho (com o resistor de 330 ohms dentro): HIGH acende"
    },
    {
     "nome": "GND",
-    "x": 38.9,
+    "x": 54.4,
     "y": 227.98,
     "sinais": [
      "power"
@@ -12166,7 +12166,7 @@
    {
     "nome": "VCC",
     "x": 6.46,
-    "y": 6.43,
+    "y": 54.8,
     "sinais": [
      "power"
     ],
@@ -12175,7 +12175,7 @@
    {
     "nome": "GND",
     "x": 16.06,
-    "y": 6.43,
+    "y": 54.8,
     "sinais": [
      "power"
     ],
@@ -12184,42 +12184,42 @@
    {
     "nome": "SCL",
     "x": 25.66,
-    "y": 6.43,
+    "y": 54.8,
     "sinais": [],
     "descricao": "I2C: o relogio (SCL da placa)"
    },
    {
     "nome": "SDA",
     "x": 35.26,
-    "y": 6.43,
+    "y": 54.8,
     "sinais": [],
     "descricao": "I2C: os dados (SDA da placa)"
    },
    {
     "nome": "XDA",
     "x": 44.86,
-    "y": 6.43,
+    "y": 54.8,
     "sinais": [],
     "descricao": "I2C auxiliar: dados de um sensor de fora (magnetometro)"
    },
    {
     "nome": "XCL",
     "x": 54.46,
-    "y": 6.43,
+    "y": 54.8,
     "sinais": [],
     "descricao": "I2C auxiliar: o relogio"
    },
    {
     "nome": "AD0",
     "x": 64.06,
-    "y": 6.43,
+    "y": 54.8,
     "sinais": [],
     "descricao": "O endereco: LOW (ou solto) = 0x68, HIGH = 0x69"
    },
    {
     "nome": "INT",
     "x": 73.66,
-    "y": 6.43,
+    "y": 54.8,
     "sinais": [],
     "descricao": "Interrupcao: avisa que ha dado novo"
    }
@@ -16614,7 +16614,7 @@
  },
  {
   "id": "tm1637",
-  "largura": 159,
+  "largura": 180,
   "altura": 91,
   "pinos": [
    {

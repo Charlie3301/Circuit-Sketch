@@ -54,10 +54,10 @@ static class DesenhoDasEntradas
     public const double JoystickEixoX = 0.5000;
     public const double JoystickEixoY = 0.3508;
     public const double JoystickCurso = 22.6772;
-    public static readonly (double X, double Y, double R) CapaEncoder = (40.44, 36.00, 13.61);
+    public static readonly (double X, double Y, double R) CapaEncoder = (36.66, 29.67, 13.61);
     /// <summary>O eixo do encoder, em fracao da caixa.</summary>
-    public const double EncoderEixoX = 0.3315;
-    public const double EncoderEixoY = 0.5000;
+    public const double EncoderEixoX = 0.2981;
+    public const double EncoderEixoY = 0.4121;
     /// <summary>Os dez furos do disco (px): o "1" no batente, cada um 30 graus antes.</summary>
     public static readonly (double X, double Y, int Numero)[] Furos =
     [

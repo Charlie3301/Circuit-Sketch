@@ -64,7 +64,7 @@ public static partial class Autoteste
                     return Perto(Math.Abs(x2 - x1) + Math.Abs(y2 - y1), 2.54);
                 }));
             Conferir("entradas: as barras (SS12D00, teclado, KY-023 na ordem GND +5V VRx VRy SW, KY-040, KY-020) no passo de 2,54 mm", barras);
-            var tamanhos = new (string Tipo, double L, double A)[] { ("membrane-keypad", 69.6, 91.0), ("analog-joystick", 26.45, 40.5), ("ky-040", 32.3, 19.05), ("tilt-switch", 24.6, 15.35) };
+            var tamanhos = new (string Tipo, double L, double A)[] { ("membrane-keypad", 69.6, 91.0), ("analog-joystick", 26.45, 40.5), ("ky-040", 32.5, 19.05), ("tilt-switch", 24.6, 15.35) };
             var errados = tamanhos.Where(t => !Perto(Catalogo.Obter(t.Tipo).Largura / mm, t.L, 0.2) || !Perto(Catalogo.Obter(t.Tipo).Altura / mm, t.A, 0.2)).Select(t => t.Tipo).ToList();
             Conferir("entradas: o teclado de 69 x 76 mm com o rabicho, o KY-023 de 26 x 34, o KY-040 de 26 x 18,6 e o KY-020 de 18,5 x 15 (com a barra a 90 graus)",
                 errados.Count == 0, string.Join(", ", errados));
