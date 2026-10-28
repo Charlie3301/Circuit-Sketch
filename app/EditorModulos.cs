@@ -93,8 +93,7 @@ public partial class EditorCircuito
                     Color = cor, BlurRadius = 8, ShadowDepth = 0, Opacity = 0.9,
                 },
             };
-            Panel.SetZIndex(luz, 145);
-            mundo.Children.Add(luz);
+            PorNaCamadaDa(peca, luz);
             luzes.Add(luz);
         }
         luzesDeModulo[peca.Id] = luzes;

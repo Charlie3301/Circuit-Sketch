@@ -150,8 +150,7 @@ public partial class EditorCircuito
         };
         foreach (UIElement e in new UIElement[] { d.Hastes[0], d.Hastes[1], d.Manches[0], d.Manches[1], d.Chaves[0], d.Chaves[1], d.Luz, d.Tela })
         {
-            Panel.SetZIndex(e, ZDe(peca.Tipo) + 2);
-            mundo.Children.Add(e);
+            PorNaCamadaDa(peca, e);
         }
         desenhosDeRadio[peca.Id] = d;
         AtualizarRadio(peca);

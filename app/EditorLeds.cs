@@ -41,8 +41,7 @@ public partial class EditorCircuito
             var l = nova();
             l.IsHitTestVisible = false;
             l.Opacity = 0;
-            Panel.SetZIndex(l, 155);
-            mundo.Children.Add(l);
+            PorNaCamadaDa(peca, l);
             luzes.Add(l);
         }
         luzesDeLed[peca.Id] = luzes;

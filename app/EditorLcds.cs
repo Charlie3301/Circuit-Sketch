@@ -81,10 +81,8 @@ public partial class EditorCircuito
                 Visibility = System.Windows.Visibility.Collapsed, IsHitTestVisible = false,
             },
         };
-        Panel.SetZIndex(tela.Sombra, 129);
-        Panel.SetZIndex(tela.Pontos, 130);
-        mundo.Children.Add(tela.Sombra);
-        mundo.Children.Add(tela.Pontos);
+        PorNaCamadaDa(peca, tela.Sombra);
+        PorNaCamadaDa(peca, tela.Pontos);
         telasLcd[peca.Id] = tela;
         PosicionarTelaLcd(peca);
     }

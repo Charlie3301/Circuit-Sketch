@@ -1168,6 +1168,7 @@ public partial class EditorCircuito : Border
 
     public void Redesenhar()
     {
+        camadasDaPeca.Clear();
         foreach (var v in visuais.Values) mundo.Children.Remove(v);
         foreach (var v in parteMovel.Values) mundo.Children.Remove(v);
         foreach (var (tela, _) in chavesDip.Values) mundo.Children.Remove(tela);
@@ -1288,8 +1289,7 @@ public partial class EditorCircuito : Border
                 IsHitTestVisible = false,
                 Opacity = 0
             };
-            Panel.SetZIndex(luz, 150);
-            mundo.Children.Add(luz);
+            PorNaCamadaDa(peca, luz);
             brilhos[peca.Id] = luz;
             PosicionarBrilho(peca, def);
             PosicionarEstouro(peca, def);
@@ -1317,8 +1317,7 @@ public partial class EditorCircuito : Border
             };
             Canvas.SetLeft(movel, peca.X);
             Canvas.SetTop(movel, peca.Y);
-            Panel.SetZIndex(movel, ZDe(peca.Tipo) + 1);
-            mundo.Children.Add(movel);
+            PorNaCamadaDa(peca, movel);
             parteMovel[peca.Id] = movel;
 
             string corpoDoModelo = FichasDeMotor.SvgDoModelo(peca, "corpo");
@@ -1465,8 +1464,7 @@ public partial class EditorCircuito : Border
             tela.Children.Add(botoes[k]);
         }
 
-        Panel.SetZIndex(tela, ZDe(peca.Tipo) + 1);
-        mundo.Children.Add(tela);
+        PorNaCamadaDa(peca, tela);
         chavesDip[peca.Id] = (tela, botoes);
 
         PosicionarChavesDip(peca, def);
@@ -1693,8 +1691,7 @@ public partial class EditorCircuito : Border
                     Color = cor, BlurRadius = 9, ShadowDepth = 0, Opacity = 0.9
                 }
             };
-            Panel.SetZIndex(luz, 145);
-            mundo.Children.Add(luz);
+            PorNaCamadaDa(peca, luz);
             luzes.Add(luz);
         }
         ledsDePlaca[peca.Id] = luzes;
@@ -1791,10 +1788,8 @@ public partial class EditorCircuito : Border
             ClipToBounds = true
         };
 
-        Panel.SetZIndex(imagem, 300);
-        Panel.SetZIndex(letras, 301);
-        mundo.Children.Add(imagem);
-        mundo.Children.Add(letras);
+        PorNaCamadaDa(peca, imagem);
+        PorNaCamadaDa(peca, letras);
         telasTft[peca.Id] = (imagem, letras);
 
         PosicionarTft(peca, def);
@@ -2026,6 +2021,31 @@ public partial class EditorCircuito : Border
     /// componentes sobre a placa sem brigar pelo clique.
     /// </summary>
     static int ZDe(string tipo) => Catalogo.EhProtoboard(tipo) ? 10 : EhAcessorio(tipo) ? 120 : 100;
+
+    /// <summary>Os desenhos que vivem em cima de cada peca (tela, luzes, a parte que gira).</summary>
+    readonly Dictionary<string, List<UIElement>> camadasDaPeca = [];
+
+    /// <summary>
+    /// Poe um desenho da peca (a tela do LCD, a luz do LED, o eixo que gira)
+    /// na camada da PROPRIA peca, logo depois dela no Canvas.
+    ///
+    /// Antes cada um tinha a sua camada fixa (a tela do TFT na 300, a do LCD
+    /// na 130, as luzes na 145...), acima de TODAS as pecas: um modulo posto
+    /// em cima de um display ficava com a tela do display por cima dele. Na
+    /// mesma camada, quem decide e a ordem no Canvas -- e a peca que veio
+    /// depois cobre a tela da que veio antes, como na mesa.
+    /// </summary>
+    void PorNaCamadaDa(PecaNoCircuito peca, UIElement elemento)
+    {
+        Panel.SetZIndex(elemento, ZDe(peca.Tipo));
+        if (!camadasDaPeca.TryGetValue(peca.Id, out var lista)) camadasDaPeca[peca.Id] = lista = [];
+        lista.RemoveAll(e => !mundo.Children.Contains(e));
+        UIElement ultimo = lista.Count > 0 ? lista[^1] : visuais.GetValueOrDefault(peca.Id);
+        int i = ultimo is null ? -1 : mundo.Children.IndexOf(ultimo);
+        if (i < 0) mundo.Children.Add(elemento);
+        else mundo.Children.Insert(i + 1, elemento);
+        lista.Add(elemento);
+    }
 
     static void Posicionar(FrameworkElement visual, PecaNoCircuito peca)
     {
@@ -2381,8 +2401,7 @@ public partial class EditorCircuito : Border
                 StrokeThickness = 1.4,
                 IsHitTestVisible = false,
             };
-            Panel.SetZIndex(tracos[k], 320);
-            mundo.Children.Add(tracos[k]);
+            PorNaCamadaDa(peca, tracos[k]);
         }
 
         tracosDoAnalisador[peca.Id] = tracos;
@@ -6056,8 +6075,7 @@ public partial class EditorCircuito : Border
                 StrokeThickness = 1,
                 IsHitTestVisible = false
             };
-            Panel.SetZIndex(luz, 320);
-            mundo.Children.Add(luz);
+            PorNaCamadaDa(peca, luz);
             luzesDeRele[peca.Id] = luz;
 
             var centro = Geometria.PosicaoLocal(peca, def, def.Largura / 2, def.Altura * 0.22);
@@ -6368,8 +6386,7 @@ public partial class EditorCircuito : Border
                     StrokeEndLineCap = PenLineCap.Round,
                     IsHitTestVisible = false
                 };
-                Panel.SetZIndex(ponteiros[i], 320);
-                mundo.Children.Add(ponteiros[i]);
+                PorNaCamadaDa(peca, ponteiros[i]);
             }
             ponteirosDePasso[peca.Id] = ponteiros;
         }

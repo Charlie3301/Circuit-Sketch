@@ -209,9 +209,9 @@ public partial class EditorCircuito
             IsHitTestVisible = false,
             RenderTransform = new RotateTransform(GiroDoBraco(peca, AnguloDoServo(peca)), centro.X, centro.Y),
         };
-        // Por cima do corpo e por baixo da roda encaixada no eixo do 360.
-        Panel.SetZIndex(braco, 115);
-        mundo.Children.Add(braco);
+        // Por cima do corpo e por baixo da roda encaixada no eixo do 360 (a
+        // roda e acessorio, na camada de cima).
+        PorNaCamadaDa(peca, braco);
         bracosServo[peca.Id] = braco;
         centrosDosBracos[peca.Id] = centro;
         PosicionarBracoServo(peca, def);
