@@ -1371,8 +1371,20 @@ public class Maquina
         var n = Nativo;
         Nativo = null;
         n?.Encerrar();
+        var s = Sketch;
+        Sketch = null;
+        s?.Encerrar();
         Audio = null;
     }
+
+    /// <summary>O sketch em C++ compilado de verdade desta placa (SketchNativo), se houver.</summary>
+    public SketchNativo Sketch { get; set; }
+
+    /// <summary>
+    /// A memoria RTC do sketch compilado (as secoes RTC_DATA_ATTR e
+    /// RTC_NOINIT_ATTR), guardada quando a placa reiniciou ou dormiu.
+    /// </summary>
+    public byte[] RtcDoSketch, RtcSemIniciarDoSketch;
 
     /// <summary>Pedido de parada vindo da interface.</summary>
     public volatile bool Parar;

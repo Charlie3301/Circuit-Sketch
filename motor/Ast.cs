@@ -278,6 +278,13 @@ public record Programa(List<Cmd> Globais, List<Funcao> Funcoes)
     public string Placa { get; init; }
 
     /// <summary>
+    /// O sketch em C/C++ compilado de verdade (CompiladorNativo): o setup()
+    /// e o loop() sao os da DLL, e o interpretador so atende o core. Nulo:
+    /// o programa e interpretado.
+    /// </summary>
+    public SketchCompilado Compilado { get; init; }
+
+    /// <summary>
     /// O partitions.csv do projeto, se ele tiver um: como na Arduino IDE, ele
     /// troca a tabela de particoes da placa (o esp_partition_find do codigo C
     /// acha as particoes dele). Nulo: a tabela padrao da placa.

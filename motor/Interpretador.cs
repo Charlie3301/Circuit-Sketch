@@ -115,7 +115,18 @@ public partial class Interpretador(Programa prog, Maquina maq)
         desvio = Desvio.Nenhum;
     }
 
-    public void Setup() => ChamarSeExistir("setup");
+    public void Setup()
+    {
+        // O C++ compilado de verdade: o setup() e o da DLL (ver
+        // InterpretadorSketchNativo.cs), carregada aqui, na thread da placa.
+        if (prog.Compilado is not null)
+        {
+            AbrirSketchNativo();
+            sketchNativo.Setup();
+            return;
+        }
+        ChamarSeExistir("setup");
+    }
 
     public void Loop()
     {
@@ -130,6 +141,11 @@ public partial class Interpretador(Programa prog, Maquina maq)
         EntregarEspNow();
         EntregarBluetooth();
         EntregarBle();
+        if (sketchNativo is not null)
+        {
+            sketchNativo.Loop();
+            return;
+        }
         ChamarSeExistir("loop");
     }
 
@@ -142,6 +158,13 @@ public partial class Interpretador(Programa prog, Maquina maq)
     /// </summary>
     Valor Vigiar(Chamada c, Ambiente amb)
     {
+        if (c.Args.Count >= 2 && c.Args[1] is Variavel nativa && RotinaNativa(nativa.Nome, out _))
+        {
+            int pinoNativo = (int)Avaliar(c.Args[0], amb).Num;
+            int bordaNativa = c.Args.Count > 2 ? (int)Avaliar(c.Args[2], amb).Num : Maquina.Mudando;
+            maq.Vigiar(pinoNativo, nativa.Nome, bordaNativa);
+            return Valor.Vazio;
+        }
         if (c.Args.Count < 2 || c.Args[1] is not Variavel alvo)
             throw new ErroDeExecucao(
                 "attachInterrupt() espera o nome de uma funcao no 2o argumento, "
@@ -198,7 +221,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
         }
         finally { atendendo = false; }
     }
-    public bool TemLoop => funcoes.ContainsKey("loop");
+    public bool TemLoop => prog.Compilado is not null || funcoes.ContainsKey("loop");
 
     /// <summary>
     /// Roda setup() ou loop().
@@ -238,6 +261,11 @@ public partial class Interpretador(Programa prog, Maquina maq)
     void ChamarInterrupcao(string nome)
     {
         if (ChamarIrqPy(nome)) return;   // o Pin.irq do MicroPython
+        if (RotinaNativa(nome, out int nativa))
+        {
+            sketchNativo?.Rotina(nativa);
+            return;
+        }
         if (!funcoes.TryGetValue(nome, out var f)) return;
         long antes = passos;
         var escopo = new Ambiente(global);

@@ -46,6 +46,10 @@ public static partial class Autoteste
         passou = falhou = 0;
         saida.Clear();
 
+        // CS_CPP_NATIVO=1: a suite inteira com o C++ compilado de verdade (o
+        // caminho da janela), para comparar com o interpretado.
+        Compilador.CppNativo = Environment.GetEnvironmentVariable("CS_CPP_NATIVO") == "1";
+
         // A suite nao pode depender do WiFi da maquina que a roda: a
         // mesma execucao tem que dar o mesmo resultado no notebook do
         // laboratorio e na maquina de casa. Quem testa a leitura do
@@ -188,6 +192,8 @@ public static partial class Autoteste
         Bloco("Motor_CppDoJogo", Motor_CppDoJogo);
         Bloco("Demo_BaseZero", Demo_BaseZero);
         Bloco("Nativo_CNaPlaca", Nativo_CNaPlaca);
+        Bloco("Cpp_Nativo", Cpp_Nativo);
+        Bloco("Cpp_NativoVarredura", Cpp_NativoVarredura);
         Bloco("Demo_Doom", Demo_Doom);
         Bloco("MotorDc_Fisica", MotorDc_Fisica);
         Bloco("MotorDc_NoCircuito", MotorDc_NoCircuito);

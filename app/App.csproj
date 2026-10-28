@@ -136,7 +136,7 @@
     executavel (fora do single-file): o compilador os le do disco.
   -->
   <ItemGroup>
-    <Content Include="..\nativo\**\*" LinkBase="nativo" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    <Content Include="..\nativo\**\*" Exclude="..\nativo\zig\**" LinkBase="nativo" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
   </ItemGroup>
 
   <!--

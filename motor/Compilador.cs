@@ -172,8 +172,41 @@ public static class Compilador
         if (linguagem is not (Linguagem.Arduino or Linguagem.C))
             return Compilar(fonte, linguagem);
 
+        // O C++ de verdade: o projeto inteiro pelo clang (CompiladorNativo),
+        // quando o que ele usa o core nativo ja tem. Se o clang recusar e o
+        // interpretador aceitar, fica o interpretador, que roda o projeto de
+        // antes; se os dois recusarem, vale o erro do clang -- e o da IDE.
+        if (CppNativo && linguagem == Linguagem.Arduino && CompiladorNativo.PorQueNao(projeto) is null)
+        {
+            try
+            {
+                var compilado = CompiladorNativo.Compilar(projeto, AvisoDoCompilador);
+                return new Programa([], [])
+                {
+                    Linguagem = linguagem,
+                    Placa = projeto.Placa,
+                    Fonte = fonte,
+                    Compilado = compilado,
+                };
+            }
+            catch (ErroDeSintaxe erroDoClang)
+            {
+                try { return new Unidades(projeto, linguagem).Compilar(); }
+                catch (ErroDeSintaxe) { throw erroDoClang; }
+            }
+        }
+
         return new Unidades(projeto, linguagem).Compilar();
     }
+
+    /// <summary>
+    /// Compilar o C/C++ de verdade (o clang do Zig) em vez de interpretar.
+    /// A janela liga; os testes antigos rodam interpretados, como sempre.
+    /// </summary>
+    public static bool CppNativo { get; set; }
+
+    /// <summary>Onde o compilador nativo avisa o que esta fazendo ("compilando o core...").</summary>
+    public static Action<string> AvisoDoCompilador { get; set; }
 
     /// <summary>Compila numa linguagem escolhida.</summary>
     /// <summary>

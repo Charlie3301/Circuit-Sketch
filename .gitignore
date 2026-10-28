@@ -17,3 +17,6 @@ node_modules/
 
 # As verificacoes rodadas (ferramentas\verificar.ps1): saidas de cada vez
 coordenacao/verificacao/
+
+# O compilador de C/C++ do modo nativo (ferramentas/baixar-zig.ps1): fica em %LOCALAPPDATA%\CircuitSketch\zig
+nativo/zig/

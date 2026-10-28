@@ -20,7 +20,7 @@
   </PropertyGroup>
   <!-- O runtime do modo nativo (TinyCC, cabecalhos e o C do simulador) vai ao lado do executavel. -->
   <ItemGroup>
-    <Content Include="..\nativo\**\*" LinkBase="nativo" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\nativo\**\*" Exclude="..\nativo\zig\**" LinkBase="nativo" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <!-- Os catalogos de idiomas (Alpha 25): "idiomas/<codigo>.json", lidos pelo Idioma.cs. -->
   <ItemGroup>

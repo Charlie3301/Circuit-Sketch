@@ -144,6 +144,17 @@ public partial class MainWindow : Window
 
         LigarConsole();
 
+        // O C/C++ compilado de verdade (CompiladorNativo): na janela, sim; nos
+        // testes e no passeio, o interpretador de sempre. O primeiro uso monta
+        // o cache do compilador -- aquece em segundo plano, para o primeiro
+        // Rodar nao esperar por ele.
+        if (!Autoteste.Rodando && !Passeio.Ativo)
+        {
+            Compilador.CppNativo = true;
+            Compilador.AvisoDoCompilador = texto => Dispatcher.BeginInvoke(() => console.Info(texto));
+            CompiladorNativo.AquecerEmSegundoPlano(texto => Dispatcher.BeginInvoke(() => console.Info(texto)));
+        }
+
         // O resumo da visão de circuito acompanha a medida. Vai direto
         // para a barra, sem passar pelo console: ele muda quatro vezes
         // por segundo, e registrar cada uma afogaria o que importa.
