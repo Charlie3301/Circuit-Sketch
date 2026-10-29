@@ -22,6 +22,18 @@
   <ItemGroup>
     <Content Include="..\nativo\**\*" Exclude="..\nativo\zig\**" LinkBase="nativo" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <!-- O C# compilado de verdade (Alpha 26, fase 4): o compilador do proprio .NET. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+    <!-- As bibliotecas do .NET para compilar contra (no executavel unico elas nao ficam no disco). -->
+    <PackageReference Include="Basic.Reference.Assemblies.Net100" Version="1.8.13" />
+  </ItemGroup>
+  <!-- A API das placas para o C# (nanoFramework, .NET IoT e a do Arduino): fonte
+       compilada pelo Roslyn na hora, junto do programa (ver CompiladorCSharp). -->
+  <ItemGroup>
+    <Compile Remove="DotNet\Api\**" />
+    <EmbeddedResource Include="DotNet\Api\*.cs" LogicalName="api/%(Filename)%(Extension)" />
+  </ItemGroup>
   <!-- Os catalogos de idiomas (Alpha 25): "idiomas/<codigo>.json", lidos pelo Idioma.cs. -->
   <ItemGroup>
     <EmbeddedResource Include="idiomas\*.json" LogicalName="idiomas/%(Filename)%(Extension)" />

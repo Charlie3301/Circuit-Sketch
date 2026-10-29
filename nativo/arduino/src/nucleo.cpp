@@ -38,7 +38,17 @@ unsigned long millis(void)
     return (unsigned long)((uint64_t)us / 1000);
 }
 
-void delay(unsigned long ms) { ch(nullptr, "delay", cs_i((int64_t)ms)); }
+extern volatile int cs_rtos_ativo;
+void vTaskDelay(const uint32_t ticks);
+void cs_rtos_ceder(void);
+
+/* Com o FreeRTOS no jogo, o delay e o vTaskDelay (a vez passa para as outras
+ * tarefas, como na ESP32); sem ele, o delay do simulador. */
+void delay(unsigned long ms)
+{
+    if (cs_rtos_ativo) vTaskDelay((uint32_t)ms);
+    else ch(nullptr, "delay", cs_i((int64_t)ms));
+}
 void delayMicroseconds(unsigned int us) { ch(nullptr, "delayMicroseconds", cs_i(us)); }
 
 /* O yield() so cede: a placa parada sai por aqui tambem. */
@@ -46,7 +56,8 @@ void yield(void)
 {
     if (!cs_p) return;
     if (cs_relogio() < 0) cs_sair_com(CS_SAIR);
-    SwitchToThread();
+    if (cs_rtos_ativo) cs_rtos_ceder();
+    else SwitchToThread();
 }
 
 unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout)
@@ -259,4 +270,43 @@ uint8_t EspClass::getChipCores() { return (uint8_t)ch_i("ESP", "getChipCores"); 
 const char *EspClass::getSdkVersion() { return guardarTexto(ch_t("ESP", "getSdkVersion")); }
 uint32_t EspClass::getCycleCount() { return (uint32_t)ch_i("ESP", "getCycleCount"); }
 void EspClass::deepSleep(uint64_t time_us) { ch("ESP", "deepSleep", cs_i((int64_t)time_us)); }
+
+void configTime(long gmtOffset_sec, int daylightOffset_sec, const char *server1, const char *server2, const char *server3)
+{
+    ch(nullptr, "configTime", cs_i(gmtOffset_sec), cs_i(daylightOffset_sec), cs_t(server1 ? server1 : "pool.ntp.org"),
+       cs_t(server2 ? server2 : ""), cs_t(server3 ? server3 : ""));
+}
+
+void configTzTime(const char *tz, const char *server1, const char *server2, const char *server3)
+{
+    ch(nullptr, "configTzTime", cs_t(tz), cs_t(server1 ? server1 : "pool.ntp.org"), cs_t(server2 ? server2 : ""),
+       cs_t(server3 ? server3 : ""));
+}
+
+/* O horario num struct tm do simulador, copiado campo a campo para o do sketch. */
+bool getLocalTime(struct tm *info, uint32_t ms)
+{
+    (void)ms;
+    cs_val criar[] = {cs_t("tm")};
+    String nome = cs_texto(nullptr, "__criar", 1, criar);
+    bool ok = ch_i(nullptr, "getLocalTime", cs_nome(nome.c_str())) != 0;
+    if (ok && info) {
+        auto campo = [&](const char *c) {
+            cs_val a[] = {cs_t(nome.c_str()), cs_t(c)};
+            return (int)cs_int(nullptr, "__ler", 2, a);
+        };
+        memset(info, 0, sizeof(*info));
+        info->tm_sec = campo("tm_sec");
+        info->tm_min = campo("tm_min");
+        info->tm_hour = campo("tm_hour");
+        info->tm_mday = campo("tm_mday");
+        info->tm_mon = campo("tm_mon");
+        info->tm_year = campo("tm_year");
+        info->tm_wday = campo("tm_wday");
+        info->tm_yday = campo("tm_yday");
+        info->tm_isdst = campo("tm_isdst");
+    }
+    ch(nullptr, "__destruir", cs_t(nome.c_str()));
+    return ok;
+}
 #endif

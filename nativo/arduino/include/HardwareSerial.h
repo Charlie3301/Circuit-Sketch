@@ -39,6 +39,8 @@ class HardwareSerial : public Stream {
 
 public:
     explicit HardwareSerial(const char *nomeDoObjeto) : nome(nomeDoObjeto) {}
+    /* "HardwareSerial MySerial(1)" da ESP32: a UART 1 e o Serial1. */
+    explicit HardwareSerial(int uart) : nome(uart == 0 ? "Serial" : uart == 1 ? "Serial1" : "Serial2") {}
 
     void begin(unsigned long baud) { begin(baud, SERIAL_8N1); }
     void begin(unsigned long baud, uint32_t config, int8_t rxPin = -1, int8_t txPin = -1, bool invert = false,
@@ -60,7 +62,11 @@ public:
 
     void setRxBufferSize(size_t) {}
     void setTxBufferSize(size_t) {}
-    void setPins(int8_t, int8_t, int8_t = -1, int8_t = -1) {}
+    void setPins(int8_t rx, int8_t tx, int8_t = -1, int8_t = -1)
+    {
+        cs_val a[] = {cs_i(rx), cs_i(tx)};
+        cs_nada(nome, "setPins", 2, a);
+    }
     void updateBaudRate(unsigned long baud);
     operator bool() const { return true; }
 

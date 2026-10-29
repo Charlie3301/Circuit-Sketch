@@ -210,4 +210,17 @@ void attachInterruptArg(uint8_t pin, void (*userFunc)(void *), void *arg, int mo
 #define random(a, b) cs_random((a), (b))
 #endif
 
+/* A ESP32 roda o Arduino em cima do FreeRTOS: xTaskCreate, filas e semaforos
+ * valem sem #include, como no core dela. */
+#ifdef ESP32
+#include "freertos/FreeRTOS.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+int64_t esp_timer_get_time(void);
+#ifdef __cplusplus
+}
+#endif
+#endif
+
 #endif

@@ -38,6 +38,8 @@ public static partial class Autoteste
         {
             falhou++;
             saida.AppendLine($"  FALHA {nome} estourou  {ex.GetType().Name}: {ex.Message}");
+            // Onde estourou: as primeiras linhas da pilha.
+            foreach (string linha in (ex.StackTrace ?? "").Split('\n').Take(4)) saida.AppendLine("        " + linha.Trim());
         }
     }
 
@@ -194,6 +196,8 @@ public static partial class Autoteste
         Bloco("Nativo_CNaPlaca", Nativo_CNaPlaca);
         Bloco("Cpp_Nativo", Cpp_Nativo);
         Bloco("Cpp_NativoVarredura", Cpp_NativoVarredura);
+        Bloco("Cpp_Sdks", Cpp_Sdks);
+        Bloco("CSharp_Roslyn", CSharp_Roslyn);
         Bloco("Demo_Doom", Demo_Doom);
         Bloco("MotorDc_Fisica", MotorDc_Fisica);
         Bloco("MotorDc_NoCircuito", MotorDc_NoCircuito);
@@ -14422,7 +14426,9 @@ public static partial class Autoteste
                 case "nucleo-c031-relogio-rtc":
                 {
                     bool relogio = EsperarPor(() => horario.IsMatch(TextoDe(M().Lcd)), 4000);
-                    Apertar("botao");
+                    // Uma volta do loop e o delay(200) mais as duas linhas do LCD
+                    // pelo I2C: o toque de 200 ms podia cair inteiro no delay.
+                    Apertar("botao", 400);
                     bool doze = EsperarPor(() => TextoDe(M().Lcd).Contains(" AM")
                                                  || TextoDe(M().Lcd).Contains(" PM"), 3000);
                     return (relogio && doze, TextoDe(m.Lcd));
@@ -14467,8 +14473,11 @@ public static partial class Autoteste
 
         try
         {
+            // CS_DEMO="a,b": so as demos com esses pedacos no nome.
+            string[] so = Environment.GetEnvironmentVariable("CS_DEMO")?.Split(',', StringSplitOptions.RemoveEmptyEntries);
             foreach (var demo in Demos.Todas)
             {
+                if (so is { Length: > 0 } && !so.Any(s => demo.Recurso.Contains(s, StringComparison.OrdinalIgnoreCase))) continue;
                 janela.TesteParar();
                 janela.TesteAbrirDemo(demo.Recurso);
                 janela.TesteRodar();

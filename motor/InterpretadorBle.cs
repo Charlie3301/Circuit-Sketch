@@ -581,6 +581,7 @@ public partial class Interpretador
     /// </summary>
     void ChamarCallbackBle(Objeto cb, string metodo, Objeto primeiro, params Valor[] resto)
     {
+        if (ChamarCallbackNativo(cb, metodo, [Valor.DeReferencia(primeiro), .. resto])) return;
         if (cb?.Escopo is null || !classes.TryGetValue(cb.Classe, out var info)) return;
         var lista = AcharLista(info, metodo);
         if (lista is null) return;

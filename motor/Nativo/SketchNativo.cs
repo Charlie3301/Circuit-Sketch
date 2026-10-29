@@ -27,7 +27,7 @@ namespace Simulador;
 /// estourada) nao derruba o simulador: o tratador da ponte devolve a thread
 /// ao salto e a placa para com a falha dita em portugues.
 /// </summary>
-public sealed unsafe class SketchNativo
+public sealed unsafe class SketchNativo : ISketchCompilado
 {
     [StructLayout(LayoutKind.Sequential)]
     struct Val
@@ -49,7 +49,7 @@ public sealed unsafe class SketchNativo
         public IntPtr Micros;
     }
 
-    const int Nada = 0, Int = 1, Real = 2, Texto = 3, Bool = 4, Char = 5, Nome = 6;
+    const int Nada = 0, Int = 1, Real = 2, Texto = 3, Bool = 4, Char = 5, Nome = 6, Bytes = 7, BytesMuda = 8;
     const int Ok = 0, Sair = 1, Falhou = 3;
 
     /// <summary>Quem atende a chamada: o interpretador da placa (alvo, nome, argumentos, quais sao nomes).</summary>
@@ -70,7 +70,7 @@ public sealed unsafe class SketchNativo
     static int limpou;
     ulong inicio, fim;
 
-    delegate* unmanaged<int, int, int> entrar;
+    delegate* unmanaged<int, int, int, Val*, int> entrar;
     delegate* unmanaged<byte*, int, uint> descreverFalha;
     delegate* unmanaged<void> refazerGuarda;
     delegate* unmanaged<uint, int*, void*> saltoDaThread;
@@ -79,13 +79,27 @@ public sealed unsafe class SketchNativo
     // O estado da thread do sketch: 0 fora do C, 1 rodando o sketch, 2 dentro
     // do simulador (numa chamada da ponte), 3 suspensa pelo vigia.
     int estado;
-    int idDoSketch = -1;
     uint tidDoSketch;
+
+    // As tarefas do FreeRTOS (cs_freertos.cpp): a thread que tem a vez, e a
+    // secao critica aberta (o vigia nao entra com a interrupcao no meio).
+    uint* tidDaVez;
+    int* secaoCritica;
+    delegate* unmanaged<void> encerrarTarefas;
+
+    /// <summary>A thread que roda o sketch agora (a da tarefa que tem a vez, com o FreeRTOS).</summary>
+    uint TidDoSketch => tidDaVez != null && *tidDaVez != 0 ? *tidDaVez : tidDoSketch;
+
+    bool EhDoSketch() => Win32.GetCurrentThreadId() == TidDoSketch;
     volatile bool encerrando;
     Thread vigia;
 
-    /// <summary>A excecao do simulador que fez o C sair (relancada na thread que chamou).</summary>
-    [ThreadStatic] static Exception guardada;
+    /// <summary>
+    /// A excecao do simulador que fez o C sair (relancada por quem chamou). E
+    /// da placa, e nao da thread: com o FreeRTOS, a tarefa que a recebeu nao
+    /// e a thread que conta ao simulador.
+    /// </summary>
+    volatile Exception guardada;
 
     /// <summary>O que a rotina de interrupcao (na thread do vigia) deixou para o sketch relancar.</summary>
     volatile Exception daRotina;
@@ -126,12 +140,15 @@ public sealed unsafe class SketchNativo
             : throw new ErroDeExecucao($"o sketch compilado nao tem '{nome}' (o core nativo e de outra versao).", 0);
 
         var iniciar = (delegate* unmanaged<Ponte*, int>)Exigir("cs_iniciar");
-        entrar = (delegate* unmanaged<int, int, int>)Exigir("cs_entrar");
+        entrar = (delegate* unmanaged<int, int, int, Val*, int>)Exigir("cs_entrar");
         descreverFalha = (delegate* unmanaged<byte*, int, uint>)Exigir("cs_descrever_falha");
         refazerGuarda = (delegate* unmanaged<void>)Exigir("cs_refazer_guarda");
         saltoDaThread = (delegate* unmanaged<uint, int*, void*>)Exigir("cs_salto_da_thread");
         secao = (delegate* unmanaged<byte*, uint*, void*>)Exigir("cs_secao");
         var medir = (delegate* unmanaged<ulong*, ulong>)Exigir("cs_modulo");
+        if (NativeLibrary.TryGetExport(modulo, "cs_tid_atual", out IntPtr pTid)) tidDaVez = (uint*)pTid;
+        if (NativeLibrary.TryGetExport(modulo, "cs_critico", out IntPtr pCritico)) secaoCritica = (int*)pCritico;
+        if (NativeLibrary.TryGetExport(modulo, "cs_rtos_encerrar", out IntPtr pEncerrar)) encerrarTarefas = (delegate* unmanaged<void>)pEncerrar;
         // O salto copiado para memoria alocada aqui (ver cs_codigo_do_salto).
         int tamanhoDoSalto;
         byte* codigoDoSalto = (byte*)((delegate* unmanaged<int*, void*>)Exigir("cs_codigo_do_salto"))(&tamanhoDoSalto);
@@ -232,20 +249,64 @@ public sealed unsafe class SketchNativo
     /// <summary>Uma rotina de interrupcao ("__nativa_3"), na thread de quem chamou.</summary>
     public void Rotina(int indice) => Rodar(2, indice);
 
-    void Rodar(int qual, int arg)
+    /// <summary>
+    /// Um callback do sketch com os argumentos que o simulador manda (o
+    /// topico e a mensagem do MQTT): numero, texto ou vetor de bytes, cada um
+    /// na memoria daqui ate a funcao voltar.
+    /// </summary>
+    public void Rotina(int indice, object[] argumentos)
     {
-        bool doSketch = qual != 2 || Environment.CurrentManagedThreadId == idDoSketch;
-        if (qual != 2)
+        int n = argumentos?.Length ?? 0;
+        var vals = new Val[n];
+        var soltar = new List<IntPtr>();
+        try
         {
-            idDoSketch = Environment.CurrentManagedThreadId;
-            tidDoSketch = Win32.GetCurrentThreadId();
+            for (int i = 0; i < n; i++)
+            {
+                switch (argumentos[i])
+                {
+                    case Valor[] vetor:
+                    {
+                        IntPtr p = (IntPtr)NativeMemory.AllocZeroed((nuint)vetor.Length + 1);
+                        soltar.Add(p);
+                        for (int k = 0; k < vetor.Length; k++) ((byte*)p)[k] = (byte)((long)vetor[k].Num & 0xFF);
+                        vals[i] = new Val { Tipo = Bytes, N = vetor.Length, S = p };
+                        break;
+                    }
+                    case Valor v when v.EhTexto:
+                    {
+                        byte[] b = Encoding.UTF8.GetBytes(v.Texto ?? "");
+                        IntPtr p = (IntPtr)NativeMemory.AllocZeroed((nuint)b.Length + 1);
+                        soltar.Add(p);
+                        Marshal.Copy(b, 0, p, b.Length);
+                        vals[i] = new Val { Tipo = Texto, N = b.Length, S = p };
+                        break;
+                    }
+                    case Valor v:
+                        vals[i] = v.Inteiro || v.Caractere || v.EhBooleano
+                            ? new Val { Tipo = Int, I = (long)v.Num, D = v.Num }
+                            : new Val { Tipo = Real, D = v.Num, I = (long)v.Num };
+                        break;
+                }
+            }
+            fixed (Val* p = vals) Rodar(2, indice, n, p);
         }
+        finally
+        {
+            foreach (var p in soltar) NativeMemory.Free((void*)p);
+        }
+    }
+
+    void Rodar(int qual, int arg, int n = 0, Val* argumentos = null)
+    {
+        if (qual != 2) tidDoSketch = Win32.GetCurrentThreadId();
+        bool doSketch = qual != 2 || EhDoSketch();
         int antes = doSketch ? Interlocked.Exchange(ref estado, 1) : 0;
         int r;
         try
         {
             if (Depurando) Console.Error.WriteLine($"[nativo] entrar {qual} {arg}");
-            r = entrar(qual, arg);
+            r = entrar(qual, arg, n, argumentos);
             if (Depurando) Console.Error.WriteLine($"[nativo] saiu {qual} {arg} = {r}");
         }
         finally
@@ -305,14 +366,15 @@ public sealed unsafe class SketchNativo
     [UnmanagedCallersOnly]
     static int Chamar(IntPtr ctx, byte* alvo, byte* nome, int n, Val* args, Val* volta)
     {
+        SketchNativo eu = null;
         try
         {
-            var eu = (SketchNativo)GCHandle.FromIntPtr(ctx).Target!;
+            eu = (SketchNativo)GCHandle.FromIntPtr(ctx).Target!;
             return eu.Atender(alvo, nome, n, args, volta);
         }
         catch (Exception e)
         {
-            guardada = e;
+            if (eu is not null) eu.guardada = e;
             return Sair;
         }
     }
@@ -333,7 +395,7 @@ public sealed unsafe class SketchNativo
 
     long Relogio()
     {
-        bool doSketch = Environment.CurrentManagedThreadId == idDoSketch;
+        bool doSketch = EhDoSketch();
         int antes = doSketch ? Entrar() : 0;
         try
         {
@@ -359,7 +421,7 @@ public sealed unsafe class SketchNativo
 
     int Atender(byte* alvo, byte* nome, int n, Val* args, Val* volta)
     {
-        bool doSketch = Environment.CurrentManagedThreadId == idDoSketch;
+        bool doSketch = EhDoSketch();
         int antes = doSketch ? Entrar() : 0;
         try
         {
@@ -367,6 +429,15 @@ public sealed unsafe class SketchNativo
             {
                 guardada = daRotina;
                 daRotina = null;
+                return Sair;
+            }
+
+            // A placa parou: cada chamada ao simulador e uma saida. O programa
+            // com main() (ou a tarefa do FreeRTOS) nunca volta ao loop() -- sem
+            // isto ele seguiria vivo, no delay que so termina mais cedo.
+            if (maq.Parar || encerrando)
+            {
+                guardada = maq.MotivoDaParada();
                 return Sair;
             }
 
@@ -385,11 +456,20 @@ public sealed unsafe class SketchNativo
                     Texto or Nome => Valor.DeTexto(a.S == IntPtr.Zero ? "" : Encoding.UTF8.GetString((byte*)a.S, Math.Max(0, a.N))),
                     Bool => Valor.DeBool(a.I != 0),
                     Char => Valor.DeCaractere(a.I),
+                    Bytes or BytesMuda => Valor.DeReferencia(Vetor((byte*)a.S, a.N)),
                     _ => Valor.Vazio,
                 });
             }
 
             var v = atender(sAlvo, sNome, lista, nomes);
+
+            // O vetor que o simulador escreveu ("radio.read(&dados, sizeof(dados))") volta para o C.
+            for (int i = 0; i < n; i++)
+                if (args[i].Tipo == BytesMuda && lista[i].Referencia is Valor[] escrito)
+                {
+                    byte* destino = (byte*)args[i].S;
+                    for (int k = 0; k < Math.Min(args[i].N, escrito.Length); k++) destino[k] = (byte)((long)escrito[k].Num & 0xFF);
+                }
             Escrever(v, volta);
             return Ok;
         }
@@ -402,6 +482,13 @@ public sealed unsafe class SketchNativo
         {
             if (doSketch) Volatile.Write(ref estado, antes);
         }
+    }
+
+    static Valor[] Vetor(byte* p, int n)
+    {
+        var v = new Valor[Math.Max(0, n)];
+        for (int i = 0; i < v.Length; i++) v[i] = Valor.DeC(p[i], TipoC.UChar);
+        return v;
     }
 
     static void Escrever(Valor v, Val* volta)
@@ -464,8 +551,12 @@ public sealed unsafe class SketchNativo
     /// </summary>
     void Interromper(bool forcarSaida)
     {
+        // Dentro da secao critica do FreeRTOS (portENTER_CRITICAL) a
+        // interrupcao espera, como na placa; a parada nao.
+        if (!forcarSaida && secaoCritica != null && Volatile.Read(ref *secaoCritica) > 0) return;
         if (Interlocked.CompareExchange(ref estado, 3, 1) != 1) return;
-        IntPtr h = Win32.OpenThread(Win32.THREAD_ALL_ACCESS, false, tidDoSketch);
+        uint tid = TidDoSketch;
+        IntPtr h = Win32.OpenThread(Win32.THREAD_ALL_ACCESS, false, tid);
         if (h == IntPtr.Zero) { Volatile.Write(ref estado, 1); return; }
         byte* bruto = (byte*)NativeMemory.AlignedAlloc(1232 + 64, 64);
         bool suspensa = false;
@@ -482,10 +573,14 @@ public sealed unsafe class SketchNativo
             // .NET): fica para a proxima volta do vigia.
             if (rip < inicio || rip >= fim) return;
 
+            // A secao critica pode ter aberto entre a conferencia e a
+            // suspensao: a interrupcao espera a proxima volta.
+            if (!forcarSaida && secaoCritica != null && Volatile.Read(ref *secaoCritica) > 0) return;
+
             if (forcarSaida)
             {
                 int rodando;
-                ulong* buffer = (ulong*)saltoDaThread(tidDoSketch, &rodando);
+                ulong* buffer = (ulong*)saltoDaThread(tid, &rodando);
                 if (buffer == null || rodando == 0) return;
                 *(ulong*)(bruto + 0x98) = (buffer[8] - 64) & ~15UL;   // Rsp
                 *(ulong*)(bruto + 0x80) = (ulong)buffer;              // Rcx
@@ -502,7 +597,7 @@ public sealed unsafe class SketchNativo
             {
                 daRotina = e;
                 int rodando;
-                ulong* buffer = (ulong*)saltoDaThread(tidDoSketch, &rodando);
+                ulong* buffer = (ulong*)saltoDaThread(tid, &rodando);
                 if (buffer != null && rodando != 0)
                 {
                     *(ulong*)(bruto + 0x98) = (buffer[8] - 64) & ~15UL;
@@ -539,6 +634,8 @@ public sealed unsafe class SketchNativo
             maq.Avisar("modo nativo: o sketch nao parou; a memoria dele fica presa ate fechar o simulador.");
             return;
         }
+        // As threads das tarefas do FreeRTOS saem antes de a DLL ser solta.
+        if (encerrarTarefas != null) encerrarTarefas();
         if (veh != IntPtr.Zero) { Win32.RemoveVectoredExceptionHandler(veh); veh = IntPtr.Zero; }
         if (salto != IntPtr.Zero) Win32.RegistrarAlvoDeExcecao(salto, false);
         if (memoriaDoSalto != IntPtr.Zero) { Win32.VirtualFree(memoriaDoSalto, 0, Win32.MEM_RELEASE); memoriaDoSalto = IntPtr.Zero; }

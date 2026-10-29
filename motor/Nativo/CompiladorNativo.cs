@@ -250,7 +250,16 @@ public static class CompiladorNativo
         // ---- o projeto ----
         var abas = new Dictionary<string, string>(projeto.Arquivos ?? new Dictionary<string, string>(), StringComparer.OrdinalIgnoreCase);
         var unidades = new List<(string Nome, string Texto)>();
-        unidades.Add(("sketch.ino.cpp", MontarIno(projeto.Sketch ?? "", abas)));
+        if (EhPrograma(projeto.Sketch))
+        {
+            // O programa com main() (o C, o SDK da Pico) ou app_main() (o
+            // ESP-IDF): o texto como esta, em C se nao tiver nada de C++, e a
+            // entrada que o chama no lugar do setup().
+            string sketch = projeto.Sketch ?? "";
+            unidades.Add((TemCpp(sketch) ? "sketch.cpp" : "sketch.c", "#include \"cs_placa.h\"\n#line 1 \"sketch.ino\"\n" + sketch + "\n"));
+            unidades.Add(("cs_principal.c", EntradaDoPrograma));
+        }
+        else unidades.Add(("sketch.ino.cpp", MontarIno(projeto.Sketch ?? "", abas)));
         foreach (var (nome, texto) in abas.Where(a => Path.GetExtension(a.Key).ToLowerInvariant() is ".cpp" or ".cc" or ".cxx" or ".c")
                                           .OrderBy(a => a.Key, StringComparer.Ordinal))
             unidades.Add((nome, texto ?? ""));
@@ -294,7 +303,8 @@ public static class CompiladorNativo
                 Directory.CreateDirectory(Path.GetDirectoryName(destino)!);
                 File.WriteAllText(destino, texto ?? "", new UTF8Encoding(false));
             }
-            File.WriteAllText(Path.Combine(trabalho, "sketch.ino.cpp"), unidades[0].Texto, new UTF8Encoding(false));
+            foreach (var (nome, texto) in unidades.Where(u => !abas.ContainsKey(u.Nome)))
+                File.WriteAllText(Path.Combine(trabalho, nome), texto, new UTF8Encoding(false));
 
             var tarefas = new List<(string Fonte, string Objeto, bool Cpp)>();
             int k = 0;
@@ -427,6 +437,48 @@ public static class CompiladorNativo
     /// primeira funcao. Cada pedaco comeca com #line: o erro aparece na
     /// linha (e na aba) de onde veio.
     /// </summary>
+    static readonly Regex DefinicaoDeSetupOuLoop = new(@"\bvoid\s+(setup|loop)\s*\(\s*(void)?\s*\)\s*\{", RegexOptions.Compiled);
+    static readonly Regex DefinicaoDeMain = new(@"\b(int|void)\s+(main|app_main)\s*\([^)]*\)\s*\{", RegexOptions.Compiled);
+    static readonly Regex MarcasDeCpp = new(
+        @"\b(class|namespace|template|nullptr|constexpr|operator|virtual)\b|std::|extern\s+""C""|\bnew\s+\w|#\s*include\s*<(iostream|vector|string|map|memory|functional|algorithm|array|cstdio|cstdint)>",
+        RegexOptions.Compiled);
+
+    /// <summary>O programa comeca no main() ou no app_main(), e nao no setup()/loop().</summary>
+    public static bool EhPrograma(string sketch)
+    {
+        string texto = SemComentarios(sketch);
+        return !DefinicaoDeSetupOuLoop.IsMatch(texto) && DefinicaoDeMain.IsMatch(texto);
+    }
+
+    static bool TemCpp(string sketch) => MarcasDeCpp.IsMatch(SemComentarios(sketch));
+
+    /// <summary>
+    /// A entrada do programa com main(): o setup() o chama (o app_main do
+    /// ESP-IDF, o do C++ sem extern "C", ou o main), com o monitor ja ligado
+    /// -- e o printf da placa. Quando ele volta, a tarefa principal acaba (as
+    /// outras do FreeRTOS seguem, como no ESP-IDF) e a placa fica parada.
+    /// </summary>
+    const string EntradaDoPrograma = """
+        #include "Arduino.h"
+        #include "freertos/FreeRTOS.h"
+        extern int main(void) __attribute__((weak));
+        extern void app_main(void) __attribute__((weak));
+        extern void cs_app_main_do_cpp(void) __asm__("_Z8app_mainv") __attribute__((weak));
+        extern volatile int cs_rtos_ativo;
+
+        void setup(void)
+        {
+            cs_val baud = cs_i(115200);
+            cs_nada("Serial", "begin", 1, &baud);
+            if (app_main) app_main();
+            else if (cs_app_main_do_cpp) cs_app_main_do_cpp();
+            else if (main) main();
+            if (cs_rtos_ativo) vTaskDelete(NULL);
+        }
+
+        void loop(void) { delay(1000); }
+        """;
+
     public static string MontarIno(string sketch, IDictionary<string, string> abas)
     {
         var partes = new List<(string Nome, string Texto)> { ("sketch.ino", sketch ?? "") };
@@ -668,4 +720,4 @@ public static class CompiladorNativo
 }
 
 /// <summary>A DLL do sketch, pronta para cada placa carregar a sua copia.</summary>
-public sealed record SketchCompilado(string Dll, string Placa);
+public sealed record SketchCompilado(string Dll, string Placa) : ProgramaCompilado;

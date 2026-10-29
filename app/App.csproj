@@ -128,6 +128,10 @@
     <Compile Include="..\motor\InterpretadorMicroPython.cs" />
     <Compile Include="..\motor\InterpretadorPecasPython.cs" />
     <Compile Include="..\motor\Nativo\*.cs" />
+    <Compile Include="..\motor\SketchCompilado.cs" />
+    <Compile Include="..\motor\DotNet\*.cs" />
+    <!-- A API das placas para o C#: fonte que o Roslyn compila na hora (ver CompiladorCSharp). -->
+    <EmbeddedResource Include="..\motor\DotNet\Api\*.cs" LogicalName="api/%(Filename)%(Extension)" />
   </ItemGroup>
 
   <!--
@@ -158,6 +162,8 @@
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
     <PackageReference Include="SharpVectors.Wpf" Version="1.8.6" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+    <PackageReference Include="Basic.Reference.Assemblies.Net100" Version="1.8.13" />
   </ItemGroup>
 
   <!--

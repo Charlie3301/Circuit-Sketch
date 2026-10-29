@@ -1,0 +1,20 @@
+/* sdkconfig.h -- a configuracao do menuconfig do ESP-IDF, com os valores
+ * padrao (e os dos exemplos oficiais, como o pino do blink). */
+#ifndef CS_SDKCONFIG_H
+#define CS_SDKCONFIG_H
+#define CONFIG_IDF_TARGET "esp32"
+#define CONFIG_IDF_TARGET_ESP32 1
+#define CONFIG_IDF_FIRMWARE_CHIP_ID 0x0000
+#define CONFIG_FREERTOS_HZ 1000
+#define CONFIG_FREERTOS_UNICORE 0
+#define CONFIG_LOG_DEFAULT_LEVEL 3
+#define CONFIG_LOG_MAXIMUM_LEVEL 3
+#define CONFIG_ESP_CONSOLE_UART_BAUDRATE 115200
+#define CONFIG_CONSOLE_UART_BAUDRATE 115200
+#define CONFIG_ESP_MAIN_TASK_STACK_SIZE 3584
+#define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ 240
+#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ 240
+#define CONFIG_BLINK_GPIO 2
+#define CONFIG_BLINK_PERIOD 1000
+#define CONFIG_BLINK_LED_GPIO 1
+#endif

@@ -58,6 +58,11 @@ typedef struct cs_ponte {
 
 #define CS_VERSAO_DA_PONTE 1
 
+/* Quem chama de volta uma funcao do sketch com os argumentos do simulador
+ * (ver cs_objeto.h, que gera um para cada tipo de funcao). */
+typedef void (*cs_chamador_t)(void *fn, void *arg, int n, const cs_val *args);
+int cs_registrar_callback(void *fn, cs_chamador_t chamador, void *arg);
+
 /* Do lado C (cs_ponte.cpp). */
 extern const cs_ponte *cs_p;
 int cs_chamar(const char *alvo, const char *nome, int n, const cs_val *args, cs_val *volta);

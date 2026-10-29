@@ -31,6 +31,13 @@ public:
 };
 
 extern EspClass ESP;
+
+#include <time.h>
+/* O relogio pela internet (NTP): o configTime e o getLocalTime do core. */
+void configTime(long gmtOffset_sec, int daylightOffset_sec, const char *server1, const char *server2 = nullptr,
+                const char *server3 = nullptr);
+void configTzTime(const char *tz, const char *server1, const char *server2 = nullptr, const char *server3 = nullptr);
+bool getLocalTime(struct tm *info, uint32_t ms = 5000);
 #endif
 
 #endif

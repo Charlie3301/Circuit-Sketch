@@ -94,6 +94,8 @@ public:
     void notUsingInterrupt(int) {}
     void attachInterrupt() {}
     void detachInterrupt() {}
+
+    const char *nomeNoSimulador() const { return nome; }
 };
 
 extern SPIClass SPI;

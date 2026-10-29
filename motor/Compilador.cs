@@ -97,7 +97,8 @@ public static class Compilador
 
         // ---- C# ----
         if (Marcas(texto, "using System", "static void Main", "namespace ",
-                   "Console.WriteLine", "public class ", "GpioController") >= 2)
+                   "Console.WriteLine", "public class ", "GpioController", "Debug.WriteLine",
+                   "Thread.Sleep(", "PinValue.", "System.Device.") >= 2)
             return Linguagem.CSharp;
 
         // ---- familia Pascal ----
@@ -169,14 +170,25 @@ public static class Compilador
         string fonte = projeto?.Sketch ?? "";
         var linguagem = Detectar(fonte);
 
+        // O C# de verdade: o Roslyn (CompiladorCSharp). O erro dele vale -- o
+        // caminho antigo aceitava o que o C# recusa (int x = "texto").
+        if (CppNativo && linguagem == Linguagem.CSharp)
+            return new Programa([], [])
+            {
+                Linguagem = linguagem,
+                Placa = projeto.Placa,
+                Fonte = fonte,
+                Compilado = CompiladorCSharp.Compilar(projeto),
+            };
+
         if (linguagem is not (Linguagem.Arduino or Linguagem.C))
             return Compilar(fonte, linguagem);
 
-        // O C++ de verdade: o projeto inteiro pelo clang (CompiladorNativo),
+        // O C/C++ de verdade: o projeto inteiro pelo clang (CompiladorNativo),
         // quando o que ele usa o core nativo ja tem. Se o clang recusar e o
         // interpretador aceitar, fica o interpretador, que roda o projeto de
         // antes; se os dois recusarem, vale o erro do clang -- e o da IDE.
-        if (CppNativo && linguagem == Linguagem.Arduino && CompiladorNativo.PorQueNao(projeto) is null)
+        if (CppNativo && CompiladorNativo.PorQueNao(projeto) is null)
         {
             try
             {

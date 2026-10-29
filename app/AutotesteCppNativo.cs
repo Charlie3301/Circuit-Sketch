@@ -186,6 +186,8 @@ public static partial class Autoteste
             void setup() { Serial.begin(9600); Serial.println("entrou"); }
             void loop() { while (true) { n++; } }
             """;
+        // Compilado antes: o relogio mede a parada, e nao o clang.
+        CompiladorNativo.Compilar(new Projeto { Sketch = preso, Placa = "esp32-devkit-v1" });
         var relogio = System.Diagnostics.Stopwatch.StartNew();
         (serial, erro, nativo, _) = RodarNativo(preso, 300);
         Conferir("C++ nativo: Parar tira a placa de um while(true) sem chamada (o vigia desvia a thread)",
@@ -230,5 +232,131 @@ public static partial class Autoteste
                                                 200, abas: abas);
         Conferir("C++ nativo: as abas -- o .cpp com o .h, e a funcao de outra aba .ino",
             nativo && erro is null && serial == "81", $"{erro} | {serial}");
+
+        // ---- as bibliotecas que o simulador imita, pelo C++ compilado ----
+        const string bibliotecas = """
+            #include <Servo.h>
+            #include <LiquidCrystal_I2C.h>
+            #include <Adafruit_NeoPixel.h>
+            #include <EEPROM.h>
+            #include <Preferences.h>
+            #include <RTClib.h>
+            #include <vector>
+
+            Servo servo;
+            LiquidCrystal_I2C lcd(0x27, 16, 2);
+            Adafruit_NeoPixel fita(4, 5, NEO_GRB + NEO_KHZ800);
+            Preferences prefs;
+            RTC_DS1307 rtc;
+            struct Config { int brilho; float limite; };
+
+            void setup() {
+              Serial.begin(115200);
+              servo.attach(9);
+              servo.write(45);
+              Serial.println(servo.read());
+
+              lcd.init();
+              lcd.backlight();
+              lcd.setCursor(0, 0);
+              lcd.print("T=");
+              lcd.print(23.456, 1);
+
+              fita.begin();
+              fita.setPixelColor(1, fita.Color(10, 20, 30));
+              fita.show();
+              Serial.println(fita.getPixelColor(1), HEX);
+
+              EEPROM.begin(32);
+              Config c = {7, 2.5f}, lida = {};
+              EEPROM.put(0, c);
+              EEPROM.commit();
+              EEPROM.get(0, lida);
+              Serial.println(String(lida.brilho) + " " + String(lida.limite, 1));
+
+              prefs.begin("ajustes");
+              prefs.putInt("voltas", 42);
+              Serial.println(prefs.getInt("voltas", 0));
+
+              rtc.begin();
+              rtc.adjust(DateTime(2026, 10, 28, 14, 30, 0));
+              DateTime agora = rtc.now();
+              Serial.println(agora.year() == 2026 && agora.month() == 10 && agora.hour() == 14 ? "rtc ok" : "rtc errado");
+            }
+            void loop() { delay(100); }
+            """;
+        (serial, erro, nativo, m) = RodarNativo(bibliotecas, 400);
+        string lcd = m.Lcd?.LinhaTexto(0)?.TrimEnd() ?? "";
+        Conferir("C++ nativo: Servo, LCD I2C, NeoPixel, EEPROM.put/get de struct, Preferences e RTClib pelo simulador",
+            nativo && erro is null && serial == "45|A141E|7 2.5|42|rtc ok" && m.AnguloServo[9] == 45 && lcd == "T=23.5",
+            $"{nativo} {erro} | {serial} | lcd \"{lcd}\" servo {m.AnguloServo[9]}");
+
+        // ---- a BLE da ESP32: os objetos do simulador e os callbacks do sketch ----
+        const string ble = """
+            #include <BLEDevice.h>
+            #include <BLEServer.h>
+            #include <BLE2902.h>
+
+            int conexoes = 0;
+            class AoConectar : public BLEServerCallbacks {
+              void onConnect(BLEServer *s) override { conexoes++; }
+            };
+            class AoEscrever : public BLECharacteristicCallbacks {
+              void onWrite(BLECharacteristic *c) override { Serial.println(c->getValue()); }
+            };
+
+            void setup() {
+              Serial.begin(115200);
+              BLEDevice::init("Robo");
+              BLEServer *servidor = BLEDevice::createServer();
+              servidor->setCallbacks(new AoConectar());
+              BLEService *servico = servidor->createService("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
+              BLECharacteristic *c = servico->createCharacteristic("beb5483e-36e1-4688-b7f5-ea07361b26a8",
+                  BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_NOTIFY);
+              c->addDescriptor(new BLE2902());
+              c->setCallbacks(new AoEscrever());
+              c->setValue("oi");
+              servico->start();
+              BLEDevice::getAdvertising()->addServiceUUID(servico->getUUID());
+              BLEDevice::startAdvertising();
+              Serial.println(c->getValue());
+              Serial.println(servico->getUUID().toString());
+              Serial.println(servidor == BLEDevice::createServer() ? "mesmo" : "outro");
+              Serial.println(BLEDevice::getAddress().toString().length() == 17 ? "mac" : BLEDevice::getAddress().toString());
+            }
+            void loop() { delay(100); }
+            """;
+        (serial, erro, nativo, _) = RodarNativo(ble, 400);
+        Conferir("C++ nativo: BLE da ESP32 -- servidor, servico, caracteristica, descritor, os callbacks do sketch e o mesmo objeto de volta",
+            nativo && erro is null && serial == "oi|4fafc201-1fb5-459e-8fcc-c5c9c331914b|mesmo|mac", $"{nativo} {erro} | {serial}");
+
+        // ---- as portas: SoftwareSerial no Uno e a UART pelo numero na ESP32 ----
+        const string portas = """
+            #include <SoftwareSerial.h>
+            SoftwareSerial bt(10, 11);
+            void setup() {
+              Serial.begin(9600);
+              bt.begin(9600);
+              bt.listen();
+              Serial.println(bt.isListening() ? "escutando" : "surda");
+              Serial.println(bt.available());
+            }
+            void loop() { delay(100); }
+            """;
+        (serial, erro, nativo, _) = RodarNativo(portas, 300, "arduino-uno");
+        string serialUno = serial;
+        const string uart = """
+            HardwareSerial gps(2);
+            void setup() {
+              Serial.begin(115200);
+              gps.begin(9600, SERIAL_8N1, 16, 17);
+              Serial.println(gps.available());
+            }
+            void loop() { delay(100); }
+            """;
+        var (serialEsp, erroEsp, nativoEsp, _) = RodarNativo(uart, 300);
+        Conferir("C++ nativo: SoftwareSerial (Uno) e HardwareSerial(2) com os pinos do begin",
+            nativo && erro is null && serialUno == "escutando|0" && nativoEsp && erroEsp is null && serialEsp == "0",
+            $"{nativo} {erro} | {serialUno} || {nativoEsp} {erroEsp} | {serialEsp}");
     }
 }

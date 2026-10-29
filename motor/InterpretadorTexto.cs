@@ -765,6 +765,12 @@ public partial class Interpretador
     /// </summary>
     Valor ChamarRotina(Rotina r, params object[] args)
     {
+        // O callback e uma funcao do C++ compilado (InterpretadorSketchNativo.cs).
+        if (r.Funcao is { } nativa && RotinaNativa(nativa.Nome, out int indice))
+        {
+            sketchNativo?.Rotina(indice, args?.Select(ParaONativo).ToArray());
+            return Valor.Vazio;
+        }
         var parametros = r.Funcao?.Params ?? r.Anonima.Params;
         var corpo = r.Funcao?.Corpo ?? r.Anonima.Corpo;
         var local = new Ambiente(r.Funcao is not null ? Global : r.Captura);

@@ -718,6 +718,11 @@ public partial class Interpretador
     /// </summary>
     Valor ChamarUsuario(Funcao f, List<Expr> args, Ambiente amb, Ambiente escopo, int linha)
     {
+        if (RotinaNativa(f.Nome, out int nativa))
+        {
+            sketchNativo?.Rotina(nativa, [.. args.Select(a => VetorDoArgumento(a, amb, out var v) ? v : ParaONativo(Avaliar(a, amb)))]);
+            return Valor.Vazio;
+        }
         if (f.Corpo is null)
             throw new ErroDeExecucao(
                 $"{NomeParaMostrar(f)}() foi declarada, mas nao tem corpo em lugar nenhum "
@@ -857,6 +862,13 @@ public partial class Interpretador
     {
         vetor = null;
         var sem = SemEndereco(e);
+
+        // O vetor que veio pronto do C++ compilado (cs_bytes): ele mesmo.
+        if (sem is Pronto { Valor.Referencia: Valor[] pronto })
+        {
+            vetor = pronto;
+            return true;
+        }
 
         if (sem is Variavel v)
             return !amb.Buscar(v.Nome, out _) && amb.BuscarArray(v.Nome, out vetor)

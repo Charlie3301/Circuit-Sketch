@@ -1377,8 +1377,8 @@ public class Maquina
         Audio = null;
     }
 
-    /// <summary>O sketch em C++ compilado de verdade desta placa (SketchNativo), se houver.</summary>
-    public SketchNativo Sketch { get; set; }
+    /// <summary>O programa compilado de verdade desta placa (o C++ ou o C#), se houver.</summary>
+    public ISketchCompilado Sketch { get; set; }
 
     /// <summary>
     /// A memoria RTC do sketch compilado (as secoes RTC_DATA_ATTR e

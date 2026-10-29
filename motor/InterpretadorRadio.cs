@@ -175,6 +175,7 @@ public partial class Interpretador
 
         var arg = SemEndereco(c.Args[i]);
         if (arg is Variavel v && amb.BuscarArray(v.Nome, out var vetor)) return TextoDoVetor(vetor);
+        if (arg is Pronto { Valor.Referencia: Valor[] doCpp }) return TextoDoVetor(doCpp);
 
         return Avaliar(arg, amb).Mostrar();
     }
@@ -184,6 +185,12 @@ public partial class Interpretador
         if (e is null) return "";
 
         var arg = SemEndereco(e);
+
+        // Os bytes do C++ compilado (cs_bytes): todos, um caractere por byte --
+        // a estrutura chega do outro lado do jeito que saiu.
+        if (arg is Pronto { Valor.Referencia: Valor[] bytes })
+            return new string([.. bytes.Select(b => (char)((long)b.Num & 0xFF))]);
+
         if (arg is Variavel v)
         {
             if (amb.BuscarArray(v.Nome, out var vetor)) return TextoDoVetor(vetor);
@@ -199,6 +206,12 @@ public partial class Interpretador
         if (e is null) return;
 
         var arg = SemEndereco(e);
+        if (arg is Pronto { Valor.Referencia: Valor[] destino })
+        {
+            for (int k = 0; k < destino.Length; k++)
+                destino[k] = Valor.DeC(k < texto.Length ? texto[k] & 0xFF : 0, TipoC.UChar);
+            return;
+        }
         if (arg is Variavel v)
         {
             if (amb.BuscarArray(v.Nome, out var vetor)) { EscreverNoVetor(vetor, texto); return; }
@@ -379,7 +392,8 @@ public partial class Interpretador
         if (arg is Conversao cv) arg = SemEndereco(cv.Alvo);
 
         return arg is Variavel { Nome: "NULL" or "nullptr" }
-               || arg is Literal { Valor: 0, EhTexto: false };
+               || arg is Literal { Valor: 0, EhTexto: false }
+               || arg is Pronto { Valor: { EhTexto: false, Referencia: null, Num: 0 } };
     }
 
     string NomeDeFuncao(Chamada c, int i, string ondeUsou)
@@ -396,6 +410,10 @@ public partial class Interpretador
         if (i >= c.Args.Count) return Rede.MacDeBroadcast;
 
         var arg = SemEndereco(c.Args[i]);
+
+        // Do C++ compilado: os 6 bytes, ou o texto "AA:BB:...".
+        if (arg is Pronto { Valor.Referencia: Valor[] doCpp }) return MacDoVetor(doCpp);
+        if (arg is Pronto { Valor.EhTexto: true } macEmTexto) return macEmTexto.Valor.Texto;
 
         if (arg is Variavel v)
         {
@@ -424,6 +442,13 @@ public partial class Interpretador
         if (arg is Conversao cv) arg = SemEndereco(cv.Alvo);
 
         string origem = Maq.Rede.MacDe(Maq);
+
+        // Os bytes do C++ compilado: a estrutura chega do outro lado do jeito que saiu.
+        if (arg is Pronto { Valor.Referencia: Valor[] bytesDoCpp })
+        {
+            byte[] crus = [.. bytesDoCpp.Select(b => (byte)((long)b.Num & 0xFF))];
+            return new CargaEspNow { Origem = origem, Bytes = crus, Texto = new string([.. crus.Select(b => (char)b)]), Tamanho = crus.Length };
+        }
 
         if (arg is Variavel v)
         {

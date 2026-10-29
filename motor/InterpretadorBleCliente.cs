@@ -613,6 +613,7 @@ public partial class Interpretador
     /// </summary>
     void ChamarCallbackDoSketch(Objeto cb, string metodo, params Valor[] args)
     {
+        if (ChamarCallbackNativo(cb, metodo, args)) return;
         if (cb?.Escopo is null || !classes.TryGetValue(cb.Classe, out var info)) return;
         var lista = AcharLista(info, metodo);
         var f = lista?.FirstOrDefault(x => x.Params.Count == args.Length);

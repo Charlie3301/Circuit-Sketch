@@ -8,9 +8,16 @@ HardwareSerial Serial("Serial");
 HardwareSerial Serial1("Serial1");
 HardwareSerial Serial2("Serial2");
 
-void HardwareSerial::begin(unsigned long baud, uint32_t, int8_t, int8_t, bool, unsigned long, uint8_t)
+/* Os pinos do begin(baud, config, rx, tx) sao os que o fio liga (o iBUS no
+ * RX2 = GPIO16); sem eles, os padroes da placa. */
+void HardwareSerial::begin(unsigned long baud, uint32_t config, int8_t rxPin, int8_t txPin, bool invert, unsigned long,
+                           uint8_t)
 {
-    ch(nome, "begin", cs_i((int64_t)baud));
+    if (rxPin < 0 && txPin < 0 && !invert) {
+        ch(nome, "begin", cs_i((int64_t)baud), cs_i(config));
+        return;
+    }
+    ch(nome, "begin", cs_i((int64_t)baud), cs_i(config), cs_i(rxPin), cs_i(txPin), cs_b(invert));
 }
 
 void HardwareSerial::end() { ch(nome, "end"); }

@@ -153,6 +153,7 @@ public partial class MainWindow : Window
             Compilador.CppNativo = true;
             Compilador.AvisoDoCompilador = texto => Dispatcher.BeginInvoke(() => console.Info(texto));
             CompiladorNativo.AquecerEmSegundoPlano(texto => Dispatcher.BeginInvoke(() => console.Info(texto)));
+            CompiladorCSharp.AquecerEmSegundoPlano();
         }
 
         // O resumo da visão de circuito acompanha a medida. Vai direto

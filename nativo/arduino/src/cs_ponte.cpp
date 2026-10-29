@@ -139,7 +139,7 @@ struct Vista {
     Entrada *volatile topo;
     volatile int *noSketch;
 };
-static Vista vistas[16];
+static Vista vistas[64];
 static SRWLOCK travaDasVistas = SRWLOCK_INIT;
 
 static void publicar(void)
@@ -290,24 +290,40 @@ extern "C" void cs_sair_com(int codigo)
 }
 
 /* ---------------------------------------------------------------------
- * As interrupcoes: a rotina vira um nome ("__nativa_3") que o simulador
- * chama de volta por cs_entrar. */
-static void (*rotinas[64])(void);
-static void (*rotinasComArg[64])(void *);
-static void *argumentos[64];
+ * As rotinas que o simulador chama de volta: a de interrupcao e os callbacks
+ * das bibliotecas (o do MQTT recebe o topico e a mensagem). Cada uma vira um
+ * nome ("__nativa_3"); o "chamador" desempacota os argumentos nos tipos da
+ * funcao (cs_objeto.h). */
+struct Rotina {
+    void *fn;
+    cs_chamador_t chamador;
+    void *arg;
+};
+static Rotina rotinas[256];
+static SRWLOCK travaDasRotinas = SRWLOCK_INIT;
+
+extern "C" int cs_registrar_callback(void *fn, cs_chamador_t chamador, void *arg)
+{
+    AcquireSRWLockExclusive(&travaDasRotinas);
+    int achou = -1;
+    for (int i = 0; i < 256 && achou < 0; i++)
+        if (rotinas[i].fn == fn && rotinas[i].chamador == chamador && rotinas[i].arg == arg) achou = i;
+    for (int i = 0; i < 256 && achou < 0; i++)
+        if (!rotinas[i].fn) {
+            rotinas[i] = {fn, chamador, arg};
+            achou = i;
+        }
+    ReleaseSRWLockExclusive(&travaDasRotinas);
+    return achou;
+}
+
+static void semArgumentos(void *fn, void *, int, const cs_val *) { ((void (*)(void))fn)(); }
+static void comArgumento(void *fn, void *arg, int, const cs_val *) { ((void (*)(void *))fn)(arg); }
 
 int cs_registrar_rotina(void (*f)(void), void (*fa)(void *), void *arg)
 {
-    for (int i = 0; i < 64; i++)
-        if ((f && rotinas[i] == f) || (fa && rotinasComArg[i] == fa && argumentos[i] == arg)) return i;
-    for (int i = 0; i < 64; i++)
-        if (!rotinas[i] && !rotinasComArg[i]) {
-            rotinas[i] = f;
-            rotinasComArg[i] = fa;
-            argumentos[i] = arg;
-            return i;
-        }
-    return -1;
+    if (f) return cs_registrar_callback((void *)f, semArgumentos, nullptr);
+    return cs_registrar_callback((void *)fa, comArgumento, arg);
 }
 
 /* ---------------------------------------------------------------------
@@ -332,12 +348,17 @@ extern "C" cs_val cs_nome(const char *s)
     return r;
 }
 
+extern "C" volatile int cs_rtos_ativo;
+extern "C" void cs_rtos_ponto(void);
+
 extern "C" int cs_chamar(const char *alvo, const char *nome, int n, const cs_val *args, cs_val *volta)
 {
     cs_val ignorada;
     if (!volta) volta = &ignorada;
     volta->tipo = CS_V_NADA;
     if (!cs_p) return CS_OK;
+    /* O tick do FreeRTOS: a vez pode passar para outra tarefa aqui. */
+    if (cs_rtos_ativo && noSketch) cs_rtos_ponto();
     int antes = noSketch;
     noSketch = 0;
     int r = cs_p->chamar(cs_p->ctx, alvo, nome, n, args, volta);
@@ -397,6 +418,44 @@ String cs_texto(const char *alvo, const char *nome, int n, const cs_val *args)
 }
 
 /* ---------------------------------------------------------------------
+ * As tarefas do FreeRTOS (cs_freertos.cpp): cada uma na sua thread, com a
+ * sua entrada -- a falha e a saida voltam por ela, e quem conta ao
+ * simulador e a thread da placa (com a falha que a tarefa guardou). */
+static Falha falhaDaTarefa;
+
+extern "C" void cs_guardar_falha(void) { falhaDaTarefa = falha; }
+extern "C" void cs_trazer_falha(void) { falha = falhaDaTarefa; }
+
+extern "C" int cs_rodar_protegido(void (*fn)(void *), void *arg)
+{
+    Entrada e;
+    e.anterior = topo;
+    int antes = noSketch;
+    topo = &e;
+    falha.codigo = 0;
+    publicar();
+    volatile int r = __cs_setjmp(e.salto);
+    if (r == 0) {
+        noSketch = 1;
+        try {
+            fn(arg);
+        } catch (const std::exception &x) {
+            snprintf(falha.texto, sizeof(falha.texto), "excecao do C++ sem catch numa tarefa: %s", x.what());
+            falha.codigo = 0xE0000001u;
+            r = CS_FALHA;
+        } catch (...) {
+            snprintf(falha.texto, sizeof(falha.texto), "excecao do C++ sem catch numa tarefa");
+            falha.codigo = 0xE0000001u;
+            r = CS_FALHA;
+        }
+    }
+    noSketch = antes;
+    topo = e.anterior;
+    publicar();
+    return r;
+}
+
+/* ---------------------------------------------------------------------
  * A entrada. */
 extern "C" BOOL WINAPI DllMainCRTStartup(HINSTANCE, DWORD, LPVOID);
 static HINSTANCE instancia;
@@ -441,16 +500,15 @@ extern "C" __declspec(dllexport) uint64_t cs_modulo(uint64_t *fim)
     return inicioDoModulo;
 }
 
-static void chamarRotina(int i)
+static void chamarRotina(int i, int n, const cs_val *args)
 {
-    if (i < 0 || i >= 64) return;
-    if (rotinas[i]) rotinas[i]();
-    else if (rotinasComArg[i]) rotinasComArg[i](argumentos[i]);
+    if (i < 0 || i >= 256 || !rotinas[i].fn) return;
+    rotinas[i].chamador(rotinas[i].fn, rotinas[i].arg, n, args);
 }
 
-/* qual: 0 setup, 1 loop, 2 a rotina de interrupcao "arg", 3 os construtores.
- * Volta 0, ou o codigo da saida (CS_SAIR, CS_FALHA). */
-extern "C" __declspec(dllexport) int cs_entrar(int qual, int arg)
+/* qual: 0 setup, 1 loop, 2 a rotina "arg" (com os n argumentos), 3 os
+ * construtores. Volta 0, ou o codigo da saida (CS_SAIR, CS_FALHA). */
+extern "C" __declspec(dllexport) int cs_entrar(int qual, int arg, int n, const cs_val *args)
 {
     Entrada e;
     e.anterior = topo;
@@ -464,8 +522,11 @@ extern "C" __declspec(dllexport) int cs_entrar(int qual, int arg)
         try {
             switch (qual) {
             case 0: setup(); break;
-            case 1: loop(); break;
-            case 2: chamarRotina(arg); break;
+            case 1:
+                loop();
+                if (cs_rtos_ativo) cs_rtos_ponto();
+                break;
+            case 2: chamarRotina(arg, n, args); break;
             case 3:
                 std::set_terminate(terminar);
                 construido = 1;
