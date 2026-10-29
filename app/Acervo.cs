@@ -639,6 +639,11 @@ public static class Acervo
             // Arquivo que o projeto JA tem: nao falta nada.
             if (arquivos is not null && arquivos.ContainsKey(cabecalho)) continue;
 
+            // O que vem com a placa (o core do Arduino-ESP32, o ESP-IDF: o
+            // SD_MMC.h, o "soc/gpio_reg.h") no C++ compilado: nem com aspas
+            // falta -- o #include "x.h" procura no core depois da pasta.
+            if (Compilador.CppNativo && CompiladorNativo.TemNoCore(cabecalho)) continue;
+
             // Arquivo do projeto nao se procura na pasta das
             // bibliotecas: ele simplesmente nao existe ainda.
             if (comAspas.Contains(cabecalho))

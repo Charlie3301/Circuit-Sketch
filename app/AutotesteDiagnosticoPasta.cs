@@ -37,14 +37,22 @@ public static partial class Autoteste
                     };
                     var linguagem = Compilador.Detectar(projeto.Sketch);
                     saida.AppendLine($"  placa {placa.Id} ({placa.Tipo}), {linguagem}, abas: {string.Join(", ", circuito.Arquivos?.Keys.ToArray() ?? [])}");
+                    bool eraNativo = Compilador.CppNativo;
+                    Compilador.CppNativo = true;
+                    var falta = Acervo.OQueFalta(Montagem.Montar(projeto.Sketch, circuito.Arquivos), circuito.Arquivos);
+                    Compilador.CppNativo = eraNativo;
+                    saida.AppendLine($"  a janela diria que falta: {(falta.Count == 0 ? "nada" : string.Join(", ", falta.Select(f => f.Cabecalho)))}");
                     string porque = CompiladorNativo.PorQueNao(projeto);
                     saida.AppendLine($"  nativo: {porque ?? "sim"}");
                     if (porque is null && linguagem is Linguagem.Arduino or Linguagem.C)
                     {
                         try { CompiladorNativo.Compilar(projeto); saida.AppendLine("  clang: compilou"); }
-                        catch (Exception e) { saida.AppendLine($"  clang: {e.Message.Split('\n')[0]}"); }
+                        catch (Exception e) { saida.AppendLine($"  clang: {string.Join("\n         ", e.Message.Split('\n').Take(12))}"); }
                     }
                 }
+
+                // CS_SO_COMPILAR=1: so o relatorio do compilador, sem abrir a janela.
+                if (Environment.GetEnvironmentVariable("CS_SO_COMPILAR") == "1") continue;
 
                 var janela = new MainWindow();
                 try

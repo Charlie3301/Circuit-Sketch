@@ -107,16 +107,26 @@ public static class CompiladorNativo
 
     static readonly Regex Inclusao = new(@"^\s*#\s*include\s*[<""]([^>""]+)[>""]", RegexOptions.Compiled | RegexOptions.Multiline);
 
+    /// <summary>
+    /// O core nativo tem este cabecalho? (O que vem com o Arduino-ESP32 e o
+    /// ESP-IDF -- "SD_MMC.h", "soc/gpio_reg.h" -- e nao e biblioteca que falta.)
+    /// </summary>
+    public static bool TemNoCore(string nome)
+        => Disponivel && DoCore().Contains((nome ?? "").Trim().Replace('\\', '/'));
+
     /// <summary>Os cabecalhos que o core nativo tem (Arduino.h, Wire.h, SPI.h...).</summary>
     static HashSet<string> DoCore()
     {
+        if (doCore is not null) return doCore;
         var conjunto = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         string inc = Path.Combine(AcharPasta() ?? "", "arduino", "include");
         if (!Directory.Exists(inc)) return conjunto;
         foreach (string f in Directory.EnumerateFiles(inc, "*", SearchOption.AllDirectories))
             conjunto.Add(Path.GetRelativePath(inc, f).Replace('\\', '/'));
-        return conjunto;
+        return doCore = conjunto;
     }
+
+    static HashSet<string> doCore;
 
     static readonly HashSet<string> DaLinguagem = new(StringComparer.Ordinal)
     {
@@ -134,8 +144,9 @@ public static class CompiladorNativo
         if (!Disponivel) return "o compilador de C++ (nativo/zig) nao esta instalado";
         var core = DoCore();
         var abas = projeto.Arquivos ?? new Dictionary<string, string>();
+        var encobertas = AbasEncobertas(projeto, core);
         var textos = new List<string> { projeto.Sketch ?? "" };
-        textos.AddRange(abas.Where(a => EhFonte(a.Key)).Select(a => a.Value ?? ""));
+        textos.AddRange(abas.Where(a => EhFonte(a.Key) && !encobertas.Contains(a.Key)).Select(a => a.Value ?? ""));
 
         foreach (string texto in textos)
         {
@@ -145,8 +156,8 @@ public static class CompiladorNativo
             foreach (Match m in Inclusao.Matches(semComentario))
             {
                 string nome = m.Groups[1].Value.Trim().Replace('\\', '/');
-                if (abas.Keys.Any(k => k.Replace('\\', '/').Equals(nome, StringComparison.OrdinalIgnoreCase))) continue;
                 if (core.Contains(nome)) continue;
+                if (abas.Keys.Any(k => k.Replace('\\', '/').Equals(nome, StringComparison.OrdinalIgnoreCase))) continue;
                 if (DaLinguagem.Contains(nome) || !nome.Contains('.')) continue;     // <vector>, <cstdio>
                 if (projeto.DoSimulador?.Invoke(nome) == true) return $"usa {nome}, que o simulador imita";
                 if (DeBiblioteca(projeto, nome) is not null) continue;
@@ -154,6 +165,24 @@ public static class CompiladorNativo
             }
         }
         return null;
+    }
+
+    static readonly Regex InclusaoComAspas = new(@"^\s*#\s*include\s*""([^""]+)""", RegexOptions.Compiled | RegexOptions.Multiline);
+
+    /// <summary>
+    /// As abas que tem o nome de um cabecalho do core e so sao incluidas com
+    /// &lt;&gt;: como no Arduino, o &lt;FS.h&gt; e o do core, e a aba fica de fora
+    /// (o projeto trouxe um FS.h de outra placa, e ele nunca e lido).
+    /// </summary>
+    static HashSet<string> AbasEncobertas(Projeto projeto, HashSet<string> core)
+    {
+        var abas = projeto.Arquivos ?? new Dictionary<string, string>();
+        var comAspas = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (string texto in abas.Values.Prepend(projeto.Sketch ?? ""))
+            foreach (Match m in InclusaoComAspas.Matches(SemComentarios(texto)))
+                comAspas.Add(m.Groups[1].Value.Trim().Replace('\\', '/'));
+        return new HashSet<string>(abas.Keys.Where(k => core.Contains(k.Replace('\\', '/')) && !comAspas.Contains(k.Replace('\\', '/'))),
+                                   StringComparer.OrdinalIgnoreCase);
     }
 
     static bool EhFonte(string nome)
@@ -314,7 +343,10 @@ public static class CompiladorNativo
             foreach (string f in fontesDasLibs)
                 tarefas.Add((f, Path.Combine(trabalho, $"b{k++}.o"), !f.EndsWith(".c", StringComparison.OrdinalIgnoreCase)));
 
-            var erros = CompilarVarios(zig, tarefas, [trabalho, .. incDasLibs, inc], depurar: true);
+            // A pasta do projeto entra DEPOIS do core e das bibliotecas: o
+            // #include "x.h" acha a aba primeiro (a pasta de quem inclui), e o
+            // <x.h> acha o do core, como no Arduino.
+            var erros = CompilarVarios(zig, tarefas, [.. incDasLibs, inc], depurar: true, depois: [trabalho]);
             if (erros.Count > 0) throw ErroDoCompilador(erros, abas);
 
             // A DLL: o ponto de entrada e o da ponte, que adia os construtores
@@ -348,10 +380,11 @@ public static class CompiladorNativo
     const string ComDepuracao = "depuracao 2: -O0 -gcodeview -fno-omit-frame-pointer -fno-sanitize=all";
 
     static List<string> CompilarVarios(string zig, IEnumerable<(string Fonte, string Objeto, bool Cpp)> tarefas, IEnumerable<string> inclusoes,
-                                       bool depurar = false)
+                                       bool depurar = false, IEnumerable<string> depois = null)
     {
         var lista = tarefas.ToList();
         var incs = inclusoes.Where(Directory.Exists).Distinct().ToList();
+        var incsDepois = (depois ?? []).Where(Directory.Exists).Distinct().ToList();
         var mensagens = new string[lista.Count];
         var codigos = new int[lista.Count];
         Parallel.For(0, lista.Count, new ParallelOptions { MaxDegreeOfParallelism = Math.Max(2, Environment.ProcessorCount) }, i =>
@@ -374,6 +407,7 @@ public static class CompiladorNativo
             if (cpp) args.Add("c++");
             args.AddRange(cpp ? Permissivos : PermissivosC);
             foreach (string inc in incs) { args.Add("-I"); args.Add(inc); }
+            foreach (string inc in incsDepois) { args.Add("-idirafter"); args.Add(inc); }
             args.Add(fonte);
             args.Add("-o");
             args.Add(objeto);
