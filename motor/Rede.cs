@@ -19,6 +19,9 @@ public sealed class EstadoWifi
     public string Mac { get; internal set; } = "";
     public bool Ligado { get; internal set; }
     public bool ModoAp { get; internal set; }
+
+    /// <summary>O nome da placa na rede (WiFi.setHostname); vazio, o de fabrica.</summary>
+    public string Hostname { get; internal set; } = "";
     public int Falha { get; internal set; }
     internal long ConectaEm;
     internal bool Anunciado;
@@ -1129,6 +1132,8 @@ public sealed partial class Rede
         foreach (var cliente in clientes) DesconectarMqtt(cliente, calado: true, educado: false);
         foreach (var conexao in abertas) conexao.Fechar();
 
+        EsquecerUdp(placa);
+        PararMdns(placa);
         EsquecerBluetooth(placa);
         EsquecerBle(placa);
         EsquecerRadios(placa);

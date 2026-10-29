@@ -398,7 +398,16 @@ public partial class Interpretador
                 return Valor.DeBool(true);
 
             case "getHostname":
-                return Valor.DeTexto("esp32-" + estado.Mac.Replace(":", "")[^6..]);
+                return Valor.DeTexto(string.IsNullOrEmpty(estado.Hostname) ? "esp32-" + estado.Mac.Replace(":", "")[^6..] : estado.Hostname);
+
+            // O nome que a placa da na rede: o hostByName e o mDNS das
+            // outras placas acham ela por ele.
+            case "setHostname":
+            case "hostname" when args.Count > 0:
+                estado.Hostname = S(0);
+                return Valor.DeBool(true);
+            case "hostname":
+                return Valor.DeTexto(string.IsNullOrEmpty(estado.Hostname) ? "esp32-" + estado.Mac.Replace(":", "")[^6..] : estado.Hostname);
 
             case "getMode":
                 return Valor.DeInt(estado.ModoAp ? 2 : 1);
@@ -416,8 +425,6 @@ public partial class Interpretador
                 return Valor.DeBool(true);
 
             // Ajustes que nao mudam nada aqui, mas o sketch chama.
-            case "setHostname":
-            case "hostname":
             case "setSleep":
             case "persistent":
             case "setAutoReconnect":

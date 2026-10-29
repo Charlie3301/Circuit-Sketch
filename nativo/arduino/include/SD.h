@@ -90,29 +90,37 @@ namespace fs {
 typedef ::File File;
 enum SeekMode { SeekSet = 0, SeekCur = 1, SeekEnd = 2 };
 class FS {
+protected:
+    /* Quem guarda os arquivos: o cartao ("SD") ou a flash ("LittleFS",
+     * "SPIFFS", "FFat"). */
+    const char *cs_alvo;
+
 public:
+    explicit FS(const char *alvo = "SD") : cs_alvo(alvo) {}
     virtual ~FS() {}
     File open(const char *path, const char *mode = "r", bool create = false)
     {
         (void)create;
-        if (cs_obj_i("SD", "open", path, mode) == 0) return File();
+        if (cs_obj_i(cs_alvo, "open", path, mode) == 0) return File();
         cs_val v[] = {cs_t("File")};
         return File::adotar(cs_texto(nullptr, "__criar", 1, v));
     }
     File open(const String &path, const char *mode = "r", bool create = false) { return open(path.c_str(), mode, create); }
-    bool exists(const char *path) { return cs_obj_i("SD", "exists", path) != 0; }
+    bool exists(const char *path) { return cs_obj_i(cs_alvo, "exists", path) != 0; }
     bool exists(const String &path) { return exists(path.c_str()); }
-    bool remove(const char *path) { return cs_obj_i("SD", "remove", path) != 0; }
+    bool remove(const char *path) { return cs_obj_i(cs_alvo, "remove", path) != 0; }
     bool remove(const String &path) { return remove(path.c_str()); }
-    bool rename(const char *de, const char *para) { return cs_obj_i("SD", "rename", de, para) != 0; }
+    bool rename(const char *de, const char *para) { return cs_obj_i(cs_alvo, "rename", de, para) != 0; }
     bool rename(const String &de, const String &para) { return rename(de.c_str(), para.c_str()); }
-    bool mkdir(const char *path) { return cs_obj_i("SD", "mkdir", path) != 0; }
+    bool mkdir(const char *path) { return cs_obj_i(cs_alvo, "mkdir", path) != 0; }
     bool mkdir(const String &path) { return mkdir(path.c_str()); }
-    bool rmdir(const char *path) { return cs_obj_i("SD", "rmdir", path) != 0; }
+    bool rmdir(const char *path) { return cs_obj_i(cs_alvo, "rmdir", path) != 0; }
     bool rmdir(const String &path) { return rmdir(path.c_str()); }
 };
 } // namespace fs
 using fs::FS;
+
+#include "sd_defines.h"
 
 class SDClass : public fs::FS {
 public:
@@ -121,7 +129,7 @@ public:
     using fs::FS::remove;
     using fs::FS::mkdir;
     using fs::FS::rmdir;
-    bool begin(uint8_t csPin = 4) { return cs_obj_i("SD", "begin", csPin) != 0; }
+    bool begin(uint8_t csPin = 4) { return montado = cs_obj_i("SD", "begin", csPin) != 0; }
     /* O barramento que o sketch deu (o SPIClass(FSPI) nos pinos dele). */
     bool begin(uint8_t csPin, SPIClass &spi, uint32_t frequency = 4000000, const char *mountpoint = "/sd",
                uint8_t max_files = 5, bool format_if_empty = false)
@@ -130,9 +138,13 @@ public:
         (void)mountpoint;
         (void)max_files;
         (void)format_if_empty;
-        return cs_obj_i("SD", "begin", csPin, cs_de(spi)) != 0;
+        return montado = cs_obj_i("SD", "begin", csPin, cs_de(spi)) != 0;
     }
-    void end() { cs_obj_n("SD", "end"); }
+    void end()
+    {
+        montado = false;
+        cs_obj_n("SD", "end");
+    }
     /* O modo em texto, como o do C: o FILE_WRITE da ESP32 e o "w" (comeca do
      * zero); o do Uno e do ESP8266 escreve no fim. O arquivo aberto fica
      * esperando o File que o simulador cria em seguida. */
@@ -148,15 +160,19 @@ public:
     }
     File open(const String &path, uint8_t mode = FILE_READ) { return open(path.c_str(), mode); }
 #endif
-    uint64_t cardSize() { return 4ULL * 1024 * 1024 * 1024; }
-    uint8_t cardType() { return 2; }
+    /* O cartao do simulador e um microSD de 4 GB (SDHC); sem begin, nenhum. */
+    uint64_t cardSize() { return montado ? 4ULL * 1024 * 1024 * 1024 : 0; }
+    sdcard_type_t cardType() { return montado ? CARD_SDHC : CARD_NONE; }
+    uint64_t totalBytes() { return montado ? cardSize() - 4ULL * 1024 * 1024 : 0; }
+    uint64_t usedBytes() { return 0; }
+    uint8_t numSectors() { return 0; }
+    size_t sectorSize() { return 512; }
+
+private:
+    bool montado = false;
 };
 
 inline SDClass SD;
 
-#define CARD_NONE 0
-#define CARD_MMC 1
-#define CARD_SD 2
-#define CARD_SDHC 3
 
 #endif

@@ -133,6 +133,9 @@ public sealed class CartaoSd
 
     public bool Presente { get; set; }
 
+    /// <summary>A particao da flash ja foi formatada (o LittleFS.begin(true), o format()).</summary>
+    public bool Formatado { get; set; }
+
     public void Gravar(string nome, string conteudo)
     {
         lock (trava)

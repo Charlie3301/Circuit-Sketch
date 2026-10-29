@@ -200,6 +200,7 @@ public static partial class Autoteste
         Bloco("CSharp_Roslyn", CSharp_Roslyn);
         Bloco("Cpp_Perifericos", Cpp_Perifericos);
         Bloco("Cpp_Depurador", Cpp_Depurador);
+        Bloco("Cpp_ArduinoEsp32", Cpp_ArduinoEsp32);
         Bloco("Diagnostico_Pasta", Diagnostico_Pasta);
         Bloco("Demo_Doom", Demo_Doom);
         Bloco("MotorDc_Fisica", MotorDc_Fisica);

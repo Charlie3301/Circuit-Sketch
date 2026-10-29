@@ -6,11 +6,19 @@
 #include "WString.h"
 #include <stdint.h>
 
+/* O tipo do endereco (o IPAddress do 3.x tambem guarda IPv6; o simulador
+ * so tem IPv4, e o IPv6 vale como "qualquer"). */
+enum IPType { IPv4, IPv6 };
+
 class IPAddress : public Printable {
     uint8_t b[4] = {0, 0, 0, 0};
+    IPType _tipo = IPv4;
 
 public:
     IPAddress() {}
+    explicit IPAddress(IPType type) : _tipo(type) {}
+    IPType type() const { return _tipo; }
+    uint8_t zone() const { return 0; }
     IPAddress(uint8_t a0, uint8_t a1, uint8_t a2, uint8_t a3) : b{a0, a1, a2, a3} {}
     IPAddress(uint32_t endereco)
     {
@@ -43,6 +51,9 @@ public:
     bool operator==(const IPAddress &o) const { return memcmp(b, o.b, 4) == 0; }
     bool operator!=(const IPAddress &o) const { return !(*this == o); }
     bool operator==(const uint8_t *o) const { return memcmp(b, o, 4) == 0; }
+    uint8_t *raw_address() { return b; }
+    const uint8_t *raw_address() const { return b; }
+    bool isAny() const { return (uint32_t)*this == 0; }
     uint8_t operator[](int i) const { return b[i & 3]; }
     uint8_t &operator[](int i) { return b[i & 3]; }
     size_t printTo(Print &p) const override;
@@ -52,5 +63,6 @@ public:
 inline size_t IPAddress::printTo(Print &p) const { return p.print(toString()); }
 
 static const IPAddress INADDR_NONE(0, 0, 0, 0);
+static const IPAddress IN6ADDR_ANY(IPv6);
 
 #endif

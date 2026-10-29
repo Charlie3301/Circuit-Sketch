@@ -22,13 +22,20 @@ public:
                int sdmmc_frequency = SDMMC_FREQ_DEFAULT, uint8_t maxOpenFiles = 5)
     {
         (void)mountpoint; (void)mode1bit; (void)format_if_mount_failed; (void)sdmmc_frequency; (void)maxOpenFiles;
-        return cs_int(nullptr, "__sdmmc_begin", 0, nullptr) != 0;
+        return montado = cs_int(nullptr, "__sdmmc_begin", 0, nullptr) != 0;
     }
-    void end() { cs_obj_n("SD", "end"); }
-    uint8_t cardType() { return CARD_SDHC; }
-    uint64_t cardSize() { return 4ULL * 1024 * 1024 * 1024; }
+    void end()
+    {
+        montado = false;
+        cs_obj_n("SD", "end");
+    }
+    sdcard_type_t cardType() { return montado ? CARD_SDHC : CARD_NONE; }
+    uint64_t cardSize() { return montado ? 4ULL * 1024 * 1024 * 1024 : 0; }
     uint64_t totalBytes() { return cardSize(); }
     uint64_t usedBytes() { return 0; }
+
+private:
+    bool montado = false;
 };
 
 inline SDMMCFS SD_MMC;

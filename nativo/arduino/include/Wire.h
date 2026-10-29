@@ -60,7 +60,22 @@ public:
     inline size_t write(unsigned int n) { return write((uint8_t)n); }
     inline size_t write(int n) { return write((uint8_t)n); }
 
+    /* A placa como escrava (o mestre e outra placa): ainda nao simulada --
+     * o simulador diz isso na hora, como no sketch interpretado. */
+    void onReceive(void (*)(int)) { ch_escravo("onReceive"); }
+    void onRequest(void (*)(void)) { ch_escravo("onRequest"); }
+    template <class F> void onReceive(F) { ch_escravo("onReceive"); }
+    template <class F> void onRequest(F) { ch_escravo("onRequest"); }
+    size_t slaveWrite(const uint8_t *, size_t) { return 0; }
+
     const char *nomeNoSimulador() const { return nome; }
+
+private:
+    void ch_escravo(const char *metodo)
+    {
+        cs_val a[] = {cs_nome("__sem_escravo")};
+        cs_nada(nome, metodo, 1, a);
+    }
 };
 
 extern TwoWire Wire;

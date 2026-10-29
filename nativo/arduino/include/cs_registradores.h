@@ -82,6 +82,9 @@ bool timerStarted(hw_timer_t *timer);
 #ifdef __cplusplus
 }
 
+/* As duas formas (2.x e 3.x) sao sobrecargas de C++: valem mesmo quando um
+ * cabecalho do IDF inclui este de dentro de um extern "C". */
+extern "C++" {
 inline hw_timer_t *timerBegin(uint32_t frequency) { return cs_timer_comecar(frequency); }
 inline hw_timer_t *timerBegin(uint8_t num, uint16_t divider, bool countUp) { return cs_timer_comecar_v2(num, divider, countUp); }
 inline void timerAttachInterrupt(hw_timer_t *timer, void (*fn)(void)) { cs_timer_rotina(timer, fn); }
@@ -89,6 +92,7 @@ inline void timerAttachInterrupt(hw_timer_t *timer, void (*fn)(void), bool edge)
 {
     (void)edge;
     cs_timer_rotina(timer, fn);
+}
 }
 
 #endif

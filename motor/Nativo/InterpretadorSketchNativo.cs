@@ -94,6 +94,13 @@ public partial class Interpretador
         // O I2S do C++ compilado (cs_i2s.h): o som no amplificador do circuito.
         if (alvo is null && nome.StartsWith("__i2s_", StringComparison.Ordinal)) return I2sDoNativo(nome, args);
 
+        // O UDP do C++ compilado (WiFiUdp.h, AsyncUDP.h).
+        if (alvo is null && nome.StartsWith("__udp_", StringComparison.Ordinal)) return UdpDoNativo(nome, args);
+
+        // O HAL da ESP32 (cs_hal.cpp): o toque e a fita do RMT.
+        if (alvo is null && nome is "__toque" or "__fita") return HalDoNativo(nome, args);
+        if (alvo is null && nome is "__dns" or "__wifi_estacoes" or "__mdns" or "__mdns_servico" or "__mdns_buscar") return NomesDoNativo(nome, args);
+
         // O tom que o pino chaveado pelo registrador forma (cs_timer.cpp): o
         // buzzer toca, como no tone().
         if (alvo is null && nome == "__tom" && args.Count >= 2)

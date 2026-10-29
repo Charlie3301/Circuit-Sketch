@@ -83,6 +83,8 @@
     <Compile Include="..\motor\Fluxo.cs" />
     <Compile Include="..\motor\Mqtt.cs" />
     <Compile Include="..\motor\Rede.cs" />
+    <Compile Include="..\motor\RedeUdp.cs" />
+    <Compile Include="..\motor\RedeNomes.cs" />
     <Compile Include="..\motor\Ble.cs" />
     <Compile Include="..\motor\TiposC.cs" />
     <Compile Include="..\motor\InterpretadorC.cs" />
@@ -117,6 +119,7 @@
     <Compile Include="..\motor\Mostradores.cs" />
     <Compile Include="..\motor\Cabecalhos.cs" />
     <Compile Include="..\motor\InterpretadorRede.cs" />
+    <Compile Include="..\motor\InterpretadorFlash.cs" />
     <Compile Include="..\motor\InterpretadorBle.cs" />
     <Compile Include="..\motor\InterpretadorI2c.cs" />
     <Compile Include="..\motor\InterpretadorRadio.cs" />

@@ -1616,7 +1616,9 @@ public partial class Interpretador(Programa prog, Maquina maq)
             case "end": maq.Cartao.Desmontar(); return Valor.Vazio;
             case "exists": return Valor.DeBool(!CaminhoRecusado(Texto(0)) && maq.Cartao.Existe(Texto(0)));
             case "remove": return Valor.DeBool(!CaminhoRecusado(Texto(0)) && maq.Cartao.Remover(Texto(0)));
-            case "mkdir": case "rmdir": return Valor.DeBool(!CaminhoRecusado(Texto(0)));
+            case "mkdir": return Valor.DeBool(!CaminhoRecusado(Texto(0)) && maq.Cartao.CriarPasta(Texto(0)));
+            case "rmdir": return Valor.DeBool(!CaminhoRecusado(Texto(0)) && maq.Cartao.RemoverPasta(Texto(0)));
+            case "rename": return Valor.DeBool(!CaminhoRecusado(Texto(0)) && maq.Cartao.Renomear(Texto(0), Texto(1)));
 
             case "open":
             {
@@ -2509,6 +2511,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 return ChamarSpi(BarramentoGlobal(o.Nome), m.Nome, c, amb);
             }
             if (o.Nome == "SD") return ChamarCartao(m.Nome, c, amb);
+            if (o.Nome is "LittleFS" or "SPIFFS" or "FFat" && !amb.BuscarObjeto(o.Nome, out _)) return ChamarFlash(o.Nome, m.Nome, c, amb);
             if (o.Nome == "WiFi") return ChamarWiFi(m.Nome, c, amb);
             if (o.Nome == "ESP") return ChamarEsp(m.Nome, c, amb);
             if (o.Nome == "EEPROM" && !amb.BuscarObjeto("EEPROM", out _)) return ChamarEeprom(m.Nome, c, amb);

@@ -123,6 +123,12 @@ public static class CompiladorNativo
         if (!Directory.Exists(inc)) return conjunto;
         foreach (string f in Directory.EnumerateFiles(inc, "*", SearchOption.AllDirectories))
             conjunto.Add(Path.GetRelativePath(inc, f).Replace('\\', '/'));
+        // Os do ESP-IDF (nativo/idf/comum e nativo/idf/<chip>).
+        string idf = Path.Combine(AcharPasta() ?? "", "idf");
+        if (Directory.Exists(idf))
+            foreach (string pastaDoIdf in Directory.EnumerateDirectories(idf))
+                foreach (string f in Directory.EnumerateFiles(pastaDoIdf, "*", SearchOption.AllDirectories))
+                    conjunto.Add(Path.GetRelativePath(pastaDoIdf, f).Replace('\\', '/'));
         return doCore = conjunto;
     }
 
@@ -257,24 +263,33 @@ public static class CompiladorNativo
         string cabecalho = CabecalhoDaPlaca(placa);
         string inc = Path.Combine(pasta, "arduino", "include");
         string src = Path.Combine(pasta, "arduino", "src");
-        var fontesDoCore = Directory.GetFiles(src, "*.cpp").OrderBy(f => f, StringComparer.Ordinal).ToList();
+        var idf = PastasDoIdf(pasta, cabecalho);
+        // O core: o do simulador (src/*.cpp) e o codigo do core oficial que vem
+        // como esta (src/arduino-esp32, com .c), em subpastas -- esse so nas
+        // placas ESP32.
+        string doCoreDaEsp32 = Path.Combine(src, "arduino-esp32") + Path.DirectorySeparatorChar;
+        var fontesDoCore = Directory.EnumerateFiles(src, "*.*", SearchOption.AllDirectories)
+            .Where(f => f.EndsWith(".cpp", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".c", StringComparison.OrdinalIgnoreCase))
+            .Where(f => idf.Count > 0 || !f.StartsWith(doCoreDaEsp32, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(f => f, StringComparer.Ordinal).ToList();
         string impressaoDoCore = Impressao(
-            [VersaoDoZig(zig), Padrao, string.Join(" ", Permissivos), cabecalho,
+            [VersaoDoZig(zig), Padrao, string.Join(" ", Permissivos), cabecalho, ImpressaoDoIdf(idf),
              .. Directory.GetFiles(inc, "*", SearchOption.AllDirectories).Order(StringComparer.Ordinal).Select(f => f + File.ReadAllText(f)),
              .. Directory.GetFiles(src, "*", SearchOption.AllDirectories).Order(StringComparer.Ordinal).Select(f => f + File.ReadAllText(f))]);
         string pastaDoCore = Path.Combine(Cache(), "nucleo-" + impressaoDoCore[..16]);
+        string ObjetoDoCore(string f) => Path.Combine(pastaDoCore, Path.GetRelativePath(src, f).Replace('\\', '_').Replace('/', '_') + ".o");
         string pronto = Path.Combine(pastaDoCore, "pronto");
         if (!File.Exists(pronto))
         {
             avisar?.Invoke("compilando o core do Arduino desta placa (so na primeira vez)…");
             Directory.CreateDirectory(pastaDoCore);
             File.WriteAllText(Path.Combine(pastaDoCore, "cs_placa.h"), cabecalho);
-            var erros = CompilarVarios(zig, fontesDoCore.Select(f => (f, Path.Combine(pastaDoCore, Path.GetFileNameWithoutExtension(f) + ".o"), true)),
-                                       [pastaDoCore, inc, src]);
+            var erros = CompilarVarios(zig, fontesDoCore.Select(f => (f, ObjetoDoCore(f), !f.EndsWith(".c", StringComparison.OrdinalIgnoreCase))),
+                                       [pastaDoCore, inc, src, .. idf]);
             if (erros.Count > 0) throw new ErroDeExecucao("o core nativo do Arduino nao compilou: " + string.Join("\n", erros.Take(8)), 0);
             File.WriteAllText(pronto, "");
         }
-        var objetosDoCore = fontesDoCore.Select(f => Path.Combine(pastaDoCore, Path.GetFileNameWithoutExtension(f) + ".o")).ToList();
+        var objetosDoCore = fontesDoCore.Select(ObjetoDoCore).ToList();
 
         // ---- o projeto ----
         var abas = new Dictionary<string, string>(projeto.Arquivos ?? new Dictionary<string, string>(), StringComparer.OrdinalIgnoreCase);
@@ -325,7 +340,10 @@ public static class CompiladorNativo
         Directory.CreateDirectory(trabalho);
         try
         {
-            File.WriteAllText(Path.Combine(trabalho, "cs_placa.h"), cabecalho);
+            // O programa do ESP-IDF (app_main) ve a configuracao de um projeto do
+            // IDF (o log em INFO); o sketch, a do core do Arduino (so os erros).
+            File.WriteAllText(Path.Combine(trabalho, "cs_placa.h"),
+                              EhPrograma(projeto.Sketch) ? cabecalho + "#define CS_PROGRAMA_IDF 1\n" : cabecalho);
             foreach (var (nome, texto) in abas)
             {
                 string destino = Path.Combine(trabalho, nome.Replace('/', Path.DirectorySeparatorChar));
@@ -346,7 +364,7 @@ public static class CompiladorNativo
             // A pasta do projeto entra DEPOIS do core e das bibliotecas: o
             // #include "x.h" acha a aba primeiro (a pasta de quem inclui), e o
             // <x.h> acha o do core, como no Arduino.
-            var erros = CompilarVarios(zig, tarefas, [.. incDasLibs, inc], depurar: true, depois: [trabalho]);
+            var erros = CompilarVarios(zig, tarefas, [.. incDasLibs, inc, .. idf], depurar: true, depois: [trabalho]);
             if (erros.Count > 0) throw ErroDoCompilador(erros, abas);
 
             // A DLL: o ponto de entrada e o da ponte, que adia os construtores
@@ -748,6 +766,25 @@ public static class CompiladorNativo
     /// do interpretador), as constantes do Arduino com os numeros que o
     /// simulador usa, e os nomes dos pinos (A0, LED_BUILTIN, D5, SDA...).
     /// </summary>
+    /// <summary>
+    /// Os cabecalhos de verdade do ESP-IDF (nativo/idf, ver
+    /// ferramentas/idf/copiar_idf.py) da placa: os do chip e os comuns, depois
+    /// dos do simulador -- o que o simulador tem com o mesmo nome vale.
+    /// </summary>
+    static List<string> PastasDoIdf(string pasta, string cabecalho)
+    {
+        var chip = Regex.Match(cabecalho, @"#define CONFIG_IDF_TARGET_(ESP32\w*) 1");
+        if (!chip.Success) return [];
+        string raiz = Path.Combine(pasta, "idf");
+        return new[] { Path.Combine(raiz, chip.Groups[1].Value.ToLowerInvariant()), Path.Combine(raiz, "comum") }
+            .Where(Directory.Exists).ToList();
+    }
+
+    /// <summary>Os cabecalhos do IDF mudam a impressao pelo nome e pelo tamanho (sao milhares: le-los a cada compilacao custaria).</summary>
+    static string ImpressaoDoIdf(List<string> pastas)
+        => string.Join("\n", pastas.SelectMany(p => Directory.EnumerateFiles(p, "*", SearchOption.AllDirectories))
+                                    .Order(StringComparer.Ordinal).Select(f => f + ":" + new FileInfo(f).Length));
+
     public static string CabecalhoDaPlaca(string placa)
     {
         var sb = new StringBuilder();

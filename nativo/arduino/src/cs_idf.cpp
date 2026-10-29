@@ -2,8 +2,12 @@
 #include "Arduino.h"
 #if defined(ESP32)
 #include "cs_idf.h"
+/* O ADC antigo (driver/adc.h, que o IDF 5 ainda tem) e o I2S antigo. */
+#include "driver/adc.h"
 #include "cs_interno.h"
 #include <stdarg.h>
+#include <map>
+#include <string>
 
 /* ---- os erros ---- */
 extern "C" const char *esp_err_to_name(esp_err_t code)
@@ -22,51 +26,145 @@ extern "C" const char *esp_err_to_name(esp_err_t code)
     }
 }
 
-/* O ESP_ERROR_CHECK que falha: na placa, a mensagem e o abort (a placa
- * reinicia); aqui, a mensagem e o programa para com ela. */
-extern "C" void cs_idf_conferir(esp_err_t r, const char *expr, const char *arquivo, int linha)
+/* O ESP_ERROR_CHECK que falha: a mensagem do esp_err.c do IDF e o abort (na
+ * placa, ela reinicia; aqui, o programa para com a mensagem). */
+static void mensagemDoCheck(esp_err_t r, const char *arquivo, int linha, const char *funcao, const char *expr)
 {
-    if (r == ESP_OK) return;
-    printf("ESP_ERROR_CHECK failed: esp_err_t 0x%x (%s) at %s:%d\nexpression: %s\n", (unsigned)r, esp_err_to_name(r),
-           arquivo, linha, expr);
+    printf("ESP_ERROR_CHECK failed: esp_err_t 0x%x (%s) at %p\nfile: \"%s\" line %d\nfunc: %s\nexpression: %s\n",
+           (unsigned)r, esp_err_to_name(r), __builtin_return_address(0), arquivo, linha, funcao, expr);
+}
+extern "C" void _esp_error_check_failed(esp_err_t r, const char *arquivo, int linha, const char *funcao, const char *expr)
+{
+    mensagemDoCheck(r, arquivo, linha, funcao, expr);
     abort();
 }
-
-/* ---- o log: "I (1234) tag: mensagem" ---- */
-static esp_log_level_t nivelDoLog = ESP_LOG_INFO;
-
-extern "C" void esp_log_level_set(const char *, esp_log_level_t level)
+extern "C" void _esp_error_check_failed_without_abort(esp_err_t r, const char *arquivo, int linha, const char *funcao,
+                                                      const char *expr)
 {
-    nivelDoLog = level;
+    mensagemDoCheck(r, arquivo, linha, funcao, expr);
+}
+
+/* ---- o log (esp_log.h): "I (1234) tag: mensagem" ----
+ * O nivel e por tag, como no IDF ("*" vale para as que nao tem o seu). A
+ * mensagem chega ja formatada pela macro (o LOG_FORMAT com a letra, o tempo e
+ * a tag); o que sai vai pelo vprintf, que o programa pode trocar. */
+static esp_log_level_t nivelPadrao = ESP_LOG_INFO;
+static esp_log_level_t nivelMestre = ESP_LOG_VERBOSE;
+static std::map<std::string, esp_log_level_t> *niveisPorTag;
+static vprintf_like_t saidaDoLog = vprintf;
+
+extern "C" void esp_log_level_set(const char *tag, esp_log_level_t level)
+{
+    if (!tag || strcmp(tag, "*") == 0) {
+        nivelPadrao = level;
+        if (niveisPorTag) niveisPorTag->clear();
+        return;
+    }
+    if (!niveisPorTag) niveisPorTag = new std::map<std::string, esp_log_level_t>();
+    (*niveisPorTag)[tag] = level;
+}
+extern "C" esp_log_level_t esp_log_level_get(const char *tag)
+{
+    if (tag && niveisPorTag) {
+        auto e = niveisPorTag->find(tag);
+        if (e != niveisPorTag->end()) return e->second;
+    }
+    return nivelPadrao;
+}
+extern "C" void esp_log_set_level_master(esp_log_level_t level) { nivelMestre = level; }
+extern "C" esp_log_level_t esp_log_get_level_master(void) { return nivelMestre; }
+extern "C" vprintf_like_t esp_log_set_vprintf(vprintf_like_t func)
+{
+    vprintf_like_t antes = saidaDoLog;
+    saidaDoLog = func ? func : vprintf;
+    return antes;
 }
 extern "C" uint32_t esp_log_timestamp(void) { return (uint32_t)millis(); }
-
-static void escreverLog(char letra, const char *tag, const char *formato, va_list a)
+extern "C" uint32_t esp_log_early_timestamp(void) { return (uint32_t)millis(); }
+extern "C" char *esp_log_system_timestamp(void)
 {
-    char corpo[512];
-    vsnprintf(corpo, sizeof(corpo), formato, a);
-    printf("%c (%lu) %s: %s\n", letra, (unsigned long)millis(), tag ? tag : "", corpo);
+    static char t[24];
+    unsigned long ms = millis();
+    snprintf(t, sizeof(t), "%02lu:%02lu:%02lu.%03lu", ms / 3600000 % 24, ms / 60000 % 60, ms / 1000 % 60, ms % 1000);
+    return t;
 }
 
-extern "C" void cs_idf_log(esp_log_level_t nivel, char letra, const char *tag, const char *formato, ...)
+static bool deixa(esp_log_level_t nivel, const char *tag)
 {
-    if (nivel > nivelDoLog) return;
-    va_list a;
-    va_start(a, formato);
-    escreverLog(letra, tag, formato, a);
-    va_end(a);
+    return nivel != ESP_LOG_NONE && nivel <= nivelMestre && nivel <= esp_log_level_get(tag);
 }
 
+extern "C" void esp_log_writev(esp_log_level_t nivel, const char *tag, const char *formato, va_list a)
+{
+    if (deixa(nivel, tag)) saidaDoLog(formato, a);
+}
 extern "C" void esp_log_write(esp_log_level_t nivel, const char *tag, const char *formato, ...)
 {
-    if (nivel > nivelDoLog) return;
     va_list a;
     va_start(a, formato);
-    char corpo[512];
-    vsnprintf(corpo, sizeof(corpo), formato, a);
+    esp_log_writev(nivel, tag, formato, a);
     va_end(a);
-    printf("%s", corpo);
-    (void)tag;
+}
+/* O log da versao 2 (esp_log): o formato vem cru, e a letra, o tempo e a tag
+ * sao postos aqui. */
+extern "C" void esp_log_va(esp_log_config_t config, const char *tag, const char *formato, va_list a)
+{
+    esp_log_level_t nivel = (esp_log_level_t)(config.data & ESP_LOG_CONFIG_LEVEL_MASK);
+    if (!deixa(nivel, tag)) return;
+    if (config.opts.require_formatting) {
+        static const char letras[] = "NEWIDV";
+        printf("%c (%lu) %s: ", letras[nivel < 6 ? nivel : 0], (unsigned long)millis(), tag ? tag : "");
+    }
+    saidaDoLog(formato, a);
+    if (config.opts.require_formatting) printf("\n");
+}
+extern "C" void esp_log(esp_log_config_t config, const char *tag, const char *formato, ...)
+{
+    va_list a;
+    va_start(a, formato);
+    esp_log_va(config, tag, formato, a);
+    va_end(a);
+}
+
+/* Os ESP_LOG_BUFFER_HEX / _CHAR / _HEXDUMP. */
+static void linhaDoLog(esp_log_level_t nivel, const char *tag, const char *texto)
+{
+    static const char letras[] = "NEWIDV";
+    esp_log_write(nivel, tag, "%c (%lu) %s: %s\n", letras[nivel < 6 ? nivel : 0], (unsigned long)millis(), tag ? tag : "", texto);
+}
+extern "C" void esp_log_buffer_hex_internal(const char *tag, const void *buffer, uint16_t n, esp_log_level_t nivel)
+{
+    const uint8_t *b = (const uint8_t *)buffer;
+    for (uint16_t i = 0; i < n; i += 16) {
+        char linha[16 * 3 + 1] = {0};
+        for (uint16_t k = 0; k < 16 && i + k < n; k++) sprintf(linha + k * 3, "%02x ", b[i + k]);
+        linhaDoLog(nivel, tag, linha);
+    }
+}
+extern "C" void esp_log_buffer_char_internal(const char *tag, const void *buffer, uint16_t n, esp_log_level_t nivel)
+{
+    const char *b = (const char *)buffer;
+    for (uint16_t i = 0; i < n; i += 16) {
+        char linha[17] = {0};
+        memcpy(linha, b + i, n - i < 16 ? n - i : 16);
+        linhaDoLog(nivel, tag, linha);
+    }
+}
+extern "C" void esp_log_buffer_hexdump_internal(const char *tag, const void *buffer, uint16_t n, esp_log_level_t nivel)
+{
+    const uint8_t *b = (const uint8_t *)buffer;
+    for (uint16_t i = 0; i < n; i += 16) {
+        char linha[100];
+        int k = snprintf(linha, sizeof(linha), "%p  ", (void *)(b + i));
+        for (int j = 0; j < 16; j++)
+            k += i + j < n ? snprintf(linha + k, sizeof(linha) - k, "%02x %s", b[i + j], j == 7 ? " " : "")
+                           : snprintf(linha + k, sizeof(linha) - k, "   %s", j == 7 ? " " : "");
+        k += snprintf(linha + k, sizeof(linha) - k, " |");
+        for (int j = 0; j < 16 && i + j < n; j++) linha[k++] = isprint(b[i + j]) ? (char)b[i + j] : '.';
+        linha[k++] = '|';
+        linha[k] = 0;
+        linhaDoLog(nivel, tag, linha);
+    }
 }
 
 /* ---- o tempo ---- */
@@ -147,7 +245,7 @@ extern "C" void esp_chip_info(esp_chip_info_t *info)
     info->revision = 301;
     info->cores = 2;
 }
-extern "C" esp_err_t esp_flash_get_size(void *, uint32_t *tamanho)
+extern "C" esp_err_t esp_flash_get_size(esp_flash_t *, uint32_t *tamanho)
 {
     *tamanho = 4u << 20;
     return ESP_OK;
@@ -405,8 +503,112 @@ extern "C" esp_err_t ledc_fade_start(ledc_mode_t m, ledc_channel_t c, ledc_fade_
 }
 
 /* ---- o ADC: o canal e o GPIO dele, e a leitura e a do analogRead ---- */
-static const int8_t gpioDoAdc1[8] = {36, 37, 38, 39, 32, 33, 34, 35};
-static const int8_t gpioDoAdc2[10] = {4, 0, 2, 15, 13, 12, 14, 27, 25, 26};
+/* O pino de cada canal: a tabela do proprio chip (soc/adc_channel.h do IDF). */
+#include "soc/adc_channel.h"
+static const int8_t gpioDoAdc1[10] = {
+#ifdef ADC1_CHANNEL_0_GPIO_NUM
+    ADC1_CHANNEL_0_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC1_CHANNEL_1_GPIO_NUM
+    ADC1_CHANNEL_1_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC1_CHANNEL_2_GPIO_NUM
+    ADC1_CHANNEL_2_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC1_CHANNEL_3_GPIO_NUM
+    ADC1_CHANNEL_3_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC1_CHANNEL_4_GPIO_NUM
+    ADC1_CHANNEL_4_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC1_CHANNEL_5_GPIO_NUM
+    ADC1_CHANNEL_5_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC1_CHANNEL_6_GPIO_NUM
+    ADC1_CHANNEL_6_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC1_CHANNEL_7_GPIO_NUM
+    ADC1_CHANNEL_7_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC1_CHANNEL_8_GPIO_NUM
+    ADC1_CHANNEL_8_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC1_CHANNEL_9_GPIO_NUM
+    ADC1_CHANNEL_9_GPIO_NUM,
+#else
+    -1,
+#endif
+};
+static const int8_t gpioDoAdc2[10] = {
+#ifdef ADC2_CHANNEL_0_GPIO_NUM
+    ADC2_CHANNEL_0_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC2_CHANNEL_1_GPIO_NUM
+    ADC2_CHANNEL_1_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC2_CHANNEL_2_GPIO_NUM
+    ADC2_CHANNEL_2_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC2_CHANNEL_3_GPIO_NUM
+    ADC2_CHANNEL_3_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC2_CHANNEL_4_GPIO_NUM
+    ADC2_CHANNEL_4_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC2_CHANNEL_5_GPIO_NUM
+    ADC2_CHANNEL_5_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC2_CHANNEL_6_GPIO_NUM
+    ADC2_CHANNEL_6_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC2_CHANNEL_7_GPIO_NUM
+    ADC2_CHANNEL_7_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC2_CHANNEL_8_GPIO_NUM
+    ADC2_CHANNEL_8_GPIO_NUM,
+#else
+    -1,
+#endif
+#ifdef ADC2_CHANNEL_9_GPIO_NUM
+    ADC2_CHANNEL_9_GPIO_NUM,
+#else
+    -1,
+#endif
+};
 static uint8_t bitsDoAdc = 12;
 
 extern "C" esp_err_t adc1_config_width(adc_bits_width_t w)
@@ -415,41 +617,45 @@ extern "C" esp_err_t adc1_config_width(adc_bits_width_t w)
     analogReadResolution(bitsDoAdc);
     return ESP_OK;
 }
+/* A atenuacao do canal vale para a leitura do pino (a do analogSetPinAttenuation). */
 extern "C" esp_err_t adc1_config_channel_atten(adc1_channel_t c, adc_atten_t a)
 {
-    if (c >= ADC1_CHANNEL_MAX) return ESP_ERR_INVALID_ARG;
-    (void)(gpioDoAdc1[c]), (void)(a);   /* a atenuacao nao muda a leitura do simulador */
+    if (c >= ADC1_CHANNEL_MAX || gpioDoAdc1[c] < 0) return ESP_ERR_INVALID_ARG;
+    analogSetPinAttenuation(gpioDoAdc1[c], (adc_attenuation_t)a);
     return ESP_OK;
 }
-extern "C" int adc1_get_raw(adc1_channel_t c) { return c < ADC1_CHANNEL_MAX ? analogRead(gpioDoAdc1[c]) : -1; }
+extern "C" int adc1_get_raw(adc1_channel_t c) { return c < ADC1_CHANNEL_MAX && gpioDoAdc1[c] >= 0 ? analogRead(gpioDoAdc1[c]) : -1; }
+#if SOC_ADC_PERIPH_NUM >= 2
 extern "C" esp_err_t adc2_config_channel_atten(adc2_channel_t c, adc_atten_t a)
 {
-    if (c >= ADC2_CHANNEL_MAX) return ESP_ERR_INVALID_ARG;
-    (void)(gpioDoAdc2[c]), (void)(a);   /* a atenuacao nao muda a leitura do simulador */
+    if (c >= ADC2_CHANNEL_MAX || gpioDoAdc2[c] < 0) return ESP_ERR_INVALID_ARG;
+    analogSetPinAttenuation(gpioDoAdc2[c], (adc_attenuation_t)a);
     return ESP_OK;
 }
 extern "C" esp_err_t adc2_get_raw(adc2_channel_t c, adc_bits_width_t, int *saida)
 {
-    if (c >= ADC2_CHANNEL_MAX || !saida) return ESP_ERR_INVALID_ARG;
+    if (c >= ADC2_CHANNEL_MAX || !saida || gpioDoAdc2[c] < 0) return ESP_ERR_INVALID_ARG;
     *saida = analogRead(gpioDoAdc2[c]);
     return ESP_OK;
 }
+#endif
 extern "C" int hall_sensor_read(void) { return 0; }
 
-struct cs_adc_unidade {
+/* A unidade do ADC (o tipo opaco do IDF). */
+struct adc_oneshot_unit_ctx_t {
     adc_unit_t unidade;
 };
 
 extern "C" esp_err_t adc_oneshot_new_unit(const adc_oneshot_unit_init_cfg_t *cfg, adc_oneshot_unit_handle_t *saida)
 {
     if (!cfg || !saida) return ESP_ERR_INVALID_ARG;
-    *saida = new cs_adc_unidade{cfg->unit_id};
+    *saida = new adc_oneshot_unit_ctx_t{cfg->unit_id};
     return ESP_OK;
 }
 extern "C" esp_err_t adc_oneshot_config_channel(adc_oneshot_unit_handle_t u, adc_channel_t c, const adc_oneshot_chan_cfg_t *cfg)
 {
     if (!u || !cfg) return ESP_ERR_INVALID_ARG;
-    int gpio = u->unidade == ADC_UNIT_1 ? (c < 8 ? gpioDoAdc1[c] : -1) : (c < 10 ? gpioDoAdc2[c] : -1);
+    int gpio = u->unidade == ADC_UNIT_1 ? (c < 10 ? gpioDoAdc1[c] : -1) : (c < 10 ? gpioDoAdc2[c] : -1);
     if (gpio < 0) return ESP_ERR_INVALID_ARG;
     if (cfg->bitwidth) analogReadResolution((int)cfg->bitwidth);
     (void)(gpio), (void)(cfg->atten);   /* a atenuacao nao muda a leitura do simulador */
@@ -458,7 +664,7 @@ extern "C" esp_err_t adc_oneshot_config_channel(adc_oneshot_unit_handle_t u, adc
 extern "C" esp_err_t adc_oneshot_read(adc_oneshot_unit_handle_t u, adc_channel_t c, int *saida)
 {
     if (!u || !saida) return ESP_ERR_INVALID_ARG;
-    int gpio = u->unidade == ADC_UNIT_1 ? (c < 8 ? gpioDoAdc1[c] : -1) : (c < 10 ? gpioDoAdc2[c] : -1);
+    int gpio = u->unidade == ADC_UNIT_1 ? (c < 10 ? gpioDoAdc1[c] : -1) : (c < 10 ? gpioDoAdc2[c] : -1);
     if (gpio < 0) return ESP_ERR_INVALID_ARG;
     *saida = analogRead(gpio);
     return ESP_OK;
@@ -470,14 +676,14 @@ extern "C" esp_err_t adc_oneshot_del_unit(adc_oneshot_unit_handle_t u)
 }
 extern "C" esp_err_t adc_oneshot_io_to_channel(int io, adc_unit_t *unidade, adc_channel_t *canal)
 {
-    for (int i = 0; i < 8; i++)
-        if (gpioDoAdc1[i] == io) {
+    for (int i = 0; i < 10; i++)
+        if (gpioDoAdc1[i] >= 0 && gpioDoAdc1[i] == io) {
             *unidade = ADC_UNIT_1;
             *canal = (adc_channel_t)i;
             return ESP_OK;
         }
     for (int i = 0; i < 10; i++)
-        if (gpioDoAdc2[i] == io) {
+        if (gpioDoAdc2[i] >= 0 && gpioDoAdc2[i] == io) {
             *unidade = ADC_UNIT_2;
             *canal = (adc_channel_t)i;
             return ESP_OK;

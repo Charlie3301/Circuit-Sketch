@@ -34,8 +34,28 @@
 #define SERIAL_7O2 0x3C
 #define SERIAL_8O2 0x3E
 
+#include <functional>
+
+typedef enum {
+    UART_NO_ERROR,
+    UART_BREAK_ERROR,
+    UART_BUFFER_FULL_ERROR,
+    UART_FIFO_OVF_ERROR,
+    UART_FRAME_ERROR,
+    UART_PARITY_ERROR
+} hardwareSerial_error_t;
+
+typedef std::function<void(void)> OnReceiveCb;
+typedef std::function<void(hardwareSerial_error_t)> OnReceiveErrorCb;
+
 class HardwareSerial : public Stream {
     const char *nome;
+    unsigned long _baud = 0;
+    OnReceiveCb _recebe;
+    OnReceiveErrorCb _erro;
+    bool _soNoFim = false;
+    void *_tarefa = nullptr;
+    static void cs_vigiar(void *arg);
 
 public:
     explicit HardwareSerial(const char *nomeDoObjeto) : nome(nomeDoObjeto) {}
@@ -60,15 +80,34 @@ public:
     long parseInt(LookaheadMode lookahead = SKIP_ALL, char ignore = NO_IGNORE_CHAR) override;
     float parseFloat(LookaheadMode lookahead = SKIP_ALL, char ignore = NO_IGNORE_CHAR) override;
 
-    void setRxBufferSize(size_t) {}
-    void setTxBufferSize(size_t) {}
     void setPins(int8_t rx, int8_t tx, int8_t = -1, int8_t = -1)
     {
         cs_val a[] = {cs_i(rx), cs_i(tx)};
         cs_nada(nome, "setPins", 2, a);
     }
     void updateBaudRate(unsigned long baud);
+    uint32_t baudRate() { return _baud; }
     operator bool() const { return true; }
+
+    /* A funcao chamada quando chegam bytes (o onReceive do 3.x): uma tarefa
+     * olha a porta, como a tarefa de eventos da UART da placa. */
+    void onReceive(OnReceiveCb function, bool onlyOnTimeout = false);
+    void onReceiveError(OnReceiveErrorCb function) { _erro = function; }
+    void setDebugOutput(bool en) { (void)en; }
+    void eventQueueReset() {}
+    bool setRxTimeout(uint8_t symbols_timeout) { (void)symbols_timeout; return true; }
+    bool setRxFIFOFull(uint8_t fifoBytes) { (void)fifoBytes; return true; }
+    bool setRxInvert(bool invert) { (void)invert; return true; }
+    bool setTxInvert(bool invert) { (void)invert; return true; }
+    bool setCtsInvert(bool invert) { (void)invert; return true; }
+    bool setRtsInvert(bool invert) { (void)invert; return true; }
+    bool setHwFlowCtrlMode(uint8_t mode = 0, uint8_t threshold = 64) { (void)mode, (void)threshold; return true; }
+    bool setMode(uint8_t mode) { (void)mode; return true; }
+    bool setIrdaDirection(bool direction) { (void)direction; return true; }
+    bool setClockSource(int clkSrc) { (void)clkSrc; return true; }
+    bool enableRxInternalPull(bool enable) { (void)enable; return true; }
+    size_t setRxBufferSize(size_t new_size) { return new_size; }
+    size_t setTxBufferSize(size_t new_size) { return new_size; }
 
     const char *nomeNoSimulador() const { return nome; }
 };

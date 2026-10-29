@@ -3,12 +3,17 @@
  * bytes, na estrutura que o callback do sketch espera. */
 #include "Arduino.h"
 #if defined(ESP32)
+#include "soc/soc_caps.h"
+#if SOC_WIFI_SUPPORTED
 #include "esp_now.h"
+#include "esp_wifi.h"
+#include "WiFi.h"
+#include "cs_objeto.h"
 
 static esp_now_recv_cb_t recebeNovo;
 static esp_now_recv_cb_v2_t recebeVelho;
-static esp_now_send_cb_t enviouVelho;
-static esp_now_send_cb_v3_t enviouNovo;
+static esp_now_send_cb_v2_t enviouVelho;
+static esp_now_send_cb_t enviouNovo;
 
 static void mac(const char *texto, uint8_t *bytes)
 {
@@ -22,7 +27,9 @@ static void aoReceber(const char *origem, uint8_t *dados, int tamanho)
     uint8_t de[6], para[6];
     mac(origem, de);
     WiFi.macAddress(para);
-    wifi_pkt_rx_ctrl_t radio = {-40, 1};
+    wifi_pkt_rx_ctrl_t radio = {};
+    radio.rssi = -40;
+    radio.channel = 1;
     if (recebeNovo) {
         esp_now_recv_info_t info = {de, para, &radio};
         recebeNovo(&info, dados, tamanho);
@@ -38,7 +45,11 @@ static void aoEnviar(const char *destino, int estado)
     WiFi.macAddress(de);
     if (enviouVelho) enviouVelho(para, (esp_now_send_status_t)estado);
     else if (enviouNovo) {
-        wifi_tx_info_t info = {para, de, WIFI_IF_STA, nullptr, 0};
+        wifi_tx_info_t info = {};
+        info.des_addr = para;
+        info.src_addr = de;
+        info.ifidx = WIFI_IF_STA;
+        info.tx_status = estado == ESP_NOW_SEND_SUCCESS ? WIFI_SEND_SUCCESS : WIFI_SEND_FAIL;
         enviouNovo(&info, (esp_now_send_status_t)estado);
     }
 }
@@ -46,12 +57,26 @@ static void aoEnviar(const char *destino, int estado)
 esp_err_t esp_now_init(void) { return (esp_err_t)cs_obj_i(nullptr, "esp_now_init"); }
 esp_err_t esp_now_deinit(void) { return (esp_err_t)cs_obj_i(nullptr, "esp_now_deinit"); }
 
+/* Os pares tambem ficam guardados aqui (cs_esp_wifi.cpp): o get_peer, o
+ * fetch_peer e o get_peer_num os leem. */
+void cs_esp_now_par_adicionado(const esp_now_peer_info_t *peer);
+void cs_esp_now_par_removido(const uint8_t *mac);
+
 esp_err_t esp_now_add_peer(const esp_now_peer_info_t *peer)
 {
-    return (esp_err_t)cs_obj_i(nullptr, "esp_now_add_peer", cs_vetor(peer->peer_addr, 6));
+    if (!peer) return ESP_ERR_ESPNOW_ARG;
+    esp_err_t r = (esp_err_t)cs_obj_i(nullptr, "esp_now_add_peer", cs_vetor(peer->peer_addr, 6));
+    if (r == ESP_OK) cs_esp_now_par_adicionado(peer);
+    return r;
 }
 
-esp_err_t esp_now_del_peer(const uint8_t *peer_addr) { return (esp_err_t)cs_obj_i(nullptr, "esp_now_del_peer", cs_vetor(peer_addr, 6)); }
+esp_err_t esp_now_del_peer(const uint8_t *peer_addr)
+{
+    if (!peer_addr) return ESP_ERR_ESPNOW_ARG;
+    esp_err_t r = (esp_err_t)cs_obj_i(nullptr, "esp_now_del_peer", cs_vetor(peer_addr, 6));
+    if (r == ESP_OK) cs_esp_now_par_removido(peer_addr);
+    return r;
+}
 bool esp_now_is_peer_exist(const uint8_t *peer_addr) { return cs_obj_i(nullptr, "esp_now_is_peer_exist", cs_vetor(peer_addr, 6)) != 0; }
 
 esp_err_t esp_now_send(const uint8_t *peer_addr, const uint8_t *data, size_t len)
@@ -76,14 +101,14 @@ esp_err_t esp_now_register_recv_cb(esp_now_recv_cb_v2_t cb)
     return (esp_err_t)cs_obj_i(nullptr, "esp_now_register_recv_cb", &aoReceber);
 }
 
-esp_err_t esp_now_register_send_cb(esp_now_send_cb_t cb)
+esp_err_t esp_now_register_send_cb(esp_now_send_cb_v2_t cb)
 {
     enviouVelho = cb;
     enviouNovo = nullptr;
     return (esp_err_t)cs_obj_i(nullptr, "esp_now_register_send_cb", &aoEnviar);
 }
 
-esp_err_t esp_now_register_send_cb(esp_now_send_cb_v3_t cb)
+esp_err_t esp_now_register_send_cb(esp_now_send_cb_t cb)
 {
     enviouNovo = cb;
     enviouVelho = nullptr;
@@ -93,14 +118,5 @@ esp_err_t esp_now_register_send_cb(esp_now_send_cb_v3_t cb)
 esp_err_t esp_now_unregister_recv_cb(void) { return (esp_err_t)cs_obj_i(nullptr, "esp_now_unregister_recv_cb"); }
 esp_err_t esp_now_unregister_send_cb(void) { return (esp_err_t)cs_obj_i(nullptr, "esp_now_unregister_send_cb"); }
 
-esp_err_t esp_wifi_set_channel(uint8_t primary, wifi_second_chan_t second) { (void)primary; (void)second; return ESP_OK; }
-esp_err_t esp_wifi_get_mac(wifi_interface_t ifx, uint8_t mac[6])
-{
-    (void)ifx;
-    WiFi.macAddress(mac);
-    return ESP_OK;
-}
-esp_err_t esp_wifi_set_ps(wifi_ps_type_t type) { (void)type; return ESP_OK; }
-esp_err_t esp_wifi_set_protocol(wifi_interface_t ifx, uint8_t protocol_bitmap) { (void)ifx; (void)protocol_bitmap; return ESP_OK; }
-esp_err_t esp_wifi_set_max_tx_power(int8_t power) { (void)power; return ESP_OK; }
+#endif
 #endif

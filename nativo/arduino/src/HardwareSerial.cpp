@@ -13,6 +13,7 @@ HardwareSerial Serial2("Serial2");
 void HardwareSerial::begin(unsigned long baud, uint32_t config, int8_t rxPin, int8_t txPin, bool invert, unsigned long,
                            uint8_t)
 {
+    _baud = baud;
     if (rxPin < 0 && txPin < 0 && !invert) {
         ch(nome, "begin", cs_i((int64_t)baud), cs_i(config));
         return;
@@ -26,7 +27,42 @@ int HardwareSerial::peek() { return (int)ch_i(nome, "peek"); }
 int HardwareSerial::read() { return (int)ch_i(nome, "read"); }
 int HardwareSerial::availableForWrite() { return (int)ch_i(nome, "availableForWrite"); }
 void HardwareSerial::flush() { ch(nome, "flush"); }
-void HardwareSerial::updateBaudRate(unsigned long baud) { ch(nome, "updateBaudRate", cs_i((int64_t)baud)); }
+void HardwareSerial::updateBaudRate(unsigned long baud)
+{
+    _baud = baud;
+    ch(nome, "updateBaudRate", cs_i((int64_t)baud));
+}
+
+#ifdef ESP32
+/* O onReceive: a tarefa olha a porta a cada 2 ms; chegou byte, chama a
+ * funcao (com onlyOnTimeout, so depois de a linha ficar quieta). */
+void HardwareSerial::cs_vigiar(void *arg)
+{
+    HardwareSerial *s = (HardwareSerial *)arg;
+    int antes = 0;
+    for (;;) {
+        int agora = s->available();
+        if (agora > 0 && s->_recebe) {
+            if (!s->_soNoFim || agora == antes) s->_recebe();
+        }
+        antes = s->available();
+        vTaskDelay(2);
+    }
+}
+
+void HardwareSerial::onReceive(OnReceiveCb function, bool onlyOnTimeout)
+{
+    _recebe = function;
+    _soNoFim = onlyOnTimeout;
+    if (!_tarefa && function) xTaskCreate(cs_vigiar, "uart_event_task", 4096, this, 5, (TaskHandle_t *)&_tarefa);
+}
+#else
+void HardwareSerial::onReceive(OnReceiveCb function, bool onlyOnTimeout)
+{
+    _recebe = function;
+    _soNoFim = onlyOnTimeout;
+}
+#endif
 
 size_t HardwareSerial::write(uint8_t c)
 {

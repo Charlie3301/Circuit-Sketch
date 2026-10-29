@@ -44,6 +44,12 @@ public:
     bool reserve(unsigned int size);
     inline unsigned int length() const { return len; }
     inline bool isEmpty() const { return len == 0; }
+    /* Esvazia a String (o 3.x da ESP32): o espaco reservado continua. */
+    void clear()
+    {
+        if (buffer) buffer[0] = 0;
+        len = 0;
+    }
 
     String &operator=(const String &rhs);
     String &operator=(const char *cstr);

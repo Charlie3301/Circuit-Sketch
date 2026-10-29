@@ -8,13 +8,7 @@
 #include <string.h>
 #include "IPAddress.h"
 
-class Client : public Stream {
-public:
-    virtual int connect(const char *host, uint16_t port) = 0;
-    virtual uint8_t connected() = 0;
-    virtual void stop() = 0;
-    virtual operator bool() = 0;
-};
+#include "Client.h"
 
 /* Quantas copias de cada client existem: como no core da ESP32 (o socket
  * num shared_ptr), a conexao fecha quando a ultima copia some -- o client
@@ -76,14 +70,14 @@ public:
     ~WiFiClient() override { soltar(); }
 
     int connect(const char *host, uint16_t port) override { return (int)cs_obj_i(cs_nome, "connect", host, port); }
-    int connect(IPAddress ip, uint16_t port) { return (int)cs_obj_i(cs_nome, "connect", ip.toString(), port); }
+    int connect(IPAddress ip, uint16_t port) override { return (int)cs_obj_i(cs_nome, "connect", ip.toString(), port); }
     int connect(const char *host, uint16_t port, int32_t timeout_ms) { (void)timeout_ms; return connect(host, port); }
     uint8_t connected() override { return (uint8_t)cs_obj_i(cs_nome, "connected"); }
     void stop() override { cs_obj_n(cs_nome, "stop"); }
     operator bool() override { return cs_nome[0] && connected(); }
     int available() override { return (int)cs_obj_i(cs_nome, "available"); }
     int read() override { return (int)cs_obj_i(cs_nome, "read"); }
-    int read(uint8_t *buf, size_t size)
+    int read(uint8_t *buf, size_t size) override
     {
         size_t n = 0;
         while (n < size && available() > 0) buf[n++] = (uint8_t)read();

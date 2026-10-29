@@ -94,17 +94,21 @@ typedef unsigned int word;
 void pinMode(uint8_t pin, uint8_t mode);
 void digitalWrite(uint8_t pin, uint8_t val);
 int digitalRead(uint8_t pin);
+#ifndef ESP32 /* na ESP32, os do esp32-hal-adc.h (uint16_t, uint8_t) */
 int analogRead(uint8_t pin);
 void analogReference(uint8_t mode);
 void analogWrite(uint8_t pin, int val);
 void analogReadResolution(int bits);
+#endif
 void analogWriteResolution(int bits);
 void analogWriteFrequency(uint32_t freq);
 void analogWriteRange(uint32_t range);
 
 unsigned long millis(void);
 unsigned long micros(void);
+#ifndef ESP32 /* na ESP32, o do esp32-hal.h (uint32_t) */
 void delay(unsigned long ms);
+#endif
 void delayMicroseconds(unsigned int us);
 void yield(void);
 
@@ -133,7 +137,13 @@ unsigned int makeWord(unsigned char h, unsigned char l);
 #define word(...) makeWord(__VA_ARGS__)
 
 /* As do stdlib do AVR que o C padrao nao tem. */
+#ifdef ESP32 /* o do stdlib_noniso.h da ESP32 (int), e os longos */
+char *dtostrf(double val, signed int width, unsigned int prec, char *sout);
+char *lltoa(long long val, char *s, int radix);
+char *ulltoa(unsigned long long val, char *s, int radix);
+#else
 char *dtostrf(double val, signed char width, unsigned char prec, char *sout);
+#endif
 char *ltoa(long value, char *str, int radix);
 char *ultoa(unsigned long value, char *str, int radix);
 char *utoa(unsigned int value, char *str, int radix);
@@ -145,22 +155,11 @@ char *itoa(int value, char *str, int radix);
 #endif
 
 #ifdef ESP32
-/* O LEDC (o PWM da ESP32): a API 2.x por canal e a 3.x por pino. */
+/* O LEDC do core 2.x (por canal), que o 3.x tirou; o resto (o ledcAttach,
+ * o touchRead, o rgbLedWrite...) vem do esp32-hal.h, o do core oficial. */
 double ledcSetup(uint8_t channel, double freq, uint8_t resolution_bits);
 void ledcAttachPin(uint8_t pin, uint8_t channel);
 void ledcDetachPin(uint8_t pin);
-bool ledcAttach(uint8_t pin, uint32_t freq, uint8_t resolution);
-bool ledcAttachChannel(uint8_t pin, uint32_t freq, uint8_t resolution, uint8_t channel);
-bool ledcDetach(uint8_t pin);
-bool ledcWrite(uint8_t chan_or_pin, uint32_t duty);
-uint32_t ledcRead(uint8_t chan_or_pin);
-double ledcWriteTone(uint8_t chan_or_pin, double freq);
-double ledcChangeFrequency(uint8_t chan_or_pin, uint32_t freq, uint8_t resolution);
-uint32_t analogReadMilliVolts(uint8_t pin);
-void neopixelWrite(uint8_t pin, uint8_t red, uint8_t green, uint8_t blue);
-void rgbLedWrite(uint8_t pin, uint8_t red, uint8_t green, uint8_t blue);
-uint16_t touchRead(uint8_t pin);
-float temperatureRead(void);
 #endif
 
 /* O sketch. */
@@ -207,8 +206,8 @@ unsigned int makeWord(unsigned int w);
 long random(long howbig);
 long random(long howsmall, long howbig);
 
-/* attachInterrupt com argumento (ESP32) e com std::function (ESP32 3.x). */
-void attachInterruptArg(uint8_t pin, void (*userFunc)(void *), void *arg, int mode);
+/* attachInterrupt com argumento (ESP32), com a ligacao de C, como no core. */
+extern "C" void attachInterruptArg(uint8_t pin, void (*userFunc)(void *), void *arg, int mode);
 #else
 #define tone(pin, freq, dur) cs_tone((pin), (freq), (dur))
 #define random(a, b) cs_random((a), (b))
@@ -219,6 +218,9 @@ void attachInterruptArg(uint8_t pin, void (*userFunc)(void *), void *arg, int mo
 #ifdef ESP32
 #include "freertos/FreeRTOS.h"
 #include "cs_registradores.h"
+/* O HAL do core oficial da ESP32 (os cabecalhos de verdade): o PWM, o toque,
+ * o DAC, o RMT, a UART, o log_x... As funcoes sao as do simulador. */
+#include "esp32-hal.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -13,10 +13,16 @@ extern "C" {
 void pinMode(uint8_t pin, uint8_t mode) { ch(nullptr, "pinMode", cs_i(pin), cs_i(mode)); }
 void digitalWrite(uint8_t pin, uint8_t val) { ch(nullptr, "digitalWrite", cs_i(pin), cs_i(val)); }
 int digitalRead(uint8_t pin) { return (int)ch_i(nullptr, "digitalRead", cs_i(pin)); }
+#ifndef ESP32 /* na ESP32, o do cs_hal.cpp (com a atenuacao) */
 int analogRead(uint8_t pin) { return (int)ch_i(nullptr, "analogRead", cs_i(pin)); }
+#endif
 void analogReference(uint8_t mode) { ch(nullptr, "analogReference", cs_i(mode)); }
 void analogWrite(uint8_t pin, int val) { ch(nullptr, "analogWrite", cs_i(pin), cs_i(val)); }
+#ifdef ESP32
+void analogReadResolution(uint8_t bits) { ch(nullptr, "analogReadResolution", cs_i(bits)); }
+#else
 void analogReadResolution(int bits) { ch(nullptr, "analogReadResolution", cs_i(bits)); }
+#endif
 void analogWriteResolution(int bits) { ch(nullptr, "analogWriteResolution", cs_i(bits)); }
 void analogWriteFrequency(uint32_t freq) { ch(nullptr, "analogWriteFrequency", cs_i(freq)); }
 void analogWriteRange(uint32_t range) { ch(nullptr, "analogWriteRange", cs_i(range)); }
@@ -44,7 +50,11 @@ void cs_rtos_ceder(void);
 
 /* Com o FreeRTOS no jogo, o delay e o vTaskDelay (a vez passa para as outras
  * tarefas, como na ESP32); sem ele, o delay do simulador. */
+#ifdef ESP32
+void delay(uint32_t ms)
+#else
 void delay(unsigned long ms)
+#endif
 {
     if (cs_rtos_ativo) vTaskDelay((uint32_t)ms);
     else ch(nullptr, "delay", cs_i((int64_t)ms));
@@ -81,16 +91,36 @@ uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder)
 }
 
 /* A rotina vira um nome que o simulador chama de volta ("__nativa_3"). */
+/* A interrupcao de cada pino (o enableInterrupt/disableInterrupt da ESP32
+ * religa a mesma). */
+cs_interrupcao_t cs_interrupcoes[CS_PINOS_COM_INTERRUPCAO];
+
+static void ligarInterrupcao(uint8_t pino, int rotina, int modo)
+{
+    char nome[24];
+    snprintf(nome, sizeof(nome), "__nativa_%d", rotina);
+    ch(nullptr, "attachInterrupt", cs_i(pino), cs_nome(nome), cs_i(modo));
+}
+
+void cs_religar_interrupcao(uint8_t pino)
+{
+    if (pino < CS_PINOS_COM_INTERRUPCAO && cs_interrupcoes[pino].rotina >= 0 && cs_interrupcoes[pino].ligada)
+        ligarInterrupcao(pino, cs_interrupcoes[pino].rotina, cs_interrupcoes[pino].modo);
+}
+
 void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode)
 {
     int i = cs_registrar_rotina(userFunc, nullptr, nullptr);
     if (i < 0) return;
-    char nome[24];
-    snprintf(nome, sizeof(nome), "__nativa_%d", i);
-    ch(nullptr, "attachInterrupt", cs_i(interruptNum), cs_nome(nome), cs_i(mode));
+    if (interruptNum < CS_PINOS_COM_INTERRUPCAO) cs_interrupcoes[interruptNum] = {i, mode, true};
+    ligarInterrupcao(interruptNum, i, mode);
 }
 
-void detachInterrupt(uint8_t interruptNum) { ch(nullptr, "detachInterrupt", cs_i(interruptNum)); }
+void detachInterrupt(uint8_t interruptNum)
+{
+    if (interruptNum < CS_PINOS_COM_INTERRUPCAO) cs_interrupcoes[interruptNum] = {-1, 0, false};
+    ch(nullptr, "detachInterrupt", cs_i(interruptNum));
+}
 int digitalPinToInterrupt(int pin) { return (int)ch_i(nullptr, "digitalPinToInterrupt", cs_i(pin)); }
 void interrupts(void) { ch(nullptr, "interrupts"); }
 void noInterrupts(void) { ch(nullptr, "noInterrupts"); }
@@ -123,7 +153,11 @@ long map(long x, long in_min, long in_max, long out_min, long out_max)
 unsigned int makeWord(unsigned char h, unsigned char l) { return ((unsigned int)h << 8) | l; }
 
 /* ---- o stdlib do AVR ---- */
+#ifdef ESP32
+char *dtostrf(double val, signed int width, unsigned int prec, char *sout)
+#else
 char *dtostrf(double val, signed char width, unsigned char prec, char *sout)
+#endif
 {
     char fmt[20];
     snprintf(fmt, sizeof(fmt), "%%%d.%df", width, prec);
@@ -173,38 +207,70 @@ double ledcSetup(uint8_t channel, double freq, uint8_t bits)
 }
 void ledcAttachPin(uint8_t pin, uint8_t channel) { ch(nullptr, "ledcAttachPin", cs_i(pin), cs_i(channel)); }
 void ledcDetachPin(uint8_t pin) { ch(nullptr, "ledcDetachPin", cs_i(pin)); }
-bool ledcAttach(uint8_t pin, uint32_t freq, uint8_t res) { return ch_i(nullptr, "ledcAttach", cs_i(pin), cs_i(freq), cs_i(res)) != 0; }
+cs_ledc_t cs_ledc[CS_PINOS_COM_INTERRUPCAO];
+
+static void guardarLedc(uint8_t pino, uint32_t freq, uint8_t bits)
+{
+    if (pino >= CS_PINOS_COM_INTERRUPCAO) return;
+    cs_ledc[pino].freq = freq;
+    if (bits) cs_ledc[pino].bits = bits;
+}
+
+bool ledcAttach(uint8_t pin, uint32_t freq, uint8_t res)
+{
+    guardarLedc(pin, freq, res);
+    return ch_i(nullptr, "ledcAttach", cs_i(pin), cs_i(freq), cs_i(res)) != 0;
+}
 bool ledcAttachChannel(uint8_t pin, uint32_t freq, uint8_t res, uint8_t channel)
 {
+    guardarLedc(pin, freq, res);
     return ch_i(nullptr, "ledcAttachChannel", cs_i(pin), cs_i(freq), cs_i(res), cs_i(channel)) != 0;
 }
 bool ledcDetach(uint8_t pin) { return ch_i(nullptr, "ledcDetach", cs_i(pin)) != 0; }
-bool ledcWrite(uint8_t chan_or_pin, uint32_t duty) { return ch_i(nullptr, "ledcWrite", cs_i(chan_or_pin), cs_i(duty)) != 0; }
-uint32_t ledcRead(uint8_t chan_or_pin) { return (uint32_t)ch_i(nullptr, "ledcRead", cs_i(chan_or_pin)); }
-double ledcWriteTone(uint8_t chan_or_pin, double freq) { return ch_r(nullptr, "ledcWriteTone", cs_i(chan_or_pin), cs_r(freq)); }
-double ledcChangeFrequency(uint8_t chan_or_pin, uint32_t freq, uint8_t res)
+bool ledcWrite(uint8_t chan_or_pin, uint32_t duty)
 {
-    return ch_r(nullptr, "ledcChangeFrequency", cs_i(chan_or_pin), cs_i(freq), cs_i(res));
+    /* A saida invertida (ledcOutputInvert): o ciclo de cabeca para baixo. */
+    if (chan_or_pin < CS_PINOS_COM_INTERRUPCAO && cs_ledc[chan_or_pin].invertido) {
+        uint32_t maximo = (1u << (cs_ledc[chan_or_pin].bits ? cs_ledc[chan_or_pin].bits : 8)) - 1;
+        duty = duty > maximo ? 0 : maximo - duty;
+    }
+    return ch_i(nullptr, "ledcWrite", cs_i(chan_or_pin), cs_i(duty)) != 0;
+}
+uint32_t ledcRead(uint8_t chan_or_pin) { return (uint32_t)ch_i(nullptr, "ledcRead", cs_i(chan_or_pin)); }
+uint32_t ledcWriteTone(uint8_t chan_or_pin, uint32_t freq)
+{
+    guardarLedc(chan_or_pin, freq, 0);
+    return (uint32_t)ch_r(nullptr, "ledcWriteTone", cs_i(chan_or_pin), cs_r(freq));
+}
+uint32_t ledcChangeFrequency(uint8_t chan_or_pin, uint32_t freq, uint8_t res)
+{
+    guardarLedc(chan_or_pin, freq, res);
+    return (uint32_t)ch_r(nullptr, "ledcChangeFrequency", cs_i(chan_or_pin), cs_i(freq), cs_i(res));
 }
 uint32_t analogReadMilliVolts(uint8_t pin) { return (uint32_t)ch_i(nullptr, "analogReadMilliVolts", cs_i(pin)); }
 void neopixelWrite(uint8_t pin, uint8_t r, uint8_t g, uint8_t b) { ch(nullptr, "neopixelWrite", cs_i(pin), cs_i(r), cs_i(g), cs_i(b)); }
 void rgbLedWrite(uint8_t pin, uint8_t r, uint8_t g, uint8_t b) { ch(nullptr, "rgbLedWrite", cs_i(pin), cs_i(r), cs_i(g), cs_i(b)); }
-uint16_t touchRead(uint8_t pin) { return (uint16_t)ch_i(nullptr, "touchRead", cs_i(pin)); }
 float temperatureRead(void) { return (float)ch_r(nullptr, "temperatureRead"); }
 
 /* ---- o sono e o reinicio (esp_sleep.h, esp_system.h) ---- */
+/* O EXT0 e o EXT1 so existem nos chips que tem (o esp_sleep.h de verdade
+ * nem os declara na C3, por exemplo). */
+#if SOC_PM_SUPPORT_EXT0_WAKEUP
 esp_err_t esp_sleep_enable_ext0_wakeup(gpio_num_t gpio, int level)
 {
     return (esp_err_t)ch_i(nullptr, "esp_sleep_enable_ext0_wakeup", cs_i(gpio), cs_i(level));
 }
-esp_err_t esp_sleep_enable_ext1_wakeup(uint64_t mask, int mode)
+#endif
+#if SOC_PM_SUPPORT_EXT1_WAKEUP
+esp_err_t esp_sleep_enable_ext1_wakeup(uint64_t mask, esp_sleep_ext1_wakeup_mode_t mode)
 {
     return (esp_err_t)ch_i(nullptr, "esp_sleep_enable_ext1_wakeup", cs_i((int64_t)mask), cs_i(mode));
 }
-esp_err_t esp_sleep_enable_ext1_wakeup_io(uint64_t mask, int mode)
+esp_err_t esp_sleep_enable_ext1_wakeup_io(uint64_t mask, esp_sleep_ext1_wakeup_mode_t mode)
 {
     return (esp_err_t)ch_i(nullptr, "esp_sleep_enable_ext1_wakeup_io", cs_i((int64_t)mask), cs_i(mode));
 }
+#endif
 esp_err_t esp_sleep_enable_timer_wakeup(uint64_t us)
 {
     return (esp_err_t)ch_i(nullptr, "esp_sleep_enable_timer_wakeup", cs_i((int64_t)us));
@@ -235,9 +301,8 @@ void attachInterruptArg(uint8_t pin, void (*userFunc)(void *), void *arg, int mo
 {
     int i = cs_registrar_rotina(nullptr, userFunc, arg);
     if (i < 0) return;
-    char nome[24];
-    snprintf(nome, sizeof(nome), "__nativa_%d", i);
-    ch(nullptr, "attachInterrupt", cs_i(pin), cs_nome(nome), cs_i(mode));
+    if (pin < CS_PINOS_COM_INTERRUPCAO) cs_interrupcoes[pin] = {i, mode, true};
+    ligarInterrupcao(pin, i, mode);
 }
 
 /* ---- o objeto ESP ---- */

@@ -13,6 +13,10 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+/* Na ESP32 o portmacro.h traz o BIT0..BIT31 (os bits do event group). */
+#if __has_include("esp_bit_defs.h")
+#include "esp_bit_defs.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -234,6 +238,11 @@ typedef struct {
     uint8_t reservado[96];
 } StaticQueue_t;
 typedef StaticQueue_t StaticSemaphore_t;
+/* A lista do FreeRTOS guardada por fora (o StaticRingbuffer_t do IDF a usa). */
+typedef struct {
+    void *reservado[5];
+    UBaseType_t numero;
+} StaticList_t;
 
 #define queueSEND_TO_BACK ((BaseType_t)0)
 #define queueSEND_TO_FRONT ((BaseType_t)1)
