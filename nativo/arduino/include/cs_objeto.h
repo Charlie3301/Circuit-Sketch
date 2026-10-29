@@ -187,6 +187,21 @@ template <class... A> inline String cs_obj_t(const char *alvo, const char *m, A.
     return cs_texto(alvo, m, (int)sizeof...(A), v);
 }
 
+/* O pedaco e texto UTF-8 valido (o acento do sketch e; um byte de dado nao). */
+inline bool cs_texto_utf8(const uint8_t *p, size_t n)
+{
+    size_t i = 0;
+    while (i < n) {
+        uint8_t c = p[i];
+        int seguem = c < 0x80 ? 0 : (c & 0xE0) == 0xC0 ? 1 : (c & 0xF0) == 0xE0 ? 2 : (c & 0xF8) == 0xF0 ? 3 : -1;
+        if (seguem < 0 || c == 0 || (seguem > 0 && i + (size_t)seguem >= n)) return false;
+        for (int k = 1; k <= seguem; k++)
+            if ((p[i + (size_t)k] & 0xC0) != 0x80) return false;
+        i += (size_t)seguem + 1;
+    }
+    return true;
+}
+
 /* O objeto do simulador por tras de cada objeto C++. */
 class CsObjeto {
 protected:

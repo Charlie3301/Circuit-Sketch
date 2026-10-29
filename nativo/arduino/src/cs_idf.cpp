@@ -491,3 +491,96 @@ extern "C" esp_err_t nvs_flash_erase(void) { return ESP_OK; }
 extern "C" esp_err_t nvs_flash_deinit(void) { return ESP_OK; }
 
 #endif
+
+/* ---- o I2S do ESP-IDF (driver/i2s.h): a mesma saida do I2SClass ---- */
+#if defined(ESP32)
+#include "driver/i2s.h"
+
+static i2s_config_t configDoI2s;
+static int pinosDoI2s[3] = {-1, -1, -1};
+static bool i2sInstalado;
+
+static void reabrirI2s(void)
+{
+    if (!i2sInstalado) return;
+    int canais = configDoI2s.channel_format == I2S_CHANNEL_FMT_RIGHT_LEFT ? 2 : 1;
+    cs_i2s_abrir(configDoI2s.sample_rate, configDoI2s.bits_per_sample, canais, pinosDoI2s[0], pinosDoI2s[1], pinosDoI2s[2]);
+}
+
+extern "C" esp_err_t i2s_driver_install(i2s_port_t, const i2s_config_t *cfg, int, void *)
+{
+    if (!cfg) return ESP_ERR_INVALID_ARG;
+    configDoI2s = *cfg;
+    i2sInstalado = true;
+    reabrirI2s();
+    return ESP_OK;
+}
+
+extern "C" esp_err_t i2s_driver_uninstall(i2s_port_t)
+{
+    if (i2sInstalado) cs_i2s_fechar();
+    i2sInstalado = false;
+    return ESP_OK;
+}
+
+extern "C" esp_err_t i2s_set_pin(i2s_port_t, const i2s_pin_config_t *pin)
+{
+    if (!pin) return ESP_OK;
+    pinosDoI2s[0] = pin->bck_io_num;
+    pinosDoI2s[1] = pin->ws_io_num;
+    pinosDoI2s[2] = pin->data_out_num;
+    reabrirI2s();
+    return ESP_OK;
+}
+
+extern "C" esp_err_t i2s_write(i2s_port_t, const void *src, size_t size, size_t *escritos, TickType_t)
+{
+    size_t n = i2sInstalado ? cs_i2s_escrever(src, size) : 0;
+    if (escritos) *escritos = n;
+    return i2sInstalado ? ESP_OK : ESP_ERR_INVALID_STATE;
+}
+
+extern "C" esp_err_t i2s_read(i2s_port_t, void *dest, size_t size, size_t *lidos, TickType_t)
+{
+    memset(dest, 0, size);
+    if (lidos) *lidos = size;
+    return ESP_OK;
+}
+
+extern "C" esp_err_t i2s_zero_dma_buffer(i2s_port_t) { return ESP_OK; }
+extern "C" esp_err_t i2s_set_clk(i2s_port_t, uint32_t rate, uint32_t bits_cfg, i2s_channel_t ch)
+{
+    configDoI2s.sample_rate = rate;
+    configDoI2s.bits_per_sample = (i2s_bits_per_sample_t)(bits_cfg & 0xFFFF);
+    configDoI2s.channel_format = ch == I2S_CHANNEL_STEREO ? I2S_CHANNEL_FMT_RIGHT_LEFT : I2S_CHANNEL_FMT_ONLY_LEFT;
+    reabrirI2s();
+    return ESP_OK;
+}
+extern "C" esp_err_t i2s_set_sample_rates(i2s_port_t, uint32_t rate)
+{
+    configDoI2s.sample_rate = rate;
+    reabrirI2s();
+    return ESP_OK;
+}
+extern "C" esp_err_t i2s_start(i2s_port_t) { return ESP_OK; }
+extern "C" esp_err_t i2s_stop(i2s_port_t) { return ESP_OK; }
+#endif
+
+/* ---- a PSRAM e a memoria por capacidade: a do PC ---- */
+#if defined(ESP32)
+#include <malloc.h>
+extern "C" bool psramFound(void) { return true; }
+extern "C" bool psramInit(void) { return true; }
+extern "C" void *ps_malloc(size_t n) { return malloc(n); }
+extern "C" void *ps_calloc(size_t n, size_t t) { return calloc(n, t); }
+extern "C" void *ps_realloc(void *p, size_t n) { return realloc(p, n); }
+extern "C" void *heap_caps_malloc(size_t n, uint32_t) { return malloc(n); }
+extern "C" void *heap_caps_calloc(size_t n, size_t t, uint32_t) { return calloc(n, t); }
+extern "C" void *heap_caps_realloc(void *p, size_t n, uint32_t) { return realloc(p, n); }
+extern "C" void *heap_caps_aligned_alloc(size_t a, size_t n, uint32_t) { (void)a; return malloc(n); }  /* o malloc do PC alinha em 16 */
+extern "C" void heap_caps_free(void *p) { free(p); }
+extern "C" size_t heap_caps_get_free_size(uint32_t caps) { return caps & MALLOC_CAP_SPIRAM ? 8u << 20 : 280000; }
+extern "C" size_t heap_caps_get_largest_free_block(uint32_t caps) { return caps & MALLOC_CAP_SPIRAM ? 8u << 20 : 110000; }
+extern "C" size_t heap_caps_get_total_size(uint32_t caps) { return caps & MALLOC_CAP_SPIRAM ? 8u << 20 : 327680; }
+extern "C" size_t heap_caps_get_minimum_free_size(uint32_t caps) { return heap_caps_get_free_size(caps); }
+#endif

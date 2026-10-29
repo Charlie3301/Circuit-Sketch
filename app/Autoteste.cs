@@ -198,6 +198,9 @@ public static partial class Autoteste
         Bloco("Cpp_NativoVarredura", Cpp_NativoVarredura);
         Bloco("Cpp_Sdks", Cpp_Sdks);
         Bloco("CSharp_Roslyn", CSharp_Roslyn);
+        Bloco("Cpp_Perifericos", Cpp_Perifericos);
+        Bloco("Cpp_Depurador", Cpp_Depurador);
+        Bloco("Diagnostico_Pasta", Diagnostico_Pasta);
         Bloco("Demo_Doom", Demo_Doom);
         Bloco("MotorDc_Fisica", MotorDc_Fisica);
         Bloco("MotorDc_NoCircuito", MotorDc_NoCircuito);

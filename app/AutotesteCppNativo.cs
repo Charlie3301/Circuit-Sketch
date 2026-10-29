@@ -16,9 +16,10 @@ public static partial class Autoteste
     /// programa veio mesmo compilado, e a placa.
     /// </summary>
     static (string Serial, string Erro, bool Nativo, Maquina Maq) RodarNativo(string sketch, int ms = 300,
-        string placa = "esp32-devkit-v1", Action<Maquina> durante = null, IDictionary<string, string> abas = null)
+        string placa = "esp32-devkit-v1", Action<Maquina> durante = null, IDictionary<string, string> abas = null,
+        Action<Interpretador, Maquina> antes = null)
     {
-        bool antes = Compilador.CppNativo;
+        bool eraNativo = Compilador.CppNativo;
         Compilador.CppNativo = true;
         var maq = new Maquina { Perfil = PerfilPlaca.De(placa) ?? PerfilPlaca.Esp32 };
         string Serial() => string.Join("|", maq.Serial.Select(l => l.Contains("] ") ? l[(l.IndexOf("] ") + 2)..] : l));
@@ -27,6 +28,7 @@ public static partial class Autoteste
             var prog = Compilador.CompilarProjeto(new Projeto { Sketch = sketch, Placa = placa, Arquivos = abas, DoSimulador = Acervo.EhDoSimulador });
             bool nativo = prog.Compilado is not null;
             var interp = new Interpretador(prog, maq);
+            antes?.Invoke(interp, maq);
             Exception falha = null;
             var thread = new Thread(() =>
             {
@@ -53,7 +55,7 @@ public static partial class Autoteste
             return (Serial(), falha?.Message, nativo, maq);
         }
         catch (Exception e) when (e is ErroDeSintaxe or ErroDeExecucao) { return (null, e.Message, false, maq); }
-        finally { Compilador.CppNativo = antes; }
+        finally { Compilador.CppNativo = eraNativo; }
     }
 
     static void Cpp_Nativo()

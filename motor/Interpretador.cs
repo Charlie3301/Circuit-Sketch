@@ -203,6 +203,15 @@ public partial class Interpretador(Programa prog, Maquina maq)
             finally { atendendo = false; }
         }
 
+        // O timer de hardware do C++ compilado (timerAlarm): as interrupcoes
+        // vencidas, em lote, cada uma no seu tempo (cs_timer.cpp).
+        if (sketchNativo is SketchNativo nativo && nativo.TimersAtivos)
+        {
+            atendendo = true;
+            try { nativo.AtenderTimers(); }
+            finally { atendendo = false; }
+        }
+
         var externas = maq.InterrupcoesExternas();
         var vencidas = maq.InterrupcoesPendentes();
         if (vencidas.Count == 0 && externas.Count == 0) return;
@@ -1604,6 +1613,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 return Valor.DeBool(true);
             }
 
+            case "end": maq.Cartao.Desmontar(); return Valor.Vazio;
             case "exists": return Valor.DeBool(!CaminhoRecusado(Texto(0)) && maq.Cartao.Existe(Texto(0)));
             case "remove": return Valor.DeBool(!CaminhoRecusado(Texto(0)) && maq.Cartao.Remover(Texto(0)));
             case "mkdir": case "rmdir": return Valor.DeBool(!CaminhoRecusado(Texto(0)));
@@ -2849,6 +2859,15 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 int alvoPino = maq.CanalPwm.TryGetValue(canal, out var pino) ? pino : canal;
                 var (hz, bits) = ledc.GetValueOrDefault(canal, (5000.0, 8));
                 int maximo = (1 << Math.Clamp(bits, 1, 16)) - 1;
+                // O servo comandado pelo LEDC (50 Hz, o pulso de 0,5 a 2,6 ms):
+                // e o pulso que o servo le, como o da biblioteca Servo.
+                double pulsoUs = hz is >= 40 and <= 400 ? Math.Clamp(A(1), 0, maximo) / (maximo + 1.0) * 1e6 / hz : 0;
+                if (pulsoUs is >= 400 and <= 2700)
+                {
+                    int graus = (int)Math.Round(Math.Clamp((pulsoUs - 544) * 180.0 / (2400 - 544), 0, 180));
+                    maq.EscreverServo(alvoPino, graus, pulsoUs);
+                    return Valor.DeBool(true);
+                }
                 maq.AnalogWrite(alvoPino, (int)Math.Round(Math.Clamp(A(1), 0, maximo) * 255.0 / maximo), hz);
                 return Valor.DeBool(true);
             }
@@ -3589,6 +3608,26 @@ public partial class Interpretador(Programa prog, Maquina maq)
                     case "close": obj.Arquivo?.Fechar(); return Valor.Vazio;
                     case "available": return Valor.DeInt(obj.Arquivo?.Disponivel() ?? 0);
                     case "read": return Valor.DeInt(obj.Arquivo?.Ler() ?? -1);
+                    // Do C++ compilado: os bytes que nao sao texto (o arquivo
+                    // binario), um caractere por byte, como o cartao guarda.
+                    case "__escrever_bytes":
+                        if (args.Count > 0 && args[0].Referencia is Valor[] bytes)
+                            obj.Arquivo?.Escrever(new string([.. bytes.Select(b => (char)((long)b.Num & 0xFF))]));
+                        return Valor.Vazio;
+                    // Do C++ compilado: um bloco de bytes de uma vez (o read(buf, n)
+                    // de um MP3 de varios MB nao cabe numa chamada por byte).
+                    case "__ler_bytes":
+                    {
+                        if (args.Count == 0 || args[0].Referencia is not Valor[] destino) return Valor.DeInt(0);
+                        int k = 0;
+                        for (; k < destino.Length; k++)
+                        {
+                            int lido = obj.Arquivo?.Ler() ?? -1;
+                            if (lido < 0) break;
+                            destino[k] = Valor.DeC(lido & 0xFF, TipoC.UChar);
+                        }
+                        return Valor.DeInt(k);
+                    }
                     case "readStringUntil":
                     case "readString":
                         return Valor.DeTexto(obj.Arquivo?.LerLinha() ?? "");

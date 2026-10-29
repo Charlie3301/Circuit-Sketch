@@ -1080,6 +1080,7 @@ public partial class MainWindow : Window
         txtSerial.Text = "";
         painelSerial.Clear();
         serialPorPlaca.Clear();
+        avisosPorPlaca.Clear();
         txtEntradaSerial.Clear();
         MonitorIde.Comecar();
 
@@ -4855,6 +4856,7 @@ public partial class MainWindow : Window
         // ja foi mostrado recomeca sempre. Limpar o monitor, so se a pessoa
         // quiser -- quem compara uma execucao com a outra prefere que nao.
         serialPorPlaca.Clear();
+        avisosPorPlaca.Clear();
         if (Preferencias.Ligado(Preferencias.LimparSerialAoRodar, true))
         {
             txtSerial.Text = "";
@@ -4958,6 +4960,7 @@ public partial class MainWindow : Window
         maquina.Reiniciar();
         maquina.TempoReal = true;
         serialPorPlaca[idDaPlaca] = 0;
+        avisosPorPlaca[idDaPlaca] = 0;
         if (rede is not null) editor.AplicarEntradas(bancada, rede);
 
         try { interpretadores[idDaPlaca] = MontarInterpretador(idDaPlaca, prog); }
@@ -5199,6 +5202,7 @@ public partial class MainWindow : Window
         // Reiniciar esvazia a lista de linhas da placa; o painel continua
         // com o que ja mostrou, como o monitor da IDE depois de um reset.
         serialPorPlaca[idDaPlaca] = 0;
+        avisosPorPlaca[idDaPlaca] = 0;
         if (rede is not null) editor.AplicarEntradas(bancada, rede);
 
         try { interpretadores[idDaPlaca] = MontarInterpretador(idDaPlaca, prog); }
@@ -5226,6 +5230,7 @@ public partial class MainWindow : Window
         maquina.Reiniciar();
         maquina.TempoReal = true;
         serialPorPlaca[idDaPlaca] = 0;
+        avisosPorPlaca[idDaPlaca] = 0;
 
         // O chip reiniciou; o circuito, nao. A chave continua ligada e o
         // botao continua apertado -- sem isto, o setup() novo leria tudo
@@ -5918,6 +5923,7 @@ public partial class MainWindow : Window
 
     // ================= desenho =================
     int ultimoHz = -1;
+    string ultimosTons = "";
 
     /// <summary>O que cada placa dormindo espera, para avisar uma vez so.</summary>
     readonly Dictionary<string, string> sonoAvisado = [];
@@ -5962,6 +5968,7 @@ public partial class MainWindow : Window
         // Buzzer e alto-falante num pino: o tom do primeiro que estiver
         // tocando. Alto-falante num amplificador I2S: o audio da placa.
         int hz = 0;
+        var outrosTons = new List<int>();
         SaidaDeAudio somDoI2s = null;
         foreach (var peca in editor.Atual.Pecas)
         {
@@ -5972,20 +5979,30 @@ public partial class MainWindow : Window
                 if (hz == 0) hz = tom;
                 continue;
             }
-            if (peca.Tipo != "buzzer" || hz != 0) continue;
+            if (peca.Tipo != "buzzer") continue;
             // O buzzer toca o tom da placa em que ELE esta ligado, que
             // pode nao ser a que esta no editor.
             var (placa, gpio) = rede.PinoDe(editor.Atual, peca.Id, "1");
             if (gpio < 0) (placa, gpio) = rede.PinoDe(editor.Atual, peca.Id, "2");
             if (gpio < 0) continue;
 
+            // Varios buzzers tocando juntos (os cilindros do motor): todos soam.
             var maquina = bancada.De(placa);
-            if (maquina.Frequencia[gpio] > 0) hz = maquina.Frequencia[gpio];
+            if (maquina.Frequencia[gpio] <= 0) continue;
+            if (hz == 0) hz = maquina.Frequencia[gpio];
+            else outrosTons.Add(maquina.Frequencia[gpio]);
         }
         // O ESC bipa pelo proprio motor: a musica de partida, o "armado".
         if (hz == 0) hz = editor.TomDosEscs();
-        if (!Preferencias.Ligado(Preferencias.SomDoBuzzer, true)) { hz = 0; somDoI2s = null; }
-        if (hz != ultimoHz) { ultimoHz = hz; buzina.Definir(hz); }
+        if (!Preferencias.Ligado(Preferencias.SomDoBuzzer, true)) { hz = 0; somDoI2s = null; outrosTons.Clear(); }
+        string assinaturaDosTons = string.Join(",", outrosTons);
+        if (hz != ultimoHz || assinaturaDosTons != ultimosTons)
+        {
+            ultimoHz = hz;
+            ultimosTons = assinaturaDosTons;
+            if (outrosTons.Count == 0) buzina.Definir(hz);
+            else buzina.Definir([hz, .. outrosTons]);
+        }
         // A suite e o passeio nao tocam no alto-falante de verdade (como nao
         // leem o teclado): o teste confere o caminho do som, e nao a caixa.
         // Sem alto-falante tocando: o DAC estereo (PCM5102A) com o fone, nos dois canais.
@@ -6055,6 +6072,10 @@ public partial class MainWindow : Window
             // no chip de 80 a 240 MHz, sem que isso mude nada. So avisa
             // quando a diferenca e grande.
             bool assembly = programas.TryGetValue(id, out var prog) && prog?.Montado is ProgramaMontado;
+
+            // O programa compilado (C/C++ pelo clang, C# pelo Roslyn) roda na
+            // velocidade do PC: a conta do interpretador nao vale para ele.
+            if (maquina.Sketch is not null) continue;
 
             // Dois segundos antes de julgar: a primeira leva inclui a
             // montagem do programa e o aquecimento do executor.
@@ -6135,6 +6156,7 @@ public partial class MainWindow : Window
     /// e elas imprimem em ritmos diferentes.
     /// </summary>
     readonly Dictionary<string, int> serialPorPlaca = [];
+    readonly Dictionary<string, int> avisosPorPlaca = [];
 
     /// <summary>O que ja esta escrito no painel, na ordem em que chegou.</summary>
     readonly List<string> painelSerial = [];
@@ -6158,6 +6180,20 @@ public partial class MainWindow : Window
 
         foreach (var (id, maquina) in bancada.Todas)
         {
+            // Os avisos da placa durante a rodada (o GPIO 35 sem pull-up, o
+            // pino da flash, o cartao mal ligado): no console, uma vez cada.
+            List<string> avisos = null;
+            lock (maquina.Trava)
+            {
+                int vistos = avisosPorPlaca.GetValueOrDefault(id);
+                if (maquina.Avisos.Count < vistos) vistos = 0;
+                if (maquina.Avisos.Count > vistos) avisos = [.. maquina.Avisos.Skip(vistos)];
+                avisosPorPlaca[id] = maquina.Avisos.Count;
+            }
+            if (avisos is not null)
+                foreach (string aviso in avisos)
+                    console.Aviso((varias ? NomeCurtoDaPlaca(id) + " " : "") + aviso);
+
             List<string> novas;
             lock (maquina.Trava)
             {

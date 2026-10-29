@@ -77,3 +77,22 @@ extern "C" int getchar(void)
         delay(1);
     }
 }
+
+/* O strlcpy e o strlcat da newlib (ESP32) e da avr-libc. */
+extern "C" size_t strlcpy(char *dst, const char *src, size_t size)
+{
+    size_t n = strlen(src);
+    if (size) {
+        size_t c = n < size - 1 ? n : size - 1;
+        memcpy(dst, src, c);
+        dst[c] = 0;
+    }
+    return n;
+}
+
+extern "C" size_t strlcat(char *dst, const char *src, size_t size)
+{
+    size_t d = strnlen(dst, size);
+    if (d == size) return size + strlen(src);
+    return d + strlcpy(dst + d, src, size - d);
+}

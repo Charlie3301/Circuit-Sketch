@@ -33,6 +33,7 @@ public partial class Interpretador
         var nativo = new SketchNativo(maq, ChamarDoNativo, AtenderInterrupcoes, () => maq.Interrupcoes.Count > 0);
         sketchNativo = nativo;
         maq.Sketch = nativo;
+        nativo.Depurador = Depurador;
         nativo.Carregar((SketchCompilado)prog.Compilado, Origem);
     }
 
@@ -76,6 +77,31 @@ public partial class Interpretador
             var cb = new Objeto(ClasseDeCallbackNativo);
             cb.Campos["_indice"] = args[0];
             return Valor.DeTexto(NomeDoObjeto(cb));
+        }
+        // O download em bytes (o MP3 da fala do Audio.h): a resposta inteira
+        // guardada aqui, e o C++ copia em pedacos.
+        if (alvo is null && nome.StartsWith("__baixad", StringComparison.Ordinal) || alvo is null && nome == "__baixar")
+            return BaixarDoNativo(nome, args);
+
+        // O cartao pelo SDMMC (SD_MMC.h): o mesmo cartao, sem o SPI.
+        if (alvo is null && nome == "__sdmmc_begin")
+        {
+            if (maq.Cartao.Montar()) return Valor.DeBool(true);
+            maq.Avisar("SD_MMC.begin() devolveu false: nao ha cartao microSD ligado nesta placa.");
+            return Valor.DeBool(false);
+        }
+
+        // O I2S do C++ compilado (cs_i2s.h): o som no amplificador do circuito.
+        if (alvo is null && nome.StartsWith("__i2s_", StringComparison.Ordinal)) return I2sDoNativo(nome, args);
+
+        // O tom que o pino chaveado pelo registrador forma (cs_timer.cpp): o
+        // buzzer toca, como no tone().
+        if (alvo is null && nome == "__tom" && args.Count >= 2)
+        {
+            int pino = (int)args[0].Num, hz = (int)args[1].Num;
+            if (hz > 0) maq.Tone(pino, hz);
+            else maq.NoTone(pino);
+            return Valor.Vazio;
         }
         if (alvo is null && nome == "__destruir")
         {
@@ -142,6 +168,117 @@ public partial class Interpretador
     };
 
     int objetosNativos, objetosDevolvidos;
+
+    // ---- os downloads do C++ compilado ----
+    readonly List<byte[]> baixados = [];
+
+    Valor BaixarDoNativo(string nome, List<Valor> args)
+    {
+        byte[] Dados(int i) => i >= 0 && i < baixados.Count ? baixados[i] : null;
+        switch (nome)
+        {
+            case "__baixar":
+            {
+                var dados = maq.Rede?.Baixar(maq, args.Count > 0 ? args[0].Texto ?? "" : "", 20000);
+                if (dados is null) return Valor.DeInt(-1);
+                baixados.Add(dados);
+                return Valor.DeInt(baixados.Count - 1);
+            }
+            case "__baixado_tamanho": return Valor.DeInt(Dados((int)args[0].Num)?.Length ?? 0);
+            case "__baixado_ler":
+            {
+                var dados = Dados((int)args[0].Num);
+                long de = (long)args[1].Num;
+                if (dados is null || args.Count < 3 || args[2].Referencia is not Valor[] destino) return Valor.DeInt(0);
+                int n = (int)Math.Clamp(dados.Length - de, 0, destino.Length);
+                for (int i = 0; i < n; i++) destino[i] = Valor.DeC(dados[de + i], TipoC.UChar);
+                return Valor.DeInt(n);
+            }
+            case "__baixado_soltar":
+            {
+                int i = (int)args[0].Num;
+                if (i >= 0 && i < baixados.Count) baixados[i] = null;
+                return Valor.Vazio;
+            }
+        }
+        return Valor.Vazio;
+    }
+
+    // ---- o I2S do C++ compilado ----
+    SaidaDeAudio somDoI2s;
+    int bitsDoI2s = 16, canaisDoI2s = 2;
+    double inicioDoI2sUs;
+    long quadrosDoI2s;
+    static int geracaoDoI2s = 1 << 20;
+
+    /// <summary>
+    /// "__i2s_abrir"(taxa, bits, canais, bclk, ws, dout), "__i2s_escrever"(bytes),
+    /// "__i2s_fechar": a mesma saida de audio do player DAP (SaidaDeAudio), que a
+    /// janela toca no alto-falante ligado ao amplificador nesses pinos. Quem
+    /// escreve espera o som tocar, como no DMA da placa (100 ms de folga).
+    /// </summary>
+    Valor I2sDoNativo(string nome, List<Valor> args)
+    {
+        switch (nome)
+        {
+            case "__i2s_abrir":
+            {
+                int taxa = (int)args[0].Num;
+                bitsDoI2s = (int)args[1].Num is 8 or 16 or 24 or 32 ? (int)args[1].Num : 16;
+                canaisDoI2s = (int)args[2].Num == 1 ? 1 : 2;
+                somDoI2s = new SaidaDeAudio(taxa, (int)args[3].Num, (int)args[4].Num, (int)args[5].Num, Interlocked.Increment(ref geracaoDoI2s));
+                maq.Audio = somDoI2s;
+                quadrosDoI2s = 0;
+                return Valor.DeBool(true);
+            }
+            case "__i2s_fechar":
+                if (maq.Audio == somDoI2s) maq.Audio = null;
+                somDoI2s = null;
+                return Valor.Vazio;
+            case "__i2s_escrever":
+            {
+                if (somDoI2s is null || args.Count == 0 || args[0].Referencia is not Valor[] bytes) return Valor.DeInt(0);
+                int porAmostra = bitsDoI2s / 8, quadro = porAmostra * canaisDoI2s;
+                int quadros = bytes.Length / quadro;
+                var estereo = new short[quadros * 2];
+                int pico = 0;
+                for (int i = 0; i < quadros; i++)
+                    for (int lado = 0; lado < 2; lado++)
+                    {
+                        int k = i * quadro + Math.Min(lado, canaisDoI2s - 1) * porAmostra;
+                        int B(int j) => (int)((long)bytes[k + j].Num & 0xFF);
+                        int v = porAmostra switch
+                        {
+                            1 => (B(0) - 128) << 8,
+                            2 => (short)(B(0) | B(1) << 8),
+                            3 => (short)(B(1) | B(2) << 8),
+                            _ => (short)(B(2) | B(3) << 8),
+                        };
+                        estereo[2 * i + lado] = (short)v;
+                        pico = Math.Max(pico, Math.Abs(v));
+                    }
+                somDoI2s.EscreverEstereo(estereo);
+                somDoI2s.Nivel = pico / 32768.0;
+
+                // O relogio do DMA: espera ate faltar 100 ms para o fim do que ja foi.
+                double agora = maq.AgoraUs();
+                if (quadrosDoI2s == 0 || inicioDoI2sUs + quadrosDoI2s * 1e6 / somDoI2s.Taxa < agora - 50_000)
+                {
+                    inicioDoI2sUs = agora;
+                    quadrosDoI2s = 0;
+                }
+                quadrosDoI2s += quadros;
+                double tocaAte = inicioDoI2sUs + quadrosDoI2s * 1e6 / somDoI2s.Taxa;
+                while (tocaAte - maq.AgoraUs() > 100_000)
+                {
+                    if (maq.Parar) throw maq.MotivoDaParada();
+                    Thread.Sleep((int)Math.Clamp((tocaAte - maq.AgoraUs() - 100_000) / 1000, 1, 10));
+                }
+                return Valor.DeInt(quadros * quadro);
+            }
+        }
+        return Valor.Vazio;
+    }
 
 
     /// <summary>"__nativa_3": a rotina de interrupcao 3 da DLL.</summary>

@@ -33,6 +33,12 @@ public sealed class Depurador
     /// <summary>Onde parou e o que as variáveis valiam naquele instante.</summary>
     public sealed record Retrato(int Linha, IReadOnlyList<Ambiente.VariavelVista> Variaveis);
 
+    /// <summary>O que a pausa do C/C++ compilado faz ao sair dela.</summary>
+    public enum Comando { Continuar, Passo, Sair }
+
+    /// <summary>O sketch compilado (o int3 na DLL); null no interpretador.</summary>
+    internal DepuracaoNativa Nativa { get; set; }
+
     readonly Maquina maq;
     readonly object trava = new();
     readonly HashSet<int> pausas = [];
@@ -81,6 +87,12 @@ public sealed class Depurador
             foreach (int linha in linhas) pausas.Add(linha);
             temPausas = pausas.Count > 0;
         }
+        Nativa?.DefinirPausas(LinhasMarcadas);
+    }
+
+    internal int[] LinhasMarcadas
+    {
+        get { lock (trava) return [.. pausas]; }
     }
 
     /// <summary>Para no próximo comando, ou já, se estiver num delay.</summary>
@@ -89,6 +101,7 @@ public sealed class Depurador
         modoPasso = false;
         pausaPedida = true;
         maq.PausaPedida = true;
+        Nativa?.PedirPausa();
     }
 
     public void Continuar()
@@ -159,7 +172,54 @@ public sealed class Depurador
             maq.PausaPedida = false;
             return;
         }
+        if (Nativa is { } nativa)
+        {
+            // O compilado: a linha e as variaveis vem da pilha da thread
+            // (a entrada da ponte). Sem linha do sketch nela, o int3 em
+            // todas as linhas para na proxima.
+            maq.PausaPedida = false;
+            switch (nativa.PausarNaEspera())
+            {
+                case Comando.Sair: throw maq.MotivoDaParada();
+                case Comando.Continuar: nativa.Seguir(); break;
+            }
+            return;
+        }
         EntrarNaPausa(linhaAtual, ambienteAtual, profundidadeAtual);
+    }
+
+    /// <summary>
+    /// A pausa do compilado (o int3, ou o Pausar no delay): na thread que
+    /// parou, devolve o que fazer -- o C++ nao recebe excecao do .NET.
+    /// </summary>
+    internal Comando EntrarNaPausaNativa(int linha, IReadOnlyList<Ambiente.VariavelVista> variaveis)
+    {
+        pausaPedida = false;
+        modoPasso = false;
+        maq.PausaPedida = false;
+        if (maq.Parar) return Comando.Sair;
+
+        liberado.Reset();
+        Pausado = true;
+        maq.CongelarRelogio();
+        try
+        {
+            Pausou?.Invoke(new Retrato(linha, variaveis));
+            while (!liberado.Wait(50))
+                if (maq.Parar) break;
+        }
+        finally
+        {
+            Pausado = false;
+            maq.DescongelarRelogio();
+        }
+
+        if (maq.Parar) return Comando.Sair;
+        bool passo = modoPasso;
+        pausaPedida = false;
+        modoPasso = false;
+        Retomou?.Invoke();
+        return passo ? Comando.Passo : Comando.Continuar;
     }
 
     void EntrarNaPausa(int linha, Ambiente amb, int profundidade)

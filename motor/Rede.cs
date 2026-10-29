@@ -347,13 +347,13 @@ public sealed partial class Rede
 
     public IReadOnlyList<ServidorWeb> Servidores { get { lock (trava) return [.. servidores]; } }
 
-    public ServidorWeb AbrirServidor(Maquina dona, int porta, bool cru)
+    public ServidorWeb AbrirServidor(Maquina dona, int porta, bool cru, bool tcpDeVerdade = false)
     {
         porta = porta <= 0 ? 80 : porta;
         foreach (var antigo in Servidores.Where(s => s.Dona == dona && s.Porta == porta))
             FecharServidor(antigo);
 
-        var servidor = new ServidorWeb(this, dona, porta, cru);
+        var servidor = new ServidorWeb(this, dona, porta, cru) { TcpDeVerdade = cru && tcpDeVerdade };
         lock (trava) servidores.Add(servidor);
         servidor.AbrirPonte();
 
@@ -412,6 +412,49 @@ public sealed partial class Rede
 
     /// <summary>Códigos negativos do HTTPClient do ESP32.</summary>
     public const int ErroConexaoRecusada = -1, ErroTempoDeLeitura = -11;
+
+    /// <summary>
+    /// Um GET em bytes (o MP3 da fala, o arquivo de audio): a resposta do
+    /// Requisitar e texto, e o binario nao sobrevive a ele. Do computador ou
+    /// da internet, com a mesma regra da internet ligada. Null se nao veio.
+    /// </summary>
+    public byte[] Baixar(Maquina origem, string url, int tempoMs, int limite = 32 << 20)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return null;
+        if (!EhLocal(uri.Host) && !UsarInternet)
+        {
+            Anotar(origem, "http", $"GET {url} → sem internet: a rede do simulador está sem saída "
+                                   + "(menu ⋮ > Rede usa a internet do computador)");
+            return null;
+        }
+        using var cancelar = new CancellationTokenSource(tempoMs);
+        var tarefa = Task.Run(async () =>
+        {
+            using var mensagem = new HttpRequestMessage(HttpMethod.Get, uri);
+            mensagem.Headers.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (ESP32 CircuitSketch)");
+            using var recebida = await Cliente.SendAsync(mensagem, HttpCompletionOption.ResponseHeadersRead, cancelar.Token);
+            if (!recebida.IsSuccessStatusCode) return null;
+            using var fluxo = await recebida.Content.ReadAsStreamAsync(cancelar.Token);
+            var memoria = new MemoryStream();
+            var buffer = new byte[16384];
+            int n;
+            while ((n = await fluxo.ReadAsync(buffer, cancelar.Token)) > 0 && memoria.Length < limite) memoria.Write(buffer, 0, n);
+            return memoria.ToArray();
+        });
+        try
+        {
+            while (!tarefa.Wait(40))
+                if (origem.Parar) { cancelar.Cancel(); throw new ExecucaoInterrompida(); }
+            var dados = tarefa.Result;
+            Anotar(origem, "http", dados is null ? $"GET {url} → recusado" : $"GET {url} → {dados.Length} bytes");
+            return dados;
+        }
+        catch (AggregateException)
+        {
+            Anotar(origem, "http", $"GET {url} → não veio");
+            return null;
+        }
+    }
 
     public RespostaHttp Requisitar(Maquina origem, string metodo, string url,
         IDictionary<string, string> cabecalhos, string corpo, int tempoMs, bool inseguro)
@@ -1327,6 +1370,7 @@ public sealed class ServidorWeb
 {
     readonly Rede rede;
     readonly Queue<PedidoHttp> fila = new();
+    readonly Queue<TcpClient> conexoesDaPonte = new();
     TcpListener ponte;
     volatile bool fechado;
 
@@ -1344,11 +1388,23 @@ public sealed class ServidorWeb
     /// <summary>WiFiServer: o sketch lê e escreve bytes. WebServer: rotas e send().</summary>
     public bool Cru { get; }
 
+    /// <summary>
+    /// O WiFiServer do sketch compilado: o navegador chega por uma conexão
+    /// TCP de verdade, que fica aberta enquanto os dois lados quiserem -- o
+    /// WebSocket precisa disso. (No interpretado, o pedido HTTP vem inteiro
+    /// e a resposta sai quando o client fecha.)
+    /// </summary>
+    public bool TcpDeVerdade { get; init; }
+
     public string UrlLocal { get; private set; }
 
     internal void AbrirPonte()
     {
-        for (int porta = 8080; porta < 8100; porta++)
+        // A porta da placa, quando ela nao e a 80 e esta livre: a pagina que
+        // monta "ws://" + location.hostname + ":81" acha o WebSocket da
+        // placa. A 80 fica na 8080 (no computador ela costuma ter dono).
+        var candidatas = (Porta is > 0 and not 80 ? new[] { Porta } : []).Concat(Enumerable.Range(8080, 20));
+        foreach (int porta in candidatas)
         {
             var ouvinte = new TcpListener(IPAddress.Loopback, porta);
             try { ouvinte.Start(); }
@@ -1374,6 +1430,12 @@ public sealed class ServidorWeb
 
     void Atender(TcpClient cliente)
     {
+        if (TcpDeVerdade)
+        {
+            lock (fila) conexoesDaPonte.Enqueue(cliente);
+            rede.Anotar(Dona, "servidor", "o navegador conectou");
+            return;
+        }
         using (cliente)
         {
             try
@@ -1411,12 +1473,21 @@ public sealed class ServidorWeb
         lock (fila) return fila.Count > 0 ? fila.Dequeue() : null;
     }
 
-    public int Esperando { get { lock (fila) return fila.Count; } }
+    /// <summary>A próxima conexão do navegador (TcpDeVerdade), ou null.</summary>
+    public TcpClient ProximaConexao()
+    {
+        lock (fila) return conexoesDaPonte.Count > 0 ? conexoesDaPonte.Dequeue() : null;
+    }
+
+    public int Esperando { get { lock (fila) return fila.Count + conexoesDaPonte.Count; } }
 
     internal void Fechar()
     {
         fechado = true;
         try { ponte?.Stop(); } catch { }
+        lock (fila)
+            while (conexoesDaPonte.Count > 0)
+                try { conexoesDaPonte.Dequeue().Close(); } catch { }
         lock (fila)
             while (fila.Count > 0)
                 fila.Dequeue().Responder(PedidoHttp.MontarResposta(503, "text/plain; charset=utf-8",
@@ -1464,6 +1535,16 @@ public sealed class ConexaoTcp
     {
         var conexao = new ConexaoTcp { tipo = Tipo.DoServidor, pedidoRecebido = pedido, IpRemoto = ipRemoto };
         conexao.Entrada.Adicionar(pedido.Cru);
+        return conexao;
+    }
+
+    /// <summary>A conexão que o navegador abriu na ponte de um WiFiServer (TcpDeVerdade).</summary>
+    internal static ConexaoTcp DaPonte(TcpClient tcp)
+    {
+        tcp.NoDelay = true;
+        var conexao = new ConexaoTcp { tipo = Tipo.Real, tcp = tcp, fluxo = tcp.GetStream(), IpRemoto = "10.0.0.100" };
+        if (tcp.Client.RemoteEndPoint is IPEndPoint fim) conexao.PortaRemota = fim.Port;
+        new Thread(conexao.Bombear) { IsBackground = true, Name = "tcp do navegador" }.Start();
         return conexao;
     }
 

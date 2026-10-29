@@ -140,23 +140,23 @@ struct Vista {
     volatile int *noSketch;
 };
 static Vista vistas[64];
-static SRWLOCK travaDasVistas = SRWLOCK_INIT;
 
+/* Sem trava: o vigia suspende a thread em qualquer ponto do modulo, e uma
+ * trava presa por ela travaria a interrupcao que viesse em seguida. Cada
+ * thread so mexe na sua vaga, tomada com um compare-and-swap. */
 static void publicar(void)
 {
     uint32_t eu = GetCurrentThreadId();
-    AcquireSRWLockExclusive(&travaDasVistas);
-    Vista *livre = nullptr;
-    for (auto &v : vistas) {
-        if (v.tid == eu) { livre = &v; break; }
-        if (!livre && v.tid == 0) livre = &v;
-    }
-    if (livre) {
-        livre->tid = topo ? eu : 0;
-        livre->topo = topo;
-        livre->noSketch = &noSketch;
-    }
-    ReleaseSRWLockExclusive(&travaDasVistas);
+    Vista *minha = nullptr;
+    for (auto &v : vistas)
+        if (v.tid == eu) { minha = &v; break; }
+    if (!minha && topo)
+        for (auto &v : vistas)
+            if (v.tid == 0 && InterlockedCompareExchange((volatile LONG *)&v.tid, (LONG)eu, 0) == 0) { minha = &v; break; }
+    if (!minha) return;
+    minha->noSketch = &noSketch;
+    minha->topo = topo;
+    if (!topo) minha->tid = 0;
 }
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
@@ -174,9 +174,16 @@ static void medirModulo(void)
  * As falhas. Roda na thread que falhou, antes do .NET; so mexe se ela
  * estava rodando o sketch. Nao chama o C#: marca a falha e aponta a thread
  * para o salto, com a pilha ja restaurada (a estourada nao serve). */
+extern "C" long cs_dep_excecao(EXCEPTION_POINTERS *p);
+extern "C" void cs_dep_guardar_contexto(void);
+extern "C" volatile int cs_dep_ativo;
+
 extern "C" __declspec(dllexport) long cs_excecao(EXCEPTION_POINTERS *p)
 {
     uint32_t codigo = p->ExceptionRecord->ExceptionCode;
+    /* O int3 e o passo unico do depurador (cs_depurador.cpp) vem primeiro. */
+    if (codigo == EXCEPTION_BREAKPOINT || codigo == EXCEPTION_SINGLE_STEP)
+        if (long r = cs_dep_excecao(p)) return r;
     switch (codigo) {
     case EXCEPTION_ACCESS_VIOLATION:
     case EXCEPTION_INT_DIVIDE_BY_ZERO:
@@ -270,15 +277,24 @@ extern "C" __declspec(dllexport) void *cs_salto_da_thread(uint32_t tid, int *rod
 {
     void *r = nullptr;
     *rodando = 0;
-    AcquireSRWLockShared(&travaDasVistas);
-    for (auto &v : vistas)
-        if (v.tid == tid && v.topo) {
-            r = v.topo->salto;
+    for (auto &v : vistas) {
+        Entrada *e = v.topo;
+        if (v.tid == tid && e) {
+            r = e->salto;
             *rodando = v.noSketch ? *v.noSketch : 0;
             break;
         }
-    ReleaseSRWLockShared(&travaDasVistas);
+    }
     return r;
+}
+
+/* O depurador parado numa linha roda o simulador (o C#) nesta thread: o
+ * vigia nao pode tomar ela como "rodando o sketch". Devolve o valor de antes. */
+extern "C" int cs_trocar_no_sketch(int v)
+{
+    int antes = noSketch;
+    noSketch = v;
+    return antes;
 }
 
 /* ---------------------------------------------------------------------
@@ -302,8 +318,13 @@ struct Rotina {
 static Rotina rotinas[256];
 static SRWLOCK travaDasRotinas = SRWLOCK_INIT;
 
+extern "C" void cs_rtos_entrar_critico(void);
+extern "C" void cs_rtos_sair_critico(void);
+
 extern "C" int cs_registrar_callback(void *fn, cs_chamador_t chamador, void *arg)
 {
+    /* A interrupcao espera: a trava presa pela thread suspensa a travaria. */
+    cs_rtos_entrar_critico();
     AcquireSRWLockExclusive(&travaDasRotinas);
     int achou = -1;
     for (int i = 0; i < 256 && achou < 0; i++)
@@ -314,6 +335,7 @@ extern "C" int cs_registrar_callback(void *fn, cs_chamador_t chamador, void *arg
             achou = i;
         }
     ReleaseSRWLockExclusive(&travaDasRotinas);
+    cs_rtos_sair_critico();
     return achou;
 }
 
@@ -350,6 +372,7 @@ extern "C" cs_val cs_nome(const char *s)
 
 extern "C" volatile int cs_rtos_ativo;
 extern "C" void cs_rtos_ponto(void);
+extern "C" void cs_atender_timers(void);
 
 extern "C" int cs_chamar(const char *alvo, const char *nome, int n, const cs_val *args, cs_val *volta)
 {
@@ -359,6 +382,8 @@ extern "C" int cs_chamar(const char *alvo, const char *nome, int n, const cs_val
     if (!cs_p) return CS_OK;
     /* O tick do FreeRTOS: a vez pode passar para outra tarefa aqui. */
     if (cs_rtos_ativo && noSketch) cs_rtos_ponto();
+    /* O depurador: o Pausar no meio de um delay acha a linha daqui. */
+    if (cs_dep_ativo && noSketch) cs_dep_guardar_contexto();
     int antes = noSketch;
     noSketch = 0;
     int r = cs_p->chamar(cs_p->ctx, alvo, nome, n, args, volta);
@@ -507,7 +532,7 @@ static void chamarRotina(int i, int n, const cs_val *args)
 }
 
 /* qual: 0 setup, 1 loop, 2 a rotina "arg" (com os n argumentos), 3 os
- * construtores. Volta 0, ou o codigo da saida (CS_SAIR, CS_FALHA). */
+ * construtores, 4 as interrupcoes de timer que venceram (cs_timer.cpp). Volta 0, ou o codigo da saida (CS_SAIR, CS_FALHA). */
 extern "C" __declspec(dllexport) int cs_entrar(int qual, int arg, int n, const cs_val *args)
 {
     Entrada e;
@@ -527,6 +552,7 @@ extern "C" __declspec(dllexport) int cs_entrar(int qual, int arg, int n, const c
                 if (cs_rtos_ativo) cs_rtos_ponto();
                 break;
             case 2: chamarRotina(arg, n, args); break;
+            case 4: cs_atender_timers(); break;
             case 3:
                 std::set_terminate(terminar);
                 construido = 1;

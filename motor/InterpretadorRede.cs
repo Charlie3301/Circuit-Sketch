@@ -914,12 +914,24 @@ public partial class Interpretador
             case "begin":
                 ExigirWifi(c.Linha, "server.begin()");
                 if (args.Count > 0) s.Porta = (int)args[0].Num;
-                s.Servidor = Maq.Rede.AbrirServidor(Maq, s.Porta, cru: true);
+                s.Servidor = Maq.Rede.AbrirServidor(Maq, s.Porta, cru: true, tcpDeVerdade: RodaNativo);
                 return Valor.Vazio;
 
             case "available":
             case "accept":
             {
+                // O sketch compilado: o client e um objeto que ele guarda (o
+                // WiFiClient de verdade fecha quando a ultima copia some), e a
+                // conexao do navegador e TCP de verdade, aberta enquanto ele
+                // quiser -- o WebSocket.
+                if (RodaNativo)
+                {
+                    ConexaoTcp nova = s.Servidor?.ProximaConexao() is { } tcp ? ConexaoTcp.DaPonte(tcp)
+                        : s.Servidor?.Proximo() is { } doPedido ? ConexaoTcp.DoServidor(doPedido, "10.0.0.1") : null;
+                    if (nova is null) return Valor.DeTexto("");
+                    return Valor.DeReferencia(new Objeto("WiFiClient") { Rede = new EstadoCliente { Conexao = nova } });
+                }
+
                 // O client da volta anterior que o sketch esqueceu aberto:
                 // responde agora, senao o navegador fica girando.
                 s.UltimaConexao?.FecharSeEsquecida();
@@ -958,6 +970,14 @@ public partial class Interpretador
         var estado = obj.Rede as EstadoCliente
                      ?? (EstadoCliente)(obj.Rede = new EstadoCliente { Seguro = obj.Classe == "WiFiClientSecure" });
         var args = c.Args.Select(a => Avaliar(a, amb)).ToList();
+
+        // Do C++ compilado: os bytes como estao (o quadro do WebSocket nao e texto).
+        if (metodo == "__escrever_bytes")
+        {
+            byte[] dados = args.Count > 0 && args[0].Referencia is Valor[] v ? [.. v.Select(x => (byte)((long)x.Num & 0xFF))] : [];
+            estado.Conexao?.Escrever(dados);
+            return Valor.DeInt(dados.Length);
+        }
         string S(int i) => i < args.Count ? args[i].Mostrar() : "";
 
         switch (metodo)

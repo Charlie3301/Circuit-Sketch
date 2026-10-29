@@ -283,14 +283,14 @@ public static class CompiladorNativo
         }
 
         string impressao = Impressao(
-            [impressaoDoCore, .. unidades.Select(u => u.Nome + "\0" + u.Texto),
+            [impressaoDoCore, ComDepuracao, .. unidades.Select(u => u.Nome + "\0" + u.Texto),
              .. abas.Select(a => a.Key + "\0" + a.Value),
              .. fontesDasLibs.Select(f => f + File.GetLastWriteTimeUtc(f).Ticks),
              .. usadas.SelectMany(l => l.Arquivos.Select(a => Path.Combine(l.Pasta, a))).Where(File.Exists)
                       .Select(f => f + File.GetLastWriteTimeUtc(f).Ticks)]);
         string pastaDoSketch = Path.Combine(Cache(), "sketch-" + impressao[..16]);
         string dll = Path.Combine(pastaDoSketch, "sketch.dll");
-        if (File.Exists(dll)) return new SketchCompilado(dll, placa);
+        if (File.Exists(dll)) return new SketchCompilado(dll, placa, projeto.Sketch);
 
         string trabalho = pastaDoSketch + ".tmp-" + Guid.NewGuid().ToString("N")[..8];
         Directory.CreateDirectory(trabalho);
@@ -314,12 +314,14 @@ public static class CompiladorNativo
             foreach (string f in fontesDasLibs)
                 tarefas.Add((f, Path.Combine(trabalho, $"b{k++}.o"), !f.EndsWith(".c", StringComparison.OrdinalIgnoreCase)));
 
-            var erros = CompilarVarios(zig, tarefas, [trabalho, .. incDasLibs, inc]);
+            var erros = CompilarVarios(zig, tarefas, [trabalho, .. incDasLibs, inc], depurar: true);
             if (erros.Count > 0) throw ErroDoCompilador(erros, abas);
 
             // A DLL: o ponto de entrada e o da ponte, que adia os construtores
             // das globais ate o simulador estar ligado.
-            var ligar = new List<string> { "c++", "-shared", "-target", "x86_64-windows-gnu", "-o", Path.Combine(trabalho, "sketch.dll"),
+            // O -g faz o PDB (o sketch.pdb ao lado da DLL): o depurador le as
+            // linhas e as variaveis dele.
+            var ligar = new List<string> { "c++", "-shared", "-g", "-target", "x86_64-windows-gnu", "-o", Path.Combine(trabalho, "sketch.dll"),
                                            "-Wl,--entry=cs_entrada_da_dll" };
             ligar.AddRange(tarefas.Select(t => t.Objeto));
             ligar.AddRange(objetosDoCore);
@@ -334,11 +336,19 @@ public static class CompiladorNativo
             try { Directory.Delete(trabalho, true); } catch { }
             throw;
         }
-        return new SketchCompilado(dll, placa);
+        return new SketchCompilado(dll, placa, projeto.Sketch);
     }
 
     /// <summary>Compila cada fonte num .o, em paralelo; devolve as mensagens de erro.</summary>
-    static List<string> CompilarVarios(string zig, IEnumerable<(string Fonte, string Objeto, bool Cpp)> tarefas, IEnumerable<string> inclusoes)
+    /// <summary>
+    /// O codigo do sketch vai sem otimizacao e com as informacoes de depuracao
+    /// (CodeView, para o PDB): cada linha e uma linha, e cada variavel tem
+    /// lugar na pilha -- o depurador para onde a pessoa marcou e mostra o valor.
+    /// </summary>
+    const string ComDepuracao = "depuracao 2: -O0 -gcodeview -fno-omit-frame-pointer -fno-sanitize=all";
+
+    static List<string> CompilarVarios(string zig, IEnumerable<(string Fonte, string Objeto, bool Cpp)> tarefas, IEnumerable<string> inclusoes,
+                                       bool depurar = false)
     {
         var lista = tarefas.ToList();
         var incs = inclusoes.Where(Directory.Exists).Distinct().ToList();
@@ -347,11 +357,19 @@ public static class CompiladorNativo
         Parallel.For(0, lista.Count, new ParallelOptions { MaxDegreeOfParallelism = Math.Max(2, Environment.ProcessorCount) }, i =>
         {
             var (fonte, objeto, cpp) = lista[i];
-            var args = new List<string> { cpp ? "c++" : "cc", "-c", "-target", "x86_64-windows-gnu", "-O1", "-w",
+            var args = new List<string> { cpp ? "c++" : "cc", "-c", "-target", "x86_64-windows-gnu", depurar ? "-O0" : "-O1", "-w",
                                           "-ferror-limit=8", "-fno-caret-diagnostics", "-DCS_NATIVO=1",
                                           // O ponteiro nulo acessa de verdade (e cai como na placa), em vez de o
                                           // otimizador apagar o caminho e por uma armadilha no lugar.
                                           "-fno-delete-null-pointer-checks", cpp ? Padrao : PadraoC };
+            if (depurar)
+            {
+                args.Add("-gcodeview");
+                args.Add("-fno-omit-frame-pointer");
+                // No -O0 o zig liga o UBSan (que aborta o processo no "panic"): o
+                // sketch roda como no -O1 e na placa, sem verificacao a mais.
+                args.Add("-fno-sanitize=all");
+            }
             if (cpp) args.Add("-x");
             if (cpp) args.Add("c++");
             args.AddRange(cpp ? Permissivos : PermissivosC);
@@ -573,6 +591,49 @@ public static class CompiladorNativo
         }
     }
 
+    /// <summary>
+    /// Os nomes que o sketch declara fora das funcoes (as globais, os objetos
+    /// "Servo s;" e "LiquidCrystal lcd(12, 11...)"): o depurador mostra os que
+    /// o PDB tem como dado. Funcao com o mesmo jeito tambem entra aqui; o PDB
+    /// diz que nao e variavel.
+    /// </summary>
+    public static IReadOnlyList<string> NomesDasGlobais(string texto)
+    {
+        string limpo = Limpar(texto ?? "");
+        var nomes = new List<string>();
+        var comando = new StringBuilder();
+        int profundidade = 0;
+        bool corpo = false;
+        foreach (char c in limpo)
+        {
+            if (c == '{')
+            {
+                // Chave depois de "=": o valor inicial (int v[] = {1, 2}); sem: o corpo.
+                if (profundidade == 0) corpo = !comando.ToString().Contains('=');
+                profundidade++;
+                if (!corpo) comando.Append(c);
+                continue;
+            }
+            if (c == '}')
+            {
+                profundidade = Math.Max(0, profundidade - 1);
+                if (profundidade == 0 && corpo) { corpo = false; comando.Clear(); }
+                else if (!corpo) comando.Append(c);
+                continue;
+            }
+            if (profundidade > 0 && corpo) continue;
+            if (c == ';' && profundidade == 0)
+            {
+                foreach (Match m in Regex.Matches(comando.ToString(), @"(?<=[\w\*&>\],]\s*)\b([A-Za-z_]\w*)\s*(?=\[|=|,|\(|$)"))
+                    if (!nomes.Contains(m.Groups[1].Value)) nomes.Add(m.Groups[1].Value);
+                comando.Clear();
+                continue;
+            }
+            comando.Append(c);
+        }
+        return nomes;
+    }
+
     /// <summary>O texto com comentarios, textos, caracteres e diretivas trocados por espacos (o tamanho fica).</summary>
     static string Limpar(string texto)
     {
@@ -607,6 +668,23 @@ public static class CompiladorNativo
                 }
                 if (i < sb.Length) { sb[i++] = ' '; if (i < sb.Length) sb[i++] = ' '; }
                 continue;
+            }
+            // O texto bruto (R"rawliteral(...)rawliteral", a pagina da web
+            // dentro do sketch): ate o fechamento com o mesmo delimitador,
+            // atravessando as linhas -- o "function beep(){" do JavaScript
+            // la dentro nao e funcao do C++.
+            if (c == '"' && i > 0 && sb[i - 1] == 'R' && (i < 2 || !char.IsLetterOrDigit(sb[i - 2]) || sb[i - 2] is 'u' or 'U' or 'L' or '8'))
+            {
+                int abre = texto.IndexOf('(', i);
+                string delimitador = abre > i && abre - i <= 17 ? texto[(i + 1)..abre] : null;
+                int fecha = delimitador is null ? -1 : texto.IndexOf(")" + delimitador + "\"", abre, StringComparison.Ordinal);
+                if (fecha > 0)
+                {
+                    int ate = fecha + delimitador.Length + 2;
+                    for (; i < ate; i++)
+                        if (sb[i] != '\n') sb[i] = ' ';
+                    continue;
+                }
             }
             if (c is '"' or '\'')
             {
@@ -720,4 +798,4 @@ public static class CompiladorNativo
 }
 
 /// <summary>A DLL do sketch, pronta para cada placa carregar a sua copia.</summary>
-public sealed record SketchCompilado(string Dll, string Placa) : ProgramaCompilado;
+public sealed record SketchCompilado(string Dll, string Placa, string Sketch = null) : ProgramaCompilado;

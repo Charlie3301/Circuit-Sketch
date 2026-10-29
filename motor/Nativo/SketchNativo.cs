@@ -85,6 +85,9 @@ public sealed unsafe class SketchNativo : ISketchCompilado
     // secao critica aberta (o vigia nao entra com a interrupcao no meio).
     uint* tidDaVez;
     int* secaoCritica;
+
+    // O timer de hardware da ESP32 (cs_timer.cpp): ha interrupcao de timer.
+    int* timersAtivos;
     delegate* unmanaged<void> encerrarTarefas;
 
     /// <summary>A thread que roda o sketch agora (a da tarefa que tem a vez, com o FreeRTOS).</summary>
@@ -106,6 +109,11 @@ public sealed unsafe class SketchNativo : ISketchCompilado
 
     [ThreadStatic] static IntPtr textoDaVolta;
     [ThreadStatic] static int capacidadeDoTexto;
+
+    /// <summary>O depurador da janela (null: sem depuracao).</summary>
+    public Depurador Depurador { get; set; }
+
+    DepuracaoNativa depuracao;
 
     public SketchNativo(Maquina maquina, Atendente atendente, Action atenderInterrupcoes, Func<bool> temInterrupcoes)
     {
@@ -148,6 +156,7 @@ public sealed unsafe class SketchNativo : ISketchCompilado
         var medir = (delegate* unmanaged<ulong*, ulong>)Exigir("cs_modulo");
         if (NativeLibrary.TryGetExport(modulo, "cs_tid_atual", out IntPtr pTid)) tidDaVez = (uint*)pTid;
         if (NativeLibrary.TryGetExport(modulo, "cs_critico", out IntPtr pCritico)) secaoCritica = (int*)pCritico;
+        if (NativeLibrary.TryGetExport(modulo, "cs_timers_ativos", out IntPtr pTimers)) timersAtivos = (int*)pTimers;
         if (NativeLibrary.TryGetExport(modulo, "cs_rtos_encerrar", out IntPtr pEncerrar)) encerrarTarefas = (delegate* unmanaged<void>)pEncerrar;
         // O salto copiado para memoria alocada aqui (ver cs_codigo_do_salto).
         int tamanhoDoSalto;
@@ -171,6 +180,10 @@ public sealed unsafe class SketchNativo : ISketchCompilado
         fim = f;
 
         veh = Win32.AddVectoredExceptionHandler(1, Exigir("cs_excecao"));
+        // O depurador (a janela com pausas e passo): o PDB do sketch, antes
+        // dos construtores das globais (eles ja podem parar numa linha).
+        if (Depurador is not null)
+            depuracao = DepuracaoNativa.Ligar(Depurador, modulo, copia, compilado.Dll, compilado.Sketch);
         if (Depurando)
         {
             Console.Error.WriteLine($"[nativo] modulo {inicio:X}..{fim:X} salto {salto:X}");
@@ -249,6 +262,18 @@ public sealed unsafe class SketchNativo : ISketchCompilado
     /// <summary>Uma rotina de interrupcao ("__nativa_3"), na thread de quem chamou.</summary>
     public void Rotina(int indice) => Rodar(2, indice);
 
+    /// <summary>Ha timer de hardware com interrupcao ligada (timerAlarm).</summary>
+    public bool TimersAtivos => timersAtivos != null && Volatile.Read(ref *timersAtivos) != 0;
+
+    /// <summary>
+    /// As interrupcoes de timer que venceram, em lote, na thread de quem
+    /// chamou: o vigia (com o sketch suspenso) ou o delay do simulador.
+    /// </summary>
+    public void AtenderTimers()
+    {
+        if (TimersAtivos) Rodar(4, 0);
+    }
+
     /// <summary>
     /// Um callback do sketch com os argumentos que o simulador manda (o
     /// topico e a mensagem do MQTT): numero, texto ou vetor de bytes, cada um
@@ -299,8 +324,9 @@ public sealed unsafe class SketchNativo : ISketchCompilado
 
     void Rodar(int qual, int arg, int n = 0, Val* argumentos = null)
     {
-        if (qual != 2) tidDoSketch = Win32.GetCurrentThreadId();
-        bool doSketch = qual != 2 || EhDoSketch();
+        bool rotina = qual is 2 or 4;
+        if (!rotina) tidDoSketch = Win32.GetCurrentThreadId();
+        bool doSketch = !rotina || EhDoSketch();
         int antes = doSketch ? Interlocked.Exchange(ref estado, 1) : 0;
         int r;
         try
@@ -332,7 +358,7 @@ public sealed unsafe class SketchNativo : ISketchCompilado
         uint codigo = descreverFalha(buf, 300);
         string texto = Marshal.PtrToStringUTF8((IntPtr)buf) ?? "falha";
         if (codigo == 0xC00000FD) refazerGuarda();
-        string onde = qual switch { 0 => "no setup()", 1 => "no loop()", 2 => "na rotina de interrupcao", _ => "nas globais" };
+        string onde = qual switch { 0 => "no setup()", 1 => "no loop()", 2 => "na rotina de interrupcao", 4 => "na interrupcao do timer", _ => "nas globais" };
         throw new ErroDeExecucao($"o programa travou {onde}: {texto}.", 0);
     }
 
@@ -541,7 +567,7 @@ public sealed unsafe class SketchNativo : ISketchCompilado
                 Interromper(forcarSaida: true);
                 continue;
             }
-            if (temInterrupcoes()) Interromper(forcarSaida: false);
+            if (temInterrupcoes() || TimersAtivos) Interromper(forcarSaida: false);
         }
     }
 
@@ -634,6 +660,8 @@ public sealed unsafe class SketchNativo : ISketchCompilado
             maq.Avisar("modo nativo: o sketch nao parou; a memoria dele fica presa ate fechar o simulador.");
             return;
         }
+        depuracao?.Desligar();
+        depuracao = null;
         // As threads das tarefas do FreeRTOS saem antes de a DLL ser solta.
         if (encerrarTarefas != null) encerrarTarefas();
         if (veh != IntPtr.Zero) { Win32.RemoveVectoredExceptionHandler(veh); veh = IntPtr.Zero; }

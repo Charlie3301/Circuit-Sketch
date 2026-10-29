@@ -42,13 +42,54 @@ public sealed class Buzina : IDisposable
     readonly object trava = new();
     readonly GeradorDeOnda gerador = new();
 
+    /// <summary>
+    /// As outras vozes: varios buzzers tocando juntos (os seis cilindros do
+    /// motor que o sketch faz na interrupcao do timer). A primeira e o gerador.
+    /// </summary>
+    const int Vozes = 8;
+    readonly GeradorDeOnda[] outras = [.. Enumerable.Range(1, Vozes - 1).Select(_ => new GeradorDeOnda())];
+    short[] mistura = [];
+
     public void Definir(int hz)
     {
         gerador.Hz = hz is >= 20 and <= 20000 ? hz : 0;
+        foreach (var v in outras) v.Hz = 0;
         if (gerador.Hz > 0) Garantir();
     }
 
-    public void Parar() => gerador.Hz = 0;
+    /// <summary>Varios tons ao mesmo tempo (um por buzzer tocando).</summary>
+    public void Definir(IReadOnlyList<int> tons)
+    {
+        var validos = tons.Where(h => h is >= 20 and <= 20000).Take(Vozes).ToList();
+        gerador.Hz = validos.Count > 0 ? validos[0] : 0;
+        for (int i = 0; i < outras.Length; i++) outras[i].Hz = i + 1 < validos.Count ? validos[i + 1] : 0;
+        if (gerador.Hz > 0) Garantir();
+    }
+
+    public void Parar()
+    {
+        gerador.Hz = 0;
+        foreach (var v in outras) v.Hz = 0;
+    }
+
+    /// <summary>As vozes somadas, cada uma mais baixa quando sao varias (sem estourar).</summary>
+    void Preencher(short[] destino)
+    {
+        gerador.Preencher(destino);
+        int tocando = 1 + outras.Count(v => v.Hz > 0 || !v.Silencioso);
+        if (tocando == 1) return;
+        if (mistura.Length != destino.Length) mistura = new short[destino.Length];
+        var soma = new int[destino.Length];
+        for (int i = 0; i < destino.Length; i++) soma[i] = destino[i];
+        foreach (var v in outras)
+        {
+            if (v.Hz == 0 && v.Silencioso) continue;
+            v.Preencher(mistura);
+            for (int i = 0; i < destino.Length; i++) soma[i] += mistura[i];
+        }
+        double escala = 1.0 / Math.Sqrt(tocando);
+        for (int i = 0; i < destino.Length; i++) destino[i] = (short)Math.Clamp(soma[i] * escala, short.MinValue, short.MaxValue);
+    }
 
     /// <summary>Conseguiu abrir a saida de audio? Falso = maquina muda.</summary>
     public bool Ativa => dispositivo != IntPtr.Zero;
@@ -131,7 +172,7 @@ public sealed class Buzina : IDisposable
                     // WHDR_DONE = 1. Bloco ainda tocando: pula.
                     if (naFila[i] && (h.dwFlags & 1) == 0) continue;
 
-                    gerador.Preencher(amostras);
+                    Preencher(amostras);
                     Marshal.Copy(amostras, 0, buffers[i], amostras.Length);
 
                     h.dwFlags &= ~1u;

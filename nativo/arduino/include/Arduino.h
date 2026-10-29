@@ -167,6 +167,10 @@ float temperatureRead(void);
 void setup(void);
 void loop(void);
 
+/* Da libc da ESP32 e do AVR (a do Windows nao tem). */
+size_t strlcpy(char *dst, const char *src, size_t size);
+size_t strlcat(char *dst, const char *src, size_t size);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
@@ -214,13 +218,22 @@ void attachInterruptArg(uint8_t pin, void (*userFunc)(void *), void *arg, int mo
  * valem sem #include, como no core dela. */
 #ifdef ESP32
 #include "freertos/FreeRTOS.h"
+#include "cs_registradores.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 int64_t esp_timer_get_time(void);
+
+/* A PSRAM (a memoria de fora da ESP32-S3/WROVER): aqui, a do PC. */
+bool psramFound(void);
+bool psramInit(void);
+void *ps_malloc(size_t size);
+void *ps_calloc(size_t n, size_t size);
+void *ps_realloc(void *ptr, size_t size);
 #ifdef __cplusplus
 }
 #endif
+#include "esp_heap_caps.h"
 #endif
 
 #endif

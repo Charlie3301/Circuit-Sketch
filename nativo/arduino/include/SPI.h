@@ -41,9 +41,11 @@
 #define SPI_MSBFIRST MSBFIRST
 
 #ifdef ESP32
-#define FSPI 0
-#define HSPI 1
-#define VSPI 2
+/* Com o tipo: o 0 sozinho tambem e ponteiro nulo, e o SPIClass(FSPI) ficaria
+ * ambiguo com o SPIClass(const char*). */
+#define FSPI ((uint8_t)0)
+#define HSPI ((uint8_t)1)
+#define VSPI ((uint8_t)2)
 #endif
 
 class SPISettings {

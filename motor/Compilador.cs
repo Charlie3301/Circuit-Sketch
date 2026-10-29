@@ -203,8 +203,14 @@ public static class Compilador
             }
             catch (ErroDeSintaxe erroDoClang)
             {
-                try { return new Unidades(projeto, linguagem).Compilar(); }
+                Programa interpretado;
+                try { interpretado = new Unidades(projeto, linguagem).Compilar(); }
                 catch (ErroDeSintaxe) { throw erroDoClang; }
+                // A pessoa precisa saber: o erro que aparecer dai em diante e
+                // do interpretador, e o motivo verdadeiro e este.
+                AvisoDoCompilador?.Invoke($"o compilador de C++ recusou ({Origens.Onde(erroDoClang.Linha)}: {erroDoClang.Message}); "
+                                          + "rodando no interpretador, que nao tem tudo do C++.");
+                return interpretado;
             }
         }
 
