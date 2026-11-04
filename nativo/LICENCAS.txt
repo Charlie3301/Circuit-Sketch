@@ -84,12 +84,31 @@ zigbee/ (a API do Zigbee)
     arduino-esp32 (Apache License 2.0). As bibliotecas binarias da ZBOSS nao
     vem: o src/cs_zigbee.cpp foi escrito para o CircuitSketch.
 
+matter/ (a biblioteca Matter do core)
+    Os cabecalhos e os endpoints de libraries/Matter do arduino-esp32 (Espressif,
+    Apache License 2.0), copiados pela ferramentas/idf/copiar_matter.py. O SDK do
+    Matter nao vem: o include/esp_matter.h e o src/cs_matter.cpp foram escritos
+    para o CircuitSketch, com os numeros de clusters e atributos da especificacao.
+
+idfrede/ (a rede de alto nivel do ESP-IDF)
+    O esp_http_client, o tcp_transport, o esp-tls, o esp_http_server, o
+    esp_https_ota, o esp_https_server e o esp-mqtt, do ESP-IDF (Espressif, Apache
+    License 2.0), copiados pela ferramentas/idf/copiar_idfrede.py. O
+    src/cs_idfrede.c e o cs_idfrede_compat.h foram escritos para o CircuitSketch.
+
 Componentes do ESP-IDF e extras em idf/ e arduino/src/arduino-esp32/idf
     O lwIP (ip4_addr.c, ip6_addr.c e os cabecalhos, Swedish Institute of
     Computer Science e colaboradores, BSD de 3 clausulas), o argtable3 (BSD) e
     o esp_console (Apache License 2.0) vem do ESP-IDF. Os esp_rmaker_* vem do
     esp-rainmaker (Espressif, Apache License 2.0). O commands.c do console
     ganhou so um #include "cs_posix.h" no topo.
+    O cJSON (Dave Gamble e colaboradores, MIT; ver
+    arduino/src/arduino-esp32/idf/LICENSE-cJSON), o http_parser (Joyent e
+    colaboradores, MIT, o texto vai no topo do arquivo), os cabecalhos do FatFs
+    (ChaN, licenca propria, o texto vai no topo do ff.h) e o esp_err_to_name.c e
+    o esp_lcd (Espressif, Apache License 2.0) tambem vem do ESP-IDF. O esp_lcd foi
+    modificado pela ferramentas/idf/copiar_idf.py: sem o DMA do LCD paralelo e os
+    registradores do GPIO, que nao existem aqui.
 
 O resto de include/ e de runtime/ foi escrito para o CircuitSketch, imitando
 as interfaces do ESP-IDF, da newlib e do FreeRTOS -- os nomes e os valores

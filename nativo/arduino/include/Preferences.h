@@ -1,3 +1,9 @@
+/* Preferences.h -- nas placas ESP32, o Preferences de verdade do core, sobre o nvs.h;
+ * nas outras, o do simulador abaixo. */
+#include "Arduino.h"
+#if defined(ESP32)
+#include "arduino-esp32/Preferences.h"
+#else
 /* Preferences.h -- o NVS da ESP32 (chave e valor que sobrevivem ao reset). */
 #ifndef _PREFERENCES_H_
 #define _PREFERENCES_H_
@@ -63,5 +69,7 @@ public:
     }
     size_t getBytesLength(const char *key) { return (size_t)cs_obj_i(cs_nome, "getBytesLength", key); }
 };
+
+#endif
 
 #endif

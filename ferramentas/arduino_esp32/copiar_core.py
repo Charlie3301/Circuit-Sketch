@@ -70,6 +70,7 @@ DAS_BIBLIOTECAS = [
     'HTTPUpdate/src/HTTPUpdate.h', 'HTTPUpdate/src/HTTPUpdate.cpp', 'HTTPUpdateServer/src/HTTPUpdateServer.h',
     'Update/src/HttpsOTAUpdate.h', 'Update/src/Updater_Signing.h',
     'ESP_NOW/src/ESP32_NOW.h', 'ESP_NOW/src/ESP32_NOW.cpp', 'ESP_NOW/src/ESP32_NOW_Serial.h', 'ESP_NOW/src/ESP32_NOW_Serial.cpp',
+    'Preferences/src/Preferences.h', 'Preferences/src/Preferences.cpp',
     'WebServer/src/WebServer.h', 'WebServer/src/WebServer.cpp', 'WebServer/src/Parsing.cpp', 'WebServer/src/HTTP_Method.h',
     'WebServer/src/Uri.h', 'WebServer/src/Middlewares.h', 'WebServer/src/uri/UriBraces.h', 'WebServer/src/uri/UriGlob.h',
     'WebServer/src/uri/UriRegex.h', 'WebServer/src/detail/RequestHandler.h', 'WebServer/src/detail/RequestHandlersImpl.h',
@@ -116,7 +117,8 @@ DAS_BIBLIOTECAS = [
 # O que vai para outro lugar: o WebServer.h e o WiFiClientSecure.h de verdade
 # ficam atras dos do include/, que os escolhem nas placas com o core da ESP32
 # (as outras usam os do simulador).
-RENOMEAR = {'WebServer/src/WebServer.h': 'arduino-esp32/WebServer.h',
+RENOMEAR = {'Preferences/src/Preferences.h': 'arduino-esp32/Preferences.h',
+            'WebServer/src/WebServer.h': 'arduino-esp32/WebServer.h',
             'NetworkClientSecure/src/WiFiClientSecure.h': 'arduino-esp32/WiFiClientSecure.h'}
 # Os cabecalhos que o codigo inclui pela pasta dele vao tambem para o src.
 TAMBEM_NO_SRC = ['WebServer/src/detail/mimetable.h', 'WebServer/src/middleware/Middleware.h', 'USB/src/keyboardLayout/KeyboardLayout.h']

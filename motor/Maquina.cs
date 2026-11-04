@@ -1258,6 +1258,10 @@ public class Maquina
     public RainMakerDaPlaca RainMaker => rainMaker ??= new RainMakerDaPlaca(this);
     RainMakerDaPlaca rainMaker;
 
+    /// <summary>O Matter da placa: o que ela reportou, e o "aplicativo" que comissiona e escreve nela.</summary>
+    public MatterDaPlaca Matter => matter ??= new MatterDaPlaca(this);
+    MatterDaPlaca matter;
+
     public Rede Rede
     {
         get => rede ??= new Rede { UsarInternet = false };

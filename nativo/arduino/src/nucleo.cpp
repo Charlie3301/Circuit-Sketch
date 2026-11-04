@@ -286,7 +286,12 @@ uint64_t esp_sleep_get_ext1_wakeup_status(void) { return (uint64_t)ch_i(nullptr,
 void esp_deep_sleep_start(void) { ch(nullptr, "esp_deep_sleep_start"); }
 esp_err_t esp_light_sleep_start(void) { return (esp_err_t)ch_i(nullptr, "esp_light_sleep_start"); }
 void esp_deep_sleep(uint64_t us) { ch(nullptr, "esp_deep_sleep", cs_i((int64_t)us)); }
-void esp_restart(void) { ch(nullptr, "esp_restart"); }
+extern "C" void cs_chamar_ao_desligar(void) __attribute__((weak));
+void esp_restart(void)
+{
+    if (cs_chamar_ao_desligar) cs_chamar_ao_desligar();
+    ch(nullptr, "esp_restart");
+}
 esp_reset_reason_t esp_reset_reason(void) { return (esp_reset_reason_t)ch_i(nullptr, "esp_reset_reason"); }
 #endif
 

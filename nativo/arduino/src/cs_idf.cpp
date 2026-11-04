@@ -10,22 +10,6 @@
 #include <string>
 
 /* ---- os erros ---- */
-extern "C" const char *esp_err_to_name(esp_err_t code)
-{
-    switch (code) {
-    case ESP_OK: return "ESP_OK";
-    case ESP_FAIL: return "ESP_FAIL";
-    case ESP_ERR_NO_MEM: return "ESP_ERR_NO_MEM";
-    case ESP_ERR_INVALID_ARG: return "ESP_ERR_INVALID_ARG";
-    case ESP_ERR_INVALID_STATE: return "ESP_ERR_INVALID_STATE";
-    case ESP_ERR_INVALID_SIZE: return "ESP_ERR_INVALID_SIZE";
-    case ESP_ERR_NOT_FOUND: return "ESP_ERR_NOT_FOUND";
-    case ESP_ERR_NOT_SUPPORTED: return "ESP_ERR_NOT_SUPPORTED";
-    case ESP_ERR_TIMEOUT: return "ESP_ERR_TIMEOUT";
-    default: return "ERROR";
-    }
-}
-
 /* O ESP_ERROR_CHECK que falha: a mensagem do esp_err.c do IDF e o abort (na
  * placa, ela reinicia; aqui, o programa para com a mensagem). */
 static void mensagemDoCheck(esp_err_t r, const char *arquivo, int linha, const char *funcao, const char *expr)
@@ -257,7 +241,7 @@ extern "C" esp_err_t esp_flash_get_size(esp_flash_t *, uint32_t *tamanho)
     *tamanho = 4u << 20;
     return ESP_OK;
 }
-extern "C" const char *esp_get_idf_version(void) { return "v5.1.4"; }
+extern "C" const char *esp_get_idf_version(void) { return "v5.5.1"; }
 
 /* ---- os pinos ---- */
 static uint8_t puxar[64];           /* 0 nada, 1 pull-up, 2 pull-down */
@@ -699,9 +683,6 @@ extern "C" esp_err_t adc_oneshot_io_to_channel(int io, adc_unit_t *unidade, adc_
 }
 
 /* ---- a flash: a NVS do simulador ja existe (o Preferences); o init so liga ---- */
-extern "C" esp_err_t nvs_flash_init(void) { return ESP_OK; }
-extern "C" esp_err_t nvs_flash_erase(void) { return ESP_OK; }
-extern "C" esp_err_t nvs_flash_deinit(void) { return ESP_OK; }
 
 #endif
 
@@ -810,13 +791,4 @@ extern "C" esp_err_t esp_efuse_mac_get_default(uint8_t *mac)
  * o http_parser (o nome de cada metodo HTTP, como o do IDF: o WebServer
  * mostra o metodo no log e o LoggingMiddleware tambem) */
 #include "http_parser.h"
-extern "C" const char *http_method_str(enum http_method m)
-{
-    static const char *const nomes[] = {
-#define XX(num, name, string) #string,
-        HTTP_METHOD_MAP(XX)
-#undef XX
-    };
-    return (unsigned)m < sizeof(nomes) / sizeof(nomes[0]) ? nomes[m] : "<unknown>";
-}
 #endif

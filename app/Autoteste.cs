@@ -202,6 +202,8 @@ public static partial class Autoteste
         Bloco("Cpp_Depurador", Cpp_Depurador);
         Bloco("Cpp_ArduinoEsp32", Cpp_ArduinoEsp32);
         Bloco("Cpp_Pilhas", Cpp_Pilhas);
+        Bloco("Cpp_Json", Cpp_Json);
+        Bloco("Cpp_Idf", Cpp_Idf);
         Bloco("Diagnostico_Pasta", Diagnostico_Pasta);
         Bloco("Demo_Doom", Demo_Doom);
         Bloco("MotorDc_Fisica", MotorDc_Fisica);

@@ -150,7 +150,8 @@ extern "C" {
 int lwip_socket(int domain, int type, int protocol)
 {
     (void)protocol;
-    if (domain != AF_INET && domain != AF_UNSPEC) {
+    /* O IPv6 aceita conexoes IPv4 (o esp_http_server abre assim); a rede da bancada e IPv4. */
+    if (domain != AF_INET && domain != AF_INET6 && domain != AF_UNSPEC) {
         errno = EAFNOSUPPORT;
         return -1;
     }
@@ -536,7 +537,8 @@ int lwip_poll(struct pollfd *fds, nfds_t nfds, int timeout)
  * o numero do socket vai para o lwIP e o resto continua nos do Windows ---- */
 static bool ehSocket(int fd) { return fd >= PRIMEIRO_FD && fd < PRIMEIRO_FD + QUANTOS; }
 
-int close(int fd) { return ehSocket(fd) ? lwip_close(fd) : _close(fd); }
+extern "C" int cs_vfs_fechar(int fd);
+int close(int fd) { return ehSocket(fd) ? lwip_close(fd) : cs_vfs_fechar(fd); }
 int read(int fd, void *buf, unsigned int n) { return ehSocket(fd) ? (int)lwip_read(fd, buf, n) : _read(fd, buf, n); }
 int write(int fd, const void *buf, unsigned int n) { return ehSocket(fd) ? (int)lwip_write(fd, buf, n) : _write(fd, buf, n); }
 

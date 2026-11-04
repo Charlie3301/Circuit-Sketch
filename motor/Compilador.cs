@@ -188,7 +188,8 @@ public static class Compilador
         // quando o que ele usa o core nativo ja tem. Se o clang recusar e o
         // interpretador aceitar, fica o interpretador, que roda o projeto de
         // antes; se os dois recusarem, vale o erro do clang -- e o da IDE.
-        if (CppNativo && CompiladorNativo.PorQueNao(projeto) is null)
+        string foraDoClang = CppNativo ? CompiladorNativo.PorQueNao(projeto) : null;
+        if (CppNativo && foraDoClang is null)
         {
             try
             {
@@ -214,7 +215,14 @@ public static class Compilador
             }
         }
 
-        return new Unidades(projeto, linguagem).Compilar();
+        try
+        {
+            return new Unidades(projeto, linguagem).Compilar();
+        }
+        catch (ErroDeSintaxe erro) when (foraDoClang is not null && CompiladorNativo.MotivoDoErro(projeto, foraDoClang, erro) is { } motivo)
+        {
+            throw motivo;
+        }
     }
 
     /// <summary>

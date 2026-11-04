@@ -156,12 +156,16 @@ inline cs_val cs_de(const BLEAddress &a)
     return cs_tn(s.c_str(), (int)s.length());
 }
 
+#if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32S2)
+#include "esp_gatts_api.h"
+#else
 typedef union {
     struct {
         uint16_t conn_id;
         uint8_t remote_bda[6];
     } connect, disconnect;
 } esp_ble_gatts_cb_param_t;
+#endif
 typedef struct {
     uint16_t conn_handle;
 } ble_gap_conn_desc;

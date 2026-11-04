@@ -252,6 +252,10 @@ public sealed class CartaoSd
         {
             nome = Normalizar(nome);
 
+            // A pasta abre para percorrer (openNextFile), como o File da ESP32.
+            if (!paraEscrever && Tipo(nome, out _) == 2)
+                return new ArquivoSd(nome, new StringBuilder(), false) { Cartao = this, EhPasta = true };
+
             // Binário aberto pela API de texto: vira texto, um caractere por byte.
             if (binarios.Remove(nome, out var bin))
                 arquivos[nome] = new StringBuilder(TextoArduino.DeBytes(BytesDe(bin)));
@@ -272,7 +276,7 @@ public sealed class CartaoSd
             // escreve no fim.
             if (paraEscrever && truncar) conteudo.Clear();
 
-            return new ArquivoSd(nome, conteudo, paraEscrever);
+            return new ArquivoSd(nome, conteudo, paraEscrever) { Cartao = this };
         }
     }
 
@@ -544,6 +548,34 @@ public sealed class ArquivoSd(string nome, StringBuilder conteudo, bool paraEscr
     public int Tamanho() => conteudo.Length;
 
     public void Fechar() => Aberto = false;
+
+    public CartaoSd Cartao { get; init; }
+    public bool EhPasta { get; init; }
+    int proximoDaPasta;
+
+    /// <summary>O proximo arquivo da pasta, aberto para ler; null no fim.</summary>
+    public ArquivoSd ProximoDaPasta()
+    {
+        if (!EhPasta || Cartao is null) return null;
+        var filhos = Cartao.Listar(Nome);
+        if (proximoDaPasta >= filhos.Count) return null;
+        string filho = filhos[proximoDaPasta++].Nome;
+        return Cartao.Abrir(Nome.Length == 0 ? filho : Nome + "/" + filho, false);
+    }
+
+    public void VoltarAoComecoDaPasta() => proximoDaPasta = 0;
+
+    /// <summary>O seek do File: 0 do comeco, 1 de onde esta, 2 do fim.</summary>
+    public bool Posicionar(long deslocamento, int deOnde)
+    {
+        long alvo = deOnde switch { 1 => leitura + deslocamento, 2 => conteudo.Length + deslocamento, _ => deslocamento };
+        if (alvo < 0 || alvo > conteudo.Length) return false;
+        leitura = (int)alvo;
+        return true;
+    }
+
+    public int Posicao() => leitura;
+    public int Espiar() => leitura < conteudo.Length ? conteudo[leitura] : -1;
 }
 
 /// <summary>

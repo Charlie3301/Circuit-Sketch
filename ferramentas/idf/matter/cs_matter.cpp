@@ -11,7 +11,10 @@
 #include <Matter.h>
 #include <MatterEndPoint.h>
 #include "cs_objeto.h"
+#include "soc/soc_caps.h"
+#if SOC_WIFI_SUPPORTED
 #include "WiFi.h"
+#endif
 #include <map>
 #include <memory>
 #include <vector>
@@ -545,6 +548,47 @@ attribute_t *create(cluster_t *c, uint32_t attribute_id, uint16_t flags, esp_mat
 }
 } /* namespace attribute */
 
+namespace cluster {
+namespace switch_cluster {
+namespace event {
+static esp_err_t mandar(uint16_t endpoint_id, const char *nome, uint8_t posicao, uint8_t quantas)
+{
+    cs_obj_n(nullptr, "__matter_evento", (int)endpoint_id, nome, (int)posicao, (int)quantas);
+    return ESP_OK;
+}
+esp_err_t send_initial_press(uint16_t e, uint8_t p) { return mandar(e, "InitialPress", p, 0); }
+esp_err_t send_short_release(uint16_t e, uint8_t p) { return mandar(e, "ShortRelease", p, 0); }
+esp_err_t send_long_press(uint16_t e, uint8_t p) { return mandar(e, "LongPress", p, 0); }
+esp_err_t send_long_release(uint16_t e, uint8_t p) { return mandar(e, "LongRelease", p, 0); }
+esp_err_t send_multi_press_ongoing(uint16_t e, uint8_t p, uint8_t q) { return mandar(e, "MultiPressOngoing", p, q); }
+esp_err_t send_multi_press_complete(uint16_t e, uint8_t p, uint8_t q) { return mandar(e, "MultiPressComplete", p, q); }
+} /* namespace event */
+} /* namespace switch_cluster */
+} /* namespace cluster */
+
+namespace data_model {
+chip::app::ServerClusterInterface *Registro::Get(const chip::app::ConcreteClusterPath &caminho)
+{
+    if (caminho.mClusterId != chip::app::Clusters::BooleanState::Id || !cluster::get(caminho.mEndpointId, caminho.mClusterId)) return nullptr;
+    static auto *clusters = new std::map<uint16_t, chip::app::Clusters::BooleanStateCluster *>();
+    auto &c = (*clusters)[caminho.mEndpointId];
+    if (!c) c = new chip::app::Clusters::BooleanStateCluster(caminho.mEndpointId);
+    return c;
+}
+namespace provider {
+Registro &Provedor::registry()
+{
+    static Registro r;
+    return r;
+}
+Provedor &get_instance()
+{
+    static Provedor p;
+    return p;
+}
+} /* namespace provider */
+} /* namespace data_model */
+
 esp_err_t start(void *event_callback, intptr_t callback_arg)
 {
     (void)event_callback;
@@ -595,6 +639,16 @@ PlatformManagerImpl &PlatformMgr()
 } /* namespace DeviceLayer */
 namespace app {
 namespace Clusters {
+void BooleanStateCluster::SetStateValue(bool valor)
+{
+    esp_matter_attr_val_t v = esp_matter_bool(valor);
+    esp_matter::attribute::update(endpoint, BooleanState::Id, BooleanState::Attributes::StateValue::Id, &v);
+}
+namespace TemperatureControl {
+static SupportedTemperatureLevelsIteratorDelegate *niveis = nullptr;
+SupportedTemperatureLevelsIteratorDelegate *GetInstance() { return niveis; }
+void SetInstance(SupportedTemperatureLevelsIteratorDelegate *instancia) { niveis = instancia; }
+} /* namespace TemperatureControl */
 namespace OccupancySensing {
 static Structs::HoldTimeLimitsStruct::Type limites = {1, 3600, 60};
 Structs::HoldTimeLimitsStruct::Type *GetHoldTimeLimitsForEndpoint(EndpointId endpoint)
@@ -685,9 +739,17 @@ bool ArduinoMatter::setSetupPasscode(uint32_t p)
 }
 bool ArduinoMatter::setBLECommissioningEnabled(bool enabled) { bleLigado = enabled; return !comecou; }
 bool ArduinoMatter::setBLEMemoryReleaseEnabled(bool enabled) { liberarMemoriaBle = enabled; return !comecou; }
-bool ArduinoMatter::isWiFiStationEnabled() { return SOC_WIFI_SUPPORTED; }
+#if SOC_WIFI_SUPPORTED
+bool ArduinoMatter::isWiFiStationEnabled() { return true; }
+#else
+bool ArduinoMatter::isWiFiStationEnabled() { return false; }
+#endif
 bool ArduinoMatter::isWiFiAccessPointEnabled() { return false; }
-bool ArduinoMatter::isThreadEnabled() { return SOC_IEEE802154_SUPPORTED; }
+#if SOC_IEEE802154_SUPPORTED
+bool ArduinoMatter::isThreadEnabled() { return true; }
+#else
+bool ArduinoMatter::isThreadEnabled() { return false; }
+#endif
 bool ArduinoMatter::isEthernetEnabled() { return false; }
 bool ArduinoMatter::isBLECommissioningEnabled() { return bleLigado; }
 bool ArduinoMatter::isBLEMemoryReleaseEnabled() { return bleLigado && liberarMemoriaBle; }
@@ -718,7 +780,11 @@ bool ArduinoMatter::waitForNetwork(uint32_t timeoutMs)
     return isDeviceConnected();
 }
 bool ArduinoMatter::isDeviceCommissioned() { return comissionada; }
-bool ArduinoMatter::isWiFiConnected() { return SOC_WIFI_SUPPORTED && WiFi.status() == WL_CONNECTED; }
+#if SOC_WIFI_SUPPORTED
+bool ArduinoMatter::isWiFiConnected() { return WiFi.status() == WL_CONNECTED; }
+#else
+bool ArduinoMatter::isWiFiConnected() { return false; }
+#endif
 bool ArduinoMatter::isThreadConnected() { return false; }
 bool ArduinoMatter::isDeviceConnected() { return isWiFiConnected(); }
 bool ArduinoMatter::isOnline() { return comissionada && isDeviceConnected(); }

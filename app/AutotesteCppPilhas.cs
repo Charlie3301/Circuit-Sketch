@@ -13,7 +13,7 @@ public static partial class Autoteste
         Compilador.CppNativo = true;
         var a = new Maquina { Perfil = PerfilPlaca.De(placa), Nome = "a" };
         var b = new Maquina { Perfil = PerfilPlaca.De(placa), Nome = "b", Rede = a.Rede };
-        static string Serial(Maquina m) => string.Join("|", m.Serial.Select(l => l.Contains("] ") ? l[(l.IndexOf("] ") + 2)..] : l));
+        static string Serial(Maquina m) { lock (m.Trava) return string.Join("|", m.Serial.Select(l => l.Contains("] ") ? l[(l.IndexOf("] ") + 2)..] : l)); }
         try
         {
             var interpretadores = new List<(Interpretador I, Maquina M)>();
@@ -50,7 +50,7 @@ public static partial class Autoteste
 
     static void Cpp_Pilhas()
     {
-        saida.AppendLine("C++ compilado: as pilhas sob demanda (OpenThread, Zigbee)");
+        saida.AppendLine("C++ compilado: as pilhas sob demanda (OpenThread, Zigbee, Matter)");
         if (!CompiladorNativo.Disponivel)
         {
             Conferir("pilhas: o compilador (nativo/zig) esta instalado", false, "faltou nativo/zig/zig.exe");
@@ -266,5 +266,79 @@ public static partial class Autoteste
         (serialA, serialB, erro) = RodarDuasNativas(termostato, sensorZb, "esp32-c6-devkit", 30000, (a, b) => a.Contains("relatorios"));
         Conferir("Zigbee: o sensor do core manda relatorios pelo binding e o termostato recebe; a faixa vem pela leitura dos atributos",
             erro is null && serialA?.Contains("ligado ao sensor") == true && serialA.Contains("faixa 10.00 50.00") && serialA.Contains("relatorios subindo"), $"{erro} | {serialA} || {serialB}");
+
+        // ---- o Matter: os endpoints de verdade, com a bancada no papel do aplicativo ----
+        const string matter = """
+            #include <Matter.h>
+            #include <WiFi.h>
+            MatterOnOffLight luz;
+            MatterTemperatureSensor termometro;
+            MatterContactSensor porta;
+            MatterGenericSwitch botao;
+            MatterDimmableLight abajur;
+            void setup() {
+              Serial.begin(115200);
+              Serial.println(Matter.isDeviceCommissioned() ? "ja comissionada" : "ainda nao");
+              WiFi.begin("CircuitSketch-WiFi");
+              while (WiFi.status() != WL_CONNECTED) delay(50);
+              luz.begin(false);
+              luz.onChange([](bool v) { Serial.printf("luz mudou %d\n", v); return true; });
+              termometro.begin(20.0);
+              porta.begin();
+              botao.begin();
+              abajur.begin(false, 10);
+              abajur.onChangeBrightness([](uint8_t b) { Serial.printf("brilho %d\n", b); return b != 99; });
+              Matter.onEvent([](matterEvent_t e, const chip::DeviceLayer::ChipDeviceEvent *) {
+                if (e == MATTER_COMMISSIONING_COMPLETE) Serial.println("evento comissionou");
+              });
+              Matter.begin();
+              Serial.println("manual " + Matter.getManualPairingCode());
+              Serial.println("qr " + Matter.getOnboardingQRCodeUrl());
+              Serial.println("esperando");
+            }
+            void loop() {
+              static bool feito = false;
+              if (Matter.isDeviceCommissioned() && !feito) {
+                feito = true;
+                Serial.printf("ids %d %d %d %d %d\n", luz.getEndPointId(), termometro.getEndPointId(), porta.getEndPointId(), botao.getEndPointId(), abajur.getEndPointId());
+                termometro.setTemperature(31.5);
+                porta.setContact(true);
+                botao.click();
+                Serial.println("pronta");
+              }
+              static bool visto = false;
+              if (luz && !visto) { visto = true; Serial.println("sketch viu a luz"); }
+              delay(20);
+            }
+            """;
+        int passoMatter = 0;
+        string valorTemperatura = null, valorPorta = null;
+        var eventosMatter = new List<string>();
+        (var serialM, var erroM, var nativoM, var placaM) = RodarNativo(matter, 6000, "esp32-c6-devkit", durante: (Maquina m) =>
+        {
+            if (passoMatter == 0 && SerialTem(m, "esperando")) { passoMatter = 1; m.Matter.Escrever(1, 6, 0, 1); m.Matter.Comissionar(); }
+            else if (passoMatter == 1 && SerialTem(m, "pronta"))
+            {
+                passoMatter = 2;
+                m.Matter.Escrever(1, 6, 0, 1);
+                m.Matter.Escrever(5, 8, 0, 200);
+                m.Matter.Escrever(5, 8, 0, 99);
+            }
+        });
+        if (placaM is not null)
+        {
+            valorTemperatura = placaM.Matter.Valor(2, 0x402, 0);
+            valorPorta = placaM.Matter.Valor(3, 0x45, 0);
+            eventosMatter = placaM.Matter.Eventos;
+        }
+        Conferir("Matter: o codigo de pareamento manual e o do QR saem como na especificacao (34970112332 com 3840/20202021)",
+            nativoM && erroM is null && serialM?.Contains("manual 34970112332") == true && serialM.Contains("MT%3AY.K9042C00KA0648G00"), $"nativo={nativoM} erro={erroM} serial=[{serialM}]");
+        Conferir("Matter: a bancada comissiona, o evento chega e cada endpoint de verdade ganha o seu numero",
+            serialM?.Contains("ainda nao") == true && serialM.Contains("evento comissionou") && serialM.Contains("ids 1 2 3 4 5"), $"serial=[{serialM}]");
+        Conferir("Matter: o aplicativo escreve e chega no onChange; a escrita antes de comissionar nao vale; o brilho recusado nao muda",
+            serialM?.Contains("luz mudou 1") == true && serialM.Contains("sketch viu a luz") && serialM.Contains("brilho 200") && serialM.Contains("brilho 99") && placaM?.Matter.Valor(5, 8, 0) == "200"
+            && (serialM.IndexOf("luz mudou 1", StringComparison.Ordinal) > serialM.IndexOf("pronta", StringComparison.Ordinal)), $"serial=[{serialM}] brilho={placaM?.Matter.Valor(5, 8, 0)}");
+        Conferir("Matter: o sensor reporta em centesimos de grau, o contato vira o atributo do BooleanState e o clique manda os eventos do interruptor",
+            valorTemperatura == "3150" && valorPorta == "1" && eventosMatter.Contains("4 InitialPress 1 0") && eventosMatter.Contains("4 ShortRelease 1 0"), $"temperatura={valorTemperatura} porta={valorPorta} eventos=[{string.Join(";", eventosMatter)}]");
     }
 }

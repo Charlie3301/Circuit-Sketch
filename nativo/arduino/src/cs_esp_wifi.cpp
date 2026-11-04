@@ -603,5 +603,143 @@ extern "C" esp_err_t esp_now_set_wake_window(uint16_t window)
     return ESP_OK;
 }
 
+/* =====================================================================
+ * o que se pergunta da interface e do WiFi, com os valores padrao do IDF */
+extern "C" esp_netif_t *esp_netif_next_unsafe(esp_netif_t *esp_netif)
+{
+    if (!esp_netif) return &interfaceSta;
+    return esp_netif == &interfaceSta ? &interfaceAp : nullptr;
+}
+extern "C" esp_netif_t *esp_netif_next(esp_netif_t *esp_netif) { return esp_netif_next_unsafe(esp_netif); }
+extern "C" esp_netif_t *esp_netif_find_if(esp_netif_find_predicate_t fn, void *ctx)
+{
+    if (!fn) return nullptr;
+    for (esp_netif_t *n = esp_netif_next_unsafe(nullptr); n; n = esp_netif_next_unsafe(n))
+        if (fn(n, ctx)) return n;
+    return nullptr;
+}
+extern "C" size_t esp_netif_get_nr_of_ifs(void) { return 2; }
+extern "C" esp_err_t esp_netif_tcpip_exec(esp_netif_callback_fn fn, void *ctx) { return fn ? fn(ctx) : ESP_ERR_INVALID_ARG; }
+extern "C" esp_netif_flags_t esp_netif_get_flags(esp_netif_t *esp_netif)
+{
+    if (!esp_netif) return (esp_netif_flags_t)0;
+    return (esp_netif_flags_t)(esp_netif->ap ? (ESP_NETIF_DHCP_SERVER | ESP_NETIF_FLAG_AUTOUP)
+                                             : (ESP_NETIF_DHCP_CLIENT | ESP_NETIF_FLAG_GARP | ESP_NETIF_FLAG_EVENT_IP_MODIFIED));
+}
+extern "C" int esp_netif_get_netif_impl_index(esp_netif_t *esp_netif) { return !esp_netif ? -1 : esp_netif->ap ? 2 : 1; }
+extern "C" esp_err_t esp_netif_get_netif_impl_name(esp_netif_t *esp_netif, char *name)
+{
+    if (!esp_netif || !name) return ESP_ERR_INVALID_ARG;
+    strcpy(name, esp_netif->ap ? "ap1" : "st1");
+    return ESP_OK;
+}
+extern "C" int esp_netif_get_route_prio(esp_netif_t *esp_netif) { return !esp_netif ? -1 : esp_netif->ap ? 10 : 100; }
+extern "C" int32_t esp_netif_get_event_id(esp_netif_t *esp_netif, esp_netif_ip_event_type_t tipo)
+{
+    if (!esp_netif || esp_netif->ap) return tipo == ESP_NETIF_IP_EVENT_GOT_IP ? IP_EVENT_AP_STAIPASSIGNED : -1;
+    return tipo == ESP_NETIF_IP_EVENT_GOT_IP ? IP_EVENT_STA_GOT_IP : IP_EVENT_STA_LOST_IP;
+}
+extern "C" esp_err_t esp_netif_dhcps_get_status(esp_netif_t *esp_netif, esp_netif_dhcp_status_t *status)
+{
+    if (!esp_netif || !status) return ESP_ERR_INVALID_ARG;
+    *status = esp_netif->ap ? ESP_NETIF_DHCP_STARTED : ESP_NETIF_DHCP_STOPPED;
+    return ESP_OK;
+}
+extern "C" void esp_netif_set_ip4_addr(esp_ip4_addr_t *addr, uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+{
+    if (addr) addr->addr = esp_netif_htonl(esp_netif_ip4_makeu32(a, b, c, d));
+}
+extern "C" esp_err_t esp_netif_create_ip6_linklocal(esp_netif_t *esp_netif) { return esp_netif ? ESP_OK : ESP_ERR_INVALID_ARG; }
+/* A rede da bancada e so IPv4 pelo WiFi: nenhuma interface tem IPv6 (o da Thread vem pelo esp_openthread). */
+extern "C" esp_err_t esp_netif_get_ip6_linklocal(esp_netif_t *, esp_ip6_addr_t *) { return ESP_FAIL; }
+extern "C" esp_err_t esp_netif_get_ip6_global(esp_netif_t *, esp_ip6_addr_t *) { return ESP_FAIL; }
+extern "C" int esp_netif_get_all_ip6(esp_netif_t *, esp_ip6_addr_t []) { return 0; }
+extern "C" int esp_netif_get_all_preferred_ip6(esp_netif_t *, esp_ip6_addr_t []) { return 0; }
+extern "C" void esp_netif_action_start(void *, esp_event_base_t, int32_t, void *) {}
+extern "C" void esp_netif_action_stop(void *, esp_event_base_t, int32_t, void *) {}
+extern "C" void esp_netif_action_connected(void *, esp_event_base_t, int32_t, void *) {}
+extern "C" void esp_netif_action_disconnected(void *, esp_event_base_t, int32_t, void *) {}
+extern "C" void esp_netif_action_got_ip(void *, esp_event_base_t, int32_t, void *) {}
+
+extern "C" esp_err_t esp_wifi_set_default_wifi_sta_handlers(void) { return ESP_OK; }
+extern "C" esp_err_t esp_wifi_set_default_wifi_ap_handlers(void) { return ESP_OK; }
+extern "C" esp_err_t esp_wifi_clear_default_wifi_driver_and_handlers(void *) { return ESP_OK; }
+extern "C" esp_err_t esp_wifi_get_country_code(char *country)
+{
+    if (!country) return ESP_ERR_INVALID_ARG;
+    memcpy(country, pais.cc, 2);
+    country[2] = 0;
+    return ESP_OK;
+}
+extern "C" esp_err_t esp_wifi_set_country_code(const char *country, bool ieee80211d_enabled)
+{
+    if (!country) return ESP_ERR_INVALID_ARG;
+    memcpy(pais.cc, country, 2);
+    pais.cc[2] = 0;
+    pais.policy = ieee80211d_enabled ? WIFI_COUNTRY_POLICY_AUTO : WIFI_COUNTRY_POLICY_MANUAL;
+    return ESP_OK;
+}
+extern "C" esp_err_t esp_wifi_get_band(wifi_band_t *band)
+{
+    if (!band) return ESP_ERR_INVALID_ARG;
+    *band = WIFI_BAND_2G;
+    return ESP_OK;
+}
+extern "C" esp_err_t esp_wifi_get_band_mode(wifi_band_mode_t *band_mode)
+{
+    if (!band_mode) return ESP_ERR_INVALID_ARG;
+    *band_mode = WIFI_BAND_MODE_2G_ONLY;
+    return ESP_OK;
+}
+extern "C" esp_err_t esp_wifi_get_protocols(wifi_interface_t ifx, wifi_protocols_t *protocols)
+{
+    if (!protocols) return ESP_ERR_INVALID_ARG;
+    uint8_t p = 0;
+    esp_err_t e = esp_wifi_get_protocol(ifx, &p);
+    protocols->ghz_2g = p;
+    protocols->ghz_5g = 0;
+    return e;
+}
+extern "C" esp_err_t esp_wifi_get_bandwidths(wifi_interface_t ifx, wifi_bandwidths_t *bw)
+{
+    if (!bw) return ESP_ERR_INVALID_ARG;
+    wifi_bandwidth_t b = WIFI_BW_HT40;
+    esp_err_t e = esp_wifi_get_bandwidth(ifx, &b);
+    bw->ghz_2g = b;
+    bw->ghz_5g = b;
+    return e;
+}
+extern "C" esp_err_t esp_wifi_sta_get_aid(uint16_t *aid)
+{
+    if (!aid) return ESP_ERR_INVALID_ARG;
+    wifi_ap_record_t ap;
+    esp_err_t e = esp_wifi_sta_get_ap_info(&ap);
+    if (e != ESP_OK) return e;
+    *aid = 1;
+    return ESP_OK;
+}
+extern "C" esp_err_t esp_wifi_sta_get_negotiated_phymode(wifi_phy_mode_t *phymode)
+{
+    if (!phymode) return ESP_ERR_INVALID_ARG;
+    wifi_ap_record_t ap;
+    esp_err_t e = esp_wifi_sta_get_ap_info(&ap);
+    if (e != ESP_OK) return e;
+    *phymode = WIFI_PHY_MODE_HT20;
+    return ESP_OK;
+}
+extern "C" esp_err_t esp_wifi_get_inactive_time(wifi_interface_t, uint16_t *sec)
+{
+    if (!sec) return ESP_ERR_INVALID_ARG;
+    *sec = 0;
+    return ESP_OK;
+}
+extern "C" int64_t esp_wifi_get_tsf_time(wifi_interface_t) { return (int64_t)micros(); }
+extern "C" esp_err_t esp_wifi_get_event_mask(uint32_t *mask)
+{
+    if (!mask) return ESP_ERR_INVALID_ARG;
+    *mask = WIFI_EVENT_MASK_AP_PROBEREQRECVED;
+    return ESP_OK;
+}
+
 #endif
 #endif

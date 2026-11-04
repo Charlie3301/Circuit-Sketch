@@ -88,6 +88,7 @@
     <Compile Include="..\motor\Rede154.cs" />
     <Compile Include="..\motor\Usb.cs" />
     <Compile Include="..\motor\RainMaker.cs" />
+    <Compile Include="..\motor\Matter.cs" />
     <Compile Include="..\motor\Ble.cs" />
     <Compile Include="..\motor\TiposC.cs" />
     <Compile Include="..\motor\InterpretadorC.cs" />

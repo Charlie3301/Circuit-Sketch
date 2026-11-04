@@ -30,6 +30,11 @@ def copiar_pasta(origem, destino, extensoes):
     return n
 
 
+# O net_sockets da biblioteca fala com o Windows; o do IDF (port/net_sockets.c), com o lwIP.
+def trocar_net_sockets(idf, destino):
+    shutil.copyfile(os.path.join(idf, 'components', 'mbedtls', 'port', 'net_sockets.c'), os.path.join(destino, 'library', 'net_sockets.c'))
+
+
 def main():
     if len(sys.argv) < 2:
         print(__doc__)
@@ -50,6 +55,7 @@ def main():
     os.makedirs(os.path.join(DESTINO, 'library'))
     fontes = copiar_pasta(os.path.join(mbed, 'library'), os.path.join(DESTINO, 'library'), ('.c', '.h'))
     shutil.copyfile(os.path.join(mbed, 'LICENSE'), os.path.join(DESTINO, 'LICENSE'))
+    trocar_net_sockets(sys.argv[1], DESTINO)
     with open(os.path.join(mbed, 'include', 'mbedtls', 'build_info.h'), encoding='utf-8') as f:
         versao = next(l.split('"')[1] for l in f if 'MBEDTLS_VERSION_STRING ' in l)
     with open(os.path.join(DESTINO, 'VERSAO'), 'w', encoding='utf-8') as f:

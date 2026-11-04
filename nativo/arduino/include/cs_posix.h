@@ -33,6 +33,7 @@ static inline int cs_asprintf(char **saida, const char *formato, ...)
     return n;
 }
 #define asprintf cs_asprintf
+int strerror_r(int erro, char *saida, size_t n);
 
 /* Os u_int*_t do sys/types.h da newlib (o Windows nao tem). */
 typedef unsigned char u_int8_t;

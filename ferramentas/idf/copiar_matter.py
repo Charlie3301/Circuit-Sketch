@@ -29,7 +29,9 @@ DO_SDK = ['esp_matter_attribute.h', 'esp_matter_cluster.h', 'esp_matter_core.h',
           'app/util/attribute-storage-null-handling.h', 'lib/support/Span.h', 'lib/core/CHIPError.h', 'platform/CHIPDeviceLayer.h',
           'app/clusters/boolean-state-server/boolean-state-cluster.h', 'app-common/zap-generated/cluster-objects.h',
           'app-common/zap-generated/cluster-enums.h', 'app/ConcreteAttributePath.h', 'lib/support/CodeUtils.h',
-          'platform/CHIPDeviceConfig.h', 'app/server/Server.h']
+          'platform/CHIPDeviceConfig.h', 'app/server/Server.h', 'app/clusters/window-covering-server/window-covering-server.h',
+          'app/clusters/closure-control-server/closure-control-cluster-objects.h', 'setup_payload/SetupPayload.h', 'platform/DeviceInstanceInfoProvider.h',
+          'platform/CommissionableDataProvider.h', 'crypto/CHIPCryptoPAL.h']
 
 
 def main():

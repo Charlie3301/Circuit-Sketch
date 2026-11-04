@@ -33,6 +33,44 @@ public partial class Interpretador
                 fita.Mostrar();
                 return Valor.Vazio;
             }
+            // A NVS da placa (src/cs_idf_nvs.cpp): o nvs.h do IDF e o Preferences do core.
+            case "__nvs_gravar":
+            {
+                var quadro = args[3].Referencia as Valor[] ?? [];
+                var dados = new byte[quadro.Length];
+                for (int i = 0; i < dados.Length; i++) dados[i] = (byte)((long)quadro[i].Num & 0xFF);
+                lock (maq.Nvs) maq.Nvs[args[0].Texto + "\0" + args[1].Texto] = ((int)args[2].Num, dados);
+                return Valor.Vazio;
+            }
+            case "__nvs_tipo":
+                lock (maq.Nvs) return Valor.DeInt(maq.Nvs.TryGetValue(args[0].Texto + "\0" + args[1].Texto, out var nvsTipo) ? nvsTipo.Tipo : -1);
+            case "__nvs_tamanho":
+                lock (maq.Nvs) return Valor.DeInt(maq.Nvs.TryGetValue(args[0].Texto + "\0" + args[1].Texto, out var nvsTam) ? nvsTam.Dados.Length : -1);
+            case "__nvs_ler":
+            {
+                if (args[2].Referencia is not Valor[] destino) return Valor.DeInt(-1);
+                lock (maq.Nvs)
+                {
+                    if (!maq.Nvs.TryGetValue(args[0].Texto + "\0" + args[1].Texto, out var nvs)) return Valor.DeInt(-1);
+                    int n = Math.Min(nvs.Dados.Length, destino.Length);
+                    for (int i = 0; i < n; i++) destino[i] = Valor.DeC(nvs.Dados[i], TipoC.UChar);
+                    return Valor.DeInt(n);
+                }
+            }
+            case "__nvs_apagar":
+                lock (maq.Nvs) return Valor.DeInt(maq.Nvs.Remove(args[0].Texto + "\0" + args[1].Texto) ? 0 : -1);
+            case "__nvs_limpar":
+                lock (maq.Nvs) maq.Nvs.Clear();
+                return Valor.Vazio;
+            case "__nvs_chaves":
+            {
+                string prefixo = args[0].Texto + "\0";
+                lock (maq.Nvs) return Valor.DeTexto(string.Join("\n", maq.Nvs.Keys.Where(k => k.StartsWith(prefixo, StringComparison.Ordinal)).Select(k => k[prefixo.Length..])));
+            }
+            case "__nvs_contar":
+                lock (maq.Nvs) return Valor.DeInt(maq.Nvs.Keys.Count(k => !k.EndsWith("\0\u0001", StringComparison.Ordinal)));
+            case "__nvs_espacos":
+                lock (maq.Nvs) return Valor.DeInt(maq.Nvs.Keys.Select(k => k.Split('\0')[0]).Distinct().Count());
             // O radio 802.15.4 do OpenThread (motor/Rede154.cs).
             case "__154_ligar":
                 maq.Rede?.Ligar154(maq, args[0].Num != 0);
@@ -55,6 +93,19 @@ public partial class Interpretador
                 return Valor.DeInt(n);
             }
             // O RainMaker (src/cs_rainmaker.cpp): a nuvem e o aplicativo sao a bancada (motor/RainMaker.cs).
+            case "__abort":
+                // Na ESP32 o abort() e um panico: a placa reinicia. Nas outras, ela para ali.
+                if (EhDaFamiliaEsp32 || EhEsp8266) throw Reiniciar(ReinicioDaPlaca.PeloPanico, 0, 0);
+                throw new ErroDeExecucao("o programa chamou abort(): a placa parou aqui.", 0);
+            case "__matter_comissionada": return Valor.DeBool(maq.Matter.Comissionada);
+            case "__matter_proxima": return Valor.DeTexto(maq.Matter.ProximaEscrita());
+            case "__matter_relatar":
+                maq.Matter.Relatar((int)args[0].Num, (long)args[1].Num, (long)args[2].Num, args[3].Texto ?? "");
+                return Valor.Vazio;
+            case "__matter_descomissionar": maq.Matter.Descomissionar(); return Valor.Vazio;
+            case "__matter_evento":
+                maq.Matter.Evento((int)args[0].Num, args[1].Texto ?? "", (int)args[2].Num, (int)args[3].Num);
+                return Valor.Vazio;
             case "__rmaker_rede": return Valor.DeBool(maq.Rede?.NaRede(maq) ?? false);
             case "__rmaker_conectou": maq.RainMaker.Conectou(); return Valor.Vazio;
             case "__rmaker_relatar":

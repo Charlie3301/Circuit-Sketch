@@ -183,6 +183,32 @@ public static class CompiladorNativo
         return null;
     }
 
+    /// <summary>
+    /// O projeto saiu do compilador de verdade (<see cref="PorQueNao"/>) e o interpretador
+    /// tambem recusou. Sem isto, o erro aparecia dentro da biblioteca ("ArduinoJson/Converter.hpp,
+    /// linha 9"), e o defeito parecia ser dela: o interpretador nao le o C++ moderno. Conta o
+    /// motivo de verdade; null deixa o erro como esta (o erro e do proprio sketch).
+    /// </summary>
+    public static ErroDeSintaxe MotivoDoErro(Projeto projeto, string foraDoClang, ErroDeSintaxe erro)
+    {
+        // "usa X.h": nem instalada nem na placa. Na IDE, o "No such file or directory".
+        if (foraDoClang.StartsWith("usa ", StringComparison.Ordinal) && !foraDoClang[4..].Contains(' '))
+        {
+            string cabecalho = foraDoClang[4..];
+            int linha = 1;
+            foreach (string texto in (projeto.Sketch ?? "").Split('\n'))
+            {
+                if (Inclusao.Match(texto) is { Success: true } m && m.Groups[1].Value.Trim().Replace('\\', '/') == cabecalho) break;
+                linha++;
+            }
+            return new ErroDeSintaxe($"{cabecalho} nao esta instalada e nao vem com a placa (na IDE do Arduino: \"No such file or directory\"). "
+                                     + "Instale a biblioteca que traz esse arquivo, ou tire o #include.", linha);
+        }
+        if (Origens.DoSketch(erro.Linha)) return null;
+        return new ErroDeSintaxe($"{foraDoClang}: isso so roda no interpretador, e o interpretador nao le esta biblioteca ({erro.Message}). "
+                                 + "No compilador de C++ ela funciona: tire do sketch o que o prende ao interpretador.", erro.Linha);
+    }
+
     static readonly Regex InclusaoComAspas = new(@"^\s*#\s*include\s*""([^""]+)""", RegexOptions.Compiled | RegexOptions.Multiline);
 
     /// <summary>
@@ -406,6 +432,7 @@ public static class CompiladorNativo
 
             if (Directory.Exists(pastaDoSketch)) Directory.Delete(pastaDoSketch, true);
             Directory.Move(trabalho, pastaDoSketch);
+            AparCache();
         }
         catch
         {
@@ -413,6 +440,37 @@ public static class CompiladorNativo
             throw;
         }
         return new SketchCompilado(dll, placa, projeto.Sketch);
+    }
+
+    /// <summary>
+    /// O cache so cresce: cada versao de cada sketch deixa uma pasta (uns 10 MB, com o PDB),
+    /// e o core e as pilhas, uma por placa a cada versao do programa. Sem limite, chega a
+    /// encher o disco. Ficam as mais novas; o resto, o compilador refaz se precisar.
+    /// A suite dos testes compila milhares de sketches e precisa das demos prontas:
+    /// CS_CACHE_SEM_LIMITE deixa tudo.
+    /// </summary>
+    static void AparCache(int sketches = 300, int porPilha = 60)
+    {
+        if (Environment.GetEnvironmentVariable("CS_CACHE_SEM_LIMITE") == "1") return;
+        try
+        {
+            var pastas = new DirectoryInfo(Cache()).GetDirectories().Where(d => d.Name != "zig").ToList();
+            // A compilacao que morreu no meio (o processo fechou) deixa a pasta de trabalho.
+            foreach (var d in pastas.Where(d => d.Name.Contains(".tmp-") && d.LastWriteTimeUtc < DateTime.UtcNow.AddDays(-1)))
+                Apagar(d);
+            foreach (var grupo in pastas.Where(d => !d.Name.Contains(".tmp-")).GroupBy(d => d.Name.Split('-')[0]))
+                foreach (var d in grupo.OrderByDescending(d => d.LastWriteTimeUtc).Skip(grupo.Key == "sketch" ? sketches : porPilha))
+                    Apagar(d);
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+
+        static void Apagar(DirectoryInfo pasta)
+        {
+            try { pasta.Delete(true); }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
+        }
     }
 
     /// <summary>Compila cada fonte num .o, em paralelo; devolve as mensagens de erro.</summary>
@@ -482,6 +540,14 @@ public static class CompiladorNativo
         new("zigbee", new Regex(@"\b(Zigbee\w*|esp_zb_\w+|ZIGBEE_\w+)\b|esp_zigbee|zboss_api", RegexOptions.Compiled),
             ["esp32", "esp32s2", "esp32s3", "esp32c3", "esp32c6", "esp32h2"],
             ["-DZIGBEE_MODE_ED=1", "-DZIGBEE_MODE_ZCZR=1"], [], ["include/ep"]),
+        // A rede de alto nivel do IDF, a de verdade, sobre os sockets do simulador.
+        new("idfrede", new Regex(@"\b(esp_http_client\w*|esp_http_server|httpd_\w+|esp_tls\w*|esp_transport\w*|esp_mqtt\w*|mqtt_client|esp_https_ota\w*|esp_https_server|esp_crt_bundle\w*)\b", RegexOptions.Compiled),
+            ["esp32", "esp32s2", "esp32s3", "esp32c3", "esp32c6", "esp32h2"],
+            [], ["-include", "cs_idfrede_compat.h", "-DESP_PLATFORM=1", "-DIDF_VER=\"v5.5.1\""], ["src/privados"]),
+        // Os endpoints do core sao os de verdade; o protocolo nao roda (src/cs_matter.cpp, motor/Matter.cs).
+        new("matter", new Regex(@"\b(Matter\w*|esp_matter\w*)\b", RegexOptions.Compiled),
+            ["esp32", "esp32s2", "esp32s3", "esp32c3", "esp32c6", "esp32h2"],
+            [], [], []),
     ];
 
     static string BibliotecaDaPilha(PilhaSobDemanda pilha, string pasta, string zig, string cabecalho, string inc, List<string> idf,
@@ -655,9 +721,11 @@ public static class CompiladorNativo
         extern void app_main(void) __attribute__((weak));
         extern void cs_app_main_do_cpp(void) __asm__("_Z8app_mainv") __attribute__((weak));
         extern volatile int cs_rtos_ativo;
+        extern int cs_nvs_iniciada __attribute__((weak));
 
         void setup(void)
         {
+            if (&cs_nvs_iniciada) cs_nvs_iniciada = 0;
             cs_val baud = cs_i(115200);
             cs_nada("Serial", "begin", 1, &baud);
             if (app_main) app_main();

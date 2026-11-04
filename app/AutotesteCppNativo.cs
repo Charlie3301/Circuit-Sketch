@@ -15,17 +15,23 @@ public static partial class Autoteste
     /// milissegundos (o relogio e o real). Devolve o serial, o erro, se o
     /// programa veio mesmo compilado, e a placa.
     /// </summary>
+    /// <summary>O serial cresce na thread da placa enquanto o teste olha.</summary>
+    static bool SerialTem(Maquina m, string texto)
+    {
+        lock (m.Trava) return m.Serial.Any(l => l.Contains(texto));
+    }
+
     static (string Serial, string Erro, bool Nativo, Maquina Maq) RodarNativo(string sketch, int ms = 300,
         string placa = "esp32-devkit-v1", Action<Maquina> durante = null, IDictionary<string, string> abas = null,
-        Action<Interpretador, Maquina> antes = null)
+        Action<Interpretador, Maquina> antes = null, List<BibliotecaDeFora> bibliotecas = null)
     {
         bool eraNativo = Compilador.CppNativo;
         Compilador.CppNativo = true;
         var maq = new Maquina { Perfil = PerfilPlaca.De(placa) ?? PerfilPlaca.Esp32 };
-        string Serial() => string.Join("|", maq.Serial.Select(l => l.Contains("] ") ? l[(l.IndexOf("] ") + 2)..] : l));
+        string Serial() { lock (maq.Trava) return string.Join("|", maq.Serial.Select(l => l.Contains("] ") ? l[(l.IndexOf("] ") + 2)..] : l)); }
         try
         {
-            var prog = Compilador.CompilarProjeto(new Projeto { Sketch = sketch, Placa = placa, Arquivos = abas, DoSimulador = Acervo.EhDoSimulador });
+            var prog = Compilador.CompilarProjeto(new Projeto { Sketch = sketch, Placa = placa, Arquivos = abas, DoSimulador = Acervo.EhDoSimulador, Bibliotecas = bibliotecas });
             bool nativo = prog.Compilado is not null;
             var interp = new Interpretador(prog, maq);
             antes?.Invoke(interp, maq);

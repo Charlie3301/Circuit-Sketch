@@ -3636,7 +3636,18 @@ public partial class Interpretador(Programa prog, Maquina maq)
                         return Valor.DeTexto(obj.Arquivo?.LerLinha() ?? "");
                     case "size": return Valor.DeInt(obj.Arquivo?.Tamanho() ?? 0);
                     case "name": return Valor.DeTexto(obj.Arquivo?.Nome ?? "");
+                    case "path": return Valor.DeTexto("/" + (obj.Arquivo?.Nome ?? ""));
                     case "flush": return Valor.Vazio;
+                    case "isDirectory": return Valor.DeBool(obj.Arquivo?.EhPasta ?? false);
+                    case "openNextFile":
+                        arquivoRecemAberto = obj.Arquivo?.ProximoDaPasta();
+                        return Valor.DeBool(arquivoRecemAberto is not null);
+                    case "rewindDirectory": obj.Arquivo?.VoltarAoComecoDaPasta(); return Valor.Vazio;
+                    case "seek":
+                        return Valor.DeBool(obj.Arquivo?.Posicionar(args.Count > 0 ? (long)args[0].Num : 0, args.Count > 1 ? (int)args[1].Num : 0) ?? false);
+                    case "position": return Valor.DeInt(obj.Arquivo?.Posicao() ?? 0);
+                    case "peek": return Valor.DeInt(obj.Arquivo?.Espiar() ?? -1);
+                    case "getLastWrite": return Valor.DeInt(0);
                 }
                 break;
 

@@ -9,9 +9,11 @@
  * papel do aplicativo (o Google Home, o Apple Home) e a bancada (motor/Matter.cs):
  * comissiona a placa, escreve nos atributos e le o que a placa reporta. */
 #pragma once
+#include <type_traits>
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdlib.h>
 #include <functional>
 #include "esp_err.h"
 #include "sdkconfig.h"
@@ -53,6 +55,7 @@ public:
     Optional(const T &v) : tem(true), valor(v) {}
     bool HasValue() const { return tem; }
     const T &Value() const { return valor; }
+    template <typename... A> void Emplace(A... a) { valor = T(a...); tem = true; }
 
 private:
     bool tem;
@@ -68,6 +71,8 @@ public:
     Span(T *dados, size_t tamanho) : p(dados), n(tamanho) {}
     template <size_t N>
     Span(T (&a)[N]) : p(a), n(N) {}
+    template <typename U, typename = typename std::enable_if<std::is_same<const U, T>::value>::type>
+    Span(const Span<U> &o) : p(o.data()), n(o.size()) {}
     T *data() const { return p; }
     size_t size() const { return n; }
     bool empty() const { return n == 0; }
@@ -93,6 +98,7 @@ public:
     using TimerCompleteCallback = void (*)(Layer *, void *);
     int StartTimer(Clock::Milliseconds32 tempo, TimerCompleteCallback f, void *arg);
     int CancelTimer(TimerCompleteCallback f, void *arg);
+    bool IsInitialized() const { return true; }
     int ScheduleLambda_(std::function<void()> f);
     template <typename F> int ScheduleLambda(F f) { return ScheduleLambda_(std::function<void()>(f)); }
 };
@@ -159,6 +165,10 @@ namespace ClusterRevision { constexpr AttributeId Id = 0x0000FFFD; }
 } /* namespace Attributes */
 enum class LocationTag : uint16_t { kIndoor = 0, kOutdoor = 1, kInside = 2, kOutside = 3 };
 enum class PositionTag : uint16_t { kLeft = 0, kRight = 1, kTop = 2, kBottom = 3, kMiddle = 4, kRow = 5, kColumn = 6 };
+namespace Structs { namespace SemanticTagStruct {
+struct CodigoDoFabricante { uint16_t valor = 0; void SetNull() { valor = 0; } };
+struct Type { CodigoDoFabricante mfgCode; uint8_t namespaceID; uint8_t tag; Optional<CharSpan> label; };
+} }
 } /* namespace Globals */
 
 #define CS_ATRIBUTO(nome, id) namespace nome { constexpr AttributeId Id = id; }
@@ -182,7 +192,7 @@ namespace Attributes { CS_ATRIBUTO(CurrentLevel, 0x0000) CS_ATRIBUTO(RemainingTi
 namespace Descriptor {
 constexpr ClusterId Id = 0x001D;
 namespace Attributes { CS_ATRIBUTO(TagList, 0x0004) CS_GLOBAIS }
-namespace Structs { namespace SemanticTagStruct { struct Type { uint16_t mfgCode; uint8_t namespaceID; uint8_t tag; Optional<CharSpan> label; }; } }
+namespace Structs { namespace SemanticTagStruct { using Type = Globals::Structs::SemanticTagStruct::Type; } }
 } /* namespace Descriptor */
 namespace BasicInformation {
 constexpr ClusterId Id = 0x0028;
@@ -213,6 +223,9 @@ CS_ATRIBUTO(CurrentPositionLiftPercent100ths, 0x000E) CS_ATRIBUTO(CurrentPositio
 CS_ATRIBUTO(InstalledClosedLimitLift, 0x0011) CS_ATRIBUTO(InstalledOpenLimitTilt, 0x0012) CS_ATRIBUTO(InstalledClosedLimitTilt, 0x0013) CS_ATRIBUTO(Mode, 0x0017)
 CS_ATRIBUTO(SafetyStatus, 0x001A) CS_GLOBAIS
 }
+enum class Type : uint8_t { kRollerShade = 0, kRollerShade2Motor = 1, kRollerShadeExterior = 2, kRollerShadeExterior2Motor = 3, kDrapery = 4, kAwning = 5, kShutter = 6, kTiltBlindTiltOnly = 7, kTiltBlindLiftAndTilt = 8, kProjectorScreen = 9, kUnknown = 255 };
+enum class OperationalState : uint8_t { Stall = 0, MovingUpOrOpen = 1, MovingDownOrClose = 2 };
+enum class OperationalStatus : uint8_t { kGlobal = 0x03, kLift = 0x0C, kTilt = 0x30 };
 } /* namespace WindowCovering */
 namespace Thermostat {
 constexpr ClusterId Id = 0x0201;
@@ -360,7 +373,8 @@ template <typename T>
 class nullable {
 public:
     nullable() : nulo(true), valor() {}
-    nullable(T v) : nulo(false), valor(v) {}
+    template <class U, class = typename std::enable_if<std::is_arithmetic<U>::value>::type>
+    nullable(U v) : nulo(false), valor((T)v) {}
     nullable(std::nullptr_t) : nulo(true), valor() {}
     bool is_null() const { return nulo; }
     T value_or(T outro) const { return nulo ? outro : valor; }
@@ -443,9 +457,17 @@ namespace esp_matter {
 namespace cluster {
 #define CS_FEATURE(nome, bit) namespace nome { constexpr uint32_t get_id() { return bit; } }
 
-namespace identify { cluster_t *create(endpoint_t *endpoint, void *config, uint8_t flags); struct config_t { uint16_t identify_time = 0; uint8_t identify_type = 0; }; }
+namespace identify {
+cluster_t *create(endpoint_t *endpoint, void *config, uint8_t flags);
+struct config_t { uint16_t identify_time = 0; uint8_t identify_type = 0; };
+namespace command { static inline void *create_trigger_effect(cluster_t *) { return nullptr; } }
+}
 namespace groups { struct config_t {}; cluster_t *create(endpoint_t *endpoint, config_t *config, uint8_t flags); }
-namespace scenes_management { struct config_t {}; cluster_t *create(endpoint_t *endpoint, config_t *config, uint8_t flags); }
+namespace scenes_management {
+struct config_t {};
+cluster_t *create(endpoint_t *endpoint, config_t *config, uint8_t flags);
+namespace command { static inline void *create_copy_scene(cluster_t *) { return nullptr; } static inline void *create_copy_scene_response(cluster_t *) { return nullptr; } }
+}
 namespace fixed_label { struct config_t {}; cluster_t *create(endpoint_t *endpoint, config_t *config, uint8_t flags); }
 namespace user_label { struct config_t {}; cluster_t *create(endpoint_t *endpoint, config_t *config, uint8_t flags); }
 namespace descriptor {
@@ -458,6 +480,7 @@ struct config_t { bool on_off = false; };
 namespace feature { CS_FEATURE(lighting, 1)
 namespace lighting { struct config_t { uint8_t global_scene_control = 1; nullable<uint16_t> on_time = 0; nullable<uint16_t> off_wait_time = 0; nullable<uint8_t> start_up_on_off = nullptr; }; esp_err_t add(cluster_t *cluster, config_t *config); } }
 cluster_t *create(endpoint_t *endpoint, config_t *config, uint8_t flags);
+namespace command { static inline void *create_on(cluster_t *) { return nullptr; } static inline void *create_toggle(cluster_t *) { return nullptr; } }
 }
 namespace level_control {
 struct config_t { nullable<uint8_t> current_level = 0; uint8_t options = 0; };
@@ -479,6 +502,7 @@ struct config_t { uint16_t color_temperature_mireds = 250; uint16_t color_temp_p
 }
 }
 namespace attribute { attribute_t *create_remaining_time(cluster_t *cluster, uint16_t value); }
+namespace command { static inline void *create_stop_move_step(cluster_t *) { return nullptr; } }
 cluster_t *create(endpoint_t *endpoint, config_t *config, uint8_t flags);
 }
 namespace fan_control { struct config_t { uint8_t fan_mode = 0; uint8_t fan_mode_sequence = 2; nullable<uint8_t> percent_setting = 0; uint8_t percent_current = 0; }; }
@@ -520,6 +544,15 @@ struct config_t {
     uint32_t feature_flags = 0;
     struct { feature::momentary_switch_multi_press::config_t momentary_switch_multi_press; } features;
 };
+/* Os eventos do interruptor: no simulador vao para a bancada, como o resto do que a placa reporta. */
+namespace event {
+esp_err_t send_initial_press(uint16_t endpoint_id, uint8_t posicao);
+esp_err_t send_short_release(uint16_t endpoint_id, uint8_t posicao);
+esp_err_t send_long_press(uint16_t endpoint_id, uint8_t posicao);
+esp_err_t send_long_release(uint16_t endpoint_id, uint8_t posicao);
+esp_err_t send_multi_press_ongoing(uint16_t endpoint_id, uint8_t posicao, uint8_t quantas);
+esp_err_t send_multi_press_complete(uint16_t endpoint_id, uint8_t posicao, uint8_t quantas);
+}
 }
 namespace window_covering {
 namespace feature {
@@ -558,7 +591,8 @@ namespace basic_information { namespace attribute { attribute_t *create_serial_n
 namespace endpoint {
 #define CS_DISPOSITIVO(nome, ...)                                                                                                                               \
     namespace nome {                                                                                                                                            \
-    struct config_t { __VA_ARGS__ };                                                                                                                            \
+    struct config_t { cluster::descriptor::config_t descriptor; cluster::identify::config_t identify; cluster::groups::config_t groups;                         \
+                      cluster::scenes_management::config_t scenes_management; __VA_ARGS__ };                                                                    \
     endpoint_t *create(node_t *node, config_t *config, uint8_t flags, void *priv_data);                                                                         \
     }
 #define CS_LUZ cluster::on_off::config_t on_off; cluster::on_off::feature::lighting::config_t on_off_lighting;
@@ -591,9 +625,6 @@ namespace identification {
 enum callback_type_t { START, STOP, EFFECT };
 typedef esp_err_t (*callback_t)(callback_type_t type, uint16_t endpoint_id, uint8_t effect_id, uint8_t effect_variant, void *priv_data);
 }
-namespace data_model {
-class Registro { public: void *Get(const void *) { return nullptr; } };
-} /* namespace data_model */
 } /* namespace esp_matter */
 
 /* ---- o que a biblioteca usa do servidor do CHIP (o protocolo nao roda aqui) ---- */
@@ -614,6 +645,21 @@ private:
 #define CHIP_NO_ERROR CHIP_ERROR(0)
 #define CHIP_ERROR_INVALID_ARGUMENT CHIP_ERROR(0x2F)
 #define CHIP_ERROR_INCORRECT_STATE CHIP_ERROR(0x03)
+#define CHIP_ERROR_PROVIDER_LIST_EXHAUSTED CHIP_ERROR(0xC6)
+#define CHIP_ERROR_BUFFER_TOO_SMALL CHIP_ERROR(0x19)
+#define ChipLogError(modulo, ...) ((void)0)
+#define ChipLogDetail(modulo, ...) ((void)0)
+#define ChipLogProgress(modulo, ...) ((void)0)
+#define ESP_MATTER_EXTENDED_COLOR_LIGHT_DEVICE_TYPE_ID 0x010D
+#define ESP_MATTER_EXTENDED_COLOR_LIGHT_DEVICE_TYPE_VERSION 4
+
+/* O sensor de presenca escolhe o tipo por aqui (occupancy-hal.h). */
+typedef enum {
+    HAL_OCCUPANCY_SENSOR_TYPE_ULTRASONIC = 0,
+    HAL_OCCUPANCY_SENSOR_TYPE_PIR = 1,
+    HAL_OCCUPANCY_SENSOR_TYPE_PIR_AND_ULTRASONIC = 2,
+    HAL_OCCUPANCY_SENSOR_TYPE_PHYSICAL = 3,
+} HalOccupancySensorType;
 #define CHIP_IM_GLOBAL_STATUS(x) CHIP_ERROR(0x500)
 
 namespace chip {
@@ -622,6 +668,10 @@ struct ConcreteClusterPath { EndpointId mEndpointId; ClusterId mClusterId; const
 struct ConcreteAttributePath : ConcreteClusterPath { AttributeId mAttributeId = 0; };
 struct ConcreteReadAttributePath : ConcreteAttributePath {};
 struct ConcreteDataAttributePath : ConcreteAttributePath {};
+class ServerClusterInterface {
+public:
+    virtual ~ServerClusterInterface() {}
+};
 class AttributeValueEncoder { public: template <typename T> CHIP_ERROR Encode(const T &) { return CHIP_NO_ERROR; } };
 class AttributeValueDecoder { public: template <typename T> CHIP_ERROR Decode(T &) { return CHIP_NO_ERROR; } };
 class AttributeAccessInterface {
@@ -638,6 +688,33 @@ public:
     void Unregister(AttributeAccessInterface *) {}
 };
 namespace Clusters {
+class BooleanStateCluster : public ServerClusterInterface {
+public:
+    explicit BooleanStateCluster(EndpointId e) : endpoint(e) {}
+    void SetStateValue(bool valor);
+
+private:
+    EndpointId endpoint;
+};
+namespace ClosureControl {
+struct GenericOverallCurrentState { int position = 0, latch = 0, speed = 0, secureState = 0; };
+struct GenericOverallTargetState { int position = 0, latch = 0, speed = 0; };
+}
+namespace TemperatureControl {
+class SupportedTemperatureLevelsIteratorDelegate {
+public:
+    virtual ~SupportedTemperatureLevelsIteratorDelegate() {}
+    void Reset(EndpointId e) { mEndpoint = e; mIndex = 0; }
+    virtual uint8_t Size() = 0;
+    virtual CHIP_ERROR Next(MutableCharSpan &item) = 0;
+
+protected:
+    EndpointId mEndpoint = 0;
+    uint8_t mIndex = 0;
+};
+SupportedTemperatureLevelsIteratorDelegate *GetInstance();
+void SetInstance(SupportedTemperatureLevelsIteratorDelegate *instancia);
+}
 namespace OccupancySensing {
 namespace Structs { namespace HoldTimeLimitsStruct { struct Type { uint16_t holdTimeMin; uint16_t holdTimeMax; uint16_t holdTimeDefault; }; } }
 class Instance {
@@ -652,4 +729,95 @@ CHIP_ERROR SetHoldTimeLimits(EndpointId endpoint, const Structs::HoldTimeLimitsS
 } /* namespace OccupancySensing */
 } /* namespace Clusters */
 } /* namespace app */
+} /* namespace chip */
+
+namespace esp_matter {
+namespace data_model {
+class Registro { public: chip::app::ServerClusterInterface *Get(const chip::app::ConcreteClusterPath &caminho); };
+namespace provider {
+struct Provedor { Registro &registry(); };
+Provedor &get_instance();
+}
+} /* namespace data_model */
+} /* namespace esp_matter */
+
+namespace chip {
+static inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan origem, MutableCharSpan &destino)
+{
+    if (origem.size() > destino.size()) return CHIP_ERROR_BUFFER_TOO_SMALL;
+    if (origem.size()) memcpy(destino.data(), origem.data(), origem.size());
+    destino.reduce_size(origem.size());
+    return CHIP_NO_ERROR;
+}
+} /* namespace chip */
+static inline void MatterReportingAttributeChangeCallback(uint16_t endpoint, uint32_t cluster, uint32_t atributo)
+{
+    (void)endpoint; (void)cluster; (void)atributo;
+}
+
+/* O que o MatterIdentity.h do core precisa: os provedores do fabricante e de pareamento.
+ * Sem o protocolo, ninguem le estes dados (o simulador calcula os codigos em cs_matter.cpp),
+ * e o verificador do SPAKE2+ fica sem conta nenhuma. */
+#define VerifyOrDie(x) do { if (!(x)) abort(); } while (0)
+#define ReturnErrorOnFailure(x) do { CHIP_ERROR cs_erro = (x); if (cs_erro != CHIP_NO_ERROR) return cs_erro; } while (0)
+#define VerifyOrReturnError(x, erro) do { if (!(x)) return (erro); } while (0)
+namespace chip {
+constexpr uint16_t kMaxDiscriminatorValue = 0xFFF;
+struct PayloadContents {
+    /* As senhas proibidas da especificacao (5.1.7.1). */
+    static bool IsValidSetupPIN(uint32_t p)
+    {
+        switch (p) {
+        case 0: case 11111111: case 22222222: case 33333333: case 44444444: case 55555555:
+        case 66666666: case 77777777: case 88888888: case 99999999: case 12345678: case 87654321:
+            return false;
+        default:
+            return p <= 99999998;
+        }
+    }
+};
+namespace Crypto {
+constexpr size_t kSpake2p_Max_PBKDF_Salt_Length = 32;
+constexpr size_t kSpake2p_VerifierSerialized_Length = 97;
+class Spake2pVerifier {
+public:
+    CHIP_ERROR Generate(uint32_t, const ByteSpan &, uint32_t) { return CHIP_NO_ERROR; }
+    CHIP_ERROR Serialize(MutableByteSpan &) const { return CHIP_NO_ERROR; }
+};
+} /* namespace Crypto */
+namespace DeviceLayer {
+class DeviceInstanceInfoProvider {
+public:
+    virtual ~DeviceInstanceInfoProvider() {}
+    virtual CHIP_ERROR GetVendorName(char *buf, size_t bufSize) = 0;
+    virtual CHIP_ERROR GetVendorId(uint16_t &vendorId) = 0;
+    virtual CHIP_ERROR GetProductName(char *buf, size_t bufSize) = 0;
+    virtual CHIP_ERROR GetProductId(uint16_t &productId) = 0;
+    virtual CHIP_ERROR GetPartNumber(char *buf, size_t bufSize) = 0;
+    virtual CHIP_ERROR GetProductURL(char *buf, size_t bufSize) = 0;
+    virtual CHIP_ERROR GetProductLabel(char *buf, size_t bufSize) = 0;
+    virtual CHIP_ERROR GetSerialNumber(char *buf, size_t bufSize) = 0;
+    virtual CHIP_ERROR GetManufacturingDate(uint16_t &year, uint8_t &month, uint8_t &day) = 0;
+    virtual CHIP_ERROR GetHardwareVersion(uint16_t &hardwareVersion) = 0;
+    virtual CHIP_ERROR GetHardwareVersionString(char *buf, size_t bufSize) = 0;
+    virtual CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan &uniqueIdSpan) = 0;
+};
+class CommissionableDataProvider {
+public:
+    virtual ~CommissionableDataProvider() {}
+    virtual CHIP_ERROR GetSetupDiscriminator(uint16_t &setupDiscriminator) = 0;
+    virtual CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator) = 0;
+    virtual CHIP_ERROR GetSpake2pIterationCount(uint32_t &iterationCount) = 0;
+    virtual CHIP_ERROR GetSpake2pSalt(MutableByteSpan &saltBuf) = 0;
+    virtual CHIP_ERROR GetSpake2pVerifier(MutableByteSpan &verifierBuf, size_t &outVerifierLen) = 0;
+    virtual CHIP_ERROR GetSetupPasscode(uint32_t &setupPasscode) = 0;
+    virtual CHIP_ERROR SetSetupPasscode(uint32_t setupPasscode) = 0;
+};
+inline DeviceInstanceInfoProvider *&cs_provedorDaInstancia() { static DeviceInstanceInfoProvider *p = nullptr; return p; }
+inline CommissionableDataProvider *&cs_provedorDoPareamento() { static CommissionableDataProvider *p = nullptr; return p; }
+inline DeviceInstanceInfoProvider *GetDeviceInstanceInfoProvider() { return cs_provedorDaInstancia(); }
+inline void SetDeviceInstanceInfoProvider(DeviceInstanceInfoProvider *p) { cs_provedorDaInstancia() = p; }
+inline CommissionableDataProvider *GetCommissionableDataProvider() { return cs_provedorDoPareamento(); }
+inline void SetCommissionableDataProvider(CommissionableDataProvider *p) { cs_provedorDoPareamento() = p; }
+} /* namespace DeviceLayer */
 } /* namespace chip */

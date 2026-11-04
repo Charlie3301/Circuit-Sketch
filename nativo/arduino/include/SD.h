@@ -73,6 +73,7 @@ public:
     size_t size() { return cs_nome[0] ? (size_t)cs_obj_i(cs_nome, "size") : 0; }
     size_t position() { return cs_nome[0] ? (size_t)cs_obj_i(cs_nome, "position") : 0; }
     bool seek(uint32_t pos) { return cs_nome[0] && cs_obj_i(cs_nome, "seek", pos) != 0; }
+    bool seek(uint32_t pos, int modo) { return cs_nome[0] && cs_obj_i(cs_nome, "seek", pos, modo) != 0; }
     const char *name()
     {
         static String n;
@@ -80,7 +81,13 @@ public:
         return n.c_str();
     }
     bool isDirectory() { return cs_nome[0] && cs_obj_i(cs_nome, "isDirectory") != 0; }
-    File openNextFile(const char *mode = "r") { (void)mode; return adotar(cs_nome[0] ? cs_obj_t(cs_nome, "openNextFile") : String()); }
+    File openNextFile(const char *mode = "r")
+    {
+        (void)mode;
+        if (!cs_nome[0] || cs_obj_i(cs_nome, "openNextFile") == 0) return File();
+        cs_val v[] = {cs_t("File")};
+        return adotar(cs_texto(nullptr, "__criar", 1, v));
+    }
     void rewindDirectory() { if (cs_nome[0]) cs_obj_n(cs_nome, "rewindDirectory"); }
     operator bool() { return cs_nome[0] != 0; }
 };

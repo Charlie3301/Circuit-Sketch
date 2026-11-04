@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include "Arduino.h"
+#include "cs_objeto.h"
 
 const cs_ponte *cs_p;
 
@@ -507,12 +508,33 @@ extern "C" BOOL WINAPI cs_entrada_da_dll(HINSTANCE h, DWORD razao, LPVOID reserv
     return TRUE;
 }
 
+/* O abort() do programa (o ESP_ERROR_CHECK que falha, um assert, a excecao sem catch):
+ * na placa e o panico e ela reinicia. O da libc do Windows mata o processo inteiro,
+ * o simulador junto, sem passar pelo filtro de excecoes. */
+extern "C" void abort(void)
+{
+    printf("\nabort() was called at PC %p on core 0\n\nRebooting...\n", __builtin_return_address(0));
+    fflush(stdout);
+    cs_obj_n(nullptr, "__abort");
+    snprintf(falha.texto, sizeof(falha.texto), "abort() foi chamado");
+    falha.codigo = 0xE0000002u;
+    cs_sair_com(CS_FALHA);
+    for (;;) {
+    }
+}
+
+extern "C" void __assert_func(const char *arquivo, int linha, const char *funcao, const char *expressao)
+{
+    printf("assert failed: %s %s:%d (%s)\n", funcao ? funcao : "", arquivo, linha, expressao);
+    abort();
+}
 [[noreturn]] static void terminar(void)
 {
     snprintf(falha.texto, sizeof(falha.texto), "terminate(): uma excecao do C++ escapou sem catch");
     falha.codigo = 0xE0000001u;
     cs_sair_com(CS_FALHA);
-    abort();
+    for (;;) {
+    }
 }
 
 extern "C" __declspec(dllexport) int cs_iniciar(const cs_ponte *ponte)

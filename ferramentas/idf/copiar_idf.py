@@ -85,7 +85,7 @@ def _pastas_de(comp, chip, do_chip, comuns):
             # (o cabecalho na raiz do componente; o HTTP_Method.h do WebServer usa), e a
             # API do Bluedroid (bt/host/bluedroid/api/include/api: o esp_gap_bt_api.h...).
             if base in ('include', 'register', 'deprecated', 'interface', 'public') or (base == chip and pai in ('include', 'esp_rom')) \
-                    or (base == 'local' and partes[0] == 'esp_wifi') or rel in ('http_parser', 'console') \
+                    or (base == 'local' and partes[0] == 'esp_wifi') or rel in ('http_parser', 'console', 'fatfs/vfs', 'fatfs/src', 'fatfs/diskio') \
                     or (base == 'api' and pai == 'include' and partes[0] == 'bt') or rel in ('newlib/platform_include', 'lwip/include/apps') \
                     or (partes[0] == 'protocomm' and pai == 'include' and base in ('common', 'security', 'transports', 'crypto')):
                 (do_chip if chip in partes or versao or emprestado else comuns).append(dirpath)
@@ -184,12 +184,14 @@ def copiar(idf, pedidos, extras=()):
 
 # O codigo do IDF que so faz conta e vem como esta (o core da placa o usa):
 # vai para nativo/arduino/src/arduino-esp32/idf, compilado so nas ESP32.
-FONTES = ['esp_hid/src/esp_hid_common.c', 'lwip/lwip/src/core/ipv4/ip4_addr.c', 'lwip/lwip/src/core/ipv6/ip6_addr.c',
+FONTES = ['esp_common/src/esp_err_to_name.c', 'http_parser/http_parser.c', 'esp_hid/src/esp_hid_common.c', 'lwip/lwip/src/core/ipv4/ip4_addr.c', 'lwip/lwip/src/core/ipv6/ip6_addr.c',
           'console/commands.c', 'console/split_argv.c', 'console/argtable3/argtable3.h', 'console/argtable3/argtable3_private.h', 'console/argtable3/argtable3.c',
           'console/argtable3/arg_cmd.c', 'console/argtable3/arg_date.c', 'console/argtable3/arg_dbl.c', 'console/argtable3/arg_dstr.c',
           'console/argtable3/arg_end.c', 'console/argtable3/arg_file.c', 'console/argtable3/arg_hashtable.c', 'console/argtable3/arg_int.c',
           'console/argtable3/arg_lit.c', 'console/argtable3/arg_rem.c', 'console/argtable3/arg_rex.c', 'console/argtable3/arg_str.c',
-          'console/argtable3/arg_utils.c']
+          'console/argtable3/arg_utils.c',
+          'esp_lcd/src/esp_lcd_panel_io.c', 'esp_lcd/src/esp_lcd_panel_ops.c', 'esp_lcd/src/esp_lcd_panel_ssd1306.c',
+          'esp_lcd/src/esp_lcd_panel_st7789.c', 'esp_lcd/src/esp_lcd_panel_nt35510.c', 'esp_lcd/i2c/esp_lcd_panel_io_i2c_v2.c', 'esp_lcd/spi/esp_lcd_panel_io_spi.c', 'esp_lcd/interface/esp_lcd_panel_interface.h', 'esp_lcd/interface/esp_lcd_panel_io_interface.h']
 
 
 # O codigo que vem de um --extra, procurado pelo fim do caminho.
@@ -204,8 +206,17 @@ def copiar_fontes(idf, extras=()):
         with open(os.path.join(idf, 'components', *f.split('/')), encoding='utf-8') as e:
             texto = e.read()
         # O strlcpy e o asprintf da newlib, que o Windows nao tem.
-        if f.endswith('/commands.c'):
+        if f.endswith(('/commands.c', '/esp_err_to_name.c')):
             texto = '/* Modificado (CircuitSketch): inclui o cs_posix.h. */\n#include "cs_posix.h"\n' + texto
+        # O __containerof da newlib. E o que o esp_lcd_common.h traz para o SPI e so para
+        # o DMA do LCD paralelo (descritores de 32 bits), que nao existe aqui.
+        if f.startswith('esp_lcd/') and f.endswith('.c'):
+            texto = texto.replace('#include "esp_private/gpio.h"\n', '').replace('#include "hal/gpio_ll.h"\n', '').replace('#include "hal/gpio_hal.h"\n', '')
+            texto = texto.replace('#include "esp_lcd_common.h"\n', '')
+            texto = texto.replace('gpio_ll_set_level(&GPIO, ', 'gpio_set_level(').replace('gpio_output_enable(', 'gpio_saida_ligada(').replace('gpio_output_disable(', 'gpio_saida_desligada(')
+            texto = ('/* Modificado (CircuitSketch): sem o DMA e os registradores do GPIO. */\n#include <stddef.h>\n#include <stdint.h>\n'
+                     '#define __containerof(p, t, m) ((t *)((char *)(p) - offsetof(t, m)))\n#define gpio_func_sel(p, f) ((void)0)\n#define gpio_saida_ligada(p) gpio_set_direction((p), GPIO_MODE_OUTPUT)\n#define gpio_saida_desligada(p) gpio_set_direction((p), GPIO_MODE_INPUT)\n'
+                     'static inline void lcd_com_reverse_buffer_bytes(uint8_t *b, int i, int f) { while (i < f) { uint8_t x = b[i]; b[i++] = b[f]; b[f--] = x; } }\n') + texto
         copiar_texto = os.path.join(pasta, os.path.basename(f))
         with open(copiar_texto, 'w', encoding='utf-8', newline='\n') as s:
             s.write(texto)
