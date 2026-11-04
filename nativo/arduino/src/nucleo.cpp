@@ -354,8 +354,19 @@ void configTzTime(const char *tz, const char *server1, const char *server2, cons
 }
 
 /* O horario num struct tm do simulador, copiado campo a campo para o do sketch. */
+#ifdef ESP32
+extern "C" int cs_relogio_foi_ajustado(void) __attribute__((weak));
+#endif
 bool getLocalTime(struct tm *info, uint32_t ms)
 {
+#ifdef ESP32
+    /* Quem acertou o relogio com o settimeofday nao depende do NTP. */
+    if (cs_relogio_foi_ajustado && cs_relogio_foi_ajustado()) {
+        time_t t = time(nullptr);
+        if (info) localtime_r(&t, info);
+        return true;
+    }
+#endif
     (void)ms;
     cs_val criar[] = {cs_t("tm")};
     String nome = cs_texto(nullptr, "__criar", 1, criar);

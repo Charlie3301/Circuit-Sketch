@@ -97,9 +97,9 @@ int digitalRead(uint8_t pin);
 #ifndef ESP32 /* na ESP32, os do esp32-hal-adc.h (uint16_t, uint8_t) */
 int analogRead(uint8_t pin);
 void analogReference(uint8_t mode);
-void analogWrite(uint8_t pin, int val);
 void analogReadResolution(int bits);
 #endif
+void analogWrite(uint8_t pin, int val);
 void analogWriteResolution(int bits);
 void analogWriteFrequency(uint32_t freq);
 void analogWriteRange(uint32_t range);
@@ -222,6 +222,18 @@ extern "C" void attachInterruptArg(uint8_t pin, void (*userFunc)(void *), void *
  * o DAC, o RMT, a UART, o log_x... As funcoes sao as do simulador. */
 #include "esp32-hal.h"
 #include "cs_posix.h"
+#include "esp_arduino_version.h"
+#include "esp_idf_version.h"
+#include "esp8266-compat.h"
+
+/* Os enderecos dos pinos, como no Arduino.h do core: quem le ou escreve neles direto pelo
+ * ponteiro nao passa pelo simulador, e o erro diz isso (cs_descrever_falha). */
+#define digitalPinToTimer(pin) (0)
+#define digitalPinToPort(pin) (((pin) > 31) ? 1 : 0)
+#define digitalPinToBitMask(pin) (1UL << ((pin) & 31))
+#define portOutputRegister(port) ((volatile uint32_t *)(uintptr_t)((port) ? GPIO_OUT1_REG : GPIO_OUT_REG))
+#define portInputRegister(port) ((volatile uint32_t *)(uintptr_t)((port) ? GPIO_IN1_REG : GPIO_IN_REG))
+#define portModeRegister(port) ((volatile uint32_t *)(uintptr_t)((port) ? GPIO_ENABLE1_REG : GPIO_ENABLE_REG))
 
 /* As macros do Arduino.h do core que o sketch usa para mudar o padrao: o
  * tamanho da pilha do loop, o relatorio do chip no boot e o nome do USB MIDI

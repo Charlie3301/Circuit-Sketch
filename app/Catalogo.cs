@@ -250,7 +250,7 @@ public static class Catalogo
             "modulo-i2c" => (0x27, "Modulo I2C (PCF8574)", "SDA"),
             "mpu6050" => (0x68, "MPU6050", "SDA"),
             "ds1307" => (0x68, "Relogio DS1307", "SDA"),
-            "ssd1306-i2c" => (0x3C, "Display OLED", "SDA"),
+            "ssd1306-i2c" or "ssd1306-128x32" or "sh1106" => (0x3C, "Display OLED", "SDA"),
             _ => (-1, null, null),
         };
 

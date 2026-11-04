@@ -78,6 +78,10 @@ public:
     void write16(uint16_t data);
     void write32(uint32_t data);
     void writeBytes(const uint8_t *data, uint32_t size);
+    void writePixels(const void *data, uint32_t size);
+    void writePattern(const uint8_t *data, uint8_t size, uint32_t repeat);
+    void transferBits(uint32_t data, uint32_t *out, uint8_t bits);
+    void setSSInvert(bool) {}
     void setBitOrder(uint8_t bitOrder);
     void setDataMode(uint8_t dataMode);
     void setFrequency(uint32_t freq);

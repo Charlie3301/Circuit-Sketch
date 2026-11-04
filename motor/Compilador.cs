@@ -184,12 +184,12 @@ public static class Compilador
         if (linguagem is not (Linguagem.Arduino or Linguagem.C))
             return Compilar(fonte, linguagem);
 
-        // O C/C++ de verdade: o projeto inteiro pelo clang (CompiladorNativo),
-        // quando o que ele usa o core nativo ja tem. Se o clang recusar e o
-        // interpretador aceitar, fica o interpretador, que roda o projeto de
-        // antes; se os dois recusarem, vale o erro do clang -- e o da IDE.
-        string foraDoClang = CppNativo ? CompiladorNativo.PorQueNao(projeto) : null;
-        if (CppNativo && foraDoClang is null)
+        // O C/C++ de verdade: o projeto inteiro pelo clang (CompiladorNativo). Quem decide e
+        // ele: "#ifdef __AVR__ #include <avr/power.h>" nao vale na ESP32, e so o
+        // pre-processador sabe disso. Se ele recusar e o interpretador aceitar, fica o
+        // interpretador, que roda o projeto de antes (o PORTB do Uno); se os dois
+        // recusarem, vale o erro do clang -- e o da IDE.
+        if (CppNativo && CompiladorNativo.Disponivel)
         {
             try
             {
@@ -206,23 +206,26 @@ public static class Compilador
             {
                 Programa interpretado;
                 try { interpretado = new Unidades(projeto, linguagem).Compilar(); }
-                catch (ErroDeSintaxe) { throw erroDoClang; }
+                catch (ErroDeSintaxe erroDoInterpretador)
+                {
+                    // O projeto que so roda no interpretador (o PORTB do Uno) e tem um erro
+                    // proprio: o do interpretador e que aponta a linha certa, e nao o clang
+                    // reclamando do PORTB, que esta certo.
+                    if (CompiladorNativo.PorQueNao(projeto) is { } porque && !porque.StartsWith("usa ", StringComparison.Ordinal) || CompiladorNativo.SoNoInterpretador(projeto))
+                        if (Origens.DoSketch(erroDoInterpretador.Linha)) throw;
+                    throw CompiladorNativo.ErroLegivel(erroDoClang);
+                }
                 // A pessoa precisa saber: o erro que aparecer dai em diante e
-                // do interpretador, e o motivo verdadeiro e este.
-                AvisoDoCompilador?.Invoke($"o compilador de C++ recusou ({Origens.Onde(erroDoClang.Linha)}: {erroDoClang.Message}); "
-                                          + "rodando no interpretador, que nao tem tudo do C++.");
+                // do interpretador, e o motivo verdadeiro e este. Quem usa o que so ele
+                // tem (o registrador do AVR) ja esperava por isso.
+                if (CompiladorNativo.PorQueNao(projeto) is null)
+                    AvisoDoCompilador?.Invoke($"o compilador de C++ recusou ({Origens.Onde(erroDoClang.Linha)}: {erroDoClang.Message}); "
+                                              + "rodando no interpretador, que nao tem tudo do C++.");
                 return interpretado;
             }
         }
 
-        try
-        {
-            return new Unidades(projeto, linguagem).Compilar();
-        }
-        catch (ErroDeSintaxe erro) when (foraDoClang is not null && CompiladorNativo.MotivoDoErro(projeto, foraDoClang, erro) is { } motivo)
-        {
-            throw motivo;
-        }
+        return new Unidades(projeto, linguagem).Compilar();
     }
 
     /// <summary>

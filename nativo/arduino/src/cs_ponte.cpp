@@ -240,7 +240,10 @@ extern "C" __declspec(dllexport) uint32_t cs_descrever_falha(char *buf, int cap)
     case EXCEPTION_DATATYPE_MISALIGNMENT: nome = "acesso desalinhado"; break;
     case EXCEPTION_BREAKPOINT: nome = "o codigo chegou num ponto impossivel (comportamento indefinido do C++: ponteiro nulo, funcao sem return...)"; break;
     }
-    if (falha.codigo == EXCEPTION_ACCESS_VIOLATION)
+    /* A faixa dos perifericos da ESP32: e uma biblioteca falando direto com o chip, nao um ponteiro quebrado. */
+    if (falha.codigo == EXCEPTION_ACCESS_VIOLATION && falha.endereco >= 0x3FF00000u && falha.endereco < 0x60100000u)
+        snprintf(buf, (size_t)cap, "o codigo mexeu direto num registrador do chip (0x%llx), sem passar pelas funcoes do Arduino: o simulador nao tem esse registrador", (unsigned long long)falha.endereco);
+    else if (falha.codigo == EXCEPTION_ACCESS_VIOLATION)
         snprintf(buf, (size_t)cap, "%s (0x%llx)", nome, (unsigned long long)falha.endereco);
     else
         snprintf(buf, (size_t)cap, "%s", nome);

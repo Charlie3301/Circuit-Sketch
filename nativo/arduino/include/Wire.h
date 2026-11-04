@@ -9,6 +9,11 @@
 #include <inttypes.h>
 #include "Stream.h"
 
+#ifndef I2C_BUFFER_LENGTH
+#define I2C_BUFFER_LENGTH 128
+#endif
+#define WIRE_HAS_BUFFER_SIZE 1
+#define WIRE_HAS_END 1
 #ifndef BUFFER_LENGTH
 #define BUFFER_LENGTH 128
 #endif
@@ -41,11 +46,13 @@ public:
     uint8_t endTransmission(void) { return endTransmission(true); }
     uint8_t requestFrom(uint8_t address, size_t quantity, bool sendStop);
     uint8_t requestFrom(uint8_t address, size_t quantity) { return requestFrom(address, quantity, true); }
+#ifndef ESP32 /* na ESP32 sao so as duas acima: com estas, o requestFrom(endereco, (uint8_t)n) fica ambiguo */
     uint8_t requestFrom(int address, int quantity) { return requestFrom((uint8_t)address, (size_t)quantity, true); }
     uint8_t requestFrom(int address, int quantity, int sendStop)
     {
         return requestFrom((uint8_t)address, (size_t)quantity, sendStop != 0);
     }
+#endif
 
     size_t write(uint8_t) override;
     size_t write(const uint8_t *, size_t) override;

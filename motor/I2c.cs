@@ -31,6 +31,9 @@ public class DispositivoI2c(int endereco, string nome)
     public IReadOnlyList<byte> Ultimos => recebidos;
     readonly List<byte> recebidos = [];
 
+    /// <summary>O barramento da transmissao que esta chegando.</summary>
+    public BarramentoI2c Origem { get; internal set; }
+
     /// <summary>Quantas transmissoes chegaram ate agora.</summary>
     public int Transmissoes { get; private set; }
 
@@ -282,6 +285,7 @@ public class BarramentoI2c
         var aparelho = Achar(alvo);
         if (aparelho is null) return SemRespostaNoEndereco;
 
+        aparelho.Origem = this;
         aparelho.Receber(bytes);
         return Ok;
     }

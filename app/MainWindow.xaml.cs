@@ -4628,7 +4628,9 @@ public partial class MainWindow : Window
             // Dois no mesmo endereco e no mesmo fio e curto de dados: no
             // barramento de verdade os dois respondem juntos e a leitura sai
             // embaralhada. O DS1307 e o MPU6050 sao 0x68 os dois.
-            var novo = new DispositivoI2c(endereco, nome) { PinoSda = sda, PinoScl = scl };
+            var novo = peca.Tipo is "ssd1306-i2c" or "ssd1306-128x32" or "sh1106"
+                ? new OledI2c(maq, endereco, nome, 128, peca.Tipo == "ssd1306-128x32" ? 32 : 64, peca.Tipo == "sh1106") { PinoSda = sda, PinoScl = scl }
+                : new DispositivoI2c(endereco, nome) { PinoSda = sda, PinoScl = scl };
             var jaEstava = maq.I2c.Ligar(novo);
 
             if (jaEstava != novo)

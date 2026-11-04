@@ -184,29 +184,15 @@ public static class CompiladorNativo
     }
 
     /// <summary>
-    /// O projeto saiu do compilador de verdade (<see cref="PorQueNao"/>) e o interpretador
-    /// tambem recusou. Sem isto, o erro aparecia dentro da biblioteca ("ArduinoJson/Converter.hpp,
-    /// linha 9"), e o defeito parecia ser dela: o interpretador nao le o C++ moderno. Conta o
-    /// motivo de verdade; null deixa o erro como esta (o erro e do proprio sketch).
+    /// O #include que nem a placa nem as bibliotecas instaladas tem, nas palavras de quem esta
+    /// lendo: o "No such file or directory" da IDE, e o que fazer.
     /// </summary>
-    public static ErroDeSintaxe MotivoDoErro(Projeto projeto, string foraDoClang, ErroDeSintaxe erro)
+    public static ErroDeSintaxe ErroLegivel(ErroDeSintaxe erro)
     {
-        // "usa X.h": nem instalada nem na placa. Na IDE, o "No such file or directory".
-        if (foraDoClang.StartsWith("usa ", StringComparison.Ordinal) && !foraDoClang[4..].Contains(' '))
-        {
-            string cabecalho = foraDoClang[4..];
-            int linha = 1;
-            foreach (string texto in (projeto.Sketch ?? "").Split('\n'))
-            {
-                if (Inclusao.Match(texto) is { Success: true } m && m.Groups[1].Value.Trim().Replace('\\', '/') == cabecalho) break;
-                linha++;
-            }
-            return new ErroDeSintaxe($"{cabecalho} nao esta instalada e nao vem com a placa (na IDE do Arduino: \"No such file or directory\"). "
-                                     + "Instale a biblioteca que traz esse arquivo, ou tire o #include.", linha);
-        }
-        if (Origens.DoSketch(erro.Linha)) return null;
-        return new ErroDeSintaxe($"{foraDoClang}: isso so roda no interpretador, e o interpretador nao le esta biblioteca ({erro.Message}). "
-                                 + "No compilador de C++ ela funciona: tire do sketch o que o prende ao interpretador.", erro.Linha);
+        var falta = Regex.Match(erro.Message, @"'([^']+)' file not found");
+        return !falta.Success ? erro
+            : new ErroDeSintaxe($"{falta.Groups[1].Value} nao esta instalada e nao vem com a placa (na IDE do Arduino: \"No such file or directory\"). "
+                                + "Instale a biblioteca que traz esse arquivo, ou tire o #include.", erro.Linha);
     }
 
     static readonly Regex InclusaoComAspas = new(@"^\s*#\s*include\s*""([^""]+)""", RegexOptions.Compiled | RegexOptions.Multiline);
@@ -230,16 +216,53 @@ public static class CompiladorNativo
     static bool EhFonte(string nome)
         => Path.GetExtension(nome).ToLowerInvariant() is ".ino" or ".cpp" or ".cc" or ".cxx" or ".c" or ".h" or ".hpp";
 
+    /// <summary>
+    /// A biblioteca que traz este cabecalho. Com mais de uma, a pontuacao da IDE (o
+    /// ComputePriority do arduino-cli): a feita para esta arquitetura, depois a que tem o
+    /// nome do cabecalho, e so depois a ordem alfabetica.
+    /// </summary>
     static BibliotecaDeFora DeBiblioteca(Projeto projeto, string cabecalho)
     {
+        string arquitetura = Preprocessador.MacrosDoCore(projeto.Placa ?? "esp32-devkit-v1").Select(m => m.Nome)
+            .FirstOrDefault(n => n.StartsWith("ARDUINO_ARCH_", StringComparison.Ordinal))?["ARDUINO_ARCH_".Length..].ToLowerInvariant();
+        string nome = Path.GetFileNameWithoutExtension(cabecalho);
+        BibliotecaDeFora melhor = null;
+        int maior = -1;
         foreach (var lib in projeto.Bibliotecas ?? [])
         {
             string raiz = (lib.Raiz ?? "").Trim('/');
             string procurado = (raiz.Length > 0 ? raiz + "/" : "") + cabecalho;
-            if (lib.Arquivos.Any(a => a.Equals(procurado, StringComparison.OrdinalIgnoreCase))) return lib;
+            if (!lib.Arquivos.Any(a => a.Equals(procurado, StringComparison.OrdinalIgnoreCase))) continue;
+            int pontos = PontosDaArquitetura(lib, arquitetura)
+                         + (lib.Nome.Equals(nome, StringComparison.OrdinalIgnoreCase) ? 700
+                            : lib.Nome.StartsWith(nome, StringComparison.OrdinalIgnoreCase) ? 500
+                            : lib.Nome.Contains(nome, StringComparison.OrdinalIgnoreCase) ? 400 : 0);
+            if (pontos > maior)
+            {
+                maior = pontos;
+                melhor = lib;
+            }
         }
-        return null;
+        return melhor;
     }
+
+    static int PontosDaArquitetura(BibliotecaDeFora lib, string arquitetura)
+    {
+        string arquivo = Path.Combine(lib.Pasta ?? "", "library.properties");
+        if (!File.Exists(arquivo)) return 1000;
+        string linha = File.ReadLines(arquivo).FirstOrDefault(l => l.StartsWith("architectures=", StringComparison.OrdinalIgnoreCase));
+        if (linha is null) return 1000;
+        var lista = linha["architectures=".Length..].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (arquitetura is not null && lista.Contains(arquitetura, StringComparer.OrdinalIgnoreCase)) return 1010;
+        return lista.Contains("*") ? 1000 : 0;
+    }
+
+    /// <summary>
+    /// O projeto usa algo que so o interpretador tem? E so para escolher qual dos dois erros
+    /// mostrar: o texto nao ve o #ifdef, e quem decide o que compila continua sendo o clang.
+    /// </summary>
+    public static bool SoNoInterpretador(Projeto projeto)
+        => PorQueNao(projeto) is { } porque && (porque.Contains("registrador") || porque.Contains("imita"));
 
     static string SemComentarios(string texto)
         => Regex.Replace(texto ?? "", @"//[^\n]*|/\*.*?\*/", m => new string('\n', m.Value.Count(c => c == '\n')),
@@ -286,10 +309,33 @@ public static class CompiladorNativo
     {
         // Uma compilacao por vez: o aquecimento e o Rodar montariam o mesmo
         // core ao mesmo tempo, na mesma pasta.
-        lock (travaDaCompilacao) return CompilarSemTrava(projeto, avisar);
+        lock (travaDaCompilacao)
+        {
+            try { return CompilarSemTrava(projeto, avisar, instaladasVencem: false); }
+            catch (ErroDeSintaxe erro) when (TemInstaladaEncoberta(projeto))
+            {
+                // O que o simulador imita nao tem tudo (o RTC_PCF8523 da RTClib). Se a pessoa
+                // instalou a biblioteca de verdade, ela e a proxima tentativa; se tambem nao
+                // der, o erro que vale e o primeiro.
+                try
+                {
+                    var comAsInstaladas = CompilarSemTrava(projeto, avisar, instaladasVencem: true);
+                    avisar?.Invoke("o que o simulador imita nao tinha o que o sketch pede: usando as bibliotecas instaladas.");
+                    return comAsInstaladas;
+                }
+                catch (ErroDeSintaxe) { throw erro; }
+            }
+        }
     }
 
-    static SketchCompilado CompilarSemTrava(Projeto projeto, Action<string> avisar)
+    /// <summary>Tem biblioteca instalada que ficou de fora porque a placa ja tem o mesmo cabecalho?</summary>
+    static bool TemInstaladaEncoberta(Projeto projeto)
+    {
+        string[] textos = [projeto.Sketch ?? "", .. (projeto.Arquivos ?? new Dictionary<string, string>()).Values.Select(v => v ?? "")];
+        return BibliotecasUsadas(projeto, textos, instaladasVencem: true).Count > BibliotecasUsadas(projeto, textos, instaladasVencem: false).Count;
+    }
+
+    static SketchCompilado CompilarSemTrava(Projeto projeto, Action<string> avisar, bool instaladasVencem)
     {
         string pasta = AcharPasta() ?? throw new ErroDeExecucao("o compilador de C++ (a pasta \"nativo\") nao foi encontrado.", 0);
         string zig = Zig ?? throw new ErroDeExecucao("o compilador de C++ (nativo/zig/zig.exe) nao foi encontrado.", 0);
@@ -325,9 +371,17 @@ public static class CompiladorNativo
             var erros = CompilarVarios(zig, fontesDoCore.Select(f => (f, ObjetoDoCore(f), !f.EndsWith(".c", StringComparison.OrdinalIgnoreCase))),
                                        [pastaDoCore, inc, src, .. idf], definicoes: definicoes);
             if (erros.Count > 0) throw new ErroDeExecucao("o core nativo do Arduino nao compilou: " + string.Join("\n", erros.Take(8)), 0);
+            var (codigoDoAr, saidaDoAr) = Rodar(zig, ["ar", "rcs", "core.a", .. fontesDoCore.Where(f => !FicaForaDoCoreA(f) && !EhFraco(f)).Select(f => Path.GetFileName(ObjetoDoCore(f)))], pastaDoCore);
+            if (codigoDoAr != 0) throw new ErroDeExecucao("o core nativo nao virou biblioteca: " + saidaDoAr, 0);
+            if (fontesDoCore.Any(EhFraco))
+            {
+                var (codigoDosFracos, saidaDosFracos) = Rodar(zig, ["ar", "rcs", "fracos.a", .. fontesDoCore.Where(EhFraco).Select(f => Path.GetFileName(ObjetoDoCore(f)))], pastaDoCore);
+                if (codigoDosFracos != 0) throw new ErroDeExecucao("o core nativo nao virou biblioteca: " + saidaDosFracos, 0);
+            }
             File.WriteAllText(pronto, "");
         }
-        var objetosDoCore = fontesDoCore.Select(ObjetoDoCore).ToList();
+        var objetosDoCore = fontesDoCore.Where(FicaForaDoCoreA).Select(ObjetoDoCore).Append(Path.Combine(pastaDoCore, "core.a")).ToList();
+        string fracos = fontesDoCore.Any(EhFraco) ? Path.Combine(pastaDoCore, "fracos.a") : null;
         string mbedtls = idf.Count > 0 ? BibliotecaMbedtls(pasta, zig, cabecalho, inc, idf, avisar) : null;
 
         // As pilhas grandes (OpenThread, Zigbee): so quem usa paga por elas.
@@ -358,25 +412,25 @@ public static class CompiladorNativo
             unidades.Add((nome, texto ?? ""));
 
         // As bibliotecas instaladas que o projeto (e elas mesmas) incluem.
-        var usadas = BibliotecasUsadas(projeto, [projeto.Sketch ?? "", .. abas.Values.Select(v => v ?? "")]);
+        var usadas = BibliotecasUsadas(projeto, [projeto.Sketch ?? "", .. abas.Values.Select(v => v ?? "")], instaladasVencem);
         var fontesDasLibs = new List<string>();
         var incDasLibs = new List<string>();
+        var fontesPorLib = new List<(BibliotecaDeFora Lib, List<string> Fontes)>();
         foreach (var lib in usadas)
         {
             incDasLibs.Add(Path.Combine(lib.Pasta, lib.Raiz ?? ""));
+            if ((lib.Raiz ?? "").Length == 0) incDasLibs.Add(Path.Combine(lib.Pasta, "utility"));
+            int antesDela = fontesDasLibs.Count;
             foreach (string arquivo in lib.Arquivos)
             {
-                string ext = Path.GetExtension(arquivo).ToLowerInvariant();
-                if (ext is not (".c" or ".cpp" or ".cc" or ".cxx")) continue;
-                string baixo = arquivo.ToLowerInvariant();
-                if (baixo.StartsWith("examples/") || baixo.Contains("/examples/") || baixo.StartsWith("test")
-                    || baixo.Contains("/test/") || baixo.Contains("/tests/") || baixo.StartsWith("extras/")) continue;
+                if (!EntraNaCompilacao(lib, arquivo)) continue;
                 fontesDasLibs.Add(Path.Combine(lib.Pasta, arquivo));
             }
+            fontesPorLib.Add((lib, fontesDasLibs.Skip(antesDela).ToList()));
         }
 
         string impressao = Impressao(
-            [impressaoDoCore, ComDepuracao, .. pilhas, .. unidades.Select(u => u.Nome + "\0" + u.Texto),
+            [impressaoDoCore, ComDepuracao, "macros da IDE", instaladasVencem ? "instaladas" : "", .. pilhas, .. unidades.Select(u => u.Nome + "\0" + u.Texto),
              .. abas.Select(a => a.Key + "\0" + a.Value),
              .. fontesDasLibs.Select(f => f + File.GetLastWriteTimeUtc(f).Ticks),
              .. usadas.SelectMany(l => l.Arquivos.Select(a => Path.Combine(l.Pasta, a))).Where(File.Exists)
@@ -407,14 +461,16 @@ public static class CompiladorNativo
             foreach (var (nome, _) in unidades)
                 tarefas.Add((Path.Combine(trabalho, nome.Replace('/', Path.DirectorySeparatorChar)),
                              Path.Combine(trabalho, $"u{k++}.o"), !nome.EndsWith(".c", StringComparison.OrdinalIgnoreCase)));
-            foreach (string f in fontesDasLibs)
-                tarefas.Add((f, Path.Combine(trabalho, $"b{k++}.o"), !f.EndsWith(".c", StringComparison.OrdinalIgnoreCase)));
-
             // A pasta do projeto entra DEPOIS do core e das bibliotecas: o
             // #include "x.h" acha a aba primeiro (a pasta de quem inclui), e o
             // <x.h> acha o do core, como no Arduino.
-            var erros = CompilarVarios(zig, tarefas, [.. incDasLibs, inc, .. idf], depurar: true, depois: [trabalho], definicoes: definicoes);
+            var erros = CompilarVarios(zig, tarefas, InclusoesDoProjeto(incDasLibs, inc, idf, instaladasVencem), depurar: true, depois: [trabalho], definicoes: [.. definicoes, .. MacrosDaIde(placa)]);
             if (erros.Count > 0) throw ErroDoCompilador(erros, abas);
+
+            var bibliotecas = fontesPorLib.Where(b => b.Fontes.Count > 0)
+                .Select(b => BibliotecaCompilada(b.Lib, b.Fontes, zig, EhPrograma(projeto.Sketch) ? cabecalho + "#define CS_PROGRAMA_IDF 1\n" : cabecalho, usadas, abas,
+                                                 InclusoesDoProjeto(incDasLibs, inc, idf, instaladasVencem), [.. definicoes, .. MacrosDaIde(placa)], impressaoDoCore, avisar))
+                .ToList();
 
             // A DLL: o ponto de entrada e o da ponte, que adia os construtores
             // das globais ate o simulador estar ligado.
@@ -423,10 +479,15 @@ public static class CompiladorNativo
             var ligar = new List<string> { "c++", "-shared", "-g", "-target", "x86_64-windows-gnu", "-o", Path.Combine(trabalho, "sketch.dll"),
                                            "-Wl,--entry=cs_entrada_da_dll" };
             ligar.AddRange(tarefas.Select(t => t.Objeto));
+            // Inteiras, como a IDE liga os objetos de uma biblioteca: o global que se registra
+            // sozinho num .cpp que ninguem chama continua valendo.
+            if (bibliotecas.Count > 0) ligar.AddRange(["-Wl,--whole-archive", .. bibliotecas, "-Wl,--no-whole-archive"]);
             ligar.AddRange(objetosDoCore);
             ligar.AddRange(pilhas);
             // O x509 do mbedTLS no Windows le o IP do certificado com o inet_pton (ws2_32).
             if (mbedtls is not null) ligar.AddRange([mbedtls, "-lws2_32"]);
+            // Por ultimo e so se ninguem resolveu: sao os avisos do que o IDF declara e nao existe aqui.
+            if (fracos is not null) ligar.Add(fracos);
             var (codigo, saida) = Rodar(zig, ligar, trabalho);
             if (codigo != 0) throw ErroDoLigador(saida);
 
@@ -550,6 +611,64 @@ public static class CompiladorNativo
             [], [], []),
     ];
 
+    /// <summary>Os que o simulador procura pelo nome na DLL (os dllexport): esses entram sempre, fora do .a.</summary>
+    static bool FicaForaDoCoreA(string fonte)
+        => Path.GetFileName(fonte) is "cs_ponte.cpp" or "cs_depurador.cpp" or "cs_freertos.cpp" or "cs_timer.cpp";
+
+    /// <summary>
+    /// Uma biblioteca instalada vira um .a no cache: mudar o sketch nao a recompila (o U8g2 tem
+    /// 136 arquivos e leva meio minuto). As abas .h entram na conta porque a biblioteca pode
+    /// incluir uma delas (o "lv_conf.h" da LVGL), e a pasta dela ve as abas como a do sketch.
+    /// </summary>
+    static bool EhFraco(string fonte) => Path.GetFileName(fonte) == "cs_idf_nao_simulado.c";
+
+    /// <summary>Como na IDE, o core vem antes das bibliotecas, menos quando elas e que devem vencer o que ele imita.</summary>
+    static List<string> InclusoesDoProjeto(List<string> bibliotecas, string inc, List<string> idf, bool instaladasVencem)
+        => instaladasVencem ? [.. bibliotecas, inc, .. idf] : [inc, .. idf, .. bibliotecas];
+
+    static string BibliotecaCompilada(BibliotecaDeFora lib, List<string> fontes, string zig, string cabecalho, List<BibliotecaDeFora> usadas,
+                                      Dictionary<string, string> abas, List<string> inclusoes, string[] definicoes, string impressaoDoCore, Action<string> avisar)
+    {
+        string impressao = Impressao(
+            [impressaoDoCore, ComDepuracao, cabecalho, lib.Pasta, .. definicoes, .. inclusoes,
+             .. usadas.SelectMany(l => l.Arquivos.Select(a => Path.Combine(l.Pasta, a))).Where(File.Exists).Select(f => f + File.GetLastWriteTimeUtc(f).Ticks),
+             .. abas.Where(a => !EhFonteCompilada(a.Key)).OrderBy(a => a.Key, StringComparer.Ordinal).Select(a => a.Key + "\0" + a.Value)]);
+        string destino = Path.Combine(Cache(), "biblioteca-" + impressao[..16]);
+        string arquivo = Path.Combine(destino, "lib.a");
+        if (File.Exists(arquivo)) return arquivo;
+
+        avisar?.Invoke($"compilando a biblioteca {lib.Nome} (so na primeira vez)…");
+        string trabalho = destino + ".tmp-" + Guid.NewGuid().ToString("N")[..8];
+        Directory.CreateDirectory(trabalho);
+        try
+        {
+            File.WriteAllText(Path.Combine(trabalho, "cs_placa.h"), cabecalho);
+            foreach (var (nome, texto) in abas.Where(a => !EhFonteCompilada(a.Key)))
+            {
+                string aba = Path.Combine(trabalho, nome.Replace('/', Path.DirectorySeparatorChar));
+                Directory.CreateDirectory(Path.GetDirectoryName(aba)!);
+                File.WriteAllText(aba, texto ?? "", new UTF8Encoding(false));
+            }
+            var objetos = fontes.Select((_, i) => $"b{i}.o").ToList();
+            var erros = CompilarVarios(zig, fontes.Select((f, i) => (f, Path.Combine(trabalho, objetos[i]), !f.EndsWith(".c", StringComparison.OrdinalIgnoreCase))),
+                                       inclusoes, depurar: true, depois: [trabalho], definicoes: definicoes);
+            if (erros.Count > 0) throw ErroDoCompilador(erros, abas);
+            var (codigo, saida) = Rodar(zig, ["ar", "rcs", "lib.a", .. objetos], trabalho);
+            if (codigo != 0) throw new ErroDeExecucao($"a biblioteca {lib.Nome} nao virou .a: " + saida, 0);
+            if (Directory.Exists(destino)) Directory.Delete(destino, true);
+            Directory.Move(trabalho, destino);
+        }
+        catch
+        {
+            try { Directory.Delete(trabalho, true); } catch { }
+            throw;
+        }
+        return arquivo;
+    }
+
+    static bool EhFonteCompilada(string nome)
+        => Path.GetExtension(nome).ToLowerInvariant() is ".ino" or ".cpp" or ".cc" or ".cxx" or ".c";
+
     static string BibliotecaDaPilha(PilhaSobDemanda pilha, string pasta, string zig, string cabecalho, string inc, List<string> idf,
                                     string[] definicoes, Action<string> avisar)
     {
@@ -660,27 +779,198 @@ public static class CompiladorNativo
         return Convert.ToHexString(h.GetHashAndReset()).ToLowerInvariant();
     }
 
-    /// <summary>As bibliotecas instaladas incluidas pelo projeto, e as que elas incluem.</summary>
-    static List<BibliotecaDeFora> BibliotecasUsadas(Projeto projeto, IEnumerable<string> textos)
+    /// <summary>
+    /// O formato novo compila a pasta src inteira; o antigo, a raiz e a pasta utility (sem as
+    /// subpastas dela), como a IDE: o utility/RPi da RF24 e de outra placa.
+    /// </summary>
+    static bool EntraNaCompilacao(BibliotecaDeFora lib, string arquivo)
     {
+        if (Path.GetExtension(arquivo).ToLowerInvariant() is not (".c" or ".cpp" or ".cc" or ".cxx")) return false;
+        string baixo = arquivo.ToLowerInvariant();
+        if ((lib.Raiz ?? "").Length > 0) return baixo.StartsWith("src/", StringComparison.Ordinal);
+        return !baixo.Contains('/') || (baixo.StartsWith("utility/", StringComparison.Ordinal) && !baixo["utility/".Length..].Contains('/'));
+    }
+
+    /// <summary>
+    /// As bibliotecas que o projeto alcanca pelos #include, como o detector da IDE: os arquivos
+    /// que entram na compilacao e os cabecalhos que eles incluem de fato. Um cabecalho que
+    /// ninguem inclui (o BlynkSimpleEthernet.h de quem usa o BlynkSimpleEsp32.h) nao puxa nada,
+    /// e o ramo de #if de outra placa tambem nao.
+    /// </summary>
+    static List<BibliotecaDeFora> BibliotecasUsadas(Projeto projeto, IEnumerable<string> textos, bool instaladasVencem)
+    {
+        var macros = new HashSet<string>(Preprocessador.MacrosDoCore(projeto.Placa ?? "esp32-devkit-v1").Select(m => m.Nome), StringComparer.Ordinal);
         var usadas = new List<BibliotecaDeFora>();
-        var fila = new Queue<string>(textos);
+        var fila = new Queue<(string Texto, BibliotecaDeFora Lib, string Arquivo)>(textos.Select(t => (t, (BibliotecaDeFora)null, (string)null)));
         var vistos = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var lidos = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        void Ler(BibliotecaDeFora lib, string arquivo)
+        {
+            if (lidos.Add(lib.Pasta + "|" + arquivo)) fila.Enqueue((lib.Ler(arquivo) ?? "", lib, arquivo));
+        }
+
+        // O #include "x.h" de dentro da biblioteca: a pasta de quem inclui, depois a raiz dela.
+        static string NaBiblioteca(BibliotecaDeFora lib, string quem, string nome)
+        {
+            string[] tentativas = [Path.Combine(Path.GetDirectoryName(quem) ?? "", nome), (lib.Raiz ?? "") + nome];
+            foreach (string t in tentativas)
+            {
+                string caminho = Path.GetFullPath(Path.Combine("c:\\x", t))["c:\\x\\".Length..].Replace('\\', '/');
+                if (lib.Arquivos.FirstOrDefault(a => a.Equals(caminho, StringComparison.OrdinalIgnoreCase)) is { } achado) return achado;
+            }
+            return null;
+        }
+
         while (fila.Count > 0)
         {
-            foreach (Match m in Inclusao.Matches(SemComentarios(fila.Dequeue())))
+            var (texto, dona, quem) = fila.Dequeue();
+            foreach (Match m in Inclusao.Matches(SemRamosDeOutraPlaca(SemComentarios(texto), macros)))
             {
                 string nome = m.Groups[1].Value.Trim().Replace('\\', '/');
+                if (dona is not null && NaBiblioteca(dona, quem, nome) is { } proprio)
+                {
+                    Ler(dona, proprio);
+                    continue;
+                }
                 if (!vistos.Add(nome)) continue;
+                // Como na IDE, o que vem com a placa vence: o SD.h da ESP32 fica, e nao o SD
+                // instalado, que nem conhece o chip.
+                if (!instaladasVencem && DoCore().Contains(nome)) continue;
                 var lib = DeBiblioteca(projeto, nome);
-                if (lib is null || usadas.Contains(lib)) continue;
+                if (lib is null) continue;
+                Ler(lib, NaBiblioteca(lib, "", nome));
+                if (usadas.Contains(lib)) continue;
                 usadas.Add(lib);
-                foreach (string arquivo in lib.Arquivos)
-                    if (Path.GetExtension(arquivo).ToLowerInvariant() is ".h" or ".hpp" or ".c" or ".cpp")
-                        fila.Enqueue(lib.Ler(arquivo) ?? "");
+                foreach (string arquivo in lib.Arquivos.Where(a => EntraNaCompilacao(lib, a))) Ler(lib, arquivo);
             }
         }
         return usadas;
+    }
+
+    static readonly Regex DiretivaDeRamo = new(@"^\s*#\s*(ifdef|ifndef|if|elif|else|endif)\b(.*)$", RegexOptions.Compiled);
+    static readonly Regex MacroDePlaca = new(@"^(__AVR\w*|ARDUINO_ARCH_\w+|ESP8266|ESP32|ESP_PLATFORM|TEENSYDUINO|CORE_TEENSY|__SAM\w+|__MK\w+|__IMXRT\w+|__arm__|__ARM\w*|STM32\w*|NRF5\w*|PARTICLE|SPARK|ENERGIA|RASPBERRYPI_PICO|__MBED__|__ZEPHYR__)$", RegexOptions.Compiled);
+
+    /// <summary>
+    /// O texto sem os ramos de #if que sao de certeza de outra placa ("#ifdef __AVR__"). Um
+    /// #if que nao da para decidir aqui (uma macro de configuracao, uma conta) fica como esta.
+    /// </summary>
+    static string SemRamosDeOutraPlaca(string texto, HashSet<string> macros)
+    {
+        if (!texto.Contains("#")) return texto;
+        var linhas = texto.Split('\n');
+        var pilha = new Stack<(bool PaiAtivo, bool Tomou, bool Ativo, bool Duvida)>();
+        bool ativo = true;
+        for (int n = 0; n < linhas.Length; n++)
+        {
+            var m = DiretivaDeRamo.Match(linhas[n].TrimEnd('\r'));
+            if (!m.Success)
+            {
+                if (!ativo) linhas[n] = "";
+                continue;
+            }
+            string tipo = m.Groups[1].Value, resto = m.Groups[2].Value.Trim();
+            switch (tipo)
+            {
+                case "ifdef" or "ifndef" or "if":
+                {
+                    bool? c = tipo == "ifdef" ? Macro(resto, macros) : tipo == "ifndef" ? Nao(Macro(resto, macros)) : new Condicao(resto, macros).Avaliar();
+                    pilha.Push((ativo, c == true, ativo && c != false, c is null));
+                    ativo = pilha.Peek().Ativo;
+                    break;
+                }
+                case "elif" when pilha.Count > 0:
+                {
+                    var t = pilha.Pop();
+                    bool? c = new Condicao(resto, macros).Avaliar();
+                    bool esta = t.PaiAtivo && !t.Tomou && c != false;
+                    pilha.Push((t.PaiAtivo, t.Tomou || (c == true && !t.Duvida), esta, t.Duvida || c is null));
+                    ativo = esta;
+                    break;
+                }
+                case "else" when pilha.Count > 0:
+                {
+                    var t = pilha.Pop();
+                    bool esta = t.PaiAtivo && !t.Tomou;
+                    pilha.Push((t.PaiAtivo, true, esta, t.Duvida));
+                    ativo = esta;
+                    break;
+                }
+                case "endif" when pilha.Count > 0:
+                    ativo = pilha.Pop().PaiAtivo;
+                    break;
+            }
+        }
+        return string.Join('\n', linhas);
+    }
+
+    static bool? Nao(bool? v) => v is null ? null : !v;
+
+    static bool? Macro(string texto, HashSet<string> macros)
+    {
+        string nome = Regex.Match(texto, @"^\w+").Value;
+        return macros.Contains(nome) ? true : MacroDePlaca.IsMatch(nome) ? false : null;
+    }
+
+    /// <summary>A conta de um #if com defined, !, && e ||. Qualquer outra coisa: nao da para saber (null).</summary>
+    sealed class Condicao(string texto, HashSet<string> macros)
+    {
+        readonly string[] partes = Regex.Matches(Regex.Replace(texto, @"//.*$|/\*.*?\*/", ""), @"\w+|\|\||&&|!=|[!()]|\S").Select(m => m.Value).ToArray();
+        int i;
+
+        public bool? Avaliar()
+        {
+            bool? v = Ou();
+            return i == partes.Length ? v : null;
+        }
+
+        bool? Ou()
+        {
+            bool? v = E();
+            while (i < partes.Length && partes[i] == "||")
+            {
+                i++;
+                bool? d = E();
+                v = v == true || d == true ? true : v is null || d is null ? null : false;
+            }
+            return v;
+        }
+
+        bool? E()
+        {
+            bool? v = Termo();
+            while (i < partes.Length && partes[i] == "&&")
+            {
+                i++;
+                bool? d = Termo();
+                v = v == false || d == false ? false : v is null || d is null ? null : true;
+            }
+            return v;
+        }
+
+        bool? Termo()
+        {
+            if (i >= partes.Length) return null;
+            string p = partes[i++];
+            if (p == "!") return Nao(Termo());
+            if (p == "(")
+            {
+                bool? v = Ou();
+                if (i < partes.Length && partes[i] == ")") i++;
+                return v;
+            }
+            if (p == "defined")
+            {
+                bool abre = i < partes.Length && partes[i] == "(";
+                if (abre) i++;
+                bool? v = i < partes.Length ? Macro(partes[i++], macros) : null;
+                if (abre && i < partes.Length && partes[i] == ")") i++;
+                return v;
+            }
+            // Um numero ou uma conta (ARDUINO >= 100): engole o resto do termo, sem decidir.
+            while (i < partes.Length && partes[i] is not ("||" or "&&" or ")")) i++;
+            return null;
+        }
     }
 
     // =====================================================================
@@ -747,7 +1037,8 @@ public static class CompiladorNativo
         foreach (var (_, texto) in partes) prototipos.AddRange(Prototipos(texto));
 
         var sb = new StringBuilder();
-        sb.Append("#include <Arduino.h>\n");
+        // Como a IDE: so se o sketch nao inclui. O "#define" antes do include dele vale.
+        if (!Regex.IsMatch(SemComentarios(sketch ?? ""), @"(?m)^\s*#\s*include\s*[<""]Arduino\.h[>""]")) sb.Append("#include <Arduino.h>\n");
         bool inseridos = false;
         foreach (var (nome, texto) in partes)
         {
@@ -772,8 +1063,39 @@ public static class CompiladorNativo
     /// <summary>Onde comeca a linha da primeira definicao de funcao (fora de chaves), ou -1.</summary>
     static int InicioDaPrimeiraFuncao(string texto)
     {
-        foreach (var f in Funcoes(texto)) return f.InicioDaLinha;
+        foreach (var f in Funcoes(texto))
+        {
+            // Dentro de um #if, os prototipos sumiriam junto com o ramo: ficam antes dele.
+            var abertos = RamosAbertos(texto, f.InicioDaLinha);
+            return abertos.Count > 0 ? abertos[0].Inicio : f.InicioDaLinha;
+        }
         return -1;
+    }
+
+    /// <summary>
+    /// Os #if abertos nesta posicao do texto, com o caminho de cada um ate aqui (o #if e os
+    /// #elif e #else ja passados).
+    /// </summary>
+    static List<(int Inicio, List<string> Caminho)> RamosAbertos(string texto, int ate)
+    {
+        var abertos = new List<(int Inicio, List<string> Caminho)>();
+        // Sem os comentarios, mas com as mesmas linhas: um "#if" num bloco de comentario nao conta.
+        var limpas = SemComentarios(texto[..Math.Min(ate, texto.Length)]).Split('\n');
+        int inicio = 0, linhaOriginal = 0;
+        var originais = texto.Split('\n');
+        foreach (string linha in limpas)
+        {
+            var m = DiretivaDeRamo.Match(linha.TrimEnd('\r'));
+            if (m.Success)
+            {
+                string tipo = m.Groups[1].Value;
+                if (tipo is "if" or "ifdef" or "ifndef") abertos.Add((inicio, [linha.TrimEnd('\r')]));
+                else if (tipo == "endif" && abertos.Count > 0) abertos.RemoveAt(abertos.Count - 1);
+                else if (abertos.Count > 0) abertos[^1].Caminho.Add(linha.TrimEnd('\r'));
+            }
+            inicio += originais[Math.Min(linhaOriginal++, originais.Length - 1)].Length + 1;
+        }
+        return abertos;
     }
 
     /// <summary>Os prototipos das funcoes definidas no topo do arquivo.</summary>
@@ -783,7 +1105,11 @@ public static class CompiladorNativo
         {
             if (f.Assinatura.Contains('=')) continue;                         // argumento padrao: o prototipo repetiria
             if (Regex.IsMatch(f.Assinatura, @"^\s*(template|static\s+inline)\b")) continue;
-            yield return f.Assinatura.Trim() + ";";
+            // Dentro do mesmo #if da funcao: o ramo de outra placa pode usar um tipo que aqui nao existe.
+            var abertos = RamosAbertos(texto, f.InicioDaLinha);
+            yield return string.Concat(abertos.SelectMany(a => a.Caminho).Select(l => l + "\n"))
+                         + f.Assinatura.Trim() + ";"
+                         + string.Concat(abertos.Select(_ => "\n#endif"));
         }
     }
 
@@ -806,7 +1132,7 @@ public static class CompiladorNativo
                 if (profundidade == 0)
                 {
                     string cabeca = limpo[inicioDoComando..i];
-                    var m = Regex.Match(cabeca, @"^\s*((?:[A-Za-z_][\w:<>,\*&\s]*?[\s\*&]+)?)([A-Za-z_]\w*)\s*\(([^()]*)\)\s*(const\s*)?$",
+                    var m = Regex.Match(cabeca, @"^\s*((?:[A-Za-z_][\w:<>,\*&\s]*?[\s\*&]+)?)([A-Za-z_]\w*)\s*\(((?:[^()]|\([^()]*\))*)\)\s*(const\s*)?$",
                                         RegexOptions.Singleline);
                     string nome = m.Success ? m.Groups[2].Value : "";
                     string tipo = m.Success ? m.Groups[1].Value.Trim() : "";
@@ -975,6 +1301,22 @@ public static class CompiladorNativo
     static string ImpressaoDoIdf(List<string> pastas)
         => string.Join("\n", pastas.SelectMany(p => Directory.EnumerateFiles(p, "*", SearchOption.AllDirectories))
                                     .Order(StringComparer.Ordinal).Select(f => f + ":" + new FileInfo(f).Length));
+
+    /// <summary>
+    /// As macros da placa na linha de comando, como a IDE do Arduino passa para todo arquivo. A
+    /// biblioteca testa o "#ifdef ARDUINO" ou o "#ifdef ESP32" antes de incluir o Arduino.h (o
+    /// U8x8lib.cpp inteiro fica dentro de um): sem isto, o codigo dela sumia sem erro nenhum.
+    /// As constantes do cs_placa.h (INPUT, DEFAULT...) ficam de fora: na IDE quem as traz e
+    /// o Arduino.h, e um .c que nao o inclui pode usar esses nomes.
+    /// </summary>
+    static IEnumerable<string> MacrosDaIde(string placa)
+        => Preprocessador.MacrosDoCore(placa)
+            // A IDE nao passa a versao do core (quem da e o esp_arduino_version.h), e o ESP32 dela
+            // vale ele mesmo: o "#if ESP32" e falso, e um enum com esse nome compila.
+            .Where(m => m.Nome != "__cplusplus" && !m.Nome.StartsWith("RTC_") && !m.Nome.StartsWith("ESP_ARDUINO_VERSION"))
+            .Select(m => m.Nome == "ESP32" ? "-DESP32=ESP32" : $"-D{m.Nome}={m.Valor}")
+            // Quem traz o time_t aqui e a libc do Windows: a biblioteca nao declara o dela (o TimeLib).
+            .Append("-D__time_t_defined=1");
 
     public static string CabecalhoDaPlaca(string placa)
     {

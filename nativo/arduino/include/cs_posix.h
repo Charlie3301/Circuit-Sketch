@@ -44,4 +44,15 @@ typedef unsigned long long u_int64_t;
 }
 #endif
 
+#include <time.h>
+#ifndef _POSIX_THREAD_SAFE_FUNCTIONS /* a libc do Windows tem so os _s, com os argumentos trocados */
+static inline struct tm *localtime_r(const time_t *t, struct tm *r) { return localtime_s(r, t) == 0 ? r : NULL; }
+static inline struct tm *gmtime_r(const time_t *t, struct tm *r) { return gmtime_s(r, t) == 0 ? r : NULL; }
+#endif
+#include <sys/time.h>
+#ifdef __cplusplus
+extern "C"
+#endif
+int settimeofday(const struct timeval *tv, const struct timezone *tz);
+
 #endif

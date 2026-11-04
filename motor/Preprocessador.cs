@@ -247,9 +247,9 @@ public sealed class Preprocessador
             yield return ("ARDUINO_VARIANT", "\"" + variante.ToLowerInvariant() + "\"");
             yield return ("F_CPU", ((long)(perfil.Megahertz * 1_000_000)) + "L");
             yield return ("ESP_ARDUINO_VERSION_MAJOR", "3");
-            yield return ("ESP_ARDUINO_VERSION_MINOR", "0");
-            yield return ("ESP_ARDUINO_VERSION_PATCH", "7");
-            yield return ("ESP_ARDUINO_VERSION", "((3 << 16) | (0 << 8) | 7)");
+            yield return ("ESP_ARDUINO_VERSION_MINOR", "3");
+            yield return ("ESP_ARDUINO_VERSION_PATCH", "12");
+            yield return ("ESP_ARDUINO_VERSION", "((3 << 16) | (3 << 8) | 12)");
             yield return ("__cplusplus", "202100L");
 
             // O esp_attr.h, que o Arduino.h da ESP32 inclui: a memoria RTC

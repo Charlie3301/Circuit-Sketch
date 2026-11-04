@@ -57,6 +57,28 @@ void SPIClass::writeBytes(const uint8_t *data, uint32_t size)
     for (uint32_t i = 0; i < size; i++) write(data[i]);
 }
 
+/* As palavras de 16 bits com o byte mais alto primeiro, como o painel espera (o da ILI9341). */
+void SPIClass::writePixels(const void *data, uint32_t size)
+{
+    const uint8_t *b = (const uint8_t *)data;
+    for (uint32_t i = 0; i + 1 < size; i += 2) {
+        write(b[i + 1]);
+        write(b[i]);
+    }
+}
+
+void SPIClass::writePattern(const uint8_t *data, uint8_t size, uint32_t repeat)
+{
+    while (repeat--) writeBytes(data, size);
+}
+
+void SPIClass::transferBits(uint32_t data, uint32_t *out, uint8_t bits)
+{
+    uint32_t r = 0;
+    for (int i = (bits - 1) / 8; i >= 0; i--) r = (r << 8) | transfer((uint8_t)(data >> (i * 8)));
+    if (out) *out = r;
+}
+
 void SPIClass::setBitOrder(uint8_t bitOrder) { ch(nome, "setBitOrder", cs_i(bitOrder)); }
 void SPIClass::setDataMode(uint8_t dataMode) { ch(nome, "setDataMode", cs_i(dataMode)); }
 void SPIClass::setFrequency(uint32_t freq) { ch(nome, "setFrequency", cs_i(freq)); }
