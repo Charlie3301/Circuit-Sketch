@@ -233,10 +233,17 @@ extern "C" bool esp_timer_is_active(esp_timer_handle_t e) { return e && xTimerIs
 /* ---- o sistema ---- */
 extern "C" uint32_t esp_get_free_heap_size(void) { return ESP.getFreeHeap(); }
 extern "C" uint32_t esp_get_minimum_free_heap_size(void) { return ESP.getMinFreeHeap(); }
-extern "C" uint32_t esp_random(void) { return (uint32_t)random(0x7FFFFFFF) ^ ((uint32_t)random(0xFFFF) << 16); }
+/* O gerador de verdade do chip (o RF): cada placa sorteia diferente, e sem mexer na sequencia do random() do sketch. */
+extern "C" int rand_s(unsigned int *numero);
+extern "C" uint32_t esp_random(void)
+{
+    unsigned int n = 0;
+    rand_s(&n);
+    return n;
+}
 extern "C" void esp_fill_random(void *buf, size_t n)
 {
-    for (size_t i = 0; i < n; i++) ((uint8_t *)buf)[i] = (uint8_t)random(256);
+    for (size_t i = 0; i < n; i++) ((uint8_t *)buf)[i] = (uint8_t)esp_random();
 }
 extern "C" void esp_chip_info(esp_chip_info_t *info)
 {
@@ -789,4 +796,27 @@ extern "C" size_t heap_caps_get_free_size(uint32_t caps) { return caps & MALLOC_
 extern "C" size_t heap_caps_get_largest_free_block(uint32_t caps) { return caps & MALLOC_CAP_SPIRAM ? 8u << 20 : 110000; }
 extern "C" size_t heap_caps_get_total_size(uint32_t caps) { return caps & MALLOC_CAP_SPIRAM ? 8u << 20 : 327680; }
 extern "C" size_t heap_caps_get_minimum_free_size(uint32_t caps) { return heap_caps_get_free_size(caps); }
+
+/* O MAC de fabrica (o da eFuse): o mesmo do ESP.getEfuseMac(). */
+extern "C" esp_err_t esp_efuse_mac_get_default(uint8_t *mac)
+{
+    if (!mac) return ESP_ERR_INVALID_ARG;
+    uint64_t m = ESP.getEfuseMac();
+    for (int i = 0; i < 6; i++) mac[i] = (uint8_t)(m >> (8 * i));
+    return ESP_OK;
+}
+
+/* =====================================================================
+ * o http_parser (o nome de cada metodo HTTP, como o do IDF: o WebServer
+ * mostra o metodo no log e o LoggingMiddleware tambem) */
+#include "http_parser.h"
+extern "C" const char *http_method_str(enum http_method m)
+{
+    static const char *const nomes[] = {
+#define XX(num, name, string) #string,
+        HTTP_METHOD_MAP(XX)
+#undef XX
+    };
+    return (unsigned)m < sizeof(nomes) / sizeof(nomes[0]) ? nomes[m] : "<unknown>";
+}
 #endif

@@ -221,6 +221,29 @@ extern "C" void attachInterruptArg(uint8_t pin, void (*userFunc)(void *), void *
 /* O HAL do core oficial da ESP32 (os cabecalhos de verdade): o PWM, o toque,
  * o DAC, o RMT, a UART, o log_x... As funcoes sao as do simulador. */
 #include "esp32-hal.h"
+#include "cs_posix.h"
+
+/* As macros do Arduino.h do core que o sketch usa para mudar o padrao: o
+ * tamanho da pilha do loop, o relatorio do chip no boot e o nome do USB MIDI
+ * (o simulador aceita; a pilha e o relatorio nao mudam nada nele). */
+size_t getArduinoLoopTaskStackSize(void);
+#define SET_LOOP_TASK_STACK_SIZE(sz)     \
+  size_t getArduinoLoopTaskStackSize() { \
+    return sz;                           \
+  }
+#define ESP32_USB_MIDI_DEFAULT_NAME "TinyUSB MIDI"
+#define SET_USB_MIDI_DEVICE_NAME(name)        \
+  const char *getUSBMIDIDefaultDeviceName() { \
+    if (!name || strlen(name) == 0) {         \
+      return ESP32_USB_MIDI_DEFAULT_NAME;     \
+    }                                         \
+    return name;                              \
+  }
+bool shouldPrintChipDebugReport(void);
+#define ENABLE_CHIP_DEBUG_REPORT          \
+  bool shouldPrintChipDebugReport(void) { \
+    return true;                          \
+  }
 #ifdef __cplusplus
 extern "C" {
 #endif

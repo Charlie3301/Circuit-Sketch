@@ -20,6 +20,9 @@ public sealed class EstadoWifi
     public bool Ligado { get; internal set; }
     public bool ModoAp { get; internal set; }
 
+    /// <summary>O cabo de rede (o ETH da placa): ligado na bancada, com o mesmo IP da placa.</summary>
+    public bool Cabo { get; internal set; }
+
     /// <summary>O nome da placa na rede (WiFi.setHostname); vazio, o de fabrica.</summary>
     public string Hostname { get; internal set; } = "";
     public int Falha { get; internal set; }
@@ -266,6 +269,31 @@ public sealed partial class Rede
         return true;
     }
 
+    /// <summary>
+    /// O ETH.begin(): o cabo da placa no switch da bancada. A placa fica na
+    /// rede (o IP dela, o TCP, o UDP, o HTTP) sem o WiFi estar conectado.
+    /// </summary>
+    public void LigarCabo(Maquina placa)
+    {
+        var estado = Wifi(placa);
+        if (estado.Cabo) return;
+        estado.Cabo = true;
+        Anotar(placa, "eth", $"cabo de rede ligado · IP {estado.Ip}");
+    }
+
+    public void DesligarCabo(Maquina placa)
+    {
+        var estado = Wifi(placa);
+        if (!estado.Cabo) return;
+        estado.Cabo = false;
+        Anotar(placa, "eth", "cabo de rede desligado");
+    }
+
+    public bool CaboConectado(Maquina placa) => Wifi(placa).Cabo;
+
+    /// <summary>A placa esta na rede da bancada: pelo WiFi ou pelo cabo.</summary>
+    public bool NaRede(Maquina placa) => CaboConectado(placa) || WifiConectado(placa);
+
     public void DesligarWifi(Maquina placa)
     {
         var estado = Wifi(placa);
@@ -469,7 +497,7 @@ public sealed partial class Rede
             return RespostaHttp.Erro(ErroConexaoRecusada);
         }
 
-        if (!WifiConectado(origem))
+        if (!NaRede(origem))
         {
             Anotar(origem, "aviso", $"{metodo} {url}: a placa não está no WiFi. "
                                     + "Chame WiFi.begin() e espere WL_CONNECTED antes.");
@@ -580,7 +608,7 @@ public sealed partial class Rede
 
     public ConexaoTcp ConectarTcp(Maquina origem, string host, int porta, bool segura, bool insegura)
     {
-        if (!WifiConectado(origem))
+        if (!NaRede(origem))
         {
             Anotar(origem, "aviso", $"connect({host}, {porta}): a placa não está no WiFi");
             return null;
@@ -667,7 +695,7 @@ public sealed partial class Rede
         cliente.Usuario = usuario;
         cliente.Senha = senha;
 
-        if (!WifiConectado(placa))
+        if (!NaRede(placa))
         {
             cliente.Estado = -2;
             Anotar(placa, "aviso", "MQTT connect(): a placa não está no WiFi");
@@ -1064,6 +1092,12 @@ public sealed partial class Rede
         return true;
     }
 
+    /// <summary>As placas que a busca do Bluetooth classico acha (o discover): as visiveis, menos quem procura.</summary>
+    public List<DispositivoBt> BluetoothVisiveis(DispositivoBt quem)
+    {
+        lock (trava) return bluetooth.Where(d => d != quem && !d.Mestre).ToList();
+    }
+
     public string CelularConectadoEm => comCelular?.Nome;
 
     public bool ConectarCelular(string nome)
@@ -1132,6 +1166,7 @@ public sealed partial class Rede
         foreach (var cliente in clientes) DesconectarMqtt(cliente, calado: true, educado: false);
         foreach (var conexao in abertas) conexao.Fechar();
 
+        Esquecer154(placa);
         EsquecerUdp(placa);
         PararMdns(placa);
         EsquecerBluetooth(placa);
@@ -1533,6 +1568,8 @@ public sealed class ConexaoTcp
     public FluxoDeEntrada Entrada { get; } = new();
     public string IpRemoto { get; private set; } = "0.0.0.0";
     public int PortaRemota { get; private set; }
+    /// <summary>O certificado do servidor (DER), na conexão segura (o getPeerCertificate da placa).</summary>
+    public byte[] CertificadoRemoto { get; private set; }
 
     ConexaoTcp() { }
 
@@ -1569,10 +1606,12 @@ public sealed class ConexaoTcp
                                 "negociar a conexão segura");
             fluxo = ssl;
         }
+        byte[] certificado = (fluxo as SslStream)?.RemoteCertificate?.GetRawCertData();
 
         var conexao = new ConexaoTcp
         {
             tipo = Tipo.Real, origem = origem, tcp = tcp, fluxo = fluxo, IpRemoto = host, PortaRemota = porta,
+            CertificadoRemoto = certificado,
         };
         new Thread(conexao.Bombear) { IsBackground = true, Name = "tcp " + host }.Start();
         return conexao;

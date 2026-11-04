@@ -20,6 +20,7 @@ inline std::map<std::string, int> &cs_copias_dos_clients()
 }
 
 class WiFiClient : public Client, public CsObjeto {
+    bool _sse = false;
     void segurar()
     {
         if (cs_nome[0]) cs_copias_dos_clients()[cs_nome]++;
@@ -93,7 +94,36 @@ public:
         cs_obj_n(cs_nome, "__escrever_bytes", cs_vetor(b, (int)n));
         return n;
     }
+    size_t write_P(PGM_P buf, size_t size) { return write((const uint8_t *)buf, size); }
+    /* O que o stream tem (o arquivo do serveStatic), em blocos como o NetworkClient. */
+    size_t write(Stream &stream)
+    {
+        uint8_t buf[1360];
+        size_t escritos = 0;
+        while (stream.available()) escritos += write(buf, stream.readBytes(buf, sizeof(buf)));
+        return escritos;
+    }
+    size_t write(Stream &stream, size_t length)
+    {
+        uint8_t buf[1360];
+        size_t escritos = 0;
+        while (length) {
+            size_t n = stream.readBytes(buf, length > sizeof(buf) ? sizeof(buf) : length);
+            if (!n) break;
+            escritos += write(buf, n);
+            length -= n;
+        }
+        return escritos;
+    }
     using Print::write;
+    /* Joga fora o que chegou e nao foi lido. */
+    void clear()
+    {
+        while (available() > 0) read();
+    }
+    /* O Server-Sent Events do WebServer: a conexao fica aberta depois da resposta. */
+    void setSSE(bool sse) { _sse = sse; }
+    bool isSSE() { return _sse; }
     String readString() override { return cs_obj_t(cs_nome, "readString"); }
     String readStringUntil(char terminator) override { return cs_obj_t(cs_nome, "readStringUntil", terminator); }
     IPAddress remoteIP()
@@ -103,6 +133,18 @@ public:
         return ip;
     }
     uint16_t remotePort() { return (uint16_t)cs_obj_i(cs_nome, "remotePort"); }
+    /* A ponta da placa: o IP dela na rede e a porta do servidor (ou a do cliente). */
+    IPAddress localIP()
+    {
+        IPAddress ip;
+        ip.fromString(cs_obj_t(cs_nome, "localIP"));
+        return ip;
+    }
+    uint16_t localPort() { return (uint16_t)cs_obj_i(cs_nome, "localPort"); }
+    void setConnectionTimeout(uint32_t ms) { (void)ms; }
+    bool getNoDelay() { return true; }
+    bool operator==(const WiFiClient &o) const { return strcmp(cs_nome, o.cs_nome) == 0; }
+    bool operator!=(const WiFiClient &o) const { return !(*this == o); }
     void setTimeout(uint32_t ms) { Stream::setTimeout(ms); cs_obj_n(cs_nome, "setTimeout", ms); }
     int setNoDelay(bool nodelay) { return (int)cs_obj_i(cs_nome, "setNoDelay", nodelay); }
 };
@@ -110,6 +152,12 @@ public:
 class WiFiServer : public CsObjeto {
 public:
     WiFiServer(uint16_t port = 80, uint8_t max_clients = 4) { (void)max_clients; cs_criar("WiFiServer", port); }
+    WiFiServer(const IPAddress &addr, uint16_t port = 80, uint8_t max_clients = 4)
+    {
+        (void)addr;
+        (void)max_clients;
+        cs_criar("WiFiServer", port);
+    }
     void begin(uint16_t port = 0) { if (port) cs_obj_n(cs_nome, "begin", port); else cs_obj_n(cs_nome, "begin"); }
     void end() { cs_obj_n(cs_nome, "end"); }
     void close() { cs_obj_n(cs_nome, "close"); }

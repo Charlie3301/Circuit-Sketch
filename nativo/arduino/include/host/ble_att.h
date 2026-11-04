@@ -1,0 +1,37 @@
+/* host/ble_att.h -- o ATT do NimBLE (as permissoes e os erros dos atributos),
+ * para o codigo da biblioteca BLE do core que inclui (o BLEHIDDevice). O
+ * radio e o do simulador; aqui ficam so os numeros do NimBLE. */
+#ifndef H_BLE_ATT_
+#define H_BLE_ATT_
+
+#define BLE_ATT_F_READ 0x01
+#define BLE_ATT_F_WRITE 0x02
+#define BLE_ATT_F_READ_ENC 0x04
+#define BLE_ATT_F_READ_AUTHEN 0x08
+#define BLE_ATT_F_READ_AUTHOR 0x10
+#define BLE_ATT_F_WRITE_ENC 0x20
+#define BLE_ATT_F_WRITE_AUTHEN 0x40
+#define BLE_ATT_F_WRITE_AUTHOR 0x80
+
+#define BLE_ATT_ERR_INVALID_HANDLE 0x01
+#define BLE_ATT_ERR_READ_NOT_PERMITTED 0x02
+#define BLE_ATT_ERR_WRITE_NOT_PERMITTED 0x03
+#define BLE_ATT_ERR_INVALID_PDU 0x04
+#define BLE_ATT_ERR_INSUFFICIENT_AUTHEN 0x05
+#define BLE_ATT_ERR_REQ_NOT_SUPPORTED 0x06
+#define BLE_ATT_ERR_INVALID_OFFSET 0x07
+#define BLE_ATT_ERR_INSUFFICIENT_AUTHOR 0x08
+#define BLE_ATT_ERR_PREPARE_QUEUE_FULL 0x09
+#define BLE_ATT_ERR_ATTR_NOT_FOUND 0x0a
+#define BLE_ATT_ERR_ATTR_NOT_LONG 0x0b
+#define BLE_ATT_ERR_INSUFFICIENT_KEY_SZ 0x0c
+#define BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN 0x0d
+#define BLE_ATT_ERR_UNLIKELY 0x0e
+#define BLE_ATT_ERR_INSUFFICIENT_ENC 0x0f
+#define BLE_ATT_ERR_UNSUPPORTED_GROUP 0x10
+#define BLE_ATT_ERR_INSUFFICIENT_RES 0x11
+
+#define BLE_ATT_MTU_DFLT 23
+#define BLE_ATT_MTU_MAX 527
+
+#endif

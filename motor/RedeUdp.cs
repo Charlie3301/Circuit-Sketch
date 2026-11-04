@@ -145,7 +145,7 @@ public sealed partial class Rede
     public bool EnviarUdp(PortaUdp de, string host, int porta, byte[] dados)
     {
         var origem = de.Dona;
-        if (!WifiConectado(origem) && !Wifi(origem).ModoAp)
+        if (!NaRede(origem) && !Wifi(origem).ModoAp)
         {
             Anotar(origem, "aviso", $"UDP para {host}:{porta}: a placa não está no WiFi");
             return false;

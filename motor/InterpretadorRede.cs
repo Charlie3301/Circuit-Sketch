@@ -29,6 +29,8 @@ public partial class Interpretador
         public ConexaoTcp Conexao;
         public bool Seguro;
         public bool Inseguro;
+        /// <summary>A porta do servidor que aceitou (o localPort do client).</summary>
+        public int PortaLocal;
     }
 
     sealed class EstadoServidor
@@ -162,7 +164,7 @@ public partial class Interpretador
 
     void ExigirWifi(int linha, string oque)
     {
-        if (Maq.Perfil.TemWifi) return;
+        if (Maq.Perfil.TemWifi || Maq.Rede.CaboConectado(Maq)) return;
         throw new ErroDeExecucao(
             $"{oque}: a {Maq.Perfil.Nome} nao tem WiFi. As placas com rede neste simulador sao a "
             + "ESP32 DevKit V1 e a Nano RP2040 Connect.", linha);
@@ -936,7 +938,7 @@ public partial class Interpretador
                     ConexaoTcp nova = s.Servidor?.ProximaConexao() is { } tcp ? ConexaoTcp.DaPonte(tcp)
                         : s.Servidor?.Proximo() is { } doPedido ? ConexaoTcp.DoServidor(doPedido, "10.0.0.1") : null;
                     if (nova is null) return Valor.DeTexto("");
-                    return Valor.DeReferencia(new Objeto("WiFiClient") { Rede = new EstadoCliente { Conexao = nova } });
+                    return Valor.DeReferencia(new Objeto("WiFiClient") { Rede = new EstadoCliente { Conexao = nova, PortaLocal = s.Porta } });
                 }
 
                 // O client da volta anterior que o sketch esqueceu aberto:
@@ -1012,6 +1014,11 @@ public partial class Interpretador
 
             case "remoteIP": return Valor.DeTexto(estado.Conexao?.IpRemoto ?? "0.0.0.0");
             case "remotePort": return Valor.DeInt(estado.Conexao?.PortaRemota ?? 0);
+            case "localIP": return Valor.DeTexto(Maq.Rede is { } r && r.NaRede(Maq) ? r.Wifi(Maq).Ip : "0.0.0.0");
+            case "localPort": return Valor.DeInt(estado.PortaLocal);
+            // O certificado do servidor (DER em base64), para o NetworkClientSecure do C++ compilado.
+            case "__certificado":
+                return Valor.DeTexto(estado.Conexao?.CertificadoRemoto is { } der ? Convert.ToBase64String(der) : "");
             case "available": return Valor.DeInt(estado.Conexao?.Disponivel ?? 0);
 
             case "print":
@@ -1346,6 +1353,19 @@ public partial class Interpretador
 
             case "getBtAddressString":
                 return Valor.DeTexto(Maq.Rede.Wifi(Maq).Mac);
+
+            // O discover do C++ compilado: "nome|endereco|rssi" de cada placa visivel.
+            case "__descobrir":
+                return Valor.DeTexto(dispositivo is null ? "" : string.Join("\n",
+                    Maq.Rede.BluetoothVisiveis(dispositivo).Select(d => $"{d.Nome}|{Maq.Rede.Wifi(d.Dona).Mac}|-50")));
+
+            // O connect(BTAddress): a placa visivel com esse endereco.
+            case "__conectar_endereco":
+            {
+                var alvo = dispositivo is null ? null
+                    : Maq.Rede.BluetoothVisiveis(dispositivo).FirstOrDefault(d => string.Equals(Maq.Rede.Wifi(d.Dona).Mac, S(0), StringComparison.OrdinalIgnoreCase));
+                return Valor.DeBool(alvo is not null && Maq.Rede.ConectarBluetooth(dispositivo, alvo.Nome));
+            }
         }
 
         if (dispositivo is not null && ChamarFluxo(dispositivo.Entrada, metodo, args, out var lido)) return lido;

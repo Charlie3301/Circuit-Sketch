@@ -15,11 +15,77 @@
  * o texto deles e o toString(). */
 inline String cs_ble_texto(const String &v) { return v.startsWith("__volta") ? cs_obj_t(v.c_str(), "toString") : v; }
 
+/* Os bytes de um String em hexadecimal, e de volta (o anuncio passa pelo simulador assim). */
+inline String cs_ble_hex(const String &bytes)
+{
+    String h;
+    char t[3];
+    for (unsigned i = 0; i < bytes.length(); i++) {
+        snprintf(t, sizeof(t), "%02x", (uint8_t)bytes[i]);
+        h += t;
+    }
+    return h;
+}
+inline String cs_ble_de_hex(const String &hex)
+{
+    String b;
+    for (unsigned i = 0; i + 1 < hex.length(); i += 2) b += (char)strtoul(hex.substring(i, i + 2).c_str(), nullptr, 16);
+    return b;
+}
+
+/* O UUID como o Bluedroid (uuid.uuid16/uuid32/uuid128) e o NimBLE
+ * (u16/u32/u128.value) o guardam, para o codigo do core que mexe nos bytes
+ * (o BLEBeacon, o Eddystone): os 128 bits do menos para o mais significativo. */
+struct cs_uuid_nativo {
+    uint16_t len;
+    union {
+        uint16_t uuid16;
+        uint32_t uuid32;
+        uint8_t uuid128[16];
+    } uuid;
+    struct {
+        uint8_t type;
+        uint16_t value;
+    } u16;
+    struct {
+        uint8_t type;
+        uint32_t value;
+    } u32;
+    struct {
+        uint8_t type;
+        uint8_t value[16];
+    } u128;
+};
+
 class BLEUUID {
     String texto;
+    mutable cs_uuid_nativo nativo;
+
+    /* Os 16 bytes do texto, do mais significativo para o menos (o "0000xxxx-0000-1000-8000-00805f9b34fb" no curto). */
+    bool bytes128(uint8_t b[16]) const
+    {
+        String t = to128().texto;
+        t.replace("-", "");
+        if (t.length() != 32) return false;
+        for (int i = 0; i < 16; i++) b[i] = (uint8_t)strtoul(t.substring(2 * i, 2 * i + 2).c_str(), nullptr, 16);
+        return true;
+    }
 
 public:
     BLEUUID() {}
+    /* Os bytes do UUID de 128 bits (msbFirst: o primeiro byte e o mais significativo, a ordem do texto). */
+    BLEUUID(const uint8_t *pData, size_t size, bool msbFirst)
+    {
+        if (size != 16) return;
+        char t[37];
+        int k = 0;
+        for (int i = 0; i < 16; i++) {
+            if (i == 4 || i == 6 || i == 8 || i == 10) t[k++] = '-';
+            snprintf(t + k, 3, "%02x", pData[msbFirst ? i : 15 - i]);
+            k += 2;
+        }
+        texto = t;
+    }
     BLEUUID(const char *uuid) : texto(uuid) {}
     BLEUUID(const String &uuid) : texto(uuid) {}
     BLEUUID(uint16_t uuid)
@@ -38,6 +104,28 @@ public:
     bool equals(const BLEUUID &o) const { return texto.equalsIgnoreCase(o.texto); }
     bool operator==(const BLEUUID &o) const { return equals(o); }
     int bitSize() const { return texto.length() > 8 ? 128 : texto.length() > 4 ? 32 : 16; }
+    /* O curto (16 ou 32 bits) na base do Bluetooth: 0000xxxx-0000-1000-8000-00805f9b34fb. */
+    BLEUUID to128() const
+    {
+        if (bitSize() == 128) return *this;
+        String t = texto;
+        while (t.length() < 8) t = "0" + t;
+        return BLEUUID(t + "-0000-1000-8000-00805f9b34fb");
+    }
+    const cs_uuid_nativo *getNative() const
+    {
+        memset(&nativo, 0, sizeof(nativo));
+        nativo.len = (uint16_t)(bitSize() / 8);
+        unsigned long curto = strtoul(texto.c_str(), nullptr, 16);
+        nativo.uuid.uuid16 = nativo.u16.value = (uint16_t)curto;
+        if (bitSize() == 32) nativo.uuid.uuid32 = nativo.u32.value = (uint32_t)curto;
+        if (bitSize() == 128) {
+            uint8_t b[16];
+            if (bytes128(b))
+                for (int i = 0; i < 16; i++) nativo.uuid.uuid128[i] = nativo.u128.value[i] = b[15 - i];
+        }
+        return &nativo;
+    }
 };
 inline cs_val cs_de(const BLEUUID &u)
 {
@@ -252,11 +340,26 @@ public:
     void setShortName(const String &name) { cs_obj_n(cs_nome, "setShortName", name); }
     void setFlags(uint8_t flags) { cs_obj_n(cs_nome, "setFlags", flags); }
     void setAppearance(uint16_t a) { cs_obj_n(cs_nome, "setAppearance", a); }
-    void setManufacturerData(const String &data) { cs_obj_n(cs_nome, "setManufacturerData", data); }
-    void setServiceData(BLEUUID uuid, const String &data) { cs_obj_n(cs_nome, "setServiceData", uuid, data); }
+    /* Os bytes vao em hexadecimal (o simulador leva o anuncio para quem varre). */
+    void setManufacturerData(const String &data) { cs_obj_n(cs_nome, "__fabricante_hex", cs_ble_hex(data)); }
+    void setServiceData(BLEUUID uuid, const String &data) { cs_obj_n(cs_nome, "__servico_hex", uuid, cs_ble_hex(data)); }
     void setCompleteServices(BLEUUID uuid) { cs_obj_n(cs_nome, "setCompleteServices", uuid); }
     void setPartialServices(BLEUUID uuid) { cs_obj_n(cs_nome, "setPartialServices", uuid); }
-    void addData(const String &data) { cs_obj_n(cs_nome, "addData", data); }
+    /* As estruturas cruas do anuncio (tamanho, tipo, dados), como o Eddystone monta: o
+     * fabricante (0xFF), o dado de servico de 16 bits (0x16) e o nome (0x08/0x09). */
+    void addData(const String &data)
+    {
+        const uint8_t *p = (const uint8_t *)data.c_str();
+        size_t n = data.length(), i = 0;
+        while (i + 1 < n && p[i] > 0 && i + 1 + p[i] <= n) {
+            uint8_t tam = p[i], tipo = p[i + 1];
+            String corpo((const char *)p + i + 2, (unsigned)(tam - 1));
+            if (tipo == 0xFF) setManufacturerData(corpo);
+            else if (tipo == 0x16 && tam >= 3) setServiceData(BLEUUID((uint16_t)(p[i + 2] | p[i + 3] << 8)), corpo.substring(2));
+            else if (tipo == 0x08 || tipo == 0x09) setName(corpo);
+            i += 1 + tam;
+        }
+    }
 };
 
 class BLEAdvertising : public CsObjeto {
@@ -293,6 +396,9 @@ public:
     void setCallbacks(BLEServerCallbacks *cb);
     void startAdvertising() { cs_obj_n(cs_nome, "startAdvertising"); }
     void stopAdvertising() { cs_obj_n(cs_nome, "stopAdvertising"); }
+    /* O servidor GATT do NimBLE comeca sozinho no simulador (os servicos ja ficam visiveis no start deles). */
+    void start() {}
+    bool isStarted() { return true; }
     uint32_t getConnectedCount() { return (uint32_t)cs_obj_i(cs_nome, "getConnectedCount"); }
     void disconnect(uint16_t connId) { cs_obj_n(cs_nome, "disconnect", connId); }
     void advertiseOnDisconnect(bool v) { cs_obj_n(cs_nome, "advertiseOnDisconnect", v); }
@@ -343,7 +449,54 @@ public:
     typedef void (*notify_callback)(BLERemoteCharacteristic *, uint8_t *, size_t, bool);
     void registerForNotify(notify_callback cb, bool notifications = true, bool descriptorRequiresRegistration = true);
     String toString() { return cs_obj_t(cs_nome, "toString"); }
+    class BLERemoteDescriptor *getDescriptor(BLEUUID uuid);
+
+private:
+    class BLERemoteDescriptor *cccd = nullptr;
 };
+
+/* O descritor do lado do cliente. O simulador nao leva os descritores do
+ * servidor pelo radio: o que existe e o 2902 (o CCCD), que toda
+ * caracteristica com notify tem -- escrever 01 00 nele liga as notificacoes,
+ * como no celular; o valor fica guardado aqui. */
+class BLERemoteDescriptor {
+public:
+    BLERemoteDescriptor(BLERemoteCharacteristic *dona, BLEUUID uuid) : m_dona(dona), m_uuid(uuid) {}
+    uint16_t getHandle() { return (uint16_t)(m_dona->getHandle() + 1); }
+    BLERemoteCharacteristic *getRemoteCharacteristic() { return m_dona; }
+    BLEUUID getUUID() { return m_uuid; }
+    String readValue(void) { return m_valor; }
+    uint8_t readUInt8(void) { return m_valor.length() >= 1 ? (uint8_t)m_valor[0] : 0; }
+    uint16_t readUInt16(void) { return m_valor.length() >= 2 ? (uint16_t)((uint8_t)m_valor[0] | (uint8_t)m_valor[1] << 8) : 0; }
+    uint32_t readUInt32(void)
+    {
+        uint32_t v = 0;
+        for (unsigned i = 0; i < 4 && i < m_valor.length(); i++) v |= (uint32_t)(uint8_t)m_valor[i] << (8 * i);
+        return v;
+    }
+    String toString(void) { return "Descriptor: uuid: " + m_uuid.toString() + ", handle: " + String(getHandle()); }
+    bool writeValue(uint8_t *data, size_t length, bool response = false)
+    {
+        (void)response;
+        m_valor = String((const char *)data, (unsigned)length);
+        return true;
+    }
+    bool writeValue(String newValue, bool response = false) { return writeValue((uint8_t *)newValue.c_str(), newValue.length(), response); }
+    bool writeValue(uint8_t newValue, bool response = false) { return writeValue(&newValue, 1, response); }
+    void setAuth(uint8_t auth) { (void)auth; }
+
+private:
+    BLERemoteCharacteristic *m_dona;
+    BLEUUID m_uuid;
+    String m_valor = String("\0\0", 2);
+};
+
+inline BLERemoteDescriptor *BLERemoteCharacteristic::getDescriptor(BLEUUID uuid)
+{
+    if (!uuid.equals(BLEUUID((uint16_t)0x2902)) || !(canNotify() || canIndicate())) return nullptr;
+    if (!cccd) cccd = new BLERemoteDescriptor(this, uuid);
+    return cccd;
+}
 
 class BLERemoteService : public CsObjeto {
 public:
@@ -370,8 +523,56 @@ public:
     int getRSSI() { return (int)cs_obj_i(cs_nome, "getRSSI"); }
     int8_t getTXPower() { return (int8_t)cs_obj_i(cs_nome, "getTXPower"); }
     uint16_t getAppearance() { return (uint16_t)cs_obj_i(cs_nome, "getAppearance"); }
-    String getManufacturerData() { return cs_obj_t(cs_nome, "getManufacturerData"); }
-    String getServiceData() { return cs_obj_t(cs_nome, "getServiceData"); }
+    String getManufacturerData() { return cs_ble_de_hex(cs_obj_t(cs_nome, "__fabricante_hex")); }
+    String getServiceData() { return cs_ble_de_hex(cs_obj_t(cs_nome, "__servico_hex")); }
+    BLEUUID getServiceDataUUID() { return BLEUUID(cs_obj_t(cs_nome, "__servico_uuid")); }
+    int getServiceDataCount() { return haveServiceData() ? 1 : 0; }
+    /* O anuncio como chegou no ar (as estruturas tamanho/tipo/dados): os flags,
+     * o nome, os servicos, o dado de servico e o do fabricante. */
+    uint8_t *getPayload()
+    {
+        carga = "";
+        auto ad = [&](uint8_t tipo, const String &dados) {
+            carga += (char)(dados.length() + 1);
+            carga += (char)tipo;
+            carga += dados;
+        };
+        ad(0x01, String((char)0x06));
+        if (haveName()) ad(0x09, getName());
+        for (int i = 0; i < getServiceUUIDCount(); i++) {
+            BLEUUID u = BLEUUID(cs_ble_texto(cs_obj_t(cs_nome, "getServiceUUID", i)));
+            const cs_uuid_nativo *n = u.getNative();
+            String b;
+            if (u.bitSize() == 16) {
+                b += (char)(n->uuid.uuid16 & 0xFF);
+                b += (char)(n->uuid.uuid16 >> 8);
+                ad(0x03, b);
+            } else {
+                for (int k = 0; k < 16; k++) b += (char)n->uuid.uuid128[k];
+                ad(0x07, b);
+            }
+        }
+        if (haveServiceData()) {
+            const cs_uuid_nativo *n = getServiceDataUUID().getNative();
+            String b;
+            b += (char)(n->uuid.uuid16 & 0xFF);
+            b += (char)(n->uuid.uuid16 >> 8);
+            b += getServiceData();
+            ad(0x16, b);
+        }
+        if (haveManufacturerData()) ad(0xFF, getManufacturerData());
+        return (uint8_t *)carga.c_str();
+    }
+    size_t getPayloadLength()
+    {
+        if (!carga.length()) getPayload();
+        return carga.length();
+    }
+
+private:
+    String carga;
+
+public:
     BLEUUID getServiceUUID() { return BLEUUID(cs_ble_texto(cs_obj_t(cs_nome, "getServiceUUID"))); }
     int getServiceUUIDCount() { return (int)cs_obj_i(cs_nome, "getServiceUUIDCount"); }
     bool haveName() { return cs_obj_i(cs_nome, "haveName") != 0; }
@@ -477,6 +678,10 @@ public:
     static String toString() { return cs_obj_t(nullptr, "BLEDevice::toString"); }
 };
 
+/* A potencia (esp_power_level_t) e as permissoes (ESP_GATT_PERM_*): as do IDF. */
+#if defined(ESP32) && !CONFIG_IDF_TARGET_ESP32S2
+#include "esp_bt.h"
+#else
 #define ESP_PWR_LVL_N12 0
 #define ESP_PWR_LVL_N9 1
 #define ESP_PWR_LVL_N6 2
@@ -485,8 +690,13 @@ public:
 #define ESP_PWR_LVL_P3 5
 #define ESP_PWR_LVL_P6 6
 #define ESP_PWR_LVL_P9 7
+#endif
+#if __has_include("esp_gatt_defs.h")
+#include "esp_gatt_defs.h"
+#else
 #define ESP_GATT_PERM_READ (1 << 0)
 #define ESP_GATT_PERM_WRITE (1 << 4)
+#endif
 
 /* ---- os despachantes: o metodo que o simulador chamou, no objeto do sketch ---- */
 inline String cs_ble_arg(int n, const cs_val *a, int i)

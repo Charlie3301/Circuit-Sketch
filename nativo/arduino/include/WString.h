@@ -182,5 +182,8 @@ inline StringSumHelper operator+(const char *lhs, const String &rhs)
     return s;
 }
 
+/* A String vazia que o core da ESP32 empresta (o WebServer, os middlewares). */
+extern const String emptyString;
+
 #endif
 #endif

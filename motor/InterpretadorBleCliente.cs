@@ -32,6 +32,13 @@ public partial class Interpretador
         public string Nome, Endereco;
         public int Rssi;
         public List<string> Uuids = [];
+        public string FabricanteHex = "", ServicoUuid = "", ServicoHex = "";
+    }
+
+    /// <summary>Os bytes que um BLEAdvertisementData leva (o fabricante e o dado de servico, em hexadecimal).</summary>
+    sealed class DadosDoAnuncioBle
+    {
+        public string FabricanteHex = "", ServicoUuid = "", ServicoHex = "";
     }
 
     sealed class EstadoClienteBle
@@ -105,6 +112,9 @@ public partial class Interpretador
             Nome = radio.Nome ?? "",
             Endereco = radio.Endereco,
             Rssi = radio.Rssi,
+            FabricanteHex = radio.FabricanteHex,
+            ServicoUuid = radio.ServicoUuid,
+            ServicoHex = radio.ServicoHex,
         };
         visto.Uuids.AddRange(radio.UuidsAnunciados);
         return new Objeto("BLEAdvertisedDevice") { Rede = visto };
@@ -272,6 +282,10 @@ public partial class Interpretador
     }
 
     /// <summary>O toString() do BLEAdvertisedDevice, na ordem do BLEAdvertisedDevice.cpp.</summary>
+    /// <summary>Os bytes (em hexadecimal) como o texto do sketch interpretado: um caractere por byte.</summary>
+    static string Latin1DoHex(string hex)
+        => string.Concat(Convert.FromHexString(hex ?? "").Select(b => (char)b));
+
     string TextoDoAnuncio(AnuncioVisto v)
     {
         var texto = new System.Text.StringBuilder($"Name: {v.Nome}, Address: {v.Endereco}");
@@ -303,8 +317,16 @@ public partial class Interpretador
             case "haveTXPower": return Valor.DeBool(v.Radio is { NimBle: false, ArduinoBle: false });
             case "getTXPower": return Valor.DeInt(3);
             case "isConnectable": case "isScannable": case "isLegacyAdvertisement": return Valor.DeBool(true);
-            case "haveManufacturerData": case "haveServiceData": case "haveAppearance": return Valor.DeBool(false);
-            case "getManufacturerData": case "getServiceData": return Valor.DeTexto("");
+            case "haveManufacturerData": return Valor.DeBool(v.FabricanteHex.Length > 0);
+            case "haveServiceData": return Valor.DeBool(v.ServicoHex.Length > 0);
+            case "haveAppearance": return Valor.DeBool(false);
+            case "getManufacturerData": return Valor.DeTexto(Latin1DoHex(v.FabricanteHex));
+            case "getServiceData": return Valor.DeTexto(Latin1DoHex(v.ServicoHex));
+            case "getServiceDataUUID": return Valor.DeReferencia(new Objeto("BLEUUID") { Texto = v.ServicoUuid });
+            // Para o C++ compilado: os bytes em hexadecimal.
+            case "__fabricante_hex": return Valor.DeTexto(v.FabricanteHex);
+            case "__servico_hex": return Valor.DeTexto(v.ServicoHex);
+            case "__servico_uuid": return Valor.DeTexto(v.ServicoUuid);
             case "getAppearance": return Valor.DeInt(0);
             case "getAddressType": return Valor.DeInt(0);
             case "toString": return Valor.DeTexto(TextoDoAnuncio(v));

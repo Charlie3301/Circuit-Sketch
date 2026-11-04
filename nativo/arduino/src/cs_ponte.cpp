@@ -495,6 +495,10 @@ extern "C" BOOL WINAPI cs_entrada_da_dll(HINSTANCE h, DWORD razao, LPVOID reserv
         instancia = h;
         return TRUE;
     }
+    /* O programa esta fechando (com a placa ainda carregada): as outras threads ja
+     * morreram, e o destrutor de uma global que espera uma tarefa nao volta nunca
+     * -- e nessa hora nem o Gerenciador de Tarefas mata o processo. */
+    if (razao == DLL_PROCESS_DETACH && reservado) return TRUE;
     if (razao == DLL_PROCESS_DETACH && construido) {
         cs_p = nullptr;
         return DllMainCRTStartup(h, razao, reservado);

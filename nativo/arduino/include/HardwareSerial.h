@@ -9,6 +9,17 @@
 #include <inttypes.h>
 #include "Stream.h"
 
+/* A tarefa dos eventos da serial (o onReceive, o USB): o tamanho e a prioridade do core. */
+#ifndef ARDUINO_SERIAL_EVENT_TASK_STACK_SIZE
+#define ARDUINO_SERIAL_EVENT_TASK_STACK_SIZE 2048
+#endif
+#ifndef ARDUINO_SERIAL_EVENT_TASK_PRIORITY
+#define ARDUINO_SERIAL_EVENT_TASK_PRIORITY (configMAX_PRIORITIES - 1)
+#endif
+#ifndef ARDUINO_SERIAL_EVENT_TASK_RUNNING_CORE
+#define ARDUINO_SERIAL_EVENT_TASK_RUNNING_CORE -1
+#endif
+
 #define SERIAL_5N1 0x00
 #define SERIAL_6N1 0x02
 #define SERIAL_7N1 0x04

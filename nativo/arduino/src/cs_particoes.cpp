@@ -355,4 +355,18 @@ String EspClass::getSketchMD5()
     return guardado;
 }
 
+/* A imagem do app na particao (o FirmwareMSC mostra o firmware.bin): no
+ * simulador o sketch e o do editor, e a imagem confere sempre. */
+#include "esp_image_format.h"
+extern "C" esp_err_t esp_image_verify(esp_image_load_mode_t mode, const esp_partition_pos_t *part, esp_image_metadata_t *data)
+{
+    (void)mode;
+    if (!part || !data) return ESP_ERR_INVALID_ARG;
+    memset(data, 0, sizeof(*data));
+    data->start_addr = part->offset;
+    data->image_len = ESP.getSketchSize();
+    data->image.magic = 0xE9;
+    return ESP_OK;
+}
+
 #endif

@@ -517,3 +517,5 @@ double String::toDouble(void) const
 {
     return buffer ? atof(buffer) : 0;
 }
+
+const String emptyString;

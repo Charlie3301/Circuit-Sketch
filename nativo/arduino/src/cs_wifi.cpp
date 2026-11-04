@@ -265,10 +265,19 @@ uint8_t NetworkInterface::calculateSubnetCIDR(IPAddress subnetMask)
 }
 
 static bool ehAp(Network_Interface_ID id) { return id == ESP_NETIF_ID_AP; }
+static bool ehEth(Network_Interface_ID id) { return id >= ESP_NETIF_ID_ETH0 && id <= ESP_NETIF_ID_ETH2; }
+static bool ehPpp(Network_Interface_ID id) { return id == ESP_NETIF_ID_PPP; }
+bool cs_eth_iniciada();
+bool cs_eth_conectada();
+IPAddress cs_eth_ip();
+IPAddress cs_eth_roteador();
+String cs_eth_mac();
+bool cs_eth_config(IPAddress ip);
 
 bool NetworkInterface::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1, IPAddress dns2, IPAddress dns3)
 {
     (void)dns3;
+    if (ehEth(_interface_id)) return cs_eth_config(local_ip);
     if (ehAp(_interface_id)) return WiFi.softAPConfig(local_ip, gateway, subnet);
     return WiFi.config(local_ip, gateway, subnet, dns1, dns2);
 }
@@ -279,18 +288,31 @@ bool NetworkInterface::dnsIP(uint8_t dns_no, IPAddress ip)
 }
 const char *NetworkInterface::getHostname() const { return WiFi.getHostname(); }
 bool NetworkInterface::setHostname(const char *hostname) const { return WiFi.setHostname(hostname); }
-bool NetworkInterface::started() const { return ehAp(_interface_id) ? rede.apLigado : rede.staLigado; }
-bool NetworkInterface::connected() const { return ehAp(_interface_id) ? rede.apLigado : WiFi.isConnected(); }
+bool NetworkInterface::started() const { return ehPpp(_interface_id) ? false : ehEth(_interface_id) ? cs_eth_iniciada() : ehAp(_interface_id) ? rede.apLigado : rede.staLigado; }
+bool NetworkInterface::connected() const { return ehPpp(_interface_id) ? false : ehEth(_interface_id) ? cs_eth_conectada() : ehAp(_interface_id) ? rede.apLigado : WiFi.isConnected(); }
 bool NetworkInterface::hasIP() const { return connected(); }
-const char *NetworkInterface::ifkey() const { return ehAp(_interface_id) ? "WIFI_AP_DEF" : "WIFI_STA_DEF"; }
-const char *NetworkInterface::desc() const { return ehAp(_interface_id) ? "ap" : "sta"; }
-String NetworkInterface::impl_name() const { return ehAp(_interface_id) ? "ap" : "st"; }
-uint8_t *NetworkInterface::macAddress(uint8_t *mac) const { return ehAp(_interface_id) ? WiFi.softAPmacAddress(mac) : WiFi.macAddress(mac); }
-String NetworkInterface::macAddress() const { return ehAp(_interface_id) ? WiFi.softAPmacAddress() : WiFi.macAddress(); }
-IPAddress NetworkInterface::localIP() const { return ehAp(_interface_id) ? WiFi.softAPIP() : WiFi.localIP(); }
-IPAddress NetworkInterface::subnetMask() const { return ehAp(_interface_id) ? WiFi.softAPSubnetMask() : WiFi.subnetMask(); }
-IPAddress NetworkInterface::gatewayIP() const { return ehAp(_interface_id) ? WiFi.softAPIP() : WiFi.gatewayIP(); }
-IPAddress NetworkInterface::dnsIP(uint8_t dns_no) const { return ehAp(_interface_id) ? WiFi.softAPIP() : WiFi.dnsIP(dns_no); }
+const char *NetworkInterface::ifkey() const { return ehEth(_interface_id) ? "ETH_DEF" : ehAp(_interface_id) ? "WIFI_AP_DEF" : "WIFI_STA_DEF"; }
+const char *NetworkInterface::desc() const { return ehEth(_interface_id) ? "eth" : ehAp(_interface_id) ? "ap" : "sta"; }
+String NetworkInterface::impl_name() const { return ehEth(_interface_id) ? "en" : ehAp(_interface_id) ? "ap" : "st"; }
+uint8_t *NetworkInterface::macAddress(uint8_t *mac) const
+{
+    if (ehEth(_interface_id)) {
+        unsigned b[6] = {};
+        sscanf(cs_eth_mac().c_str(), "%x:%x:%x:%x:%x:%x", &b[0], &b[1], &b[2], &b[3], &b[4], &b[5]);
+        for (int i = 0; i < 6; i++) mac[i] = (uint8_t)b[i];
+        return mac;
+    }
+    return ehAp(_interface_id) ? WiFi.softAPmacAddress(mac) : WiFi.macAddress(mac);
+}
+String NetworkInterface::macAddress() const { return ehEth(_interface_id) ? cs_eth_mac() : ehAp(_interface_id) ? WiFi.softAPmacAddress() : WiFi.macAddress(); }
+IPAddress NetworkInterface::localIP() const { return ehPpp(_interface_id) ? IPAddress() : ehEth(_interface_id) ? cs_eth_ip() : ehAp(_interface_id) ? WiFi.softAPIP() : WiFi.localIP(); }
+IPAddress NetworkInterface::subnetMask() const
+{
+    if (ehEth(_interface_id)) return cs_eth_conectada() ? IPAddress(255, 255, 255, 0) : IPAddress();
+    return ehAp(_interface_id) ? WiFi.softAPSubnetMask() : WiFi.subnetMask();
+}
+IPAddress NetworkInterface::gatewayIP() const { return ehEth(_interface_id) ? cs_eth_roteador() : ehAp(_interface_id) ? WiFi.softAPIP() : WiFi.gatewayIP(); }
+IPAddress NetworkInterface::dnsIP(uint8_t dns_no) const { return ehEth(_interface_id) ? cs_eth_roteador() : ehAp(_interface_id) ? WiFi.softAPIP() : WiFi.dnsIP(dns_no); }
 IPAddress NetworkInterface::broadcastIP() const { return calculateBroadcast(localIP(), subnetMask()); }
 IPAddress NetworkInterface::networkID() const { return calculateNetworkID(localIP(), subnetMask()); }
 uint8_t NetworkInterface::subnetCIDR() const { return calculateSubnetCIDR(subnetMask()); }
@@ -623,10 +645,82 @@ void WiFiClass::printDiag(Print &dest)
  * sem WiFi no chip (o ESP32-H2): o Network existe (a Thread, a Ethernet e o
  * PPP usam), mas nao ha interface ligada. */
 #include "Network.h"
+#include "cs_objeto.h"
 
 NetworkManager Network;
 
 static char cs_nome_do_host[33] = "esp32h2";
+
+bool cs_eth_iniciada();
+bool cs_eth_conectada();
+IPAddress cs_eth_ip();
+IPAddress cs_eth_roteador();
+String cs_eth_mac();
+bool cs_eth_config(IPAddress ip);
+
+IPAddress NetworkInterface::calculateNetworkID(IPAddress ip, IPAddress subnet) { return IPAddress((uint32_t)ip & (uint32_t)subnet); }
+IPAddress NetworkInterface::calculateBroadcast(IPAddress ip, IPAddress subnet)
+{
+    return IPAddress((uint32_t)ip | ~(uint32_t)subnet);
+}
+uint8_t NetworkInterface::calculateSubnetCIDR(IPAddress subnetMask)
+{
+    uint8_t n = 0;
+    for (uint32_t m = (uint32_t)subnetMask; m; m >>= 1) n += m & 1;
+    return n;
+}
+bool NetworkInterface::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1, IPAddress dns2, IPAddress dns3)
+{
+    (void)gateway;
+    (void)subnet;
+    (void)dns1;
+    (void)dns2;
+    (void)dns3;
+    return cs_eth_config(local_ip);
+}
+bool NetworkInterface::dnsIP(uint8_t dns_no, IPAddress ip)
+{
+    (void)dns_no;
+    (void)ip;
+    return true;
+}
+const char *NetworkInterface::getHostname() const { return NetworkManager::getHostname(); }
+bool NetworkInterface::setHostname(const char *hostname) const { return NetworkManager::setHostname(hostname); }
+bool NetworkInterface::started() const { return cs_eth_iniciada(); }
+bool NetworkInterface::connected() const { return cs_eth_conectada(); }
+bool NetworkInterface::hasIP() const { return connected(); }
+const char *NetworkInterface::ifkey() const { return "ETH_DEF"; }
+const char *NetworkInterface::desc() const { return "eth"; }
+String NetworkInterface::impl_name() const { return "en"; }
+uint8_t *NetworkInterface::macAddress(uint8_t *mac) const
+{
+    unsigned b[6] = {};
+    sscanf(cs_eth_mac().c_str(), "%x:%x:%x:%x:%x:%x", &b[0], &b[1], &b[2], &b[3], &b[4], &b[5]);
+    for (int i = 0; i < 6; i++) mac[i] = (uint8_t)b[i];
+    return mac;
+}
+String NetworkInterface::macAddress() const { return cs_eth_mac(); }
+IPAddress NetworkInterface::localIP() const { return cs_eth_ip(); }
+IPAddress NetworkInterface::subnetMask() const { return connected() ? IPAddress(255, 255, 255, 0) : IPAddress(); }
+IPAddress NetworkInterface::gatewayIP() const { return cs_eth_roteador(); }
+IPAddress NetworkInterface::dnsIP(uint8_t dns_no) const
+{
+    (void)dns_no;
+    return cs_eth_roteador();
+}
+IPAddress NetworkInterface::broadcastIP() const { return calculateBroadcast(localIP(), subnetMask()); }
+IPAddress NetworkInterface::networkID() const { return calculateNetworkID(localIP(), subnetMask()); }
+uint8_t NetworkInterface::subnetCIDR() const { return calculateSubnetCIDR(subnetMask()); }
+int NetworkInterface::getStatusBits() const { return Network.getStatusBits(); }
+int NetworkInterface::waitStatusBits(int bits, uint32_t timeout_ms) const { return Network.waitStatusBits(bits, timeout_ms); }
+size_t NetworkInterface::printTo(Print &out) const
+{
+    size_t n = out.printf("%s: <%s%s> ", desc(), started() ? "UP" : "DOWN", connected() ? ",CONNECTED" : "");
+    n += out.printf("ether %s", macAddress().c_str());
+    n += out.println();
+    n += printDriverInfo(out);
+    return n;
+}
 
 bool NetworkManager::begin()
 {
@@ -637,9 +731,9 @@ bool NetworkManager::begin()
 }
 int NetworkManager::hostByName(const char *aHostname, IPAddress &aResult)
 {
-    (void)aHostname;
-    (void)aResult;
-    return 0;
+    String ip = cs_obj_t(nullptr, "__dns", aHostname ? aHostname : "");
+    if (!ip.length()) return 0;
+    return aResult.fromString(ip) ? 1 : 0;
 }
 uint8_t *NetworkManager::macAddress(uint8_t *mac)
 {
@@ -661,7 +755,7 @@ bool NetworkManager::setDefaultInterface(NetworkInterface &ifc)
     return false;
 }
 NetworkInterface *NetworkManager::getDefaultInterface() { return nullptr; }
-bool NetworkManager::isOnline() { return false; }
+bool NetworkManager::isOnline() { return cs_eth_conectada(); }
 size_t NetworkManager::printTo(Print &out) const { return out.printf("Network: hostname %s\n", getHostname()); }
 const char *NetworkManager::getHostname() { return cs_nome_do_host; }
 bool NetworkManager::setHostname(const char *hostname)

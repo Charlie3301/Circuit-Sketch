@@ -112,7 +112,7 @@ public static class CompiladorNativo
     /// ESP-IDF -- "SD_MMC.h", "soc/gpio_reg.h" -- e nao e biblioteca que falta.)
     /// </summary>
     public static bool TemNoCore(string nome)
-        => Disponivel && DoCore().Contains((nome ?? "").Trim().Replace('\\', '/'));
+        => Disponivel && (DaLinguagem.Contains((nome ?? "").Trim()) || DoCore().Contains((nome ?? "").Trim().Replace('\\', '/')));
 
     /// <summary>Os cabecalhos que o core nativo tem (Arduino.h, Wire.h, SPI.h...).</summary>
     static HashSet<string> DoCore()
@@ -129,6 +129,14 @@ public static class CompiladorNativo
             foreach (string pastaDoIdf in Directory.EnumerateDirectories(idf))
                 foreach (string f in Directory.EnumerateFiles(pastaDoIdf, "*", SearchOption.AllDirectories))
                     conjunto.Add(Path.GetRelativePath(pastaDoIdf, f).Replace('\\', '/'));
+        // Os do mbedTLS ("mbedtls/md.h", "psa/crypto.h"), os do TinyUSB ("tusb.h", "class/hid/hid.h") e os das pilhas sob demanda.
+        foreach (string outra in new[] { "mbedtls", "tinyusb" }.Concat(PilhasSobDemanda.Select(p => p.Pasta)))
+        {
+            string pastaDela = Path.Combine(AcharPasta() ?? "", outra, "include");
+            if (Directory.Exists(pastaDela))
+                foreach (string f in Directory.EnumerateFiles(pastaDela, "*", SearchOption.AllDirectories))
+                    conjunto.Add(Path.GetRelativePath(pastaDela, f).Replace('\\', '/'));
+        }
         return doCore = conjunto;
     }
 
@@ -139,6 +147,8 @@ public static class CompiladorNativo
         "stdio.h", "stdlib.h", "string.h", "strings.h", "math.h", "stdint.h", "stdbool.h", "ctype.h", "limits.h", "float.h",
         "stddef.h", "stdarg.h", "assert.h", "time.h", "errno.h", "inttypes.h", "setjmp.h", "locale.h", "wchar.h",
         "wctype.h", "iso646.h", "fenv.h", "complex.h", "tgmath.h", "stdalign.h", "stdnoreturn.h", "uchar.h",
+        // O POSIX que os programas do IDF incluem (o compilador traz ou o core tem).
+        "unistd.h", "sys/types.h", "sys/time.h", "sys/stat.h",
     };
 
     /// <summary>
@@ -268,6 +278,8 @@ public static class CompiladorNativo
         // como esta (src/arduino-esp32, com .c), em subpastas -- esse so nas
         // placas ESP32.
         string doCoreDaEsp32 = Path.Combine(src, "arduino-esp32") + Path.DirectorySeparatorChar;
+        // O mbedTLS das placas ESP32 ve a configuracao do IDF (o MBEDTLS_CONFIG_FILE, como no IDF).
+        string[] definicoes = idf.Count > 0 ? [ConfiguracaoDoMbedtls] : [];
         var fontesDoCore = Directory.EnumerateFiles(src, "*.*", SearchOption.AllDirectories)
             .Where(f => f.EndsWith(".cpp", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".c", StringComparison.OrdinalIgnoreCase))
             .Where(f => idf.Count > 0 || !f.StartsWith(doCoreDaEsp32, StringComparison.OrdinalIgnoreCase))
@@ -285,11 +297,22 @@ public static class CompiladorNativo
             Directory.CreateDirectory(pastaDoCore);
             File.WriteAllText(Path.Combine(pastaDoCore, "cs_placa.h"), cabecalho);
             var erros = CompilarVarios(zig, fontesDoCore.Select(f => (f, ObjetoDoCore(f), !f.EndsWith(".c", StringComparison.OrdinalIgnoreCase))),
-                                       [pastaDoCore, inc, src, .. idf]);
+                                       [pastaDoCore, inc, src, .. idf], definicoes: definicoes);
             if (erros.Count > 0) throw new ErroDeExecucao("o core nativo do Arduino nao compilou: " + string.Join("\n", erros.Take(8)), 0);
             File.WriteAllText(pronto, "");
         }
         var objetosDoCore = fontesDoCore.Select(ObjetoDoCore).ToList();
+        string mbedtls = idf.Count > 0 ? BibliotecaMbedtls(pasta, zig, cabecalho, inc, idf, avisar) : null;
+
+        // As pilhas grandes (OpenThread, Zigbee): so quem usa paga por elas.
+        var textoDoProjeto = new[] { projeto.Sketch ?? "" }.Concat((projeto.Arquivos ?? new Dictionary<string, string>()).Values.Select(v => v ?? "")).ToList();
+        var pilhas = new List<string>();
+        foreach (var pilha in PilhasSobDemanda)
+        {
+            if (idf.Count == 0 || !pilha.Chips.Contains(Path.GetFileName(idf[0])) || !textoDoProjeto.Any(pilha.Usa.IsMatch)) continue;
+            pilhas.Add(BibliotecaDaPilha(pilha, pasta, zig, cabecalho, inc, idf, definicoes, avisar));
+            definicoes = [.. definicoes, .. pilha.Publicas];
+        }
 
         // ---- o projeto ----
         var abas = new Dictionary<string, string>(projeto.Arquivos ?? new Dictionary<string, string>(), StringComparer.OrdinalIgnoreCase);
@@ -327,7 +350,7 @@ public static class CompiladorNativo
         }
 
         string impressao = Impressao(
-            [impressaoDoCore, ComDepuracao, .. unidades.Select(u => u.Nome + "\0" + u.Texto),
+            [impressaoDoCore, ComDepuracao, .. pilhas, .. unidades.Select(u => u.Nome + "\0" + u.Texto),
              .. abas.Select(a => a.Key + "\0" + a.Value),
              .. fontesDasLibs.Select(f => f + File.GetLastWriteTimeUtc(f).Ticks),
              .. usadas.SelectMany(l => l.Arquivos.Select(a => Path.Combine(l.Pasta, a))).Where(File.Exists)
@@ -364,7 +387,7 @@ public static class CompiladorNativo
             // A pasta do projeto entra DEPOIS do core e das bibliotecas: o
             // #include "x.h" acha a aba primeiro (a pasta de quem inclui), e o
             // <x.h> acha o do core, como no Arduino.
-            var erros = CompilarVarios(zig, tarefas, [.. incDasLibs, inc, .. idf], depurar: true, depois: [trabalho]);
+            var erros = CompilarVarios(zig, tarefas, [.. incDasLibs, inc, .. idf], depurar: true, depois: [trabalho], definicoes: definicoes);
             if (erros.Count > 0) throw ErroDoCompilador(erros, abas);
 
             // A DLL: o ponto de entrada e o da ponte, que adia os construtores
@@ -375,6 +398,9 @@ public static class CompiladorNativo
                                            "-Wl,--entry=cs_entrada_da_dll" };
             ligar.AddRange(tarefas.Select(t => t.Objeto));
             ligar.AddRange(objetosDoCore);
+            ligar.AddRange(pilhas);
+            // O x509 do mbedTLS no Windows le o IP do certificado com o inet_pton (ws2_32).
+            if (mbedtls is not null) ligar.AddRange([mbedtls, "-lws2_32"]);
             var (codigo, saida) = Rodar(zig, ligar, trabalho);
             if (codigo != 0) throw ErroDoLigador(saida);
 
@@ -397,9 +423,102 @@ public static class CompiladorNativo
     /// </summary>
     const string ComDepuracao = "depuracao 2: -O0 -gcodeview -fno-omit-frame-pointer -fno-sanitize=all";
 
-    static List<string> CompilarVarios(string zig, IEnumerable<(string Fonte, string Objeto, bool Cpp)> tarefas, IEnumerable<string> inclusoes,
-                                       bool depurar = false, IEnumerable<string> depois = null)
+    /// <summary>O arquivo de configuracao do mbedTLS (o do IDF, sem o hardware do chip: include/cs_mbedtls_config.h).</summary>
+    const string ConfiguracaoDoMbedtls = "-DMBEDTLS_CONFIG_FILE=\"cs_mbedtls_config.h\"";
+
+    /// <summary>
+    /// O mbedTLS de verdade (nativo/mbedtls, o do ESP-IDF), compilado uma vez
+    /// por chip num libmbedtls.a: o ligador so tira dele o que o sketch (ou o
+    /// core) usa -- o sketch que nao usa nem fica maior.
+    /// </summary>
+    static string BibliotecaMbedtls(string pasta, string zig, string cabecalho, string inc, List<string> idf, Action<string> avisar)
     {
+        string library = Path.Combine(pasta, "mbedtls", "library");
+        if (!Directory.Exists(library)) return null;
+        var fontes = Directory.GetFiles(library, "*.c").Order(StringComparer.Ordinal).ToList();
+        string chip = Path.GetFileName(idf[0]);
+        string impressao = Impressao(
+            [VersaoDoZig(zig), PadraoC, string.Join(" ", PermissivosC), ConfiguracaoDoMbedtls, chip, ImpressaoDoIdf(idf),
+             File.ReadAllText(Path.Combine(inc, "cs_mbedtls_config.h")),
+             .. Directory.GetFiles(library).Order(StringComparer.Ordinal).Select(f => f + ":" + new FileInfo(f).Length)]);
+        string destino = Path.Combine(Cache(), "mbedtls-" + impressao[..16]);
+        string arquivo = Path.Combine(destino, "libmbedtls.a");
+        if (File.Exists(arquivo)) return arquivo;
+
+        avisar?.Invoke("compilando o mbedTLS desta placa (so na primeira vez)…");
+        Directory.CreateDirectory(destino);
+        // So o chip (o sdkconfig.h escolhe a configuracao pelo CONFIG_IDF_TARGET): o
+        // resto do cs_placa.h (o INPUT, o OUTPUT...) bate com o windows.h que o
+        // mbedTLS inclui no Windows.
+        File.WriteAllText(Path.Combine(destino, "cs_placa.h"),
+                          "#pragma once\n#define ESP32 1\n" + Regex.Match(cabecalho, @"#define CONFIG_IDF_TARGET_ESP32\w* 1").Value + "\n");
+        var objetos = fontes.Select(f => Path.Combine(destino, Path.GetFileNameWithoutExtension(f) + ".o")).ToList();
+        var erros = CompilarVarios(zig, fontes.Select((f, i) => (f, objetos[i], false)), [destino, inc, library, .. idf],
+                                   definicoes: [ConfiguracaoDoMbedtls]);
+        if (erros.Count > 0) throw new ErroDeExecucao("o mbedTLS nao compilou: " + string.Join("\n", erros.Take(8)), 0);
+        var (codigo, saida) = Rodar(zig, ["ar", "rcs", arquivo, .. objetos], destino);
+        if (codigo != 0) throw new ErroDeExecucao("o mbedTLS nao virou biblioteca: " + saida, 0);
+        return arquivo;
+    }
+
+    /// <summary>
+    /// Uma pilha que vem com a placa e pesa demais para todo sketch compilar:
+    /// os cabecalhos (Pasta/include) valem sempre, e o codigo (Pasta/src) vira
+    /// um arquivo .a na primeira vez que um sketch do chip a usa.
+    /// </summary>
+    sealed record PilhaSobDemanda(string Pasta, Regex Usa, string[] Chips, string[] Publicas, string[] Privadas, string[] Inclusoes);
+
+    static readonly PilhaSobDemanda[] PilhasSobDemanda =
+    [
+        // As definicoes sao as do components/openthread/CMakeLists.txt do IDF.
+        new("openthread", new Regex(@"\b(OThread\w*|OpenThread|esp_openthread\w*|OpenThreadCLI)\b|openthread/", RegexOptions.Compiled),
+            ["esp32c6", "esp32h2"],
+            ["-DOPENTHREAD_FTD=1", "-DOPENTHREAD_CONFIG_FILE=\"openthread-core-esp32x-ftd-config.h\"",
+             "-DOPENTHREAD_PROJECT_LIB_CONFIG_FILE=\"openthread-core-esp32x-ftd-config.h\""],
+            ["-DOPENTHREAD_SETTINGS_RAM=1", "-DPACKAGE_VERSION=\"CircuitSketch\"", "-DOPENTHREAD_BUILD_DATETIME=\"\""],
+            ["src", "src/core", "src/include", "src/lib"]),
+        // A pilha de verdade (a ZBOSS) so existe para o chip: a API e a do simulador (src/cs_zigbee.cpp).
+        // Os dois modos do menu "Zigbee mode" do Arduino valem: quem escolhe o papel e o Zigbee.begin().
+        new("zigbee", new Regex(@"\b(Zigbee\w*|esp_zb_\w+|ZIGBEE_\w+)\b|esp_zigbee|zboss_api", RegexOptions.Compiled),
+            ["esp32", "esp32s2", "esp32s3", "esp32c3", "esp32c6", "esp32h2"],
+            ["-DZIGBEE_MODE_ED=1", "-DZIGBEE_MODE_ZCZR=1"], [], ["include/ep"]),
+    ];
+
+    static string BibliotecaDaPilha(PilhaSobDemanda pilha, string pasta, string zig, string cabecalho, string inc, List<string> idf,
+                                    string[] definicoes, Action<string> avisar)
+    {
+        string raiz = Path.Combine(pasta, pilha.Pasta);
+        string src = Path.Combine(raiz, "src");
+        var fontes = Directory.EnumerateFiles(src, "*.*", SearchOption.AllDirectories)
+            .Where(f => f.EndsWith(".cpp", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".c", StringComparison.OrdinalIgnoreCase))
+            .Order(StringComparer.Ordinal).ToList();
+        string impressao = Impressao(
+            [VersaoDoZig(zig), Padrao, PadraoC, string.Join(" ", Permissivos), string.Join(" ", PermissivosC), cabecalho, ImpressaoDoIdf(idf),
+             .. pilha.Publicas, .. pilha.Privadas,
+             .. Directory.GetFiles(inc, "*", SearchOption.AllDirectories).Order(StringComparer.Ordinal).Select(f => f + ":" + new FileInfo(f).Length + ":" + File.GetLastWriteTimeUtc(f).Ticks),
+             .. Directory.GetFiles(src, "*", SearchOption.AllDirectories).Order(StringComparer.Ordinal).Select(f => f + ":" + new FileInfo(f).Length + ":" + File.GetLastWriteTimeUtc(f).Ticks)]);
+        string destino = Path.Combine(Cache(), pilha.Pasta + "-" + impressao[..16]);
+        string arquivo = Path.Combine(destino, "lib" + pilha.Pasta + ".a");
+        if (File.Exists(arquivo)) return arquivo;
+
+        avisar?.Invoke($"compilando a pilha {pilha.Pasta} desta placa (so na primeira vez, pode levar alguns minutos)…");
+        Directory.CreateDirectory(destino);
+        File.WriteAllText(Path.Combine(destino, "cs_placa.h"), cabecalho);
+        // Os objetos pelo nome relativo: sao centenas, e a linha de comando do Windows tem limite.
+        var objetos = fontes.Select(f => Path.GetRelativePath(src, f).Replace('\\', '_').Replace('/', '_') + ".o").ToList();
+        var erros = CompilarVarios(zig, fontes.Select((f, i) => (f, Path.Combine(destino, objetos[i]), !f.EndsWith(".c", StringComparison.OrdinalIgnoreCase))),
+                                   [destino, inc, .. pilha.Inclusoes.Select(i => Path.Combine(raiz, i)), .. idf],
+                                   definicoes: [.. definicoes, .. pilha.Publicas, .. pilha.Privadas]);
+        if (erros.Count > 0) throw new ErroDeExecucao($"a pilha {pilha.Pasta} nao compilou: " + string.Join("\n", erros.Take(8)), 0);
+        var (codigo, saida) = Rodar(zig, ["ar", "rcs", Path.GetFileName(arquivo), .. objetos], destino);
+        if (codigo != 0) throw new ErroDeExecucao($"a pilha {pilha.Pasta} nao virou biblioteca: " + saida, 0);
+        return arquivo;
+    }
+
+    static List<string> CompilarVarios(string zig, IEnumerable<(string Fonte, string Objeto, bool Cpp)> tarefas, IEnumerable<string> inclusoes,
+                                       bool depurar = false, IEnumerable<string> depois = null, IEnumerable<string> definicoes = null)
+    {
+        var defs = (definicoes ?? []).ToList();
         var lista = tarefas.ToList();
         var incs = inclusoes.Where(Directory.Exists).Distinct().ToList();
         var incsDepois = (depois ?? []).Where(Directory.Exists).Distinct().ToList();
@@ -424,6 +543,7 @@ public static class CompiladorNativo
             if (cpp) args.Add("-x");
             if (cpp) args.Add("c++");
             args.AddRange(cpp ? Permissivos : PermissivosC);
+            args.AddRange(defs);
             foreach (string inc in incs) { args.Add("-I"); args.Add(inc); }
             foreach (string inc in incsDepois) { args.Add("-idirafter"); args.Add(inc); }
             args.Add(fonte);
@@ -776,7 +896,10 @@ public static class CompiladorNativo
         var chip = Regex.Match(cabecalho, @"#define CONFIG_IDF_TARGET_(ESP32\w*) 1");
         if (!chip.Success) return [];
         string raiz = Path.Combine(pasta, "idf");
-        return new[] { Path.Combine(raiz, chip.Groups[1].Value.ToLowerInvariant()), Path.Combine(raiz, "comum") }
+        // Depois dos do IDF, os do mbedTLS (nativo/mbedtls/include) e os do TinyUSB (nativo/tinyusb/include).
+        return new[] { Path.Combine(raiz, chip.Groups[1].Value.ToLowerInvariant()), Path.Combine(raiz, "comum"), Path.Combine(raiz, "proximos"),
+                       Path.Combine(pasta, "mbedtls", "include"), Path.Combine(pasta, "tinyusb", "include") }
+            .Concat(PilhasSobDemanda.Select(p => Path.Combine(pasta, p.Pasta, "include")))
             .Where(Directory.Exists).ToList();
     }
 

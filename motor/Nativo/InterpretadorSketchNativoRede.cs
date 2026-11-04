@@ -12,6 +12,9 @@ public partial class Interpretador
     /// numero que o sensor do chip daria.
     /// "__fita"(pino, bytes): os LEDs enderecaveis que o RMT mandou (3 bytes
     /// por LED, na ordem G R B), como a fita do Adafruit_NeoPixel.
+    /// "__usb"(tipo, protocolo, id, bytes em hexadecimal): o que o USB da
+    /// placa (o TinyUSB do core) mandou ao computador -- "conectou" (com as
+    /// interfaces no lugar dos bytes), "hid", "midi", "vendor" (motor/Usb.cs).
     /// </summary>
     Valor HalDoNativo(string nome, List<Valor> args)
     {
@@ -30,6 +33,48 @@ public partial class Interpretador
                 fita.Mostrar();
                 return Valor.Vazio;
             }
+            // O radio 802.15.4 do OpenThread (motor/Rede154.cs).
+            case "__154_ligar":
+                maq.Rede?.Ligar154(maq, args[0].Num != 0);
+                return Valor.Vazio;
+            case "__154_enviar":
+            {
+                if (args.Count < 2 || args[1].Referencia is not Valor[] quadro) return Valor.Vazio;
+                var dados = new byte[quadro.Length];
+                for (int i = 0; i < dados.Length; i++) dados[i] = (byte)((long)quadro[i].Num & 0xFF);
+                maq.Rede?.Enviar154(maq, (int)args[0].Num, dados);
+                return Valor.Vazio;
+            }
+            case "__154_receber":
+            {
+                if (args.Count < 1 || args[0].Referencia is not Valor[] destino) return Valor.DeInt(-1);
+                var pacote = maq.Rede?.Receber154(maq);
+                if (pacote is null) return Valor.DeInt(-1);
+                int n = Math.Min(pacote.Length, destino.Length);
+                for (int i = 0; i < n; i++) destino[i] = Valor.DeC(pacote[i], TipoC.UChar);
+                return Valor.DeInt(n);
+            }
+            // O RainMaker (src/cs_rainmaker.cpp): a nuvem e o aplicativo sao a bancada (motor/RainMaker.cs).
+            case "__rmaker_rede": return Valor.DeBool(maq.Rede?.NaRede(maq) ?? false);
+            case "__rmaker_conectou": maq.RainMaker.Conectou(); return Valor.Vazio;
+            case "__rmaker_relatar":
+                maq.RainMaker.Relatar(args[0].Texto ?? "", args[1].Texto ?? "", args[2].Texto ?? "");
+                return Valor.Vazio;
+            case "__rmaker_proxima": return Valor.DeTexto(maq.RainMaker.ProximaEscrita());
+            case "__rmaker_aviso": maq.RainMaker.Avisar(args[0].Texto ?? ""); return Valor.Vazio;
+            case "__usb":
+            {
+                string tipo = args[0].Texto, dados = args.Count > 3 ? args[3].Texto ?? "" : "";
+                byte[] Bytes() => Convert.FromHexString(dados);
+                switch (tipo)
+                {
+                    case "conectou": maq.Usb.Conectar(dados); break;
+                    case "hid": maq.Usb.RelatorioHid((int)args[1].Num, (int)args[2].Num, Bytes()); break;
+                    case "midi": maq.Usb.Midi(Bytes()); break;
+                    case "vendor": maq.Usb.Vendor(Bytes()); break;
+                }
+                return Valor.Vazio;
+            }
         }
         return Valor.Vazio;
     }
@@ -39,6 +84,9 @@ public partial class Interpretador
     /// -> quantas placas estao no AP desta; "__mdns"(nome) -> anuncia
     /// "nome.local" (vazio: para); "__mdns_servico"(servico, protocolo,
     /// porta); "__mdns_buscar"(servico, protocolo) -> "nome|ip|porta" por linha.
+    /// "__eth"(1 ou 0): liga ou desliga o cabo de rede (o ETH.begin/end);
+    /// "__eth_ip", "__eth_roteador", "__eth_mac" (o MAC da placa + 3, como no
+    /// esp_read_mac do ETH) e "__eth_config"(ip): o IP fixo do ETH.config().
     /// </summary>
     Valor NomesDoNativo(string nome, List<Valor> args)
     {
@@ -47,6 +95,21 @@ public partial class Interpretador
         {
             case "__dns": return Valor.DeTexto(rede?.ResolverNome(maq, args.Count > 0 ? args[0].Texto : "") ?? "");
             case "__wifi_estacoes": return Valor.DeInt(rede?.EstacoesNoAp(maq) ?? 0);
+            case "__eth":
+                if (args[0].Num != 0) rede?.LigarCabo(maq);
+                else rede?.DesligarCabo(maq);
+                return Valor.Vazio;
+            case "__eth_ip": return Valor.DeTexto(rede?.Wifi(maq).Ip ?? "0.0.0.0");
+            case "__eth_roteador": return Valor.DeTexto(Rede.Gateway);
+            case "__eth_mac":
+            {
+                var partes = (rede?.Wifi(maq).Mac ?? "00:00:00:00:00:00").Split(':');
+                partes[5] = ((Convert.ToInt32(partes[5], 16) + 3) & 0xFF).ToString("X2");
+                return Valor.DeTexto(string.Join(":", partes));
+            }
+            case "__eth_config":
+                if (rede is not null && args[0].Texto is { Length: > 0 } fixo && fixo != "0.0.0.0") rede.Wifi(maq).Ip = fixo;
+                return Valor.DeBool(rede is not null);
             case "__mdns":
                 if (rede is null) return Valor.DeBool(false);
                 if (args.Count > 0 && !string.IsNullOrWhiteSpace(args[0].Texto)) rede.AnunciarMdns(maq, args[0].Texto);

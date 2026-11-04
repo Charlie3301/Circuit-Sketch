@@ -90,8 +90,20 @@ struct EventGroupDef_t {
     EventBits_t bits = 0;
 };
 
-static std::vector<TaskHandle_t> tarefas;
-static std::vector<tmrTimerControl *> temporizadores;
+/* Criados no primeiro uso, nao como globais: uma global do sketch pode chamar o
+ * FreeRTOS no construtor (o semaforo do ZigbeeEP), antes dos construtores daqui. */
+static std::vector<TaskHandle_t> &listaDeTarefas()
+{
+    static auto *v = new std::vector<TaskHandle_t>();
+    return *v;
+}
+static std::vector<tmrTimerControl *> &listaDeTemporizadores()
+{
+    static auto *v = new std::vector<tmrTimerControl *>();
+    return *v;
+}
+#define tarefas listaDeTarefas()
+#define temporizadores listaDeTemporizadores()
 static TaskHandle_t atual;
 static TaskHandle_t principal;
 static TaskHandle_t servicoDosTemporizadores;

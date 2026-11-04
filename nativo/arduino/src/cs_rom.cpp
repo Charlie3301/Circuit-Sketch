@@ -161,4 +161,9 @@ extern "C" void esp_rom_md5_final(uint8_t *digest, md5_context_t *c)
 }
 
 #endif
+
+/* A saida da ROM (o ets_printf): quem escreve cada caractere. O USBCDC troca
+ * a da UART pela dele; no simulador o log ja vai para o monitor. */
+extern "C" void ets_install_putc1(void (*p)(char c)) { (void)p; }
+extern "C" void ets_install_putc2(void (*p)(char c)) { (void)p; }
 #endif

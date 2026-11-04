@@ -1,11 +1,29 @@
-/* WebServer.h -- o servidor web da ESP32 (e o ESP8266WebServer): o navegador
- * de verdade do computador abre as paginas pela rede do simulador, e cada
- * rota chama de volta a funcao do sketch. */
+/* WebServer.h -- o servidor web.
+ *
+ * Nas placas com o core da ESP32, o WebServer de verdade do arduino-esp32
+ * (arduino-esp32/WebServer.h): as rotas, o Uri/UriBraces/UriRegex/UriGlob,
+ * os RequestHandler, os middlewares, o serveStatic e o upload, sobre o TCP
+ * do simulador (o navegador do computador conecta na placa).
+ *
+ * Nas outras (o ESP8266WebServer), o do simulador abaixo: o navegador abre
+ * as paginas pela rede do simulador, e cada rota chama de volta a funcao do
+ * sketch. */
+#include "Arduino.h"
+#if defined(ESP32)
+#include "arduino-esp32/WebServer.h"
+#else
 #ifndef WEBSERVER_H
 #define WEBSERVER_H
 
 #include "cs_objeto.h"
 #include "WiFi.h"
+#include "Uri.h"
+#include <type_traits>
+
+/* O caminho guardado no Uri (o "/led/{}" do UriBraces), para a rota do simulador. */
+struct CsCaminhoDoUri : Uri {
+    static String de(const Uri &u) { return u.*(&CsCaminhoDoUri::_uri); }
+};
 
 typedef enum {
     HTTP_DELETE = 0,
@@ -38,6 +56,11 @@ public:
         (void)ufn;
         cs_obj_n(cs_nome, "on", uri, (int)method, fn);
     }
+    /* O UriBraces/UriRegex/UriGlob (o texto e o String acima). */
+    template <typename U, typename = typename std::enable_if<std::is_base_of<Uri, U>::value>::type>
+    void on(const U &uri, THandlerFunction fn) { on(CsCaminhoDoUri::de(uri), fn); }
+    template <typename U, typename = typename std::enable_if<std::is_base_of<Uri, U>::value>::type>
+    void on(const U &uri, HTTPMethod method, THandlerFunction fn) { on(CsCaminhoDoUri::de(uri), method, fn); }
     void onNotFound(THandlerFunction fn) { cs_obj_n(cs_nome, "onNotFound", fn); }
 
     String uri() { return cs_obj_t(cs_nome, "uri"); }
@@ -76,4 +99,5 @@ public:
     WiFiClient client() { return WiFiClient(nullptr); }
 };
 
+#endif
 #endif

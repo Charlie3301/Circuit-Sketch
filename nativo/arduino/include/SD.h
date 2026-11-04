@@ -3,6 +3,7 @@
 #ifndef __SD_H__
 #define __SD_H__
 
+#include <memory>
 #include "cs_objeto.h"
 #include "SPI.h"
 
@@ -89,6 +90,9 @@ public:
 namespace fs {
 typedef ::File File;
 enum SeekMode { SeekSet = 0, SeekCur = 1, SeekEnd = 2 };
+class FSImpl;
+typedef std::shared_ptr<FSImpl> FSImplPtr;
+
 class FS {
 protected:
     /* Quem guarda os arquivos: o cartao ("SD") ou a flash ("LittleFS",
@@ -116,6 +120,14 @@ public:
     bool mkdir(const String &path) { return mkdir(path.c_str()); }
     bool rmdir(const char *path) { return cs_obj_i(cs_alvo, "rmdir", path) != 0; }
     bool rmdir(const String &path) { return rmdir(path.c_str()); }
+    /* Onde o sistema de arquivos estaria montado na VFS da placa. */
+    const char *mountpoint()
+    {
+        if (!strcmp(cs_alvo, "LittleFS")) return "/littlefs";
+        if (!strcmp(cs_alvo, "SPIFFS")) return "/spiffs";
+        if (!strcmp(cs_alvo, "FFat")) return "/ffat";
+        return "/sd";
+    }
 };
 } // namespace fs
 using fs::FS;

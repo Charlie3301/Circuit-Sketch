@@ -37,6 +37,13 @@ public sealed class RadioBle
     public bool Anunciando { get; internal set; }
     public List<string> UuidsAnunciados { get; } = [];
 
+    /// <summary>Os dados do fabricante no anuncio (o iBeacon), em hexadecimal.</summary>
+    public string FabricanteHex { get; internal set; } = "";
+
+    /// <summary>Os dados de servico no anuncio (o Eddystone no FEAA): o UUID e os bytes em hexadecimal.</summary>
+    public string ServicoUuid { get; internal set; } = "";
+    public string ServicoHex { get; internal set; } = "";
+
     /// <summary>O advertiseOnDisconnect(): volta a anunciar sozinho quando o celular sai. De fabrica, nao.</summary>
     public bool ReanunciarAoDesconectar { get; internal set; }
 

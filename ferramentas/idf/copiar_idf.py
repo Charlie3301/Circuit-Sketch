@@ -27,10 +27,13 @@ import os
 import re
 import shutil
 import sys
+import time
 
 CHIPS = ['esp32', 'esp32s2', 'esp32s3', 'esp32c3', 'esp32c6', 'esp32h2']
 # A versao do sensor de toque de cada chip (SOC_TOUCH_SENSOR_VERSION).
 VERSAO_DO_TOQUE = {'esp32': 1, 'esp32s2': 2, 'esp32s3': 2}
+# O controlador Bluetooth da S3 e o da C3: o IDF usa o bt/include/esp32c3 nas duas.
+BT_DE_OUTRO_CHIP = {'esp32s3': 'esp32c3'}
 AQUI = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.normpath(os.path.join(AQUI, '..', '..'))
 DESTINO = os.path.join(REPO, 'nativo', 'idf')
@@ -39,8 +42,9 @@ DO_SIMULADOR = os.path.join(REPO, 'nativo', 'arduino', 'include')
 # Os da linguagem e da libc (o compilador traz) e o FreeRTOS (o do simulador).
 PULAR = re.compile(r'^(std\w*\.h|string\.h|strings\.h|limits\.h|math\.h|time\.h|errno\.h|assert\.h|ctype\.h|inttypes\.h|'
                    r'float\.h|stdio\.h|stdlib\.h|unistd\.h|fcntl\.h|signal\.h|setjmp\.h|locale\.h|wchar\.h|alloca\.h|'
-                   r'sys/.*|machine/.*|freertos/(?!ringbuf\.h).*|FreeRTOS\.h|reent\.h|sdkconfig\.h|xtensa/.*|riscv/.*)$')
+                   r'sys/(?!socket\.h|ioctl\.h|poll\.h|select\.h|uio\.h).*|machine/.*|freertos/(?!ringbuf\.h).*|FreeRTOS\.h|reent\.h|sdkconfig\.h|xtensa/.*|riscv/.*)$')
 INCLUSAO = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.M)
+INCLUSAO_SEGUINTE = re.compile(r'^\s*#\s*include_next\s*[<"]([^>"]+)[>"]', re.M)
 
 
 def pastas_de_inclusao(idf, chip, extras=()):
@@ -60,10 +64,11 @@ def _pastas_de(comp, chip, do_chip, comuns):
             rel = os.path.relpath(dirpath, comp).replace(os.sep, '/')
             partes = rel.split('/')
             # Pastas de teste, de exemplo e de outros chips ficam de fora.
-            if any(p in ('test', 'test_apps', 'tests', 'host_test', 'linux', 'mock', 'examples') for p in partes):
+            if any(p in ('test', 'test_apps', 'tests', 'host_test', 'linux', 'mock', 'examples', 'contrib', 'subproject') for p in partes):
                 dirnames[:] = []
                 continue
-            if [p for p in partes if p.startswith('esp32') and p != chip]:
+            emprestado = partes[0] == 'bt' and BT_DE_OUTRO_CHIP.get(chip) in partes
+            if [p for p in partes if p.startswith('esp32') and p not in (chip, 'esp32xx')] and not emprestado:
                 dirnames[:] = []
                 continue
             # O driver do toque tem uma pasta por versao do sensor (hw_ver1 na
@@ -76,10 +81,14 @@ def _pastas_de(comp, chip, do_chip, comuns):
             pai = partes[-2] if len(partes) > 1 else ''
             # include/, register/, deprecated/ (os drivers antigos), o
             # include/<chip> do esp_rom (o "rom/ets_sys.h") e o esp_rom/<chip> (esp_rom_caps.h).
-            # E o include/local do WiFi (o esp_wifi_types_native.h).
+            # E o include/local do WiFi (o esp_wifi_types_native.h), e o http_parser
+            # (o cabecalho na raiz do componente; o HTTP_Method.h do WebServer usa), e a
+            # API do Bluedroid (bt/host/bluedroid/api/include/api: o esp_gap_bt_api.h...).
             if base in ('include', 'register', 'deprecated', 'interface', 'public') or (base == chip and pai in ('include', 'esp_rom')) \
-                    or (base == 'local' and partes[0] == 'esp_wifi'):
-                (do_chip if chip in partes or versao else comuns).append(dirpath)
+                    or (base == 'local' and partes[0] == 'esp_wifi') or rel in ('http_parser', 'console') \
+                    or (base == 'api' and pai == 'include' and partes[0] == 'bt') or rel in ('newlib/platform_include', 'lwip/include/apps') \
+                    or (partes[0] == 'protocomm' and pai == 'include' and base in ('common', 'security', 'transports', 'crypto')):
+                (do_chip if chip in partes or versao or emprestado else comuns).append(dirpath)
 
 
 def indice(pastas):
@@ -94,11 +103,38 @@ def indice(pastas):
     return achados
 
 
+def copiar_arquivo(origem, alvo):
+    """Copia so o que mudou; o OneDrive as vezes segura o arquivo um instante (o Errno 22)."""
+    dados = open(origem, 'rb').read()
+    if os.path.isfile(alvo) and open(alvo, 'rb').read() == dados:
+        return
+    for tentativa in range(10):
+        try:
+            with open(alvo, 'wb') as f:
+                f.write(dados)
+            return
+        except OSError:
+            if tentativa == 9:
+                raise
+            time.sleep(0.5)
+
+
+def todos_com_o_nome(pastas, nome):
+    """Os arquivos com esse caminho de #include, na ordem das pastas."""
+    achados = []
+    for p in pastas:
+        caminho = os.path.join(p, *nome.split('/'))
+        if os.path.isfile(caminho) and caminho not in achados:
+            achados.append(caminho)
+    return achados
+
+
 def copiar(idf, pedidos, extras=()):
     copiados = {c: set() for c in CHIPS}
     faltaram = set()
     for chip in CHIPS:
-        mapa = indice(pastas_de_inclusao(idf, chip, extras))
+        pastas = pastas_de_inclusao(idf, chip, extras)
+        mapa = indice(pastas)
         fila = list(pedidos)
         vistos = set()
         while fila:
@@ -111,12 +147,27 @@ def copiar(idf, pedidos, extras=()):
                 faltaram.add(nome)
                 continue
             rel = origem.replace(os.sep, '/')
-            especifico = chip in rel.split('/') or any(re.fullmatch(r'hw_ver\d', p) for p in rel.split('/'))
+            partes = rel.split('/')
+            emprestado = BT_DE_OUTRO_CHIP.get(chip) in partes and '/bt/' in rel
+            especifico = chip in partes or emprestado or any(re.fullmatch(r'hw_ver\d', p) for p in partes)
             alvo = os.path.join(DESTINO, chip if especifico else 'comum', nome)
             os.makedirs(os.path.dirname(alvo), exist_ok=True)
-            shutil.copyfile(origem, alvo)
+            copiar_arquivo(origem, alvo)
             copiados[chip].add(nome)
             texto = open(origem, encoding='utf-8', errors='ignore').read()
+            # O #include_next de um wrapper do IDF (o lwip/sockets.h): a camada de
+            # baixo vai para idf/proximos, que vem logo depois de idf/comum.
+            for m in INCLUSAO_SEGUINTE.finditer(texto):
+                seguinte = m.group(1)
+                candidatos = [c for c in todos_com_o_nome(pastas, seguinte) if os.path.normcase(c) != os.path.normcase(origem)]
+                if not candidatos:
+                    faltaram.add(seguinte)
+                    continue
+                destino = os.path.join(DESTINO, 'proximos', *seguinte.split('/'))
+                os.makedirs(os.path.dirname(destino), exist_ok=True)
+                copiar_arquivo(candidatos[0], destino)
+                texto_seguinte = open(candidatos[0], encoding='utf-8', errors='ignore').read()
+                fila.extend(i.group(1) for i in INCLUSAO.finditer(texto_seguinte))
             for m in INCLUSAO.finditer(texto):
                 inc = m.group(1)
                 # "x.h" relativo a pasta do proprio arquivo.
@@ -129,6 +180,41 @@ def copiar(idf, pedidos, extras=()):
     print(f'{total} cabecalhos copiados')
     if faltaram:
         print('nao achados (o simulador precisa ter):', ' '.join(sorted(faltaram)))
+
+
+# O codigo do IDF que so faz conta e vem como esta (o core da placa o usa):
+# vai para nativo/arduino/src/arduino-esp32/idf, compilado so nas ESP32.
+FONTES = ['esp_hid/src/esp_hid_common.c', 'lwip/lwip/src/core/ipv4/ip4_addr.c', 'lwip/lwip/src/core/ipv6/ip6_addr.c',
+          'console/commands.c', 'console/split_argv.c', 'console/argtable3/argtable3.h', 'console/argtable3/argtable3_private.h', 'console/argtable3/argtable3.c',
+          'console/argtable3/arg_cmd.c', 'console/argtable3/arg_date.c', 'console/argtable3/arg_dbl.c', 'console/argtable3/arg_dstr.c',
+          'console/argtable3/arg_end.c', 'console/argtable3/arg_file.c', 'console/argtable3/arg_hashtable.c', 'console/argtable3/arg_int.c',
+          'console/argtable3/arg_lit.c', 'console/argtable3/arg_rem.c', 'console/argtable3/arg_rex.c', 'console/argtable3/arg_str.c',
+          'console/argtable3/arg_utils.c']
+
+
+# O codigo que vem de um --extra, procurado pelo fim do caminho.
+FONTES_DOS_EXTRAS = ['esp_rainmaker/src/standard_types/esp_rmaker_standard_params.c',
+                     'esp_rainmaker/src/standard_types/esp_rmaker_standard_devices.c']
+
+
+def copiar_fontes(idf, extras=()):
+    pasta = os.path.join(REPO, 'nativo', 'arduino', 'src', 'arduino-esp32', 'idf')
+    os.makedirs(pasta, exist_ok=True)
+    for f in FONTES:
+        with open(os.path.join(idf, 'components', *f.split('/')), encoding='utf-8') as e:
+            texto = e.read()
+        # O strlcpy e o asprintf da newlib, que o Windows nao tem.
+        if f.endswith('/commands.c'):
+            texto = '/* Modificado (CircuitSketch): inclui o cs_posix.h. */\n#include "cs_posix.h"\n' + texto
+        copiar_texto = os.path.join(pasta, os.path.basename(f))
+        with open(copiar_texto, 'w', encoding='utf-8', newline='\n') as s:
+            s.write(texto)
+    for f in FONTES_DOS_EXTRAS:
+        for extra in extras:
+            for dirpath, _, arquivos in os.walk(extra):
+                caminho = os.path.join(dirpath, os.path.basename(f))
+                if os.path.basename(f) in arquivos and caminho.replace(os.sep, '/').endswith(f):
+                    shutil.copyfile(caminho, os.path.join(pasta, os.path.basename(f)))
 
 
 def main():
@@ -146,6 +232,7 @@ def main():
     else:
         pedidos = resto
     copiar(idf, pedidos, extras)
+    copiar_fontes(idf, extras)
     versao = os.path.join(idf, 'version.txt')
     with open(os.path.join(DESTINO, 'VERSAO'), 'w', encoding='utf-8') as f:
         f.write(open(versao).read().strip() if os.path.isfile(versao) else os.path.basename(os.path.normpath(idf)))

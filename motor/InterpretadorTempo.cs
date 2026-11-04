@@ -89,7 +89,7 @@ public partial class Interpretador
                 + "como em getLocalTime(&agora).", c.Linha);
 
         // Sem WiFi nao ha NTP -- e o erro numero um deste sketch.
-        bool temRede = Maq.Rede is not null && Maq.Rede.WifiConectado(Maq);
+        bool temRede = Maq.Rede is not null && Maq.Rede.NaRede(Maq);
         if (!temRede || !relogioPedido)
         {
             Maq.Rede?.Anotar(Maq, "ntp", !relogioPedido

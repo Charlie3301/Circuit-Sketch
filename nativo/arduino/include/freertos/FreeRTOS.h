@@ -167,6 +167,14 @@ TaskHandle_t xTaskCreateStatic(TaskFunction_t pxTaskCode, const char *pcName, ui
 BaseType_t xTaskCreateAffinitySet(TaskFunction_t pxTaskCode, const char *pcName, uint32_t usStackDepth, void *pvParameters,
                                   UBaseType_t uxPriority, UBaseType_t uxCoreAffinityMask, TaskHandle_t *pxCreatedTask);
 void vTaskDelete(TaskHandle_t xTaskToDelete);
+/* As formas do IDF com a pilha numa memoria escolhida (a PSRAM): no PC a memoria e uma so. */
+static inline BaseType_t xTaskCreatePinnedToCoreWithCaps(TaskFunction_t pvTaskCode, const char *const pcName, uint32_t usStackDepth, void *const pvParameters,
+                                                         UBaseType_t uxPriority, TaskHandle_t *const pvCreatedTask, const BaseType_t xCoreID, uint32_t uxMemoryCaps)
+{
+    (void)uxMemoryCaps;
+    return xTaskCreatePinnedToCore(pvTaskCode, pcName, usStackDepth, pvParameters, uxPriority, pvCreatedTask, xCoreID);
+}
+static inline void vTaskDeleteWithCaps(TaskHandle_t xTaskToDelete) { vTaskDelete(xTaskToDelete); }
 void vTaskDelay(const TickType_t xTicksToDelay);
 BaseType_t xTaskDelayUntil(TickType_t *const pxPreviousWakeTime, const TickType_t xTimeIncrement);
 #define vTaskDelayUntil(pxPreviousWakeTime, xTimeIncrement) ((void)xTaskDelayUntil((pxPreviousWakeTime), (xTimeIncrement)))

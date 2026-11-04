@@ -44,7 +44,7 @@ public:
     virtual float parseFloat(LookaheadMode lookahead = SKIP_ALL, char ignore = NO_IGNORE_CHAR);
 
     virtual size_t readBytes(char *buffer, size_t length);
-    size_t readBytes(uint8_t *buffer, size_t length) { return readBytes((char *)buffer, length); }
+    virtual size_t readBytes(uint8_t *buffer, size_t length) { return readBytes((char *)buffer, length); }
     virtual size_t readBytesUntil(char terminator, char *buffer, size_t length);
     size_t readBytesUntil(char terminator, uint8_t *buffer, size_t length)
     {

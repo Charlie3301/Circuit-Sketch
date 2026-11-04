@@ -1250,6 +1250,14 @@ public class Maquina
     /// comando), a placa ganha uma so dela e SEM internet: nada sai deste
     /// computador sem a janela ter dito que pode.
     /// </summary>
+    /// <summary>O USB da placa (S2, S3): o que ela mandou ao computador da bancada.</summary>
+    public UsbDaPlaca Usb => usb ??= new UsbDaPlaca(this);
+    UsbDaPlaca usb;
+
+    /// <summary>O ESP RainMaker da placa: o que ela relatou, e o "aplicativo" que escreve nela.</summary>
+    public RainMakerDaPlaca RainMaker => rainMaker ??= new RainMakerDaPlaca(this);
+    RainMakerDaPlaca rainMaker;
+
     public Rede Rede
     {
         get => rede ??= new Rede { UsarInternet = false };

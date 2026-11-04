@@ -43,6 +43,54 @@ idf/ (os cabecalhos do C/C++ compilado pelo clang)
 arduino/include/sdkconfig/*.h e arduino/include/chip/*/soc/*.h
     Os mesmos sdkconfig.h e soc_caps.h/gpio_num.h de include/ (acima).
 
+arduino/include e arduino/src/arduino-esp32 (o que vem do core da ESP32)
+    Do arduino-esp32 (Espressif Systems e colaboradores), a versao em
+    arduino/VERSAO-ARDUINO-ESP32: o core sob a GNU LGPL 2.1 e as bibliotecas
+    sob a LGPL 2.1 ou a Apache License 2.0 (cada arquivo diz a sua),
+    copiados pela ferramentas/arduino_esp32/copiar_core.py. Os que mudaram
+    dizem no topo "Modificado (CircuitSketch)" e o que mudou. O
+    arduino-esp32/idf/esp_hid_common.c e do ESP-IDF (Apache License 2.0).
+
+mbedtls/ (o mbedTLS das placas ESP32)
+    Do mbedTLS (Mbed TLS Contributors), o fork da Espressif que vem com o
+    ESP-IDF (a versao em mbedtls/VERSAO), sob a Apache License 2.0 (ou a GPL
+    2.0 ou posterior, a escolha; ver mbedtls/LICENSE), copiado sem
+    modificacao pela ferramentas/idf/copiar_mbedtls.py. O
+    include/mbedtls/esp_config.h e o do ESP-IDF (Apache License 2.0).
+
+tinyusb/ (os cabecalhos do USB da S2 e da S3)
+    Do TinyUSB (Ha Thach e colaboradores), o fork da Espressif (a versao em
+    tinyusb/VERSAO), sob a licenca MIT (ver tinyusb/LICENSE), copiado sem
+    modificacao pela ferramentas/idf/copiar_tinyusb.py. O
+    include/tusb_config.h e o do esp32-arduino-lib-builder (MIT).
+
+openthread/ (a pilha Thread da C6 e da H2)
+    Do OpenThread (The OpenThread Authors), o fork da Espressif que vem com o
+    ESP-IDF, sob a licenca BSD de 3 clausulas (ver openthread/LICENSE),
+    copiado pela ferramentas/idf/copiar_openthread.py. O
+    src/openthread-core-esp32x-ftd-config.h, o esp_openthread_common_macro.h
+    e os include/esp_openthread*.h sao do ESP-IDF (Apache License 2.0), e
+    src/arduino e os include/OThread*.h sao do arduino-esp32 (Apache License
+    2.0). O src/cs_openthread.cpp foi escrito para o CircuitSketch.
+
+zigbee/ (a API do Zigbee)
+    Os cabecalhos do esp-zigbee-lib (Espressif, Apache License 2.0; ver
+    zigbee/LICENSE-esp-zigbee-lib) e do esp-zboss-lib (DSR Corporation e
+    Espressif, licenca propria; ver zigbee/LICENSE-zboss), copiados pela
+    ferramentas/idf/copiar_zigbee.py. O include/zb_debug.h foi modificado (a
+    conferencia de tamanho das estruturas, feita para 32 bits, fica de fora no
+    simulador). O include/esp_ieee802154_types.h e do ESP-IDF (Apache License
+    2.0), e src/arduino e os include/Zigbee*.h e include/ep sao do
+    arduino-esp32 (Apache License 2.0). As bibliotecas binarias da ZBOSS nao
+    vem: o src/cs_zigbee.cpp foi escrito para o CircuitSketch.
+
+Componentes do ESP-IDF e extras em idf/ e arduino/src/arduino-esp32/idf
+    O lwIP (ip4_addr.c, ip6_addr.c e os cabecalhos, Swedish Institute of
+    Computer Science e colaboradores, BSD de 3 clausulas), o argtable3 (BSD) e
+    o esp_console (Apache License 2.0) vem do ESP-IDF. Os esp_rmaker_* vem do
+    esp-rainmaker (Espressif, Apache License 2.0). O commands.c do console
+    ganhou so um #include "cs_posix.h" no topo.
+
 O resto de include/ e de runtime/ foi escrito para o CircuitSketch, imitando
 as interfaces do ESP-IDF, da newlib e do FreeRTOS -- os nomes e os valores
 que o codigo C usa, para o mesmo codigo compilar aqui e na placa.

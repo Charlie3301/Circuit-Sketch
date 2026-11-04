@@ -24,6 +24,12 @@ public partial class Interpretador
 
     static bool EhClasseBle(string classe) => ClassesBle.Contains(classe) || EhClasseDoClienteBle(classe);
 
+    static DadosDoAnuncioBle AnuncioDe(Objeto dados)
+    {
+        var estado = dados.Rede as EstadoBle ?? (EstadoBle)(dados.Rede = new EstadoBle());
+        return estado.Anuncio ??= new DadosDoAnuncioBle();
+    }
+
     sealed class EstadoBle
     {
         public ServicoBle Servico;
@@ -36,6 +42,9 @@ public partial class Interpretador
         public CaracteristicaBle Dono;
         public bool Notificacoes, Indicacoes;
         public string Descricao;
+
+        /// <summary>BLEAdvertisementData: os bytes do anuncio que o C++ compilado mandou.</summary>
+        public DadosDoAnuncioBle Anuncio;
     }
 
     RadioBle radioBle;
@@ -402,8 +411,17 @@ public partial class Interpretador
                         if (radioBle is not null) Maq.Rede.AnunciarBle(radioBle, false);
                         return Valor.DeBool(true);
                     case "setAdvertisementData":
-                        if (radioBle is not null && args.Count > 0 && args[0].Referencia is Objeto dados
-                            && dados.Texto is { Length: > 0 } nome) radioBle.Nome = nome;
+                        if (radioBle is not null && args.Count > 0 && args[0].Referencia is Objeto dados)
+                        {
+                            if (dados.Texto is { Length: > 0 } nome) radioBle.Nome = nome;
+                            // Os bytes do anuncio (o C++ compilado manda: o iBeacon, o Eddystone).
+                            if (dados.Rede is EstadoBle { Anuncio: { } bytes })
+                            {
+                                radioBle.FabricanteHex = bytes.FabricanteHex;
+                                radioBle.ServicoUuid = bytes.ServicoUuid;
+                                radioBle.ServicoHex = bytes.ServicoHex;
+                            }
+                        }
                         return Valor.Vazio;
                     case "setScanResponse": case "setMinPreferred": case "setMaxPreferred": case "setMinInterval":
                     case "setMaxInterval": case "setAppearance": case "setScanResponseData": case "reset":
@@ -418,6 +436,17 @@ public partial class Interpretador
                     case "setName": case "setShortName":
                         obj.Texto = S(0);
                         return Valor.Vazio;
+                    // Do C++ compilado: os bytes em hexadecimal (o texto do sketch nao e binario).
+                    case "__fabricante_hex":
+                        AnuncioDe(obj).FabricanteHex = S(0);
+                        return Valor.Vazio;
+                    case "__servico_hex":
+                    {
+                        var bytes = AnuncioDe(obj);
+                        bytes.ServicoUuid = S(0);
+                        bytes.ServicoHex = S(1);
+                        return Valor.Vazio;
+                    }
                     case "setFlags": case "setCompleteServices": case "setPartialServices": case "setManufacturerData":
                     case "setServiceData": case "setAppearance": case "addData": case "setPreferredParams":
                         return Valor.Vazio;

@@ -43,6 +43,17 @@ typedef uint32_t prog_uint32_t;
 #define pgm_get_far_address(var) ((uintptr_t)(&(var)))
 
 #define memcpy_P memcpy
+#define memccpy_P(dest, src, c, n) memccpy((dest), (src), (c), (n))
+/* O memmem da newlib (o Windows nao tem): onde "agulha" aparece em "palheiro". */
+static inline void *cs_memmem(const void *palheiro, size_t n, const void *agulha, size_t m)
+{
+    const unsigned char *p = (const unsigned char *)palheiro;
+    if (m == 0) return (void *)p;
+    for (size_t i = 0; i + m <= n; i++)
+        if (p[i] == *(const unsigned char *)agulha && memcmp(p + i, agulha, m) == 0) return (void *)(p + i);
+    return NULL;
+}
+#define memmem_P(h, hl, n, nl) cs_memmem((h), (hl), (n), (nl))
 #define memcmp_P memcmp
 #define memchr_P memchr
 #define strcpy_P strcpy
