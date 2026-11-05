@@ -10,6 +10,15 @@ namespace Simulador.App;
 /// </summary>
 public static partial class Autoteste
 {
+    static void CopiarPasta(string origem, string destino)
+    {
+        Directory.CreateDirectory(destino);
+        foreach (string arquivo in Directory.GetFiles(origem))
+            File.Copy(arquivo, Path.Combine(destino, Path.GetFileName(arquivo)), true);
+        foreach (string pasta in Directory.GetDirectories(origem))
+            CopiarPasta(pasta, Path.Combine(destino, Path.GetFileName(pasta)));
+    }
+
     static void Diagnostico_Pasta()
     {
         string pasta = Environment.GetEnvironmentVariable("CS_PASTA");
@@ -19,6 +28,11 @@ public static partial class Autoteste
             return;
         }
         int ms = int.TryParse(Environment.GetEnvironmentVariable("CS_MS"), out int lido) ? lido : 4000;
+        // A suite roda num armazem isolado, sem as bibliotecas que a pessoa instalou. CS_ACERVO aponta
+        // a pasta "bibliotecas" dela, para o projeto compilar contra as mesmas da janela.
+        if (Environment.GetEnvironmentVariable("CS_ACERVO") is { Length: > 0 } acervo && Directory.Exists(acervo))
+            foreach (string origem in Directory.GetDirectories(acervo))
+                CopiarPasta(origem, Path.Combine(Acervo.Pasta, Path.GetFileName(origem)));
         foreach (string arquivo in Directory.GetFiles(pasta, "*.sktch").Order())
         {
             saida.AppendLine($"=== {Path.GetFileName(arquivo)}");

@@ -4699,8 +4699,12 @@ public partial class MainWindow : Window
         editor.MarcarPinosLigados(rede);
     }
 
-    void Rodar(object s = null, RoutedEventArgs e = null)
+    /// <summary>Uma compilacao em andamento: o Rodar de novo (o F5) espera ela acabar.</summary>
+    bool compilando;
+
+    async void Rodar(object s = null, RoutedEventArgs e = null)
     {
+        if (compilando) return;
         PararExecucao();
         GuardarCodigoDoEditor();
 
@@ -4814,14 +4818,49 @@ public partial class MainWindow : Window
         // Compila TODAS antes de comecar qualquer uma: metade rodando e
         // metade com erro de sintaxe seria pior de entender do que
         // nenhuma rodando.
-        foreach (var placa in placas)
+        // O projeto inteiro: o "#include "config.h"" traz a aba, o
+        // "#include <Botao.h>" traz a biblioteca instalada, e o
+        // "#ifdef ESP32" ve as macros do core desta placa.
+        var projetos = placas.Select(ProjetoDaPlaca).ToList();
+        var compilados = new Programa[placas.Count];
+        var falhas = new Exception[placas.Count];
+        void CompilarTodas()
         {
+            for (int i = 0; i < projetos.Count; i++)
+            {
+                try { compilados[i] = Compilador.CompilarProjeto(projetos[i]); }
+                catch (Exception ex)
+                {
+                    falhas[i] = ex;
+                    return;
+                }
+            }
+        }
+        // O compilador de C++ na primeira vez leva minutos (o core, o mbedTLS, a biblioteca grande):
+        // a janela continua respondendo enquanto isso. Os testes e o passeio esperam ali mesmo.
+        if (Autoteste.Rodando || Passeio.Ativo) CompilarTodas();
+        else
+        {
+            var circuitoDaCompilacao = editor.Atual;
+            compilando = true;
+            btRodar.IsEnabled = false;
+            try { await Task.Run(CompilarTodas); }
+            finally
+            {
+                compilando = false;
+                btRodar.IsEnabled = true;
+            }
+            // Trocou de projeto no meio: o que compilou ja nao e o da tela.
+            if (!ReferenceEquals(circuitoDaCompilacao, editor.Atual)) return;
+        }
+
+        for (int i = 0; i < placas.Count; i++)
+        {
+            var placa = placas[i];
             try
             {
-                // O projeto inteiro: o "#include "config.h"" traz a aba, o
-                // "#include <Botao.h>" traz a biblioteca instalada, e o
-                // "#ifdef ESP32" ve as macros do core desta placa.
-                var prog = Compilador.CompilarProjeto(ProjetoDaPlaca(placa));
+                if (falhas[i] is { } falha) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(falha).Throw();
+                if (compilados[i] is not { } prog) return;
                 foreach (string aviso in prog.Avisos) console.Aviso(aviso);
                 programas[placa.Id] = prog;
 
