@@ -21,6 +21,160 @@ public partial class EditorCircuito : Border
     public Circuito Atual { get; private set; } = new();
 
     readonly Canvas mundo = new();
+
+    /// <summary>
+    /// O que nao muda enquanto a simulacao roda: o desenho das pecas, guardado numa textura
+    /// so. A arte traçada do CAD tem milhares de vetores, e o WPF refaz todos a cada quadro
+    /// em que algo se mexe, por isso o custo crescia com o numero de pecas. Ficam
+    /// em <see cref="mundo"/>, por cima, o que muda: halos, telas, bracos.
+    /// Ser fixa e so desempenho: se algo aqui mudar, a textura se refaz sozinha uma vez.
+    /// </summary>
+    readonly Canvas camadaFixa = new() { IsHitTestVisible = false };
+    readonly BitmapCache cacheDaFixa = new() { EnableClearType = false, SnapsToDevicePixels = true };
+
+    /// <summary>
+    /// Os fios em outras texturas, por cima das pecas: pegar uma peca sem fio nao refaz os fios, e
+    /// pegar uma com fio refaz so a textura de um punhado deles, sem tracar de novo os outros
+    /// nem o desenho das outras pecas.
+    /// </summary>
+    readonly (Canvas Camada, BitmapCache Cache)[] camadasDosFios =
+        [.. Enumerable.Range(0, 2).Select(_ => (new Canvas { IsHitTestVisible = false }, new BitmapCache { EnableClearType = false, SnapsToDevicePixels = true }))];
+
+    /// <summary>
+    /// Cada peca tem a sua textura, e cada elemento de <see cref="mundo"/> tambem. Tirar uma peca
+    /// da camada fixa so recompoe texturas prontas, sem tracar de novo os vetores das outras,
+    /// e um LED que pisca so mexe no canto dele, sem refazer uma textura da camada inteira.
+    /// </summary>
+    BitmapCache cacheDeCadaUm;
+
+    /// <summary>
+    /// A peca na mao e os fios dela: mudam a cada movimento do mouse, entao ficam sozinhos, sem
+    /// textura de camada, para nao refazer as outras. Fora do arraste, nao tem peca nem fio.
+    /// </summary>
+    readonly Canvas camadaDaMao = new() { IsHitTestVisible = false };
+
+    /// <summary>
+    /// O desenho do LED aceso ja pronto em bitmap, um por desenho: a piscada so liga e desliga uma
+    /// imagem pronta, sem tracar vetores nem refazer textura nenhuma.
+    /// </summary>
+    static readonly Dictionary<ImageSource, ImageSource> luzesProntas = [];
+
+    static ImageSource LuzPronta(ImageSource desenho)
+    {
+        if (desenho is null or BitmapSource) return desenho;
+        if (luzesProntas.TryGetValue(desenho, out var pronta)) return pronta;
+        const double Aumento = 4;
+        var visual = new DrawingVisual();
+        using (var dc = visual.RenderOpen()) dc.DrawImage(desenho, new Rect(0, 0, desenho.Width, desenho.Height));
+        var bitmap = new RenderTargetBitmap((int)Math.Ceiling(desenho.Width * Aumento), (int)Math.Ceiling(desenho.Height * Aumento),
+                                            96 * Aumento, 96 * Aumento, PixelFormats.Pbgra32);
+        bitmap.Render(visual);
+        bitmap.Freeze();
+        return luzesProntas[desenho] = bitmap;
+    }
+
+    /// <summary>A luz dos LEDs (o desenho aceso e o halo) nao ganha textura: e mais leve sem ela.</summary>
+    readonly HashSet<UIElement> semTextura = [];
+    System.Windows.Threading.DispatcherTimer relogioDoCache;
+
+    /// <summary>
+    /// Os limites, em pixels (4 bytes cada). Com zoom muito alto a camada perde a textura e cada
+    /// peca fica com a sua; sem nenhuma, volta a tracar os vetores.
+    /// </summary>
+    const double MaiorTexturaDeCamada = 32e6, MaiorSomaDasPecas = 64e6;
+
+    /// <summary>Muda sozinha enquanto simula: trocar a arte a cada quadro refaria a textura inteira.</summary>
+    static bool ArteMuda(string tipo) => tipo is "buzzer" or "alto-falante" or "tilt-switch";
+
+    /// <summary>
+    /// O LED aceso: o desenho apagado fica na textura, e este vai por cima so enquanto ha
+    /// corrente. Um LED piscando nao refaz a textura de todas as pecas a cada piscada.
+    /// </summary>
+    readonly Dictionary<string, Image> ledsAcesos = [];
+
+    /// <summary>A resolucao da textura segue o zoom, sem refazer a cada passo da rodinha.</summary>
+    void PedirCacheDaFixa()
+    {
+        if (relogioDoCache is null)
+        {
+            relogioDoCache = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(120) };
+            relogioDoCache.Tick += (_, _) =>
+            {
+                relogioDoCache.Stop();
+                AjustarCacheDaFixa();
+            };
+        }
+        relogioDoCache.Stop();
+        relogioDoCache.Start();
+    }
+
+    void AjustarCacheDaFixa()
+    {
+        double pontos = escala.ScaleX * VisualTreeHelper.GetDpi(this).DpiScaleX;
+        double area = 0;
+        foreach (var visual in visuais.Values)
+        {
+            var limites = VisualTreeHelper.GetDescendantBounds(visual);
+            if (!limites.IsEmpty) area += limites.Width * limites.Height;
+        }
+        // Congelada e trocada inteira: mudar a escala de uma textura em uso por varios
+        // elementos derruba a thread de render do WPF.
+        if (cacheDeCadaUm is null || Math.Abs(cacheDeCadaUm.RenderAtScale - pontos) > 0.001)
+        {
+            cacheDeCadaUm = new BitmapCache { RenderAtScale = pontos, EnableClearType = false, SnapsToDevicePixels = true };
+            cacheDeCadaUm.Freeze();
+        }
+        CacheMode deCadaUm = area * pontos * pontos > MaiorSomaDasPecas ? null : cacheDeCadaUm;
+        foreach (var visual in visuais.Values)
+            if (visual.CacheMode != deCadaUm) visual.CacheMode = deCadaUm;
+        foreach (UIElement filho in mundo.Children)
+        {
+            if (semTextura.Contains(filho)) continue;
+            var limites = VisualTreeHelper.GetDescendantBounds(filho);
+            CacheMode desejado = !limites.IsEmpty && limites.Width * limites.Height * pontos * pontos > MaiorTexturaDeCamada ? null : cacheDeCadaUm;
+            if (filho.CacheMode != desejado) filho.CacheMode = desejado;
+        }
+
+        void AjustarCamada(Canvas camada, BitmapCache cache)
+        {
+            var limites = VisualTreeHelper.GetDescendantBounds(camada);
+            if (!limites.IsEmpty && limites.Width * limites.Height * pontos * pontos > MaiorTexturaDeCamada)
+            {
+                if (camada.CacheMode is not null) camada.CacheMode = null;
+                return;
+            }
+            if (Math.Abs(cache.RenderAtScale - pontos) > 0.001) cache.RenderAtScale = pontos;
+            if (camada.CacheMode is null) camada.CacheMode = cache;
+        }
+        AjustarCamada(camadaFixa, cacheDaFixa);
+        foreach (var (camada, cache) in camadasDosFios) AjustarCamada(camada, cache);
+    }
+
+    /// <summary>O elemento sai da camada em que estiver.</summary>
+    static void TirarDaCamada(FrameworkElement elemento) => (elemento.Parent as Panel)?.Children.Remove(elemento);
+
+    /// <summary>A peca na mao passa para a camada de cima, para a textura nao se refazer a cada passo.</summary>
+    void LevarParaMao(string idDaPeca)
+    {
+        if (visuais.TryGetValue(idDaPeca, out var visual) && visual.Parent != camadaDaMao)
+        {
+            TirarDaCamada(visual);
+            camadaDaMao.Children.Add(visual);
+        }
+    }
+
+    /// <summary>A mao soltou: o que nao muda sozinho volta para a textura.</summary>
+    void DevolverParaFixa()
+    {
+        foreach (var peca in Atual.Pecas)
+            if (visuais.TryGetValue(peca.Id, out var visual) && visual.Parent == camadaDaMao)
+            {
+                camadaDaMao.Children.Remove(visual);
+                (ArteMuda(peca.Tipo) ? mundo : camadaFixa).Children.Add(visual);
+            }
+        RedesenharFios();
+        PedirCacheDaFixa();
+    }
     readonly ScaleTransform escala = new(1, 1);
     readonly TranslateTransform deslocamento = new(0, 0);
 
@@ -280,6 +434,9 @@ public partial class EditorCircuito : Border
     readonly List<Rectangle> realces = [];
     readonly Rectangle laco = new();
     readonly Path pinosLigados = new();
+
+    /// <summary>As marcas da peca na mao andam com ela, sem refazer as de todas as outras.</summary>
+    readonly Path pinosNaMao = new();
     readonly Path marcasBotoes = new();
     readonly Path marcasApertadas = new();
     readonly Path slotsCheios = new();
@@ -813,6 +970,9 @@ public partial class EditorCircuito : Border
            && g.Children[0] is TranslateTransform t ? t.X : 0;
 
     /// <summary>Para o teste: quantas marcas de "apertado" estao na tela.</summary>
+    /// <summary>Onde o --desempenho poe o ponto que forca um quadro novo a cada volta.</summary>
+    internal System.Windows.Controls.Panel MundoParaMedir => mundo;
+
     internal int MarcasApertadasParaTeste
         => marcasApertadas.Data is GeometryGroup g ? g.Children.Count : 0;
 
@@ -908,8 +1068,25 @@ public partial class EditorCircuito : Border
                 Geometria.PosicaoLocal(peca, def, capa.X, capa.Y), capa.R * 0.92, capa.R * 0.92));
         }
 
-        marcasBotoes.Data = soltos;
-        marcasApertadas.Data = apertados;
+        TrocarMarcas(marcasBotoes, soltos);
+        TrocarMarcas(marcasApertadas, apertados);
+    }
+
+    /// <summary>
+    /// Troca as marcas de um desenho so se mudaram. Geometria nova suja a textura dele, e estes
+    /// desenhos cobrem o circuito inteiro: sem isto, cada passo do arraste refazia todos.
+    /// </summary>
+    static void TrocarMarcas(Path desenho, GeometryGroup novas)
+    {
+        if (desenho.Data is GeometryGroup velhas && velhas.Children.Count == novas.Children.Count)
+        {
+            bool iguais = true;
+            for (int i = 0; iguais && i < novas.Children.Count; i++)
+                iguais = velhas.Children[i] is EllipseGeometry a && novas.Children[i] is EllipseGeometry b
+                         && a.Center == b.Center && a.RadiusX == b.RadiusX && a.RadiusY == b.RadiusY;
+            if (iguais) return;
+        }
+        desenho.Data = novas;
     }
 
     string arrastando;
@@ -982,8 +1159,21 @@ public partial class EditorCircuito : Border
         grupo.Children.Add(escala);
         grupo.Children.Add(deslocamento);
         mundo.RenderTransform = grupo;
+        camadaFixa.RenderTransform = grupo;
+        camadaFixa.CacheMode = cacheDaFixa;
+        foreach (var (camada, cache) in camadasDosFios)
+        {
+            camada.RenderTransform = grupo;
+            camada.CacheMode = cache;
+        }
         mundo.Background = Brushes.Transparent;
-        Child = mundo;
+        var camadas = new Grid();
+        camadas.Children.Add(camadaFixa);
+        foreach (var (camada, _) in camadasDosFios) camadas.Children.Add(camada);
+        camadas.Children.Add(mundo);
+        camadaDaMao.RenderTransform = grupo;
+        camadas.Children.Add(camadaDaMao);
+        Child = camadas;
 
         PrepararArrastoDaPaleta();
 
@@ -1032,6 +1222,12 @@ public partial class EditorCircuito : Border
         // Por baixo dos fios: o anel fica em volta da ponta desencapada, sem cobri-la.
         Panel.SetZIndex(pinosLigados, 490);
         mundo.Children.Add(pinosLigados);
+        pinosNaMao.Stroke = pinosLigados.Stroke;
+        pinosNaMao.StrokeThickness = pinosLigados.StrokeThickness;
+        pinosNaMao.Fill = pinosLigados.Fill;
+        pinosNaMao.IsHitTestVisible = false;
+        Panel.SetZIndex(pinosNaMao, 490);
+        camadaDaMao.Children.Add(pinosNaMao);
 
         // Botoes fisicos por cima da placa, para serem visiveis e clicaveis.
         marcasBotoes.Stroke = new SolidColorBrush(Color.FromArgb(0xAA, 0xFF, 0xFF, 0xFF));
@@ -1079,6 +1275,7 @@ public partial class EditorCircuito : Border
         mundo.Children.Add(niveisLogicos);
 
         saidasAcesas.IsHitTestVisible = false;
+        saidasAcesas.Visibility = Visibility.Collapsed;
         saidasAcesas.Effect = new System.Windows.Media.Effects.BlurEffect { Radius = 3 };
         Panel.SetZIndex(saidasAcesas, 160);
         mundo.Children.Add(saidasAcesas);
@@ -1131,6 +1328,16 @@ public partial class EditorCircuito : Border
         }
 
         double raio = Math.Clamp(0.7 * escala.ScaleX, 0.5, 1.8);
+        var viewport = new Rect(Resto(deslocamento.X - passo / 2, passo),
+                                Resto(deslocamento.Y - passo / 2, passo),
+                                passo, passo);
+        // Arrastar a tela so anda o ladrilho: um pincel novo teria de ser desenhado de novo a cada quadro.
+        var chave = (passo, raio, CorDoFundo, CorDaGrade);
+        if (ReferenceEquals(Background, pincelDaGrade) && chave == chaveDaGrade)
+        {
+            pincelDaGrade.Viewport = viewport;
+            return;
+        }
         var desenho = new DrawingGroup();
         desenho.Children.Add(new GeometryDrawing(
             new SolidColorBrush(CorDoFundo), null,
@@ -1142,16 +1349,20 @@ public partial class EditorCircuito : Border
         // O ponto do ladrilho cai no MESMO lugar que um furo da
         // protoboard cairia: o ladrilho comeca meio passo antes do
         // deslocamento atual.
-        Background = new DrawingBrush(desenho)
+        pincelDaGrade = new DrawingBrush(desenho)
         {
             TileMode = TileMode.Tile,
             ViewportUnits = BrushMappingMode.Absolute,
             Stretch = Stretch.None,
-            Viewport = new Rect(Resto(deslocamento.X - passo / 2, passo),
-                                Resto(deslocamento.Y - passo / 2, passo),
-                                passo, passo),
+            Viewport = viewport,
         };
+        RenderOptions.SetCachingHint(pincelDaGrade, CachingHint.Cache);
+        chaveDaGrade = chave;
+        Background = pincelDaGrade;
     }
+
+    DrawingBrush pincelDaGrade;
+    (double, double, Color, Color) chaveDaGrade;
 
     /// <summary>Resto sempre positivo: o pan negativo tambem precisa ladrilhar.</summary>
     static double Resto(double a, double b) => ((a % b) + b) % b;
@@ -1169,7 +1380,7 @@ public partial class EditorCircuito : Border
     public void Redesenhar()
     {
         camadasDaPeca.Clear();
-        foreach (var v in visuais.Values) mundo.Children.Remove(v);
+        foreach (var v in visuais.Values) TirarDaCamada(v);
         foreach (var v in parteMovel.Values) mundo.Children.Remove(v);
         foreach (var (tela, _) in chavesDip.Values) mundo.Children.Remove(tela);
         chavesDip.Clear();
@@ -1179,6 +1390,9 @@ public partial class EditorCircuito : Border
         tracosDoAnalisador.Clear();
         ondasDoAnalisador.Clear();
         foreach (var v in brilhos.Values) mundo.Children.Remove(v);
+        foreach (var v in ledsAcesos.Values) mundo.Children.Remove(v);
+        ledsAcesos.Clear();
+        semTextura.Clear();
         foreach (var tela in telasLcd.Values) RemoverTelaLcd(tela);
         foreach (var b in bracosServo.Values) mundo.Children.Remove(b);
         foreach (var luzes in ledsDePlaca.Values)
@@ -1275,10 +1489,23 @@ public partial class EditorCircuito : Border
         Posicionar(visual, peca);
         AplicarSombra(visual);
         Panel.SetZIndex(visual, ZDe(peca.Tipo));
-        mundo.Children.Add(visual);
+        (ArteMuda(peca.Tipo) ? mundo : camadaFixa).Children.Add(visual);
         visuais[peca.Id] = visual;
+        PedirCacheDaFixa();
 
         AtualizarRotulo(peca, def);
+
+        if (peca.Tipo == "led")
+        {
+            var aceso = DesenharImagem(peca, def);
+            aceso.Source = LuzPronta(Pecas.Obter(NomeSvg(peca, true)));
+            aceso.IsHitTestVisible = false;
+            aceso.Visibility = Visibility.Collapsed;
+            semTextura.Add(aceso);
+            Posicionar(aceso, peca);
+            PorNaCamadaDa(peca, aceso);
+            ledsAcesos[peca.Id] = aceso;
+        }
 
         if (peca.Tipo is "led" or "rgb-led")
         {
@@ -1287,8 +1514,10 @@ public partial class EditorCircuito : Border
                 Width = def.Largura * 2.6,
                 Height = def.Largura * 2.6,
                 IsHitTestVisible = false,
-                Opacity = 0
+                Opacity = 0,
+                Visibility = Visibility.Collapsed,
             };
+            semTextura.Add(luz);
             PorNaCamadaDa(peca, luz);
             brilhos[peca.Id] = luz;
             PosicionarBrilho(peca, def);
@@ -2122,6 +2351,7 @@ public partial class EditorCircuito : Border
 
     void PosicionarBrilho(PecaNoCircuito peca, PecaDef def)
     {
+        if (ledsAcesos.TryGetValue(peca.Id, out var aceso)) Posicionar(aceso, peca);
         if (!brilhos.TryGetValue(peca.Id, out var luz)) return;
         // No chip, dentro do bulbo (o desenho diz onde: pecas-leds.py).
         var (cx, cy) = DesenhoDosLeds.CentroDoBrilho.TryGetValue(peca.Tipo, out var c) ? c : (def.Largura / 2, def.Altura * 0.30);
@@ -2860,9 +3090,14 @@ public partial class EditorCircuito : Border
         return new SolidColorBrush(CoresDaEnergia[nivel]);
     }
 
+    /// <summary>O desenho de cada fio e o que o fez: igual, nem se mexe nele (e a textura nao se refaz).</summary>
+    readonly Dictionary<Fio, (string Chave, DesenhoDoFio Traco)> desenhosDosFios = [];
+    readonly List<FrameworkElement> tracosSemChave = [];
+
     void RedesenharFios()
     {
-        foreach (var f in visuaisFios) mundo.Children.Remove(f);
+        var antes = new Dictionary<Fio, (string Chave, DesenhoDoFio Traco)>(desenhosDosFios);
+        desenhosDosFios.Clear();
         visuaisFios.Clear();
         grossuraDesenhada.Clear();
 
@@ -2877,7 +3112,29 @@ public partial class EditorCircuito : Border
 
             bool escolhido = fiosSelecionados.Contains(i);
             grossuraDesenhada[i] = escolhido ? 4.5 : 3;
-            var forma = Curva(fio, a.Value, b.Value, DesvioDe(i));
+            double desvio = DesvioDe(i);
+            bool naMao = visuais.TryGetValue(fio.DePeca ?? "", out var vistaDe) && vistaDe.Parent == camadaDaMao
+                         || visuais.TryGetValue(fio.ParaPeca ?? "", out var vistaPara) && vistaPara.Parent == camadaDaMao;
+            // O fio de uma peca da camada viva fica por cima dela, como sempre foi.
+            bool emCima = escolhido || (Atual.Achar(fio.DePeca) is { } pecaDe && ArteMuda(pecaDe.Tipo))
+                          || (Atual.Achar(fio.ParaPeca) is { } pecaPara && ArteMuda(pecaPara.Tipo));
+            Panel destino = naMao ? camadaDaMao : emCima ? mundo : camadasDosFios[i % camadasDosFios.Length].Camada;
+            // Na visao de energia, a cor muda com a corrente: sempre de novo.
+            string chave = visaoDeEnergia ? null
+                : $"{a.Value}|{b.Value}|{desvio}|{escolhido}|{fatorDosFios}|{fio.Cor}|{fio.Lado}|{FioDoOutroLado(fio)}|{(fio.Dobras is null ? "" : string.Join(";", fio.Dobras))}";
+            bool jaTinha = antes.Remove(fio, out var mesmo);
+            if (jaTinha && chave is not null && mesmo.Chave == chave)
+            {
+                if (mesmo.Traco.Parent != destino && (arrastando is null || naMao))
+                {
+                    TirarDaCamada(mesmo.Traco);
+                    destino.Children.Add(mesmo.Traco);
+                }
+                desenhosDosFios[fio] = mesmo;
+                visuaisFios.Add(mesmo.Traco);
+                continue;
+            }
+            var forma = Curva(fio, a.Value, b.Value, desvio);
 
             // O cabinho de protoboard de verdade (DesenhoDoFio): a capa com
             // volume e as pontas desencapadas; a trilha de baixo da PCB e
@@ -2897,9 +3154,19 @@ public partial class EditorCircuito : Border
             // O fio do outro lado da PCB: apagado, como visto atraves da placa.
             if (FioDoOutroLado(fio)) traco.Opacity = 0.18;
             Panel.SetZIndex(traco, escolhido ? 520 : 500);
-            mundo.Children.Add(traco);
+            if (jaTinha) TirarDaCamada(mesmo.Traco);
+            // Outro fio que mudou por tabela durante o arraste (o desvio): sai da textura so ate soltar.
+            (arrastando is not null ? camadaDaMao : destino).Children.Add(traco);
             visuaisFios.Add(traco);
+            if (chave is not null) desenhosDosFios[fio] = (chave, traco);
         }
+
+        // Os que sumiram (fio apagado, ponta sem pino, visao de energia).
+        foreach (var (_, resto) in antes) TirarDaCamada(resto.Traco);
+        foreach (var solto in tracosSemChave) TirarDaCamada(solto);
+        tracosSemChave.Clear();
+        if (visaoDeEnergia) tracosSemChave.AddRange(visuaisFios.Where(v => !desenhosDosFios.Values.Any(d => ReferenceEquals(d.Traco, v))));
+        PedirCacheDaFixa();
 
         RedesenharAlcas();
     }
@@ -4208,6 +4475,7 @@ public partial class EditorCircuito : Border
         }
         if (Math.Abs(nx - peca2.X) > 0.01 || Math.Abs(ny - peca2.Y) > 0.01) moveuDeVerdade = true;
 
+        double antesX = peca2.X, antesY = peca2.Y;
         peca2.X = nx; peca2.Y = ny;
         var def2 = Catalogo.Obter(peca2.Tipo);
 
@@ -4218,11 +4486,17 @@ public partial class EditorCircuito : Border
             if (ajuste is not null) { peca2.X += ajuste.Value.X; peca2.Y += ajuste.Value.Y; }
         }
 
+        // Grudada no mesmo furo, nao mudou nada: nem a rede, nem os fios.
+        if (peca2.X == antesX && peca2.Y == antesY) return;
+
+        LevarParaMao(peca2.Id);
+
         // Placa arrastada leva a carona quem esta espetado nela.
         foreach (var (id, dx, dy) in carona)
         {
             var passageira = Atual.Achar(id);
             if (passageira is null) continue;
+            LevarParaMao(id);
             passageira.X = peca2.X + dx;
             passageira.Y = peca2.Y + dy;
             Reposicionar(passageira);
@@ -4556,6 +4830,7 @@ public partial class EditorCircuito : Border
             string pegou = arrastando;
             arrastando = null;
             carona.Clear();
+            DevolverParaFixa();
             if (moveuDeVerdade) Mudou?.Invoke();
             else if (pegou == suporteDoClique && Atual.Achar(pegou) is { } suporte && Catalogo.Obter(suporte.Tipo) is { } defSuporte)
                 AlternarPilha(suporte, Baterias.SlotNoPonto(suporte.Tipo, Geometria.PontoLocal(suporte, defSuporte, pegouEm)));
@@ -4734,6 +5009,7 @@ public partial class EditorCircuito : Border
         deslocamento.X = ancoraTela.X - ancoraMundo.X * novo;
         deslocamento.Y = ancoraTela.Y - ancoraMundo.Y * novo;
         AplicarGrade();
+        PedirCacheDaFixa();
     }
 
     // ================= comandos =================
@@ -5276,7 +5552,7 @@ public partial class EditorCircuito : Border
         // placa em qualquer mudanca: mover, girar, espelhar.
         DesenharBotoesDaPlaca();
 
-        foreach (var r in realces) mundo.Children.Remove(r);
+        foreach (var r in realces) TirarDaCamada(r);
         realces.Clear();
 
         foreach (string id in selecionadas)
@@ -5300,7 +5576,7 @@ public partial class EditorCircuito : Border
             Canvas.SetLeft(r, peca.X - 4);
             Canvas.SetTop(r, peca.Y - 4);
             Panel.SetZIndex(r, 800);
-            mundo.Children.Add(r);
+            (arrastando is not null ? camadaDaMao : mundo).Children.Add(r);
             realces.Add(r);
         }
     }
@@ -5341,6 +5617,7 @@ public partial class EditorCircuito : Border
         DesenharSlotsCheios(rede);
 
         var grupo = new GeometryGroup();
+        var daMao = new GeometryGroup();
         if (rede is not null)
         {
             foreach (var peca in Atual.Pecas)
@@ -5350,16 +5627,18 @@ public partial class EditorCircuito : Border
                 if (def is null) continue;
 
                 double raio = Catalogo.EhPlacaDeDesenvolvimento(peca.Tipo) ? 3.4 : 2.8;
+                var destino = visuais.TryGetValue(peca.Id, out var visual) && visual.Parent == camadaDaMao ? daMao : grupo;
 
                 foreach (var pino in def.Pinos)
                 {
                     if (!rede.EstaLigado(peca.Id, pino.Nome)) continue;
                     var q = Geometria.PosicaoPino(peca, def, pino);
-                    grupo.Children.Add(new EllipseGeometry(q, raio, raio));
+                    destino.Children.Add(new EllipseGeometry(q, raio, raio));
                 }
             }
         }
-        pinosLigados.Data = grupo;
+        TrocarMarcas(pinosLigados, grupo);
+        TrocarMarcas(pinosNaMao, daMao);
     }
 
     /// <summary>
@@ -5385,7 +5664,7 @@ public partial class EditorCircuito : Border
                     Geometria.PosicaoPino(placa, def, furo), 2.6, 2.6));
             }
         }
-        slotsCheios.Data = grupo;
+        TrocarMarcas(slotsCheios, grupo);
     }
 
     /// <summary>
@@ -6602,6 +6881,8 @@ public partial class EditorCircuito : Border
                     else forca = ForcaDoLedDaPlaca(maq, ledsDaPlaca[k].Gpio);
                     double alvo = 0.94 * Luminancia(forca);
                     if (Math.Abs(luzesDaPlaca[k].Opacity - alvo) > 0.005) luzesDaPlaca[k].Opacity = alvo;
+                    // Como no LED: o TX pisca a cada println, e oculto perde a textura.
+                    if (alvo > 0 && luzesDaPlaca[k].Visibility != Visibility.Visible) luzesDaPlaca[k].Visibility = Visibility.Visible;
                 }
             }
 
@@ -6621,10 +6902,18 @@ public partial class EditorCircuito : Border
 
                     // A arte acesa entra assim que ha corrente; quem faz
                     // o meio-termo entre uma e outra e o halo.
-                    if (visual is Image img)
+                    if (ledsAcesos.TryGetValue(peca.Id, out var aceso))
                     {
-                        var alvo = Pecas.Obter(NomeSvg(peca, brilho > 0));
-                        if (!ReferenceEquals(img.Source, alvo)) img.Source = alvo;
+                        if (brilho > 0)
+                        {
+                            var alvo = LuzPronta(Pecas.Obter(NomeSvg(peca, true)));
+                            if (!ReferenceEquals(aceso.Source, alvo)) aceso.Source = alvo;
+                        }
+                        // Depois de acender, so a opacidade muda: oculto, o WPF joga fora a
+                        // textura, e cada piscada de cada LED teria de tracar o desenho de novo.
+                        if (brilho > 0 && aceso.Visibility != Visibility.Visible) aceso.Visibility = Visibility.Visible;
+                        double opacidade = brilho > 0 ? 1 : 0;
+                        if (aceso.Opacity != opacidade) aceso.Opacity = opacidade;
                     }
 
                     // Glow de verdade: halo radial que some nas bordas,
@@ -6639,7 +6928,7 @@ public partial class EditorCircuito : Border
                             // Do branco quente para a cor e depois some.
                             // O disco chapado na cor do LED que estava aqui
                             // parecia um adesivo por cima do bulbo.
-                            luz.Fill = new RadialGradientBrush
+                            var haloDoLed = Halo(halosDeLed, c, () => new RadialGradientBrush
                             {
                                 GradientStops =
                                 [
@@ -6648,7 +6937,8 @@ public partial class EditorCircuito : Border
                                     new GradientStop(Color.FromArgb(0x66, c.R, c.G, c.B), 0.34),
                                     new GradientStop(Color.FromArgb(0x00, c.R, c.G, c.B), 1.00),
                                 ]
-                            };
+                            });
+                            if (!ReferenceEquals(luz.Fill, haloDoLed)) luz.Fill = haloDoLed;
                             AjustarHalo(luz, f);
                         }
                     }
@@ -6734,8 +7024,10 @@ public partial class EditorCircuito : Border
     /// </summary>
     void DesenharSaidas(Bancada bancada, Netlist rede)
     {
+        // Atribuir uma geometria nova suja a tela mesmo igual a anterior, e com o desfoque
+        // deste Path o WPF recompoe o que esta embaixo: so troca quando mudou.
         var grupo = new GeometryGroup();
-        var pincel = new GradientStopCollection();
+        var assinatura = new System.Text.StringBuilder();
 
         foreach (var peca in Atual.Pecas)
         {
@@ -6768,11 +7060,29 @@ public partial class EditorCircuito : Border
                 // ou numa barra em rampa, da para ver a intensidade de
                 // cada segmento, e nao so que ele esta ligado.
                 double raio = 4.2 * (0.55 + 0.45 * Luminancia(forca));
-                grupo.Children.Add(new EllipseGeometry(
-                    Geometria.PosicaoPino(peca, def, pino), raio, raio));
+                var centro = Geometria.PosicaoPino(peca, def, pino);
+                grupo.Children.Add(new EllipseGeometry(centro, raio, raio));
+                assinatura.Append(centro.X).Append(',').Append(centro.Y).Append(',').Append(raio).Append(';');
             }
         }
+        string agora = assinatura.ToString();
+        if (agora == assinaturaDasSaidas) return;
+        assinaturaDasSaidas = agora;
         saidasAcesas.Data = grupo;
+        saidasAcesas.Visibility = agora.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    string assinaturaDasSaidas = "";
+    readonly Dictionary<Color, Brush> halosDeLed = [];
+    readonly Dictionary<Color, Brush> halosDeRgb = [];
+
+    /// <summary>O halo de cada cor: o mesmo pincel, para nao sujar a tela a cada quadro.</summary>
+    static Brush Halo(Dictionary<Color, Brush> cache, Color cor, Func<RadialGradientBrush> criar)
+    {
+        if (cache.TryGetValue(cor, out var pincel)) return pincel;
+        var novo = criar();
+        novo.Freeze();
+        return cache[cor] = novo;
     }
 
     /// <summary>
@@ -6835,7 +7145,7 @@ public partial class EditorCircuito : Border
         if (forte == 0) { AjustarHalo(luz, 0); return; }
 
         var cor = Color.FromRgb((byte)r, (byte)v, (byte)b);
-        luz.Fill = new RadialGradientBrush
+        var halo = Halo(halosDeRgb, cor, () => new RadialGradientBrush
         {
             GradientStops =
             [
@@ -6843,7 +7153,8 @@ public partial class EditorCircuito : Border
                 new GradientStop(Color.FromArgb(0x99, cor.R, cor.G, cor.B), 0.16),
                 new GradientStop(Color.FromArgb(0x00, cor.R, cor.G, cor.B), 1.00),
             ]
-        };
+        });
+        if (!ReferenceEquals(luz.Fill, halo)) luz.Fill = halo;
         AjustarHalo(luz, forte / 255.0);
     }
 
@@ -6873,6 +7184,8 @@ public partial class EditorCircuito : Border
     {
         double lum = Luminancia(brilho);
         luz.Opacity = 0.94 * lum;
+        // So se oculta antes da primeira vez: oculto, o WPF joga fora a textura do halo.
+        if (lum > 0 && luz.Visibility != Visibility.Visible) luz.Visibility = Visibility.Visible;
 
         if (luz.RenderTransform is not ScaleTransform escala)
         {

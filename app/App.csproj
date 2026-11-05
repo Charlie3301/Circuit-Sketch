@@ -10,6 +10,10 @@
          compilacao de depuracao) o executor do AVR nao dava os 16 MHz do chip.
          Otimizado sempre, inclusive na que roda os testes. -->
     <Optimize>true</Optimize>
+    <!-- A PGO recompila o que esta quente durante o primeiro minuto, numa thread que compete
+         com a janela. Sem ela, o executor do AVR perde cerca de 10% (e continua muito acima
+         dos 16 MHz) e os quadros param de atrasar nesse tempo. -->
+    <TieredPGO>false</TieredPGO>
     <RootNamespace>Simulador.App</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- O modo nativo desvia uma tarefa do C que falhou (ou travou) de volta

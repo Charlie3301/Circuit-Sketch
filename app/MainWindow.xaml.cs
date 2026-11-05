@@ -152,8 +152,12 @@ public partial class MainWindow : Window
         {
             Compilador.CppNativo = true;
             Compilador.AvisoDoCompilador = texto => Dispatcher.BeginInvoke(() => console.Info(texto));
-            CompiladorNativo.AquecerEmSegundoPlano(texto => Dispatcher.BeginInvoke(() => console.Info(texto)));
-            CompiladorCSharp.AquecerEmSegundoPlano();
+            // A medida de desempenho conta os quadros da janela, nao os do compilador.
+            if (!MedirDesempenho.Medindo)
+            {
+                CompiladorNativo.AquecerEmSegundoPlano(texto => Dispatcher.BeginInvoke(() => console.Info(texto)));
+                CompiladorCSharp.AquecerEmSegundoPlano();
+            }
         }
 
         // O resumo da visão de circuito acompanha a medida. Vai direto
@@ -1077,8 +1081,8 @@ public partial class MainWindow : Window
 
         // Monitor serial: o que a placa anterior imprimiu, o que ficou
         // digitado para ela, e o espelho que a Arduino IDE acompanha.
-        txtSerial.Text = "";
         painelSerial.Clear();
+        RedesenharSerial();
         serialPorPlaca.Clear();
         avisosPorPlaca.Clear();
         txtEntradaSerial.Clear();
@@ -4352,7 +4356,8 @@ public partial class MainWindow : Window
 
     internal void TesteAtualizarSerial() => AtualizarSerial();
 
-    internal string TesteSerial => txtSerial.Text;
+    internal void TesteDarPorSalvo() => circuitoSalvo = AssinaturaAtual();
+    internal string TesteSerial => string.Join(Environment.NewLine, LinhasDoSerial(0, painelSerial.Count));
 
     /// <summary>O que a barra de status esta dizendo agora.</summary>
     internal string TesteStatus => txtStatus.Text;
@@ -4460,8 +4465,7 @@ public partial class MainWindow : Window
             if (maq.Pwm[i] > 0) algumLigado = true;
 
         bool viva = execucoes.Values.Any(t => t is { IsAlive: true });
-        int noPainel = txtSerial.Text.Length == 0
-            ? 0 : txtSerial.Text.Count(ch => ch == (char)10) + 1;
+        int noPainel = painelSerial.Count;
 
         return $"serial={linhas} algumLedLigado={algumLigado} "
              + $"rodarHabilitado={btRodar.IsEnabled} pararHabilitado={btParar.IsEnabled} "
@@ -4861,8 +4865,8 @@ public partial class MainWindow : Window
         avisosPorPlaca.Clear();
         if (Preferencias.Ligado(Preferencias.LimparSerialAoRodar, true))
         {
-            txtSerial.Text = "";
             painelSerial.Clear();
+            RedesenharSerial();
         }
         else if (painelSerial.Count > 0)
         {
@@ -6232,13 +6236,64 @@ public partial class MainWindow : Window
     static readonly System.Text.RegularExpressions.Regex TempoDaLinha =
         new(@"\[\s*\d+ms\] ", System.Text.RegularExpressions.RegexOptions.Compiled);
 
-    /// <summary>O monitor na tela, com ou sem o tempo de cada linha.</summary>
-    void RedesenharSerial()
+    /// <summary>As linhas do monitor na tela, com ou sem o tempo de cada uma.</summary>
+    IEnumerable<string> LinhasDoSerial(int comeco, int quantas)
     {
         bool comTempo = Preferencias.Ligado(Preferencias.TempoNoSerial, true);
-        txtSerial.Text = string.Join(Environment.NewLine,
-            comTempo ? painelSerial : painelSerial.Select(l => TempoDaLinha.Replace(l, "", 1)));
-        if (Preferencias.Ligado(Preferencias.RolarSerial, true)) rolagemSerial.ScrollToEnd();
+        var linhas = painelSerial.Skip(comeco).Take(quantas);
+        return comTempo ? linhas : linhas.Select(l => TempoDaLinha.Replace(l, "", 1));
+    }
+
+    /// <summary>Linhas a mais em cima e embaixo da parte que aparece, para rolar sem refazer o texto.</summary>
+    const int FolgaDoSerial = 5;
+
+    int primeiraNaTelaDoSerial, quantasNaTelaDoSerial;
+
+    /// <summary>
+    /// O monitor na tela. So as linhas que aparecem vao para o texto, e as margens fazem o papel
+    /// das outras na barra de rolagem: refazer todas a cada println pesava na janela inteira.
+    /// </summary>
+    void RedesenharSerial()
+    {
+        bool rolar = Preferencias.Ligado(Preferencias.RolarSerial, true);
+        double altura = txtSerial.LineHeight;
+        double janela = rolagemSerial.ViewportHeight > 0 ? rolagemSerial.ViewportHeight : 600;
+        int total = painelSerial.Count;
+        int quantas = Math.Min(total, (int)Math.Ceiling(janela / altura) + 2 * FolgaDoSerial);
+        int primeira = rolar ? total - quantas
+            : Math.Clamp((int)(rolagemSerial.VerticalOffset / altura) - FolgaDoSerial, 0, total - quantas);
+
+        MostrarLinhasDoSerial(primeira, quantas);
+        // A largura da linha mais comprida de todas (Consolas: toda letra tem a mesma largura),
+        // para a barra de lado nao mudar conforme o que esta aparecendo.
+        int maisComprida = 0;
+        foreach (string linha in painelSerial) maisComprida = Math.Max(maisComprida, linha.Length);
+        txtSerial.MinWidth = maisComprida * txtSerial.FontSize * 0.55;
+        if (rolar) rolagemSerial.ScrollToEnd();
+    }
+
+    void MostrarLinhasDoSerial(int primeira, int quantas)
+    {
+        double altura = txtSerial.LineHeight;
+        txtSerial.Text = string.Join(Environment.NewLine, LinhasDoSerial(primeira, quantas));
+        txtSerial.Margin = new Thickness(0, primeira * altura, 0, (painelSerial.Count - primeira - quantas) * altura);
+        primeiraNaTelaDoSerial = primeira;
+        quantasNaTelaDoSerial = quantas;
+    }
+
+    /// <summary>Quem rola com a roda ou a barra chega nas linhas que ainda nao estao no texto.</summary>
+    void RolouOSerial(object s, ScrollChangedEventArgs e)
+    {
+        if (e.VerticalChange == 0 && e.ViewportHeightChange == 0) return;
+        double altura = txtSerial.LineHeight;
+        int topo = (int)(rolagemSerial.VerticalOffset / altura);
+        int fim = (int)Math.Ceiling((rolagemSerial.VerticalOffset + rolagemSerial.ViewportHeight) / altura);
+        bool faltaEmCima = topo < primeiraNaTelaDoSerial;
+        bool faltaEmBaixo = fim > primeiraNaTelaDoSerial + quantasNaTelaDoSerial && primeiraNaTelaDoSerial + quantasNaTelaDoSerial < painelSerial.Count;
+        if (!faltaEmCima && !faltaEmBaixo) return;
+
+        int quantas = Math.Min(painelSerial.Count, fim - topo + 2 * FolgaDoSerial);
+        MostrarLinhasDoSerial(Math.Clamp(topo - FolgaDoSerial, 0, painelSerial.Count - quantas), quantas);
     }
 
     /// <summary>O fim de linha que o monitor manda, como na Arduino IDE.</summary>

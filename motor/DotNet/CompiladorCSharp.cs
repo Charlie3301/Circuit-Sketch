@@ -64,8 +64,10 @@ public static class CompiladorCSharp
     public static void AquecerEmSegundoPlano()
         => Task.Run(() =>
         {
+            Thread.CurrentThread.Priority = ThreadPriority.Lowest;
             try { Compilar(new Projeto { Sketch = "System.Console.WriteLine();", Placa = "esp32-devkit-v1" }); }
             catch { }
+            Thread.CurrentThread.Priority = ThreadPriority.Normal;
         });
 
     /// <summary>

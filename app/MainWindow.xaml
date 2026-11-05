@@ -618,7 +618,7 @@
                                      KeyDown="TeclaNaEntradaSerial"/>
                         </DockPanel>
                         <ScrollViewer x:Name="rolagemSerial" VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Auto">
+                                      HorizontalScrollBarVisibility="Auto" ScrollChanged="RolouOSerial">
                             <!-- Sem quebra automatica: cada println e uma linha, e
                                  linha comprida rola de lado em vez de virar duas. -->
                             <TextBlock x:Name="txtSerial" VerticalAlignment="Top" FontFamily="Consolas" FontSize="11"

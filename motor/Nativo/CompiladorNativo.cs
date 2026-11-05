@@ -285,6 +285,8 @@ public static class CompiladorNativo
         if (!Disponivel || aquecimento is not null) return;
         aquecimento = Task.Run(() =>
         {
+            // Com a janela abrindo e a pessoa montando o circuito, quem espera e o aquecimento.
+            Thread.CurrentThread.Priority = ThreadPriority.Lowest;
             foreach (string placa in new[] { "esp32-devkit-v1", "arduino-uno" })
             {
                 try
@@ -294,6 +296,7 @@ public static class CompiladorNativo
                 }
                 catch { }
             }
+            Thread.CurrentThread.Priority = ThreadPriority.Normal;
         });
     }
 

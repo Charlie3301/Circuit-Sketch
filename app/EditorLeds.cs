@@ -111,10 +111,18 @@ public partial class EditorCircuito
                     luz.Fill = new SolidColorBrush(cor);
                     if (luz.Effect is System.Windows.Media.Effects.DropShadowEffect s) s.Color = cor;
                 }
-                var figura = new PathFigure { IsClosed = true, IsFilled = true, StartPoint = Geometria.PosicaoLocal(peca, def, contorno[0].X, contorno[0].Y) };
-                for (int k = 1; k < contorno.Length; k++)
-                    figura.Segments.Add(new LineSegment(Geometria.PosicaoLocal(peca, def, contorno[k].X, contorno[k].Y), false));
-                luz.Data = new PathGeometry([figura]);
+                // So com a peca no lugar novo: geometria nova refaria a textura do segmento a cada quadro.
+                var cantos = new System.Windows.Point[contorno.Length];
+                for (int k = 0; k < contorno.Length; k++)
+                    cantos[k] = Geometria.PosicaoLocal(peca, def, contorno[k].X, contorno[k].Y);
+                if (luz.Tag is not System.Windows.Point[] antes || !antes.SequenceEqual(cantos))
+                {
+                    luz.Tag = cantos;
+                    var figura = new PathFigure { IsClosed = true, IsFilled = true, StartPoint = cantos[0] };
+                    for (int k = 1; k < cantos.Length; k++)
+                        figura.Segments.Add(new LineSegment(cantos[k], false));
+                    luz.Data = new PathGeometry([figura]);
+                }
             }
             if (Math.Abs(luz.Opacity - alvo) > 0.01) luz.Opacity = alvo;
         }

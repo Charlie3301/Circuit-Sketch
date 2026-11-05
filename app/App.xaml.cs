@@ -178,7 +178,7 @@ public partial class App : Application
         // gravariam nas preferencias e nos recentes de quem os rodou.
         // Tem que ser a primeira coisa: as preferencias ficam em memoria
         // depois da primeira leitura.
-        if (e.Args.Any(a => a is "--teste" or "--passeio" or "--fluxo" or "--desenho"))
+        if (e.Args.Any(a => a is "--teste" or "--passeio" or "--fluxo" or "--desenho" or "--desempenho"))
         {
             Armazem.Isolar();
             Exit += (_, _) => Armazem.Descartar();
@@ -369,6 +369,21 @@ public partial class App : Application
         if (iPasseio >= 0 && iPasseio + 1 < e.Args.Length)
         {
             Passeio.Comecar(this, e.Args[iPasseio + 1]);
+            return;
+        }
+
+        // Mede os quadros da janela de verdade com circuitos de varios tamanhos.
+        int iDesempenho = Array.IndexOf(e.Args, "--desempenho");
+        if (iDesempenho >= 0 && iDesempenho + 1 < e.Args.Length)
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            string medida;
+            int iOndeAntes = Array.IndexOf(e.Args, "--saida");
+            try { medida = MedirDesempenho.Rodar(e.Args[iDesempenho + 1], int.TryParse(Environment.GetEnvironmentVariable("CS_MED_MS"), out int msDaCena) ? msDaCena : 8000, iOndeAntes >= 0 && iOndeAntes + 1 < e.Args.Length ? e.Args[iOndeAntes + 1] : null); }
+            catch (Exception erro) { medida = "ESTOUROU: " + erro; }
+            int iOnde = Array.IndexOf(e.Args, "--saida");
+            if (iOnde >= 0 && iOnde + 1 < e.Args.Length) File.WriteAllText(e.Args[iOnde + 1], medida);
+            Shutdown(0);
             return;
         }
 
