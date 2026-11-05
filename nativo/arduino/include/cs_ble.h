@@ -57,6 +57,10 @@ struct cs_uuid_nativo {
     } u128;
 };
 
+#if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32S2)
+#include "esp_bt_defs.h"
+#endif
+
 class BLEUUID {
     String texto;
     mutable cs_uuid_nativo nativo;
@@ -86,6 +90,14 @@ public:
         }
         texto = t;
     }
+#if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32S2)
+    BLEUUID(esp_bt_uuid_t u)
+    {
+        if (u.len == ESP_UUID_LEN_16) *this = BLEUUID(u.uuid.uuid16);
+        else if (u.len == ESP_UUID_LEN_32) *this = BLEUUID(u.uuid.uuid32);
+        else if (u.len == ESP_UUID_LEN_128) *this = BLEUUID(u.uuid.uuid128, 16, false);
+    }
+#endif
     BLEUUID(const char *uuid) : texto(uuid) {}
     BLEUUID(const String &uuid) : texto(uuid) {}
     BLEUUID(uint16_t uuid)
@@ -101,6 +113,14 @@ public:
         texto = t;
     }
     String toString() const { return texto; }
+    static BLEUUID fromString(String uuid) { return BLEUUID(uuid); }
+    /* O de 128 bits so encurta se estiver na base do Bluetooth. */
+    BLEUUID to16() const
+    {
+        if (bitSize() == 16) return *this;
+        if (bitSize() == 32) return texto.startsWith("0000") ? BLEUUID(texto.substring(4)) : BLEUUID();
+        return texto.startsWith("0000") && texto.substring(8).equalsIgnoreCase("-0000-1000-8000-00805f9b34fb") ? BLEUUID(texto.substring(4, 8)) : BLEUUID();
+    }
     bool equals(const BLEUUID &o) const { return texto.equalsIgnoreCase(o.texto); }
     bool operator==(const BLEUUID &o) const { return equals(o); }
     int bitSize() const { return texto.length() > 8 ? 128 : texto.length() > 4 ? 32 : 16; }
@@ -143,9 +163,28 @@ public:
     BLEAddress() {}
     BLEAddress(const String &t) : texto(t) {}
     BLEAddress(const char *t) : texto(t) {}
+    BLEAddress(const uint8_t *b, uint8_t tipoDoEndereco = 0) : tipo(tipoDoEndereco)
+    {
+        char t[18];
+        snprintf(t, sizeof(t), "%02x:%02x:%02x:%02x:%02x:%02x", b[0], b[1], b[2], b[3], b[4], b[5]);
+        texto = t;
+    }
     String toString() const { return texto; }
+    uint8_t getType() const { return tipo; }
+    void setType(uint8_t t) { tipo = t; }
+    uint8_t *getNative()
+    {
+        unsigned v[6] = {0};
+        sscanf(texto.c_str(), "%x:%x:%x:%x:%x:%x", &v[0], &v[1], &v[2], &v[3], &v[4], &v[5]);
+        for (int i = 0; i < 6; i++) nativo[i] = (uint8_t)v[i];
+        return nativo;
+    }
     bool equals(const BLEAddress &o) const { return texto.equalsIgnoreCase(o.texto); }
     bool operator==(const BLEAddress &o) const { return equals(o); }
+
+private:
+    uint8_t tipo = 0;
+    uint8_t nativo[6] = {0};
 };
 inline cs_val cs_de(const BLEAddress &a)
 {
@@ -158,6 +197,7 @@ inline cs_val cs_de(const BLEAddress &a)
 
 #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32S2)
 #include "esp_gatts_api.h"
+#include "esp_gap_ble_api.h"
 #else
 typedef union {
     struct {
@@ -190,6 +230,9 @@ public:
     /* Os do NimBLE (o BLE do C6/H2 e do core 3.x com NimBLE). */
     virtual void onConnect(BLEServer *, ble_gap_conn_desc *) {}
     virtual void onDisconnect(BLEServer *, ble_gap_conn_desc *) {}
+#if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32S2)
+    virtual void onConnParamsUpdate(esp_bd_addr_t, uint16_t, uint16_t, uint16_t, esp_bt_status_t) {}
+#endif
 };
 
 class BLECharacteristicCallbacks {
@@ -238,6 +281,13 @@ public:
     BLEUUID getUUID() { return BLEUUID(cs_ble_texto(cs_obj_t(cs_nome, "getUUID"))); }
     void setAccessPermissions(uint16_t perm) { cs_obj_n(cs_nome, "setAccessPermissions", perm); }
     void setCallbacks(BLEDescriptorCallbacks *cb) { (void)cb; }
+    BLECharacteristic *getCharacteristic() const { return m_dona; }
+    uint16_t getHandle() const;
+    String toString() const;
+
+private:
+    friend class BLECharacteristic;
+    BLECharacteristic *m_dona = nullptr;
 };
 
 class BLE2902 : public BLEDescriptor {
@@ -300,7 +350,12 @@ public:
     size_t getLength() { return (size_t)cs_obj_i(cs_nome, "getLength"); }
     void notify(bool is_notification = true) { (void)is_notification; cs_obj_n(cs_nome, "notify"); }
     void indicate() { cs_obj_n(cs_nome, "indicate"); }
-    void addDescriptor(BLEDescriptor *d) { cs_obj_n(cs_nome, "addDescriptor", d); }
+    void addDescriptor(BLEDescriptor *d)
+    {
+        d->m_dona = this;
+        cs_obj_n(cs_nome, "addDescriptor", d);
+    }
+    uint32_t getProperties() const { return (uint32_t)cs_obj_i(cs_nome, "getProperties"); }
     BLEDescriptor *getDescriptorByUUID(const char *uuid) { return cs_envolver<BLEDescriptor>(cs_obj_t(cs_nome, "getDescriptorByUUID", uuid)); }
     BLEDescriptor *getDescriptorByUUID(BLEUUID uuid) { return cs_envolver<BLEDescriptor>(cs_obj_t(cs_nome, "getDescriptorByUUID", uuid)); }
     BLEUUID getUUID() { return BLEUUID(cs_ble_texto(cs_obj_t(cs_nome, "getUUID"))); }
@@ -315,6 +370,12 @@ public:
     void setAccessPermissions(uint16_t perm) { cs_obj_n(cs_nome, "setAccessPermissions", perm); }
     String toString() { return cs_obj_t(cs_nome, "toString"); }
 };
+
+inline uint16_t BLEDescriptor::getHandle() const { return m_dona ? (uint16_t)(m_dona->getHandle() + 1) : 0xFFFF; }
+inline String BLEDescriptor::toString() const
+{
+    return "UUID: " + const_cast<BLEDescriptor *>(this)->getUUID().toString() + ", handle: 0x" + String(getHandle(), HEX);
+}
 
 class BLEService : public CsObjeto {
 public:
@@ -335,6 +396,15 @@ public:
     BLEUUID getUUID() { return BLEUUID(cs_ble_texto(cs_obj_t(cs_nome, "getUUID"))); }
     uint16_t getHandle() { return (uint16_t)cs_obj_i(cs_nome, "getHandle"); }
     String toString() { return cs_obj_t(cs_nome, "toString"); }
+    BLEServer *getServer() { return m_servidor; }
+    void executeCreate(BLEServer *servidor) { m_servidor = servidor; }
+    void executeDelete() {}
+    void removeCharacteristic(BLECharacteristic *c, bool = false) { cs_obj_n(cs_nome, "removeCharacteristic", c); }
+    void dump() { Serial.printf("Service: uuid:%s, handle: 0x%.2x\n", getUUID().toString().c_str(), getHandle()); }
+
+private:
+    friend class BLEServer;
+    BLEServer *m_servidor = nullptr;
 };
 
 class BLEAdvertisementData : public CsObjeto {
@@ -347,6 +417,9 @@ public:
     /* Os bytes vao em hexadecimal (o simulador leva o anuncio para quem varre). */
     void setManufacturerData(const String &data) { cs_obj_n(cs_nome, "__fabricante_hex", cs_ble_hex(data)); }
     void setServiceData(BLEUUID uuid, const String &data) { cs_obj_n(cs_nome, "__servico_hex", uuid, cs_ble_hex(data)); }
+    void addTxPower() {}
+    void setPreferredParams(uint16_t, uint16_t) {}
+    String getPayload() { return cs_ble_de_hex(cs_obj_t(cs_nome, "__carga_hex")); }
     void setCompleteServices(BLEUUID uuid) { cs_obj_n(cs_nome, "setCompleteServices", uuid); }
     void setPartialServices(BLEUUID uuid) { cs_obj_n(cs_nome, "setPartialServices", uuid); }
     /* As estruturas cruas do anuncio (tamanho, tipo, dados), como o Eddystone monta: o
@@ -372,8 +445,21 @@ public:
     void addServiceUUID(const char *uuid) { cs_obj_n(cs_nome, "addServiceUUID", uuid); }
     void addServiceUUID(BLEUUID uuid) { cs_obj_n(cs_nome, "addServiceUUID", uuid); }
     void removeServiceUUID(BLEUUID uuid) { cs_obj_n(cs_nome, "removeServiceUUID", uuid); }
-    bool start() { cs_obj_n(cs_nome, "start"); return true; }
+    bool start(uint32_t duracao = 0, void (*aoAcabar)(BLEAdvertising *) = nullptr)
+    {
+        (void)duracao;
+        (void)aoAcabar;
+        cs_obj_n(cs_nome, "start");
+        return true;
+    }
     bool stop() { cs_obj_n(cs_nome, "stop"); return true; }
+    bool isAdvertising() { return cs_obj_i(cs_nome, "isAdvertising") != 0; }
+    void reset() { cs_obj_n(cs_nome, "stop"); }
+    void setName(String nome) { cs_obj_n(cs_nome, "setName", nome); }
+    void addTxPower() {}
+    void setPrivateAddress(uint8_t = 1) {}
+    void setScanFilter(bool, bool) {}
+    void setAdvertisementChannelMap(uint8_t) {}
     void setScanResponse(bool v) { cs_obj_n(cs_nome, "setScanResponse", v); }
     void setMinPreferred(uint16_t v) { cs_obj_n(cs_nome, "setMinPreferred", v); }
     void setMaxPreferred(uint16_t v) { cs_obj_n(cs_nome, "setMaxPreferred", v); }
@@ -389,12 +475,27 @@ public:
 class BLEServer : public CsObjeto {
 public:
     explicit BLEServer(const String &nome) { cs_adotar(nome); }
-    BLEService *createService(const char *uuid) { return cs_envolver<BLEService>(cs_obj_t(cs_nome, "createService", uuid)); }
+    BLEService *createService(const char *uuid)
+    {
+        BLEService *s = cs_envolver<BLEService>(cs_obj_t(cs_nome, "createService", uuid));
+        if (s) s->m_servidor = this;
+        return s;
+    }
     BLEService *createService(BLEUUID uuid, uint32_t numHandles = 15, uint8_t inst_id = 0)
     {
         (void)inst_id;
-        return cs_envolver<BLEService>(cs_obj_t(cs_nome, "createService", uuid, numHandles));
+        BLEService *s = cs_envolver<BLEService>(cs_obj_t(cs_nome, "createService", uuid, numHandles));
+        if (s) s->m_servidor = this;
+        return s;
     }
+    uint16_t getConnId() { return getConnectedCount() ? 0 : 0xFFFF; }
+    uint16_t getHandle() { return 0; }
+    bool connect(BLEAddress) { return false; }
+    BLEServer *getServerByConnId(uint16_t) { return this; }
+    void updatePeerMTU(uint16_t, uint16_t) {}
+    bool removePeerDevice(uint16_t, bool) { return false; }
+    void restoreCCCDValues(const BLEAddress &) {}
+    bool requestConnParams(uint8_t *, uint16_t, uint16_t, uint16_t, uint16_t) { return getConnectedCount() != 0; }
     BLEService *getServiceByUUID(const char *uuid) { return cs_envolver<BLEService>(cs_obj_t(cs_nome, "getServiceByUUID", uuid)); }
     BLEAdvertising *getAdvertising() { return cs_envolver<BLEAdvertising>(cs_obj_t(cs_nome, "getAdvertising")); }
     void setCallbacks(BLEServerCallbacks *cb);
@@ -418,13 +519,71 @@ public:
     }
 };
 
-class BLESecurity : public CsObjeto {
+/* O radio simulado nao cifra nem faz pareamento: a configuracao fica guardada e nada a pede. */
+#ifndef BLE_SM_DEFAULT_PASSKEY
+#define BLE_SM_DEFAULT_PASSKEY 123456
+#endif
+
+class BLESecurityCallbacks {
 public:
-    BLESecurity() { cs_criar("BLESecurity"); }
-    void setAuthenticationMode(uint8_t mode) { (void)mode; }
-    void setCapability(uint8_t cap) { (void)cap; }
-    void setInitEncryptionKey(uint8_t key) { (void)key; }
-    void setStaticPIN(uint32_t pin) { (void)pin; }
+    virtual ~BLESecurityCallbacks() = default;
+    virtual uint32_t onPassKeyRequest() { return BLE_SM_DEFAULT_PASSKEY; }
+    virtual void onPassKeyNotify(uint32_t) {}
+    virtual bool onSecurityRequest() { return true; }
+    virtual bool onConfirmPIN(uint32_t) { return true; }
+    virtual bool onAuthorizationRequest(uint16_t, uint16_t, bool) { return true; }
+#if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32S2) && !defined(CONFIG_NIMBLE_ENABLED)
+    virtual void onAuthenticationComplete(esp_ble_auth_cmpl_t) {}
+#endif
+};
+
+class BLESecurity {
+public:
+    BLESecurity() {}
+    virtual ~BLESecurity() = default;
+    static void setAuthenticationMode(uint8_t) {}
+    static void setAuthenticationMode(bool, bool, bool) {}
+    static void setCapability(uint8_t) {}
+    static void setInitEncryptionKey(uint8_t = 0) {}
+    static void setRespEncryptionKey(uint8_t = 0) {}
+    static void setKeySize(uint8_t = 16) {}
+    static void setStaticPIN(uint32_t pin) { chave() = pin; }
+    static uint32_t setPassKey(bool = false, uint32_t passkey = BLE_SM_DEFAULT_PASSKEY) { return chave() = passkey; }
+    static uint32_t getPassKey() { return chave(); }
+    static uint32_t generateRandomPassKey() { return (uint32_t)random(0, 1000000); }
+    static void regenPassKeyOnConnect(bool = false) {}
+    static void resetSecurity() { chave() = BLE_SM_DEFAULT_PASSKEY; forcar() = false; }
+    static void setForceAuthentication(bool v) { forcar() = v; }
+    static bool getForceAuthentication() { return forcar(); }
+    static void waitForAuthenticationComplete(uint32_t = 10000) {}
+    static void signalAuthenticationComplete() {}
+#if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32S2) && !defined(CONFIG_NIMBLE_ENABLED)
+    static char *esp_key_type_to_str(esp_ble_key_type_t) { return (char *)"ESP_LE_KEY_NONE"; }
+    static void setEncryptionLevel(esp_ble_sec_act_t) {}
+    static bool startSecurity(esp_bd_addr_t, int *rc = nullptr)
+    {
+        if (rc) *rc = 0;
+        return true;
+    }
+#else
+    static bool startSecurity(uint16_t, int *rc = nullptr)
+    {
+        if (rc) *rc = 0;
+        return true;
+    }
+#endif
+
+private:
+    static uint32_t &chave()
+    {
+        static uint32_t k = BLE_SM_DEFAULT_PASSKEY;
+        return k;
+    }
+    static bool &forcar()
+    {
+        static bool f = false;
+        return f;
+    }
 };
 
 /* ---- o cliente ---- */
@@ -454,9 +613,30 @@ public:
     void registerForNotify(notify_callback cb, bool notifications = true, bool descriptorRequiresRegistration = true);
     String toString() { return cs_obj_t(cs_nome, "toString"); }
     class BLERemoteDescriptor *getDescriptor(BLEUUID uuid);
+    std::map<std::string, class BLERemoteDescriptor *> *getDescriptors();
+    class BLERemoteService *getRemoteService();
+    bool canBroadcast() { return false; }
+    void setAuth(uint8_t) {}
+    uint8_t *readRawData()
+    {
+        static String guardado;
+        guardado = readValue();
+        return (uint8_t *)guardado.c_str();
+    }
+    bool subscribe(bool notificacoes = true, notify_callback cb = nullptr, bool = true)
+    {
+        registerForNotify(cb, notificacoes);
+        return canNotify() || canIndicate();
+    }
+    bool unsubscribe(bool = true)
+    {
+        registerForNotify(nullptr);
+        return true;
+    }
 
 private:
     class BLERemoteDescriptor *cccd = nullptr;
+    std::map<std::string, class BLERemoteDescriptor *> descritores;
 };
 
 /* O descritor do lado do cliente. O simulador nao leva os descritores do
@@ -502,6 +682,13 @@ inline BLERemoteDescriptor *BLERemoteCharacteristic::getDescriptor(BLEUUID uuid)
     return cccd;
 }
 
+inline std::map<std::string, BLERemoteDescriptor *> *BLERemoteCharacteristic::getDescriptors()
+{
+    BLEUUID u((uint16_t)0x2902);
+    if (BLERemoteDescriptor *d = getDescriptor(u)) descritores[u.to128().toString().c_str()] = d;
+    return &descritores;
+}
+
 class BLERemoteService : public CsObjeto {
 public:
     explicit BLERemoteService(const String &nome) { cs_adotar(nome); }
@@ -516,7 +703,39 @@ public:
     String getValue(BLEUUID uuid) { return cs_obj_t(cs_nome, "getValue", uuid); }
     void setValue(BLEUUID uuid, const String &v) { cs_obj_n(cs_nome, "setValue", uuid, v); }
     BLEUUID getUUID() { return BLEUUID(cs_ble_texto(cs_obj_t(cs_nome, "getUUID"))); }
+    uint16_t getHandle() { return (uint16_t)cs_obj_i(cs_nome, "getHandle"); }
+    String toString() { return cs_obj_t(cs_nome, "toString"); }
+    BLEClient *getClient();
+    void retrieveCharacteristics() { getCharacteristics(); }
+    /* O que o servidor tem, em ordem: a descoberta volta do simulador como lista de UUIDs. */
+    std::map<std::string, BLERemoteCharacteristic *> *getCharacteristics()
+    {
+        String lista = cs_obj_t(cs_nome, "__caracteristicas");
+        while (lista.length()) {
+            int fim = lista.indexOf(',');
+            String u = fim < 0 ? lista : lista.substring(0, fim);
+            lista = fim < 0 ? String() : lista.substring(fim + 1);
+            if (BLERemoteCharacteristic *c = getCharacteristic(BLEUUID(u))) {
+                porUuid[u.c_str()] = c;
+                porHandle[c->getHandle()] = c;
+            }
+        }
+        return &porUuid;
+    }
+    std::map<uint16_t, BLERemoteCharacteristic *> *getCharacteristicsByHandle()
+    {
+        getCharacteristics();
+        return &porHandle;
+    }
+
+private:
+    std::map<std::string, BLERemoteCharacteristic *> porUuid;
+    std::map<uint16_t, BLERemoteCharacteristic *> porHandle;
 };
+
+inline BLERemoteService *BLERemoteCharacteristic::getRemoteService() { return cs_envolver<BLERemoteService>(cs_obj_t(cs_nome, "getRemoteService")); }
+
+typedef enum { BLE_UNKNOWN_FRAME, BLE_EDDYSTONE_UUID_FRAME, BLE_EDDYSTONE_URL_FRAME, BLE_EDDYSTONE_TLM_FRAME, BLE_FRAME_MAX } ble_frame_type_t;
 
 class BLEAdvertisedDevice : public CsObjeto {
 public:
@@ -531,6 +750,23 @@ public:
     String getServiceData() { return cs_ble_de_hex(cs_obj_t(cs_nome, "__servico_hex")); }
     BLEUUID getServiceDataUUID() { return BLEUUID(cs_obj_t(cs_nome, "__servico_uuid")); }
     int getServiceDataCount() { return haveServiceData() ? 1 : 0; }
+    int getServiceDataUUIDCount() { return getServiceDataCount(); }
+    uint8_t getAddressType() { return tipoDeEndereco; }
+    void setAddressType(uint8_t t) { tipoDeEndereco = t; }
+    uint8_t getAdvType() { return tipoDeAnuncio; }
+    void setAdvType(uint8_t t) { tipoDeAnuncio = t; }
+    bool isLegacyAdvertisement() { return true; }
+    bool isScannable() { return isConnectable(); }
+    BLEScan *getScan();
+    /* O Eddystone: o servico 0xFEAA, e o primeiro byte do dado diz o quadro. */
+    ble_frame_type_t getFrameType()
+    {
+        if (!haveServiceData() || !getServiceDataUUID().equals(BLEUUID((uint16_t)0xFEAA))) return BLE_UNKNOWN_FRAME;
+        String d = getServiceData();
+        if (!d.length()) return BLE_UNKNOWN_FRAME;
+        uint8_t tipo = (uint8_t)d[0];
+        return tipo == 0x00 ? BLE_EDDYSTONE_UUID_FRAME : tipo == 0x10 ? BLE_EDDYSTONE_URL_FRAME : tipo == 0x20 ? BLE_EDDYSTONE_TLM_FRAME : BLE_UNKNOWN_FRAME;
+    }
     /* O anuncio como chegou no ar (as estruturas tamanho/tipo/dados): os flags,
      * o nome, os servicos, o dado de servico e o do fabricante. */
     uint8_t *getPayload()
@@ -575,6 +811,7 @@ public:
 
 private:
     String carga;
+    uint8_t tipoDeEndereco = 0, tipoDeAnuncio = 0;
 
 public:
     BLEUUID getServiceUUID() { return BLEUUID(cs_ble_texto(cs_obj_t(cs_nome, "getServiceUUID"))); }
@@ -603,6 +840,11 @@ public:
     explicit BLEScanResults(const String &nome) { cs_adotar(nome); }
     int getCount() { return cs_nome[0] ? (int)cs_obj_i(cs_nome, "getCount") : 0; }
     BLEAdvertisedDevice getDevice(uint32_t i) { return BLEAdvertisedDevice(cs_obj_t(cs_nome, "getDevice", i)); }
+    void dump()
+    {
+        Serial.printf("Number of devices: %d\n", getCount());
+        for (int i = 0; i < getCount(); i++) Serial.printf("- %s\n", getDevice(i).toString().c_str());
+    }
 };
 
 class BLEScan : public CsObjeto {
@@ -620,13 +862,16 @@ public:
         r = BLEScanResults(cs_obj_t(cs_nome, "start", duration));
         return &r;
     }
+    /* O start daqui espera a varredura acabar: o aviso vem logo depois dela. */
     bool start(uint32_t duration, void (*scanCompleteCB)(BLEScanResults), bool is_continue = false)
     {
-        (void)scanCompleteCB;
-        start(duration, is_continue);
+        BLEScanResults *r = start(duration, is_continue);
+        if (scanCompleteCB) scanCompleteCB(*r);
         return true;
     }
     void stop() { cs_obj_n(cs_nome, "stop"); }
+    void clearDuplicateCache() {}
+    void erase(BLEAddress) {}
     void clearResults() { cs_obj_n(cs_nome, "clearResults"); }
     bool isScanning() { return cs_obj_i(cs_nome, "isScanning") != 0; }
     BLEScanResults *getResults()
@@ -642,6 +887,7 @@ public:
     virtual ~BLEClientCallbacks() {}
     virtual void onConnect(BLEClient *) {}
     virtual void onDisconnect(BLEClient *) {}
+    virtual bool onConnParamsUpdateRequest(BLEClient *, const struct ble_gap_upd_params *) { return true; }
 };
 
 class BLEClient : public CsObjeto {
@@ -658,16 +904,182 @@ public:
     uint16_t getMTU() { return (uint16_t)cs_obj_i(cs_nome, "getMTU"); }
     bool setMTU(uint16_t mtu) { return cs_obj_i(cs_nome, "setMTU", mtu) != 0; }
     BLEAddress getPeerAddress() { return BLEAddress(cs_ble_texto(cs_obj_t(cs_nome, "getPeerAddress"))); }
+    bool connectTimeout(BLEAdvertisedDevice *device, uint32_t = 0xFFFFFFFF) { return connect(device); }
+    uint16_t getConnId() { return (uint16_t)cs_obj_i(cs_nome, "getConnId"); }
+    uint16_t getGattcIf() { return 0; }
+    String getValue(BLEUUID servico, BLEUUID caracteristica) { return cs_obj_t(cs_nome, "getValue", servico, caracteristica); }
+    void setValue(BLEUUID servico, BLEUUID caracteristica, String valor) { cs_obj_n(cs_nome, "setValue", servico, caracteristica, valor); }
+    bool secureConnection() { return cs_obj_i(cs_nome, "secureConnection") != 0; }
+    bool updateConnParams(uint16_t, uint16_t, uint16_t, uint16_t) { return cs_obj_i(cs_nome, "updateConnParams") != 0; }
+    String toString() { return cs_obj_t(cs_nome, "toString"); }
+    /* Os servicos do servidor: a descoberta volta do simulador como lista de UUIDs. */
+    std::map<std::string, BLERemoteService *> *getServices()
+    {
+        String lista = cs_obj_t(cs_nome, "__servicos");
+        while (lista.length()) {
+            int fim = lista.indexOf(',');
+            String u = fim < 0 ? lista : lista.substring(0, fim);
+            lista = fim < 0 ? String() : lista.substring(fim + 1);
+            if (BLERemoteService *s = getService(BLEUUID(u))) servicos[u.c_str()] = s;
+        }
+        return &servicos;
+    }
+
+private:
+    std::map<std::string, BLERemoteService *> servicos;
+};
+
+inline BLEClient *BLERemoteService::getClient() { return cs_envolver<BLEClient>(cs_obj_t(cs_nome, "getClient")); }
+
+enum class BLEStack { BLUEDROID, NIMBLE, UNKNOWN };
+
+/* O que o core guarda de cada conexao (BLEDevice::getPeerDevices). */
+typedef struct {
+    void *peer_device;
+    bool connected;
+    uint16_t mtu;
+} conn_status_t;
+
+class BLEDeviceCallbacks {
+public:
+    virtual ~BLEDeviceCallbacks() {}
+    virtual int onStoreStatus(struct ble_store_status_event *, void *) { return 0; }
 };
 
 /* ---- o BLEDevice (tudo static) ---- */
 class BLEDevice {
+    static String &nomeDoAparelho()
+    {
+        static String n;
+        return n;
+    }
+    static bool &ligado()
+    {
+        static bool l = false;
+        return l;
+    }
+    static BLEServer *&servidor()
+    {
+        static BLEServer *s = nullptr;
+        return s;
+    }
+    static std::vector<BLEClient *> &clientes()
+    {
+        static std::vector<BLEClient *> c;
+        return c;
+    }
+    static std::vector<String> &permitidos()
+    {
+        static std::vector<String> p;
+        return p;
+    }
+    static void anotar(const String &nome)
+    {
+        nomeDoAparelho() = nome;
+        ligado() = true;
+    }
+
 public:
-    static void init(const String &deviceName) { cs_obj_n(nullptr, "BLEDevice::init", deviceName); }
-    static void init(const char *deviceName) { cs_obj_n(nullptr, "BLEDevice::init", deviceName); }
-    static void deinit(bool release_memory = false) { cs_obj_n(nullptr, "BLEDevice::deinit", release_memory); }
-    static BLEServer *createServer() { return cs_envolver<BLEServer>(cs_obj_t(nullptr, "BLEDevice::createServer")); }
-    static BLEClient *createClient() { return cs_envolver<BLEClient>(cs_obj_t(nullptr, "BLEDevice::createClient")); }
+    static void init(const String &deviceName)
+    {
+        cs_obj_n(nullptr, "BLEDevice::init", deviceName);
+        anotar(deviceName);
+    }
+    static void init(const char *deviceName)
+    {
+        cs_obj_n(nullptr, "BLEDevice::init", deviceName);
+        anotar(deviceName);
+    }
+    static void deinit(bool release_memory = false)
+    {
+        cs_obj_n(nullptr, "BLEDevice::deinit", release_memory);
+        ligado() = false;
+        servidor() = nullptr;
+        clientes().clear();
+    }
+    static bool getInitialized() { return ligado(); }
+    static String getDeviceName() { return nomeDoAparelho(); }
+    static BLEServer *createServer() { return servidor() = cs_envolver<BLEServer>(cs_obj_t(nullptr, "BLEDevice::createServer")); }
+    static BLEServer *getServer() { return servidor(); }
+    static BLEClient *createClient()
+    {
+        BLEClient *c = cs_envolver<BLEClient>(cs_obj_t(nullptr, "BLEDevice::createClient"));
+        if (c) clientes().push_back(c);
+        return c;
+    }
+    static BLEClient *getClientByID(uint16_t id)
+    {
+        for (BLEClient *c : clientes())
+            if (c->isConnected() && c->getConnId() == id) return c;
+        return nullptr;
+    }
+    static BLEClient *getClientByGattIf(uint16_t id) { return getClientByID(id); }
+    static BLEClient *getClientByAddress(BLEAddress endereco)
+    {
+        for (BLEClient *c : clientes())
+            if (c->isConnected() && c->getPeerAddress().equals(endereco)) return c;
+        return nullptr;
+    }
+    /* Liga, le ou escreve, e desliga, como a biblioteca. */
+    static String getValue(BLEAddress endereco, BLEUUID servico, BLEUUID caracteristica)
+    {
+        BLEClient *c = createClient();
+        if (!c || !c->connect(endereco)) return String();
+        String valor = c->getValue(servico, caracteristica);
+        c->disconnect();
+        return valor;
+    }
+    static void setValue(BLEAddress endereco, BLEUUID servico, BLEUUID caracteristica, String valor)
+    {
+        BLEClient *c = createClient();
+        if (!c || !c->connect(endereco)) return;
+        c->setValue(servico, caracteristica, valor);
+        c->disconnect();
+    }
+    static std::map<uint16_t, conn_status_t> getPeerDevices(bool)
+    {
+        std::map<uint16_t, conn_status_t> mapa;
+        for (BLEClient *c : clientes())
+            if (c->isConnected()) mapa[c->getConnId()] = {c, true, c->getMTU()};
+        return mapa;
+    }
+    static void addPeerDevice(void *, bool, uint16_t) {}
+    static void removePeerDevice(uint16_t, bool) {}
+    static void whiteListAdd(BLEAddress endereco) { permitidos().push_back(endereco.toString()); }
+    static void whiteListRemove(BLEAddress endereco)
+    {
+        auto &p = permitidos();
+        p.erase(std::remove(p.begin(), p.end(), endereco.toString()), p.end());
+    }
+    static bool onWhiteList(BLEAddress &endereco)
+    {
+        auto &p = permitidos();
+        return std::find(p.begin(), p.end(), endereco.toString()) != p.end();
+    }
+    static BLEStack getBLEStack()
+    {
+#ifdef CONFIG_NIMBLE_ENABLED
+        return BLEStack::NIMBLE;
+#else
+        return BLEStack::BLUEDROID;
+#endif
+    }
+    static String getBLEStackString() { return getBLEStack() == BLEStack::NIMBLE ? "NimBLE" : "Bluedroid"; }
+    static bool isHostedBLE() { return false; }
+    static bool setPins(int8_t, int8_t, int8_t, int8_t, int8_t, int8_t, int8_t) { return true; }
+    static void setDeviceCallbacks(BLEDeviceCallbacks *) {}
+    static bool setOwnAddrType(uint8_t) { return true; }
+    static bool setOwnAddr(BLEAddress &) { return true; }
+    static bool setOwnAddr(uint8_t *) { return true; }
+    /* O radio simulado nao faz pareamento: nao ha chave de identidade (IRK) de ninguem. */
+    static bool getLocalIRK(uint8_t *) { return false; }
+    static String getLocalIRKString() { return String(); }
+    static String getLocalIRKBase64() { return String(); }
+    static String getLocalIRKReverse() { return String(); }
+    static bool getPeerIRK(BLEAddress, uint8_t *) { return false; }
+    static String getPeerIRKString(BLEAddress) { return String(); }
+    static String getPeerIRKBase64(BLEAddress) { return String(); }
+    static String getPeerIRKReverse(BLEAddress) { return String(); }
     static BLEAdvertising *getAdvertising() { return cs_envolver<BLEAdvertising>(cs_obj_t(nullptr, "BLEDevice::getAdvertising")); }
     static BLEScan *getScan() { return cs_envolver<BLEScan>(cs_obj_t(nullptr, "BLEDevice::getScan")); }
     static void startAdvertising() { cs_obj_n(nullptr, "BLEDevice::startAdvertising"); }
@@ -681,6 +1093,12 @@ public:
     static void setSecurityCallbacks(void *cb) { (void)cb; }
     static String toString() { return cs_obj_t(nullptr, "BLEDevice::toString"); }
 };
+
+inline BLEScan *BLEAdvertisedDevice::getScan() { return BLEDevice::getScan(); }
+
+#if defined(ESP32)
+#include "BLEUtils.h"
+#endif
 
 /* A potencia (esp_power_level_t) e as permissoes (ESP_GATT_PERM_*): as do IDF. */
 #if defined(ESP32) && !CONFIG_IDF_TARGET_ESP32S2

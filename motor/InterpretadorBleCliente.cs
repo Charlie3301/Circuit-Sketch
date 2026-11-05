@@ -406,6 +406,8 @@ public partial class Interpretador
                 return Valor.Vazio;
             }
 
+            case "__servicos":
+                return Valor.DeTexto(conexao is null ? "" : string.Join(",", conexao.Servidor.ServicosIniciados().Select(s => s.Uuid)));
             case "getRssi": return Valor.DeInt(conexao?.Servidor.Rssi ?? 0);
             case "getPeerAddress": return Valor.DeReferencia(new Objeto("BLEAddress") { Texto = conexao?.Servidor.Endereco ?? "00:00:00:00:00:00" });
             case "getMTU": return Valor.DeInt(conexao?.Mtu ?? 23);
@@ -454,6 +456,9 @@ public partial class Interpretador
                 if (car is not null) Maq.Rede.EscreverDaPlaca(estado.Conexao, car, TextoArduino.ParaBytes(args[1].Mostrar()), comResposta: true);
                 return Valor.Vazio;
             }
+            case "__caracteristicas":
+                if (estado.Servico is null) return Valor.DeTexto("");
+                lock (estado.Servico.Caracteristicas) return Valor.DeTexto(string.Join(",", estado.Servico.Caracteristicas.Select(x => x.Uuid)));
             case "getHandle": return Valor.DeInt(40);
             case "toString": return Valor.DeTexto($"Service: uuid: {estado.Servico?.Uuid}");
         }

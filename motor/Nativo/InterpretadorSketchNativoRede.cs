@@ -93,6 +93,9 @@ public partial class Interpretador
                 return Valor.DeInt(n);
             }
             // O RainMaker (src/cs_rainmaker.cpp): a nuvem e o aplicativo sao a bancada (motor/RainMaker.cs).
+            // O erro que escapou do programa em Python: o traceback ja foi para o monitor.
+            case "__erro_python":
+                throw new ErroDeExecucao($"{args[0].Mostrar()}: {args[1].Mostrar()}", (int)args[3].Num);
             case "__abort":
                 // Na ESP32 o abort() e um panico: a placa reinicia. Nas outras, ela para ali.
                 if (EhDaFamiliaEsp32 || EhEsp8266) throw Reiniciar(ReinicioDaPlaca.PeloPanico, 0, 0);

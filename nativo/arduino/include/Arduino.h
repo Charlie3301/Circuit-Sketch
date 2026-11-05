@@ -109,7 +109,7 @@ unsigned long micros(void);
 #ifndef ESP32 /* na ESP32, o do esp32-hal.h (uint32_t) */
 void delay(unsigned long ms);
 #endif
-void delayMicroseconds(unsigned int us);
+void delayMicroseconds(uint32_t us);
 void yield(void);
 
 unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);

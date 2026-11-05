@@ -7,6 +7,30 @@
 #define MINIMP3_NO_SIMD
 #include "terceiros/minimp3.h"
 
+extern "C" bool cs_i2s_tocar_mp3(const uint8_t *dados, size_t n, int bclk, int ws, int dout)
+{
+    static mp3dec_t decodificador;
+    static int16_t pcm[MINIMP3_MAX_SAMPLES_PER_FRAME];
+    mp3dec_init(&decodificador);
+    size_t posicao = 0;
+    uint32_t taxa = 0;
+    int canais = 0;
+    while (posicao < n) {
+        mp3dec_frame_info_t f = {};
+        int amostras = mp3dec_decode_frame(&decodificador, dados + posicao, (int)(n - posicao), pcm, &f);
+        if (!f.frame_bytes) break;
+        posicao += (size_t)f.frame_bytes;
+        if (!amostras) continue;
+        if ((uint32_t)f.hz != taxa || f.channels != canais) {
+            taxa = (uint32_t)f.hz;
+            canais = f.channels;
+            if (!cs_i2s_abrir(taxa, 16, canais, bclk, ws, dout)) return false;
+        }
+        cs_i2s_escrever(pcm, (size_t)amostras * canais * 2);
+    }
+    return taxa != 0;
+}
+
 static void info(const char *t)
 {
     if (audio_info) audio_info(t);

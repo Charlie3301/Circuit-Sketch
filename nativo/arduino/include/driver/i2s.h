@@ -57,6 +57,23 @@ esp_err_t i2s_set_clk(i2s_port_t i2s_num, uint32_t rate, uint32_t bits_cfg, i2s_
 esp_err_t i2s_set_sample_rates(i2s_port_t i2s_num, uint32_t rate);
 esp_err_t i2s_start(i2s_port_t i2s_num);
 esp_err_t i2s_stop(i2s_port_t i2s_num);
+float i2s_get_clk(i2s_port_t i2s_num);
+esp_err_t i2s_write_expand(i2s_port_t i2s_num, const void *src, size_t size, size_t src_bits, size_t aim_bits, size_t *bytes_written, TickType_t ticks_to_wait);
+
+/* O DAC e o ADC internos pelo I2S, o PCM e o PDM: a saida daqui e o amplificador do circuito, e os
+ * ajustes so sao aceitos. */
+typedef enum { I2S_DAC_CHANNEL_DISABLE = 0, I2S_DAC_CHANNEL_RIGHT_EN = 1, I2S_DAC_CHANNEL_LEFT_EN = 2, I2S_DAC_CHANNEL_BOTH_EN = 3, I2S_DAC_CHANNEL_MAX } i2s_dac_mode_t;
+typedef enum { I2S_PDM_DSR_8S = 0, I2S_PDM_DSR_16S, I2S_PDM_DSR_MAX } i2s_pdm_dsr_t;
+typedef enum { I2S_PCM_DISABLE = 0, I2S_PCM_A_DECOMPRESS, I2S_PCM_A_COMPRESS, I2S_PCM_U_DECOMPRESS, I2S_PCM_U_COMPRESS } i2s_pcm_compress_t;
+typedef struct { i2s_pcm_compress_t pcm_type; } i2s_pcm_cfg_t;
+typedef struct { uint32_t sample_rate; uint32_t fp; uint32_t fs; } i2s_pdm_tx_upsample_cfg_t;
+esp_err_t i2s_set_dac_mode(i2s_dac_mode_t dac_mode);
+esp_err_t i2s_adc_enable(i2s_port_t i2s_num);
+esp_err_t i2s_adc_disable(i2s_port_t i2s_num);
+esp_err_t i2s_set_adc_mode(int adc_unit, int adc_channel);
+esp_err_t i2s_pcm_config(i2s_port_t i2s_num, const i2s_pcm_cfg_t *pcm_cfg);
+esp_err_t i2s_set_pdm_rx_down_sample(i2s_port_t i2s_num, i2s_pdm_dsr_t downsample);
+esp_err_t i2s_set_pdm_tx_up_sample(i2s_port_t i2s_num, const i2s_pdm_tx_upsample_cfg_t *upsample_cfg);
 
 #ifdef __cplusplus
 }

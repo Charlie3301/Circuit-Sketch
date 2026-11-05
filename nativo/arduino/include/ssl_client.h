@@ -4,6 +4,7 @@
  */
 
 #include "IPAddress.h"
+#include "esp_err.h"
 #ifndef ARD_SSL_H
 #define ARD_SSL_H
 #include "mbedtls/platform.h"

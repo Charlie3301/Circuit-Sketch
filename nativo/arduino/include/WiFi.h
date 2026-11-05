@@ -88,9 +88,19 @@ public:
     uint8_t *BSSID(uint8_t *bssid = NULL);
     String BSSIDstr();
     int8_t RSSI();
+    bool bandwidth(wifi_bandwidth_t b) { (void)b; return true; }
+    const char *disconnectReasonName(wifi_err_reason_t reason);
+    uint16_t getInactiveTime() { return _inativo; }
+    bool setInactiveTime(uint16_t segundos) { _inativo = segundos; return true; }
+    void setMinSecurity(wifi_auth_mode_t) {}
+    void setScanMethod(wifi_scan_method_t) {}
+    void setSortMethod(wifi_sort_method_t) {}
 
 protected:
     size_t printDriverInfo(Print &out) const override;
+
+private:
+    uint16_t _inativo = 6;
 };
 
 class APClass : public NetworkInterface {
@@ -112,7 +122,13 @@ protected:
 };
 
 /* As partes do WiFiClass de verdade (o NetworkEvents as declara amigas). */
-class WiFiGenericClass {};
+class WiFiGenericClass {
+public:
+    /* Como na placa, sem precisar do objeto: WiFiGenericClass::getMode(). */
+    static wifi_mode_t getMode() { return (wifi_mode_t)cs_obj_i("WiFi", "getMode"); }
+    /* Os pinos do radio externo (SDIO, nas placas sem Wi-Fi no chip): o do simulador nao tem. */
+    static bool setPins(int8_t, int8_t, int8_t, int8_t, int8_t, int8_t, int8_t) { return true; }
+};
 class WiFiSTAClass {};
 class WiFiScanClass {};
 class WiFiAPClass {};
@@ -181,6 +197,10 @@ public:
     IPAddress networkID() { return NetworkInterface::calculateNetworkID(localIP(), subnetMask()); }
     uint8_t subnetCIDR() { return NetworkInterface::calculateSubnetCIDR(subnetMask()); }
     bool enableIPv6(bool en = true) { return STA.enableIPv6(en); }
+    IPAddress linkLocalIPv6() { return STA.linkLocalIPv6(); }
+    IPAddress globalIPv6() { return STA.globalIPv6(); }
+    IPAddress softAPlinkLocalIPv6() { return AP.linkLocalIPv6(); }
+    bool bandwidth(wifi_bandwidth_t b) { return STA.bandwidth(b); }
     const char *getHostname()
     {
         static String h;
@@ -278,7 +298,6 @@ public:
     }
     void enableLongRange(bool enable) { (void)enable; }
     bool mode(wifi_mode_t m);
-    wifi_mode_t getMode() { return (wifi_mode_t)cs_obj_i("WiFi", "getMode"); }
     bool enableSTA(bool enable);
     bool enableAP(bool enable);
     bool setSleep(bool enabled) { return setSleep(enabled ? WIFI_PS_MIN_MODEM : WIFI_PS_NONE); }

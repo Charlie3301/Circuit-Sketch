@@ -6,6 +6,7 @@
 
 #include "cs_objeto.h"
 #include "cs_i2s.h"
+#include "driver/i2s_types.h"
 
 typedef enum { I2S_MODE_STD, I2S_MODE_TDM, I2S_MODE_PDM_TX, I2S_MODE_PDM_RX } i2s_mode_t;
 typedef enum { I2S_DATA_BIT_WIDTH_8BIT = 8, I2S_DATA_BIT_WIDTH_16BIT = 16, I2S_DATA_BIT_WIDTH_24BIT = 24, I2S_DATA_BIT_WIDTH_32BIT = 32 } i2s_data_bit_width_t;
@@ -16,6 +17,7 @@ typedef enum { I2S_RX_TRANSFORM_NONE, I2S_RX_TRANSFORM_32_TO_16, I2S_RX_TRANSFOR
 class I2SClass : public Stream {
     int8_t bclk = -1, ws = -1, dout = -1, din = -1;
     bool aberto = false;
+    i2s_port_t porta = I2S_NUM_0;
     uint32_t taxa = 0;
     int bits = 16, canais = 2;
     int erro = 0;
@@ -41,6 +43,23 @@ public:
     }
     void setPinsPdmRx(int8_t clk, int8_t din0, int8_t, int8_t, int8_t) { bclk = clk; din = din0; }
     void setInverted(bool, bool, bool = false) {}
+    void setInvertedPdm(bool) {}
+    bool setPort(i2s_port_t p)
+    {
+        if (aberto) return false;
+        porta = p;
+        return true;
+    }
+    i2s_port_t getPort() { return porta; }
+    /* O handle do driver: aqui nao ha canal do IDF por tras (o som vai direto ao amplificador). */
+    i2s_chan_handle_t txChan() { return nullptr; }
+    i2s_chan_handle_t rxChan() { return nullptr; }
+    uint32_t txSampleRate() { return taxa; }
+    i2s_data_bit_width_t txDataWidth() { return (i2s_data_bit_width_t)bits; }
+    i2s_slot_mode_t txSlotMode() { return (i2s_slot_mode_t)canais; }
+    uint32_t rxSampleRate() { return taxa; }
+    i2s_data_bit_width_t rxDataWidth() { return (i2s_data_bit_width_t)bits; }
+    i2s_slot_mode_t rxSlotMode() { return (i2s_slot_mode_t)canais; }
     void setTimeout(uint32_t) {}
 
     bool begin(i2s_mode_t mode, uint32_t rate, i2s_data_bit_width_t bits_cfg, i2s_slot_mode_t ch, int8_t slot_mask = -1)
@@ -95,6 +114,16 @@ public:
         begin(I2S_MODE_STD, rate, (i2s_data_bit_width_t)b, (i2s_slot_mode_t)ch);
         write(data + p + 8, n);
         if (antesTaxa) begin(I2S_MODE_STD, antesTaxa, (i2s_data_bit_width_t)antesBits, (i2s_slot_mode_t)antesCanais);
+    }
+
+    /* O MP3 inteiro na memoria, quadro a quadro; toca na configuracao que o arquivo diz. */
+    bool playMP3(const uint8_t *src, size_t src_len)
+    {
+        uint32_t antesTaxa = taxa;
+        int antesBits = bits, antesCanais = canais;
+        bool tocou = cs_i2s_tocar_mp3(src, src_len, bclk, ws, dout);
+        if (tocou && antesTaxa) begin(I2S_MODE_STD, antesTaxa, (i2s_data_bit_width_t)antesBits, (i2s_slot_mode_t)antesCanais);
+        return tocou;
     }
 
     uint8_t *recordWAV(size_t, size_t *out_size)

@@ -9,6 +9,7 @@
 
 #include "cs_objeto.h"
 
+#define VERSION_IRREMOTE "4.5.0"
 #define ENABLE_LED_FEEDBACK true
 #define DISABLE_LED_FEEDBACK false
 #define USE_DEFAULT_FEEDBACK_LED_PIN 0

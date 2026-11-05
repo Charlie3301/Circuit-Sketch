@@ -17,6 +17,7 @@ bool cs_i2s_abrir(uint32_t taxa, int bits, int canais, int bclk, int ws, int dou
  * o DMA da placa: devolve os bytes aceitos. */
 size_t cs_i2s_escrever(const void *dados, size_t n);
 void cs_i2s_fechar(void);
+bool cs_i2s_tocar_mp3(const uint8_t *dados, size_t n, int bclk, int ws, int dout);
 
 #ifdef __cplusplus
 }

@@ -49,6 +49,8 @@ public:
     bool hasIP() const;
     bool hasLinkLocalIPv6() const { return false; }
     bool hasGlobalIPv6() const { return false; }
+    IPAddress linkLocalIPv6() const { return IPAddress(IPv6); }
+    IPAddress globalIPv6() const { return IPAddress(IPv6); }
     bool enableIPv6(bool en = true)
     {
         _ipv6 = en;

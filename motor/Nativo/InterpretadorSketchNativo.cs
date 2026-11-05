@@ -98,7 +98,7 @@ public partial class Interpretador
         if (alvo is null && nome.StartsWith("__udp_", StringComparison.Ordinal)) return UdpDoNativo(nome, args);
 
         // O HAL da ESP32 (cs_hal.cpp): o toque e a fita do RMT.
-        if (alvo is null && nome is "__toque" or "__fita" or "__usb"
+        if (alvo is null && nome is "__toque" or "__fita" or "__usb" or "__erro_python"
             or "__nvs_gravar" or "__nvs_ler" or "__nvs_tipo" or "__nvs_tamanho" or "__nvs_apagar" or "__nvs_limpar" or "__nvs_chaves" or "__nvs_contar" or "__nvs_espacos"
             or "__154_ligar" or "__154_enviar" or "__154_receber" or "__rmaker_rede" or "__rmaker_conectou" or "__rmaker_relatar" or "__rmaker_proxima" or "__rmaker_aviso"
             or "__matter_comissionada" or "__matter_proxima" or "__matter_relatar" or "__matter_descomissionar" or "__matter_evento" or "__abort") return HalDoNativo(nome, args);

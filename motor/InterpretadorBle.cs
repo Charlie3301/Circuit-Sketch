@@ -339,6 +339,10 @@ public partial class Interpretador
                     }
                     case "getUUID":
                         return Valor.DeReferencia(new Objeto("BLEUUID") { Texto = estado.Servico?.Uuid ?? "" });
+                    case "removeCharacteristic":
+                        if (estado.Servico is { } s3 && args.Count > 0 && args[0].Referencia is Objeto { Rede: EstadoBle { Caracteristica: { } tirar } })
+                            lock (s3.Caracteristicas) s3.Caracteristicas.Remove(tirar);
+                        return Valor.Vazio;
                     case "toString":
                         return Valor.DeTexto($"UUID: {estado.Servico?.Uuid}");
                 }
@@ -381,6 +385,8 @@ public partial class Interpretador
                     }
                     case "getUUID":
                         return Valor.DeReferencia(new Objeto("BLEUUID") { Texto = car?.Uuid ?? "" });
+                    case "getProperties":
+                        return Valor.DeInt(car?.Propriedades ?? 0);
                     case "getDescriptorByUUID":
                         return Valor.DeInt(0);
                     case "getHandle":
@@ -410,6 +416,11 @@ public partial class Interpretador
                     case "stop":
                         if (radioBle is not null) Maq.Rede.AnunciarBle(radioBle, false);
                         return Valor.DeBool(true);
+                    case "isAdvertising":
+                        return Valor.DeBool(radioBle?.Anunciando ?? false);
+                    case "setName":
+                        if (radioBle is not null) radioBle.Nome = S(0);
+                        return Valor.Vazio;
                     case "setAdvertisementData":
                         if (radioBle is not null && args.Count > 0 && args[0].Referencia is Objeto dados)
                         {
@@ -436,6 +447,20 @@ public partial class Interpretador
                     case "setName": case "setShortName":
                         obj.Texto = S(0);
                         return Valor.Vazio;
+                    // As estruturas do anuncio (tamanho, tipo, dados), em hexadecimal.
+                    case "__carga_hex":
+                    {
+                        var carga = new StringBuilder();
+                        void Estrutura(int tipo, string hex) => carga.Append($"{hex.Length / 2 + 1:x2}{tipo:x2}{hex}");
+                        if (obj.Texto is { Length: > 0 } nome) Estrutura(0x09, Convert.ToHexString(Encoding.UTF8.GetBytes(nome)).ToLowerInvariant());
+                        if (obj.Rede is EstadoBle { Anuncio: { } a })
+                        {
+                            if (a.ServicoHex is { Length: > 0 } && a.ServicoUuid is { Length: 4 } u)
+                                Estrutura(0x16, u[2..4] + u[..2] + a.ServicoHex);
+                            if (a.FabricanteHex is { Length: > 0 }) Estrutura(0xFF, a.FabricanteHex);
+                        }
+                        return Valor.DeTexto(carga.ToString());
+                    }
                     // Do C++ compilado: os bytes em hexadecimal (o texto do sketch nao e binario).
                     case "__fabricante_hex":
                         AnuncioDe(obj).FabricanteHex = S(0);

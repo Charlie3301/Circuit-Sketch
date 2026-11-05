@@ -9,6 +9,7 @@
 #include "Print.h"
 #include "Stream.h"
 #include "cs_objeto.h"
+#include "lwip/ip_addr.h"
 #include <functional>
 #include <vector>
 #include <algorithm>
@@ -24,15 +25,6 @@ typedef enum {
     TCPIP_ADAPTER_IF_PPP,
     TCPIP_ADAPTER_IF_MAX
 } tcpip_adapter_if_t;
-
-#ifndef CS_IP_ADDR_T
-#define CS_IP_ADDR_T
-/* O endereco do lwIP (so IPv4 aqui), na ordem da rede. */
-typedef struct ip4_addr {
-    uint32_t addr;
-} ip4_addr_t;
-typedef ip4_addr_t ip_addr_t;
-#endif
 
 class AsyncUDP;
 class AsyncUDPPacket;
@@ -92,6 +84,8 @@ public:
     IPAddress localIP();
     uint16_t localPort() { return _localPort; }
     IPAddress remoteIP() { return _remoteIp; }
+    IPAddress localIPv6() { return IPAddress(IPv6); }
+    IPAddress remoteIPv6() { return IPAddress(IPv6); }
     uint16_t remotePort() { return _remotePort; }
     void remoteMac(uint8_t *mac) { memset(mac, 0, 6); }
     size_t send(AsyncUDPMessage &message);
@@ -174,7 +168,7 @@ protected:
         _porta = (uint16_t)cs_obj_i(nullptr, "__udp_porta", _id);
         return true;
     }
-    static IPAddress ipDe(const ip_addr_t *a) { return a ? IPAddress(a->addr) : IPAddress(); }
+    static IPAddress ipDe(const ip_addr_t *a) { return a ? IPAddress(ip_2_ip4(a)->addr) : IPAddress(); }
 
 public:
     AsyncUDP() {}

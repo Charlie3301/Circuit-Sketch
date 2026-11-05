@@ -17,7 +17,7 @@ Barramento barramentos[SOC_SPI_PERIPH_NUM + 1] = {};
 
 SPIClass &objetoDe(spi_host_device_t host)
 {
-    return (int)host >= 2 ? SPI1 : SPI;
+    return (int)host >= 2 ? cs_segundo_spi : SPI;
 }
 } /* namespace */
 

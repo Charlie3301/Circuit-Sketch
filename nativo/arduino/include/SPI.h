@@ -57,8 +57,11 @@ public:
     uint8_t dataMode;
 };
 
+typedef struct spi_struct_t spi_t;
+
 class SPIClass {
     const char *nome;
+    uint32_t divisor = 0;
 
 public:
     explicit SPIClass(const char *nomeDoObjeto) : nome(nomeDoObjeto) {}
@@ -86,6 +89,8 @@ public:
     void setDataMode(uint8_t dataMode);
     void setFrequency(uint32_t freq);
     void setClockDivider(uint32_t clockDiv);
+    uint32_t getClockDivider() { return divisor; }
+    spi_t *bus() { return nullptr; }
     void setHwCs(bool use);
     int8_t pinSS();
     bool setRX(int pin);
@@ -105,8 +110,11 @@ public:
 };
 
 extern SPIClass SPI;
-#if defined(ESP32) || defined(ARDUINO_ARCH_RP2040)
+#if defined(ARDUINO_ARCH_RP2040)
 extern SPIClass SPI1;
+#elif defined(ESP32)
+/* Na ESP32 o nome SPI1 e o do registrador (soc/spi_struct.h): o segundo barramento nao tem global. */
+extern SPIClass cs_segundo_spi;
 #endif
 
 #endif

@@ -35,10 +35,12 @@ static inline int cs_asprintf(char **saida, const char *formato, ...)
 #define asprintf cs_asprintf
 int strerror_r(int erro, char *saida, size_t n);
 
+#include <stdint.h>
+
 /* Os u_int*_t do sys/types.h da newlib (o Windows nao tem). */
 typedef unsigned char u_int8_t;
 typedef unsigned short u_int16_t;
-typedef unsigned int u_int32_t;
+typedef uint32_t u_int32_t;
 typedef unsigned long long u_int64_t;
 #ifdef __cplusplus
 }

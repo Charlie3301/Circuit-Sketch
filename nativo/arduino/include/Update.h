@@ -62,6 +62,8 @@ public:
     typedef std::function<void(size_t, size_t)> THandlerFunction_Progress;
 
     UpdateClass() {}
+    /* A assinatura do firmware: a imagem daqui nao passa pelo verificador. */
+    bool installSignature(class UpdaterVerifyClass *) { return true; }
     UpdateClass &onProgress(THandlerFunction_Progress fn)
     {
         _progress_callback = fn;

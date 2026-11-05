@@ -18,6 +18,7 @@ typedef std::function<bool(void)> ConnectionTestCB_t;
 class WiFiMulti {
 public:
     WiFiMulti() {}
+    void enableIPv6(bool) {}
     ~WiFiMulti() { APlistClean(); }
 
     bool addAP(const char *ssid, const char *passphrase = NULL)

@@ -181,6 +181,16 @@ public static class Compilador
                 Compilado = CompiladorCSharp.Compilar(projeto),
             };
 
+        // O Python de verdade: o MicroPython, o mesmo firmware da placa, compilado junto do core.
+        if (CppNativo && linguagem == Linguagem.MicroPython && CompiladorNativo.Disponivel && CompiladorNativo.TemMicroPython(projeto.Placa))
+            return new Programa([], [])
+            {
+                Linguagem = linguagem,
+                Placa = projeto.Placa,
+                Fonte = fonte,
+                Compilado = CompiladorNativo.Compilar(CompiladorNativo.ProjetoDoMicroPython(projeto), AvisoDoCompilador),
+            };
+
         if (linguagem is not (Linguagem.Arduino or Linguagem.C))
             return Compilar(fonte, linguagem);
 

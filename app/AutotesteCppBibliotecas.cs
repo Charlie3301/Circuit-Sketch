@@ -55,6 +55,7 @@ public static partial class Autoteste
                     .ToDictionary(f => Path.GetFileName(f), File.ReadAllText, StringComparer.OrdinalIgnoreCase);
                 var projeto = new Projeto { Sketch = File.ReadAllText(ino), Placa = placa, Arquivos = abas, Bibliotecas = todas, DoSimulador = Acervo.EhDoSimulador };
                 var relogio = System.Diagnostics.Stopwatch.StartNew();
+                CompiladorNativo.ErroComAsInstaladas = null;
                 try
                 {
                     CompiladorNativo.Compilar(projeto);
@@ -65,7 +66,9 @@ public static partial class Autoteste
                 catch (Exception e)
                 {
                     string motivo = Regex.Replace(e is ErroDeSintaxe sintaxe ? CompiladorNativo.ErroLegivel(sintaxe).Message : e.Message, @"\s+", " ");
-                    Linha($"{lib.Nome}/{exemplo}: ERRO {motivo[..Math.Min(420, motivo.Length)]}");
+                    if (CompiladorNativo.ErroComAsInstaladas is { } segundo)
+                        motivo += " || COM AS INSTALADAS: " + Regex.Replace(CompiladorNativo.ErroLegivel(segundo).Message, @"\s+", " ");
+                    Linha($"{lib.Nome}/{exemplo}: ERRO {motivo[..Math.Min(700, motivo.Length)]}");
                 }
             }
         }

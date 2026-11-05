@@ -59,7 +59,7 @@ void delay(unsigned long ms)
     if (cs_rtos_ativo) vTaskDelay((uint32_t)ms);
     else ch(nullptr, "delay", cs_i((int64_t)ms));
 }
-void delayMicroseconds(unsigned int us) { ch(nullptr, "delayMicroseconds", cs_i(us)); }
+void delayMicroseconds(uint32_t us) { ch(nullptr, "delayMicroseconds", cs_i(us)); }
 
 /* O yield() so cede: a placa parada sai por aqui tambem. */
 void yield(void)

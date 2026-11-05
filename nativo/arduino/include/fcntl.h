@@ -4,6 +4,13 @@
 
 #include_next <fcntl.h>
 
+#ifndef O_NONBLOCK
+#define O_NONBLOCK 0x4000
+#endif
+#ifndef O_SYNC
+#define O_SYNC 0x2000
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

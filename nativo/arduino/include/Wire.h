@@ -8,6 +8,7 @@
 
 #include <inttypes.h>
 #include "Stream.h"
+#include "cs_ponte.h"
 
 #ifndef I2C_BUFFER_LENGTH
 #define I2C_BUFFER_LENGTH 128
@@ -39,6 +40,7 @@ public:
     void setTimeOut(uint16_t timeOutMillis);
     void setWireTimeout(uint32_t timeout = 25000, bool reset_with_timeout = false);
     uint16_t getTimeOut();
+    uint8_t getBusNum() { return strcmp(nome, "Wire") == 0 ? 0 : 1; }
 
     void beginTransmission(uint8_t address);
     void beginTransmission(int address) { beginTransmission((uint8_t)address); }

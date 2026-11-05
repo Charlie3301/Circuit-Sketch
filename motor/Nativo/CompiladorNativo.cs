@@ -42,6 +42,8 @@ public static class CompiladorNativo
     [
         "-Wno-c++11-narrowing", "-Wno-register", "-Wno-writable-strings", "-Wno-deprecated-register",
         "-Wno-reserved-user-defined-literal", "-Wno-invalid-source-encoding",
+        // O ponteiro aqui tem 64 bits e o da placa 32: o (uint32_t)ponteiro de quem imprime um endereco nao e erro.
+        "-fms-extensions",
     ];
 
     static readonly string[] PermissivosC =
@@ -326,10 +328,17 @@ public static class CompiladorNativo
                     avisar?.Invoke("o que o simulador imita nao tinha o que o sketch pede: usando as bibliotecas instaladas.");
                     return comAsInstaladas;
                 }
-                catch (ErroDeSintaxe) { throw erro; }
+                catch (ErroDeSintaxe comAsInstaladas)
+                {
+                    ErroComAsInstaladas = comAsInstaladas;
+                    throw erro;
+                }
             }
         }
     }
+
+    /// <summary>O erro da segunda tentativa, com as bibliotecas instaladas: a varredura mostra os dois.</summary>
+    internal static ErroDeSintaxe ErroComAsInstaladas;
 
     /// <summary>Tem biblioteca instalada que ficou de fora porque a placa ja tem o mesmo cabecalho?</summary>
     static bool TemInstaladaEncoberta(Projeto projeto)
@@ -432,8 +441,9 @@ public static class CompiladorNativo
             fontesPorLib.Add((lib, fontesDasLibs.Skip(antesDela).ToList()));
         }
 
+        string encaminhados = PastaDeEncaminhados(usadas);
         string impressao = Impressao(
-            [impressaoDoCore, ComDepuracao, "macros da IDE", instaladasVencem ? "instaladas" : "", .. pilhas, .. unidades.Select(u => u.Nome + "\0" + u.Texto),
+            [impressaoDoCore, ComDepuracao, "macros da IDE", encaminhados ?? "", .. pilhas, .. unidades.Select(u => u.Nome + "\0" + u.Texto),
              .. abas.Select(a => a.Key + "\0" + a.Value),
              .. fontesDasLibs.Select(f => f + File.GetLastWriteTimeUtc(f).Ticks),
              .. usadas.SelectMany(l => l.Arquivos.Select(a => Path.Combine(l.Pasta, a))).Where(File.Exists)
@@ -467,12 +477,12 @@ public static class CompiladorNativo
             // A pasta do projeto entra DEPOIS do core e das bibliotecas: o
             // #include "x.h" acha a aba primeiro (a pasta de quem inclui), e o
             // <x.h> acha o do core, como no Arduino.
-            var erros = CompilarVarios(zig, tarefas, InclusoesDoProjeto(incDasLibs, inc, idf, instaladasVencem), depurar: true, depois: [trabalho], definicoes: [.. definicoes, .. MacrosDaIde(placa)]);
+            var erros = CompilarVarios(zig, tarefas, InclusoesDoProjeto(incDasLibs, inc, idf, encaminhados), depurar: true, depois: [trabalho], definicoes: [.. definicoes, .. MacrosDaIde(placa)]);
             if (erros.Count > 0) throw ErroDoCompilador(erros, abas);
 
             var bibliotecas = fontesPorLib.Where(b => b.Fontes.Count > 0)
                 .Select(b => BibliotecaCompilada(b.Lib, b.Fontes, zig, EhPrograma(projeto.Sketch) ? cabecalho + "#define CS_PROGRAMA_IDF 1\n" : cabecalho, usadas, abas,
-                                                 InclusoesDoProjeto(incDasLibs, inc, idf, instaladasVencem), [.. definicoes, .. MacrosDaIde(placa)], impressaoDoCore, avisar))
+                                                 InclusoesDoProjeto(incDasLibs, inc, idf, encaminhados), [.. definicoes, .. MacrosDaIde(placa)], impressaoDoCore, avisar))
                 .ToList();
 
             // A DLL: o ponto de entrada e o da ponte, que adia os construtores
@@ -492,6 +502,13 @@ public static class CompiladorNativo
             // Por ultimo e so se ninguem resolveu: sao os avisos do que o IDF declara e nao existe aqui.
             if (fracos is not null) ligar.Add(fracos);
             var (codigo, saida) = Rodar(zig, ligar, trabalho);
+            for (int rodada = 0; codigo != 0 && rodada < 5; rodada++)
+            {
+                string ausentes = AusentesDasBibliotecas(saida, rodada, usadas, [.. tarefas.Select(t => t.Objeto), .. bibliotecas], zig, trabalho);
+                if (ausentes is null) break;
+                ligar.Add(ausentes);
+                (codigo, saida) = Rodar(zig, ligar, trabalho);
+            }
             if (codigo != 0) throw ErroDoLigador(saida);
 
             if (Directory.Exists(pastaDoSketch)) Directory.Delete(pastaDoSketch, true);
@@ -544,6 +561,29 @@ public static class CompiladorNativo
     /// lugar na pilha -- o depurador para onde a pessoa marcou e mostra o valor.
     /// </summary>
     const string ComDepuracao = "depuracao 2: -O0 -gcodeview -fno-omit-frame-pointer -fno-sanitize=all";
+
+    /// <summary>
+    /// O programa em Python vira um sketch: as abas .py como texto, e o MicroPython de verdade roda no
+    /// setup(), como o firmware dele roda o main.py. Ele nao volta enquanto o programa nao acabar.
+    /// </summary>
+    public static Projeto ProjetoDoMicroPython(Projeto projeto)
+    {
+        static string Texto(string t) => "R\"cs_py(" + (t ?? "").Replace("\r", "") + ")cs_py\"";
+        var abas = new List<(string Nome, string Texto)> { ("main.py", projeto.Sketch) };
+        foreach (var (nome, texto) in projeto.Arquivos ?? new Dictionary<string, string>())
+            if (nome.EndsWith(".py", StringComparison.OrdinalIgnoreCase) && nome != "main.py") abas.Add((nome.Replace('\\', '/'), texto));
+        var sketch = new StringBuilder("#include <Arduino.h>\nstruct cs_py_aba_t { const char *nome; const char *texto; };\nextern \"C\" void cs_py_rodar(void);\n");
+        sketch.Append("extern \"C\" const cs_py_aba_t cs_py_abas[] = {\n");
+        foreach (var (nome, texto) in abas) sketch.Append($"{{\"{nome}\", {Texto(texto)}}},\n");
+        sketch.Append($"}};\nextern \"C\" const int cs_py_quantas_abas = {abas.Count};\nvoid setup() {{ cs_py_rodar(); }}\nvoid loop() {{ delay(100); }}\n");
+        return new Projeto { Sketch = sketch.ToString(), Placa = projeto.Placa, Bibliotecas = [] };
+    }
+
+    /// <summary>O MicroPython daqui e o da ESP32: as outras placas ficam com o interpretador.</summary>
+    public static bool TemMicroPython(string placa)
+    {
+        return (placa ?? "esp32-devkit-v1").StartsWith("esp32", StringComparison.Ordinal);
+    }
 
     /// <summary>O arquivo de configuracao do mbedTLS (o do IDF, sem o hardware do chip: include/cs_mbedtls_config.h).</summary>
     const string ConfiguracaoDoMbedtls = "-DMBEDTLS_CONFIG_FILE=\"cs_mbedtls_config.h\"";
@@ -608,6 +648,10 @@ public static class CompiladorNativo
         new("idfrede", new Regex(@"\b(esp_http_client\w*|esp_http_server|httpd_\w+|esp_tls\w*|esp_transport\w*|esp_mqtt\w*|mqtt_client|esp_https_ota\w*|esp_https_server|esp_crt_bundle\w*)\b", RegexOptions.Compiled),
             ["esp32", "esp32s2", "esp32s3", "esp32c3", "esp32c6", "esp32h2"],
             [], ["-include", "cs_idfrede_compat.h", "-DESP_PLATFORM=1", "-DIDF_VER=\"v5.5.1\""], ["src/privados"]),
+        // O MicroPython de verdade (ferramentas/micropython): quem o pede e o programa em Python (ProjetoDoMicroPython).
+        new("micropython", new Regex(@"\bcs_py_rodar\b", RegexOptions.Compiled),
+            ["esp32", "esp32s2", "esp32s3", "esp32c3", "esp32c6", "esp32h2"],
+            [], [], ["vm", "vm/py", "vm/lib"]),
         // Os endpoints do core sao os de verdade; o protocolo nao roda (src/cs_matter.cpp, motor/Matter.cs).
         new("matter", new Regex(@"\b(Matter\w*|esp_matter\w*)\b", RegexOptions.Compiled),
             ["esp32", "esp32s2", "esp32s3", "esp32c3", "esp32c6", "esp32h2"],
@@ -626,8 +670,76 @@ public static class CompiladorNativo
     static bool EhFraco(string fonte) => Path.GetFileName(fonte) == "cs_idf_nao_simulado.c";
 
     /// <summary>Como na IDE, o core vem antes das bibliotecas, menos quando elas e que devem vencer o que ele imita.</summary>
-    static List<string> InclusoesDoProjeto(List<string> bibliotecas, string inc, List<string> idf, bool instaladasVencem)
-        => instaladasVencem ? [.. bibliotecas, inc, .. idf] : [inc, .. idf, .. bibliotecas];
+    static List<string> InclusoesDoProjeto(List<string> bibliotecas, string inc, List<string> idf, string encaminhados)
+        => encaminhados is null ? [inc, .. idf, .. bibliotecas] : [encaminhados, inc, .. idf, .. bibliotecas];
+
+    /// <summary>
+    /// Os cabecalhos que o simulador imita de bibliotecas de terceiros (a imitacao move a peca
+    /// do circuito; a de verdade falaria com um chip que nao esta aqui). Os que vem com a
+    /// placa ficam de fora: esses nunca cedem o lugar, como na IDE.
+    /// </summary>
+    static readonly HashSet<string> Imitados = new(
+        ["Adafruit_GFX.h", "Adafruit_ILI9341.h", "Adafruit_MPU6050.h", "Adafruit_NeoPixel.h", "Adafruit_SH110X.h", "Adafruit_SSD1306.h",
+         "Adafruit_ST7735.h", "Adafruit_ST7789.h", "Adafruit_ST77xx.h", "Adafruit_Sensor.h", "Audio.h", "DHT.h", "ESP32Servo.h", "HX711.h",
+         "IRrecv.h", "IRremote.h", "IRremote.hpp", "IRremoteESP8266.h", "IRutils.h", "Keypad.h", "LedControl.h", "LiquidCrystal.h",
+         "LiquidCrystal_I2C.h", "MPU6050.h", "PubSubClient.h", "RF24.h", "nRF24L01.h", "printf.h", "RTClib.h", "Servo.h", "SoftwareSerial.h",
+         "Stepper.h", "TM1637Display.h", "UniversalTelegramBot.h", "WebSocketsServer.h"],
+        StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// O que nao tem como ser geral: cabecalho de biblioteca que escreve na pedra que o ponteiro
+    /// da ESP32 tem 32 bits. Aqui ele tem 64, entao o tipo de tamanho muda so na copia usada na
+    /// compilacao; a biblioteca instalada fica como esta.
+    /// </summary>
+    static readonly (string Cabecalho, (string De, string Para)[] Trocas)[] Remendos =
+    [
+        ("platforms/esp/int.h",
+         [("typedef unsigned int size; ", "typedef unsigned long long size; "), ("typedef unsigned int uptr; ", "typedef unsigned long long uptr; "),
+          ("typedef int iptr; ", "typedef long long iptr; "), ("typedef int ptrdiff; ", "typedef long long ptrdiff; ")]),
+        ("platforms/esp/32/esp32_lazy_serial0_gate.h", [("#define FL_ESP32_STOCK_ARDUINO_MAIN 0", "#define FL_ESP32_STOCK_ARDUINO_MAIN 1")]),
+        ("platforms/esp/32/core/memory_barrier.h", [("#if defined(__XTENSA__)", "#if 1\n#define FL_PLATFORMS_MEMORY_BARRIER __sync_synchronize()\n#elif defined(__XTENSA__)")]),
+    ];
+
+    /// <summary>
+    /// Uma biblioteca entra inteira: a que veio de verdade traz os seus cabecalhos, mesmo os que
+    /// o simulador imita, senao o .cpp dela compilaria contra o cabecalho da imitacao (o I2Cdev
+    /// puxa a MPU6050, e o MPU6050.cpp nao combina com o MPU6050.h do simulador). Uma pasta de
+    /// encaminhamentos, antes de todas, leva so esses nomes para a biblioteca; o Wire.h e o
+    /// resto do que vem com a placa continuam os da placa. Sem nome em comum, nao ha pasta.
+    /// </summary>
+    static string PastaDeEncaminhados(List<BibliotecaDeFora> usadas)
+    {
+        var encaminhados = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var remendados = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var lib in usadas)
+        {
+            string raiz = lib.Raiz ?? "";
+            foreach (string arquivo in lib.Arquivos)
+            {
+                if (!arquivo.StartsWith(raiz, StringComparison.OrdinalIgnoreCase)) continue;
+                string nome = arquivo[raiz.Length..];
+                if (Imitados.Contains(nome)) encaminhados.TryAdd(nome, Path.Combine(lib.Pasta, arquivo).Replace('\\', '/'));
+                if (Remendos.FirstOrDefault(r => r.Cabecalho.Equals(nome, StringComparison.OrdinalIgnoreCase)) is { Cabecalho: not null } remendo)
+                {
+                    string texto = File.ReadAllText(Path.Combine(lib.Pasta, arquivo));
+                    foreach (var (de, para) in remendo.Trocas) texto = texto.Replace(de, para);
+                    remendados[nome] = texto;
+                }
+            }
+        }
+        if (encaminhados.Count == 0 && remendados.Count == 0) return null;
+        string pasta = Path.Combine(Cache(), "encaminhados-" + Impressao([.. encaminhados.Select(e => e.Key + "\0" + e.Value), .. remendados.Select(e => e.Key + "\0" + e.Value)])[..16]);
+        Directory.CreateDirectory(pasta);
+        foreach (var (nome, texto) in remendados)
+        {
+            string caminho = Path.Combine(pasta, nome.Replace('/', Path.DirectorySeparatorChar));
+            Directory.CreateDirectory(Path.GetDirectoryName(caminho)!);
+            File.WriteAllText(caminho, texto, new UTF8Encoding(false));
+        }
+        foreach (var (nome, destino) in encaminhados)
+            File.WriteAllText(Path.Combine(pasta, nome), $"#include \"{destino}\"\n", new UTF8Encoding(false));
+        return pasta;
+    }
 
     static string BibliotecaCompilada(BibliotecaDeFora lib, List<string> fontes, string zig, string cabecalho, List<BibliotecaDeFora> usadas,
                                       Dictionary<string, string> abas, List<string> inclusoes, string[] definicoes, string impressaoDoCore, Action<string> avisar)
@@ -684,7 +796,7 @@ public static class CompiladorNativo
             [VersaoDoZig(zig), Padrao, PadraoC, string.Join(" ", Permissivos), string.Join(" ", PermissivosC), cabecalho, ImpressaoDoIdf(idf),
              .. pilha.Publicas, .. pilha.Privadas,
              .. Directory.GetFiles(inc, "*", SearchOption.AllDirectories).Order(StringComparer.Ordinal).Select(f => f + ":" + new FileInfo(f).Length + ":" + File.GetLastWriteTimeUtc(f).Ticks),
-             .. Directory.GetFiles(src, "*", SearchOption.AllDirectories).Order(StringComparer.Ordinal).Select(f => f + ":" + new FileInfo(f).Length + ":" + File.GetLastWriteTimeUtc(f).Ticks)]);
+             .. Directory.GetFiles(raiz, "*", SearchOption.AllDirectories).Order(StringComparer.Ordinal).Select(f => f + ":" + new FileInfo(f).Length + ":" + File.GetLastWriteTimeUtc(f).Ticks)]);
         string destino = Path.Combine(Cache(), pilha.Pasta + "-" + impressao[..16]);
         string arquivo = Path.Combine(destino, "lib" + pilha.Pasta + ".a");
         if (File.Exists(arquivo)) return arquivo;
@@ -719,7 +831,9 @@ public static class CompiladorNativo
                                           "-ferror-limit=8", "-fno-caret-diagnostics", "-DCS_NATIVO=1",
                                           // O ponteiro nulo acessa de verdade (e cai como na placa), em vez de o
                                           // otimizador apagar o caminho e por uma armadilha no lugar.
-                                          "-fno-delete-null-pointer-checks", cpp ? Padrao : PadraoC };
+                                          "-fno-delete-null-pointer-checks", cpp ? Padrao : PadraoC,
+                                          // Como no compilador das placas (ver stdint.h do core).
+                                          "-U__UINT32_TYPE__", "-D__UINT32_TYPE__=long unsigned int", "-U__INT32_TYPE__", "-D__INT32_TYPE__=long int" };
             if (depurar)
             {
                 args.Add("-gcodeview");
@@ -839,7 +953,7 @@ public static class CompiladorNativo
                 if (!vistos.Add(nome)) continue;
                 // Como na IDE, o que vem com a placa vence: o SD.h da ESP32 fica, e nao o SD
                 // instalado, que nem conhece o chip.
-                if (!instaladasVencem && DoCore().Contains(nome)) continue;
+                if (DoCore().Contains(nome) && !(instaladasVencem && Imitados.Contains(nome))) continue;
                 var lib = DeBiblioteca(projeto, nome);
                 if (lib is null) continue;
                 Ler(lib, NaBiblioteca(lib, "", nome));
@@ -1388,6 +1502,47 @@ public static class CompiladorNativo
             return new ErroDeSintaxe(texto + mais, linha);
         int codigo = Origens.Codificar(Origens.Registrar("nativo:" + arquivo, arquivo), linha);
         return new ErroDeSintaxe(texto + mais, codigo);
+    }
+
+    /// <summary>
+    /// Na IDE o ligador joga fora o que ninguem chama (--gc-sections) antes de reclamar, e uma funcao
+    /// de biblioteca que chama outra que nao existe so e erro se for usada: a IRremote com
+    /// NO_LED_FEEDBACK_CODE tem varias. O ligador do Windows reclama antes de jogar fora. Entao a funcao
+    /// que so a biblioteca menciona ganha um corpo que para o programa se for mesmo chamada, e o sketch
+    /// que a chama direto continua com o erro de sempre. Sem nada a fazer, devolve null.
+    /// </summary>
+    static string AusentesDasBibliotecas(string saida, int rodada, List<BibliotecaDeFora> usadas, IEnumerable<string> objetos, string zig, string trabalho)
+    {
+        var faltas = Regex.Matches(saida, @"undefined symbol:\s*(.+?)\r?\n((?:>>>.*(?:\r?\n|$))+)");
+        if (faltas.Count == 0) return null;
+        var pastas = usadas.Select(l => l.Pasta.Replace('/', '\\')).ToList();
+        var padroes = new List<(string Legivel, Regex Padrao)>();
+        foreach (Match falta in faltas)
+        {
+            string legivel = falta.Groups[1].Value.Trim();
+            string nome = Regex.Replace(legivel, @"\(.*\)( const)?$", "");
+            if (nome == legivel || nome.Contains('<') || nome.Contains(' ')) return null;
+            var quem = Regex.Matches(falta.Groups[2].Value, @"referenced by (.+)").Select(m => m.Groups[1].Value.Trim().Replace('/', '\\'));
+            if (!quem.All(q => pastas.Any(p => q.StartsWith(p, StringComparison.OrdinalIgnoreCase)))) return null;
+            var partes = nome.Split("::").Select(p => p.Length + Regex.Escape(p)).ToList();
+            padroes.Add((legivel, new Regex((partes.Count > 1 ? "_ZNK?" : "_Z") + string.Concat(partes) + "[A-Za-z0-9_]*")));
+        }
+        var corpos = new StringBuilder("int printf(const char *, ...);\nvoid abort(void);\n");
+        var vistos = new HashSet<string>();
+        foreach (string objeto in objetos.Where(File.Exists))
+        {
+            string bytes = Encoding.Latin1.GetString(File.ReadAllBytes(objeto));
+            foreach (var (legivel, padrao) in padroes)
+                foreach (Match m in padrao.Matches(bytes))
+                    if (vistos.Add(m.Value))
+                        corpos.Append($"void cs_ausente{vistos.Count}(void) __asm__(\"{m.Value}\") __attribute__((weak));\n" +
+                                      $"void cs_ausente{vistos.Count}(void) {{ printf(\"\\n{legivel.Replace("\\", "").Replace("\"", "")}: a biblioteca chamou esta funcao, mas ela nao existe\\n\"); abort(); }}\n");
+        }
+        if (vistos.Count == 0) return null;
+        string fonte = Path.Combine(trabalho, $"cs_ausentes{rodada}.c"), objetoNovo = Path.ChangeExtension(fonte, ".o");
+        File.WriteAllText(fonte, corpos.ToString(), new UTF8Encoding(false));
+        var (codigo, _) = Rodar(zig, ["cc", "-c", "-w", "-target", "x86_64-windows-gnu", fonte, "-o", objetoNovo], trabalho);
+        return codigo == 0 ? objetoNovo : null;
     }
 
     static ErroDeSintaxe ErroDoLigador(string saida)

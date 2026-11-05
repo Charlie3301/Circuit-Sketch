@@ -70,16 +70,24 @@ public:
         return cs_nome[0] ? cs_obj_t(cs_nome, "readStringUntil", terminator) : String();
     }
     void close() { if (cs_nome[0]) cs_obj_n(cs_nome, "close"); }
-    size_t size() { return cs_nome[0] ? (size_t)cs_obj_i(cs_nome, "size") : 0; }
-    size_t position() { return cs_nome[0] ? (size_t)cs_obj_i(cs_nome, "position") : 0; }
+    size_t size() const { return cs_nome[0] ? (size_t)cs_obj_i(cs_nome, "size") : 0; }
+    size_t position() const { return cs_nome[0] ? (size_t)cs_obj_i(cs_nome, "position") : 0; }
     bool seek(uint32_t pos) { return cs_nome[0] && cs_obj_i(cs_nome, "seek", pos) != 0; }
     bool seek(uint32_t pos, int modo) { return cs_nome[0] && cs_obj_i(cs_nome, "seek", pos, modo) != 0; }
-    const char *name()
+    const char *name() const
     {
         static String n;
         n = cs_nome[0] ? cs_obj_t(cs_nome, "name") : String();
         return n.c_str();
     }
+    const char *path() const
+    {
+        static String n;
+        n = cs_nome[0] ? cs_obj_t(cs_nome, "path") : String();
+        return n.c_str();
+    }
+    time_t getLastWrite() { return cs_nome[0] ? (time_t)cs_obj_i(cs_nome, "getLastWrite") : 0; }
+    bool setBufferSize(size_t) { return cs_nome[0] != 0; }
     bool isDirectory() { return cs_nome[0] && cs_obj_i(cs_nome, "isDirectory") != 0; }
     File openNextFile(const char *mode = "r")
     {
@@ -89,7 +97,24 @@ public:
         return adotar(cs_texto(nullptr, "__criar", 1, v));
     }
     void rewindDirectory() { if (cs_nome[0]) cs_obj_n(cs_nome, "rewindDirectory"); }
-    operator bool() { return cs_nome[0] != 0; }
+    String getNextFileName(bool *ehPasta = nullptr)
+    {
+        File f = openNextFile();
+        if (!f) return String();
+        if (ehPasta) *ehPasta = f.isDirectory();
+        String caminho = f.path();
+        f.close();
+        return caminho;
+    }
+    bool seekDir(long posicao)
+    {
+        if (!isDirectory()) return false;
+        rewindDirectory();
+        for (long i = 0; i < posicao; i++)
+            if (!getNextFileName().length()) break;
+        return true;
+    }
+    operator bool() const { return cs_nome[0] != 0; }
 };
 
 /* O sistema de arquivos do core da ESP32: a funcao que recebe "fs::FS &fs"
@@ -137,7 +162,13 @@ public:
     }
 };
 } // namespace fs
+#ifndef FS_NO_GLOBALS
 using fs::FS;
+using fs::SeekMode;
+using fs::SeekSet;
+using fs::SeekCur;
+using fs::SeekEnd;
+#endif
 
 #include "sd_defines.h"
 
@@ -184,12 +215,19 @@ public:
     sdcard_type_t cardType() { return montado ? CARD_SDHC : CARD_NONE; }
     uint64_t totalBytes() { return montado ? cardSize() - 4ULL * 1024 * 1024 : 0; }
     uint64_t usedBytes() { return 0; }
-    uint8_t numSectors() { return 0; }
+    size_t numSectors() { return (size_t)(cardSize() / sectorSize()); }
     size_t sectorSize() { return 512; }
+    /* O simulador guarda os arquivos do cartao, nao os setores do sistema de arquivos. */
+    bool readRAW(uint8_t *, uint32_t) { return false; }
+    bool writeRAW(uint8_t *, uint32_t) { return false; }
 
 private:
     bool montado = false;
 };
+
+namespace fs {
+typedef ::SDClass SDFS;
+}
 
 inline SDClass SD;
 

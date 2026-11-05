@@ -33,6 +33,12 @@ public:
     uint64_t cardSize() { return montado ? 4ULL * 1024 * 1024 * 1024 : 0; }
     uint64_t totalBytes() { return cardSize(); }
     uint64_t usedBytes() { return 0; }
+    int sectorSize() { return montado ? 512 : 0; }
+    int numSectors() { return montado ? (int)(cardSize() / 512) : 0; }
+    /* O simulador guarda os arquivos do cartao, nao os setores do sistema de arquivos. */
+    bool readRAW(uint8_t *, uint32_t) { return false; }
+    bool writeRAW(uint8_t *, uint32_t) { return false; }
+    bool setPowerChannel(int) { return !montado; }
 
 private:
     bool montado = false;

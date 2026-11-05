@@ -1307,7 +1307,7 @@ struct spi_struct_t {
 };
 static spi_struct_t spis[4] = {};
 
-static SPIClass &spiDe(spi_t *s) { return s && s->num == 3 ? SPI1 : SPI; }
+static SPIClass &spiDe(spi_t *s) { return s && s->num == 3 ? cs_segundo_spi : SPI; }
 
 /* O divisor do relogio do SPI da ESP32 (sobre os 80 MHz do APB). */
 extern "C" uint32_t spiClockDivToFrequency(spi_t *spi, uint32_t clockDiv)

@@ -130,6 +130,8 @@ public:
     void setTimeout(uint16_t timeout) { cs_obj_n(cs_nome, "setTimeout", timeout); }
     void setConnectTimeout(int32_t connectTimeout) { cs_obj_n(cs_nome, "setConnectTimeout", connectTimeout); }
     void setUserAgent(const String &userAgent) { cs_obj_n(cs_nome, "setUserAgent", userAgent); }
+    void setAcceptEncoding(const String &acceptEncoding) { addHeader("Accept-Encoding", acceptEncoding); }
+    void collectAllHeaders(bool = true) {}
     void setReuse(bool reuse) { cs_obj_n(cs_nome, "setReuse", reuse); }
     void setFollowRedirects(followRedirects_t follow) { cs_obj_n(cs_nome, "setFollowRedirects", (int)follow); }
     void collectHeaders(const char *headerKeys[], const size_t headerKeysCount) { (void)headerKeys; (void)headerKeysCount; }

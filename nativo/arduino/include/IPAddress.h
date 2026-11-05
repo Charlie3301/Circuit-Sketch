@@ -12,6 +12,9 @@
 
 enum IPType { IPv4, IPv6 };
 
+struct ip_addr;
+typedef struct ip_addr ip_addr_t;
+
 class IPAddress : public Printable {
     uint8_t b[4] = {0, 0, 0, 0};
     uint8_t b6[16] = {0};
@@ -70,6 +73,11 @@ public:
         : b6{o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15, o16}, _tipo(IPv6), _zona(z) {}
     IPType type() const { return _tipo; }
     uint8_t zone() const { return _tipo == IPv6 ? _zona : 0; }
+    /* O endereco do lwIP, de ida e de volta (em cs_rede_ip.cpp, que conhece o lwIP). */
+    void to_ip_addr_t(ip_addr_t *addr) const;
+    IPAddress &from_ip_addr_t(const ip_addr_t *addr);
+    /* O tipo do IPv6: 0 desconhecido, 1 global, 2 link local, 3 site local, 4 unique local, 5 loopback. */
+    int addr_type() const;
     IPAddress(uint8_t a0, uint8_t a1, uint8_t a2, uint8_t a3) : b{a0, a1, a2, a3} {}
     IPAddress(uint32_t endereco)
     {

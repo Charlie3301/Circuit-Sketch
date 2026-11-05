@@ -4,8 +4,10 @@
 #include "SPI.h"
 
 SPIClass SPI("SPI");
-#if defined(ESP32) || defined(ARDUINO_ARCH_RP2040)
+#if defined(ARDUINO_ARCH_RP2040)
 SPIClass SPI1("SPI1");
+#elif defined(ESP32)
+SPIClass cs_segundo_spi("SPI1");
 #endif
 
 SPIClass::SPIClass(uint8_t bus) : nome(bus == 0 ? "SPI" : "SPI1") {}
@@ -82,7 +84,11 @@ void SPIClass::transferBits(uint32_t data, uint32_t *out, uint8_t bits)
 void SPIClass::setBitOrder(uint8_t bitOrder) { ch(nome, "setBitOrder", cs_i(bitOrder)); }
 void SPIClass::setDataMode(uint8_t dataMode) { ch(nome, "setDataMode", cs_i(dataMode)); }
 void SPIClass::setFrequency(uint32_t freq) { ch(nome, "setFrequency", cs_i(freq)); }
-void SPIClass::setClockDivider(uint32_t clockDiv) { ch(nome, "setClockDivider", cs_i(clockDiv)); }
+void SPIClass::setClockDivider(uint32_t clockDiv)
+{
+    divisor = clockDiv;
+    ch(nome, "setClockDivider", cs_i(clockDiv));
+}
 void SPIClass::setHwCs(bool use) { ch(nome, "setHwCs", cs_b(use)); }
 int8_t SPIClass::pinSS() { return (int8_t)ch_i(nome, "pinSS"); }
 bool SPIClass::setRX(int pin) { return ch_i(nome, "setRX", cs_i(pin)) != 0; }

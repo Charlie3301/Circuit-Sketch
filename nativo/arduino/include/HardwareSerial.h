@@ -8,6 +8,7 @@
 
 #include <inttypes.h>
 #include "Stream.h"
+#include "cs_ponte.h"
 
 /* A tarefa dos eventos da serial (o onReceive, o USB): o tamanho e a prioridade do core. */
 #ifndef ARDUINO_SERIAL_EVENT_TASK_STACK_SIZE

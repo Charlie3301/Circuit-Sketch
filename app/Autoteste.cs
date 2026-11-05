@@ -203,6 +203,8 @@ public static partial class Autoteste
         Bloco("Cpp_ArduinoEsp32", Cpp_ArduinoEsp32);
         Bloco("Cpp_Pilhas", Cpp_Pilhas);
         Bloco("Cpp_Json", Cpp_Json);
+        Bloco("Cpp_Api", Cpp_Api);
+        Bloco("MicroPython_Real", MicroPython_Real);
         Bloco("Cpp_Bibliotecas", Cpp_Bibliotecas);
         Bloco("Cpp_Idf", Cpp_Idf);
         Bloco("Diagnostico_Pasta", Diagnostico_Pasta);

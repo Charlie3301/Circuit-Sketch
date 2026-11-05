@@ -5,6 +5,7 @@
 #define LWIP_HDR_DEF_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,6 +15,12 @@ extern "C" {
 #define LWIP_MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define LWIP_ARRAYSIZE(x) (sizeof(x) / sizeof((x)[0]))
 #define LWIP_MAKEU32(a, b, c, d) (((uint32_t)((a) & 0xff) << 24) | ((uint32_t)((b) & 0xff) << 16) | ((uint32_t)((c) & 0xff) << 8) | (uint32_t)((d) & 0xff))
+
+char *lwip_strnstr(const char *buffer, const char *token, size_t n);
+char *lwip_strnistr(const char *buffer, const char *token, size_t n);
+int lwip_stricmp(const char *str1, const char *str2);
+int lwip_strnicmp(const char *str1, const char *str2, size_t len);
+void lwip_itoa(char *result, size_t bufsize, int number);
 
 static inline uint16_t lwip_htons(uint16_t x) { return (uint16_t)__builtin_bswap16(x); }
 static inline uint32_t lwip_htonl(uint32_t x) { return __builtin_bswap32(x); }

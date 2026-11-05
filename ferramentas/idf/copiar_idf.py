@@ -16,6 +16,12 @@ inclui-lo (#include_next) e so acrescentar o que e dele.
 Uso:
     python copiar_idf.py <pasta do esp-idf> [--extra <idf-extra-components>] <cabecalho> [<cabecalho> ...]
     python copiar_idf.py <pasta do esp-idf> [--extra <idf-extra-components>] --lista arquivo.txt
+    python copiar_idf.py <pasta do esp-idf> --todos
+
+O --todos traz todo cabecalho dos componentes de DA_PLACA: biblioteca que usa o hardware direto
+inclui o hal/gpio_ll.h, o soc/rtc.h, o esp_private/gdma.h, e na placa eles sempre existem. A
+pilha Bluetooth, o wpa_supplicant e o mbedTLS ficam de fora: tem nomes genericos demais
+("os.h", "common/...") e o simulador tem os dele.
 
 O --extra traz componentes da Espressif que nao vem no IDF e o core do
 Arduino usa (o network_provisioning).
@@ -40,7 +46,7 @@ DESTINO = os.path.join(REPO, 'nativo', 'idf')
 DO_SIMULADOR = os.path.join(REPO, 'nativo', 'arduino', 'include')
 
 # Os da linguagem e da libc (o compilador traz) e o FreeRTOS (o do simulador).
-PULAR = re.compile(r'^(std\w*\.h|string\.h|strings\.h|limits\.h|math\.h|time\.h|errno\.h|assert\.h|ctype\.h|inttypes\.h|'
+PULAR = re.compile(r'^(pthread\.h|semaphore\.h|mqueue\.h|endian\.h|byteswap\.h|std\w*\.h|string\.h|strings\.h|limits\.h|math\.h|time\.h|errno\.h|assert\.h|ctype\.h|inttypes\.h|'
                    r'float\.h|stdio\.h|stdlib\.h|unistd\.h|fcntl\.h|signal\.h|setjmp\.h|locale\.h|wchar\.h|alloca\.h|'
                    r'sys/(?!socket\.h|ioctl\.h|poll\.h|select\.h|uio\.h).*|machine/.*|freertos/(?!ringbuf\.h).*|FreeRTOS\.h|reent\.h|sdkconfig\.h|xtensa/.*|riscv/.*)$')
 INCLUSAO = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.M)
@@ -228,6 +234,45 @@ def copiar_fontes(idf, extras=()):
                     shutil.copyfile(caminho, os.path.join(pasta, os.path.basename(f)))
 
 
+DA_PLACA = ['app_update', 'bootloader_support', 'console', 'driver', 'efuse', 'esp_adc', 'esp_app_format', 'esp_blockdev',
+            'esp_bootloader_format', 'esp_coex', 'esp_common', 'esp_driver_ana_cmpr', 'esp_driver_bitscrambler', 'esp_driver_cam',
+            'esp_driver_dac', 'esp_driver_gpio', 'esp_driver_gptimer', 'esp_driver_i2c', 'esp_driver_i2s', 'esp_driver_i3c',
+            'esp_driver_isp', 'esp_driver_jpeg', 'esp_driver_ledc', 'esp_driver_mcpwm', 'esp_driver_parlio', 'esp_driver_pcnt',
+            'esp_driver_ppa', 'esp_driver_rmt', 'esp_driver_sdio', 'esp_driver_sdm', 'esp_driver_sdmmc', 'esp_driver_sdspi',
+            'esp_driver_spi', 'esp_driver_touch_sens', 'esp_driver_tsens', 'esp_driver_twai', 'esp_driver_uart', 'esp_driver_usb_serial_jtag',
+            'esp_eth', 'esp_event', 'esp_gdbstub', 'esp_hid', 'esp_http_client', 'esp_http_server', 'esp_https_ota', 'esp_https_server',
+            'esp_hw_support', 'esp_lcd', 'esp_local_ctrl', 'esp_mm', 'esp_netif', 'esp_partition', 'esp_phy', 'esp_pm', 'esp_psram',
+            'esp_ringbuf', 'esp_rom', 'esp_security', 'esp_system', 'esp_tee', 'esp_timer', 'esp_vfs_console', 'esp_wifi', 'espcoredump',
+            'fatfs', 'hal', 'heap', 'http_parser', 'ieee802154', 'log', 'mqtt', 'nvs_flash', 'nvs_sec_provider', 'perfmon', 'riscv',
+            'sdmmc', 'soc', 'spi_flash', 'tcp_transport', 'touch_element', 'ulp', 'unity', 'usb', 'vfs', 'wear_levelling', 'xtensa']
+
+
+def unificar_rom():
+    """No IDF, "rom/x.h" e "<chip>/rom/x.h" sao o mesmo arquivo, e a guarda dele vale para os dois.
+    Copiados viram dois: quem inclui os dois (a GFX Library) definiria tudo duas vezes."""
+    for chip in CHIPS:
+        pasta = os.path.join(DESTINO, chip, 'rom')
+        if not os.path.isdir(pasta):
+            continue
+        for nome in os.listdir(pasta):
+            caminho = os.path.join(pasta, nome)
+            original = os.path.join(DESTINO, chip, chip, 'rom', nome)
+            if os.path.isfile(original) and open(caminho, 'rb').read() == open(original, 'rb').read():
+                with open(caminho, 'w', encoding='utf-8', newline='\n') as f:
+                    f.write('#include "%s/rom/%s"\n' % (chip, nome))
+
+
+def todos_da_placa(idf):
+    """Os caminhos de #include de todo cabecalho dos componentes de DA_PLACA, em todos os chips."""
+    nomes = set()
+    raiz = os.path.join(idf, 'components')
+    for chip in CHIPS:
+        pastas = [p for p in pastas_de_inclusao(idf, chip)
+                  if os.path.relpath(p, raiz).replace(os.sep, '/').split('/')[0] in DA_PLACA]
+        nomes |= set(indice(pastas))
+    return sorted(nomes)
+
+
 def main():
     if len(sys.argv) < 3:
         print(__doc__)
@@ -238,6 +283,10 @@ def main():
     while resto and resto[0] == '--extra':
         extras.append(resto[1])
         resto = resto[2:]
+    if resto[0] == '--todos':
+        copiar(idf, todos_da_placa(idf), extras)
+        unificar_rom()
+        return
     if resto[0] == '--lista':
         pedidos = [l.strip() for l in open(resto[1], encoding='utf-8') if l.strip() and not l.startswith('#')]
     else:

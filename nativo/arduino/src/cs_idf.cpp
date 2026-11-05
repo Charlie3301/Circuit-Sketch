@@ -727,6 +727,38 @@ extern "C" esp_err_t i2s_set_pin(i2s_port_t, const i2s_pin_config_t *pin)
     return ESP_OK;
 }
 
+extern "C" esp_err_t i2s_set_dac_mode(i2s_dac_mode_t) { return ESP_OK; }
+extern "C" esp_err_t i2s_adc_enable(i2s_port_t) { return ESP_OK; }
+extern "C" esp_err_t i2s_adc_disable(i2s_port_t) { return ESP_OK; }
+extern "C" esp_err_t i2s_set_adc_mode(int, int) { return ESP_OK; }
+extern "C" esp_err_t i2s_pcm_config(i2s_port_t, const i2s_pcm_cfg_t *) { return ESP_OK; }
+extern "C" esp_err_t i2s_set_pdm_rx_down_sample(i2s_port_t, i2s_pdm_dsr_t) { return ESP_OK; }
+extern "C" esp_err_t i2s_set_pdm_tx_up_sample(i2s_port_t, const i2s_pdm_tx_upsample_cfg_t *) { return ESP_OK; }
+/* A taxa que o sketch pediu, e a amostra de src_bits alargada para aim_bits (o byte mais baixo em zero). */
+extern "C" float i2s_get_clk(i2s_port_t) { return i2sInstalado ? (float)configDoI2s.sample_rate : 0; }
+extern "C" esp_err_t i2s_write_expand(i2s_port_t p, const void *src, size_t size, size_t src_bits, size_t aim_bits, size_t *escritos, TickType_t t)
+{
+    if (src_bits % 8 || aim_bits % 8 || aim_bits < src_bits || !src_bits) return ESP_ERR_INVALID_ARG;
+    size_t origem = src_bits / 8, destino = aim_bits / 8, amostras = size / origem, total = 0;
+    uint8_t buf[256];
+    size_t k = 0;
+    const uint8_t *q = (const uint8_t *)src;
+    for (size_t i = 0; i < amostras; i++) {
+        memset(buf + k, 0, destino - origem);
+        memcpy(buf + k + destino - origem, q + i * origem, origem);
+        k += destino;
+        if (k + destino > sizeof(buf) || i + 1 == amostras) {
+            size_t n = 0;
+            esp_err_t e = i2s_write(p, buf, k, &n, t);
+            if (e != ESP_OK) return e;
+            total += n;
+            k = 0;
+        }
+    }
+    if (escritos) *escritos = total;
+    return ESP_OK;
+}
+
 extern "C" esp_err_t i2s_write(i2s_port_t, const void *src, size_t size, size_t *escritos, TickType_t)
 {
     size_t n = i2sInstalado ? cs_i2s_escrever(src, size) : 0;

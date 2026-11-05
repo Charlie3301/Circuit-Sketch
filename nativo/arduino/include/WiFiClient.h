@@ -70,6 +70,17 @@ public:
     }
     ~WiFiClient() override { soltar(); }
 
+    /* O socket e as opcoes dele: na rede simulada nao existe socket do lwIP, e as opcoes nao mudam nada. */
+    virtual int fd() const { return cs_nome[0] ? 1 : -1; }
+    int setSocketOption(int, int, const void *, size_t) { return 0; }
+    int setSocketOption(int, char *, size_t) { return 0; }
+    int getSocketOption(int, int, const void *, size_t) { return 0; }
+    int setOption(int, int *) { return 0; }
+    int getOption(int, int *valor)
+    {
+        if (valor) *valor = 0;
+        return 0;
+    }
     int connect(const char *host, uint16_t port) override { return (int)cs_obj_i(cs_nome, "connect", host, port); }
     int connect(IPAddress ip, uint16_t port) override { return (int)cs_obj_i(cs_nome, "connect", ip.toString(), port); }
     int connect(const char *host, uint16_t port, int32_t timeout_ms) { (void)timeout_ms; return connect(host, port); }
@@ -158,14 +169,26 @@ public:
         (void)max_clients;
         cs_criar("WiFiServer", port);
     }
-    void begin(uint16_t port = 0) { if (port) cs_obj_n(cs_nome, "begin", port); else cs_obj_n(cs_nome, "begin"); }
-    void end() { cs_obj_n(cs_nome, "end"); }
-    void close() { cs_obj_n(cs_nome, "close"); }
-    void stop() { cs_obj_n(cs_nome, "stop"); }
+    void begin(uint16_t port = 0)
+    {
+        if (port) cs_obj_n(cs_nome, "begin", port);
+        else cs_obj_n(cs_nome, "begin");
+        _ouvindo = true;
+    }
+    void end() { cs_obj_n(cs_nome, "end"); _ouvindo = false; }
+    void close() { cs_obj_n(cs_nome, "close"); _ouvindo = false; }
+    void stop() { cs_obj_n(cs_nome, "stop"); _ouvindo = false; }
+    operator bool() { return _ouvindo; }
     bool hasClient() { return cs_obj_i(cs_nome, "hasClient") != 0; }
-    void setNoDelay(bool nodelay) { cs_obj_n(cs_nome, "setNoDelay", nodelay); }
+    void setNoDelay(bool nodelay) { cs_obj_n(cs_nome, "setNoDelay", nodelay); _semAtraso = nodelay; }
+    bool getNoDelay() { return _semAtraso; }
+    int setTimeout(uint32_t) { return 0; }
+    void listenOnLocalhost() {}
     WiFiClient available() { return WiFiClient::adotar(cs_obj_t(cs_nome, "available")); }
     WiFiClient accept() { return WiFiClient::adotar(cs_obj_t(cs_nome, "accept")); }
+
+private:
+    bool _ouvindo = false, _semAtraso = false;
 };
 
 #endif

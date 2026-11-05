@@ -607,6 +607,8 @@ bool WiFiClass::enableAP(bool enable)
     return mode(enable ? (sta ? WIFI_MODE_APSTA : WIFI_MODE_AP) : (sta ? WIFI_MODE_STA : WIFI_MODE_NULL));
 }
 
+const char *STAClass::disconnectReasonName(wifi_err_reason_t reason) { return WiFiClass::disconnectReasonName(reason); }
+
 const char *WiFiClass::disconnectReasonName(wifi_err_reason_t reason)
 {
     switch (reason) {

@@ -344,3 +344,8 @@ extern "C" void cs_atender_timers(void)
 extern "C" void cs_atender_timers(void) {}
 extern "C" __declspec(dllexport) volatile int cs_timers_ativos = 0;
 #endif
+
+#if defined(ESP32)
+/* soc/dport_access.h: o DPORT_REG_READ da ESP32 (a leitura segura contra o outro nucleo). */
+extern "C" uint32_t esp_dport_access_reg_read(uint32_t r) { return cs_reg_ler(r); }
+#endif

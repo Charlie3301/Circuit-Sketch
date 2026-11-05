@@ -12,25 +12,60 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/* O soc.h do ESP-IDF vem antes: o que ele define com ponteiro para o registrador, daqui para baixo
+ * vai ao simulador. */
+#include "soc/soc.h"
+#undef REG_WRITE
+#undef REG_READ
+#undef REG_SET_BIT
+#undef REG_CLR_BIT
+#undef REG_GET_BIT
+#undef WRITE_PERI_REG
+#undef READ_PERI_REG
+#undef SET_PERI_REG_MASK
+#undef CLEAR_PERI_REG_MASK
+#undef GET_PERI_REG_MASK
+#undef GET_PERI_REG_BITS
+#undef GET_PERI_REG_BITS2
+#undef SET_PERI_REG_BITS
+#undef REG_SET_BITS
+#undef REG_GET_FIELD
+#undef REG_SET_FIELD
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* ---- os enderecos (ESP32) ---- */
+#undef DR_REG_GPIO_BASE
 #define DR_REG_GPIO_BASE 0x3ff44000
+#undef GPIO_OUT_REG
 #define GPIO_OUT_REG (DR_REG_GPIO_BASE + 0x0004)
+#undef GPIO_OUT_W1TS_REG
 #define GPIO_OUT_W1TS_REG (DR_REG_GPIO_BASE + 0x0008)
+#undef GPIO_OUT_W1TC_REG
 #define GPIO_OUT_W1TC_REG (DR_REG_GPIO_BASE + 0x000c)
+#undef GPIO_OUT1_REG
 #define GPIO_OUT1_REG (DR_REG_GPIO_BASE + 0x0010)
+#undef GPIO_OUT1_W1TS_REG
 #define GPIO_OUT1_W1TS_REG (DR_REG_GPIO_BASE + 0x0014)
+#undef GPIO_OUT1_W1TC_REG
 #define GPIO_OUT1_W1TC_REG (DR_REG_GPIO_BASE + 0x0018)
+#undef GPIO_ENABLE_REG
 #define GPIO_ENABLE_REG (DR_REG_GPIO_BASE + 0x0020)
+#undef GPIO_ENABLE_W1TS_REG
 #define GPIO_ENABLE_W1TS_REG (DR_REG_GPIO_BASE + 0x0024)
+#undef GPIO_ENABLE_W1TC_REG
 #define GPIO_ENABLE_W1TC_REG (DR_REG_GPIO_BASE + 0x0028)
+#undef GPIO_ENABLE1_REG
 #define GPIO_ENABLE1_REG (DR_REG_GPIO_BASE + 0x002c)
+#undef GPIO_ENABLE1_W1TS_REG
 #define GPIO_ENABLE1_W1TS_REG (DR_REG_GPIO_BASE + 0x0030)
+#undef GPIO_ENABLE1_W1TC_REG
 #define GPIO_ENABLE1_W1TC_REG (DR_REG_GPIO_BASE + 0x0034)
+#undef GPIO_IN_REG
 #define GPIO_IN_REG (DR_REG_GPIO_BASE + 0x003c)
+#undef GPIO_IN1_REG
 #define GPIO_IN1_REG (DR_REG_GPIO_BASE + 0x0040)
 
 void cs_reg_escrever(uint32_t endereco, uint32_t valor);
@@ -45,6 +80,13 @@ uint32_t cs_reg_ler(uint32_t endereco);
 #define READ_PERI_REG(r) REG_READ(r)
 #define SET_PERI_REG_MASK(r, m) REG_SET_BIT(r, m)
 #define CLEAR_PERI_REG_MASK(r, m) REG_CLR_BIT(r, m)
+#define GET_PERI_REG_MASK(r, m) REG_GET_BIT(r, m)
+#define GET_PERI_REG_BITS(r, h, l) ((REG_READ(r) >> (l)) & ((1UL << ((h) - (l) + 1)) - 1))
+#define GET_PERI_REG_BITS2(r, m, s) ((REG_READ(r) >> (s)) & (m))
+#define SET_PERI_REG_BITS(r, m, v, s) REG_WRITE(r, (REG_READ(r) & ~((m) << (s))) | (((v) & (m)) << (s)))
+#define REG_SET_BITS(r, b, m) REG_WRITE(r, (REG_READ(r) & ~(uint32_t)(m)) | ((uint32_t)(b) & (uint32_t)(m)))
+#define REG_GET_FIELD(r, f) ((REG_READ(r) >> (f##_S)) & (f##_V))
+#define REG_SET_FIELD(r, f, v) REG_WRITE(r, (REG_READ(r) & ~((f##_V) << (f##_S))) | (((uint32_t)(v) & (f##_V)) << (f##_S)))
 #define GPIO_REG_WRITE(r, v) REG_WRITE(r, v)
 #define GPIO_REG_READ(r) REG_READ(r)
 
