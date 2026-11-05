@@ -7,6 +7,16 @@
 #ifndef O_NONBLOCK
 #define O_NONBLOCK 0x4000
 #endif
+/* Os da newlib que o Windows nao tem (o F_GETFL e o F_SETFL vem do lwip/sockets.h). */
+#ifndef F_GETFD
+#define F_GETFD 1
+#endif
+#ifndef F_SETFD
+#define F_SETFD 2
+#endif
+#ifndef FD_CLOEXEC
+#define FD_CLOEXEC 1
+#endif
 #ifndef O_SYNC
 #define O_SYNC 0x2000
 #endif

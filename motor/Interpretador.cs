@@ -707,10 +707,13 @@ public partial class Interpretador(Programa prog, Maquina maq)
         // O DS3231 fala a mesma lingua do DS1307 no RTClib (e no mesmo
         // endereco, 0x68); so tem a mais o termometro e o lostPower().
         ["RTC_DS3231"] = "RTC_DS1307",
+        ["RTC_PCF8523"] = "RTC_DS1307",
+        ["RTC_PCF8563"] = "RTC_DS1307",
     };
 
     void ExecDeclObj(CmdDeclObj d, Ambiente amb)
     {
+        string classeDoSketch = d.Classe;
         if (ApelidosDeClasse.TryGetValue(d.Classe, out var verdadeira)) d = d with { Classe = verdadeira };
 
         // Classe do proprio programa ou de uma biblioteca instalada.
@@ -875,7 +878,8 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 // O relogio nasce acertado com a hora do computador, como um
                 // modulo com bateria que alguem ja acertou uma vez.
                 case "RTC_DS1307":
-                    RegistrarNoI2c(obj);
+                    if (classeDoSketch == "RTC_PCF8563") obj.Campos["_endereco"] = Valor.DeInt(0x51);
+                    RegistrarNoI2c(obj, classeDoSketch == "RTC_PCF8563" ? 0x51 : -1);
                     obj.Campos["_base"] = Valor.DeInt(DateTimeOffset.Now.ToUnixTimeSeconds()
                                                       + (long)DateTimeOffset.Now.Offset.TotalSeconds
                                                       - maq.Ms / 1000);

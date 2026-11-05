@@ -16,6 +16,8 @@
 #include "HardwareSerial.h"
 #include "soc/soc_caps.h"
 #include "soc/adc_channel.h"
+#include "esp_private/periph_ctrl.h"
+#include "esp_timer.h"
 #if SOC_TOUCH_SENSOR_SUPPORTED
 #include "soc/touch_sensor_channel.h"
 #endif
@@ -1024,6 +1026,16 @@ extern "C" uint32_t getXtalFrequencyMhz()
 #endif
 }
 extern "C" uint32_t getApbFrequency() { return apbDe(cpuMhz); }
+/* Os do esp_private/esp_clk.h, que as bibliotecas (a FastLED) leem direto, sem o HAL do Arduino. */
+extern "C" int esp_clk_cpu_freq(void) { return (int)(cpuMhz * 1000000u); }
+extern "C" int esp_clk_apb_freq(void) { return (int)getApbFrequency(); }
+extern "C" int esp_clk_xtal_freq(void) { return (int)(getXtalFrequencyMhz() * 1000000u); }
+extern "C" uint64_t esp_clk_rtc_time(void) { return (uint64_t)esp_timer_get_time(); }
+/* O relogio e o reset de cada periferico (esp_private/periph_ctrl.h): no simulador o periferico
+ * ja esta sempre ligado, entao ligar, desligar e resetar nao mudam nada. */
+extern "C" void periph_module_enable(periph_module_t periph) { (void)periph; }
+extern "C" void periph_module_disable(periph_module_t periph) { (void)periph; }
+extern "C" void periph_module_reset(periph_module_t periph) { (void)periph; }
 extern "C" const char *getClockSourceName(uint8_t source)
 {
     switch (source) {

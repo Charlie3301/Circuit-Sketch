@@ -145,13 +145,25 @@ public sealed partial class Rede
     public bool EnviarUdp(PortaUdp de, string host, int porta, byte[] dados)
     {
         var origem = de.Dona;
+        host = (host ?? "").Trim();
+        // O 127.0.0.1 da placa e ela mesma (o loopback do lwIP), com ou sem WiFi: o
+        // socket de controle do esp_http_server conversa assim com a propria tarefa.
+        if (EhLocal(host))
+        {
+            List<PortaUdp> daPlaca;
+            lock (trava) daPlaca = [.. portasUdp.Where(p => p.Dona == origem && p.Porta == porta && !p.Fechada)];
+            if (daPlaca.Count > 0)
+            {
+                foreach (var alvo in daPlaca) alvo.Chegou(new Datagrama(dados, "127.0.0.1", de.Porta));
+                return true;
+            }
+        }
         if (!NaRede(origem) && !Wifi(origem).ModoAp)
         {
             Anotar(origem, "aviso", $"UDP para {host}:{porta}: a placa não está no WiFi");
             return false;
         }
         string ipDeQuem = Wifi(origem).Ip;
-        host = (host ?? "").Trim();
 
         // O NTP: a rede responde com o relogio do computador, como o configTime.
         if (porta == 123 && dados.Length >= 48 && (dados[0] & 0x07) == 3)

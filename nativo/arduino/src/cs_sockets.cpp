@@ -456,6 +456,7 @@ int lwip_fcntl(int fd, int cmd, int val)
 {
     Socket *s = socketDe(fd);
     if (!s) return -1;
+    if (cmd == F_GETFD || cmd == F_SETFD) return 0;
     if (cmd == F_GETFL) return s->naoBloqueia ? O_NONBLOCK : 0;
     if (cmd == F_SETFL) {
         s->naoBloqueia = (val & O_NONBLOCK) != 0;

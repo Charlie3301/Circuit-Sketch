@@ -184,6 +184,73 @@ public static partial class Autoteste
             nativo && erro is null && serial == "01BancadaBluedroid|11" + (1 | 4) + "1|010|180f2551|10|654321|4|broadcast: 0, read: 1, write_nr: 0, write: 0, notify: 1, indicate: 0, auth: 0",
             $"{nativo} {erro} | {serial}");
 
+        // ---- a NimBLE-Arduino: as duas pontas, pelo radio da bancada ----
+        const string servidorNimble = """
+            #include <NimBLEDevice.h>
+            NimBLECharacteristic *k;
+            class Servidor : public NimBLEServerCallbacks {
+              void onConnect(NimBLEServer *s, NimBLEConnInfo &info) override { Serial.println("conectou"); }
+            };
+            class Escrita : public NimBLECharacteristicCallbacks {
+              void onWrite(NimBLECharacteristic *c, NimBLEConnInfo &info) override {
+                Serial.println(("escreveu " + std::string(c->getValue())).c_str());
+                c->notify(std::string("eco"));
+              }
+            };
+            void setup() {
+              Serial.begin(115200);
+              NimBLEDevice::init("nim-servidor");
+              NimBLEServer *s = NimBLEDevice::createServer();
+              s->setCallbacks(new Servidor());
+              NimBLEService *sv = s->createService("181A");
+              k = sv->createCharacteristic("2A6E", NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY);
+              k->setCallbacks(new Escrita());
+              k->setValue(std::string("ola"));
+              NimBLEAdvertising *a = NimBLEDevice::getAdvertising();
+              a->setName("nim-servidor");
+              a->addServiceUUID(sv->getUUID());
+              a->start();
+              Serial.println(a->isAdvertising() ? "anunciando" : "parado");
+            }
+            void loop() { delay(10); }
+            """;
+        const string clienteNimble = """
+            #include <NimBLEDevice.h>
+            const NimBLEAdvertisedDevice *alvo = nullptr;
+            class Busca : public NimBLEScanCallbacks {
+              void onResult(const NimBLEAdvertisedDevice *d) override {
+                if (d->isAdvertisingService(NimBLEUUID("181A"))) alvo = d;
+              }
+            };
+            void setup() {
+              Serial.begin(115200);
+              delay(500);
+              NimBLEDevice::init("nim-cliente");
+              NimBLEScan *scan = NimBLEDevice::getScan();
+              scan->setScanCallbacks(new Busca());
+              scan->setActiveScan(true);
+              scan->start(1500);
+              while (scan->isScanning()) delay(50);
+              if (!alvo) { Serial.println("nao achou"); return; }
+              Serial.println(("achou " + alvo->getName()).c_str());
+              NimBLEClient *c = NimBLEDevice::createClient();
+              if (!c->connect(alvo)) { Serial.println("nao conectou"); return; }
+              NimBLERemoteCharacteristic *k = c->getService("181A")->getCharacteristic("2A6E");
+              Serial.println(("leu " + std::string(k->readValue())).c_str());
+              k->subscribe(true, [](NimBLERemoteCharacteristic *, uint8_t *d, size_t n, bool) {
+                Serial.println(("notificou " + std::string((char *)d, n)).c_str());
+              });
+              k->writeValue(std::string("oi"), true);
+              delay(300);
+              Serial.println("fim");
+            }
+            void loop() { delay(10); }
+            """;
+        var (serA, serB, erroNim) = RodarDuasNativas(servidorNimble, clienteNimble, "esp32-devkit-v1", 6000, (a, b) => b.Contains("fim"));
+        Conferir("api: a NimBLE-Arduino -- o servidor anuncia, o cliente acha pelo scan assincrono, conecta, le, escreve e recebe o notify",
+            erroNim is null && serA?.Contains("anunciando") == true && serB?.Contains("achou nim-servidor") == true && serB.Contains("leu ola")
+            && serA.Contains("conectou") && serA.Contains("escreveu oi") && serB.Contains("notificou eco"), $"{erroNim} | {serA} || {serB}");
+
         const string lwip = """
             #include <WiFi.h>
             #include <lwip/ip_addr.h>

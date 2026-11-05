@@ -39,7 +39,9 @@ public static partial class Autoteste
             var inos = Directory.Exists(pastaDeExemplos)
                 ? Directory.GetFiles(pastaDeExemplos, "*.ino", SearchOption.AllDirectories).Order(StringComparer.Ordinal).ToList() : [];
             // Ate 3, espalhados pela lista: costumam mostrar partes diferentes da biblioteca.
-            var escolhidos = inos.Count <= 3 ? inos : [inos[0], inos[inos.Count / 2], inos[^1]];
+            // CS_LIBS_TODOS=1: todos (para fechar uma biblioteca so).
+            var escolhidos = inos.Count <= 3 || Environment.GetEnvironmentVariable("CS_LIBS_TODOS") == "1"
+                ? inos : [inos[0], inos[inos.Count / 2], inos[^1]];
             if (escolhidos.Count == 0)
             {
                 Linha($"{lib.Nome}: SEM EXEMPLO");
@@ -73,5 +75,26 @@ public static partial class Autoteste
             }
         }
         Linha($"TOTAL: {compilaram} de {exemplos} exemplos compilaram");
+
+        // A FastLED, se estiver no acervo, tambem roda: o driver dela (o RMT do IDF) acende a fita.
+        if (todas.FirstOrDefault(l => l.Nome == "FastLED") is not null && (so is not { Length: > 0 } || so.Any(s => "FastLED".Contains(s, StringComparison.OrdinalIgnoreCase))))
+        {
+            const string fastled = """
+                #include <FastLED.h>
+                CRGB leds[4];
+                void setup() {
+                  Serial.begin(115200);
+                  FastLED.addLeds<WS2812B, 5, GRB>(leds, 4);
+                  leds[1] = CRGB(10, 20, 30);
+                  FastLED.show();
+                  Serial.println("mostrou");
+                }
+                void loop() { delay(50); }
+                """;
+            var (serial, erro, nativo, m) = RodarNativo(fastled, 3000, bibliotecas: todas);
+            int cor = m.Fitas.TryGetValue(5, out var fita) ? fita.Cores[1] : -1;
+            Conferir("bibliotecas: a FastLED roda -- o addLeds com a WS2812B acende o LED 1 da fita no pino 5",
+                nativo && erro is null && serial.Contains("mostrou") && cor == Fita.Montar(10, 20, 30), $"{nativo} {erro} | {serial} | cor {cor:X6}");
+        }
     }
 }

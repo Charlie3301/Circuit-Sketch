@@ -396,16 +396,6 @@ public static class CompiladorNativo
         string fracos = fontesDoCore.Any(EhFraco) ? Path.Combine(pastaDoCore, "fracos.a") : null;
         string mbedtls = idf.Count > 0 ? BibliotecaMbedtls(pasta, zig, cabecalho, inc, idf, avisar) : null;
 
-        // As pilhas grandes (OpenThread, Zigbee): so quem usa paga por elas.
-        var textoDoProjeto = new[] { projeto.Sketch ?? "" }.Concat((projeto.Arquivos ?? new Dictionary<string, string>()).Values.Select(v => v ?? "")).ToList();
-        var pilhas = new List<string>();
-        foreach (var pilha in PilhasSobDemanda)
-        {
-            if (idf.Count == 0 || !pilha.Chips.Contains(Path.GetFileName(idf[0])) || !textoDoProjeto.Any(pilha.Usa.IsMatch)) continue;
-            pilhas.Add(BibliotecaDaPilha(pilha, pasta, zig, cabecalho, inc, idf, definicoes, avisar));
-            definicoes = [.. definicoes, .. pilha.Publicas];
-        }
-
         // ---- o projeto ----
         var abas = new Dictionary<string, string>(projeto.Arquivos ?? new Dictionary<string, string>(), StringComparer.OrdinalIgnoreCase);
         var unidades = new List<(string Nome, string Texto)>();
@@ -439,6 +429,18 @@ public static class CompiladorNativo
                 fontesDasLibs.Add(Path.Combine(lib.Pasta, arquivo));
             }
             fontesPorLib.Add((lib, fontesDasLibs.Skip(antesDela).ToList()));
+        }
+
+        // As pilhas grandes (OpenThread, Zigbee, a rede do IDF): so quem usa paga por elas. Quem
+        // usa pode ser o projeto ou uma biblioteca dele (a FastLED abre o esp_http_server).
+        var textoDoProjeto = new[] { projeto.Sketch ?? "" }.Concat((projeto.Arquivos ?? new Dictionary<string, string>()).Values.Select(v => v ?? "")).ToList();
+        var pilhas = new List<string>();
+        foreach (var pilha in PilhasSobDemanda)
+        {
+            if (idf.Count == 0 || !pilha.Chips.Contains(Path.GetFileName(idf[0]))) continue;
+            if (!textoDoProjeto.Any(pilha.Usa.IsMatch) && !usadas.Any(l => BibliotecaUsaPilha(l, pilha))) continue;
+            pilhas.Add(BibliotecaDaPilha(pilha, pasta, zig, cabecalho, inc, idf, definicoes, avisar));
+            definicoes = [.. definicoes, .. pilha.Publicas];
         }
 
         string encaminhados = PastaDeEncaminhados(usadas);
@@ -630,6 +632,34 @@ public static class CompiladorNativo
     /// </summary>
     sealed record PilhaSobDemanda(string Pasta, Regex Usa, string[] Chips, string[] Publicas, string[] Privadas, string[] Inclusoes);
 
+    /// <summary>
+    /// Se algum fonte da biblioteca (os .cpp e os cabecalhos que eles incluem, como os .cpp.hpp da
+    /// FastLED) usa a pilha. Uma biblioteca grande tem milhares de arquivos: a resposta fica guardada
+    /// pela data de cada um.
+    /// </summary>
+    static bool BibliotecaUsaPilha(BibliotecaDeFora lib, PilhaSobDemanda pilha)
+    {
+        foreach (string arquivo in lib.Arquivos)
+        {
+            if (Path.GetExtension(arquivo).ToLowerInvariant() is not (".c" or ".cpp" or ".cc" or ".h" or ".hpp" or ".hh" or ".inc" or ".ipp")) continue;
+            string caminho = Path.Combine(lib.Pasta, arquivo);
+            long data;
+            try { data = File.GetLastWriteTimeUtc(caminho).Ticks; }
+            catch (IOException) { continue; }
+            var chave = (caminho, pilha.Pasta);
+            bool usa;
+            lock (UsoDasPilhas)
+                if (UsoDasPilhas.TryGetValue(chave, out var guardado) && guardado.Data == data) { if (guardado.Usa) return true; continue; }
+            try { usa = pilha.Usa.IsMatch(File.ReadAllText(caminho)); }
+            catch (IOException) { continue; }
+            lock (UsoDasPilhas) UsoDasPilhas[chave] = (data, usa);
+            if (usa) return true;
+        }
+        return false;
+    }
+
+    static readonly Dictionary<(string Arquivo, string Pilha), (long Data, bool Usa)> UsoDasPilhas = [];
+
     static readonly PilhaSobDemanda[] PilhasSobDemanda =
     [
         // As definicoes sao as do components/openthread/CMakeLists.txt do IDF.
@@ -683,7 +713,9 @@ public static class CompiladorNativo
          "Adafruit_ST7735.h", "Adafruit_ST7789.h", "Adafruit_ST77xx.h", "Adafruit_Sensor.h", "Audio.h", "DHT.h", "ESP32Servo.h", "HX711.h",
          "IRrecv.h", "IRremote.h", "IRremote.hpp", "IRremoteESP8266.h", "IRutils.h", "Keypad.h", "LedControl.h", "LiquidCrystal.h",
          "LiquidCrystal_I2C.h", "MPU6050.h", "PubSubClient.h", "RF24.h", "nRF24L01.h", "printf.h", "RTClib.h", "Servo.h", "SoftwareSerial.h",
-         "Stepper.h", "TM1637Display.h", "UniversalTelegramBot.h", "WebSocketsServer.h"],
+         "Stepper.h", "TM1637Display.h", "UniversalTelegramBot.h", "WebSocketsServer.h",
+         "NimBLEDevice.h", "NimBLEBeacon.h", "NimBLEEddystoneTLM.h", "NimBLEStream.h", "NimBLEServer.h", "NimBLEClient.h", "NimBLEScan.h", "NimBLEAdvertising.h",
+         "NimBLEAdvertisementData.h", "NimBLEAdvertisedDevice.h", "NimBLEUUID.h", "NimBLEAddress.h", "NimBLECharacteristic.h", "NimBLEService.h", "NimBLEDescriptor.h", "NimBLE2904.h", "NimBLERemoteCharacteristic.h", "NimBLERemoteService.h", "NimBLERemoteDescriptor.h", "NimBLEConnInfo.h", "NimBLEAttValue.h", "NimBLEUtils.h"],
         StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
@@ -697,7 +729,10 @@ public static class CompiladorNativo
          [("typedef unsigned int size; ", "typedef unsigned long long size; "), ("typedef unsigned int uptr; ", "typedef unsigned long long uptr; "),
           ("typedef int iptr; ", "typedef long long iptr; "), ("typedef int ptrdiff; ", "typedef long long ptrdiff; ")]),
         ("platforms/esp/32/esp32_lazy_serial0_gate.h", [("#define FL_ESP32_STOCK_ARDUINO_MAIN 0", "#define FL_ESP32_STOCK_ARDUINO_MAIN 1")]),
-        ("platforms/esp/32/core/memory_barrier.h", [("#if defined(__XTENSA__)", "#if 1\n#define FL_PLATFORMS_MEMORY_BARRIER __sync_synchronize()\n#elif defined(__XTENSA__)")]),
+        // O FastLED ve o _WIN32 do compilador daqui e compilaria o caminho do PC junto com o da placa.
+        ("platforms/win/is_win.h", [("#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)", "#if 0"),
+                                    ("#if defined(__MINGW32__) || defined(__MINGW64__)", "#if 0")]),
+        ("platforms/esp/32/core/memory_barrier.h",[("#if defined(__XTENSA__)", "#if 1\n#define FL_PLATFORMS_MEMORY_BARRIER __sync_synchronize()\n#elif defined(__XTENSA__)")]),
     ];
 
     /// <summary>
@@ -1509,7 +1544,9 @@ public static class CompiladorNativo
     /// de biblioteca que chama outra que nao existe so e erro se for usada: a IRremote com
     /// NO_LED_FEEDBACK_CODE tem varias. O ligador do Windows reclama antes de jogar fora. Entao a funcao
     /// que so a biblioteca menciona ganha um corpo que para o programa se for mesmo chamada, e o sketch
-    /// que a chama direto continua com o erro de sempre. Sem nada a fazer, devolve null.
+    /// que a chama direto continua com o erro de sempre. O registrador de um periferico (o I2S0 e o
+    /// MCPWM0 que os drivers da FastLED citam, e que na placa o script do ligador poe no endereco do
+    /// chip) vira uma memoria zerada. Sem nada a fazer, devolve null.
     /// </summary>
     static string AusentesDasBibliotecas(string saida, int rodada, List<BibliotecaDeFora> usadas, IEnumerable<string> objetos, string zig, string trabalho)
     {
@@ -1517,19 +1554,32 @@ public static class CompiladorNativo
         if (faltas.Count == 0) return null;
         var pastas = usadas.Select(l => l.Pasta.Replace('/', '\\')).ToList();
         var padroes = new List<(string Legivel, Regex Padrao)>();
+        var corpos = new StringBuilder("int printf(const char *, ...);\nvoid abort(void);\n");
+        var vistos = new HashSet<string>();
         foreach (Match falta in faltas)
         {
             string legivel = falta.Groups[1].Value.Trim();
             string nome = Regex.Replace(legivel, @"\(.*\)( const)?$", "");
-            if (nome == legivel || nome.Contains('<') || nome.Contains(' ')) return null;
-            var quem = Regex.Matches(falta.Groups[2].Value, @"referenced by (.+)").Select(m => m.Groups[1].Value.Trim().Replace('/', '\\'));
-            if (!quem.All(q => pastas.Any(p => q.StartsWith(p, StringComparison.OrdinalIgnoreCase)))) return null;
+            // O de C (o extern "C" da FastLED, o registrador) vem sem os parenteses e o nome e o proprio simbolo.
+            bool deC = nome == legivel;
+            if (deC ? !Regex.IsMatch(nome, @"^[A-Za-z_]\w*$") : nome.Contains('<') || nome.Contains(' ')) return null;
+            var quem = Regex.Matches(falta.Groups[2].Value, @"referenced by (.+)").Select(m => m.Groups[1].Value.Trim().Replace('/', '\\')).ToList();
+            // O dado lido pelo endereco (.refptr) vem sem o arquivo, so com o objeto: o lib.a e o de uma biblioteca.
+            bool dado = deC && quem.Count > 0 && quem.All(q => q.StartsWith("lib.a(") && q.EndsWith("(.refptr." + nome + ")"));
+            if (!dado && !quem.All(q => pastas.Any(p => q.StartsWith(p, StringComparison.OrdinalIgnoreCase)))) return null;
+            if (deC)
+            {
+                if (vistos.Add(nome))
+                    corpos.Append(dado
+                        ? $"__attribute__((weak, aligned(64))) unsigned char cs_ausente{vistos.Count}[16384] __asm__(\"{nome}\");\n"
+                        : $"void cs_ausente{vistos.Count}(void) __asm__(\"{nome}\") __attribute__((weak));\n" +
+                          $"void cs_ausente{vistos.Count}(void) {{ printf(\"\\n{nome}: a biblioteca chamou esta funcao, mas ela nao existe\\n\"); abort(); }}\n");
+                continue;
+            }
             var partes = nome.Split("::").Select(p => p.Length + Regex.Escape(p)).ToList();
             padroes.Add((legivel, new Regex((partes.Count > 1 ? "_ZNK?" : "_Z") + string.Concat(partes) + "[A-Za-z0-9_]*")));
         }
-        var corpos = new StringBuilder("int printf(const char *, ...);\nvoid abort(void);\n");
-        var vistos = new HashSet<string>();
-        foreach (string objeto in objetos.Where(File.Exists))
+        foreach (string objeto in padroes.Count > 0 ? objetos.Where(File.Exists) : Enumerable.Empty<string>())
         {
             string bytes = Encoding.Latin1.GetString(File.ReadAllBytes(objeto));
             foreach (var (legivel, padrao) in padroes)
