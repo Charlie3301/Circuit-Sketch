@@ -4632,9 +4632,14 @@ public partial class MainWindow : Window
             // Dois no mesmo endereco e no mesmo fio e curto de dados: no
             // barramento de verdade os dois respondem juntos e a leitura sai
             // embaralhada. O DS1307 e o MPU6050 sao 0x68 os dois.
-            var novo = peca.Tipo is "ssd1306-i2c" or "ssd1306-128x32" or "sh1106"
-                ? new OledI2c(maq, endereco, nome, 128, peca.Tipo == "ssd1306-128x32" ? 32 : 64, peca.Tipo == "sh1106") { PinoSda = sda, PinoScl = scl }
-                : new DispositivoI2c(endereco, nome) { PinoSda = sda, PinoScl = scl };
+            // O OLED e o LCD com o modulo I2C entendem os bytes crus (o driver que nao e a biblioteca imitada).
+            DispositivoI2c novo = peca.Tipo switch
+            {
+                "ssd1306-i2c" or "ssd1306-128x32" or "sh1106" => new OledI2c(maq, endereco, nome, 128, peca.Tipo == "ssd1306-128x32" ? 32 : 64, peca.Tipo == "sh1106") { PinoSda = sda, PinoScl = scl },
+                "lcd1602-i2c" => new LcdPcf8574(maq, endereco, nome, 16, 2) { PinoSda = sda, PinoScl = scl },
+                "lcd2004-i2c" => new LcdPcf8574(maq, endereco, nome, 20, 4) { PinoSda = sda, PinoScl = scl },
+                _ => new DispositivoI2c(endereco, nome) { PinoSda = sda, PinoScl = scl },
+            };
             var jaEstava = maq.I2c.Ligar(novo);
 
             if (jaEstava != novo)

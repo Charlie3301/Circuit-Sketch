@@ -3,9 +3,15 @@
 #include <stdint.h>
 #include <malloc.h>
 
+/* A familia (ESP32, ARDUINO_ARCH_RP2040) vem na linha de comando, como a IDE passa. */
 #define MICROPY_HW_BOARD_NAME "CircuitSketch"
+#if defined(ARDUINO_ARCH_RP2040)
+#define MICROPY_HW_MCU_NAME "RP2040"
+#define MICROPY_PY_SYS_PLATFORM "rp2"
+#else
 #define MICROPY_HW_MCU_NAME "ESP32"
 #define MICROPY_PY_SYS_PLATFORM "esp32"
+#endif
 
 #define MICROPY_CONFIG_ROM_LEVEL (MICROPY_CONFIG_ROM_LEVEL_EXTRA_FEATURES)
 #define MICROPY_OBJ_REPR (MICROPY_OBJ_REPR_A)
@@ -95,6 +101,7 @@
 #define MICROPY_HW_SOFTSPI_MIN_DELAY (0)
 #define MICROPY_HW_SOFTSPI_MAX_BAUDRATE (40000000)
 #define MICROPY_PY_ONEWIRE (1)
+#if defined(ESP32)
 #define MICROPY_PY_NETWORK (1)
 #define MICROPY_PY_NETWORK_INCLUDEFILE "port/modnetwork.h"
 #define MICROPY_PY_NETWORK_MODULE_GLOBALS_INCLUDEFILE "port/modnetwork_globals.h"
@@ -104,8 +111,13 @@
 #define MICROPY_HW_ENABLE_MDNS_QUERIES (0)
 #define MICROPY_HW_ENABLE_MDNS_RESPONDER (0)
 #define MICROPY_PY_SSL (1)
-#define MICROPY_PY_HASHLIB (1)
+#define MICROPY_SSL_MBEDTLS (1)
 #define MICROPY_PY_CRYPTOLIB (1)
+#else
+#define MICROPY_PY_NETWORK (0)
+#define MICROPY_PY_CRYPTOLIB (0)
+#endif
+#define MICROPY_PY_HASHLIB (1)
 #define MICROPY_PY_DEFLATE (1)
 
 /* Tipos: ponteiro de 64 bits no PC. */
@@ -133,6 +145,5 @@ void cs_py_aguardar(int ms);
 
 #define MP_STATE_PORT MP_STATE_VM
 #define FFCONF_H "lib/oofatfs/ffconf.h"
-#define MICROPY_SSL_MBEDTLS (1)
 
 #define MICROPY_MAKE_POINTER_CALLABLE(p) (p)

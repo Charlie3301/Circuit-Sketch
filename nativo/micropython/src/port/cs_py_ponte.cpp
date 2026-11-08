@@ -5,17 +5,22 @@
 #include <Wire.h>
 #include <SD.h>
 #include <LittleFS.h>
-#include <WiFi.h>
 #include <Adafruit_NeoPixel.h>
 #include <DHT.h>
-#include <sys/time.h>
-#include <map>
-#include "cs_ponte.h"
+#if defined(ARDUINO_ARCH_RP2040)
+#include "pico/time.h"
+#endif
+#if defined(ESP32)
+#include <WiFi.h>
 #include "esp_random.h"
 #include "esp_task_wdt.h"
 #include "esp_timer.h"
 #include "esp_sleep.h"
 #include "esp_system.h"
+#endif
+#include <sys/time.h>
+#include <map>
+#include "cs_ponte.h"
 #include "port/cs_py_ponte.h"
 
 extern "C" {
@@ -30,9 +35,19 @@ uint32_t cs_py_atomica_comeca(void)
     return 0;
 }
 void cs_py_atomica_termina(uint32_t) { interrupts(); }
+#if defined(ESP32)
 uint32_t cs_py_aleatorio(void) { return esp_random(); }
+#else
+uint32_t cs_py_aleatorio(void) { return ((uint32_t)random(0x10000) << 16) | (uint32_t)random(0x10000); }
+#endif
 void cs_py_ceder(void) { yield(); }
+#if defined(ESP32)
 void cs_py_reiniciar(void) { ESP.restart(); }
+int cs_py_bootsel(void) { return 0; }
+#else
+void cs_py_reiniciar(void) { rp2040.reboot(); }
+int cs_py_bootsel(void) { return BOOTSEL ? 1 : 0; }
+#endif
 
 int64_t cs_py_epoca_us(void)
 {
@@ -66,7 +81,12 @@ void cs_py_pino_modo(int p, int modo)
 {
     switch (modo) {
     case CS_PY_SAIDA: pinMode(p, OUTPUT); break;
+#if defined(OUTPUT_OPEN_DRAIN)
     case CS_PY_DRENO: pinMode(p, OUTPUT_OPEN_DRAIN); break;
+#else
+    /* A Pico nao tem o dreno aberto no pino: o port rp2 do MicroPython tambem o imita com a saida. */
+    case CS_PY_DRENO: pinMode(p, OUTPUT); break;
+#endif
     case CS_PY_PULL_UP: pinMode(p, INPUT_PULLUP); break;
     case CS_PY_PULL_DOWN: pinMode(p, INPUT_PULLDOWN); break;
     default: pinMode(p, INPUT); break;
@@ -86,8 +106,13 @@ void cs_py_pino_sem_interrupcao(int p) { detachInterrupt(digitalPinToInterrupt(p
 /* ---- ADC, PWM, DAC, toque ---- */
 int cs_py_adc_ler(int p) { return analogRead(p); }
 void cs_py_adc_bits(int bits) { analogReadResolution(bits); }
+#if defined(ESP32)
 void cs_py_adc_atenuacao(int p, int a) { analogSetPinAttenuation(p, (adc_attenuation_t)a); }
+#else
+void cs_py_adc_atenuacao(int, int) {}
+#endif
 
+#if defined(ESP32)
 /* O LEDC tem a resolucao que a frequencia deixa, como na placa (80 MHz de relogio). */
 static uint8_t bitsDoPwm(uint32_t freq)
 {
@@ -117,14 +142,38 @@ void cs_py_pwm_parar(int p)
 {
     if (pwmAtivos().erase(p)) ledcDetach(p);
 }
+#else
+/* O PWM da Pico: 16 bits e a frequencia global do analogWrite. */
+void cs_py_pwm_iniciar(int p, uint32_t freq, uint32_t duty16)
+{
+    analogWriteFrequency(freq);
+    analogWriteResolution(16);
+    analogWrite(p, duty16);
+}
+void cs_py_pwm_duty(int p, uint32_t duty16) { analogWrite(p, duty16); }
+void cs_py_pwm_parar(int p) { analogWrite(p, 0); }
+#endif
+#if defined(ESP32)
 void cs_py_dac_escrever(int p, int v) { dacWrite(p, (uint8_t)v); }
 int cs_py_toque_ler(int p) { return touchRead(p); }
+#else
+void cs_py_dac_escrever(int, int) {}
+int cs_py_toque_ler(int) { return 0; }
+#endif
 
 /* ---- I2C ---- */
 static TwoWire &i2cDe(int bus) { return bus == 0 ? Wire : Wire1; }
 void cs_py_i2c_iniciar(int bus, int sda, int scl, uint32_t freq)
 {
+#if defined(ARDUINO_ARCH_RP2040)
+    /* Na Pico os pinos vao antes do begin(), como no core arduino-pico. */
+    i2cDe(bus).setSDA(sda);
+    i2cDe(bus).setSCL(scl);
+    i2cDe(bus).begin();
+    i2cDe(bus).setClock(freq);
+#else
     i2cDe(bus).begin(sda, scl, freq);
+#endif
     i2cDe(bus).setBufferSize(4096);
 }
 void cs_py_i2c_parar(int bus) { i2cDe(bus).end(); }
@@ -143,20 +192,26 @@ int cs_py_i2c_ler(int bus, uint16_t endereco, uint8_t *dados, size_t n, bool par
     return (int)veio;
 }
 
-/* ---- SPI: o 2 e o VSPI (o SPI do Arduino), o 1 e o HSPI ---- */
+/* ---- SPI: na ESP32 o 2 e o VSPI (o SPI do Arduino) e o 1 e o HSPI; na Pico, spi0 e spi1 ---- */
 static SPIClass &spiDe(int bus)
 {
 #if defined(ESP32)
     return bus == 1 ? cs_segundo_spi : SPI;
 #else
-    (void)bus;
-    return SPI;
+    return bus == 1 ? SPI1 : SPI;
 #endif
 }
 void cs_py_spi_iniciar(int bus, int sck, int mosi, int miso, uint32_t freq, int polaridade, int fase, int primeiro)
 {
     SPIClass &s = spiDe(bus);
+#if defined(ARDUINO_ARCH_RP2040)
+    s.setSCK(sck);
+    s.setTX(mosi);
+    s.setRX(miso);
+    s.begin();
+#else
     s.begin(sck, miso, mosi);
+#endif
     s.setFrequency(freq);
     s.setDataMode((polaridade ? 2 : 0) | (fase ? 1 : 0));
     s.setBitOrder(primeiro ? LSBFIRST : MSBFIRST);
@@ -174,7 +229,7 @@ void cs_py_spi_trocar(int bus, size_t n, const uint8_t *saida, uint8_t *entrada)
 /* ---- UART ---- */
 static HardwareSerial &uartDe(int u)
 {
-#if SOC_UART_NUM > 2
+#if !defined(ESP32) || SOC_UART_NUM > 2
     if (u == 2) return Serial2;
 #endif
     return u == 1 ? Serial1 : Serial;
@@ -183,9 +238,20 @@ void cs_py_uart_iniciar(int u, uint32_t baud, int bits, int paridade, int parada
 {
     /* O formato do SERIAL_8N1 da ESP32. */
     uint32_t cfg = 0x8000000u | (uint32_t)((bits - 5) << 2) | (parada == 2 ? 0x30u : 0x10u) | (paridade == 0 ? 2u : paridade == 1 ? 3u : 0u);
+    /* A UART do MicroPython 0 e a Serial1 da Pico: a Serial e a USB (o REPL). */
+#if defined(ARDUINO_ARCH_RP2040)
+    u = u + 1;
+#endif
     HardwareSerial &s = uartDe(u);
     if (rxbuf > 0) s.setRxBufferSize((size_t)rxbuf);
+#if defined(ARDUINO_ARCH_RP2040)
+    /* Os pinos da UART da Pico sao os de fabrica do MicroPython (0/1 e 4/5): o begin() do core. */
+    (void)tx;
+    (void)rx;
+    s.begin(baud, cfg);
+#else
     s.begin(baud, cfg, rx, tx);
+#endif
 }
 void cs_py_uart_parar(int u) { uartDe(u).end(); }
 size_t cs_py_uart_escrever(int u, const uint8_t *d, size_t n) { return uartDe(u).write(d, n); }
@@ -223,6 +289,7 @@ bool cs_py_dht_medir(int p, int tipo, float *temperatura, float *umidade)
     return true;
 }
 
+#if defined(ESP32)
 /* ---- o Timer ---- */
 struct TimerPy {
     esp_timer_handle_t h;
@@ -348,6 +415,53 @@ void cs_py_dormir_leve(uint64_t us)
     esp_light_sleep_start();
 }
 int cs_py_motivo_do_reinicio(void) { return (int)esp_reset_reason(); }
+
+#else
+/* O Timer da Pico: o add_repeating_timer do SDK, que o core ja simula. */
+struct TimerPy {
+    cs_py_timer_t f;
+    void *arg;
+    repeating_timer t;
+    bool rodando, repete;
+};
+static bool aoEsgotarNaPico(repeating_timer *r)
+{
+    auto *t = (TimerPy *)r->user_data;
+    t->f(t->arg);
+    if (!t->repete) t->rodando = false;
+    return t->repete;
+}
+void *cs_py_timer_novo(cs_py_timer_t f, void *arg) { return new TimerPy{f, arg}; }
+void cs_py_timer_parar(void *p)
+{
+    auto *t = (TimerPy *)p;
+    if (t->rodando) cancel_repeating_timer(&t->t);
+    t->rodando = false;
+}
+void cs_py_timer_iniciar(void *p, uint64_t us, bool repete)
+{
+    auto *t = (TimerPy *)p;
+    cs_py_timer_parar(t);
+    t->repete = repete;
+    t->rodando = add_repeating_timer_us(-(int64_t)us, aoEsgotarNaPico, t, &t->t);
+}
+void cs_py_timer_apagar(void *p)
+{
+    cs_py_timer_parar(p);
+    delete (TimerPy *)p;
+}
+
+void cs_py_wdt_iniciar(uint32_t) {}
+void cs_py_wdt_alimentar(void) {}
+void cs_py_dormir_fundo(uint64_t us) { delay((uint32_t)(us / 1000)); rp2040.reboot(); }
+void cs_py_dormir_leve(uint64_t us) { delay((uint32_t)(us / 1000)); }
+int cs_py_motivo_do_reinicio(void) { return 1; }
+void cs_py_wifi_mac(int, uint8_t mac[6])
+{
+    static const uint8_t fixo[6] = {0xE6, 0x61, 0x38, 0x1A, 0x2B, 0x3C};
+    memcpy(mac, fixo, 6);
+}
+#endif
 
 /* ---- os arquivos: "/sd/..." e o cartao, o resto e a flash ---- */
 static bool cartaoMontado;

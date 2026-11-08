@@ -61,9 +61,18 @@ static mp_obj_t machine_timer_init_helper(machine_timer_obj_t *self, size_t n_ar
 
 static mp_obj_t machine_timer_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw, const mp_obj_t *args)
 {
+#if defined(ARDUINO_ARCH_RP2040)
+    /* O da Pico e o virtual do extmod: o id e opcional e so o -1 existe. */
+    mp_int_t id = -1;
+    if (n_args > 0) {
+        id = mp_obj_get_int(args[0]);
+        if (id != -1) mp_raise_ValueError(MP_ERROR_TEXT("Timer doesn't exist"));
+    }
+#else
     mp_arg_check_num(n_args, n_kw, 1, MP_OBJ_FUN_ARGS_MAX, true);
     mp_int_t id = mp_obj_get_int(args[0]);
     if (id < -1 || id > 3) mp_raise_ValueError(MP_ERROR_TEXT("invalid Timer number"));
+#endif
     machine_timer_obj_t *self = id >= 0 ? MP_STATE_PORT(cs_timers)[id] : NULL;
     if (!self) {
         self = mp_obj_malloc(machine_timer_obj_t, type);
@@ -73,10 +82,12 @@ static mp_obj_t machine_timer_make_new(const mp_obj_type_t *type, size_t n_args,
         self->periodoUs = 0;
         if (id >= 0) MP_STATE_PORT(cs_timers)[id] = self;
     }
-    if (n_args > 1 || n_kw > 0) {
+    /* Os argumentos depois do id (sem id na Pico, todos). */
+    size_t pulados = n_args > 0 ? 1 : 0;
+    if (n_args > pulados || n_kw > 0) {
         mp_map_t kw_args;
         mp_map_init_fixed_table(&kw_args, n_kw, args + n_args);
-        machine_timer_init_helper(self, n_args - 1, args + 1, &kw_args);
+        machine_timer_init_helper(self, n_args - pulados, args + pulados, &kw_args);
     }
     return MP_OBJ_FROM_PTR(self);
 }
@@ -191,6 +202,7 @@ MP_DEFINE_CONST_OBJ_TYPE(
     locals_dict, &machine_rtc_locals_dict
     );
 
+#if defined(ESP32)
 /* ---- TouchPad ---- */
 typedef struct {
     mp_obj_base_t base;
@@ -322,6 +334,25 @@ const mp_obj_module_t esp32_module = {
     .globals = (mp_obj_dict_t *)&esp32_module_globals,
 };
 MP_REGISTER_MODULE(MP_QSTR_esp32, esp32_module);
+
+#endif
+
+/* ---- rp2: o botao BOOTSEL ---- */
+#if defined(ARDUINO_ARCH_RP2040)
+static mp_obj_t rp2_bootsel_button(void) { return MP_OBJ_NEW_SMALL_INT(cs_py_bootsel()); }
+static MP_DEFINE_CONST_FUN_OBJ_0(rp2_bootsel_button_obj, rp2_bootsel_button);
+
+static const mp_rom_map_elem_t rp2_module_globals_table[] = {
+    { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_rp2) },
+    { MP_ROM_QSTR(MP_QSTR_bootsel_button), MP_ROM_PTR(&rp2_bootsel_button_obj) },
+};
+static MP_DEFINE_CONST_DICT(rp2_module_globals, rp2_module_globals_table);
+const mp_obj_module_t rp2_module = {
+    .base = { &mp_type_module },
+    .globals = (mp_obj_dict_t *)&rp2_module_globals,
+};
+MP_REGISTER_MODULE(MP_QSTR_rp2, rp2_module);
+#endif
 
 /* ---- _cs: o que as bibliotecas em Python daqui (dht.py) pedem da bancada ---- */
 bool cs_py_dht_medir(int pino, int tipo, float *temperatura, float *umidade);

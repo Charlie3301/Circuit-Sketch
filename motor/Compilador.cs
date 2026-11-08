@@ -182,7 +182,7 @@ public static class Compilador
             };
 
         // O Python de verdade: o MicroPython, o mesmo firmware da placa, compilado junto do core.
-        if (CppNativo && linguagem == Linguagem.MicroPython && CompiladorNativo.Disponivel && CompiladorNativo.TemMicroPython(projeto.Placa))
+        if (CppNativo && linguagem == Linguagem.MicroPython && CompiladorNativo.Disponivel && CompiladorNativo.TemMicroPython(projeto.Placa, fonte))
             return new Programa([], [])
             {
                 Linguagem = linguagem,

@@ -1,4 +1,6 @@
 /* network_wlan.c -- network.WLAN, com a API do port da ESP32, por cima do WiFi da placa. */
+#include "py/mpconfig.h"
+#if MICROPY_PY_NETWORK
 #include <stdio.h>
 #include <string.h>
 
@@ -254,3 +256,5 @@ static mp_obj_t cs_rede_modo(size_t n_args, const mp_obj_t *args)
     return n_args == 0 ? MP_OBJ_NEW_SMALL_INT(4) : mp_const_none;
 }
 MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(cs_rede_modo_obj, 0, 1, cs_rede_modo);
+
+#endif /* MICROPY_PY_NETWORK */

@@ -195,5 +195,30 @@ public static partial class Autoteste
         (serial, erro, nativo, _) = RodarNativo(semSintaxe, 200);
         Conferir("micropython: o erro de sintaxe vem do compilador dele, e nada roda",
             nativo && !serial.Contains("nunca") && erro is not null && erro.Contains("SyntaxError"), $"{nativo} {erro} | {serial}");
+
+        // ---- a Pico: o mesmo MicroPython, com o port rp2 (os pinos, os barramentos e o rp2) ----
+        const string pico = """
+            import sys, machine, rp2, time
+            from machine import Pin, PWM, Timer, I2C, UART
+            print(sys.platform, machine.freq())
+            led = Pin(25, Pin.OUT)
+            led.on()
+            pwm = PWM(Pin(15))
+            pwm.freq(500)
+            pwm.duty_u16(16384)
+            voltas = []
+            t = Timer(period=20, mode=Timer.PERIODIC, callback=lambda _: voltas.append(1))
+            time.sleep_ms(110)
+            t.deinit()
+            i2c = I2C(0)
+            u = UART(0, 9600)
+            print("pico", led.value(), pwm.freq(), 3 <= len(voltas) <= 7, rp2.bootsel_button(), i2c, u)
+            """;
+        (serial, erro, nativo, m) = RodarNativo(pico, 1500, "pi-pico");
+        saida.AppendLine($"        {serial}");
+        Conferir("micropython: a Pico roda o MicroPython de verdade -- sys.platform rp2, 125 MHz, Pin(25), PWM, Timer, I2C(0) nos GPIO 8/9 e o rp2.bootsel_button()",
+            nativo && erro is null && serial.Contains("rp2 125000000") && serial.Contains("pico 1 500 True 0") && serial.Contains("scl=9, sda=8")
+            && m is not null && m.DigitalRead(25) == 1,
+            $"{nativo} {erro} | {serial}");
     }
 }

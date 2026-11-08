@@ -94,6 +94,7 @@
     <Compile Include="..\motor\RainMaker.cs" />
     <Compile Include="..\motor\Matter.cs" />
     <Compile Include="..\motor\OledI2c.cs" />
+    <Compile Include="..\motor\LcdHd44780.cs" />
     <Compile Include="..\motor\Ble.cs" />
     <Compile Include="..\motor\TiposC.cs" />
     <Compile Include="..\motor\InterpretadorC.cs" />

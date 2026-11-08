@@ -2,7 +2,8 @@
  * em diante o gettimeofday, o time e o getLocalTime contam a partir da hora pedida. So entra
  * na ligacao de quem usa: o .a do core nao traz este arquivo a toa. */
 #include "Arduino.h"
-#if defined(ESP32)
+/* A newlib da ESP32 e a da Pico (arduino-pico) tem o settimeofday. */
+#if defined(ESP32) || defined(ARDUINO_ARCH_RP2040)
 #include <sys/time.h>
 #include <time.h>
 

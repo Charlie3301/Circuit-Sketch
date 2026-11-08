@@ -273,4 +273,10 @@ void *ps_realloc(void *ptr, size_t size);
 #include "esp_heap_caps.h"
 #endif
 
+/* O core da Pico (arduino-pico): o objeto rp2040 e o botao BOOTSEL valem sem #include. */
+#if defined(ARDUINO_ARCH_RP2040) && defined(__cplusplus)
+#include "RP2040Support.h"
+#include "Bootsel.h"
+#endif
+
 #endif

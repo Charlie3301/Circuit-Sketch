@@ -35,7 +35,10 @@ public static class CompiladorCSharp
     /// 10, que vem dentro do motor (no executavel unico as do runtime nem
     /// ficam no disco).
     /// </summary>
-    static readonly Lazy<List<MetadataReference>> doNet = new(() => [.. Basic.Reference.Assemblies.Net100.References.All]);
+    /// O System.Net.Http fica de fora: o HttpClient do programa e o da API (DotNet/Api/Rede.cs), que
+    /// passa pelo WiFi da placa, e nao o do computador, que sairia direto para a internet.
+    static readonly Lazy<List<MetadataReference>> doNet = new(() =>
+        [.. Basic.Reference.Assemblies.Net100.References.All.Where(r => !(r.Display ?? "").Contains("System.Net.Http", StringComparison.OrdinalIgnoreCase))]);
 
     /// <summary>A API das placas (DotNet/Api/*.cs, dentro do motor), compilada uma vez.</summary>
     static readonly Lazy<(byte[] Imagem, MetadataReference Referencia)> api = new(() =>
@@ -89,6 +92,10 @@ public static class CompiladorCSharp
             .Any(t => t.IsKind(SyntaxKind.IdentifierToken) && t.ValueText is "nanoFramework" or "Iot"
                       || t.ValueText == "Device" && t.GetPreviousToken().GetPreviousToken().ValueText == "System"));
         arvores.Add(CSharpSyntaxTree.ParseText(GlobaisDaPlaca(placa, comArduino), Analise, "cs_placa.cs", Encoding.UTF8));
+        // O Buffer do Bluetooth do nanoFramework: la nao existe o System.Buffer, aqui os dois
+        // nomes brigariam no "using System; using nanoFramework.Device.Bluetooth;" dos exemplos.
+        if (arvores.Take(doUsuario).Any(a => a.GetRoot().DescendantTokens().Any(t => t.IsKind(SyntaxKind.IdentifierToken) && t.ValueText == "Bluetooth")))
+            arvores.Add(CSharpSyntaxTree.ParseText("global using Buffer = global::nanoFramework.Device.Bluetooth.Buffer;\n", Analise, "cs_bluetooth.cs", Encoding.UTF8));
 
         var opcoes = new CSharpCompilationOptions(OutputKind.ConsoleApplication, optimizationLevel: OptimizationLevel.Debug,
                                                   allowUnsafe: true, nullableContextOptions: NullableContextOptions.Disable,

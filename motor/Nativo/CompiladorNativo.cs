@@ -437,9 +437,12 @@ public static class CompiladorNativo
         var pilhas = new List<string>();
         foreach (var pilha in PilhasSobDemanda)
         {
-            if (idf.Count == 0 || !pilha.Chips.Contains(Path.GetFileName(idf[0]))) continue;
+            // O MicroPython tambem e o da Pico, que nao tem IDF.
+            string chipDaPilha = idf.Count > 0 ? Path.GetFileName(idf[0]) : placa.StartsWith("pi-pico", StringComparison.Ordinal) ? "rp2040" : null;
+            if (chipDaPilha is null || !pilha.Chips.Contains(chipDaPilha)) continue;
             if (!textoDoProjeto.Any(pilha.Usa.IsMatch) && !usadas.Any(l => BibliotecaUsaPilha(l, pilha))) continue;
-            pilhas.Add(BibliotecaDaPilha(pilha, pasta, zig, cabecalho, inc, idf, definicoes, avisar));
+            // O MicroPython escolhe o port pela familia (o ESP32 ou o ARDUINO_ARCH_RP2040), como a IDE passa.
+            pilhas.Add(BibliotecaDaPilha(pilha, pasta, zig, cabecalho, inc, idf, pilha.Pasta == "micropython" ? [.. definicoes, .. MacrosDaIde(placa)] : definicoes, avisar));
             definicoes = [.. definicoes, .. pilha.Publicas];
         }
 
@@ -581,10 +584,16 @@ public static class CompiladorNativo
         return new Projeto { Sketch = sketch.ToString(), Placa = projeto.Placa, Bibliotecas = [] };
     }
 
-    /// <summary>O MicroPython daqui e o da ESP32: as outras placas ficam com o interpretador.</summary>
-    public static bool TemMicroPython(string placa)
+    /// <summary>
+    /// O MicroPython daqui e o da ESP32 e o da Pico. A rede da Pico W e a do interpretador: os sockets
+    /// do core (cs_sockets.cpp) sao o lwip do IDF, que so a ESP32 tem.
+    /// </summary>
+    public static bool TemMicroPython(string placa, string fonte = null)
     {
-        return (placa ?? "esp32-devkit-v1").StartsWith("esp32", StringComparison.Ordinal);
+        placa ??= "esp32-devkit-v1";
+        if (placa.StartsWith("esp32", StringComparison.Ordinal)) return true;
+        return placa.StartsWith("pi-pico", StringComparison.Ordinal)
+               && !Regex.IsMatch(fonte ?? "", @"^\s*(import|from)\s+(network|socket|usocket|urequests|requests|umqtt|ntptime|ssl|bluetooth)\b", RegexOptions.Multiline);
     }
 
     /// <summary>O arquivo de configuracao do mbedTLS (o do IDF, sem o hardware do chip: include/cs_mbedtls_config.h).</summary>
@@ -680,7 +689,7 @@ public static class CompiladorNativo
             [], ["-include", "cs_idfrede_compat.h", "-DESP_PLATFORM=1", "-DIDF_VER=\"v5.5.1\""], ["src/privados"]),
         // O MicroPython de verdade (ferramentas/micropython): quem o pede e o programa em Python (ProjetoDoMicroPython).
         new("micropython", new Regex(@"\bcs_py_rodar\b", RegexOptions.Compiled),
-            ["esp32", "esp32s2", "esp32s3", "esp32c3", "esp32c6", "esp32h2"],
+            ["esp32", "esp32s2", "esp32s3", "esp32c3", "esp32c6", "esp32h2", "rp2040"],
             [], [], ["vm", "vm/py", "vm/lib"]),
         // Os endpoints do core sao os de verdade; o protocolo nao roda (src/cs_matter.cpp, motor/Matter.cs).
         new("matter", new Regex(@"\b(Matter\w*|esp_matter\w*)\b", RegexOptions.Compiled),
@@ -829,7 +838,7 @@ public static class CompiladorNativo
             .Order(StringComparer.Ordinal).ToList();
         string impressao = Impressao(
             [VersaoDoZig(zig), Padrao, PadraoC, string.Join(" ", Permissivos), string.Join(" ", PermissivosC), cabecalho, ImpressaoDoIdf(idf),
-             .. pilha.Publicas, .. pilha.Privadas,
+             .. definicoes, .. pilha.Publicas, .. pilha.Privadas,
              .. Directory.GetFiles(inc, "*", SearchOption.AllDirectories).Order(StringComparer.Ordinal).Select(f => f + ":" + new FileInfo(f).Length + ":" + File.GetLastWriteTimeUtc(f).Ticks),
              .. Directory.GetFiles(raiz, "*", SearchOption.AllDirectories).Order(StringComparer.Ordinal).Select(f => f + ":" + new FileInfo(f).Length + ":" + File.GetLastWriteTimeUtc(f).Ticks)]);
         string destino = Path.Combine(Cache(), pilha.Pasta + "-" + impressao[..16]);

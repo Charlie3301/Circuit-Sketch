@@ -20,13 +20,20 @@ MP_DECLARE_CONST_FUN_OBJ_VAR_BETWEEN(machine_lightsleep_obj);
 static mp_obj_t machine_wake_reason(void);
 static MP_DEFINE_CONST_FUN_OBJ_0(machine_wake_reason_obj, machine_wake_reason);
 
+#if defined(ESP32)
+#define MICROPY_PY_MACHINE_SO_DA_ESP32 \
+    { MP_ROM_QSTR(MP_QSTR_TouchPad), MP_ROM_PTR(&machine_touchpad_type) }, \
+    { MP_ROM_QSTR(MP_QSTR_DAC), MP_ROM_PTR(&machine_dac_type) },
+#else
+#define MICROPY_PY_MACHINE_SO_DA_ESP32
+#endif
+
 #define MICROPY_PY_MACHINE_EXTRA_GLOBALS \
     { MP_ROM_QSTR(MP_QSTR_sleep), MP_ROM_PTR(&machine_lightsleep_obj) }, \
     { MP_ROM_QSTR(MP_QSTR_Timer), MP_ROM_PTR(&machine_timer_type) }, \
     { MP_ROM_QSTR(MP_QSTR_Pin), MP_ROM_PTR(&machine_pin_type) }, \
     { MP_ROM_QSTR(MP_QSTR_RTC), MP_ROM_PTR(&machine_rtc_type) }, \
-    { MP_ROM_QSTR(MP_QSTR_TouchPad), MP_ROM_PTR(&machine_touchpad_type) }, \
-    { MP_ROM_QSTR(MP_QSTR_DAC), MP_ROM_PTR(&machine_dac_type) }, \
+    MICROPY_PY_MACHINE_SO_DA_ESP32 \
     { MP_ROM_QSTR(MP_QSTR_SDCard), MP_ROM_PTR(&machine_sdcard_type) }, \
     { MP_ROM_QSTR(MP_QSTR_SLEEP), MP_ROM_INT(2) }, \
     { MP_ROM_QSTR(MP_QSTR_DEEPSLEEP), MP_ROM_INT(4) }, \
@@ -76,13 +83,19 @@ static mp_obj_t mp_machine_unique_id(void)
     return mp_obj_new_bytes(mac, 6);
 }
 
+#if defined(ARDUINO_ARCH_RP2040)
+static mp_obj_t mp_machine_get_freq(void) { return mp_obj_new_int(125000000); }
+#else
 static mp_obj_t mp_machine_get_freq(void) { return mp_obj_new_int(240000000); }
+#endif
 
 static void mp_machine_set_freq(size_t n_args, const mp_obj_t *args)
 {
     (void)n_args;
+#if !defined(ARDUINO_ARCH_RP2040)
     mp_int_t f = mp_obj_get_int(args[0]) / 1000000;
     if (f != 20 && f != 40 && f != 80 && f != 160 && f != 240) mp_raise_ValueError(MP_ERROR_TEXT("frequency must be 20MHz, 40MHz, 80Mhz, 160MHz or 240MHz"));
+#endif
 }
 
 static void mp_machine_lightsleep(size_t n_args, const mp_obj_t *args)

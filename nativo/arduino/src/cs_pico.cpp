@@ -302,3 +302,23 @@ extern "C" uint32_t clock_get_hz(enum clock_index c)
     }
 }
 extern "C" bool set_sys_clock_khz(uint32_t, bool) { return true; }
+
+/* ---- o objeto rp2040 e o BOOTSEL do core arduino-pico (RP2040Support.h, Bootsel.h) ---- */
+#if defined(ARDUINO_ARCH_RP2040)
+#include "RP2040Support.h"
+#include "Bootsel.h"
+#include "cs_objeto.h"
+extern "C" volatile bool __otherCoreIdled = false;
+RP2040 rp2040;
+__Bootsel BOOTSEL;
+__Bootsel::operator bool() { return rp2040.getBootselButton(); }
+int RP2040::f_cpu() { return (int)cs_obj_i(nullptr, "__rp2040", "f_cpu"); }
+int RP2040::getFreeHeap() { return (int)cs_obj_i(nullptr, "__rp2040", "getFreeHeap"); }
+int RP2040::getUsedHeap() { return (int)cs_obj_i(nullptr, "__rp2040", "getUsedHeap"); }
+int RP2040::getTotalHeap() { return (int)cs_obj_i(nullptr, "__rp2040", "getTotalHeap"); }
+void RP2040::reboot() { cs_obj_n(nullptr, "__rp2040", "reboot"); }
+void RP2040::wdt_begin(uint32_t delay_ms) { cs_obj_n(nullptr, "__rp2040", "wdt_begin", delay_ms); }
+void RP2040::wdt_reset() { cs_obj_n(nullptr, "__rp2040", "wdt_reset"); }
+bool RP2040::getBootselButton() { return cs_obj_i(nullptr, "__rp2040", "getBootselButton") != 0; }
+bool RP2040::isPicoW() { return cs_obj_i(nullptr, "__rp2040", "isPicoW") != 0; }
+#endif

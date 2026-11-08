@@ -41,8 +41,13 @@ mp_obj_t machine_hw_i2c_make_new(const mp_obj_type_t *type, size_t n_args, size_
     self->base.type = &machine_i2c_type;
     self->bus = bus;
     /* Os pinos de fabrica do port da ESP32. */
+#if defined(ARDUINO_ARCH_RP2040)
+    self->scl = args[ARG_scl].u_obj != mp_const_none ? mp_hal_get_pin_obj(args[ARG_scl].u_obj) : bus == 0 ? 9 : 7;
+    self->sda = args[ARG_sda].u_obj != mp_const_none ? mp_hal_get_pin_obj(args[ARG_sda].u_obj) : bus == 0 ? 8 : 6;
+#else
     self->scl = args[ARG_scl].u_obj != mp_const_none ? mp_hal_get_pin_obj(args[ARG_scl].u_obj) : bus == 0 ? 18 : 25;
     self->sda = args[ARG_sda].u_obj != mp_const_none ? mp_hal_get_pin_obj(args[ARG_sda].u_obj) : bus == 0 ? 19 : 26;
+#endif
     self->freq = args[ARG_freq].u_int;
     self->espera = args[ARG_timeout].u_int;
     cs_py_i2c_iniciar(bus, self->sda, self->scl, self->freq);
@@ -128,7 +133,11 @@ mp_obj_t machine_hw_spi_make_new(const mp_obj_type_t *type, size_t n_args, size_
     MP_MACHINE_SPI_CHECK_FOR_LEGACY_SOFTSPI_CONSTRUCTION(n_args, n_kw, args);
     mp_arg_check_num(n_args, n_kw, 1, MP_OBJ_FUN_ARGS_MAX, true);
     mp_int_t bus = mp_obj_get_int(args[0]);
+#if defined(ARDUINO_ARCH_RP2040)
+    if (bus < 0 || bus > 1) mp_raise_msg_varg(&mp_type_ValueError, MP_ERROR_TEXT("SPI(%d) doesn't exist"), bus);
+#else
     if (bus < 1 || bus > 2) mp_raise_msg_varg(&mp_type_ValueError, MP_ERROR_TEXT("SPI(%d) doesn't exist"), bus);
+#endif
     machine_hw_spi_obj_t *self = &spis[bus];
     self->base.type = &machine_spi_type;
     self->bus = bus;
@@ -138,9 +147,15 @@ mp_obj_t machine_hw_spi_make_new(const mp_obj_type_t *type, size_t n_args, size_
     self->fase = 0;
     self->bits = 8;
     self->primeiro = 0;
+#if defined(ARDUINO_ARCH_RP2040)
+    self->sck = bus == 0 ? 18 : 10;
+    self->mosi = bus == 0 ? 19 : 11;
+    self->miso = bus == 0 ? 16 : 8;
+#else
     self->sck = bus == 1 ? 14 : 18;
     self->mosi = bus == 1 ? 13 : 23;
     self->miso = bus == 1 ? 12 : 19;
+#endif
     mp_map_t kw_args;
     mp_map_init_fixed_table(&kw_args, n_kw, args + n_args);
     machine_hw_spi_init(&self->base, n_args - 1, args + 1, &kw_args);

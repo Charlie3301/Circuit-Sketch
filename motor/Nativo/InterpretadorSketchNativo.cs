@@ -13,6 +13,9 @@ public partial class Interpretador
 {
     ISketchCompilado sketchNativo;
 
+    /// <summary>O HD44780 do LCD paralelo que o C# fala pelos pinos (o "__lcd_hd44780").</summary>
+    ControladorHd44780 lcdParalelo;
+
     /// <summary>O programa veio compilado de verdade (e roda nativo).</summary>
     public bool RodaNativo => prog.Compilado is not null;
 
@@ -96,6 +99,34 @@ public partial class Interpretador
 
         // O UDP do C++ compilado (WiFiUdp.h, AsyncUDP.h).
         if (alvo is null && nome.StartsWith("__udp_", StringComparison.Ordinal)) return UdpDoNativo(nome, args);
+
+        // O objeto rp2040 do core da Pico (RP2040Support.h): o que ele le e faz na placa da bancada.
+        if (alvo is null && nome == "__rp2040" && args.Count >= 1)
+        {
+            string metodo = args[0].Texto ?? "";
+            if (WatchdogDoRp2040(metodo, [.. args.Skip(1)])) return Valor.Vazio;
+            return metodo switch
+            {
+                "f_cpu" => Valor.DeInt((long)((maq.Perfil?.Megahertz ?? 133) * 1_000_000)),
+                "getFreeHeap" => Valor.DeInt(Ram.HeapLivre),
+                "getUsedHeap" => Valor.DeInt(Ram.HeapUsada),
+                "getTotalHeap" => Valor.DeInt(Ram.HeapTotal),
+                "getBootselButton" => Valor.DeBool(maq.BootselApertado),
+                "isPicoW" => Valor.DeBool(maq.Perfil?.Id == "pi-pico-w"),
+                "reboot" => throw Reiniciar(ReinicioDaPlaca.PeloSoftware, 0, 0),
+                _ => Valor.Vazio,
+            };
+        }
+
+        // O LCD paralelo do C# (LcdInterface.CreateGpio do nanoFramework): "__lcd_hd44780"(rs, byte,
+        // colunas, linhas) -- o comando ou o dado que o driver poria nos pinos D0 a D7.
+        if (alvo is null && nome == "__lcd_hd44780" && args.Count >= 4)
+        {
+            lcdParalelo ??= new ControladorHd44780(maq.CriarLcd, (int)args[2].Num, (int)args[3].Num);
+            if (args[0].Num != 0) lcdParalelo.Dado((byte)args[1].Num);
+            else lcdParalelo.Comando((byte)args[1].Num);
+            return Valor.Vazio;
+        }
 
         // O HAL da ESP32 (cs_hal.cpp): o toque e a fita do RMT.
         if (alvo is null && nome is "__toque" or "__fita" or "__usb" or "__erro_python"

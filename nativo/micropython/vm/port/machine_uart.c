@@ -73,8 +73,13 @@ static mp_obj_t mp_machine_uart_make_new(const mp_obj_type_t *type, size_t n_arg
     self->paridade = -1;
     self->parada = 1;
     /* Os pinos de fabrica da ESP32. */
+#if defined(ARDUINO_ARCH_RP2040)
+    self->tx = uart == 0 ? 0 : 4;
+    self->rx = uart == 0 ? 1 : 5;
+#else
     self->tx = uart == 0 ? 1 : uart == 1 ? 10 : 17;
     self->rx = uart == 0 ? 3 : uart == 1 ? 9 : 16;
+#endif
     self->esperaMs = 0;
     self->esperaCharMs = 0;
     mp_map_t kw_args;

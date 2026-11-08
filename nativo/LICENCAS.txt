@@ -110,6 +110,13 @@ Componentes do ESP-IDF e extras em idf/ e arduino/src/arduino-esp32/idf
     modificado pela ferramentas/idf/copiar_idf.py: sem o DMA do LCD paralelo e os
     registradores do GPIO, que nao existem aqui.
 
+A API do C# (motor/DotNet/Api: Telas.cs, Leds.cs, Rede.cs, Bluetooth.cs)
+    Adaptada dos fontes do nanoFramework (nanoFramework.IoT.Device: Ssd13xx,
+    CharacterLcd e Ws28xx.Esp32; System.Device.Wifi, System.Net.Http,
+    nanoFramework.M2Mqtt e nanoFramework.Device.Bluetooth), (c) .NET Foundation
+    e colaboradores, licenca MIT: os nomes, as assinaturas e os drivers, com a
+    parte da placa trocada pela rede, pelo I2C e pelo BLE do simulador.
+
 O resto de include/ e de runtime/ foi escrito para o CircuitSketch, imitando
 as interfaces do ESP-IDF, da newlib e do FreeRTOS -- os nomes e os valores
 que o codigo C usa, para o mesmo codigo compilar aqui e na placa.

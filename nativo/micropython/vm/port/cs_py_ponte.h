@@ -24,6 +24,7 @@ void cs_py_atomica_termina(uint32_t estado);
 uint32_t cs_py_aleatorio(void);
 void cs_py_ceder(void);
 void cs_py_reiniciar(void);
+int cs_py_bootsel(void);
 int64_t cs_py_epoca_us(void);
 void cs_py_acertar_epoca_us(int64_t us);
 

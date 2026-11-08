@@ -39,15 +39,16 @@ public partial class MainWindow
     /// o compilador de verdade confere tambem -- o que passa nos dois roda
     /// no simulador E compila para a placa.
     /// </summary>
-    void Verificar(object s = null, RoutedEventArgs e = null)
+    async void Verificar(object s = null, RoutedEventArgs e = null)
     {
         if (trabalhoDaPlaca is not null) { CancelarNaPlaca(); return; }
+        if (verificando) return;
 
         GuardarCodigoDoEditor();
         var placa = PlacaDoEditor();
         if (placa is null) { Erro("não há placa no circuito para verificar."); return; }
 
-        string doSimulador = ConferirNoSimulador(placa, out bool simuladorAceitou);
+        var (doSimulador, simuladorAceitou) = await ConferirNoSimulador(placa);
 
         string fqbn = PlacaDeVerdade.FqbnDe(placa.Tipo);
         string porQueNao = PorQueNaoCompila(placa, fqbn);
@@ -62,13 +63,28 @@ public partial class MainWindow
         ComecarNaPlaca(placa, fqbn, null);
     }
 
-    /// <summary>A conferencia do simulador: compila e ve se cabe. Devolve a frase do resultado.</summary>
-    string ConferirNoSimulador(PecaNoCircuito placa, out bool aceitou)
+    /// <summary>A conferencia do simulador em andamento: o segundo clique no visto espera por ela.</summary>
+    bool verificando;
+
+    /// <summary>
+    /// A conferencia do simulador: compila e ve se cabe. Devolve a frase do resultado. Como no
+    /// Rodar, o C++ compilado pode levar minutos na primeira vez: a janela continua respondendo
+    /// (os testes e o passeio esperam ali mesmo).
+    /// </summary>
+    async Task<(string Frase, bool Aceitou)> ConferirNoSimulador(PecaNoCircuito placa)
     {
-        aceitou = false;
         try
         {
-            var prog = Compilador.CompilarProjeto(ProjetoDaPlaca(placa));
+            var projeto = ProjetoDaPlaca(placa);
+            Programa prog;
+            if (Autoteste.Rodando || Passeio.Ativo) prog = Compilador.CompilarProjeto(projeto);
+            else
+            {
+                verificando = true;
+                console.Info($"verificando {NomeDaPlaca(placa)}…");
+                try { prog = await Task.Run(() => Compilador.CompilarProjeto(projeto)); }
+                finally { verificando = false; }
+            }
             foreach (string aviso in prog.Avisos) console.Aviso(aviso);
 
             if (PerfilPlaca.De(placa.Tipo) is { } perfil)
@@ -77,17 +93,16 @@ public partial class MainWindow
                 if (conta.Estourou)
                 {
                     Erro($"{NomeDaPlaca(placa)}: não cabe na placa — {conta.PorQueNaoCabe()}");
-                    return null;
+                    return (null, false);
                 }
             }
 
-            aceitou = true;
-            return $"{NomeDaPlaca(placa)}: o simulador aceitou o código";
+            return ($"{NomeDaPlaca(placa)}: o simulador aceitou o código", true);
         }
         catch (Exception ex) when (ex is ErroDeSintaxe or ErroDeExecucao)
         {
             Erro($"{NomeDaPlaca(placa)}: {ex.Message}");
-            return null;
+            return (null, false);
         }
     }
 

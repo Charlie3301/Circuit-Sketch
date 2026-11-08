@@ -111,6 +111,12 @@ def main():
     copiar(os.path.join(mp, 'drivers', 'bus', 'softspi.c'), os.path.join(SRC, 'drivers', 'bus', 'softspi.c'))
     # Os sockets do port da ESP32: o lwip_* do simulador (cs_sockets.cpp) atende.
     copiar(os.path.join(mp, 'ports', 'esp32', 'modsocket.c'), os.path.join(SRC, 'esp32', 'modsocket.c'))
+    # So na ESP32: a Pico nao tem o lwip do IDF (a rede dela e a do interpretador).
+    soquete = os.path.join(SRC, 'esp32', 'modsocket.c')
+    texto = open(soquete, encoding='utf-8').read()
+    open(soquete, 'w', encoding='utf-8', newline='\n').write(
+        '/* Modificado (CircuitSketch): so com o socket ligado (a ESP32). */\n#include "py/mpconfig.h"\n#if MICROPY_PY_SOCKET\n'
+        + texto.rstrip() + '\n\n#endif /* MICROPY_PY_SOCKET */\n')
     congelar(mp)
     gerar(mp)
     copiar(os.path.join(mp, 'LICENSE'), os.path.join(DESTINO, 'LICENSE'))
@@ -168,24 +174,34 @@ def gerar(mp):
         open(os.path.join(gen, nome), 'w').close()
     fontes = [os.path.join(d, f) for d, _, fs in os.walk(SRC) for f in fs if f.endswith('.c') and f != 'cs_congelados.c']
     # A placa so importa aqui para os cabecalhos do IDF do modsocket.c: os nomes (qstr) nao mudam de chip.
-    open(os.path.join(tmp, 'cs_placa.h'), 'w', newline='\n').write('#define ESP32 1\n#define CONFIG_IDF_TARGET_ESP32 1\n')
     n = os.path.join(RAIZ, 'nativo')
-    pastas = [tmp, os.path.join(n, 'arduino', 'include'), INC, os.path.join(INC, 'py'), os.path.join(INC, 'lib'), SRC,
+    pastas = [os.path.join(n, 'arduino', 'include'), INC, os.path.join(INC, 'py'), os.path.join(INC, 'lib'), SRC,
               os.path.join(n, 'idf', 'esp32'), os.path.join(n, 'idf', 'comum'), os.path.join(n, 'idf', 'proximos'), os.path.join(n, 'mbedtls', 'include')]
     bases = ['-E', '-DNO_QSTR', '-w', '-target', 'x86_64-windows-gnu', '-DMBEDTLS_CONFIG_FILE="cs_mbedtls_config.h"', *[x for d in pastas for x in ('-I', d)]]
 
-    def um(f):
-        r = subprocess.run([zig, 'c++' if f.endswith('.cpp') else 'cc', *bases, f], capture_output=True, text=True, errors='replace', env=ambiente)
+    def um(par):
+        f, placa = par
+        r = subprocess.run([zig, 'cc', *bases, '-I', os.path.join(tmp, placa), f], capture_output=True, text=True, errors='replace', env=ambiente)
         if r.returncode:
             print('pre-processar', f, ' '.join(l for l in r.stderr.splitlines() if 'error:' in l)[:300])
-        return r.stdout
+        return placa, r.stdout
+    # Os nomes (qstr) das duas familias: a tabela e uma so.
+    os.makedirs(os.path.join(tmp, 'esp32'), exist_ok=True)
+    os.makedirs(os.path.join(tmp, 'rp2040'), exist_ok=True)
+    open(os.path.join(tmp, 'esp32', 'cs_placa.h'), 'w', newline='\n').write('#define ESP32 1\n#define CONFIG_IDF_TARGET_ESP32 1\n')
+    open(os.path.join(tmp, 'rp2040', 'cs_placa.h'), 'w', newline='\n').write('#define ARDUINO_ARCH_RP2040 1\n')
     with cf.ThreadPoolExecutor(8) as ex:
-        tudo = '\n'.join(ex.map(um, fontes))
+        saidas = list(ex.map(um, [(f, p) for f in fontes for p in ('esp32', 'rp2040')
+                                  if not (p == 'rp2040' and os.path.basename(f) in ('modsocket.c', 'modtls_mbedtls.c', 'modcryptolib.c', 'modhashlib.c'))]))
+    tudo = '\n'.join(t for _, t in saidas)
+    # O modulo que so uma familia tem (o network da ESP32, o rp2 da Pico) entra so nela.
+    registro = r'MP_REGISTER(?:_EXTENSIBLE)?_MODULE(?:_DELEGATION)?\(\s*MP_QSTR_(\w+)'
+    por_familia = {f: set(re.findall(registro, '\n'.join(t for p, t in saidas if p == f))) for f in ('esp32', 'rp2040')}
     qstrs = sorted(set(re.findall(r'\bMP_QSTR_(\w+)', tudo)))
     qstrs = [q for q in qstrs if q != 'NULL']
     modulos = sorted(set(re.findall(r'MP_REGISTER(?:_EXTENSIBLE)?_MODULE(?:_DELEGATION)?\([^;]*\);', tudo)))
     raizes = sorted(set(re.findall(r'MP_REGISTER_ROOT_POINTER\([^;]*\);', tudo)))
-    r = subprocess.run([zig, 'cc', '-E', '-DNO_QSTR', '-w', '-target', 'x86_64-windows-gnu', '-I', INC, '-I', SRC, '-x', 'c', os.path.join(INC, 'py', 'qstrdefs.h')],
+    r = subprocess.run([zig, 'cc', '-E', '-DNO_QSTR', '-w', '-target', 'x86_64-windows-gnu', '-I', os.path.join(tmp, 'esp32'), '-I', INC, '-I', SRC, '-x', 'c', os.path.join(INC, 'py', 'qstrdefs.h')],
                        capture_output=True, text=True, env=ambiente)
     base = [l for l in r.stdout.splitlines() if l.startswith(('QCFG', 'Q('))]
     previo = os.path.join(tmp, 'qstrdefs.pre.h')
@@ -201,6 +217,16 @@ def gerar(mp):
     p = os.path.join(tmp, 'module.collected')
     open(p, 'w', newline='\n').write('\n'.join(modulos) + '\n')
     rodar('makemoduledefs.py', p, 'moduledefs.h')
+    condicao = {'esp32': 'defined(ESP32)', 'rp2040': 'defined(ARDUINO_ARCH_RP2040)'}
+    caminho = os.path.join(gen, 'moduledefs.h')
+    texto = open(caminho, encoding='utf-8').read()
+    for familia, outra in (('esp32', 'rp2040'), ('rp2040', 'esp32')):
+        for nome in sorted(por_familia[familia] - por_familia[outra]):
+            macro = 'MODULE_DEF_' + nome.upper()
+            bloco = re.search(r'(?m)^extern [^\n]*\n#undef %s\n#define %s [^\n]*\n' % (macro, macro), texto)
+            if bloco:
+                texto = texto.replace(bloco.group(0), '#if %s\n%s#else\n#undef %s\n#define %s\n#endif\n' % (condicao[familia], bloco.group(0), macro, macro))
+    open(caminho, 'w', newline='\n').write(texto)
     p = os.path.join(tmp, 'root.collected')
     open(p, 'w', newline='\n').write('\n'.join(raizes) + '\n')
     rodar('make_root_pointers.py', p, 'root_pointers.h')
