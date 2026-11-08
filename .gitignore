@@ -1,22 +1,12 @@
-# O que a compilacao gera (recria-se com dotnet build): fica fora do historico.
+
 bin/
 obj/
 .vs/
 *.user
-
-# Python e Node
 __pycache__/
 *.pyc
 node_modules/
-
-# Saidas temporarias dos agentes (relatorios ficam em coordenacao/)
 *.tmp
-
-# As compilacoes de cada agente (dotnet build --artifacts-path .artefatos/<agente>)
 .artefatos/
-
-# As verificacoes rodadas (ferramentas\verificar.ps1): saidas de cada vez
 coordenacao/verificacao/
-
-# O compilador de C/C++ do modo nativo (ferramentas/baixar-zig.ps1): fica em %LOCALAPPDATA%\CircuitSketch\zig
 nativo/zig/
