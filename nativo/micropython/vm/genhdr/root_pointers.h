@@ -3,8 +3,11 @@
 const char *readline_hist[(8)];
 mp_obj_base_t * cur_exception;
 mp_obj_list_t mp_sys_argv_obj;
+mp_obj_t bluetooth;
 mp_obj_t sys_mutable[MP_SYS_MUTABLE_NUM];
 mp_sched_item_t sched_queue[(8)];
+struct _esp_espnow_obj_t *espnow_singleton;
+struct _mp_map_t *cs_ble_gatts_db;
 struct _mp_vfs_mount_t *vfs_cur;
 struct _mp_vfs_mount_t *vfs_mount_table;
 void *cs_pinos[64];

@@ -59,16 +59,27 @@ uintptr_t mp_hal_stdio_poll(uintptr_t poll_flags)
     return poll_flags & 4 /* MP_STREAM_POLL_WR */;
 }
 
+#if MICROPY_PY_BLUETOOTH
+void cs_py_ble_colher(void);
+#else
+#define cs_py_ble_colher()
+#endif
+
 void mp_hal_delay_ms(mp_uint_t ms)
 {
     mp_uint_t inicio = mp_hal_ticks_ms();
     for (;;) {
+        /* O que chegou pelo radio BLE: o irq do programa roda aqui, na espera. */
+        cs_py_ble_colher();
         mp_handle_pending(true);
         mp_uint_t passou = mp_hal_ticks_ms() - inicio;
         if (passou >= ms) return;
         mp_uint_t resta = ms - passou;
-        /* Em fatias: a interrupcao agendada roda antes do fim da espera. */
+        /* Em fatias: a interrupcao agendada roda antes do fim da espera. Quem dorme solta a
+         * trava: as outras threads do Python rodam enquanto isso. */
+        MP_THREAD_GIL_EXIT();
         cs_py_esperar_ms(resta > 10 ? 10 : resta);
+        MP_THREAD_GIL_ENTER();
     }
 }
 
@@ -78,7 +89,13 @@ void mp_hal_delay_us(mp_uint_t us)
     cs_py_esperar_us(us % 1000);
 }
 
-void cs_py_aguardar(int ms) { cs_py_esperar_ms(ms < 0 || ms > 1 ? 1 : (uint32_t)ms); }
+void cs_py_aguardar(int ms)
+{
+    cs_py_ble_colher();
+    MP_THREAD_GIL_EXIT();
+    cs_py_esperar_ms(ms < 0 || ms > 1 ? 1 : (uint32_t)ms);
+    MP_THREAD_GIL_ENTER();
+}
 
 uint64_t mp_hal_time_ns(void) { return (uint64_t)cs_py_epoca_us() * 1000; }
 
@@ -87,7 +104,12 @@ __attribute__((noinline)) static void coletarDaPilha(void)
 {
     volatile uintptr_t marca = 0;
     uintptr_t base = (uintptr_t)&marca & ~(uintptr_t)7;
-    gc_collect_root((void **)base, ((uintptr_t)topoDaPilha - base) / sizeof(void *));
+    /* Cada thread do Python tem a sua pilha: o topo e o da que esta coletando. */
+    uintptr_t topo = (uintptr_t)topoDaPilha;
+    #if MICROPY_PY_THREAD
+    if (mp_thread_topo_desta()) topo = (uintptr_t)mp_thread_topo_desta();
+    #endif
+    gc_collect_root((void **)base, (topo - base) / sizeof(void *));
 }
 
 void gc_collect(void)
@@ -95,6 +117,9 @@ void gc_collect(void)
     gc_collect_start();
     __builtin_unwind_init();
     coletarDaPilha();
+    #if MICROPY_PY_THREAD
+    mp_thread_gc_others();
+    #endif
     gc_collect_end();
 }
 
@@ -184,6 +209,9 @@ void cs_py_rodar(void)
     topoDaPilha = &aqui + 256;
     mp_stack_set_top(topoDaPilha);
     mp_stack_set_limit(LIMITE_DA_PILHA);
+    #if MICROPY_PY_THREAD
+    mp_thread_init(topoDaPilha);
+    #endif
     gc_init(memoria, memoria + sizeof(memoria));
     mp_init();
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR_));

@@ -28,7 +28,7 @@ SRC = os.path.join(DESTINO, 'src')
 FORA_DO_PY = re.compile(r'^(asm|emitinl|emitn|nlr(thumb|xtensa|powerpc|rv32|rv64|aarch64|mips|x86)|nativeglue)')
 EXTMOD = ['machine_adc', 'machine_adc_block', 'machine_bitstream', 'machine_i2c', 'machine_mem', 'machine_pinbase', 'machine_pulse',
           'machine_pwm', 'machine_signal', 'machine_spi', 'machine_timer', 'machine_uart', 'machine_wdt', 'modasyncio', 'modbinascii',
-          'modcryptolib', 'moddeflate', 'modframebuf', 'modhashlib', 'modheapq', 'modjson', 'modmachine', 'modmarshal', 'modnetwork',
+          'modcryptolib', 'moddeflate', 'modframebuf', 'modhashlib', 'modheapq', 'modjson', 'modmachine', 'modmarshal', 'modbluetooth', 'modnetwork',
           'modonewire', 'modtls_mbedtls', 'modos', 'modplatform', 'modrandom', 'modre', 'modselect', 'modtime', 'moductypes', 'modvfs', 'modwebsocket',
           'os_dupterm', 'vfs', 'vfs_reader', 'virtpin']
 SHARED = ['runtime/interrupt_char.c', 'runtime/mpirq.c', 'runtime/pyexec.c', 'runtime/stdout_helpers.c',
@@ -45,6 +45,8 @@ CONGELADOS = {
     'micropython-lib/micropython/umqtt.simple/umqtt/simple.py': 'umqtt/simple',
     'micropython-lib/micropython/umqtt.robust/umqtt/robust.py': 'umqtt/robust',
     'micropython-lib/micropython/net/ntptime/ntptime.py': 'ntptime',
+    '../ports/esp32/modules/espnow.py': 'espnow',
+    'micropython-lib/micropython/aioespnow/aioespnow.py': 'aioespnow',
     'micropython-lib/python-ecosys/requests/requests/__init__.py': 'requests/__init__',
     'micropython-lib/python-stdlib/base64/base64.py': 'base64',
     'micropython-lib/python-stdlib/logging/logging.py': 'logging',
@@ -66,7 +68,7 @@ CONGELADOS = {
 
 def limpar(pasta):
     for nome in os.listdir(pasta):
-        if nome in ('port', 'lwip') or nome in ('mpconfigport.h', 'mphalport.h', 'modnetwork.h', 'mdns.h'):
+        if nome in ('port', 'lwip') or nome in ('mpconfigport.h', 'mphalport.h', 'mpthreadport.h', 'modnetwork.h', 'mdns.h'):
             continue
         caminho = os.path.join(pasta, nome)
         shutil.rmtree(caminho) if os.path.isdir(caminho) else os.remove(caminho)
@@ -117,9 +119,20 @@ def main():
     open(soquete, 'w', encoding='utf-8', newline='\n').write(
         '/* Modificado (CircuitSketch): so com o socket ligado (a ESP32). */\n#include "py/mpconfig.h"\n#if MICROPY_PY_SOCKET\n'
         + texto.rstrip() + '\n\n#endif /* MICROPY_PY_SOCKET */\n')
+    # O ESP-NOW do port da ESP32: o esp_now_* do simulador (src/esp_now.cpp) atende.
+    copiar(os.path.join(mp, 'ports', 'esp32', 'modespnow.h'), os.path.join(SRC, 'esp32', 'modespnow.h'))
+    agora = os.path.join(SRC, 'esp32', 'modespnow.c')
+    texto = open(os.path.join(mp, 'ports', 'esp32', 'modespnow.c'), encoding='utf-8').read()
+    open(agora, 'w', encoding='utf-8', newline='\n').write(
+        '/* Modificado (CircuitSketch): so com o ESP-NOW ligado (a ESP32). */\n#include "py/mpconfig.h"\n#if MICROPY_PY_ESPNOW\n'
+        + texto.rstrip() + '\n\n#endif /* MICROPY_PY_ESPNOW (CircuitSketch) */\n')
     congelar(mp)
     gerar(mp)
     copiar(os.path.join(mp, 'LICENSE'), os.path.join(DESTINO, 'LICENSE'))
+
+
+# A familia vem na linha de comando, como o CompiladorNativo passa (as macros da IDE).
+FAMILIAS = {'esp32': ['-DESP32=ESP32', '-DCONFIG_IDF_TARGET_ESP32=1'], 'rp2040': ['-DARDUINO_ARCH_RP2040=1']}
 
 
 def congelar(mp):
@@ -181,7 +194,7 @@ def gerar(mp):
 
     def um(par):
         f, placa = par
-        r = subprocess.run([zig, 'cc', *bases, '-I', os.path.join(tmp, placa), f], capture_output=True, text=True, errors='replace', env=ambiente)
+        r = subprocess.run([zig, 'cc', *bases, *FAMILIAS[placa], '-I', os.path.join(tmp, placa), f], capture_output=True, text=True, errors='replace', env=ambiente)
         if r.returncode:
             print('pre-processar', f, ' '.join(l for l in r.stderr.splitlines() if 'error:' in l)[:300])
         return placa, r.stdout
@@ -192,7 +205,7 @@ def gerar(mp):
     open(os.path.join(tmp, 'rp2040', 'cs_placa.h'), 'w', newline='\n').write('#define ARDUINO_ARCH_RP2040 1\n')
     with cf.ThreadPoolExecutor(8) as ex:
         saidas = list(ex.map(um, [(f, p) for f in fontes for p in ('esp32', 'rp2040')
-                                  if not (p == 'rp2040' and os.path.basename(f) in ('modsocket.c', 'modtls_mbedtls.c', 'modcryptolib.c', 'modhashlib.c'))]))
+                                  if not (p == 'rp2040' and os.path.basename(f) in ('modsocket.c', 'modespnow.c', 'modtls_mbedtls.c', 'modcryptolib.c', 'modhashlib.c'))]))
     tudo = '\n'.join(t for _, t in saidas)
     # O modulo que so uma familia tem (o network da ESP32, o rp2 da Pico) entra so nela.
     registro = r'MP_REGISTER(?:_EXTENSIBLE)?_MODULE(?:_DELEGATION)?\(\s*MP_QSTR_(\w+)'
@@ -201,7 +214,7 @@ def gerar(mp):
     qstrs = [q for q in qstrs if q != 'NULL']
     modulos = sorted(set(re.findall(r'MP_REGISTER(?:_EXTENSIBLE)?_MODULE(?:_DELEGATION)?\([^;]*\);', tudo)))
     raizes = sorted(set(re.findall(r'MP_REGISTER_ROOT_POINTER\([^;]*\);', tudo)))
-    r = subprocess.run([zig, 'cc', '-E', '-DNO_QSTR', '-w', '-target', 'x86_64-windows-gnu', '-I', os.path.join(tmp, 'esp32'), '-I', INC, '-I', SRC, '-x', 'c', os.path.join(INC, 'py', 'qstrdefs.h')],
+    r = subprocess.run([zig, 'cc', '-E', '-DNO_QSTR', '-w', '-target', 'x86_64-windows-gnu', *FAMILIAS['esp32'], '-I', os.path.join(tmp, 'esp32'), '-I', INC, '-I', SRC, '-x', 'c', os.path.join(INC, 'py', 'qstrdefs.h')],
                        capture_output=True, text=True, env=ambiente)
     base = [l for l in r.stdout.splitlines() if l.startswith(('QCFG', 'Q('))]
     previo = os.path.join(tmp, 'qstrdefs.pre.h')

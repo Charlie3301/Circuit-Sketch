@@ -118,6 +118,9 @@ public partial class Interpretador
             };
         }
 
+        // O bluetooth do MicroPython (modbluetooth_cs.c): os pedidos e os eventos do radio BLE.
+        if (alvo is null && nome == "__mpble") return BleDoPython(args);
+
         // O LCD paralelo do C# (LcdInterface.CreateGpio do nanoFramework): "__lcd_hd44780"(rs, byte,
         // colunas, linhas) -- o comando ou o dado que o driver poria nos pinos D0 a D7.
         if (alvo is null && nome == "__lcd_hd44780" && args.Count >= 4)

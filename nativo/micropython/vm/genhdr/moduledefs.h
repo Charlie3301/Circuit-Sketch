@@ -8,6 +8,15 @@ extern const struct _mp_obj_module_t mp_module_binascii;
 #undef MODULE_DEF_BINASCII
 #define MODULE_DEF_BINASCII { MP_ROM_QSTR(MP_QSTR_binascii), MP_ROM_PTR(&mp_module_binascii) },
 
+#if defined(ESP32)
+extern const struct _mp_obj_module_t mp_module_bluetooth;
+#undef MODULE_DEF_BLUETOOTH
+#define MODULE_DEF_BLUETOOTH { MP_ROM_QSTR(MP_QSTR_bluetooth), MP_ROM_PTR(&mp_module_bluetooth) },
+#else
+#undef MODULE_DEF_BLUETOOTH
+#define MODULE_DEF_BLUETOOTH
+#endif
+
 extern const struct _mp_obj_module_t mp_module_collections;
 #undef MODULE_DEF_COLLECTIONS
 #define MODULE_DEF_COLLECTIONS { MP_ROM_QSTR(MP_QSTR_collections), MP_ROM_PTR(&mp_module_collections) },
@@ -99,9 +108,22 @@ extern const struct _mp_obj_module_t cs_module;
 #undef MODULE_DEF__CS
 #define MODULE_DEF__CS { MP_ROM_QSTR(MP_QSTR__cs), MP_ROM_PTR(&cs_module) },
 
+#if defined(ESP32)
+extern const struct _mp_obj_module_t mp_module_espnow;
+#undef MODULE_DEF__ESPNOW
+#define MODULE_DEF__ESPNOW { MP_ROM_QSTR(MP_QSTR__espnow), MP_ROM_PTR(&mp_module_espnow) },
+#else
+#undef MODULE_DEF__ESPNOW
+#define MODULE_DEF__ESPNOW
+#endif
+
 extern const struct _mp_obj_module_t mp_module_onewire;
 #undef MODULE_DEF__ONEWIRE
 #define MODULE_DEF__ONEWIRE { MP_ROM_QSTR(MP_QSTR__onewire), MP_ROM_PTR(&mp_module_onewire) },
+
+extern const struct _mp_obj_module_t mp_module_thread;
+#undef MODULE_DEF__THREAD
+#define MODULE_DEF__THREAD { MP_ROM_QSTR(MP_QSTR__thread), MP_ROM_PTR(&mp_module_thread) },
 
 extern const struct _mp_obj_module_t mp_module_builtins;
 #undef MODULE_DEF_BUILTINS
@@ -207,15 +229,18 @@ extern const struct _mp_obj_module_t mp_module_vfs;
     MODULE_DEF_VFS \
     MODULE_DEF__ASYNCIO \
     MODULE_DEF__CS \
+    MODULE_DEF__ESPNOW \
     MODULE_DEF__ONEWIRE \
+    MODULE_DEF__THREAD \
     MODULE_DEF___MAIN__ \
 // MICROPY_REGISTERED_MODULES
 
-#define MICROPY_HAVE_REGISTERED_EXTENSIBLE_MODULES  18
+#define MICROPY_HAVE_REGISTERED_EXTENSIBLE_MODULES  19
 
 #define MICROPY_REGISTERED_EXTENSIBLE_MODULES \
     MODULE_DEF_ARRAY \
     MODULE_DEF_BINASCII \
+    MODULE_DEF_BLUETOOTH \
     MODULE_DEF_COLLECTIONS \
     MODULE_DEF_CRYPTOLIB \
     MODULE_DEF_ERRNO \

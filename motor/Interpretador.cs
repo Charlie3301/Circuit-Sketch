@@ -2830,6 +2830,9 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 if (ate < ms) ConferirWatchdogs();
                 Ceder();
                 AtenderInterrupcoes();
+                // Tambem na espera curta: quem espera o pacote de 1 em 1 ms (o recv do espnow do
+                // MicroPython) nunca passa pelo delay longo nem pela volta do loop().
+                EntregarEspNow();
                 EntregarBle();
                 passos = 0;
                 return Valor.Vazio;

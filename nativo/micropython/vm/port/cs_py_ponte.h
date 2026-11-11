@@ -98,6 +98,10 @@ void cs_py_wifi_rede(int i, const char **ssid, uint8_t bssid[6], int *canal, int
 const char *cs_py_wifi_nome(void);
 void cs_py_wifi_definir_nome(const char *nome);
 
+/* O radio BLE do bluetooth.BLE: o pedido vai como texto ("__mpble" no simulador) e a resposta volta
+ * em volta[] (devolve o tamanho dela; 0: nao deu, ou nao ha mais evento). */
+int cs_py_ble(const char *op, const char *texto, long a, long b, long c, char *volta, int cabe);
+
 /* Sono */
 void cs_py_dormir_fundo(uint64_t us);
 void cs_py_dormir_leve(uint64_t us);

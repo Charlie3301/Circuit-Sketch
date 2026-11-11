@@ -290,6 +290,17 @@ bool cs_py_dht_medir(int p, int tipo, float *temperatura, float *umidade)
 }
 
 #if defined(ESP32)
+/* ---- o radio BLE do bluetooth.BLE ---- */
+int cs_py_ble(const char *op, const char *texto, long a, long b, long c, char *volta, int cabe)
+{
+    String r = cs_obj_t(nullptr, "__mpble", op, texto, (int)a, (int)b, (int)c);
+    int n = (int)r.length();
+    if (n >= cabe) n = cabe - 1;
+    memcpy(volta, r.c_str(), n);
+    volta[n] = 0;
+    return n;
+}
+
 /* ---- o Timer ---- */
 struct TimerPy {
     esp_timer_handle_t h;

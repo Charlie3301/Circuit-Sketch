@@ -33,4 +33,8 @@ static inline void mp_hal_pin_write(mp_hal_pin_obj_t p, int v) { cs_py_pino_escr
 #define mp_hal_pin_high(p) mp_hal_pin_write(p, 1)
 #define mp_hal_pin_low(p) mp_hal_pin_write(p, 0)
 
+/* O erro do IDF como excecao (o do port da ESP32): OSError com o numero e o nome. */
+void cs_py_erro_do_idf(int codigo);
+#define check_esp_err(codigo) cs_py_erro_do_idf(codigo)
+
 #endif

@@ -147,7 +147,7 @@ public partial class Interpretador
         var rede = maq.Rede;
         switch (nome)
         {
-            case "__dns": return Valor.DeTexto(rede?.ResolverNome(maq, args.Count > 0 ? args[0].Texto : "") ?? "");
+            case "__dns": return Valor.DeTexto(rede?.ResolverNome(maq, args.Count > 0 ? args[0].Texto : "", args.Count > 1 ? (int)args[1].Num : 0) ?? "");
             case "__wifi_estacoes": return Valor.DeInt(rede?.EstacoesNoAp(maq) ?? 0);
             case "__eth":
                 if (args[0].Num != 0) rede?.LigarCabo(maq);

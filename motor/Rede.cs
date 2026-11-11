@@ -626,6 +626,17 @@ public sealed partial class Rede
             Anotar(origem, "tcp", $"{host}:{porta} recusou: nenhuma placa ouve nessa porta");
             return null;
         }
+        else if (host == EnderecoDoBrokerInterno && PortaDoBroker > 0 && !segura)
+        {
+            // O cliente MQTT por socket (o umqtt, o esp-mqtt) cujo broker nao resolveu: o interno.
+            try { conexao = ConexaoTcp.Real(origem, "127.0.0.1", PortaDoBroker, false, false, 5000); }
+            catch (ExecucaoInterrompida) { throw; }
+            catch (Exception ex)
+            {
+                Anotar(origem, "tcp", $"o broker interno não conectou: {Explicar(ex)}");
+                return null;
+            }
+        }
         else if (!EhLocal(host) && !UsarInternet)
         {
             Anotar(origem, "tcp", $"{host}:{porta}: sem internet (menu ⋮ > Rede usa a internet do computador)");
@@ -641,8 +652,23 @@ public sealed partial class Rede
             catch (ExecucaoInterrompida) { throw; }
             catch (Exception ex)
             {
-                Anotar(origem, "tcp", $"{host}:{porta} não conectou: {Explicar(ex)}");
-                return null;
+                // A rede que bloqueia a porta do MQTT (a da escola): o broker interno atende, como na PubSubClient.
+                conexao = null;
+                if (porta == 1883 && !segura && !EhLocal(host) && PortaDoBroker > 0)
+                {
+                    try
+                    {
+                        conexao = ConexaoTcp.Real(origem, "127.0.0.1", PortaDoBroker, false, false, 5000);
+                        Anotar(origem, "mqtt", $"{host}:{porta} não respondeu ({Explicar(ex)}) -- o broker interno do simulador atende no lugar dele");
+                    }
+                    catch (ExecucaoInterrompida) { throw; }
+                    catch (Exception) { conexao = null; }
+                }
+                if (conexao is null)
+                {
+                    Anotar(origem, "tcp", $"{host}:{porta} não conectou: {Explicar(ex)}");
+                    return null;
+                }
             }
         }
 

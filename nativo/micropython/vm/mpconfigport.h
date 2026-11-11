@@ -27,6 +27,10 @@
 #define MICROPY_READER_VFS (1)
 #define MICROPY_VFS (1)
 #define MICROPY_STACK_CHECK (1)
+/* O _thread: cada thread e uma tarefa do FreeRTOS do simulador, com a trava global (mpthreadport.h). */
+#define MICROPY_PY_THREAD (1)
+#define MICROPY_PY_THREAD_GIL (1)
+#define MICROPY_PY_THREAD_GIL_VM_DIVISOR (32)
 #define MICROPY_STACK_CHECK_MARGIN (4096)
 #define MICROPY_ENABLE_EMERGENCY_EXCEPTION_BUF (1)
 #define MICROPY_EMERGENCY_EXCEPTION_BUF_SIZE (256)
@@ -107,6 +111,19 @@
 #define MICROPY_PY_NETWORK_MODULE_GLOBALS_INCLUDEFILE "port/modnetwork_globals.h"
 #define MICROPY_PY_NETWORK_HOSTNAME_DEFAULT "mpy-esp32"
 #define MICROPY_PY_NETWORK_WLAN (1)
+#define MICROPY_PY_ESPNOW (1)
+/* O bluetooth.BLE: o extmod/modbluetooth.c do MicroPython sobre o radio BLE da bancada
+ * (port/modbluetooth_cs.c). Os eventos saem na thread do Python, como no port da ESP32. */
+#define MICROPY_PY_BLUETOOTH (1)
+#define MICROPY_PY_BLUETOOTH_USE_SYNC_EVENTS (1)
+#define MICROPY_PY_BLUETOOTH_ENABLE_CENTRAL_MODE (1)
+#define MICROPY_PY_BLUETOOTH_ENABLE_PAIRING_BONDING (1)
+#define MICROPY_PY_BLUETOOTH_DEFAULT_GAP_NAME "MPY ESP32"
+#define MICROPY_PY_BLUETOOTH_ENTER
+#define MICROPY_PY_BLUETOOTH_EXIT
+/* O laco que nao espera tambem recebe os eventos do radio (de tempos em tempos). */
+void cs_py_ble_no_laco(void);
+#define MICROPY_VM_HOOK_LOOP cs_py_ble_no_laco();
 #define MICROPY_PY_SOCKET (1)
 #define MICROPY_HW_ENABLE_MDNS_QUERIES (0)
 #define MICROPY_HW_ENABLE_MDNS_RESPONDER (0)
@@ -142,6 +159,8 @@ void cs_py_ceder(void);
 /* Quem espera (time.sleep, o input) deixa o simulador rodar. */
 #define MICROPY_INTERNAL_WFE(TIMEOUT_MS) cs_py_aguardar((int)(TIMEOUT_MS))
 void cs_py_aguardar(int ms);
+/* O gancho do port da ESP32 (o espnow espera por ele): os eventos pendentes e uma folga de 1 ms. */
+#define MICROPY_EVENT_POLL_HOOK     do {         extern void mp_handle_pending(bool);         mp_handle_pending(true);         cs_py_aguardar(1);     } while (0);
 
 #define MP_STATE_PORT MP_STATE_VM
 #define FFCONF_H "lib/oofatfs/ffconf.h"

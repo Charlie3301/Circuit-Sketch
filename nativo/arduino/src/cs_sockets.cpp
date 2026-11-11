@@ -663,13 +663,18 @@ int lwip_getaddrinfo(const char *nodename, const char *servname, const struct ad
 {
     if (!res || (!nodename && !servname)) return EAI_FAIL;
     if (hints && hints->ai_family != AF_INET && hints->ai_family != AF_UNSPEC) return EAI_FAMILY;
-    String ip = nodename ? cs_obj_t(nullptr, "__dns", nodename) : String("0.0.0.0");
+    /* A porta vai junto: o broker MQTT que nao resolve (sem internet) cai no interno do simulador. */
+    String ip = nodename ? cs_obj_t(nullptr, "__dns", nodename, servname ? atoi(servname) : 0) : String("0.0.0.0");
     if (!ip.length()) return HOST_NOT_FOUND;
-    /* O addrinfo e o endereco juntos, como o lwIP aloca: o freeaddrinfo solta tudo de uma vez. */
-    size_t tamanho = sizeof(struct addrinfo) + sizeof(sockaddr_in);
+    /* O addrinfo, o endereco e o nome juntos, como o lwIP aloca: o freeaddrinfo solta tudo de uma
+     * vez. O ai_canonname vem sempre (o nome pedido), com ou sem o AI_CANONNAME, como la. */
+    size_t nome = nodename ? strlen(nodename) : 0;
+    size_t tamanho = sizeof(struct addrinfo) + sizeof(sockaddr_storage) + nome + 1;
     struct addrinfo *ai = (struct addrinfo *)calloc(1, tamanho);
     if (!ai) return EAI_MEMORY;
     sockaddr_in *a = (sockaddr_in *)(ai + 1);
+    ai->ai_canonname = (char *)a + sizeof(sockaddr_storage);
+    if (nodename) memcpy(ai->ai_canonname, nodename, nome);
     preencher(a, ip, servname ? (uint16_t)atoi(servname) : 0);
     ai->ai_family = AF_INET;
     ai->ai_socktype = hints ? hints->ai_socktype : 0;

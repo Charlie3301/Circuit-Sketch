@@ -203,6 +203,22 @@ MP_DEFINE_CONST_OBJ_TYPE(
     );
 
 #if defined(ESP32)
+/* ---- o check_esp_err do port da ESP32 (o espnow usa) ---- */
+#include "esp_err.h"
+#include "py/mperrno.h"
+void cs_py_erro_do_idf(int codigo)
+{
+    if (codigo == ESP_OK) return;
+    mp_int_t posix = -codigo;
+    switch (codigo) {
+    case ESP_ERR_NO_MEM: posix = MP_ENOMEM; break;
+    case ESP_ERR_TIMEOUT: posix = MP_ETIMEDOUT; break;
+    case ESP_ERR_NOT_SUPPORTED: posix = MP_EOPNOTSUPP; break;
+    }
+    mp_obj_t args[2] = { MP_OBJ_NEW_SMALL_INT(posix), mp_obj_new_str_from_cstr(esp_err_to_name(codigo)) };
+    nlr_raise(mp_obj_exception_make_new(&mp_type_OSError, 2, 0, args));
+}
+
 /* ---- TouchPad ---- */
 typedef struct {
     mp_obj_base_t base;

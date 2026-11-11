@@ -44,6 +44,18 @@ public sealed class RadioBle
     public string ServicoUuid { get; internal set; } = "";
     public string ServicoHex { get; internal set; } = "";
 
+    /// <summary>
+    /// O anuncio byte a byte (as estruturas tamanho/tipo/dados), quando quem anuncia o montou assim
+    /// (o gap_advertise do MicroPython); nulo: quem varre monta pelos campos de cima.
+    /// </summary>
+    public byte[] CargaDoAnuncio { get; internal set; }
+
+    /// <summary>A resposta a varredura ativa (o resp_data do gap_advertise), se houver.</summary>
+    public byte[] RespostaDoAnuncio { get; internal set; }
+
+    /// <summary>O anuncio aceita conexao (o connectable do gap_advertise). De fabrica, sim.</summary>
+    public bool Conectavel { get; internal set; } = true;
+
     /// <summary>O advertiseOnDisconnect(): volta a anunciar sozinho quando o celular sai. De fabrica, nao.</summary>
     public bool ReanunciarAoDesconectar { get; internal set; }
 
@@ -155,6 +167,9 @@ public sealed class CaracteristicaBle
     /// <summary>O celular ligou as notificacoes (escreveu no CCCD).</summary>
     public bool Assinada { get; internal set; }
 
+    /// <summary>Os descritores que o programa registrou alem do CCCD (o bluetooth do MicroPython).</summary>
+    public List<DescritorBle> Descritores { get; } = [];
+
     public byte[] Valor
     {
         get { lock (trava) return (byte[])valor.Clone(); }
@@ -163,6 +178,32 @@ public sealed class CaracteristicaBle
 
     /// <summary>O nome que um app de BLE mostra para os UUID conhecidos.</summary>
     public string NomeConhecido => Ble.NomeDoUuid(Uuid);
+}
+
+/// <summary>Um descritor de uma caracteristica: o UUID, o que ele deixa fazer e o valor.</summary>
+public sealed class DescritorBle
+{
+    readonly object trava = new();
+    byte[] valor = [];
+
+    internal DescritorBle(CaracteristicaBle dona, string uuid, bool le, bool escreve)
+    {
+        Dona = dona;
+        Uuid = uuid;
+        Le = le;
+        Escreve = escreve;
+    }
+
+    public CaracteristicaBle Dona { get; }
+    public string Uuid { get; }
+    public bool Le { get; }
+    public bool Escreve { get; }
+
+    public byte[] Valor
+    {
+        get { lock (trava) return (byte[])valor.Clone(); }
+        internal set { lock (trava) valor = value is null ? [] : (byte[])value.Clone(); }
+    }
 }
 
 public enum TipoDeEventoBle
@@ -178,10 +219,11 @@ public enum TipoDeEventoBle
 
 /// <summary>
 /// Um evento do radio. <paramref name="Conexao"/>: a placa do outro lado
-/// (nulo: o celular). <paramref name="Dados"/>: o que chegou numa notificacao.
+/// (nulo: o celular). <paramref name="Dados"/>: o que chegou numa notificacao
+/// ou numa escrita. <paramref name="Descritor"/>: a escrita foi num descritor.
 /// </summary>
 public sealed record EventoBle(TipoDeEventoBle Tipo, CaracteristicaBle Caracteristica = null, int Valor = 0,
-                               ConexaoBle Conexao = null, byte[] Dados = null);
+                               ConexaoBle Conexao = null, byte[] Dados = null, DescritorBle Descritor = null);
 
 /// <summary>
 /// Uma placa conectada no servidor GATT de outra, como cliente (central): o
@@ -305,7 +347,8 @@ public sealed partial class Rede
     /// <summary>A conexao BLE do celular acabou (a placa desconectou, reiniciou ou parou).</summary>
     public event Action<RadioBle> BleDoCelularCaiu;
 
-    public RadioBle IniciarBle(Maquina placa, string nome)
+    /// <param name="nimble">A pilha, quando nao e a do core do Arduino (o MicroPython usa o NimBLE em toda ESP32).</param>
+    public RadioBle IniciarBle(Maquina placa, string nome, bool? nimble = null)
     {
         EsquecerBle(placa);
 
@@ -319,8 +362,8 @@ public sealed partial class Rede
 
         // A ESP32 usa o Bluedroid; a S3, a C3, a C6 e a H2, o NimBLE (e o que
         // os sdkconfig.h do core 3.3.11 ligam em cada chip).
-        bool nimble = ModuloNativo.Chip(placa.Perfil?.Id ?? "") != "esp32";
-        var radio = new RadioBle(placa, string.IsNullOrWhiteSpace(nome) ? "ESP32" : nome, endereco, nimble);
+        bool pilha = nimble ?? ModuloNativo.Chip(placa.Perfil?.Id ?? "") != "esp32";
+        var radio = new RadioBle(placa, string.IsNullOrWhiteSpace(nome) ? "ESP32" : nome, endereco, pilha);
         lock (trava) radiosBle.Add(radio);
         Anotar(placa, "ble", $"BLE ligado como \"{radio.Nome}\" ({endereco})");
         return radio;
@@ -372,7 +415,7 @@ public sealed partial class Rede
     {
         if (cliente is null || servidor is null || cliente == servidor) return null;
         lock (trava)
-            if (!radiosBle.Contains(servidor) || !radiosBle.Contains(cliente) || !servidor.Anunciando) return null;
+            if (!radiosBle.Contains(servidor) || !radiosBle.Contains(cliente) || !servidor.Anunciando || !servidor.Conectavel) return null;
 
         var conexao = new ConexaoBle(servidor, cliente);
         lock (servidor.Clientes) servidor.Clientes.Add(conexao);
@@ -421,8 +464,35 @@ public sealed partial class Rede
         if (conexao is not { Ativa: true } || c is null) return false;
         if (comResposta ? !c.Escreve : !(c.EscreveSemResposta || c.Escreve)) return false;
         c.Valor = dados;
-        conexao.Servidor.Avisar(new EventoBle(TipoDeEventoBle.Escreveu, c, Conexao: conexao));
+        conexao.Servidor.Avisar(new EventoBle(TipoDeEventoBle.Escreveu, c, Conexao: conexao, Dados: dados));
         Anotar(conexao.Servidor.Dona, "ble", $"\"{conexao.Cliente.Nome}\" → {Ble.NomeDoUuid(c.Uuid) ?? c.Uuid}: {Ble.Mostrar(dados)}");
+        return true;
+    }
+
+    /// <summary>O cliente escreve num descritor do servidor. Falso: ele nao aceita (ou a conexao caiu).</summary>
+    public bool EscreverDescritorDaPlaca(ConexaoBle conexao, DescritorBle d, byte[] dados)
+    {
+        if (conexao is not { Ativa: true } || d is null || !d.Escreve) return false;
+        d.Valor = dados;
+        conexao.Servidor.Avisar(new EventoBle(TipoDeEventoBle.Escreveu, d.Dona, Conexao: conexao, Dados: dados, Descritor: d));
+        return true;
+    }
+
+    /// <summary>
+    /// O notify (ou indicate) para uma conexao so, com os bytes dados -- o gatts_notify do
+    /// MicroPython, que manda mesmo sem o outro lado ter assinado. Conexao nula: o celular.
+    /// </summary>
+    internal bool NotificarPara(CaracteristicaBle c, ConexaoBle conexao, byte[] dados, bool indicacao)
+    {
+        var radio = c.Servico.Radio;
+        if (conexao is null)
+        {
+            if (!radio.CelularConectado || BleDoCelular != radio) return false;
+            NotificouOCelular?.Invoke(radio, c, dados);
+            return true;
+        }
+        if (!conexao.Ativa) return false;
+        conexao.Cliente.Avisar(new EventoBle(TipoDeEventoBle.Notificou, c, indicacao ? 0 : 1, conexao, dados));
         return true;
     }
 
@@ -452,7 +522,7 @@ public sealed partial class Rede
 
     public bool ConectarBleDoCelular(RadioBle radio)
     {
-        if (radio is null || !radio.Anunciando) return false;
+        if (radio is null || !radio.Anunciando || !radio.Conectavel) return false;
         if (BleDoCelular is { } antes && antes != radio) DesconectarBleDoCelular();
 
         // Como no controlador BLE: com a conexao, o anuncio para.
@@ -491,7 +561,7 @@ public sealed partial class Rede
     {
         if (c is null || !(c.Escreve || c.EscreveSemResposta) || BleDoCelular != c.Servico.Radio) return false;
         c.Valor = dados;
-        c.Servico.Radio.Avisar(new EventoBle(TipoDeEventoBle.Escreveu, c));
+        c.Servico.Radio.Avisar(new EventoBle(TipoDeEventoBle.Escreveu, c, Dados: dados));
         Anotar(c.Servico.Radio.Dona, "ble", $"celular → {Ble.NomeDoUuid(c.Uuid) ?? c.Uuid}: {Ble.Mostrar(dados)}");
         return true;
     }

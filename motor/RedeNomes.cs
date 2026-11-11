@@ -63,8 +63,18 @@ public sealed partial class Rede
         return achados;
     }
 
-    /// <summary>O IP do nome, ou null (o nome nao existe, ou a placa nao esta na rede).</summary>
-    public string ResolverNome(Maquina origem, string host)
+    /// <summary>
+    /// O endereco que o broker MQTT de fora ganha quando nao da para chegar nele (sem internet, o
+    /// nome nao resolve): quem conecta ali cai no broker interno, como a PubSubClient ja cai. E
+    /// da faixa de testes de rede (198.18.0.0/15), que nao e de ninguem na internet.
+    /// </summary>
+    public const string EnderecoDoBrokerInterno = "198.18.0.1";
+
+    /// <summary>
+    /// O IP do nome, ou null (o nome nao existe, ou a placa nao esta na rede). Com a porta do MQTT
+    /// (o getaddrinfo do umqtt e do esp-mqtt a diz), o broker que nao resolve vira o interno.
+    /// </summary>
+    public string ResolverNome(Maquina origem, string host, int porta = 0)
     {
         host = (host ?? "").Trim().TrimEnd('.');
         if (host.Length == 0) return null;
@@ -84,8 +94,17 @@ public sealed partial class Rede
         }
         // O ".local" so existe na rede local (o mDNS): fora da bancada, nao ha.
         if (host.EndsWith(".local", StringComparison.OrdinalIgnoreCase)) return null;
+        bool paraOBroker = porta == 1883 && PortaDoBroker > 0;
         if (!UsarInternet)
         {
+            // O NTP quem responde e a rede da bancada, com o relogio do computador (como no
+            // configTime): o servidor de hora resolve para o roteador, com ou sem internet.
+            if (porta == 123) return Gateway;
+            if (paraOBroker)
+            {
+                Anotar(origem, "mqtt", $"{host}: sem internet -- o broker interno do simulador atende no lugar dele");
+                return EnderecoDoBrokerInterno;
+            }
             Anotar(origem, "dns", $"{host}: sem internet (menu ⋮ > Rede usa a internet do computador)");
             return null;
         }
@@ -95,6 +114,11 @@ public sealed partial class Rede
         }
         catch (SocketException)
         {
+            if (paraOBroker)
+            {
+                Anotar(origem, "mqtt", $"{host}: o nome nao resolveu -- o broker interno do simulador atende no lugar dele");
+                return EnderecoDoBrokerInterno;
+            }
             Anotar(origem, "dns", $"{host}: o nome nao existe");
             return null;
         }
