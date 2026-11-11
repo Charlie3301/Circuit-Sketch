@@ -10,6 +10,8 @@
 #if defined(ESP32)
 #include "cs_interno.h"
 #include "cs_registradores.h"
+#include "cs_objeto.h"
+#include "soc/spi_reg.h"
 
 /* ---- os pinos pelos registradores ---- */
 static uint64_t saida;          /* o nivel que o registrador de saida guarda */
@@ -89,6 +91,28 @@ static void escreverSaida(uint64_t nova)
         if (mudou & 1) mudarPino(p, (int)((nova >> p) & 1));
 }
 
+/* O W1TS e o W1TC: os pinos da mascara vao para o nivel, qualquer que seja o
+ * que o registrador guardava -- o pino pode ter mudado por fora dele (o
+ * gpio_set_level, uma biblioteca). So a mudanca conta como borda para o tom. */
+static void porPinos(uint64_t mascara, int nivel)
+{
+    uint64_t antes = saida;
+    saida = nivel ? saida | mascara : saida & ~mascara;
+    for (int p = 0; mascara; p++, mascara >>= 1) {
+        if (!(mascara & 1)) continue;
+        if ((int)((antes >> p) & 1) != nivel) mudarPino(p, nivel);
+        else if (!tons[p].hz && tempoDaIsr < 0) ch(nullptr, "digitalWrite", cs_i(p), cs_i(nivel));
+    }
+}
+
+/* O digitalWrite() do sketch: o registrador de saida guarda o nivel novo. */
+extern "C" void cs_reg_pino(int p, int nivel)
+{
+    if (p < 0 || p >= 64) return;
+    if (nivel) saida |= 1ULL << p;
+    else saida &= ~(1ULL << p);
+}
+
 static void escreverHabilitado(uint64_t novo)
 {
     uint64_t mudou = novo ^ habilitado;
@@ -97,27 +121,139 @@ static void escreverHabilitado(uint64_t novo)
         if (mudou & 1) ch(nullptr, "pinMode", cs_i(p), cs_i((novo >> p) & 1 ? OUTPUT : INPUT));
 }
 
+/* ---- o SPI pelos registradores ----
+ * Quem fala direto com o SPI do chip (a TFT_eSPI) poe os bytes em W0..W15,
+ * o tamanho em bits no MOSI_DLEN e dispara com o SPI_USR do CMD; o bit volta
+ * a zero quando a transferencia acaba. Aqui o disparo manda os bytes pelo
+ * barramento do core que e esse periferico (o SPI, ou o segundo -- o HSPI),
+ * com os pinos e a velocidade que o SPI.begin() e o beginTransaction()
+ * deram. Os outros registradores do SPI guardam o que foi escrito. */
+struct SpiDoChip {
+    uint32_t base;
+    const char *nome;
+    uint32_t r[64];
+};
+static SpiDoChip spisDoChip[] = {
+#if CONFIG_IDF_TARGET_ESP32
+    {DR_REG_SPI3_BASE, "SPI", {0}},  /* o VSPI: o SPI do Arduino */
+    {DR_REG_SPI2_BASE, "SPI1", {0}}, /* o HSPI */
+#else
+    {DR_REG_SPI2_BASE, "SPI", {0}},  /* o FSPI */
+#ifdef DR_REG_SPI3_BASE
+    {DR_REG_SPI3_BASE, "SPI1", {0}},
+#endif
+#endif
+};
+
+/* O indice de um registrador do SPI (o deslocamento dele em palavras). */
+#define CS_SPI_REG(reg) ((int)(((uint32_t)(reg(2)) - (uint32_t)DR_REG_SPI2_BASE) / 4))
+
+static SpiDoChip *spiDoRegistrador(uint32_t r)
+{
+    for (auto &s : spisDoChip)
+        if (r >= s.base && r < s.base + sizeof(s.r)) return &s;
+    return nullptr;
+}
+
+static uint8_t aoContrario(uint8_t b)
+{
+    b = (uint8_t)((b & 0xF0) >> 4 | (b & 0x0F) << 4);
+    b = (uint8_t)((b & 0xCC) >> 2 | (b & 0x33) << 2);
+    return (uint8_t)((b & 0xAA) >> 1 | (b & 0x55) << 1);
+}
+
+static void dispararSpi(SpiDoChip &s)
+{
+    uint32_t user = s.r[CS_SPI_REG(SPI_USER_REG)], ctrl = s.r[CS_SPI_REG(SPI_CTRL_REG)];
+    bool sai = (user & SPI_USR_MOSI) != 0, entra = (user & SPI_USR_MISO) != 0;
+#ifdef SPI_MOSI_DLEN_REG
+    int bitsSai = (int)(s.r[CS_SPI_REG(SPI_MOSI_DLEN_REG)] & 0xFFFFFF) + 1;
+    int bitsEntra = (int)(s.r[CS_SPI_REG(SPI_MISO_DLEN_REG)] & 0xFFFFFF) + 1;
+#else
+    int bitsSai = (int)(s.r[CS_SPI_REG(SPI_MS_DLEN_REG)] & 0x3FFFF) + 1;
+    int bitsEntra = bitsSai;
+#endif
+    int bits = sai && entra ? (bitsSai > bitsEntra ? bitsSai : bitsEntra) : sai ? bitsSai : entra ? bitsEntra : 0;
+    int n = (bits + 7) / 8;
+    if (n <= 0) return;
+    if (n > 64) n = 64;
+
+    /* W0 primeiro, o byte baixo de cada palavra primeiro; com o HIGHPART, de W8 em diante. */
+    const uint8_t *w = (const uint8_t *)&s.r[CS_SPI_REG(SPI_W0_REG)];
+    uint8_t manda[64], chega[64];
+    int inicio = sai && (user & SPI_USR_MOSI_HIGHPART) ? 32 : 0;
+    for (int i = 0; i < n; i++) manda[i] = sai && inicio + i < 64 ? w[inicio + i] : 0xFF;
+    bool baixoPrimeiro = ((ctrl >> SPI_WR_BIT_ORDER_S) & SPI_WR_BIT_ORDER_V) == 1;
+    if (baixoPrimeiro)
+        for (int i = 0; i < n; i++) manda[i] = aoContrario(manda[i]);
+
+    if (!entra) {
+        ch(s.nome, "writeBytes", cs_de(cs_vetor(manda, n)), cs_i(n));
+        return;
+    }
+    memset(chega, 0, sizeof(chega));
+    ch(s.nome, "transferBytes", cs_de(cs_vetor(manda, n)), cs_de(cs_vetor_mutavel(chega, n)), cs_i(n));
+    if (((ctrl >> SPI_RD_BIT_ORDER_S) & SPI_RD_BIT_ORDER_V) == 1)
+        for (int i = 0; i < n; i++) chega[i] = aoContrario(chega[i]);
+    memcpy(&s.r[CS_SPI_REG(SPI_W0_REG)], chega, (size_t)n);
+}
+
+static void escreverNoSpi(uint32_t r, uint32_t v)
+{
+    SpiDoChip *s = spiDoRegistrador(r);
+    if (!s) return;
+    int i = (int)((r - s->base) / 4);
+    if (i != CS_SPI_REG(SPI_CMD_REG)) {
+        s->r[i] = v;
+        return;
+    }
+    /* O disparo (e, nos chips novos, o SPI_UPDATE que leva a configuracao): os bits voltam a zero sozinhos. */
+    uint32_t somem = SPI_USR;
+#ifdef SPI_UPDATE
+    somem |= SPI_UPDATE;
+#endif
+    s->r[i] = v & ~somem;
+    if (v & SPI_USR) dispararSpi(*s);
+}
+
+/* O GPIO pelo endereco de verdade do chip e o mesmo registrador. */
+static uint32_t enderecoDoGpio(uint32_t r)
+{
+    return (r & ~0xFFFu) == (uint32_t)CS_GPIO_DO_CHIP ? (uint32_t)DR_REG_GPIO_BASE | (r & 0xFFFu) : r;
+}
+
 extern "C" void cs_reg_escrever(uint32_t r, uint32_t v)
 {
+    r = enderecoDoGpio(r);
     switch (r) {
     case GPIO_OUT_REG: escreverSaida((saida & 0xFFFFFFFF00000000ULL) | v); break;
-    case GPIO_OUT_W1TS_REG: escreverSaida(saida | v); break;
-    case GPIO_OUT_W1TC_REG: escreverSaida(saida & ~(uint64_t)v); break;
+    case GPIO_OUT_W1TS_REG: porPinos(v, 1); break;
+    case GPIO_OUT_W1TC_REG: porPinos(v, 0); break;
     case GPIO_OUT1_REG: escreverSaida((saida & 0xFFFFFFFFULL) | ((uint64_t)(v & 0xFF) << 32)); break;
-    case GPIO_OUT1_W1TS_REG: escreverSaida(saida | ((uint64_t)(v & 0xFF) << 32)); break;
-    case GPIO_OUT1_W1TC_REG: escreverSaida(saida & ~((uint64_t)(v & 0xFF) << 32)); break;
+    case GPIO_OUT1_W1TS_REG: porPinos((uint64_t)(v & 0xFF) << 32, 1); break;
+    case GPIO_OUT1_W1TC_REG: porPinos((uint64_t)(v & 0xFF) << 32, 0); break;
     case GPIO_ENABLE_REG: escreverHabilitado((habilitado & 0xFFFFFFFF00000000ULL) | v); break;
     case GPIO_ENABLE_W1TS_REG: escreverHabilitado(habilitado | v); break;
     case GPIO_ENABLE_W1TC_REG: escreverHabilitado(habilitado & ~(uint64_t)v); break;
     case GPIO_ENABLE1_REG: escreverHabilitado((habilitado & 0xFFFFFFFFULL) | ((uint64_t)(v & 0xFF) << 32)); break;
     case GPIO_ENABLE1_W1TS_REG: escreverHabilitado(habilitado | ((uint64_t)(v & 0xFF) << 32)); break;
     case GPIO_ENABLE1_W1TC_REG: escreverHabilitado(habilitado & ~((uint64_t)(v & 0xFF) << 32)); break;
-    default: break;
+    default: escreverNoSpi(r, v); break;
     }
+}
+
+/* O que o registrador guarda, sem ir aos pinos: o que o ponteiro le antes
+ * de uma escrita (o "|=" le e escreve), e os vizinhos de um acesso largo. */
+extern "C" uint32_t cs_reg_guardado(uint32_t r)
+{
+    r = enderecoDoGpio(r);
+    if (r == GPIO_IN_REG || r == GPIO_IN1_REG) return 0;
+    return cs_reg_ler(r);
 }
 
 extern "C" uint32_t cs_reg_ler(uint32_t r)
 {
+    r = enderecoDoGpio(r);
     switch (r) {
     case GPIO_OUT_REG: case GPIO_OUT_W1TS_REG: case GPIO_OUT_W1TC_REG: return (uint32_t)saida;
     case GPIO_OUT1_REG: case GPIO_OUT1_W1TS_REG: case GPIO_OUT1_W1TC_REG: return (uint32_t)(saida >> 32) & 0xFF;
@@ -131,7 +267,9 @@ extern "C" uint32_t cs_reg_ler(uint32_t r)
             if (digitalRead(base + i)) v |= 1u << i;
         return v;
     }
-    default: return 0;
+    default:
+        if (SpiDoChip *s = spiDoRegistrador(r)) return s->r[(r - s->base) / 4];
+        return 0;
     }
 }
 

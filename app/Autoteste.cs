@@ -208,6 +208,7 @@ public static partial class Autoteste
         Bloco("Cpp_Bibliotecas", Cpp_Bibliotecas);
         Bloco("Cpp_Idf", Cpp_Idf);
         Bloco("Chips_Spi", Chips_Spi);
+        Bloco("Cpp_Registradores", Cpp_Registradores);
         Bloco("Diagnostico_Pasta", Diagnostico_Pasta);
         Bloco("Demo_Doom", Demo_Doom);
         Bloco("MotorDc_Fisica", MotorDc_Fisica);

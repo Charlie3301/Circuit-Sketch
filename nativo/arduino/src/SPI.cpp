@@ -16,8 +16,12 @@ SPIClass SPI1("SPI1");
 SPIClass cs_segundo_spi("SPI1");
 #endif
 
-/* O 1 (o HSPI da ESP32) e o outro barramento; o VSPI e o FSPI sao o proprio SPI. */
+/* O HSPI da ESP32 (e o 1 das outras placas) e o outro barramento; o VSPI e o FSPI sao o proprio SPI. */
+#ifdef ESP32
+SPIClass::SPIClass(uint8_t bus) : nome(bus == HSPI ? "SPI1" : "SPI") {}
+#else
 SPIClass::SPIClass(uint8_t bus) : nome(bus == 1 ? "SPI1" : "SPI") {}
+#endif
 
 void SPIClass::begin() { ch(nome, "begin"); }
 

@@ -3,7 +3,10 @@
  * core 3.x e a do 2.x).
  *
  * O REG_WRITE(GPIO_OUT_W1TS_REG, mascara) mexe nos pinos de verdade do
- * simulador. Pino chaveado depressa (o som feito na mao, numa interrupcao
+ * simulador, e o ponteiro para o endereco tambem (*portOutputRegister(p),
+ * o volatile uint32_t* da TFT_eSPI): a faixa dos perifericos e uma pagina
+ * protegida, e cada acesso a ela passa por aqui (cs_ponte.cpp). O SPI do
+ * chip tambem esta aqui (W0..W15, o MOSI_DLEN e o disparo pelo SPI_USR). Pino chaveado depressa (o som feito na mao, numa interrupcao
  * de timer a 40 kHz) vira o tom que ele forma -- a frequencia medida pelas
  * bordas, no tempo de cada interrupcao --, e o buzzer toca esse tom. */
 #ifndef CS_REGISTRADORES_H
@@ -34,6 +37,15 @@
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/* O endereco de verdade do GPIO deste chip (o da S3 nao e o da ESP32): quem
+ * ve os registradores pelo soc/gpio_reg.h do IDF chega aqui com ele, e o
+ * simulador o reconhece. */
+#ifdef DR_REG_GPIO_BASE
+enum { CS_GPIO_DO_CHIP = DR_REG_GPIO_BASE };
+#else
+enum { CS_GPIO_DO_CHIP = 0x3ff44000 };
 #endif
 
 /* ---- os enderecos (ESP32) ---- */
@@ -70,6 +82,10 @@ extern "C" {
 
 void cs_reg_escrever(uint32_t endereco, uint32_t valor);
 uint32_t cs_reg_ler(uint32_t endereco);
+/* O que o registrador guarda, sem ir aos pinos (o GPIO_IN volta zero). */
+uint32_t cs_reg_guardado(uint32_t endereco);
+/* O digitalWrite() avisa: o registrador de saida acompanha o pino. */
+void cs_reg_pino(int pino, int nivel);
 
 #define REG_WRITE(r, v) cs_reg_escrever((uint32_t)(r), (uint32_t)(v))
 #define REG_READ(r) cs_reg_ler((uint32_t)(r))

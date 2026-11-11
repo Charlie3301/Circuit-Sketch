@@ -11,7 +11,13 @@ extern "C" __declspec(dllimport) int __stdcall SwitchToThread(void);
 extern "C" {
 
 void pinMode(uint8_t pin, uint8_t mode) { ch(nullptr, "pinMode", cs_i(pin), cs_i(mode)); }
-void digitalWrite(uint8_t pin, uint8_t val) { ch(nullptr, "digitalWrite", cs_i(pin), cs_i(val)); }
+void digitalWrite(uint8_t pin, uint8_t val)
+{
+#if defined(ESP32)
+    cs_reg_pino(pin, val != 0);
+#endif
+    ch(nullptr, "digitalWrite", cs_i(pin), cs_i(val));
+}
 int digitalRead(uint8_t pin) { return (int)ch_i(nullptr, "digitalRead", cs_i(pin)); }
 #ifndef ESP32 /* na ESP32, o do cs_hal.cpp (com a atenuacao) */
 int analogRead(uint8_t pin) { return (int)ch_i(nullptr, "analogRead", cs_i(pin)); }

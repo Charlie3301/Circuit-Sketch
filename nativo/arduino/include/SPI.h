@@ -41,11 +41,21 @@
 #define SPI_MSBFIRST MSBFIRST
 
 #ifdef ESP32
-/* Com o tipo: o 0 sozinho tambem e ponteiro nulo, e o SPIClass(FSPI) ficaria
+#include "sdkconfig.h"
+/* Os numeros do core (esp32-hal-spi.h): na ESP32 classica sao os do
+ * periferico (o HSPI e o SPI2, o VSPI e o SPI3) -- quem fala com os
+ * registradores usa o numero para achar o endereco (SPI_CMD_REG(VSPI)).
+ * Nas outras so ha o FSPI e o HSPI.
+ * Com o tipo: o 0 sozinho tambem e ponteiro nulo, e o SPIClass(FSPI) ficaria
  * ambiguo com o SPIClass(const char*). */
+#if CONFIG_IDF_TARGET_ESP32
+#define FSPI ((uint8_t)1)
+#define HSPI ((uint8_t)2)
+#define VSPI ((uint8_t)3)
+#else
 #define FSPI ((uint8_t)0)
 #define HSPI ((uint8_t)1)
-#define VSPI ((uint8_t)2)
+#endif
 #endif
 
 class SPISettings {

@@ -179,9 +179,169 @@ extern "C" long cs_dep_excecao(EXCEPTION_POINTERS *p);
 extern "C" void cs_dep_guardar_contexto(void);
 extern "C" volatile int cs_dep_ativo;
 
+/* ---------------------------------------------------------------------
+ * Os registradores do chip por ponteiro: *portOutputRegister(porta) |= bit,
+ * o volatile uint32_t* que a TFT_eSPI guarda do SPI_CMD_REG. O endereco e o
+ * da placa (0x3FF44004), onde no PC nao ha nada: o acesso falha, e a falha
+ * vira a leitura ou a escrita do registrador (cs_reg_ler, cs_reg_escrever
+ * -- cs_timer.cpp), assim:
+ *
+ *   1. na falha, a pagina passa a existir (reservada sem acesso na primeira
+ *      vez), a palavra recebe o valor do registrador, e a instrucao roda de
+ *      novo com o passo unico do processador ligado;
+ *   2. no passo, a pagina volta a ficar sem acesso, e o que a instrucao
+ *      escreveu vai para o registrador.
+ *
+ * A instrucao pode ser larga (o memcpy de 32 bytes para o W0..W7 do SPI):
+ * a janela sao as dezesseis palavras a partir da que falhou, e vai ao
+ * registrador cada uma que mudou. So para as placas ESP32. */
+#if defined(ESP32)
+enum { JanelaDoRegistrador = 16 };
+struct PassoDoRegistrador {
+    uint32_t palavra; /* o endereco da primeira palavra da janela */
+    int quantas;
+    bool escrita;
+    uint32_t antes[JanelaDoRegistrador];
+};
+/* Duas: a instrucao que copia de um registrador para outro (movs) falha nas duas paginas. */
+static thread_local PassoDoRegistrador passosDoRegistrador[2];
+static thread_local int passosAbertos;
+
+static bool ehRegistrador(uint64_t e)
+{
+    return (e >= 0x3FF00000u && e < 0x3FF80000u)     /* a ESP32 */
+           || (e >= 0x3F400000u && e < 0x3F4C0000u)  /* a S2 */
+           || (e >= 0x60000000u && e < 0x60100000u); /* as S3, C3, C6 e H2 */
+}
+
+/* A pagina e do simulador se foi reservada sem acesso (o AllocationProtect
+ * guarda): memoria de outro dono nesse endereco nao e tocada. */
+static bool paginaDoSimulador(const MEMORY_BASIC_INFORMATION &m)
+{
+    return m.State == MEM_COMMIT && m.Type == MEM_PRIVATE && m.AllocationProtect == PAGE_NOACCESS;
+}
+
+static bool abrirPaginaDoRegistrador(uint32_t pagina)
+{
+    void *p = (void *)(uintptr_t)pagina;
+    MEMORY_BASIC_INFORMATION m;
+    if (!VirtualQuery(p, &m, sizeof(m))) return false;
+    if (m.State == MEM_FREE) {
+        /* O Windows reserva de 64 em 64 KB. */
+        if (!VirtualAlloc((void *)(uintptr_t)(pagina & ~0xFFFFu), 0x10000, MEM_RESERVE | MEM_COMMIT, PAGE_NOACCESS)) return false;
+    } else if (!paginaDoSimulador(m))
+        return false;
+    DWORD antes;
+    return VirtualProtect(p, 4096, PAGE_READWRITE, &antes) != 0;
+}
+
+static void fecharPaginaDoRegistrador(uint32_t pagina)
+{
+    DWORD antes;
+    VirtualProtect((void *)(uintptr_t)pagina, 4096, PAGE_NOACCESS, &antes);
+}
+
+/* A thread saiu do sketch no meio de um acesso (a falha, a placa parada):
+ * as paginas que ela abriu voltam a ficar sem acesso. */
+static void largarPassosDoRegistrador(void)
+{
+    for (int i = 0; i < passosAbertos; i++) fecharPaginaDoRegistrador(passosDoRegistrador[i].palavra & ~0xFFFu);
+    passosAbertos = 0;
+}
+
+/* Uma pagina que ficou aberta de uma rodada anterior (a thread parada
+ * entre a falha e o passo): sem isso os acessos a ela passariam direto. */
+static void fecharRegistradoresAbertos(void)
+{
+    static const uint32_t faixas[][2] = {{0x3FF00000u, 0x3FF80000u}, {0x3F400000u, 0x3F4C0000u}, {0x60000000u, 0x60100000u}};
+    for (auto &f : faixas) {
+        uint64_t e = f[0];
+        while (e < f[1]) {
+            MEMORY_BASIC_INFORMATION m;
+            if (!VirtualQuery((void *)(uintptr_t)e, &m, sizeof(m)) || m.RegionSize == 0) break;
+            uint64_t fim = (uint64_t)(uintptr_t)m.BaseAddress + m.RegionSize;
+            if (paginaDoSimulador(m) && m.Protect != PAGE_NOACCESS) {
+                DWORD antes;
+                VirtualProtect(m.BaseAddress, m.RegionSize, PAGE_NOACCESS, &antes);
+            }
+            e = fim;
+        }
+    }
+}
+
+/* A falha de acesso num registrador: prepara a palavra e liga o passo unico. */
+static bool falhaNoRegistrador(EXCEPTION_POINTERS *p)
+{
+    uint64_t tipo = p->ExceptionRecord->ExceptionInformation[0];
+    uint64_t e = p->ExceptionRecord->ExceptionInformation[1];
+    if (tipo > 1 || !ehRegistrador(e)) return false;
+    uint32_t palavra = (uint32_t)e & ~3u, pagina = palavra & ~0xFFFu;
+
+    /* A mesma janela de novo (a pagina foi fechada por baixo): so reabre. */
+    for (int i = 0; i < passosAbertos; i++)
+        if (passosDoRegistrador[i].palavra == palavra) {
+            if (!abrirPaginaDoRegistrador(pagina)) return false;
+            passosDoRegistrador[i].escrita |= tipo == 1;
+            p->ContextRecord->EFlags |= 0x100;
+            return true;
+        }
+    if (passosAbertos >= 2) return false;
+
+    PassoDoRegistrador ps;
+    ps.palavra = palavra;
+    ps.escrita = tipo == 1;
+    ps.quantas = JanelaDoRegistrador;
+    if (palavra + (uint32_t)ps.quantas * 4 > pagina + 4096) ps.quantas = (int)((pagina + 4096 - palavra) / 4);
+    /* A leitura vai aos pinos (o GPIO_IN); a escrita so precisa do que o registrador guarda. */
+    ps.antes[0] = tipo == 0 ? cs_reg_ler(palavra) : cs_reg_guardado(palavra);
+    for (int i = 1; i < ps.quantas; i++) ps.antes[i] = cs_reg_guardado(palavra + (uint32_t)i * 4);
+
+    if (!abrirPaginaDoRegistrador(pagina)) return false;
+    memcpy((void *)(uintptr_t)palavra, ps.antes, (size_t)ps.quantas * 4);
+    passosDoRegistrador[passosAbertos++] = ps;
+    p->ContextRecord->EFlags |= 0x100;
+    return true;
+}
+
+/* O passo depois do acesso: fecha a pagina e leva ao registrador o que foi escrito. */
+static bool passoNoRegistrador(EXCEPTION_POINTERS *p)
+{
+    if (!passosAbertos) return false;
+    PassoDoRegistrador feitos[2];
+    uint32_t agora[2][JanelaDoRegistrador];
+    int n = passosAbertos;
+    for (int i = 0; i < n; i++) {
+        feitos[i] = passosDoRegistrador[i];
+        memcpy(agora[i], (void *)(uintptr_t)feitos[i].palavra, (size_t)feitos[i].quantas * 4);
+        fecharPaginaDoRegistrador(feitos[i].palavra & ~0xFFFu);
+    }
+    passosAbertos = 0;
+    p->ContextRecord->EFlags &= ~0x100u;
+    /* Por ultimo: a escrita chama o simulador, que pode tirar a thread daqui (a placa parou). */
+    for (int i = 0; i < n; i++)
+        for (int k = 0; k < feitos[i].quantas; k++)
+            if (agora[i][k] != feitos[i].antes[k] || (k == 0 && feitos[i].escrita))
+                cs_reg_escrever(feitos[i].palavra + (uint32_t)k * 4, agora[i][k]);
+    return true;
+}
+#else
+static void largarPassosDoRegistrador(void) {}
+static void fecharRegistradoresAbertos(void) {}
+#endif
+
 extern "C" __declspec(dllexport) long cs_excecao(EXCEPTION_POINTERS *p)
 {
     uint32_t codigo = p->ExceptionRecord->ExceptionCode;
+#if defined(ESP32)
+    /* O acesso a um registrador do chip por ponteiro, e o passo unico que o termina. */
+    if (codigo == EXCEPTION_SINGLE_STEP && passosAbertos) {
+        passoNoRegistrador(p);
+        /* O depurador pode ter pedido o mesmo passo (a instrucao sob um ponto de parada). */
+        cs_dep_excecao(p);
+        return EXCEPTION_CONTINUE_EXECUTION;
+    }
+    if (codigo == EXCEPTION_ACCESS_VIOLATION && topo && noSketch && falhaNoRegistrador(p)) return EXCEPTION_CONTINUE_EXECUTION;
+#endif
     /* O int3 e o passo unico do depurador (cs_depurador.cpp) vem primeiro. */
     if (codigo == EXCEPTION_BREAKPOINT || codigo == EXCEPTION_SINGLE_STEP)
         if (long r = cs_dep_excecao(p)) return r;
@@ -203,6 +363,7 @@ extern "C" __declspec(dllexport) long cs_excecao(EXCEPTION_POINTERS *p)
     Entrada *e = topo;
     if (!e || !noSketch) return EXCEPTION_CONTINUE_SEARCH;
 
+    largarPassosDoRegistrador();
     falha.codigo = codigo;
     falha.tipo = codigo == EXCEPTION_ACCESS_VIOLATION ? p->ExceptionRecord->ExceptionInformation[0] : 0;
     falha.endereco = codigo == EXCEPTION_ACCESS_VIOLATION ? p->ExceptionRecord->ExceptionInformation[1] : 0;
@@ -545,6 +706,7 @@ extern "C" __declspec(dllexport) int cs_iniciar(const cs_ponte *ponte)
     if (!ponte || ponte->tamanho != (int32_t)sizeof(cs_ponte) || ponte->versao != CS_VERSAO_DA_PONTE) return -1;
     cs_p = ponte;
     medirModulo();
+    fecharRegistradoresAbertos();
     return 0;
 }
 
@@ -566,6 +728,8 @@ extern "C" __declspec(dllexport) int cs_entrar(int qual, int arg, int n, const c
 {
     Entrada e;
     e.anterior = topo;
+    /* A entrada de fora: o acesso a um registrador que ficou pela metade (a thread tirada do sketch) acabou. */
+    if (!topo) largarPassosDoRegistrador();
     int antes = noSketch;
     topo = &e;
     falha.codigo = 0;
