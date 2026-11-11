@@ -207,6 +207,7 @@ public static partial class Autoteste
         Bloco("MicroPython_Real", MicroPython_Real);
         Bloco("Cpp_Bibliotecas", Cpp_Bibliotecas);
         Bloco("Cpp_Idf", Cpp_Idf);
+        Bloco("Chips_Spi", Chips_Spi);
         Bloco("Diagnostico_Pasta", Diagnostico_Pasta);
         Bloco("Demo_Doom", Demo_Doom);
         Bloco("MotorDc_Fisica", MotorDc_Fisica);

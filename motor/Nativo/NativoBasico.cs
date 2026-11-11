@@ -358,7 +358,6 @@ public sealed unsafe partial class ModuloNativo
             Maquina.DigitalWrite(p, nivel);
             if (vigiaTipo[p] != 0 && antes != nivel) AnotarBorda(p, antes, nivel);
         }
-        PinoMudou(p, nivel);
     }
 
     internal int GpioLer(int p)

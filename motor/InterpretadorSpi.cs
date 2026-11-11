@@ -46,7 +46,13 @@ public partial class Interpretador
     {
         if (barramentosSpi.TryGetValue(nome, out var b)) return b;
         b = new BarramentoDoSketch { Nome = nome, Hz = FrequenciaPadraoDoSpi };
-        if (nome == "SPI1")
+        if (nome == "SPI1" && EhFamiliaEsp32)
+        {
+            // O segundo barramento do core da ESP32: o HSPI. So a ESP32 classica
+            // tem pinos de fabrica nele; nas outras eles vem do begin().
+            if (SpiDaEsp32Classica) (b.Sck, b.Miso, b.Mosi, b.Ss) = (14, 12, 13, 15);
+        }
+        else if (nome == "SPI1")
         {
             // A Pico: o SPI1 do arduino-pico (variant da Pico).
             (b.Miso, b.Ss, b.Sck, b.Mosi) = (12, 13, 14, 15);
@@ -189,7 +195,7 @@ public partial class Interpretador
                 maq.PinMode(b.Sck, 1);
                 maq.PinMode(b.Mosi, 1);
                 if (b.Miso >= 0) maq.PinMode(b.Miso, 0);
-                maq.PinoDoPeriferico(b.Sck, b.Modo >= 2 ? 1 : 0, 0);
+                PorOSckEmRepouso(b);
                 if (EhAvr && b.Ss >= 0)
                 {
                     maq.PinMode(b.Ss, 1);
@@ -206,7 +212,7 @@ public partial class Interpretador
                 if (args.Count > 0 && args[0].Referencia is Objeto { Rede: ConfiguracaoSpi conf })
                     (b.Hz, b.Msb, b.Modo) = (conf.Hz, conf.Msb, conf.Modo);
                 b.EmTransacao = true;
-                if (b.Iniciado) maq.PinoDoPeriferico(b.Sck, b.Modo >= 2 ? 1 : 0, 0);
+                if (b.Iniciado) PorOSckEmRepouso(b);
                 return Valor.Vazio;
 
             case "endTransaction":
@@ -217,6 +223,7 @@ public partial class Interpretador
             {
                 // transfer(buf, n): cada byte sai e o que chega fica no lugar.
                 int n = Math.Min(buffer.Length, Math.Max(0, A(1)));
+                if (TransferirEmBloco(b, buffer, n, buffer)) return Valor.Vazio;
                 for (int i = 0; i < n; i++)
                     buffer[i] = NoLugar(buffer[i], Valor.DeC(Transferir(b, (int)buffer[i].Num & 0xFF, 8, c.Linha), TipoC.UChar));
                 return Valor.Vazio;
@@ -244,6 +251,7 @@ public partial class Interpretador
                 int n = metodo == "transferBytes" ? A(2) : A(1);
                 if (saida is null) return Valor.Vazio;
                 n = Math.Min(saida.Length, Math.Max(0, n));
+                if (TransferirEmBloco(b, saida, n, entrada)) return Valor.Vazio;
                 for (int i = 0; i < n; i++)
                 {
                     long lido = Transferir(b, (int)saida[i].Num & 0xFF, 8, c.Linha);
@@ -312,6 +320,51 @@ public partial class Interpretador
         }
 
         throw new ErroDeExecucao($"{b.Nome}.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+    }
+
+    /// <summary>
+    /// Um bloco de bytes (writeBytes, transferBytes, transfer(buf, n)) para um
+    /// chip que esta ouvindo o barramento -- o display com o CS em LOW: os
+    /// bytes chegam nele inteiros e o relogio anda o tempo do barramento, sem
+    /// as dezesseis bordas de cada byte nos pinos. E assim que o chip manda
+    /// um bloco (a ESP32, de 64 em 64 bytes, sem o processador no meio), e e
+    /// o que deixa uma tela inteira sair nos 30 ms que ela leva a 40 MHz.
+    /// Falso: ninguem ouve (ou o bloco e pequeno) -- os bits vao pelos pinos,
+    /// para o analisador logico e o registrador de deslocamento verem.
+    /// </summary>
+    bool TransferirEmBloco(BarramentoDoSketch b, Valor[] saida, int n, Valor[] entrada)
+    {
+        // Os displays amostram na subida do SCK, o bit mais alto primeiro:
+        // fora disso o que chegaria nos pinos e outra coisa.
+        if (n < 8 || !b.Iniciado || !b.Msb || b.Modo is 1 or 2 || b.CsPeloHardware) return false;
+        if (maq.EscutaDoSpi is not { } escuta) return false;
+
+        var bytes = new byte[n];
+        for (int i = 0; i < n; i++) bytes[i] = (byte)((int)saida[i].Num & 0xFF);
+        if (!escuta.Entregar(b.Sck, b.Mosi, bytes)) return false;
+
+        // O display nao responde: o que volta e o nivel em que o MISO esta.
+        if (entrada is not null)
+        {
+            int volta = b.Miso >= 0 && maq.DigitalRead(b.Miso) != 0 ? 0xFF : 0;
+            for (int i = 0; i < n && i < entrada.Length; i++) entrada[i] = NoLugar(entrada[i], Valor.DeC(volta, TipoC.UChar));
+        }
+
+        maq.TempoDoPeriferico(n * 8e6 / Math.Max(1, b.Hz));
+        maq.GastarProcessador(EhAvr ? 0.5 * n : EhFamiliaEsp32 ? 1.5 * ((n + 63) / 64) : 1.0 * n);
+        return true;
+    }
+
+    /// <summary>
+    /// O SCK vai para o nivel de repouso do modo. Para um chip que escuta os
+    /// fios isso nao e um bit: sem o aviso, o display sem pino CS (o ST7789
+    /// de 240x240, que pede o modo 3) contaria a subida como o primeiro bit
+    /// de um byte e perderia o alinhamento de todos os seguintes.
+    /// </summary>
+    void PorOSckEmRepouso(BarramentoDoSketch b)
+    {
+        maq.PinoDoPeriferico(b.Sck, b.Modo >= 2 ? 1 : 0, 0);
+        maq.EscutaDoSpi?.Repousou(b.Sck);
     }
 
     /// <summary>

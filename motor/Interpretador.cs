@@ -2509,7 +2509,9 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 return ChamarPorta(PortaGlobal(o.Nome, c.Linha), m.Nome, c, amb);
             if (o.Nome is "SPI" or "SPI1" && !amb.BuscarObjeto(o.Nome, out _))
             {
-                if (o.Nome == "SPI1" && Chip != "RP2040")
+                // No C++ compilado o "SPI1" e o nome que o core da ao segundo barramento
+                // da ESP32 (o SPIClass(HSPI), o SPI(1) do MicroPython): o sketch nao o escreve.
+                if (o.Nome == "SPI1" && Chip != "RP2040" && !(RodaNativo && EhFamiliaEsp32))
                     throw new ErroDeExecucao($"'SPI1' nao existe no core da {maq.Perfil?.Nome}: o outro barramento e um "
                                              + (EhFamiliaEsp32 ? "SPIClass (\"SPIClass hspi(HSPI);\")." : "SPIClass declarado no sketch."), c.Linha);
                 return ChamarSpi(BarramentoGlobal(o.Nome), m.Nome, c, amb);

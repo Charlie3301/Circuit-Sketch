@@ -2987,6 +2987,9 @@ public partial class EditorCircuito : Border
             string[] pinos = peca.Tipo switch
             {
                 "ili9341" => ["CS", "D/C", "RST", "MOSI", "MISO", "SCK", "LED"],
+                "st7789" => ["CS", "DC", "RES", "SDA", null, "SCL", "BLK"],
+                "st7735" => ["CS", "A0", "RESET", "SDA", null, "SCK", "LED"],
+                "ssd1306" => ["CS", "DC", "RST", "DATA", null, "CLK", null],
                 "microsd-card" => ["CS", null, null, "DI", "DO", "SCK", null],
                 _ => null,
             };
@@ -3004,7 +3007,7 @@ public partial class EditorCircuito : Border
                 nestaPlaca = true;
             }
             if (!nestaPlaca) continue;
-            lista.Add(new AparelhoNoSpi(peca.Tipo == "ili9341" ? "ili9341" : "sd", g[0], g[1], g[2], g[3], g[4], g[5], g[6]));
+            lista.Add(new AparelhoNoSpi(peca.Tipo == "microsd-card" ? "sd" : peca.Tipo, g[0], g[1], g[2], g[3], g[4], g[5], g[6]));
         }
         return lista;
     }

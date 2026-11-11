@@ -219,11 +219,8 @@ void cs_py_spi_iniciar(int bus, int sck, int mosi, int miso, uint32_t freq, int 
 void cs_py_spi_parar(int bus) { spiDe(bus).end(); }
 void cs_py_spi_trocar(int bus, size_t n, const uint8_t *saida, uint8_t *entrada)
 {
-    SPIClass &s = spiDe(bus);
-    for (size_t i = 0; i < n; i++) {
-        uint8_t v = s.transfer(saida ? saida[i] : 0xFF);
-        if (entrada) entrada[i] = v;
-    }
+    /* O bloco inteiro: o display que esta ouvindo recebe de uma vez. */
+    spiDe(bus).transferBytes(saida, entrada, (uint32_t)n);
 }
 
 /* ---- UART ---- */

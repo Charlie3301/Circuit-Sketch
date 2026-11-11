@@ -2,6 +2,12 @@
  * frequencia, a ordem e o modo do SPISettings antes de comecar. */
 #include "cs_interno.h"
 #include "SPI.h"
+#include "cs_objeto.h"
+
+/* Um bloco de bytes numa chamada so (em pedacos, para o vetor nao ficar
+ * enorme): o simulador entrega inteiro ao display que esta ouvindo, ou
+ * bate bit a bit nos pinos quando nao ha quem ouca. */
+enum { CS_SPI_PEDACO = 4096 };
 
 SPIClass SPI("SPI");
 #if defined(ARDUINO_ARCH_RP2040)
@@ -10,7 +16,8 @@ SPIClass SPI1("SPI1");
 SPIClass cs_segundo_spi("SPI1");
 #endif
 
-SPIClass::SPIClass(uint8_t bus) : nome(bus == 0 ? "SPI" : "SPI1") {}
+/* O 1 (o HSPI da ESP32) e o outro barramento; o VSPI e o FSPI sao o proprio SPI. */
+SPIClass::SPIClass(uint8_t bus) : nome(bus == 1 ? "SPI1" : "SPI") {}
 
 void SPIClass::begin() { ch(nome, "begin"); }
 
@@ -36,7 +43,10 @@ uint8_t SPIClass::transfer(uint8_t data) { return (uint8_t)ch_i(nome, "transfer"
 void SPIClass::transfer(void *buf, size_t count)
 {
     uint8_t *p = (uint8_t *)buf;
-    for (size_t i = 0; i < count; i++) p[i] = transfer(p[i]);
+    for (size_t i = 0; i < count; i += CS_SPI_PEDACO) {
+        int n = (int)(count - i < CS_SPI_PEDACO ? count - i : CS_SPI_PEDACO);
+        ch(nome, "transfer", cs_de(cs_vetor_mutavel(p + i, n)), cs_i(n));
+    }
 }
 
 uint16_t SPIClass::transfer16(uint16_t data) { return (uint16_t)ch_i(nome, "transfer16", cs_i(data)); }
@@ -44,9 +54,15 @@ uint32_t SPIClass::transfer32(uint32_t data) { return (uint32_t)ch_i(nome, "tran
 
 void SPIClass::transferBytes(const uint8_t *data, uint8_t *out, uint32_t size)
 {
-    for (uint32_t i = 0; i < size; i++) {
-        uint8_t r = transfer(data ? data[i] : 0xFF);
-        if (out) out[i] = r;
+    /* Sem dados para mandar (so ler), o MOSI fica em nivel alto. */
+    uint8_t nada[64];
+    memset(nada, 0xFF, sizeof(nada));
+    uint32_t pedaco = data ? (uint32_t)CS_SPI_PEDACO : (uint32_t)sizeof(nada);
+    for (uint32_t i = 0; i < size; i += pedaco) {
+        int n = (int)(size - i < pedaco ? size - i : pedaco);
+        const uint8_t *sai = data ? data + i : nada;
+        if (out) ch(nome, "transferBytes", cs_de(cs_vetor(sai, n)), cs_de(cs_vetor_mutavel(out + i, n)), cs_i(n));
+        else ch(nome, "writeBytes", cs_de(cs_vetor(sai, n)), cs_i(n));
     }
 }
 
@@ -56,16 +72,24 @@ void SPIClass::write32(uint32_t data) { ch(nome, "write32", cs_i(data)); }
 
 void SPIClass::writeBytes(const uint8_t *data, uint32_t size)
 {
-    for (uint32_t i = 0; i < size; i++) write(data[i]);
+    for (uint32_t i = 0; i < size; i += CS_SPI_PEDACO) {
+        int n = (int)(size - i < CS_SPI_PEDACO ? size - i : CS_SPI_PEDACO);
+        ch(nome, "writeBytes", cs_de(cs_vetor(data + i, n)), cs_i(n));
+    }
 }
 
 /* As palavras de 16 bits com o byte mais alto primeiro, como o painel espera (o da ILI9341). */
 void SPIClass::writePixels(const void *data, uint32_t size)
 {
     const uint8_t *b = (const uint8_t *)data;
-    for (uint32_t i = 0; i + 1 < size; i += 2) {
-        write(b[i + 1]);
-        write(b[i]);
+    uint8_t troca[512];
+    for (uint32_t i = 0; i + 1 < size;) {
+        uint32_t n = 0;
+        for (; n + 1 < sizeof(troca) && i + 1 < size; i += 2, n += 2) {
+            troca[n] = b[i + 1];
+            troca[n + 1] = b[i];
+        }
+        writeBytes(troca, n);
     }
 }
 

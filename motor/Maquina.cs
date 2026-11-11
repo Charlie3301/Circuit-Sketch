@@ -965,6 +965,7 @@ public class Maquina
 
     public TelaGrafica CriarPainelOled(int largura, int altura, int barramento = 0, int endereco = 0x3C, bool spi = false)
     {
+        if (spi) OledSpiDaBiblioteca = true;
         lock (PaineisOled)
         {
             int i = PaineisOled.FindIndex(p => p.Barramento == barramento && p.Endereco == endereco && p.Spi == spi);
@@ -1220,10 +1221,45 @@ public class Maquina
     /// pedir: 240x320 no ILI9341, 240x240 no ST7789.
     /// </summary>
     public TelaGrafica CriarTela(int largura = 240, int altura = 320)
-        => Tela ??= new TelaGrafica(largura, altura);
+    {
+        TelaDaBiblioteca = true;
+        return Tela ??= new TelaGrafica(largura, altura);
+    }
 
     /// <summary>Outro tamanho de painel (o initR() do ST7735 que escolhe o de 1,44").</summary>
-    public TelaGrafica TrocarTela(int largura, int altura) => Tela = new TelaGrafica(largura, altura);
+    public TelaGrafica TrocarTela(int largura, int altura)
+    {
+        TelaDaBiblioteca = true;
+        return Tela = new TelaGrafica(largura, altura);
+    }
+
+    /// <summary>
+    /// Quem desenha na tela e uma biblioteca que o simulador imita (a
+    /// Adafruit_ILI9341 do sketch): ela escreve direto no vidro, e o chip do
+    /// display (<see cref="ChipTft"/>) ignora o que passar pelos fios -- os
+    /// bytes do SPI nessa hora sao de outro aparelho do barramento.
+    /// </summary>
+    public bool TelaDaBiblioteca { get; private set; }
+
+    /// <summary>O mesmo, para o OLED de SPI (a Adafruit_SSD1306 imitada).</summary>
+    public bool OledSpiDaBiblioteca { get; private set; }
+
+    /// <summary>A tela para o chip do display, que recebe os bytes do barramento: no tamanho do vidro dele.</summary>
+    internal TelaGrafica TelaDoChip(int largura, int altura)
+    {
+        if (Tela is not { } t || t.LarguraFisica != largura || t.AlturaFisica != altura)
+            Tela = new TelaGrafica(largura, altura);
+        return Tela;
+    }
+
+    /// <summary>O vidro do OLED de SPI para o chip dele (a mesma chave da biblioteca imitada).</summary>
+    internal TelaGrafica PainelOledDoChip(int largura, int altura)
+    {
+        bool antes = OledSpiDaBiblioteca;
+        var painel = CriarPainelOled(largura, altura, -1, -1, spi: true);
+        OledSpiDaBiblioteca = antes;
+        return painel;
+    }
 
     public readonly List<EventoPino> Eventos = [];
 
@@ -1279,7 +1315,48 @@ public class Maquina
     /// Os aparelhos do barramento SPI, do jeito que o circuito os liga.
     /// Quem conhece o circuito (a janela) responde; sem ele, nenhum aparelho.
     /// </summary>
-    public Func<IReadOnlyList<AparelhoNoSpi>> AparelhosSpi { get; set; }
+    public Func<IReadOnlyList<AparelhoNoSpi>> AparelhosSpi
+    {
+        get => aparelhosSpi;
+        set { aparelhosSpi = value; EsquecerOsChipsDoSpi(eAsBibliotecas: false); }
+    }
+    Func<IReadOnlyList<AparelhoNoSpi>> aparelhosSpi;
+
+    // Os chips que escutam os fios do SPI (o display, o OLED): montados na
+    // primeira mudanca de pino da rodada, do que o circuito tem.
+    EscutaSpi escutaSpi;
+    volatile bool escutaSpiMontada;
+    readonly object travaDaEscutaSpi = new();
+
+    /// <summary>Os chips do SPI desta placa; nulo se o circuito nao tem nenhum.</summary>
+    public EscutaSpi EscutaDoSpi
+    {
+        get
+        {
+            if (escutaSpiMontada) return escutaSpi;
+            lock (travaDaEscutaSpi)
+            {
+                if (escutaSpiMontada) return escutaSpi;
+                var nova = aparelhosSpi?.Invoke() is { Count: > 0 } lista ? new EscutaSpi(this, lista) : null;
+                escutaSpi = nova is { Vazia: false } ? nova : null;
+                escutaSpiMontada = true;
+                return escutaSpi;
+            }
+        }
+    }
+
+    /// <summary>Sem energia (ou outra rodada), os chips voltam do zero.</summary>
+    void EsquecerOsChipsDoSpi(bool eAsBibliotecas = true)
+    {
+        lock (travaDaEscutaSpi)
+        {
+            escutaSpi = null;
+            escutaSpiMontada = false;
+        }
+        if (!eAsBibliotecas) return;
+        TelaDaBiblioteca = false;
+        OledSpiDaBiblioteca = false;
+    }
 
     /// <summary>O som do I2S, para a janela tocar quando ha alto-falante ligado.</summary>
     public volatile SaidaDeAudio Audio;
@@ -1866,6 +1943,15 @@ public class Maquina
         MudarPino(p, v, quando);
     }
 
+    /// <summary>
+    /// O tempo que um periferico do chip leva sem mexer em pino nenhum que
+    /// alguem veja: o bloco de bytes do SPI que foi direto para o display.
+    /// </summary>
+    public void TempoDoPeriferico(double us)
+    {
+        if (us > 0) Gastar(us);
+    }
+
     void MudarPino(int p, int v, double quando)
     {
         // Pino vigiado: a borda e anotada AQUI, na escrita, e nao
@@ -1878,6 +1964,10 @@ public class Maquina
 
         Digital[p] = v;
         Pwm[p] = v * 255;
+
+        // Os chips do SPI veem a borda nos fios deles, venha de onde vier.
+        if (EscutaDoSpi is { } escuta && escuta.Interessa(p)) escuta.Borda(p, v);
+
         lock (Trava)
         {
             // O codigo nativo mexe no D/C do display milhares de vezes por
@@ -2044,6 +2134,7 @@ public class Maquina
         Lcd?.Limpar();
         Lcd?.Desligar();
         lock (PaineisOled) PaineisOled.Clear();
+        EsquecerOsChipsDoSpi();
 
         // Placa sem energia nao serve pagina nem fala MQTT.
         rede?.EsquecerPlaca(this);
@@ -2136,6 +2227,7 @@ public class Maquina
     public void Reiniciar()
     {
         EncerrarNativo();
+        EsquecerOsChipsDoSpi();
         ReinicioPedido = null;
         Energizada = true;
         Sono = null;
