@@ -173,6 +173,9 @@ public partial class MainWindow : Window
 
         // O multimetro (a aba MULTÍMETRO): as pontas, a chave e a ponta do clique esquerdo.
         editor.PontasMudaram += AtualizarMultimetro;
+        // O X de um selo de aviso: diz como trazer de volta.
+        editor.AvisoFechado += aviso => Aviso($"aviso fechado ({EditorCircuito.TextoDoSelo(aviso)}). "
+                                              + "Configurações > Simulação traz os fechados de volta.");
         painelMultimetro.FuncaoMudou += AtualizarMultimetro;
         painelMultimetro.PontaAtivaMudou += () => editor.PretaNoEsquerdo = painelMultimetro.PretaNoEsquerdo;
         // Rodar e parar mudam o que o multimetro le (parado, so o ohmimetro tem o que medir).
@@ -2571,6 +2574,12 @@ public partial class MainWindow : Window
         {
             CaberNaTela = CaberNaTela,
             AbrirBibliotecas = () => AbrirBibliotecas(),
+            EsquecerAvisosFechados = () =>
+            {
+                int quantos = editor.AvisosFechados;
+                editor.EsquecerAvisosFechados();
+                Aviso(quantos == 0 ? "nenhum aviso estava fechado." : $"{quantos} aviso(s) fechado(s) voltam a aparecer.");
+            },
             Aplicar = AplicarPreferencias,
             Placas = [.. PerfilPlaca.Conhecidos.Select(p => (p.Id, p.Nome))],
         });
@@ -6493,7 +6502,8 @@ public partial class MainWindow : Window
                     lock (m.Trava) m.Serial.Add($"💥 {nome} queimou: {estouro.Motivo}");
         }
         naTela.AddRange(queimadosNaRodada.Values.Where(q => editor.EstaQueimada(q.Peca)));
-        editor.MostrarAvisos(naTela);
+        // Desligados nas configuracoes: so a barra e o monitor avisam.
+        editor.MostrarAvisos(Preferencias.Ligado(Preferencias.SelosDeAviso, true) ? naTela : []);
     }
 
     /// <summary>O que queimou nesta rodada, e por que: o selo vermelho fica ate a proxima.</summary>

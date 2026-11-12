@@ -54,6 +54,29 @@ public static partial class Autoteste
             Conferir("selos: o LED que queimou no 5 V do Uno fica com o selo (vermelho) ate a proxima rodada",
                 ed.EstaQueimada("led2") && selos.Any(s => s.Peca == "led2"), lista);
 
+            // ---- o X: fecha o aviso, e ele nao volta nos quadros seguintes ----
+            bool fechou = ed.FecharAvisoParaTeste("led1", null);
+            EsperarPor(() => false, 600);       // alguns quadros da simulacao
+            var depois = ed.AvisosNaTelaParaTeste;
+            Conferir("selos: o X fecha aquele aviso (e so ele), e os quadros seguintes nao o trazem de volta",
+                fechou && !depois.Any(s => s.Peca == "led1") && depois.Any(s => s.Peca == "ds") && depois.Any(s => s.Peca == "hc"),
+                string.Join(" | ", depois));
+            ed.EsquecerAvisosFechados();
+            EsperarPor(() => ed.AvisosNaTelaParaTeste.Any(s => s.Peca == "led1"), 3000);
+            Conferir("selos: \"mostrar de novo os avisos fechados\" traz o aviso de volta",
+                ed.AvisosNaTelaParaTeste.Any(s => s.Peca == "led1"), string.Join(" | ", ed.AvisosNaTelaParaTeste));
+
+            // ---- a opcao das configuracoes: vem ligada, e desligada some com todos ----
+            bool deFabrica = Preferencias.Ligado(Preferencias.SelosDeAviso, true);
+            Preferencias.Definir(Preferencias.SelosDeAviso, false);
+            EsperarPor(() => ed.AvisosNaTelaParaTeste.Count == 0, 3000);
+            int comElaDesligada = ed.AvisosNaTelaParaTeste.Count;
+            Preferencias.Definir(Preferencias.SelosDeAviso, true);
+            EsperarPor(() => ed.AvisosNaTelaParaTeste.Count >= 4, 3000);
+            Conferir("selos: a opcao \"Mostrar os avisos em cima das peças\" vem ligada; desligada, os selos somem; ligada, voltam",
+                deFabrica && comElaDesligada == 0 && ed.AvisosNaTelaParaTeste.Count >= 4,
+                $"de fabrica={deFabrica} desligada={comElaDesligada} ligada={ed.AvisosNaTelaParaTeste.Count}");
+
             janela.TesteParar();
             janela.TesteRodar();
             EsperarPor(() => ed.AvisosNaTelaParaTeste.Count >= 4, 10000);

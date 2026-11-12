@@ -21,10 +21,57 @@ public partial class EditorCircuito
     bool marcasDeAvisoNoMundo;
     List<Estouro> avisosNaTela = [];
 
+    /// <summary>
+    /// Os avisos fechados no X: a peca, o pino e o texto do selo (o motivo inteiro muda
+    /// com a corrente de cada quadro; o selo, nao). Valem enquanto o circuito esta
+    /// aberto -- abrir outro, ou "mostrar de novo" nas configuracoes, traz de volta.
+    /// </summary>
+    readonly HashSet<string> avisosFechados = [];
+
+    static string ChaveDoAviso(Estouro aviso) => $"{aviso.Peca}|{aviso.Pino}|{TextoDoSelo(aviso)}";
+
+    /// <summary>Fecha (ignora) o aviso: o selo dele some e nao volta neste circuito.</summary>
+    public void FecharAviso(Estouro aviso)
+    {
+        if (aviso is null || !avisosFechados.Add(ChaveDoAviso(aviso))) return;
+        avisosNaTela = [.. avisosNaTela.Where(a => ChaveDoAviso(a) != ChaveDoAviso(aviso))];
+        DesenharAvisos();
+        AvisoFechado?.Invoke(aviso);
+    }
+
+    /// <summary>Disparado ao fechar um aviso no X (a janela diz na barra como trazer de volta).</summary>
+    public event Action<Estouro> AvisoFechado;
+
+    /// <summary>Quantos avisos estao fechados agora.</summary>
+    public int AvisosFechados => avisosFechados.Count;
+
+    /// <summary>Traz de volta os avisos fechados (o botao das configuracoes, e abrir outro circuito).</summary>
+    public void EsquecerAvisosFechados()
+    {
+        if (avisosFechados.Count == 0) return;
+        avisosFechados.Clear();
+        // Redesenha ja, com a ultima lista (parado, nao ha proximo quadro para isso).
+        if (ultimosAvisos is { } ultimos) MostrarAvisos(ultimos);
+    }
+
+    /// <summary>A ultima lista recebida, antes de tirar os fechados (para redesenhar sem esperar).</summary>
+    List<Estouro> ultimosAvisos;
+
+    /// <summary>Para o teste: fecha o aviso desta peca (e pino) como o X faria.</summary>
+    internal bool FecharAvisoParaTeste(string peca, string pino)
+    {
+        var aviso = avisosNaTela.FirstOrDefault(a => a.Peca == peca && a.Pino == pino);
+        if (aviso is null) return false;
+        FecharAviso(aviso);
+        return true;
+    }
+
     /// <summary>Os avisos de agora; os que sumiram da lista somem da tela.</summary>
     public void MostrarAvisos(IEnumerable<Estouro> avisos)
     {
-        var novos = avisos.Where(a => a is not null && Atual.Achar(a.Peca) is not null).Distinct().ToList();
+        ultimosAvisos = [.. avisos];
+        var novos = ultimosAvisos.Where(a => a is not null && Atual.Achar(a.Peca) is not null
+                                             && !avisosFechados.Contains(ChaveDoAviso(a))).Distinct().ToList();
         // A conta roda a cada quadro, e a ordem pode mudar: redesenhar so quando o
         // CONJUNTO muda -- redesenhar o selo fecha a dica que o mouse abriu nele.
         if (novos.Count == avisosNaTela.Count && novos.ToHashSet().SetEquals(avisosNaTela)) return;
@@ -126,7 +173,8 @@ public partial class EditorCircuito
                 BorderBrush = escuro,
                 BorderThickness = new Thickness(1 * s),
                 CornerRadius = new CornerRadius(3 * s),
-                Padding = new Thickness(4 * s, 1 * s, 5 * s, 1 * s),
+                // Espaco a direita para o X nao cobrir o texto.
+                Padding = new Thickness(4 * s, 1 * s, 12 * s, 1 * s),
                 Child = new TextBlock
                 {
                     Text = (aviso.Queimou ? "✖ " : "⚠ ") + TextoDoSelo(aviso),
@@ -153,6 +201,36 @@ public partial class EditorCircuito
             Canvas.SetLeft(selo, canto.X);
             Canvas.SetTop(selo, canto.Y);
             marcasDeAviso.Children.Add(selo);
+
+            // O X no canto de cima da direita: fecha (ignora) este aviso.
+            selo.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            double d = 13 * s;
+            var fechar = new Border
+            {
+                Width = d, Height = d,
+                CornerRadius = new CornerRadius(d / 2),
+                Background = new SolidColorBrush(Color.FromRgb(0x26, 0x27, 0x2B)),
+                BorderBrush = cor,
+                BorderThickness = new Thickness(1.2 * s),
+                Cursor = System.Windows.Input.Cursors.Hand,
+                ToolTip = new ToolTip
+                {
+                    Background = Tema.Pincel(Tema.Painel),
+                    Content = new TextBlock { Text = "Fechar este aviso (ignorar)", Foreground = Tema.Pincel(Tema.Texto) },
+                },
+                Child = new TextBlock
+                {
+                    Text = "✕", FontSize = 8 * s, FontWeight = FontWeights.Bold, Foreground = Brushes.White,
+                    HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
+                },
+            };
+            var esse = aviso;
+            // O clique fica aqui: nao vira clique no circuito (nem ponta de multimetro, nem selecao).
+            fechar.MouseLeftButtonDown += (_, e) => { e.Handled = true; FecharAviso(esse); };
+            fechar.MouseLeftButtonUp += (_, e) => e.Handled = true;
+            Canvas.SetLeft(fechar, canto.X + selo.DesiredSize.Width - d * 0.65);
+            Canvas.SetTop(fechar, canto.Y - d * 0.4);
+            marcasDeAviso.Children.Add(fechar);
         }
     }
 }

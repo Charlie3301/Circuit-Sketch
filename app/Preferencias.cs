@@ -131,6 +131,9 @@ public static class Preferencias
     public const string RodarAoAbrirProjeto = "rodar-ao-abrir-projeto";
     public const string RodarAoAbrirDemo = "rodar-ao-abrir-demo";
     public const string SimularQueima = "simular-queima";
+
+    /// <summary>Os selos de aviso em cima das pecas (com o X para fechar cada um). Vem ligado.</summary>
+    public const string SelosDeAviso = "selos-de-aviso";
     public const string SomDoBuzzer = "som-do-buzzer";
     public const string VolumeDoBuzzer = "volume-do-buzzer";
 

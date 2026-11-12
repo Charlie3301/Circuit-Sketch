@@ -1381,11 +1381,14 @@ public partial class EditorCircuito : Border
     // ================= desenhar =================
     public void Carregar(Circuito circuito)
     {
+        // Os avisos fechados eram do circuito anterior.
+        EsquecerAvisosFechados();
         Atual = circuito ?? new Circuito();
         selecionadas.Clear();
         fiosSelecionados.Clear();
         ZerarMotores();
         Redesenhar();
+        MostrarAvisos([]);     // os selos eram das pecas do circuito anterior
     }
 
     public void Redesenhar()

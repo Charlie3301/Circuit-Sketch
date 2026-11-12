@@ -22,6 +22,9 @@ public sealed record AjustesDoPrograma(
     /// <summary>Abre o acervo de bibliotecas.</summary>
     public Action AbrirBibliotecas { get; init; }
 
+    /// <summary>Traz de volta os avisos fechados no X dos selos.</summary>
+    public Action EsquecerAvisosFechados { get; init; }
+
     /// <summary>
     /// Poe na janela principal o que acabou de mudar aqui. Chamado a cada
     /// escolha: as configuracoes valem na hora, sem "Aplicar" nem reiniciar.
@@ -324,7 +327,7 @@ public class JanelaConfiguracoes : Window
         assuntos.Add(new("codigo", "Monitor serial",
             "serial hora tempo linhas rolar fim de linha enviar enter limpar", MontarMonitor));
         assuntos.Add(new("codigo", "Simulação",
-            "rodar demo queimar queima som buzzer volume avisos", MontarSimulacao));
+            "rodar demo queimar queima som buzzer volume avisos selos aviso fechar ignorar", MontarSimulacao));
 
         assuntos.Add(new("arquivos", "Arquivos e projetos",
             "salvar sozinho automático cópia backup bak recentes placa circuito novo", MontarArquivos));
@@ -634,6 +637,12 @@ public class JanelaConfiguracoes : Window
         CaixaGuardada(pecas, "Queimar o componente ligado errado", Preferencias.SimularQueima, true);
         Nota(pecas, "Desligado, o LED sem resistor e o curto não queimam aqui — mas queimam na "
                     + "bancada. É bom só para montar rápido; para aprender, deixe ligado.");
+
+        CaixaGuardada(pecas, "Mostrar os avisos em cima das peças", Preferencias.SelosDeAviso, true);
+        Nota(pecas, "O selo amarelo (ou vermelho, no que queimou) em cima da peça ou do pino, com o motivo "
+                    + "na dica do mouse. O X de cada selo fecha aquele aviso até abrir outro circuito.");
+        if (ajustes.EsquecerAvisosFechados is not null)
+            Botao(pecas, "Mostrar de novo os avisos fechados", () => ajustes.EsquecerAvisosFechados());
 
         var som = Grupo(painel, "Som");
         CaixaGuardada(som, "Som do buzzer", Preferencias.SomDoBuzzer, true);
