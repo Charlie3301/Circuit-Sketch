@@ -541,6 +541,10 @@ public partial class EditorCircuito : Border
         // vermelho de 2,5 mm no centro do RESET.
         ["arduino-uno"] = [(39.7, 14.3, 5.5, "RESET")],
 
+        // O botao da placa ZS-040 do HC-05 (pecas-hc05.py): leva o KEY a HIGH,
+        // como o EN. Segurado ao ligar (F5 com ele apertado), o modo AT.
+        ["hc-05"] = [(52.91, 118.06, 4.5, "KEY")],
+
         // O TS42 do arquivo da placa (placas-arduino.py, Alpha 25).
         ["arduino-mega"] = [(38.7, 17.2, 5.5, "RESET")],
 
@@ -567,7 +571,7 @@ public partial class EditorCircuito : Border
     };
 
     /// <summary>O botao da placa que vai num pino (BOOT das ESP32, BOOTSEL da Pico, USER da Nucleo-64, FLASH da NodeMCU), e nao o reset.</summary>
-    static bool EhBotaoDeBoot(string nome) => nome is "BOOT" or "BOOTSEL" or "USER" or "FLASH";
+    static bool EhBotaoDeBoot(string nome) => nome is "BOOT" or "BOOTSEL" or "USER" or "FLASH" or "KEY";
 
     /// <summary>
     /// Os vinte botoes do controle remoto, com o codigo que cada um manda.
@@ -2794,6 +2798,9 @@ public partial class EditorCircuito : Border
     /// <summary>Os chips proprios do circuito.</summary>
     public ChipsNoCircuito Chips { get; } = new();
 
+    /// <summary>Os HC-05 do circuito, rodando (a UART e o Bluetooth de cada um).</summary>
+    public ModulosHc05 Hc05 { get; } = new();
+
     /// <summary>
     /// Um quadro de cada chip proprio: le as entradas da rede, roda o
     /// codigo dele e devolve o que ele esta mandando para as placas.
@@ -2991,6 +2998,8 @@ public partial class EditorCircuito : Border
                 "st7735" => ["CS", "A0", "RESET", "SDA", null, "SCK", "LED"],
                 "ssd1306" => ["CS", "DC", "RST", "DATA", null, "CLK", null],
                 "microsd-card" => ["CS", null, null, "DI", "DO", "SCK", null],
+                // O 74HC595: o STCP no lugar do CS, o MR no do reset, o DS e o SHCP no MOSI e no SCK.
+                "74hc595" => ["STCP", null, "MR", "DS", null, "SHCP", null],
                 _ => null,
             };
             if (pinos is null) continue;
@@ -3007,7 +3016,21 @@ public partial class EditorCircuito : Border
                 nestaPlaca = true;
             }
             if (!nestaPlaca) continue;
-            lista.Add(new AparelhoNoSpi(peca.Tipo == "microsd-card" ? "sd" : peca.Tipo, g[0], g[1], g[2], g[3], g[4], g[5], g[6]));
+
+            // O 74HC595 so e desta placa se o relogio do deslocamento vem dela
+            // (senao a conta da Logica cuida, pelos niveis). O DS pode vir do
+            // Q7S de outro 74HC595: a fila.
+            string serDe = null;
+            if (peca.Tipo == "74hc595")
+            {
+                if (g[5] < 0) continue;
+                string raizDoDs = rede.RaizDe(Netlist.No(peca.Id, "DS"));
+                serDe = raizDoDs is null ? null
+                    : Atual.Pecas.FirstOrDefault(o => o != peca && o.Tipo == "74hc595"
+                                                      && rede.RaizDe(Netlist.No(o.Id, "Q7S")) == raizDoDs)?.Id;
+            }
+            lista.Add(new AparelhoNoSpi(peca.Tipo == "microsd-card" ? "sd" : peca.Tipo, g[0], g[1], g[2], g[3], g[4], g[5], g[6],
+                                        peca.Id, serDe));
         }
         return lista;
     }
@@ -5898,6 +5921,21 @@ public partial class EditorCircuito : Border
 
             switch (peca.Tipo)
             {
+                // O HC-05: a energia e o EN decidem o modo; o STATE vai a HIGH conectado.
+                case "hc-05":
+                {
+                    var conta = EnergiaDoQuadro is { } e && e.Calculada >= Hc05.Inicio ? e : null;
+                    double volts = conta is null ? 0 : conta.TensaoDoPino(peca.Id, "VCC") - conta.TensaoDoPino(peca.Id, "GND");
+                    int en = rede.GpioDe(Atual, peca.Id, "EN");
+                    bool enAlto = en >= 0 && maq.Modo[en] == 1 && maq.Digital[en] == 1
+                                  || conta is not null && conta.TensaoDoPino(peca.Id, "EN") - conta.TensaoDoPino(peca.Id, "GND") >= 2.0
+                                  || BootPressionado.Contains(peca.Id);
+                    int estado = Hc05.Passo(peca.Id, volts, enAlto);
+                    int st = rede.GpioDe(Atual, peca.Id, "STATE");
+                    if (st >= 0 && maq.Modo[st] != 1) maq.NivelExterno[st] = Math.Max(0, estado);
+                    break;
+                }
+
                 case "pushbutton":
                 case "pushbutton-6mm":
                 {

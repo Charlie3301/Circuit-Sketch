@@ -490,6 +490,337 @@ modulo_lm393('flame-sensor', receptor_ir, ['VCC', 'GND', 'DOUT', 'AOUT'],
               (['analog'], 'Saida analogica: mais chama, menos tensao')], ('+', '-'), 9.4)
 
 # =====================================================================
+#  ir-obstacle-sensor: o modulo de obstaculo infravermelho (FC-51, a placa MH-B)
+# =====================================================================
+
+
+def mover_cmds(cmds, dx, dy):
+    """Os comandos de um caminho deslocados (a sombra)."""
+    saida = []
+    for c in cmds:
+        if c[0] in 'ML':
+            saida.append((c[0], c[1] + dx, c[2] + dy))
+        elif c[0] == 'A':
+            saida.append(('A', c[1], c[2], c[3], c[4] + dx, c[5] + dy))
+        else:
+            saida.append(c)
+    return saida
+
+
+def led5_deitado(d, x_base, cy, x_ponta, transparente):
+    """O LED de 5 mm deitado para fora da placa, visto de cima: o colar junto da
+    placa (que termina em x_base), o corpo de 5 mm e a ponta redonda em x_ponta.
+    O receptor e de epoxi preto; o emissor infravermelho, de epoxi transparente,
+    com a moldura das pernas (o catodo largo, o anodo fino e o fio) por dentro."""
+    r = 2.5
+    x_colar = x_base - 1.0
+    x_cupula = x_ponta + r
+    corpo = [('M', x_colar, cy - r), ('L', x_cupula, cy - r), ('A', r, 0, 0, x_cupula, cy + r),
+             ('L', x_colar, cy + r), ('Z',)]
+    d.caminho(mover_cmds(corpo, 0.25, 0.3), '#000000', op=0.3)
+    d.ret(x_colar + 0.25, cy - 2.9 + 0.3, 1.0, 5.8, '#000000', rx=0.25, op=0.3)
+    if not transparente:
+        d.caminho(corpo, '#18191c', stroke='#050506', sw=0.1)
+        d.ret(x_ponta + 0.7, cy - 1.95, x_colar - x_ponta - 1.2, 0.6, '#ffffff', rx=0.3, op=0.16)
+        d.circ(x_ponta + 1.1, cy - 1.15, 0.45, '#ffffff', op=0.22)
+        d.ret(x_colar, cy - 2.9, 1.0, 5.8, '#121315', rx=0.25, stroke='#050506', sw=0.08)
+        d.ret(x_colar + 0.15, cy - 2.75, 0.25, 5.5, '#ffffff', rx=0.1, op=0.08)
+        return
+    d.caminho(corpo, '#dfe6ea', stroke='#a9b4bb', sw=0.1, op=0.95)
+    # a moldura de dentro: as duas pernas, a bandeira larga do catodo com o copo e a do anodo
+    for s_ in (-1, 1):
+        d.ret(x_colar - 3.6, cy + s_ * 1.27 - 0.25, 3.6, 0.5, '#aab3ba', op=0.9)
+    d.poli([(x_colar - 3.4, cy + 0.35), (x_colar - 5.2, cy + 0.35), (x_colar - 5.2, cy + 1.75),
+            (x_colar - 3.4, cy + 1.75)], '#9aa4ac', stroke='#7c868e', sw=0.06, op=0.9)
+    d.ret_c(x_colar - 4.8, cy + 0.75, 0.9, 0.9, '#c7ced4', rx=0.15, op=0.9)            # o copo do chip
+    d.ret_c(x_colar - 4.8, cy + 0.75, 0.3, 0.3, '#3a3f45')
+    d.poli([(x_colar - 3.4, cy - 0.55), (x_colar - 4.4, cy - 0.55), (x_colar - 4.4, cy - 1.6),
+            (x_colar - 3.4, cy - 1.6)], '#9aa4ac', stroke='#7c868e', sw=0.06, op=0.9)
+    d.linha(x_colar - 4.3, cy - 0.65, x_colar - 4.75, cy + 0.6, '#5d666e', 0.05, curva=-0.25)   # o fio
+    d.ret(x_ponta + 0.7, cy - 2.0, x_colar - x_ponta - 1.1, 0.75, '#ffffff', rx=0.35, op=0.55)
+    d.circ(x_ponta + 1.05, cy - 1.1, 0.5, '#ffffff', op=0.6)
+    d.caminho(corpo, 'url(#luz)', op=0.6)
+    d.ret(x_colar, cy - 2.9, 1.0, 5.8, '#e8edf0', rx=0.25, stroke='#a9b4bb', sw=0.08, op=0.95)
+    d.ret(x_colar + 0.15, cy - 2.75, 0.25, 5.5, '#ffffff', rx=0.1, op=0.5)
+
+
+def lm393_de_pe(d, cx, cy, linhas, x_linhas):
+    """O LM393 em SOP-8 de pe, as pernas a esquerda e a direita, a marcacao lida
+    de baixo para cima (o pino 1 fica embaixo a direita, ao lado do ponto da
+    serigrafia)."""
+    for k in range(4):
+        y = cy + (k - 1.5) * 1.27
+        for s_ in (-1, 1):
+            d.ret_c(cx + s_ * 3.2, y, 1.4, 0.64, ESTANHO, rx=0.06)
+            d.ret(cx + s_ * 2.0 - (0 if s_ > 0 else 1.05), y - 0.21, 1.05, 0.42, 'url(#metal)', rx=0.05)
+    E.sombra(d, cx - 2.0, cy - 2.5, 4.0, 5.0, rx=0.15)
+    d.ret_c(cx, cy, 4.0, 5.0, PRETO_CI, rx=0.15)
+    d.ret_c(cx, cy, 4.0, 5.0, 'url(#luz)', rx=0.15)
+    d.linha(cx - 1.75, cy + 1.6, cx + 1.75, cy + 1.6, '#34363b', 0.1)
+    d.circ(cx + 1.3, cy + 1.95, 0.3, '#2f3136')
+    for (t, tam), x in zip(linhas, x_linhas):
+        texto_girado(d, cx + x, cy, t, tam, MARCA_CI, -90, peso='normal')
+
+
+def silk_colchetes(d, x0, y0, x1, y1, abertura, r=0.35, larg=0.16):
+    """O contorno do capacitor na serigrafia: dois colchetes, abertos no meio de cima e de baixo."""
+    xm = (x0 + x1) / 2
+    for lado in (-1, 1):
+        xa = x0 if lado < 0 else x1
+        xi = xm + lado * abertura / 2
+        d.caminho([('M', xi, y0), ('L', xa - lado * r, y0), ('A', r, 0, 0 if lado < 0 else 1, xa, y0 + r),
+                   ('L', xa, y1 - r), ('A', r, 0, 0 if lado < 0 else 1, xa - lado * r, y1), ('L', xi, y1)],
+                  None, stroke=SERIGRAFIA, sw=larg, cap='round')
+
+
+def silk_moldura_aberta(d, x0, y0, x1, y1, x_abre, w_abre, embaixo, r=0.5, larg=0.16):
+    """O contorno do LED, arredondado, com uma abertura no meio de um lado."""
+    xa, xb = x_abre - w_abre / 2, x_abre + w_abre / 2
+    if embaixo:
+        cmds = [('M', xb, y1), ('L', x1 - r, y1), ('A', r, 0, 0, x1, y1 - r), ('L', x1, y0 + r), ('A', r, 0, 0, x1 - r, y0),
+                ('L', x0 + r, y0), ('A', r, 0, 0, x0, y0 + r), ('L', x0, y1 - r), ('A', r, 0, 0, x0 + r, y1), ('L', xa, y1)]
+    else:
+        cmds = [('M', xb, y0), ('L', x1 - r, y0), ('A', r, 0, 1, x1, y0 + r), ('L', x1, y1 - r), ('A', r, 0, 1, x1 - r, y1),
+                ('L', x0 + r, y1), ('A', r, 0, 1, x0, y1 - r), ('L', x0, y0 + r), ('A', r, 0, 1, x0 + r, y0), ('L', xa, y0)]
+    d.caminho(cmds, None, stroke=SERIGRAFIA, sw=larg, cap='round')
+
+
+def obstaculo_ir():
+    """O modulo de obstaculo infravermelho (o FC-51, na placa MH-B), medido na
+    foto de cima publicada pela SunFounder, retificada em 40 px/mm pelo passo
+    das pernas do LM393: a placa de 31,5 x 13,3 mm, o receptor preto e o emissor
+    transparente de 5 mm deitados para fora da ponta, os passivos 0805 da
+    coluna, o trimpot 3362, o LM393 em SOP-8, os LEDs verdes de energia e de
+    saida, o furo de 3 mm e a barra de tres pinos a 90 graus (VCC, GND, OUT).
+    A camera nao estava a pino: o que e alto (o trimpot, os LEDs de 5 mm, a
+    barra) saiu deslocado na foto, e vai para o lugar da base. O cobre vem da
+    foto (vetorizado: o plano, as trilhas e o isolamento em volta das ilhas)."""
+    nome = 'ir-obstacle-sensor'
+    BW, BH = 31.5, 13.3
+    X0 = 9.6
+    L, H = caixa(X0 + BW + 6.2, 13.7)
+    Y0 = (H - BH) / 2
+
+    def P(x, y):                                                    # da foto retificada (mm) para a peca
+        return X0 + x - 0.55, Y0 + y
+
+    mascara, borda, cor_cobre = '#163d84', '#0b2552', '#2a5fbf'
+    d = Desenho(T(A, 0, 0, A, 0, 0))
+    E.sombra(d, X0, Y0, BW, BH, rx=0.4, op=0.35)
+    d.ret(X0, Y0, BW, BH, mascara, rx=0.4, stroke=borda, sw=0.15)
+    cobre_da_foto(d, 'mh-b', X0, Y0, cor_cobre)
+    via(d, *P(8.18, 5.25), cor_cobre, '#0c1a3a', r=0.3)
+    d.ret(X0, Y0, BW, BH, 'url(#luz)', rx=0.4)
+
+    # a serigrafia
+    for (x0, y0, x1, y1, ym) in ((0.85, 0.52, 3.75, 5.85, 3.08), (0.7, 7.05, 3.75, 12.55, 9.83)):
+        E.silk_ret(d, *P(x0, y0), x1 - x0, y1 - y0, larg=0.16, rx=0.05)
+        E.silk_linha(d, *P(x0, ym), *P(x1, ym), larg=0.16)
+    for y0, y1 in ((0.47, 2.19), (3.1, 4.85)):
+        silk_colchetes(d, *P(7.23, y0), *P(10.52, y1), abertura=0.32)
+    for y0, y1 in ((5.7, 7.3), (8.33, 9.9), (11.04, 12.7)):
+        E.silk_ret(d, *P(7.3, y0), 3.16, y1 - y0, larg=0.16, rx=0.12)
+    for y0, y1 in ((1.85, 4.83), (8.1, 11.2)):
+        E.silk_ret(d, *P(20.12, y0), 1.78, y1 - y0, larg=0.16, rx=0.12)
+    silk_moldura_aberta(d, *P(22.08, 1.56), *P(27.4, 3.9), P(25.0, 0)[0], 0.45, embaixo=True)
+    silk_moldura_aberta(d, *P(22.4, 9.2), *P(27.6, 11.6), P(25.3, 0)[0], 0.45, embaixo=False)
+    for x, y in ((27.6, 1.48), (28.3, 11.65)):
+        E.silk_linha(d, *P(x - 0.5, y), *P(x + 0.5, y), larg=0.16)
+        E.silk_linha(d, *P(x, y - 0.6), *P(x, y + 0.6), larg=0.16)
+    d.poli([P(32.05, 2.73), P(28.95, 2.73), P(28.95, 10.8), P(32.05, 10.8)], None, stroke=SERIGRAFIA, sw=0.16, fechado=False)
+    for t, y in (('VCC', 3.7), ('GND', 6.6), ('OUT', 10.1)):
+        texto_girado(d, *P(28.1, y), t, 0.95, SERIGRAFIA, -90)
+    d.texto(*P(29.95, 0.83), 'MH-B', 0.85, SERIGRAFIA, alinhar='center', peso='bold')
+    d.ret(*P(14.5, 12.62), 2.6, 0.4, None, rx=0.12, stroke=SERIGRAFIA, sw=0.14)       # a marca do lado do chip
+    d.circ(*P(18.56, 13.0), 0.2, SERIGRAFIA)                                           # o ponto do pino 1
+
+    # o furo de 3 mm (sem cobre em volta) e as ilhas das pernas dos LEDs de 5 mm
+    d.circ(*P(25.05, 6.75), 1.5, '#0c0d0f')
+    d.circ(*P(25.05, 6.75), 1.5, None, '#0a1f45', 0.15)
+    for y in (2.08, 4.62, 8.53, 11.07):
+        furo_metalizado(d, *P(2.35, y), 0.85, 0.42)
+
+    # as pecas
+    for y, tipo in ((1.3, 'C'), (3.96, 'C')):
+        E.passivo(d, *P(9.1, y), '0805', tipo)
+    for y, cod, giro in ((6.37, '103', 0), (9.03, '103', 180), (11.88, '101', 180)):
+        E.passivo(d, *P(9.05, y), '0805', 'R')
+        texto_girado(d, *P(9.05, y), cod, 0.55, '#e8e8e8', giro, peso='normal')
+    for y in (3.17, 9.56):
+        E.passivo(d, *P(21.06, y), '0805', 'R', vertical=True)
+        texto_girado(d, *P(21.06, y), '102', 0.55, '#e8e8e8', -90, peso='normal')
+    for x, y in ((25.08, 2.68), (25.29, 10.3)):
+        for s_ in (-1, 1):
+            d.ret_c(P(x, y)[0] + s_ * 1.42, P(x, y)[1], 1.05, 1.3, ESTANHO, rx=0.08)
+        E.led_smd(d, *P(x, y), '#7fd99a', '0805')
+    lm393_de_pe(d, *P(15.9, 10.17), [('LM393', 0.7), ('8AK', 0.7), ('908H', 0.7)], (-1.0, 0.0, 0.96))
+    trimpot_3362(d, *P(15.75, 3.68), w=7.2, h=6.65)
+    for t, x in (('3', 12.75), ('1', 18.8)):
+        texto_girado(d, *P(x, 0.85), t, 0.62, '#173d82', 180)
+
+    # a barra de pinos (VCC, GND, OUT) e os dois LEDs de 5 mm
+    ys = [Y0 + 6.75 + (k - 1) * PASSO for k in range(3)]
+    x_borda = X0 + BW
+    barra_90(d, x_borda, ys, L - 0.15 - x_borda)
+    for y_eixo, ponta, base, transparente in ((3.35, -8.6, 0.5, False), (9.8, -9.0, 0.3, True)):
+        pernas(d, P(2.35, 0)[0], (Y0 + y_eixo - 1.27, Y0 + y_eixo + 1.27), P(base, 0)[0])
+        led5_deitado(d, P(base, 0)[0], Y0 + y_eixo, P(ponta, 0)[0], transparente)
+
+    gravar(nome, d, L, H)
+    guardar(nome, L, H, [
+        ('VCC', L - 0.9, ys[0], ['power'], 'Alimentacao: 3,3 a 5 V'),
+        ('GND', L - 0.9, ys[1], ['power'], 'GND'),
+        ('OUT', L - 0.9, ys[2], [], 'Saida digital: LOW com obstaculo na frente (o LED de saida acende); '
+                                    'o trimpot ajusta o alcance, de 2 a 30 cm'),
+    ])
+    luz(nome, *P(25.08, 2.68), 0.55, 'verde', 'vcc-gnd')
+    luz(nome, *P(25.29, 10.3), 0.55, 'verde', 'sensor-do')
+
+
+obstaculo_ir()
+
+# =====================================================================
+#  tcrt5000: o modulo seguidor de linha (o sensor reflexivo TCRT5000)
+# =====================================================================
+
+
+def anel_furo(d, cx, cy, r_anel, r_furo, x_corte=None):
+    """O furo de fixacao com o anel estanhado; x_corte: a borda da placa que corta o anel."""
+    if x_corte is None or cx - r_anel >= x_corte:
+        d.circ(cx, cy, r_anel, ESTANHO)
+    else:
+        dy = math.sqrt(max(0.0, r_anel ** 2 - (cx - x_corte) ** 2))
+        d.caminho([('M', x_corte, cy - dy), ('A', r_anel, 1, 1, x_corte, cy + dy), ('Z',)], ESTANHO)
+    d.circ(cx, cy, r_anel, 'url(#luz)', op=0.6)
+    d.circ(cx, cy, r_furo + 0.12, None, '#7c838b', 0.1)
+    d.circ(cx, cy, r_furo, '#0c0d0f')
+
+
+def tcrt5000_sensor(d, x0, y0, x1, y1, emissor, receptor):
+    """O TCRT5000 visto de cima: a caixa preta, a janela do emissor (o LED azul)
+    e a do receptor (o fototransistor preto), com a parede no meio."""
+    E.sombra(d, x0, y0, x1 - x0, y1 - y0, rx=0.3, op=0.4)
+    d.ret(x0, y0, x1 - x0, y1 - y0, '#1c1d20', rx=0.3, stroke='#060607', sw=0.12)
+    d.ret(x0 + 0.35, y0 + 0.35, x1 - x0 - 0.7, y1 - y0 - 0.7, None, rx=0.25, stroke='#2d2f33', sw=0.12)
+    d.linha(x1 - 0.7, y0 + 0.75, x1 - 0.7, y1 - 0.75, '#33363b', 0.25)              # o degrau do lado
+    (ex, ey, er), (rx_, ry, rr) = emissor, receptor
+    c = 0.7
+    janela = [(ex - 1.75 + c, ey - 1.65), (ex + 1.75 - c, ey - 1.65), (ex + 1.75, ey - 1.65 + c), (ex + 1.75, ey + 1.65 - c),
+              (ex + 1.75 - c, ey + 1.65), (ex - 1.75 + c, ey + 1.65), (ex - 1.75, ey + 1.65 - c), (ex - 1.75, ey - 1.65 + c)]
+    d.poli(janela, '#0f1012', stroke='#2a2c30', sw=0.1)
+    d.circ(rx_, ry, rr + 0.32, '#0f1012', stroke='#2a2c30', sw=0.1)
+    d.linha(x0 + 0.5, (ey + ry) / 2, x1 - 0.9, (ey + ry) / 2, '#2a2c30', 0.18)       # a parede entre os dois
+    d.circ(ex + 0.1, ey + 0.12, er, '#000000', op=0.35)
+    d.circ(ex, ey, er, '#1b86df', stroke='#0f4f8a', sw=0.08)
+    d.circ(ex, ey, er * 0.7, '#3aa2ef', op=0.6)
+    d.circ(ex, ey, er, 'url(#cupula)', op=0.85)
+    d.circ(ex - er * 0.35, ey - er * 0.35, er * 0.22, '#ffffff', op=0.75)
+    d.circ(rx_ + 0.1, ry + 0.12, rr, '#000000', op=0.35)
+    d.circ(rx_, ry, rr, '#0c0d0f', stroke='#26282c', sw=0.08)
+    d.circ(rx_, ry, rr, 'url(#cupula)', op=0.7)
+    d.circ(rx_ - rr * 0.35, ry - rr * 0.35, rr * 0.2, '#ffffff', op=0.55)
+
+
+def trimpot_rotor_branco(d, cx, cy, w, h, rotor, r, marca):
+    """O trimpot de 6 mm de cima (o azul de rotor branco): a moldura azul
+    quadrada, o disco branco com a fenda e o contato que aparece por ela."""
+    E.sombra(d, cx - w / 2, cy - h / 2, w, h, rx=0.25, op=0.35)
+    d.ret_c(cx, cy, w, h, '#2f7fd6', rx=0.25, stroke='#1a5aa6', sw=0.1)
+    d.ret_c(cx, cy, w, h, 'url(#luz)', rx=0.25)
+    rx_, ry = rotor
+    d.circ(rx_ + 0.12, ry + 0.15, r, '#000000', op=0.3)
+    d.circ(rx_, ry, r, '#eceef0', stroke='#b6bcc2', sw=0.08)
+    d.circ(rx_, ry, r, 'url(#cupula)', op=0.35)
+    d.ret_c(rx_ + 0.22, ry - 0.05, 1.2, 4.1, '#2a2c30', rx=0.4)                       # a fenda
+    for y in (ry - 1.35, ry + 1.15):
+        d.ret_c(rx_ + 0.22, y, 0.8, 0.5, '#c4c9cf', rx=0.1)
+    texto_girado(d, rx_ - 1.8, ry - 0.05, marca, 0.9, '#a3a8ae', -90, peso='normal')
+    d.ret_c(rx_ + 2.37, ry + 0.18, 1.0, 2.7, '#aab0b7', rx=0.12, stroke='#3d4a5c', sw=0.1)  # o contato do lado
+
+
+def seguidor_tcrt5000():
+    """O modulo seguidor de linha do TCRT5000 (a placa preta de 38,9 x 9,1 mm,
+    tres pinos: S, V+ e G), medido na foto de cima publicada pela SunFounder
+    (retificada em 40 px/mm pelo passo do LM393 e da barra): os dois furos de
+    3,8 mm com o anel estanhado, o TCRT5000 atravessado na placa (o LED azul e
+    o fototransistor), o trimpot de rotor branco, o LM393, o LED de sinal e
+    os resistores com a marcacao da foto. Na placa preta o cobre quase nao
+    aparece na foto, e por isso nao ha trilha desenhada: so o que se ve."""
+    nome = 'tcrt5000'
+    BW, BH = 38.85, 9.07
+    X0 = 0.2
+    L, H = caixa(X0 + BW + 6.2, 10.6)
+    Y0 = 0.3
+
+    def P(x, y):
+        return X0 + x, Y0 + y
+
+    mascara, borda, _ = E.MASCARAS['preta']
+    d = Desenho(T(A, 0, 0, A, 0, 0))
+    E.sombra(d, X0, Y0, BW, BH, rx=0.4, op=0.35)
+    d.ret(X0, Y0, BW, BH, mascara, rx=0.4, stroke=borda, sw=0.15)
+    d.ret(X0, Y0, BW, BH, 'url(#luz)', rx=0.4)
+    anel_furo(d, *P(2.55, 4.5), 2.85, 1.88, x_corte=X0)
+    anel_furo(d, *P(13.6, 4.44), 2.85, 1.9)
+
+    # a serigrafia
+    for t, x, y, giro, tam in (('T', 5.02, 1.0, 90, 0.8), ('R', 4.1, 8.4, 180, 0.95), ('IR_01', 13.0, 0.83, 180, 1.15),
+                               ('R2', 15.95, 1.25, 90, 0.85), ('R3', 16.05, 8.15, -90, 0.85), ('R1', 25.05, 3.4, -90, 0.85),
+                               ('IC1', 25.95, 8.1, -90, 0.85), ('S', 35.05, 1.3, -90, 1.0), ('V+', 35.05, 4.72, -90, 1.0),
+                               ('G', 35.05, 8.3, -90, 1.0)):
+        texto_girado(d, *P(x, y), t, tam, SERIGRAFIA, giro)
+    for x0, y0, x1, y1 in ((16.95, 0.25, 20.15, 1.75), (16.9, 7.1, 20.27, 8.93), (25.75, 0.42, 28.92, 2.5)):
+        E.silk_ret(d, *P(x0, y0), x1 - x0, y1 - y0, larg=0.16, rx=0.08)
+    E.silk_linha(d, *P(16.95, 1.65), *P(16.95, 7.05), larg=0.16)
+    E.silk_linha(d, *P(20.3, 8.6), *P(22.9, 8.6), larg=0.16)
+    d.poli([P(31.3, 2.76), P(29.33, 2.76), P(29.33, 0.4), P(34.05, 0.4), P(34.05, 2.76), P(32.1, 2.76)],
+           None, stroke=SERIGRAFIA, sw=0.16, fechado=False)
+    E.silk_linha(d, *P(28.4, 3.75), *P(30.1, 3.75), larg=0.16)
+    E.silk_linha(d, *P(30.6, 3.75), *P(32.1, 3.75), larg=0.16)
+    d.poli([P(36.45, 0.75), P(36.45, 8.3), P(38.8, 8.3)], None, stroke=SERIGRAFIA, sw=0.16, fechado=False)
+
+    # as pecas
+    for x, y, cod, giro in ((18.5, 0.93, '391', 0), (18.54, 8.0, '103', 0), (27.6, 1.5, '202', 180)):
+        E.passivo(d, *P(x, y), '0805', 'R')
+        texto_girado(d, *P(x, y), cod, 0.55, '#e8e8e8', giro, peso='normal')
+    lx, ly = P(31.75, 1.6)
+    for s_ in (-1, 1):
+        d.ret_c(lx + s_ * 1.6, ly, 1.15, 1.55, ESTANHO, rx=0.08)
+    E.sombra(d, lx - 1.1, ly - 0.72, 2.2, 1.45)
+    d.ret_c(lx, ly, 2.2, 1.45, '#f2efe6', rx=0.1)
+    d.ret_c(lx, ly, 0.6, 0.6, '#e8d9c6', rx=0.08)
+    d.ret_c(lx, ly, 0.25, 0.25, '#b79e76')
+    d.ret_c(lx + 0.75, ly, 0.2, 1.3, '#2fa37a', op=0.85)
+    d.ret_c(lx, ly, 2.2, 1.45, 'url(#luz)', rx=0.1)
+    cx, cy = P(30.3, 6.13)
+    for k in range(4):
+        y = cy + (k - 1.5) * 1.27
+        for s_ in (-1, 1):
+            d.ret_c(cx + s_ * 2.95, y, 1.3, 0.6, ESTANHO, rx=0.06)
+            d.ret(cx + s_ * 1.95 - (0 if s_ > 0 else 1.0), y - 0.2, 1.0, 0.4, 'url(#metal)', rx=0.05)
+    E.sombra(d, cx - 1.95, cy - 2.5, 3.9, 5.0, rx=0.15)
+    d.ret_c(cx, cy, 3.9, 5.0, PRETO_CI, rx=0.15)
+    d.ret_c(cx, cy, 3.9, 5.0, 'url(#luz)', rx=0.15)
+    d.circ(cx - 1.3, cy - 1.95, 0.3, '#2f3136')
+    trimpot_rotor_branco(d, *P(21.07, 4.21), 6.82, 6.58, P(20.73, 4.27), 2.8, '103')
+    tcrt5000_sensor(d, *P(5.42, -0.25), *P(10.65, 9.95), (*P(7.85, 2.8), 1.48), (*P(8.0, 6.9), 1.45))
+
+    ys = [Y0 + 4.3 + (k - 1) * PASSO for k in range(3)]
+    x_borda = X0 + BW
+    barra_90(d, x_borda, ys, L - 0.15 - x_borda)
+    gravar(nome, d, L, H)
+    guardar(nome, L, H, [
+        ('S', L - 0.9, ys[0], [], 'Saida digital: LOW sobre superficie clara (a luz infravermelha volta e o LED acende); '
+                                 'HIGH sobre a linha preta ou sem nada perto (alcance de 1 a 8 mm)'),
+        ('V+', L - 0.9, ys[1], ['power'], 'Alimentacao: 3,3 a 5 V'),
+        ('GND', L - 0.9, ys[2], ['power'], 'GND (o "G" da placa)'),
+    ])
+    luz(nome, lx, ly, 0.55, 'vermelho', 'sensor-do')
+
+
+seguidor_tcrt5000()
+
+# =====================================================================
 #  gas-sensor: o modulo do MQ-2
 # =====================================================================
 L, H = caixa(32.2 + 6.2, 22.4)

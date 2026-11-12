@@ -43,6 +43,8 @@ public static class FormatoWokwi
         "pir-motion-sensor", "potentiometer", "pushbutton", "pushbutton-6mm", "resistor", "rgb-led",
         "rotary-dialer", "servo", "slide-potentiometer", "slide-switch", "small-sound-sensor", "ssd1306",
         "stepper-motor", "tilt-switch", "wifi-ap",
+        // O registrador de deslocamento: os pinos com os nomes deles (DS, SHCP, STCP, MR, OE, Q0..Q7, Q7S).
+        "74hc595",
     ];
 
     /// <summary>As pecas com nome diferente la (as placas novas sao "board-", nao "wokwi-").</summary>

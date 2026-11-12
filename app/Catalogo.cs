@@ -540,6 +540,7 @@ public static class Catalogo
         "74hc20" => "74HC20 (2 portas NAND de 4 entradas)",
         "74hc21" => "74HC21 (2 portas AND de 4 entradas)",
         "74hc125" => "74HC125 (4 buffers tri-state)",
+        "74hc595" => "74HC595 (registrador de deslocamento de 8 bits)",
         "buffer-gate" => "Porta BUFFER",
         "buffer-tristate" => "Buffer tri-state",
         "and-gate-3" => "Porta AND de 3 entradas",
@@ -600,6 +601,9 @@ public static class Catalogo
         "nrf24l01" => "Modulo de radio NRF24L01",
         "nrf24l01-pa-lna" => "Modulo de radio NRF24L01+PA+LNA (antena externa)",
         "flame-sensor" => "Sensor de chama",
+        "ir-obstacle-sensor" => "Sensor de obstaculo infravermelho (FC-51)",
+        "tcrt5000" => "Sensor reflexivo TCRT5000 (seguidor de linha)",
+        "hc-05" => "Modulo Bluetooth HC-05",
         "gas-sensor" => "Sensor de gas",
         "heart-beat-sensor" => "Sensor de batimento",
         "big-sound-sensor" => "Sensor de som (grande)",
@@ -693,7 +697,7 @@ public static class Catalogo
         "hc-sr04" or "dht22" or "photoresistor-sensor" or "ntc-temperature-sensor"
             or "pir-motion-sensor" or "flame-sensor" or "gas-sensor"
             or "heart-beat-sensor" or "big-sound-sensor" or "small-sound-sensor"
-            or "mpu6050" or "hx711" or "dht11" => "Sensores",
+            or "mpu6050" or "hx711" or "dht11" or "ir-obstacle-sensor" or "tcrt5000" => "Sensores",
 
         "buzzer" or "ks2e-m-dc5" or "alto-falante" or "modulo-rele-1" or "modulo-rele-2" or "modulo-rele-4" => "Atuadores",
 
@@ -722,7 +726,7 @@ public static class Catalogo
             or "flip-flop-sr" or "flip-flop-dsr" or "clock-generator"
             or "logic-analyzer" => "Logica",
         _ when Logica.EhChip(id) || Logica.EhPecaDeLogica(id) => "Logica",
-        "modulo-i2c" or "nrf24l01" or "nrf24l01-pa-lna" or "max98357a" or "pcm5102a" => "Modulos",
+        "modulo-i2c" or "nrf24l01" or "nrf24l01-pa-lna" or "max98357a" or "pcm5102a" or "hc-05" => "Modulos",
         "wifi-ap" => "Rede",
         "texto" => "Anotacao",
         IdProtoboard or IdProtoboard830 or IdProtoboard170 => "Base",

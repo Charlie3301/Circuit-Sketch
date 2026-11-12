@@ -51,6 +51,12 @@ public partial class EditorCircuito
         ["big-sound-sensor"] = [(65.01, 53.57, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (65.01, 6.70, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
         ["small-sound-sensor"] = [(65.01, 53.57, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vcc-gnd"), (65.01, 6.70, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
         ["mpu6050"] = [(63.59, 36.11, 0.55 * Mm, Color.FromRgb(0x3A, 0xFF, 0x6A), "vcc-gnd")],
+        // O modulo de obstaculo (FC-51) e o seguidor de linha (TCRT5000): os LEDs verdes de energia e
+        // de saida do primeiro, o de sinal do segundo (aceso com o reflexo).
+        ["ir-obstacle-sensor"] = [(129.00, 11.00, 0.55 * Mm, Color.FromRgb(0x3A, 0xFF, 0x6A), "vcc-gnd"), (129.79, 39.80, 0.55 * Mm, Color.FromRgb(0x3A, 0xFF, 0x6A), "sensor-do")],
+        ["tcrt5000"] = [(120.76, 7.18, 0.55 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "sensor-do")],
+        // O HC-05 (pecas-hc05.py): rapido procurando, duas piscadas conectado, devagar no modo AT.
+        ["hc-05"] = [(3.73, 111.83, 0.5 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "hc05")],
         // O LED do modulo do AMS1117 (pecas-reguladores.py): fica na saida, acende com o VOUT.
         ["ams1117"] = [(28.7, 35.1, 0.5 * Mm, Color.FromRgb(0xFF, 0x3B, 0x30), "vout-gnd")],
         // O roteador (pecas-wifi-ap.py): energia, WiFi, clientes e internet.
@@ -144,10 +150,10 @@ public partial class EditorCircuito
         "ir" => teclaDoControle.Count > 0 && EnergiaDoQuadro is { } conta
                 && conta.TensaoDoPino(peca.Id, "VCC") - conta.TensaoDoPino(peca.Id, "GND") >= 2.5,
         // O LED de energia de um modulo: aceso com 2,5 V ou mais entre os pinos.
-        "vcc-gnd" => EnergiaDoQuadro is { } c1 && c1.TensaoDoPino(peca.Id, "VCC") - c1.TensaoDoPino(peca.Id, "GND") >= 2.5,
+        "vcc-gnd" => TensaoDoModulo(peca) >= 2.5,
         // O LED do DO: o comparador disparou (o controle passou do limiar), com o modulo alimentado.
-        "sensor-do" => EnergiaDoQuadro is { } c4 && c4.TensaoDoPino(peca.Id, "VCC") - c4.TensaoDoPino(peca.Id, "GND") >= 2.5
-                       && Comportamento.De(peca.Tipo) is { } comp && peca.Giro > comp.Limiar,
+        "sensor-do" => TensaoDoModulo(peca) >= 2.5 && Comportamento.De(peca.Tipo) is { } comp && peca.Giro > comp.Limiar,
+        "hc05" => Hc05.LedAceso(peca.Id),
         "vin-gnd" => EnergiaDoQuadro is { } c2 && c2.TensaoDoPino(peca.Id, "VIN") - c2.TensaoDoPino(peca.Id, "GND") >= 2.5,
         "vout-gnd" => EnergiaDoQuadro is { } c3 && c3.TensaoDoPino(peca.Id, "VOUT") - c3.TensaoDoPino(peca.Id, "GND.2") >= 1.8,
         // O roteador: ligado com a simulacao rodando; o WiFi com a rede nomeada;
@@ -158,6 +164,16 @@ public partial class EditorCircuito
         "ap-internet" => EmSimulacao && RedeDoRoteador?.UsarInternet == true,
         _ => false,
     };
+
+    /// <summary>A tensao entre a alimentacao e o terra do modulo (o VCC e o GND, ou o V+ do TCRT5000).</summary>
+    double TensaoDoModulo(PecaNoCircuito peca)
+    {
+        if (EnergiaDoQuadro is not { } conta || Catalogo.Obter(peca.Tipo) is not { } def) return 0;
+        // O VCC e o GND quando a peca tem (o modulo I2C tem tambem o VDD e o VSS do LCD); senao o V+.
+        var vcc = def.Pinos.FirstOrDefault(p => p.Nome == "VCC") ?? def.Pinos.FirstOrDefault(p => Netlist.EhPinoDeAlimentacao(p.Nome));
+        var gnd = def.Pinos.FirstOrDefault(p => p.Nome == "GND") ?? def.Pinos.FirstOrDefault(p => Netlist.EhPinoDeTerra(p.Nome));
+        return vcc is null || gnd is null ? 0 : conta.TensaoDoPino(peca.Id, vcc.Nome) - conta.TensaoDoPino(peca.Id, gnd.Nome);
+    }
 
     /// <summary>A rede da bancada, para as luzes do roteador (a janela entrega).</summary>
     public Simulador.Rede RedeDoRoteador { get; set; }

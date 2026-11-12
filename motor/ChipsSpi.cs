@@ -14,6 +14,13 @@ public interface IChipSpi
 
     /// <summary>O pino de reset foi a LOW.</summary>
     void Resetar();
+
+    /// <summary>
+    /// O driver do chip (o spi_master do ESP-IDF) soltou o CS no fim da
+    /// transacao. Os bytes vieram prontos, sem passar pelos pinos -- e o
+    /// 74HC595, que trava as saidas na subida desse pino, trava aqui.
+    /// </summary>
+    void FimDaTransacao() { }
 }
 
 /// <summary>
@@ -34,6 +41,7 @@ public sealed class EscutaSpi
 
     readonly Maquina maq;
     readonly List<Ligado> ligados = [];
+    readonly List<Chip595> registradores = [];
     readonly bool[] interessa;
     readonly byte[] um = new byte[1];
 
@@ -43,6 +51,16 @@ public sealed class EscutaSpi
         interessa = new bool[maq.Digital.Length];
         foreach (var a in aparelhos)
         {
+            // O 74HC595 nao tem CS: o SHCP desloca sempre, o STCP trava, o MR zera.
+            if (a.Tipo == "74hc595")
+            {
+                if (a.Sck < 0 || a.Sck >= interessa.Length) continue;
+                registradores.Add(new Chip595(maq, a));
+                foreach (int p in new[] { a.Sck, a.Cs, a.Rst })
+                    if (p >= 0 && p < interessa.Length) interessa[p] = true;
+                continue;
+            }
+
             IChipSpi chip = a.Tipo switch
             {
                 "ili9341" => new ChipTft(maq, ChipTft.Ili9341),
@@ -58,9 +76,18 @@ public sealed class EscutaSpi
             foreach (int p in new[] { a.Cs, a.Rst, a.Mosi >= 0 ? a.Sck : -1 })
                 if (p >= 0 && p < interessa.Length) interessa[p] = true;
         }
+        Chip595.Encadear(registradores);
     }
 
-    public bool Vazia => ligados.Count == 0;
+    public bool Vazia => ligados.Count == 0 && registradores.Count == 0;
+
+    /// <summary>O 74HC595 de uma peca do circuito, se esta placa manda nele.</summary>
+    public Chip595 Registrador(string peca)
+    {
+        foreach (var r in registradores)
+            if (r.Aparelho.Peca == peca) return r;
+        return null;
+    }
 
     /// <summary>O pino e de algum chip? (a pergunta barata, feita a cada mudanca de pino)</summary>
     public bool Interessa(int pino) => interessa[pino];
@@ -70,6 +97,8 @@ public sealed class EscutaSpi
     {
         foreach (var l in ligados)
             if (ReferenceEquals(l.Aparelho, aparelho) || l.Aparelho == aparelho) return l.Chip;
+        foreach (var r in registradores)
+            if (ReferenceEquals(r.Aparelho, aparelho) || r.Aparelho == aparelho) return r;
         return null;
     }
 
@@ -77,6 +106,8 @@ public sealed class EscutaSpi
     public void Borda(int pino, int nivel)
     {
         lock (ligados)
+        {
+            if (registradores.Count > 0) Chip595.Borda(registradores, pino, nivel);
             foreach (var l in ligados)
             {
                 var a = l.Aparelho;
@@ -96,6 +127,7 @@ public sealed class EscutaSpi
                 bool dado = a.Dc < 0 || maq.Digital[a.Dc] != 0;
                 lock (l.Chip) l.Chip.Receber(um, dado);
             }
+        }
     }
 
     /// <summary>
@@ -116,7 +148,11 @@ public sealed class EscutaSpi
                 if (l.Bits != 0) return false;
                 alguem = true;
             }
-            if (!alguem) return false;
+            // O 74HC595 no mesmo SCK e MOSI: os bits andam nele como andariam nos pinos.
+            Chip595 registrador = null;
+            foreach (var r in registradores)
+                if (r.Aparelho.Sck == sck && r.Aparelho.Mosi == mosi) { registrador = r; break; }
+            if (!alguem && registrador is null) return false;
             foreach (var l in ligados)
             {
                 if (!Ouve(l, sck, mosi)) continue;
@@ -124,6 +160,7 @@ public sealed class EscutaSpi
                 bool dado = a.Dc < 0 || maq.Digital[a.Dc] != 0;
                 lock (l.Chip) l.Chip.Receber(dados, dado);
             }
+            registrador?.Receber(dados, true);
             return true;
         }
     }
@@ -144,6 +181,120 @@ public sealed class EscutaSpi
         lock (ligados)
             foreach (var l in ligados)
                 if (l.Aparelho.Sck == sck) l.Bits = l.Palavra = 0;
+    }
+}
+
+/// <summary>
+/// O 74HC595: oito flip-flops em fila (o registrador de deslocamento) e oito
+/// em paralelo (o latch, que e o que as saidas mostram). Na subida do SHCP o
+/// DS entra no primeiro e cada bit anda uma casa; o que sai da ultima vai ao
+/// Q7S -- e, por fio, ao DS do proximo chip da fila. Na subida do STCP os
+/// oito bits vao para o latch. O MR em LOW zera a fila (nao o latch). Com os
+/// dois relogios no mesmo fio, o latch pega a fila de antes do passo: fica um
+/// pulso atras, como a ficha avisa.
+///
+/// Ele escuta os pinos da placa: o shiftOut, o SPI bit a bit, o digitalWrite
+/// na mao. As saidas vao ao circuito pela conta da Logica, que le o latch.
+/// </summary>
+public sealed class Chip595 : IChipSpi
+{
+    readonly Maquina maq;
+    volatile int fila, latch;
+
+    /// <summary>Os registradores que andam no mesmo SHCP (este incluido).</summary>
+    List<Chip595> doMesmoRelogio = [];
+
+    /// <summary>O 74HC595 cujo Q7S chega no DS deste.</summary>
+    Chip595 anterior;
+
+    public Chip595(Maquina maq, AparelhoNoSpi aparelho)
+    {
+        this.maq = maq;
+        Aparelho = aparelho;
+        doMesmoRelogio.Add(this);
+    }
+
+    public AparelhoNoSpi Aparelho { get; }
+
+    /// <summary>A fila (o bit 0 e o primeiro flip-flop, o que recebe o DS).</summary>
+    public int Fila => fila;
+
+    /// <summary>O que as saidas Q0 a Q7 mostram (o bit k e o Qk).</summary>
+    public int Latch => latch;
+
+    /// <summary>O Q7S: o ultimo flip-flop da fila.</summary>
+    public int Q7S => (fila >> 7) & 1;
+
+    /// <summary>
+    /// O MR ligado direto num nivel LOW do circuito (nao num pino da placa):
+    /// a fila fica zerada. Quem sabe e a conta da Logica.
+    /// </summary>
+    public volatile bool MrPreso;
+
+    bool Zerado => MrPreso || Aparelho.Rst >= 0 && maq.Digital[Aparelho.Rst] == 0;
+
+    /// <summary>Liga cada chip ao anterior da fila e junta os que andam no mesmo relogio.</summary>
+    internal static void Encadear(List<Chip595> todos)
+    {
+        foreach (var r in todos)
+        {
+            if (r.Aparelho.SerDe is { } de)
+                r.anterior = todos.FirstOrDefault(o => o != r && o.Aparelho.Peca == de);
+            r.doMesmoRelogio = [.. todos.Where(o => o.Aparelho.Sck == r.Aparelho.Sck)];
+        }
+    }
+
+    /// <summary>
+    /// Um passo do relogio para todos os chips dele, ao mesmo tempo: cada um
+    /// pega a entrada de antes do passo (o Q7S do anterior ainda e o velho).
+    /// O bit do MOSI vale para quem tem o DS nele; os outros leem o pino.
+    /// </summary>
+    static void Andar(List<Chip595> grupo, int mosi, int bit)
+    {
+        Span<int> entra = stackalloc int[grupo.Count];
+        for (int i = 0; i < grupo.Count; i++)
+        {
+            var c = grupo[i];
+            int ds = c.Aparelho.Mosi;
+            entra[i] = c.anterior is { } a ? a.Q7S
+                     : ds < 0 ? 0
+                     : ds == mosi ? bit
+                     : c.maq.Digital[ds] & 1;
+        }
+        for (int i = 0; i < grupo.Count; i++)
+        {
+            var c = grupo[i];
+            c.fila = c.Zerado ? 0 : ((c.fila << 1) | entra[i]) & 0xFF;
+        }
+    }
+
+    /// <summary>Um pino da placa mudou: o SHCP desloca, o STCP trava, o MR zera.</summary>
+    internal static void Borda(List<Chip595> todos, int pino, int nivel)
+    {
+        foreach (var r in todos)
+        {
+            if (pino == r.Aparelho.Rst && nivel == 0) r.fila = 0;
+            if (pino == r.Aparelho.Cs && nivel == 1) r.latch = r.fila;    // antes do passo: os relogios juntos
+        }
+        if (nivel == 0) return;
+        foreach (var r in todos)
+            if (r.Aparelho.Sck == pino && r.doMesmoRelogio[0] == r) Andar(r.doMesmoRelogio, -1, 0);
+    }
+
+    /// <summary>Bytes inteiros no DS (o SPI em bloco): o bit mais alto primeiro, como os modos 0 e 3.</summary>
+    public void Receber(ReadOnlySpan<byte> dados, bool ehDado)
+    {
+        foreach (byte b in dados)
+            for (int i = 7; i >= 0; i--) Andar(doMesmoRelogio, Aparelho.Mosi, (b >> i) & 1);
+    }
+
+    public void Resetar() => fila = 0;
+
+    /// <summary>O CS do spi_master e o STCP: subiu no fim, as saidas mostram o que chegou.</summary>
+    public void FimDaTransacao()
+    {
+        foreach (var r in doMesmoRelogio)
+            if (r.Aparelho.Cs == Aparelho.Cs) r.latch = r.fila;
     }
 }
 

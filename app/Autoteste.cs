@@ -141,6 +141,9 @@ public static partial class Autoteste
         Bloco("Mostradores_NoEditor", Mostradores_NoEditor);
         Bloco("Entradas_Redesenhadas", Entradas_Redesenhadas);
         Bloco("Logica_Chips", Logica_Chips);
+        Bloco("Chips_595", Chips_595);
+        Bloco("Pecas_IrEBluetooth", Pecas_IrEBluetooth);
+        Bloco("Monitor_Baud", Monitor_Baud);
         Bloco("Sensores_Redesenhados", Sensores_Redesenhados);
         Bloco("Esp8266_Redesenhadas", Esp8266_Redesenhadas);
         Bloco("Pcb_Base", Pcb_Base);

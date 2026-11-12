@@ -63,6 +63,9 @@ public sealed partial class Energia
 
     Netlist rede;
     Circuito circuitoDaConta;
+
+    /// <summary>Quando a conta foi feita: a de antes do Rodar nao vale para quem liga agora (o HC-05).</summary>
+    public DateTime Calculada { get; } = DateTime.Now;
     IReadOnlyDictionary<string, double> forcas;
 
     /// <summary>A resistencia de agora das pecas que mudam de consumo (o servo parado ou girando, o ESC), em ohms.</summary>
@@ -992,6 +995,11 @@ public sealed partial class Energia
         "ssd1306" or "ssd1306-i2c" or "ssd1306-128x32" or "sh1106" or "ili9341" or "st7789" or "st7735" => 250,
         // O nRF24L01 com amplificador: ~115 mA transmitindo, ~45 mA na media.
         "nrf24l01-pa-lna" => 75,
+        // O FC-51 (o emissor infravermelho com 100 ohms: ~43 mA em 5 V), o seguidor
+        // de linha (~13 mA) e o HC-05 procurando (~35 mA; conectado gasta menos).
+        "ir-obstacle-sensor" => 115,
+        "tcrt5000" => 380,
+        "hc-05" => 150,
         // O TM1637 aceso (~35 mA) e a matriz do MAX7219 (~100 mA, a meia luz).
         "tm1637" => 150,
         "max7219-matriz" => 50,

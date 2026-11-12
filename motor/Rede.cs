@@ -1110,6 +1110,15 @@ public sealed partial class Rede
             Anotar(mestre.Dona, "bt", $"não encontrou \"{nome}\" (a outra placa chamou SerialBT.begin(\"{nome}\")?)");
             return false;
         }
+        return ConectarBluetooth(mestre, alvo);
+    }
+
+    /// <summary>O mestre conecta num aparelho certo (o HC-05 pelo endereco do BIND: o nome pode repetir).</summary>
+    public bool ConectarBluetooth(DispositivoBt mestre, DispositivoBt alvo)
+    {
+        string nome = alvo.Nome;
+        lock (trava)
+            if (!bluetooth.Contains(alvo) || alvo == mestre || alvo.Mestre) return false;
         mestre.Par = alvo;
         alvo.Par = mestre;
         mestre.Avisar(DispositivoBt.EventoAbriu, alvo.Nome);
@@ -1760,11 +1769,17 @@ public sealed class DispositivoBt
         Dona = dona;
         Nome = nome;
         Mestre = mestre;
+        uint h = 2166136261;
+        foreach (char c in nome ?? "") h = (h ^ c) * 16777619;
+        Endereco = $"24:0a:c4:{h >> 16 & 0xFF:x2}:{h >> 8 & 0xFF:x2}:{h & 0xFF:x2}";
     }
 
     public Maquina Dona { get; }
     public string Nome { get; }
     public bool Mestre { get; }
+
+    /// <summary>O endereco Bluetooth (o da ESP32 pelo nome; o HC-05 poe o dele).</summary>
+    public string Endereco { get; set; }
 
     /// <summary>O que chegou pelo Bluetooth e o sketch ainda não leu.</summary>
     public FluxoDeEntrada Entrada { get; } = new();

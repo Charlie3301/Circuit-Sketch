@@ -611,6 +611,11 @@
                         <!-- O que se digita aqui chega no Serial.read() do
                              sketch: ate a 1.4 nao havia como mandar nada. -->
                         <DockPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
+                            <!-- O baud do monitor, como o da IDE: diferente do Serial.begin,
+                                 o texto sai embaralhado nos dois sentidos. -->
+                            <Button DockPanel.Dock="Right" x:Name="btBaudSerial" Content="9600 baud" Width="92"
+                                    Margin="6,0,0,0" Style="{StaticResource BotaoPequeno}" Click="AbrirListaDeBaud"
+                                    ToolTip="O baud do monitor serial da placa do editor (o do Serial.begin do sketch)"/>
                             <Button DockPanel.Dock="Right" Content="Enviar" Width="64" Margin="6,0,0,0"
                                     Style="{StaticResource BotaoPequeno}" Click="EnviarPeloSerial"/>
                             <TextBox x:Name="txtEntradaSerial" Style="{StaticResource CampoEscuro}"

@@ -2963,9 +2963,9 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 maq.PararDeVigiar((int)A(0));
                 return Valor.Vazio;
 
-            // Registrador de deslocamento: ninguem simula o 74HC595 aqui,
-            // mas os pinos mexem de verdade -- e e isso que o osciloscopio
-            // da tela (a linha do tempo) mostra.
+            // Registrador de deslocamento: os pinos mexem de verdade, bit a
+            // bit -- o 74HC595 do circuito escuta cada subida do relogio (o
+            // Chip595), e a linha do tempo mostra o byte.
             case "shiftOut":
             {
                 int dados = (int)A(0), relogio = (int)A(1);

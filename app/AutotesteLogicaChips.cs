@@ -32,20 +32,20 @@ public static partial class Autoteste
 
         // ---- os desenhos: os simbolos no lugar de sempre, os chips no DIP de 0,3" ----
         string[] chips = ["74hc00", "74hc02", "74hc04", "74hc08", "74hc32", "74hc86", "74hc74", "74hc157",
-                          "74hc7266", "74hc14", "74hc10", "74hc11", "74hc27", "74hc20", "74hc21", "74hc125"];
+                          "74hc7266", "74hc14", "74hc10", "74hc11", "74hc27", "74hc20", "74hc21", "74hc125", "74hc595"];
         string[] simbolos = ["not-gate", "and-gate", "or-gate", "xor-gate", "nand-gate", "nor-gate", "xnor-gate", "mux-2",
                              "flip-flop-d", "flip-flop-sr", "flip-flop-dsr", "clock-generator", "logic-analyzer",
                              "buffer-gate", "buffer-tristate", "and-gate-3", "nand-gate-3", "or-gate-3", "nor-gate-3",
                              "xor-gate-3", "xnor-gate-3", "flip-flop-jk", "flip-flop-t", "latch-sr", "latch-d"];
         var semDesenho = chips.Concat(simbolos).Where(t => !Pecas.Existe(t) || Catalogo.Obter(t) is not { Categoria: "Logica" }).ToList();
-        Conferir("logica: os 25 simbolos e os 16 chips 74HC tem desenho e estao na categoria Logica", semDesenho.Count == 0, string.Join(", ", semDesenho));
+        Conferir("logica: os 25 simbolos e os 17 chips 74HC tem desenho e estao na categoria Logica", semDesenho.Count == 0, string.Join(", ", semDesenho));
         var and = Catalogo.Obter("and-gate");
         Conferir("logica: a porta continua com o A, o B e o Q nos mesmos furos (0,1\" do Wokwi)",
             and.Pinos.Select(p => (p.Nome, Math.Round(p.X / mm, 2), Math.Round(p.Y / mm, 2))).SequenceEqual([("A", 0.0, 3.81), ("B", 0.0, 8.89), ("Q", 17.78, 6.35)]));
         var errados = chips.Where(t =>
         {
             var d = Catalogo.Obter(t);
-            int n = t == "74hc157" ? 16 : 14;
+            int n = t is "74hc157" or "74hc595" ? 16 : 14;
             var ys = d.Pinos.Select(p => Math.Round(p.Y / mm, 2)).Distinct().OrderBy(y => y).ToArray();
             var xs = d.Pinos.Select(p => p.X / mm).Distinct().OrderBy(x => x).ToArray();
             var p1 = d.Pinos[0];
@@ -55,7 +55,7 @@ public static partial class Autoteste
                    || d.Pinos[n - 1].Nome != "VCC" || d.Pinos[n / 2 - 1].Nome != "GND"
                    || d.Categoria != "Logica";
         }).ToList();
-        Conferir("74HC: DIP de 14 (o 157, de 16) com as fileiras a 7,62 mm, o pino 1 embaixo a esquerda, GND no 7 (8) e VCC no 14 (16), na categoria Logica",
+        Conferir("74HC: DIP de 14 (o 157 e o 595, de 16) com as fileiras a 7,62 mm, o pino 1 embaixo a esquerda, GND no 7 (8) e VCC no 14 (16), na categoria Logica",
             errados.Count == 0, string.Join(", ", errados));
 
         // ---- a tabela de cada porta, em cada chip ----

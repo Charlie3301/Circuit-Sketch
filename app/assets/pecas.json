@@ -1457,6 +1457,131 @@
   "metades": false
  },
  {
+  "id": "74hc595",
+  "largura": 75,
+  "altura": 35,
+  "pinos": [
+   {
+    "nome": "Q1",
+    "x": 3.9,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 1: Saida 1 do latch: o bit 1 do ultimo byte travado pelo STCP (solta com o OE em HIGH)"
+   },
+   {
+    "nome": "Q2",
+    "x": 13.5,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 2: Saida 2 do latch: o bit 2 do ultimo byte travado pelo STCP (solta com o OE em HIGH)"
+   },
+   {
+    "nome": "Q3",
+    "x": 23.1,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 3: Saida 3 do latch: o bit 3 do ultimo byte travado pelo STCP (solta com o OE em HIGH)"
+   },
+   {
+    "nome": "Q4",
+    "x": 32.7,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 4: Saida 4 do latch: o bit 4 do ultimo byte travado pelo STCP (solta com o OE em HIGH)"
+   },
+   {
+    "nome": "Q5",
+    "x": 42.3,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 5: Saida 5 do latch: o bit 5 do ultimo byte travado pelo STCP (solta com o OE em HIGH)"
+   },
+   {
+    "nome": "Q6",
+    "x": 51.9,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 6: Saida 6 do latch: o bit 6 do ultimo byte travado pelo STCP (solta com o OE em HIGH)"
+   },
+   {
+    "nome": "Q7",
+    "x": 61.5,
+    "y": 31.9,
+    "sinais": [],
+    "descricao": "Pino 7: Saida 7 do latch: o bit 7 do ultimo byte travado pelo STCP (solta com o OE em HIGH)"
+   },
+   {
+    "nome": "GND",
+    "x": 71.1,
+    "y": 31.9,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 8: GND"
+   },
+   {
+    "nome": "Q7S",
+    "x": 71.1,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 9: Saida serial: o bit que sai do registrador -- ligue no DS do proximo 74HC595 para encadear"
+   },
+   {
+    "nome": "MR",
+    "x": 61.5,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 10: Zera o registrador de deslocamento (ativo em LOW; o latch so muda no proximo STCP). Sem uso, ligue no VCC (solto, flutua)"
+   },
+   {
+    "nome": "SHCP",
+    "x": 51.9,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 11: O relogio do deslocamento: na subida, o DS entra no Q0 e cada bit anda uma casa (o clockPin do shiftOut, o SCK do SPI)"
+   },
+   {
+    "nome": "STCP",
+    "x": 42.3,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 12: O relogio do latch: na subida, os oito bits do registrador vao para as saidas Q0 a Q7 (o latchPin)"
+   },
+   {
+    "nome": "OE",
+    "x": 32.7,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 13: Habilita as saidas (ativo em LOW): em HIGH o Q0 a Q7 se soltam. Para usar, ligue no GND (solto, flutua)"
+   },
+   {
+    "nome": "DS",
+    "x": 23.1,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 14: A entrada serial: o bit que entra na subida do SHCP (o dataPin do shiftOut, o MOSI do SPI)"
+   },
+   {
+    "nome": "Q0",
+    "x": 13.5,
+    "y": 3.1,
+    "sinais": [],
+    "descricao": "Pino 15: Saida 0 do latch: o bit 0 do ultimo byte travado pelo STCP (solta com o OE em HIGH)"
+   },
+   {
+    "nome": "VCC",
+    "x": 3.9,
+    "y": 3.1,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Pino 16: Alimentacao: 2 a 6 V (o 3,3 V ou o 5 V da placa). Sem ele o chip nao funciona"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "74hc7266",
   "largura": 74,
   "altura": 35,
@@ -9494,6 +9619,61 @@
   "metades": false
  },
  {
+  "id": "hc-05",
+  "largura": 57,
+  "altura": 165,
+  "pinos": [
+   {
+    "nome": "STATE",
+    "x": 5.33,
+    "y": 161.6,
+    "sinais": [],
+    "descricao": "Estado: HIGH com um aparelho conectado"
+   },
+   {
+    "nome": "RXD",
+    "x": 14.93,
+    "y": 161.6,
+    "sinais": [],
+    "descricao": "Recebe da placa: ligue no TX dela (a entrada e de 3,3 V; no Uno, use um divisor de tensao)"
+   },
+   {
+    "nome": "TXD",
+    "x": 24.53,
+    "y": 161.6,
+    "sinais": [],
+    "descricao": "Manda para a placa: ligue no RX dela"
+   },
+   {
+    "nome": "GND",
+    "x": 34.13,
+    "y": 161.6,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND"
+   },
+   {
+    "nome": "VCC",
+    "x": 43.73,
+    "y": 161.6,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Alimentacao: 3,6 a 6 V (o regulador da placa baixa para 3,3 V)"
+   },
+   {
+    "nome": "EN",
+    "x": 53.33,
+    "y": 161.6,
+    "sinais": [],
+    "descricao": "Em HIGH ao ligar (ou com o botao apertado): o modo de comandos AT, a 38400 baud"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "hc-sr04",
   "largura": 171,
   "altura": 99,
@@ -9729,6 +9909,40 @@
     "y": 44.22,
     "sinais": [],
     "descricao": "Terminal"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "ir-obstacle-sensor",
+  "largura": 179,
+  "altura": 52,
+  "pinos": [
+   {
+    "nome": "VCC",
+    "x": 175.6,
+    "y": 16.78,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Alimentacao: 3,3 a 5 V"
+   },
+   {
+    "nome": "GND",
+    "x": 175.6,
+    "y": 26.38,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND"
+   },
+   {
+    "nome": "OUT",
+    "x": 175.6,
+    "y": 35.98,
+    "sinais": [],
+    "descricao": "Saida digital: LOW com obstaculo na frente (o LED de saida acende); o trimpot ajusta o alcance, de 2 a 30 cm"
    }
   ],
   "variantes": [],
@@ -16565,6 +16779,40 @@
      "power"
     ],
     "descricao": "GND"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
+  "id": "tcrt5000",
+  "largura": 171,
+  "altura": 40,
+  "pinos": [
+   {
+    "nome": "S",
+    "x": 167.6,
+    "y": 7.79,
+    "sinais": [],
+    "descricao": "Saida digital: LOW sobre superficie clara (a luz infravermelha volta e o LED acende); HIGH sobre a linha preta ou sem nada perto (alcance de 1 a 8 mm)"
+   },
+   {
+    "nome": "V+",
+    "x": 167.6,
+    "y": 17.39,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "Alimentacao: 3,3 a 5 V"
+   },
+   {
+    "nome": "GND",
+    "x": 167.6,
+    "y": 26.99,
+    "sinais": [
+     "power"
+    ],
+    "descricao": "GND (o \"G\" da placa)"
    }
   ],
   "variantes": [],

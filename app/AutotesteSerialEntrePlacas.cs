@@ -35,6 +35,7 @@ public static partial class Autoteste
             void setup() {
               Serial.begin(115200);
               Serial2.begin(9600);
+              delay(300);   // a outra placa abre a Serial2 antes do primeiro ping
             }
             void loop() {
               Serial2.print("ping ");

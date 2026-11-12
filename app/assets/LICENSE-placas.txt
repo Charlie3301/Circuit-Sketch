@@ -108,8 +108,21 @@ A logica (as portas de uma, duas e tres entradas, os buffers, o
 multiplexador, os flip-flops e os latches, o gerador de clock, o analisador
 logico e os chips 74hc*.svg) tambem e desenho proprio do CircuitSketch. Os
 chips seguem o DIP de 0,3" da JEDEC (MS-001) e a pinagem das fichas da
-Texas Instruments de cada um; o codigo na tampa e so o do tipo, sem o
-prefixo de fabricante.
+Texas Instruments de cada um (o 74HC595 com os nomes da ficha da Nexperia,
+os mesmos do Wokwi); o codigo na tampa e so o do tipo, sem o prefixo de
+fabricante.
+
+O sensor de obstaculo infravermelho (ir-obstacle-sensor.svg, a placa MH-B do
+FC-51) e o seguidor de linha (tcrt5000.svg) foram tracados das fotos de cima
+publicadas pela SunFounder na documentacao dos kits dela
+(docs.sunfounder.com), retificadas pelo passo das pernas do LM393 e da barra
+de pinos; o cobre da MH-B foi vetorizado da foto. O modulo Bluetooth HC-05
+(hc-05.svg, a placa ZS-040) foi tracado da foto de cima de Martyn Currey
+(martyncurrey.com), com a escala conferida pelo passo de 1,5 mm das ilhas
+casteladas do modulo (a ficha do HC-05); o isolamento do cobre do modulo e a
+serigrafia da placa azul foram vetorizados da foto. Nenhuma foto e
+reproduzida, e nenhuma marca e desenhada (nem o logotipo dos fabricantes dos
+chips).
 
 Os sensores (hc-sr04.svg, dht22.svg, dht11.svg, photoresistor-sensor.svg,
 flame-sensor.svg, gas-sensor.svg, ntc-temperature-sensor.svg,

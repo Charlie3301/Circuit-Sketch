@@ -24,8 +24,23 @@ public sealed class FluxoDeEntrada
 
     public void Adicionar(string texto) => Adicionar(Encoding.UTF8.GetBytes(texto ?? ""));
 
+    /// <summary>
+    /// Quem consome o que chega na hora, sem buffer: o HC-05 do circuito, que
+    /// manda pelo fio o que o Bluetooth entregou. Nulo: vai para o buffer.
+    /// </summary>
+    public Action<byte[]> Desvio { get; set; }
+
     public void Adicionar(byte[] dados)
     {
+        if (Desvio is { } desvio)
+        {
+            if (dados.Length > 0)
+            {
+                desvio([.. dados]);
+                UltimaChegadaMs = Environment.TickCount64;
+            }
+            return;
+        }
         lock (trava)
             foreach (byte b in dados)
                 if (bytes.Count < Teto) bytes.Enqueue(b);

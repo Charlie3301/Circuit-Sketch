@@ -159,6 +159,10 @@ public record Comportamento
         // ---- so digital ----
         ["tilt-switch"] = new() { Digitais = ["OUT"], Chave = true, Rotulo = "Inclinado" },
         ["pir-motion-sensor"] = new() { Digitais = ["OUT"], Chave = true, Rotulo = "Movimento" },
+        // O FC-51: o OUT vai a LOW com um obstaculo na frente (dentro do alcance do trimpot).
+        ["ir-obstacle-sensor"] = new() { Digitais = ["OUT"], DigitalInvertido = true, Chave = true, Rotulo = "Obstaculo" },
+        // O TCRT5000: a superficie clara devolve o infravermelho e o S vai a LOW; a linha preta, HIGH.
+        ["tcrt5000"] = new() { Digitais = ["S"], DigitalInvertido = true, Chave = true, Rotulo = "Superficie clara" },
         ["slide-switch"] = new() { Digitais = ["1", "2", "3"], Chave = true, Rotulo = "Ligada" },
 
         // ---- saidas ----

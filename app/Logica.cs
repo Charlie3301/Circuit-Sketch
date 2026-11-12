@@ -36,7 +36,7 @@ public sealed class Logica
 
     /// <summary>
     /// Os chips 74HC (Alpha 25): cada um e um punhado de portas, com os nomes
-    /// dos pinos da ficha. O 74HC74 e o 74HC157 tem conta propria (abaixo).
+    /// dos pinos da ficha. O 74HC74, o 74HC157 e o 74HC595 tem conta propria (abaixo).
     /// </summary>
     static readonly Dictionary<string, PortaDoChip[]> Chips = new()
     {
@@ -57,6 +57,7 @@ public sealed class Logica
         ["74hc74"] = [],
         ["74hc125"] = [],
         ["74hc157"] = [],
+        ["74hc595"] = [],
     };
 
     /// <summary>Um chip 74HC de verdade: so funciona com o VCC e o GND ligados.</summary>
@@ -72,6 +73,7 @@ public sealed class Logica
     readonly Dictionary<(string Peca, string Pino), int> saidas = [];
     Netlist rede;
     Circuito circuito;
+    Bancada bancada;
 
     /// <summary>
     /// O nivel que cada peca de logica poe em cada saida dela, nesta conta. A
@@ -91,7 +93,7 @@ public sealed class Logica
     public static Logica Avaliar(Circuito circuito, Netlist rede, Bancada bancada,
                                  Dictionary<string, int> memoria, long tempoMs)
     {
-        var logica = new Logica { circuito = circuito, rede = rede };
+        var logica = new Logica { circuito = circuito, rede = rede, bancada = bancada };
         if (circuito is null || rede is null) return logica;
 
         logica.Semear(bancada);
@@ -286,6 +288,8 @@ public sealed class Logica
             }
         }
 
+        if (peca.Tipo == "74hc595") mudou |= PassoDo595(peca, memoria);
+
         if (peca.Tipo == "74hc74")
         {
             for (int u = 1; u <= 2; u++)
@@ -318,6 +322,63 @@ public sealed class Logica
         }
 
         return mudou;
+    }
+
+    /// <summary>
+    /// O 74HC595. Com o SHCP num pino da placa, quem desloca e o chip que
+    /// escuta os fios dela (o Chip595, no ritmo do shiftOut); a conta daqui so
+    /// le o latch. Com o relogio em outra coisa (um botao, o gerador de
+    /// relogio), a conta faz tudo pelos niveis: o DS de antes da subida do
+    /// SHCP entra na fila, a subida do STCP trava. O MR ou o OE soltos deixam
+    /// as saidas soltas; o OE em HIGH solta so o Q0 a Q7 (o Q7S continua).
+    /// </summary>
+    bool PassoDo595(PecaNoCircuito peca, Dictionary<string, int> memoria)
+    {
+        int oe = Ler(peca.Id, "OE"), mr = Ler(peca.Id, "MR");
+        int fila, travado;
+
+        if (RegistradorDaPlaca(peca.Id) is { } chip)
+        {
+            if (chip.Aparelho.Rst < 0) chip.MrPreso = mr == 0;
+            fila = chip.Fila;
+            travado = chip.Latch;
+        }
+        else
+        {
+            string k = peca.Id + ":595";
+            fila = memoria.GetValueOrDefault(k + "fila", 0);
+            travado = memoria.GetValueOrDefault(k + "latch", 0);
+            int sh = Ler(peca.Id, "SHCP"), st = Ler(peca.Id, "STCP"), ds = Ler(peca.Id, "DS");
+            bool subiuSh = sh == 1 && memoria.GetValueOrDefault(k + "sh", 0) != 1;
+            bool subiuSt = st == 1 && memoria.GetValueOrDefault(k + "st", 0) != 1;
+            if (sh != Indefinido) memoria[k + "sh"] = sh;
+            if (st != Indefinido) memoria[k + "st"] = st;
+
+            // O DS de antes da subida: no 74HC595 seguinte da fila ele e o Q7S do
+            // anterior, que pode ja ter andado nesta mesma conta.
+            int dsAntes = memoria.TryGetValue(k + "ds", out int guardado) ? guardado : ds;
+            if (subiuSt) travado = fila;
+            if (mr == 0) fila = 0;
+            else if (subiuSh && dsAntes != Indefinido) fila = ((fila << 1) | dsAntes) & 0xFF;
+            if (!subiuSh) memoria[k + "ds"] = ds;
+            memoria[k + "fila"] = fila;
+            memoria[k + "latch"] = travado;
+        }
+
+        if (mr == Indefinido || oe == Indefinido) return false;
+        bool mudou = Sair(peca.Id, "Q7S", (fila >> 7) & 1);
+        if (oe == 0)
+            for (int q = 0; q < 8; q++) mudou |= Sair(peca.Id, $"Q{q}", (travado >> q) & 1);
+        return mudou;
+    }
+
+    /// <summary>O 74HC595 desta peca, quando uma placa da bancada manda no relogio dele.</summary>
+    Chip595 RegistradorDaPlaca(string id)
+    {
+        if (bancada is null) return null;
+        foreach (var (_, maq) in bancada.Todas)
+            if (maq?.EscutaDoSpi?.Registrador(id) is { } chip) return chip;
+        return null;
     }
 
     bool Sequencial(PecaNoCircuito peca, Dictionary<string, int> memoria)

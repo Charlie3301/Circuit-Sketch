@@ -170,6 +170,20 @@ public class PecaNoCircuito
     public double JanelaUs { get; set; }
 
     /// <summary>
+    /// O que o HC-05 guarda na flash: o que os comandos AT mudaram (o nome, a
+    /// senha, o baud, o papel). Nulo: o de fabrica. Vai no .sktch como no
+    /// modulo de verdade, que nao esquece ao desligar.
+    /// </summary>
+    public ConfiguracaoHc05 Hc05 { get; set; }
+
+    /// <summary>
+    /// O baud do monitor serial desta placa, escolhido no monitor. Nulo: o
+    /// monitor segue o Serial.begin do sketch. Diferente do sketch, o texto
+    /// sai embaralhado, como na IDE.
+    /// </summary>
+    public int? BaudDoMonitor { get; set; }
+
+    /// <summary>
     /// Mesma peca com Id novo. Existe para copiar/colar nao esquecer
     /// campo: antes cada lugar listava os campos a mao e Giro, Giro2 e
     /// Bits ficaram de fora -- colar um potenciometro perdia a posicao e
@@ -190,6 +204,8 @@ public class PecaNoCircuito
         Codigo = Codigo is null ? null : [.. Codigo],
         PlacaQueManda = PlacaQueManda,
         JanelaUs = JanelaUs,
+        Hc05 = Hc05?.Copia(),
+        BaudDoMonitor = BaudDoMonitor,
         Modelo = Modelo, Ficha = Ficha?.Copia(), Amperes = Amperes, Acabamento = Acabamento, Braco = Braco, Usb = Usb,
         AtributosDoWokwi = AtributosDoWokwi is null ? null : new Dictionary<string, string>(AtributosDoWokwi),
     };
@@ -202,6 +218,27 @@ public class PecaNoCircuito
         set => Codigo = value is null
             ? null : [.. value.Replace("\r\n", "\n").Split('\n')];
     }
+}
+
+/// <summary>A flash do HC-05: o de fabrica e o firmware 2.0 da placa ZS-040.</summary>
+public sealed class ConfiguracaoHc05
+{
+    public string Nome { get; set; } = "HC-05";
+    public string Senha { get; set; } = "1234";
+
+    /// <summary>0 escravo, 1 mestre, 2 escravo em laco.</summary>
+    public int Papel { get; set; }
+
+    public long Baud { get; set; } = 9600;
+    public int Parada { get; set; }
+    public int Paridade { get; set; }
+
+    /// <summary>0: o mestre so conecta no do BIND; 1: em qualquer um.</summary>
+    public int Cmode { get; set; }
+
+    public string Bind { get; set; } = "";
+
+    public ConfiguracaoHc05 Copia() => (ConfiguracaoHc05)MemberwiseClone();
 }
 
 public class Fio

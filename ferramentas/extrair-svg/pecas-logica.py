@@ -404,6 +404,21 @@ dip('74hc157', 16, '74HC157N', [('S', [], 'A escolha dos quatro: LOW passa os A,
                                 mux(3, 'Y'), mux(3, 'B'), mux(3, 'A'), mux(4, 'Y'), mux(4, 'B'), mux(4, 'A'),
                                 ('G', [], 'Habilita (ativo em LOW): em HIGH as quatro saidas vao a LOW. Para usar, ligue no GND (solto, flutua)'), VCC])
 
+
+def q595(k):
+    return (f'Q{k}', [], f'Saida {k} do latch: o bit {k} do ultimo byte travado pelo STCP (solta com o OE em HIGH)')
+
+
+# O registrador de deslocamento: os nomes da ficha da Nexperia (os mesmos do Wokwi).
+dip('74hc595', 16, '74HC595N', [q595(1), q595(2), q595(3), q595(4), q595(5), q595(6), q595(7), GND,
+                                ('Q7S', [], 'Saida serial: o bit que sai do registrador -- ligue no DS do proximo 74HC595 para encadear'),
+                                ('MR', [], 'Zera o registrador de deslocamento (ativo em LOW; o latch so muda no proximo STCP). Sem uso, ligue no VCC (solto, flutua)'),
+                                ('SHCP', [], 'O relogio do deslocamento: na subida, o DS entra no Q0 e cada bit anda uma casa (o clockPin do shiftOut, o SCK do SPI)'),
+                                ('STCP', [], 'O relogio do latch: na subida, os oito bits do registrador vao para as saidas Q0 a Q7 (o latchPin)'),
+                                ('OE', [], 'Habilita as saidas (ativo em LOW): em HIGH o Q0 a Q7 se soltam. Para usar, ligue no GND (solto, flutua)'),
+                                ('DS', [], 'A entrada serial: o bit que entra na subida do SHCP (o dataPin do shiftOut, o MOSI do SPI)'),
+                                q595(0), VCC])
+
 # =====================================================================
 cam = pa.BASE + 'app/assets/pecas.json'
 dados = json.load(io.open(cam, encoding='utf-8'))

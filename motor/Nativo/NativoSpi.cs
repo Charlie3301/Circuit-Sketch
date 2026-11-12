@@ -3,9 +3,13 @@ namespace Simulador;
 /// <summary>
 /// Um aparelho ligado no barramento SPI da placa, como o circuito o liga:
 /// o tipo ("ili9341", "sd"...) e os GPIOs de cada pino dele (-1 = solto).
+/// O 74HC595 entra aqui tambem, que e o SPI mais simples que ha: o STCP no
+/// lugar do CS, o MR no do reset, o DS no do MOSI e o SHCP no do SCK. Peca e
+/// a peca do circuito; SerDe, o 74HC595 cujo Q7S chega no DS deste (a fila).
 /// </summary>
 public sealed record AparelhoNoSpi(string Tipo, int Cs, int Dc = -1, int Rst = -1, int Mosi = -1,
-                                   int Miso = -1, int Sck = -1, int Luz = -1);
+                                   int Miso = -1, int Sck = -1, int Luz = -1,
+                                   string Peca = null, string SerDe = null);
 
 /// <summary>
 /// O SPI do modo nativo: os barramentos que o C iniciou, os dispositivos
@@ -88,6 +92,7 @@ public sealed unsafe partial class ModuloNativo
         "st7735" => "display ST7735",
         "ssd1306" => "display OLED",
         "sd" => "modulo microSD",
+        "74hc595" => "74HC595",
         _ => tipo,
     };
 
@@ -104,7 +109,11 @@ public sealed unsafe partial class ModuloNativo
         {
             int dc = d.Aparelho.Dc;
             bool dado = dc < 0 || Maquina.DigitalRead(dc) != 0;
-            lock (d.Chip) d.Chip.Receber(new ReadOnlySpan<byte>(tx, bytesTx), dado);
+            lock (d.Chip)
+            {
+                d.Chip.Receber(new ReadOnlySpan<byte>(tx, bytesTx), dado);
+                d.Chip.FimDaTransacao();
+            }
             if (rx != null && bytesRx > 0) new Span<byte>(rx, bytesRx).Clear();
         }
 

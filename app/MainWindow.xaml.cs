@@ -814,6 +814,7 @@ public partial class MainWindow : Window
 
     void AtualizarCabecalhoDaPlaca()
     {
+        MostrarBaudDoMonitor();
         var dona = PlacaDoEditor();
         var placas = editor.Atual.Placas().ToList();
 
@@ -4359,6 +4360,16 @@ public partial class MainWindow : Window
     internal void TesteDarPorSalvo() => circuitoSalvo = AssinaturaAtual();
     internal string TesteSerial => string.Join(Environment.NewLine, LinhasDoSerial(0, painelSerial.Count));
 
+    /// <summary>Para o teste: digitar no monitor e apertar Enviar.</summary>
+    internal void TesteEnviarNoMonitor(string texto)
+    {
+        txtEntradaSerial.Text = texto;
+        EnviarPeloSerial();
+    }
+
+    /// <summary>Para o teste: o que o botao do baud do monitor mostra.</summary>
+    internal string TesteBaudDoMonitor => btBaudSerial.Content as string;
+
     /// <summary>O que a barra de status esta dizendo agora.</summary>
     internal string TesteStatus => txtStatus.Text;
 
@@ -4737,6 +4748,7 @@ public partial class MainWindow : Window
         bancada.Reiniciar();
 
         editor.Chips.Comecar(editor.Atual);
+        editor.Hc05.Comecar(editor.Atual, rede, bancada, redeSimulada);
         editor.AplicarEntradas(bancada, rede);
         redeSimulada.DefinirPontosDeAcesso(editor.PontosDeAcessoDoCircuito());
 
@@ -4788,9 +4800,12 @@ public partial class MainWindow : Window
             var circuitoDaRodada = editor.Atual;
             var redeDaRodada = rede;
             string idDaPlaca = id;
+            // O HC-05 tambem: o TX da placa no RXD dele chega na UART do modulo.
+            var hc05 = editor.Hc05;
             m.LigadosAoPino = gpio => [.. redeDaRodada.PlacasNoMesmoNo(circuitoDaRodada, idDaPlaca, gpio)
                                           .Select(x => (bancada.De(x.Placa), x.Gpio))
-                                          .Where(x => x.Item1 is not null)];
+                                          .Where(x => x.Item1 is not null)
+                                          .Concat(hc05.NoFioDaPlaca(idDaPlaca, gpio))];
         }
 
         // Todas as placas na MESMA rede, com o nome curto que aparece no
@@ -4907,6 +4922,7 @@ public partial class MainWindow : Window
         // quiser -- quem compara uma execucao com a outra prefere que nao.
         serialPorPlaca.Clear();
         avisosPorPlaca.Clear();
+        avisouBaud.Clear();
         if (Preferencias.Ligado(Preferencias.LimparSerialAoRodar, true))
         {
             painelSerial.Clear();
@@ -5400,6 +5416,7 @@ public partial class MainWindow : Window
     void PararExecucao()
     {
         editor.Chips.Parar();
+        editor.Hc05.Parar();
         GuardarCartoes();
         editor.EmSimulacao = false;
         geracao++;              // invalida a rodada atual
@@ -5720,9 +5737,12 @@ public partial class MainWindow : Window
         string texto = txtEntradaSerial.Text;
         if (texto.Length == 0) return;
 
-        // Para a placa que esta no editor: e a dona do monitor em foco.
+        // Para a placa que esta no editor: e a dona do monitor em foco. Com o
+        // baud do monitor diferente do sketch, os bytes chegam trocados.
         var maquina = bancada.De(placaDoEditor);
-        maquina.EntradaSerial.Adicionar(texto + FimDeLinhaDoMonitor());
+        var bytes = System.Text.Encoding.UTF8.GetBytes(texto + FimDeLinhaDoMonitor());
+        if (BaudErrado(placaDoEditor, maquina, out _, out _)) bytes = Embaralhar(bytes);
+        maquina.EntradaSerial.Adicionar(bytes);
         maquina.EscreverSerial($"[{maquina.Ms,7}ms] > {texto}");
         txtEntradaSerial.Clear();
         AtualizarSerial();
@@ -5750,6 +5770,94 @@ public partial class MainWindow : Window
         if (e.Key != Key.Enter) return;
         PublicarNoMqtt();
         e.Handled = true;
+    }
+
+    // =====================================================================
+    //  o baud do monitor serial
+    // =====================================================================
+
+    static readonly int[] BaudsDoMonitor = [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200,
+                                            230400, 250000, 500000, 1000000, 2000000];
+
+    /// <summary>As placas que ja levaram o aviso do baud errado nesta rodada.</summary>
+    readonly HashSet<string> avisouBaud = [];
+
+    /// <summary>
+    /// O monitor desta placa esta num baud diferente do Serial.begin? (mais de
+    /// 3% de diferenca, a mesma conta dos fios). Sem Serial.begin, nao ha o
+    /// que comparar.
+    /// </summary>
+    bool BaudErrado(string idDaPlaca, Maquina maquina, out int doMonitor, out int doSketch)
+    {
+        doSketch = maquina?.BaudDaSerial ?? 0;
+        doMonitor = editor.Atual.Achar(idDaPlaca)?.BaudDoMonitor ?? doSketch;
+        return doSketch > 0 && doMonitor > 0 && Math.Abs(doMonitor - doSketch) > doSketch * 0.03;
+    }
+
+    /// <summary>O que o baud trocado faz com os bytes: a mesma conta da serial entre placas.</summary>
+    static byte[] Embaralhar(byte[] bytes)
+    {
+        var saida = new byte[bytes.Length];
+        for (int i = 0; i < bytes.Length; i++) saida[i] = (byte)(((bytes[i] ^ 0xA5) * 7 + i) & 0xFF);
+        return saida;
+    }
+
+    /// <summary>Uma linha do monitor lida no baud errado: o tempo fica, o texto vira lixo.</summary>
+    static string LinhaEmbaralhada(string linha)
+    {
+        var tempo = TempoDaLinha.Match(linha);
+        if (!tempo.Success || tempo.Index != 0) return linha;
+        string texto = linha[tempo.Length..];
+        if (texto.StartsWith("> ")) return linha;                   // o eco do que se digitou
+        var bytes = Embaralhar(System.Text.Encoding.UTF8.GetBytes(texto));
+        var lixo = new System.Text.StringBuilder(bytes.Length);
+        foreach (byte b in bytes) lixo.Append(b is >= 0x20 and < 0x7F ? (char)b : '\uFFFD');
+        return linha[..tempo.Length] + lixo;
+    }
+
+    /// <summary>O rotulo do botao do baud: o da placa do editor (o escolhido, ou o do sketch).</summary>
+    void MostrarBaudDoMonitor()
+    {
+        var maquina = placaDoEditor is null ? null : bancada.De(placaDoEditor);
+        var peca = editor.Atual.Achar(placaDoEditor);
+        int baud = peca?.BaudDoMonitor ?? (maquina?.BaudDaSerial is > 0 and var b ? b : 9600);
+        string rotulo = $"{baud} baud";
+        if (!Equals(btBaudSerial.Content, rotulo)) btBaudSerial.Content = rotulo;
+    }
+
+    void AbrirListaDeBaud(object s = null, RoutedEventArgs e = null)
+    {
+        var peca = editor.Atual.Achar(placaDoEditor);
+        if (peca is null) { Aviso("não há placa no editor para o monitor serial."); return; }
+        var maquina = bancada.De(placaDoEditor);
+        int doSketch = maquina?.BaudDaSerial ?? 0;
+
+        var menu = new ContextMenu { PlacementTarget = btBaudSerial };
+        var seguir = new MenuItem
+        {
+            Header = doSketch > 0 ? $"Seguir o Serial.begin ({doSketch})" : "Seguir o Serial.begin",
+            IsChecked = peca.BaudDoMonitor is null,
+        };
+        seguir.Click += (_, _) => EscolherBaud(peca, null);
+        menu.Items.Add(seguir);
+        menu.Items.Add(new Separator());
+        foreach (int baud in BaudsDoMonitor)
+        {
+            var item = new MenuItem { Header = $"{baud} baud", IsChecked = peca.BaudDoMonitor == baud };
+            item.Click += (_, _) => EscolherBaud(peca, baud);
+            menu.Items.Add(item);
+        }
+        btBaudSerial.ContextMenu = menu;
+        menu.IsOpen = true;
+    }
+
+    /// <summary>O baud escolhido vai para a peca da placa (e para o arquivo do projeto).</summary>
+    internal void EscolherBaud(PecaNoCircuito peca, int? baud)
+    {
+        if (peca is null || peca.BaudDoMonitor == baud) return;
+        peca.BaudDoMonitor = baud;
+        avisouBaud.Remove(peca.Id);
+        MostrarBaudDoMonitor();
     }
 
     /// <summary>A lista de placas visíveis, no menu escuro do programa.</summary>
@@ -6259,7 +6367,12 @@ public partial class MainWindow : Window
             novasDoQuadro.AddRange(novas);
 
             string etiqueta = varias ? NomeCurtoDaPlaca(id) + " " : "";
-            foreach (string linha in novas) painelSerial.Add(etiqueta + linha);
+            // O monitor desta placa num baud diferente do sketch: o texto vira lixo, como na IDE.
+            bool errado = BaudErrado(id, maquina, out int doMonitor, out int doSketch);
+            if (errado && avisouBaud.Add(id))
+                console.Aviso($"{(varias ? NomeCurtoDaPlaca(id) + " " : "")}o monitor está a {doMonitor} baud e o sketch "
+                              + $"abriu a serial a {doSketch}: o texto sai embaralhado. Escolha {doSketch} no baud do monitor.");
+            foreach (string linha in novas) painelSerial.Add(etiqueta + (errado ? LinhaEmbaralhada(linha) : linha));
         }
 
         if (!mudou) return;
@@ -6272,6 +6385,7 @@ public partial class MainWindow : Window
             painelSerial.RemoveRange(0, painelSerial.Count - limite);
 
         RedesenharSerial();
+        MostrarBaudDoMonitor();
 
         MonitorIde.Escrever(novasDoQuadro);
     }
