@@ -640,9 +640,10 @@ public class JanelaConfiguracoes : Window
 
         CaixaGuardada(pecas, "Mostrar os avisos em cima das peças", Preferencias.SelosDeAviso, true);
         Nota(pecas, "O selo amarelo (ou vermelho, no que queimou) em cima da peça ou do pino, com o motivo "
-                    + "na dica do mouse. O X de cada selo fecha aquele aviso até abrir outro circuito.");
+                    + "na dica do mouse. O X de cada selo fecha aquele aviso, e o projeto guarda isso: "
+                    + "reaberto, ele continua fechado.");
         if (ajustes.EsquecerAvisosFechados is not null)
-            Botao(pecas, "Mostrar de novo os avisos fechados", () => ajustes.EsquecerAvisosFechados());
+            Botao(pecas, "Mostrar de novo os avisos fechados deste projeto", () => ajustes.EsquecerAvisosFechados());
 
         var som = Grupo(painel, "Som");
         CaixaGuardada(som, "Som do buzzer", Preferencias.SomDoBuzzer, true);

@@ -310,6 +310,12 @@ public class Circuito
     public Dictionary<string, string> ExtrasDoDiagrama { get; set; }
 
     /// <summary>
+    /// Os avisos fechados no X dos selos ("peca|pino|texto do selo"): vao no .sktch, e o
+    /// projeto reaberto continua sem eles. Nulo quando nao ha nenhum.
+    /// </summary>
+    public List<string> AvisosFechados { get; set; }
+
+    /// <summary>
     /// Um id legivel para uma peca nova, no jeito do Wokwi: "led1", "r2",
     /// "esp1" -- o diagram.json se le pelos ids, e "a3f9c2d1" nao diz nada.
     /// </summary>

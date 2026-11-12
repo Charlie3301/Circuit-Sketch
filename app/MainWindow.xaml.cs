@@ -1207,7 +1207,11 @@ public partial class MainWindow : Window
     void AplicarDoHistorico()
     {
         aplicandoHistorico = true;
-        editor.Carregar(Circuito.DeJson(historico[posHistorico]));
+        // Fechar um aviso nao e passo do desfazer: os fechados de agora ficam.
+        var fechados = editor.Atual.AvisosFechados;
+        var doHistorico = Circuito.DeJson(historico[posHistorico]);
+        doHistorico.AvisosFechados = fechados;
+        editor.Carregar(doHistorico);
         editor.AplicarGrade();
         ReconstruirRede();
         aplicandoHistorico = false;

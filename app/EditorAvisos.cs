@@ -22,18 +22,20 @@ public partial class EditorCircuito
     List<Estouro> avisosNaTela = [];
 
     /// <summary>
-    /// Os avisos fechados no X: a peca, o pino e o texto do selo (o motivo inteiro muda
-    /// com a corrente de cada quadro; o selo, nao). Valem enquanto o circuito esta
-    /// aberto -- abrir outro, ou "mostrar de novo" nas configuracoes, traz de volta.
+    /// A chave de um aviso fechado no X: a peca, o pino e o texto do selo (o motivo
+    /// inteiro muda com a corrente de cada quadro; o selo, nao). Os fechados ficam no
+    /// circuito (Circuito.AvisosFechados) e vao no .sktch -- o projeto reaberto
+    /// continua sem eles; "mostrar de novo" nas configuracoes traz de volta.
     /// </summary>
-    readonly HashSet<string> avisosFechados = [];
-
     static string ChaveDoAviso(Estouro aviso) => $"{aviso.Peca}|{aviso.Pino}|{TextoDoSelo(aviso)}";
 
-    /// <summary>Fecha (ignora) o aviso: o selo dele some e nao volta neste circuito.</summary>
+    bool Fechado(Estouro aviso) => Atual.AvisosFechados?.Contains(ChaveDoAviso(aviso)) == true;
+
+    /// <summary>Fecha (ignora) o aviso: o selo dele some, e o projeto guarda que ele foi fechado.</summary>
     public void FecharAviso(Estouro aviso)
     {
-        if (aviso is null || !avisosFechados.Add(ChaveDoAviso(aviso))) return;
+        if (aviso is null || Fechado(aviso)) return;
+        (Atual.AvisosFechados ??= []).Add(ChaveDoAviso(aviso));
         avisosNaTela = [.. avisosNaTela.Where(a => ChaveDoAviso(a) != ChaveDoAviso(aviso))];
         DesenharAvisos();
         AvisoFechado?.Invoke(aviso);
@@ -42,14 +44,14 @@ public partial class EditorCircuito
     /// <summary>Disparado ao fechar um aviso no X (a janela diz na barra como trazer de volta).</summary>
     public event Action<Estouro> AvisoFechado;
 
-    /// <summary>Quantos avisos estao fechados agora.</summary>
-    public int AvisosFechados => avisosFechados.Count;
+    /// <summary>Quantos avisos estao fechados neste circuito.</summary>
+    public int AvisosFechados => Atual.AvisosFechados?.Count ?? 0;
 
-    /// <summary>Traz de volta os avisos fechados (o botao das configuracoes, e abrir outro circuito).</summary>
+    /// <summary>Traz de volta os avisos fechados deste circuito (o botao das configuracoes).</summary>
     public void EsquecerAvisosFechados()
     {
-        if (avisosFechados.Count == 0) return;
-        avisosFechados.Clear();
+        if (AvisosFechados == 0) return;
+        Atual.AvisosFechados = null;
         // Redesenha ja, com a ultima lista (parado, nao ha proximo quadro para isso).
         if (ultimosAvisos is { } ultimos) MostrarAvisos(ultimos);
     }
@@ -70,8 +72,8 @@ public partial class EditorCircuito
     public void MostrarAvisos(IEnumerable<Estouro> avisos)
     {
         ultimosAvisos = [.. avisos];
-        var novos = ultimosAvisos.Where(a => a is not null && Atual.Achar(a.Peca) is not null
-                                             && !avisosFechados.Contains(ChaveDoAviso(a))).Distinct().ToList();
+        var novos = ultimosAvisos.Where(a => a is not null && Atual.Achar(a.Peca) is not null && !Fechado(a))
+                                 .Distinct().ToList();
         // A conta roda a cada quadro, e a ordem pode mudar: redesenhar so quando o
         // CONJUNTO muda -- redesenhar o selo fecha a dica que o mouse abriu nele.
         if (novos.Count == avisosNaTela.Count && novos.ToHashSet().SetEquals(avisosNaTela)) return;

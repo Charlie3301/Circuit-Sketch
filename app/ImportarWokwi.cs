@@ -88,6 +88,8 @@ public static class ImportarWokwi
 
         circuito.Nome = Texto(raiz, "name");
         circuito.Autor = Texto(raiz, "author");
+        // Os avisos fechados nao estao no diagram.json: a aba os mantem do circuito de agora.
+        circuito.AvisosFechados = atual?.AvisosFechados is { Count: > 0 } fechados ? [.. fechados] : null;
 
         // O resto do topo ("serialMonitor", "dependencies"...) vai junto como veio.
         foreach (var campo in raiz.EnumerateObject())

@@ -1381,8 +1381,7 @@ public partial class EditorCircuito : Border
     // ================= desenhar =================
     public void Carregar(Circuito circuito)
     {
-        // Os avisos fechados eram do circuito anterior.
-        EsquecerAvisosFechados();
+        // Os avisos fechados vem com o circuito (Circuito.AvisosFechados).
         Atual = circuito ?? new Circuito();
         selecionadas.Clear();
         fiosSelecionados.Clear();

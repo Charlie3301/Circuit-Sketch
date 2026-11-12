@@ -61,6 +61,23 @@ public static partial class Autoteste
             Conferir("selos: o X fecha aquele aviso (e so ele), e os quadros seguintes nao o trazem de volta",
                 fechou && !depois.Any(s => s.Peca == "led1") && depois.Any(s => s.Peca == "ds") && depois.Any(s => s.Peca == "hc"),
                 string.Join(" | ", depois));
+            // ---- o projeto guarda o fechado: salvo, reaberto, ele continua fechado ----
+            var guardados = ed.Atual.AvisosFechados?.ToList() ?? [];
+            string arquivo = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"circuitsketch-selos-{Guid.NewGuid():N}.sktch");
+            List<string> reabertos;
+            List<string> pelaAba;
+            try
+            {
+                Sktch.Salvar(arquivo, ed.Atual, "void setup() {}\nvoid loop() {}");
+                reabertos = Sktch.Abrir(arquivo).circuito.AvisosFechados ?? [];
+                pelaAba = ImportarWokwi.Ler(ExportarWokwi.Gerar(ed.Atual), ed.Atual, estrito: true).Circuito.AvisosFechados ?? [];
+            }
+            finally { try { System.IO.File.Delete(arquivo); } catch { } }
+            Conferir("selos: o fechado vai no .sktch (\"led1||LED direto no pino 14, sem resistor\"), volta ao reabrir, e a aba do diagram.json nao o perde",
+                guardados.SequenceEqual(["led1||LED direto no pino 14, sem resistor"]) && reabertos.SequenceEqual(guardados)
+                && pelaAba.SequenceEqual(guardados),
+                $"guardados={string.Join(";", guardados)} reabertos={string.Join(";", reabertos)} aba={string.Join(";", pelaAba)}");
+
             ed.EsquecerAvisosFechados();
             EsperarPor(() => ed.AvisosNaTelaParaTeste.Any(s => s.Peca == "led1"), 3000);
             Conferir("selos: \"mostrar de novo os avisos fechados\" traz o aviso de volta",
