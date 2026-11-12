@@ -96,6 +96,8 @@ public sealed class PainelMultimetro : Border
             CornerRadius = new CornerRadius(5),
             Padding = new Thickness(4, 3, 4, 3),
             Child = visor,
+            // O visor e a chave sao o aparelho: nao viram com a lingua.
+            FlowDirection = FlowDirection.LeftToRight,
         });
 
         txtNota.FontSize = 10;
@@ -127,7 +129,7 @@ public sealed class PainelMultimetro : Border
     FrameworkElement MontarChave()
     {
         const double L = 220, A = 128, Cx = L / 2, Cy = 84, RaioDoBotao = 34, RaioDosIcones = 60;
-        var tela = new Canvas { Width = L, Height = A, Margin = new Thickness(0, 4, 0, 0), Background = Brushes.Transparent };
+        var tela = new Canvas { Width = L, Height = A, Margin = new Thickness(0, 4, 0, 0), Background = Brushes.Transparent, FlowDirection = FlowDirection.LeftToRight };
 
         // As marcas de cada posicao, em volta do botao.
         foreach (var (funcao, angulo, dica) in Posicoes)
@@ -295,7 +297,8 @@ public sealed class PainelMultimetro : Border
 
     FrameworkElement MontarEntradas()
     {
-        var grade = new Grid { Margin = new Thickness(0, 2, 0, 0) };
+        // COM a esquerda e VΩA a direita como no aparelho, em qualquer lingua.
+        var grade = new Grid { Margin = new Thickness(0, 2, 0, 0), FlowDirection = FlowDirection.LeftToRight };
         grade.ColumnDefinitions.Add(new ColumnDefinition());
         grade.ColumnDefinitions.Add(new ColumnDefinition());
 
@@ -331,6 +334,7 @@ public sealed class PainelMultimetro : Border
         });
         onde.FontSize = 9;
         onde.TextWrapping = TextWrapping.Wrap;
+        if (Idioma.Cultura.TextInfo.IsRightToLeft) onde.FlowDirection = FlowDirection.RightToLeft;
         onde.Foreground = new SolidColorBrush(Color.FromRgb(0xB5, 0xBA, 0xC1));
         textos.Children.Add(onde);
         linha.Children.Add(textos);

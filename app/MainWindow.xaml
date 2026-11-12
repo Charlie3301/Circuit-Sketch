@@ -335,7 +335,7 @@
         <!-- ================= EDITOR ================= -->
         <Grid Grid.Row="1" Grid.Column="0">
             <Border CornerRadius="6" BorderBrush="{DynamicResource Borda}" BorderThickness="1">
-                <local:EditorCircuito x:Name="editor"/>
+                <local:EditorCircuito x:Name="editor" FlowDirection="LeftToRight"/>
             </Border>
 
             <!-- O multimetro: so na aba MULTÍMETRO, no canto de cima da direita. -->
@@ -494,7 +494,7 @@
                                  a vista porque quem escolhe e o CODIGO: sem
                                  o aviso, um sketch em Python que o detector
                                  leu como C++ so daria erro ao rodar. -->
-                            <TextBlock x:Name="rotuloLinguagem" DockPanel.Dock="Right"
+                            <TextBlock x:Name="rotuloLinguagem" FlowDirection="LeftToRight" DockPanel.Dock="Right"
                                        Margin="10,0,0,0"
                                        Foreground="{DynamicResource TextoFraco}"
                                        ToolTip="{local:T 'A linguagem sai do proprio codigo do sketch'}"
@@ -537,7 +537,7 @@
                     <!-- AvalonEdit no lugar do TextBox: um TextBox nao tem
                          como pintar so uma palavra. Traz numero de linha
                          de brinde, que ajuda quando o erro diz "linha 23". -->
-                    <avalon:TextEditor x:Name="txtCodigo"
+                    <avalon:TextEditor x:Name="txtCodigo" FlowDirection="LeftToRight"
                                        Background="Transparent"
                                        Foreground="{DynamicResource Texto}"
                                        BorderThickness="0" Padding="6"
@@ -565,7 +565,7 @@
                     <ScrollViewer x:Name="rolagemVariaveis" MaxHeight="150"
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Auto">
-                        <TextBlock x:Name="txtVariaveis" VerticalAlignment="Top" FontFamily="Consolas" FontSize="11"
+                        <TextBlock x:Name="txtVariaveis" FlowDirection="LeftToRight" VerticalAlignment="Top" FontFamily="Consolas" FontSize="11"
                                    TextWrapping="NoWrap" LineHeight="15"
                                    LineStackingStrategy="BlockLineHeight"/>
                     </ScrollViewer>
@@ -672,7 +672,7 @@
                                     ToolTip="{local:T 'O baud do monitor serial da placa do editor (o do Serial.begin do sketch)'}"/>
                             <Button DockPanel.Dock="Right" Content="{local:T 'Enviar'}" Width="64" Margin="6,0,0,0"
                                     Style="{StaticResource BotaoPequeno}" Click="EnviarPeloSerial"/>
-                            <TextBox x:Name="txtEntradaSerial" Style="{StaticResource CampoEscuro}"
+                            <TextBox x:Name="txtEntradaSerial" FlowDirection="LeftToRight" Style="{StaticResource CampoEscuro}"
                                      ToolTip="{local:T 'Texto para o sketch (Serial.available / Serial.read)'}"
                                      KeyDown="TeclaNaEntradaSerial"/>
                         </DockPanel>
@@ -680,7 +680,7 @@
                                       HorizontalScrollBarVisibility="Auto" ScrollChanged="RolouOSerial">
                             <!-- Sem quebra automatica: cada println e uma linha, e
                                  linha comprida rola de lado em vez de virar duas. -->
-                            <TextBlock x:Name="txtSerial" VerticalAlignment="Top" FontFamily="Consolas" FontSize="11"
+                            <TextBlock x:Name="txtSerial" FlowDirection="LeftToRight" VerticalAlignment="Top" FontFamily="Consolas" FontSize="11"
                                        Foreground="{DynamicResource Terminal}" TextWrapping="NoWrap"
                                        LineHeight="15" LineStackingStrategy="BlockLineHeight"/>
                         </ScrollViewer>
@@ -775,7 +775,7 @@
                         <TextBlock x:Name="txtPlacaEstado" DockPanel.Dock="Top" Margin="0,0,0,6" FontSize="11"
                                    TextWrapping="Wrap" Foreground="{DynamicResource TextoFraco}"/>
                         <ScrollViewer x:Name="rolagemPlaca" VerticalScrollBarVisibility="Auto">
-                            <TextBlock x:Name="txtPlaca" VerticalAlignment="Top" FontFamily="Consolas" FontSize="11"
+                            <TextBlock x:Name="txtPlaca" FlowDirection="LeftToRight" VerticalAlignment="Top" FontFamily="Consolas" FontSize="11"
                                        Foreground="{DynamicResource Texto}" TextWrapping="Wrap"
                                        LineHeight="15" LineStackingStrategy="BlockLineHeight"/>
                         </ScrollViewer>

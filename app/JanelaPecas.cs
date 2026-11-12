@@ -414,7 +414,7 @@ public class JanelaPecas : Window
         linha.Children.Add(moldura);
 
         var textos = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
-        var nomeDaPeca = new TextBlock { Text = peca.Nome, FontSize = 12 };
+        var nomeDaPeca = new TextBlock { Text = Idioma.NaLinha(peca.Nome), FontSize = 12 };
         nomeDaPeca.SetResourceReference(TextBlock.ForegroundProperty, Tema.Texto);
         textos.Children.Add(nomeDaPeca);
 

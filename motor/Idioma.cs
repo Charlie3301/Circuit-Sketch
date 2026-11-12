@@ -75,12 +75,53 @@ public static class Idioma
         lock (voltas) { voltas.Clear(); moldes = null; }
         try { cultura = CultureInfo.GetCultureInfo(catalogo?.Cultura ?? Original); }
         catch (CultureNotFoundException) { cultura = CultureInfo.InvariantCulture; }
+        cultura = ComAlgarismosOcidentais(cultura);
 
         CultureInfo.DefaultThreadCurrentCulture = cultura;
         CultureInfo.DefaultThreadCurrentUICulture = cultura;
         CultureInfo.CurrentCulture = cultura;
         CultureInfo.CurrentUICulture = cultura;
         return catalogo is not null || codigo is null or "" or Original;
+    }
+
+    /// <summary>
+    /// Um nome todo em letra latina ("Franzininho (ATtiny85)") numa tela da
+    /// direita para a esquerda: os parenteses e o que fica na ponta tomariam a
+    /// direcao da tela e sairiam trocados. As marcas invisiveis de "esquerda
+    /// para a direita" nas duas pontas seguram o nome inteiro de um jeito so.
+    /// Nas outras linguas, e no nome que ja tem letra arabe, volta igual.
+    /// </summary>
+    public static string NaLinha(string nome)
+    {
+        if (string.IsNullOrEmpty(nome) || !cultura.TextInfo.IsRightToLeft) return nome;
+        foreach (char c in nome)
+            if (c is >= '\u0590' and <= '\u08FF' or >= '\uFB1D' and <= '\uFDFF' or >= '\uFE70' and <= '\uFEFF') return nome;
+        return "\u200E" + nome + "\u200E";
+    }
+
+    /// <summary>
+    /// A cultura com algarismos de 0 a 9, ponto decimal e o "-" simples quando
+    /// a lingua tem algarismos proprios (o arabe tem ٠١٢...، o "٫" decimal e
+    /// um "-" com marca de direcao). Numero de placa, de pino e de medida
+    /// fica igual ao do codigo e do que a placa imprime; e o WPF, que troca
+    /// os digitos pelo contexto quando a cultura pede, para de misturar
+    /// "٩٦٠٠ baud" com "0-4095" na mesma linha.
+    /// </summary>
+    static CultureInfo ComAlgarismosOcidentais(CultureInfo c)
+    {
+        if (c.NumberFormat.NativeDigits is [ "0", .. ] &&
+            c.NumberFormat.DigitSubstitution == DigitShapes.None) return c;
+        var nova = (CultureInfo)c.Clone();
+        var n = nova.NumberFormat;
+        n.NativeDigits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+        n.DigitSubstitution = DigitShapes.None;
+        n.NumberDecimalSeparator = n.CurrencyDecimalSeparator = n.PercentDecimalSeparator = ".";
+        n.NumberGroupSeparator = n.CurrencyGroupSeparator = n.PercentGroupSeparator = ",";
+        n.NegativeSign = "-";
+        n.PositiveSign = "+";
+        n.PercentSymbol = "%";
+        n.PerMilleSymbol = "‰";
+        return CultureInfo.ReadOnly(nova);
     }
 
     /// <summary>

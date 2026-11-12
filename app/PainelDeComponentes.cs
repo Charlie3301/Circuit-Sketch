@@ -299,7 +299,7 @@ public partial class MainWindow
         string t = item.Titulo;
         if (t.StartsWith("> ", StringComparison.Ordinal)) t = t[2..];
         if (t.Length > 2 && t[0] == '[' && t[^1] == ']') t = t[1..^1];
-        return t;
+        return Idioma.NaLinha(t);
     }
 
     /// <summary>A miniatura da peca (a mesma da paleta), numa moldura do tamanho da linha.</summary>

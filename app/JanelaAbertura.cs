@@ -520,7 +520,7 @@ public class JanelaAbertura : Window
         var linha = new DockPanel();
         linha.Children.Add(new TextBlock
         {
-            Text = perfil.Nome,
+            Text = Idioma.NaLinha(perfil.Nome),
             Foreground = Texto,
             FontSize = 13,
         });

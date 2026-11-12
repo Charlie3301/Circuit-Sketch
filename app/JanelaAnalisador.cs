@@ -90,7 +90,9 @@ public class JanelaAnalisador : Window
                                  SalvarVcd));
 
         // ---- os canais ----
-        var meio = new Grid { Margin = new Thickness(10, 0, 10, 0) };
+        // O tempo corre da esquerda para a direita, como num analisador de
+        // verdade, mesmo com a janela em arabe.
+        var meio = new Grid { Margin = new Thickness(10, 0, 10, 0), FlowDirection = FlowDirection.LeftToRight };
         meio.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(LarguraDosRotulos) });
         meio.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 

@@ -206,6 +206,27 @@ public partial class App : Application
             FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(lingua));
         }
 
+        // O arabe se le da direita para a esquerda: a janela inteira vira (o
+        // WPF espelha a disposicao, e o texto de dentro herda). O que nao e
+        // texto da lingua -- o circuito, o codigo, o que a placa imprime --
+        // fica da esquerda para a direita no proprio XAML/construtor. O Window
+        // ja tem metadado proprio de FlowDirection (nao aceita outro), e ha
+        // janela feita com "new Window": por isso o Loaded de toda janela.
+        // A imagem (a arte das pecas, a capa) o WPF espelharia junto: ela fica
+        // como foi desenhada, salvo se alguem pediu outra coisa nela.
+        if (Idioma.Cultura.TextInfo.IsRightToLeft)
+        {
+            EventManager.RegisterClassHandler(typeof(Window), FrameworkElement.LoadedEvent,
+                new RoutedEventHandler((janela, _) => ((Window)janela).FlowDirection = FlowDirection.RightToLeft));
+            EventManager.RegisterClassHandler(typeof(System.Windows.Controls.Image), FrameworkElement.LoadedEvent,
+                new RoutedEventHandler((imagem, _) =>
+                {
+                    var i = (System.Windows.Controls.Image)imagem;
+                    if (i.ReadLocalValue(FrameworkElement.FlowDirectionProperty) == DependencyProperty.UnsetValue)
+                        i.FlowDirection = FlowDirection.LeftToRight;
+                }));
+        }
+
         DispatcherUnhandledException += (_, ev) =>
         {
             Registrar("DispatcherUnhandledException", ev.Exception);
