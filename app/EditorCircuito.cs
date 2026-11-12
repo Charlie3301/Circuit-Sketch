@@ -231,6 +231,7 @@ public partial class EditorCircuito : Border
         foreach (var marca in estouros.Values) mundo.Children.Remove(marca);
         estouros.Clear();
         queimadasPelaAlimentacao.Clear();
+        MostrarAvisos([]);
         EsfriarReguladores();
         memoriaDaEnergia.Esquecer();
     }
@@ -5066,6 +5067,7 @@ public partial class EditorCircuito : Border
         AplicarGrade();
         PedirCacheDaFixa();
         if (soMedir) DesenharPontas();     // as pontas tem o mesmo tamanho na tela em qualquer zoom
+        if (avisosNaTela.Count > 0) DesenharAvisos();
     }
 
     // ================= comandos =================

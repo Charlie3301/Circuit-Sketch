@@ -9,7 +9,17 @@ namespace Simulador.App;
 /// Falso quando a ligação está errada mas a porta não tem corrente para
 /// destruir nada. Vira aviso na barra, e não peça estourada.
 /// </param>
-public sealed record Estouro(string Peca, string Motivo, bool Queimou = true);
+public sealed record Estouro(string Peca, string Motivo, bool Queimou = true)
+{
+    /// <summary>
+    /// O pino do aviso, quando ele e de um pino so (o de 3,3 V que recebe 5 V, o VCC
+    /// da peca de 5 V no 3V3): o editor poe a marca amarela em cima dele.
+    /// </summary>
+    public string Pino { get; init; }
+
+    /// <summary>O texto curto da marca no pino ("5 V numa porta de 3,3 V").</summary>
+    public string Marca { get; init; }
+}
 
 /// <summary>
 /// Descobre ligação que queima componente.
@@ -72,6 +82,15 @@ public static class Queima
 
         /// <summary>Maior tensão que uma PLACA põe neste nó (0 = nenhuma).</summary>
         public double TensaoDeTrilho;
+
+        /// <summary>Os pinos de dados de placa neste nó, com a tensão da lógica de cada placa.</summary>
+        public readonly List<(string Placa, string Pino, double Logica)> PinosDePlaca = [];
+
+        /// <summary>As saídas de módulo neste nó (o ECHO do HC-SR04), com a tensão do VCC do módulo.</summary>
+        public readonly List<(string Peca, string Pino, double Tensao)> SaidasDeModulo = [];
+
+        /// <summary>Os pinos de alimentação de placa (e de símbolo de VCC) neste nó, com a tensão de cada um.</summary>
+        public readonly List<(string Peca, string Pino, double Tensao, bool DePlaca)> Trilhos = [];
 
         /// <summary>Saídas ligadas neste nó: placa, pino e nível.</summary>
         public readonly List<(string Placa, int Gpio, bool Alto, double Tensao,
@@ -266,9 +285,11 @@ public static class Queima
         // A mesma placa pode aparecer por dois motivos; o primeiro basta.
         // O que QUEIMA vem antes do que só avisa: a peça só estoura uma
         // vez, e o motivo grave é o que interessa.
+        // Os avisos de nivel (10 e 11) vem a parte, um por pino: cada um tem a marca dele.
         return [.. achados
             .GroupBy(x => x.Peca)
-            .Select(g => g.OrderByDescending(x => x.Queimou).First())];
+            .Select(g => g.OrderByDescending(x => x.Queimou).First())
+            .Concat(AvisosDeNivel(circuito, rede, redes).DistinctBy(x => (x.Peca, x.Pino)))];
     }
 
     /// <summary>
@@ -451,8 +472,11 @@ public static class Queima
                     // Fonte de verdade é a da PLACA: o VCC de um módulo é
                     // quem consome, não quem fornece.
                     if (ehFonte)
-                        ponto.TensaoDeTrilho = Math.Max(ponto.TensaoDeTrilho,
-                            TensaoDoPino(pino.Nome, perfilDaPeca ?? doCircuito));
+                    {
+                        double v = TensaoDoPino(pino.Nome, perfilDaPeca ?? doCircuito);
+                        ponto.TensaoDeTrilho = Math.Max(ponto.TensaoDeTrilho, v);
+                        ponto.Trilhos.Add((peca.Id, pino.Nome, v, ehPlaca));
+                    }
                 }
 
                 // Só os pinos da PLACA entram como saída. Toda saída é,
@@ -471,6 +495,7 @@ public static class Queima
 
                 var maq = bancada.De(peca.Id);
                 if (ponto.Gpio < 0) ponto.Gpio = gpio;
+                ponto.PinosDePlaca.Add((peca.Id, pino.Nome, perfilDaPeca.TensaoDeOperacao));
 
                 if (maq.Modo[gpio] != 1) continue;
 
@@ -484,8 +509,163 @@ public static class Queima
             }
         }
 
+        // As saidas dos modulos: o comparador (LM393) e o HC-SR04 poem o sinal no
+        // nivel do VCC deles -- alimentados com 5 V, sao 5 V num pino de 3,3 V.
+        foreach (var peca in circuito.Pecas)
+        {
+            if (PerfilPlaca.EhPlaca(peca.Tipo) || Catalogo.EhProtoboard(peca.Tipo) || Netlist.EhFonte(peca.Tipo)) continue;
+            var def = Catalogo.Obter(peca.Tipo);
+            if (def is null) continue;
+            double vcc = def.Pinos.Where(p => EhAlimentacao(p.Nome))
+                .Select(p => Achar(redes, rede, peca.Id, p.Nome)?.TensaoDeTrilho ?? 0).DefaultIfEmpty(0).Max();
+            if (vcc <= 0) continue;
+            // O HC-SR501 tem regulador: a saida dele e de 3,3 V mesmo no 5 V.
+            double nivel = peca.Tipo == "pir-motion-sensor" ? Math.Min(vcc, 3.3) : vcc;
+            foreach (var pino in def.Pinos.Where(p => SaidasDeModulo.Contains(p.Nome)))
+                if (Achar(redes, rede, peca.Id, pino.Nome) is { } ponto)
+                    ponto.SaidasDeModulo.Add((peca.Id, pino.Nome, nivel));
+        }
+
         return redes;
     }
+
+    /// <summary>Os pinos de saida de modulo que saem no nivel do VCC dele.</summary>
+    static readonly HashSet<string> SaidasDeModulo = ["ECHO", "DO", "D0", "DOUT", "OUT"];
+
+    /// <summary>
+    /// As pecas que pedem 5 V no VCC, e a tensao abaixo da qual elas nao funcionam
+    /// direito. (O servo e o modulo de rele tem o aviso deles, com a conta de energia.)
+    /// </summary>
+    static readonly Dictionary<string, (double Minimo, string Sintoma)> PedemCincoVolts = new()
+    {
+        ["hc-sr04"] = (4.5, "o pulso do sensor sai fraco e o eco não volta: a distância lida fica em 0"),
+        ["lcd1602"] = (4.5, "o contraste some e os caracteres não aparecem"),
+        ["lcd2004"] = (4.5, "o contraste some e os caracteres não aparecem"),
+        ["lcd1602-i2c"] = (4.5, "o contraste some e os caracteres não aparecem"),
+        ["lcd2004-i2c"] = (4.5, "o contraste some e os caracteres não aparecem"),
+        ["gas-sensor"] = (4.5, "o aquecedor do MQ-2 não esquenta e a leitura não vale"),
+        ["max7219-matriz"] = (4.0, "o MAX7219 pede de 4 a 5,5 V: a matriz pisca ou apaga"),
+        ["neopixel"] = (3.5, "o WS2812 pede pelo menos 3,5 V: as cores saem erradas"),
+        ["led-ring"] = (3.5, "o WS2812 pede pelo menos 3,5 V: as cores saem erradas"),
+        ["neopixel-matrix"] = (3.5, "o WS2812 pede pelo menos 3,5 V: as cores saem erradas"),
+    };
+
+    /// <summary>As pecas que aguentam no maximo 3,6 V no VCC: com 5 V, queimam.</summary>
+    static readonly Dictionary<string, double> SoTresVolts = new()
+    {
+        ["nrf24l01"] = 3.6,
+        ["nrf24l01-pa-lna"] = 3.6,
+    };
+
+    /// <summary>
+    /// O nivel de tensao errado, em qualquer porta, nos dois sentidos -- e o que
+    /// acontece se ficar assim:
+    ///
+    ///   10) uma tensao maior numa porta de dados menor (5 V no pino da ESP32);
+    ///   11) uma tensao menor numa porta de dados maior (3,3 V no pino do Uno);
+    ///   12) a peca de 5 V alimentada pelo 3,3 V;
+    ///   13) 5 V num pino de alimentacao de 3,3 V (o 3V3 da placa, o VCC do nRF24L01).
+    ///
+    /// Sao avisos, com a marca no pino: na hora nada estoura no simulador, mas o
+    /// texto diz o que a bancada faz.
+    /// </summary>
+    static IEnumerable<Estouro> AvisosDeNivel(Circuito circuito, Netlist rede, Dictionary<string, Ponto> redes)
+    {
+        foreach (var ponto in redes.Values)
+        {
+            if (ponto.Resistor) continue;     // o resistor (o divisor) ja segura
+
+            // Quem poe tensao neste no, e com quanto. O pino em OUTPUT conta com a
+            // tensao da placa dele em HIGH ou em LOW: e o que ele PODE pôr (e assim
+            // a marca nao pisca com o LED).
+            var fontes = new List<(string Texto, double V, string Dono, bool Saida)>();
+            foreach (var t in ponto.Trilhos)
+                fontes.Add(($"o {t.Pino} do {NomeDe(circuito, t.Peca)}", t.Tensao, t.Peca, false));
+            foreach (var saida in ponto.Saidas)
+                fontes.Add(($"o pino {saida.Gpio} do {NomeDe(circuito, saida.Placa)}, em OUTPUT", saida.Tensao, saida.Placa, true));
+            foreach (var m in ponto.SaidasDeModulo)
+                fontes.Add(($"a saída {m.Pino} do {NomeDe(circuito, m.Peca)}, alimentado com {Volts(m.Tensao)}", m.Tensao, m.Peca, false));
+            if (fontes.Count == 0) continue;
+
+            // ---- 10 e 11) as portas de dados das placas ----
+            foreach (var (placa, pino, logica) in ponto.PinosDePlaca)
+            {
+                // A saida da propria placa neste no nao conta contra ela.
+                bool saidaDela = ponto.Saidas.Any(x => x.Placa == placa);
+                var outras = fontes.Where(f => !(f.Saida && f.Dono == placa)).ToList();
+
+                var maior = outras.Where(f => f.V > logica + 0.6).OrderByDescending(f => f.V).FirstOrDefault();
+                if (maior.Texto is not null)
+                {
+                    yield return new Estouro(placa,
+                        $"o pino {pino} recebe {Volts(maior.V)} ({maior.Texto}), e a porta do {NomeDe(circuito, placa)} é de "
+                        + $"{Volts(logica)}. Se ficar assim: a corrente entra pelos diodos de proteção da porta, ela esquenta "
+                        + "e pode queimar com o tempo (ou o chip trava e reinicia). Ponha um divisor de tensão (1 kΩ em série "
+                        + "e 2 kΩ para o GND) ou um conversor de nível lógico.",
+                        Queimou: false) { Pino = pino, Marca = $"{Volts(maior.V)} numa porta de {Volts(logica)}" };
+                    continue;
+                }
+
+                // A porta de entrada de 5 V com o HIGH de 3,3 V (a saida dela mesma nao conta).
+                if (saidaDela) continue;
+                var menor = outras.Where(f => f.V > 0 && f.V < logica - 1).OrderBy(f => f.V).FirstOrDefault();
+                if (menor.Texto is null || outras.Any(f => f.V >= logica - 0.5)) continue;
+                yield return new Estouro(placa,
+                    $"o pino {pino} recebe {Volts(menor.V)} ({menor.Texto}), e a porta do {NomeDe(circuito, placa)} é de "
+                    + $"{Volts(logica)}. Se ficar assim: o HIGH de {Volts(menor.V)} fica perto do limite que a porta entende "
+                    + "como HIGH (uns 3 V no ATmega). Costuma funcionar, mas sem folga: com ruído ou fio comprido a leitura "
+                    + "falha às vezes. Para garantir, use um conversor de nível lógico.",
+                    Queimou: false) { Pino = pino, Marca = $"{Volts(menor.V)} numa porta de {Volts(logica)}" };
+            }
+
+            // ---- 13) 5 V no 3V3 de uma placa: dois trilhos diferentes no mesmo fio ----
+            foreach (var baixo in ponto.Trilhos.Where(t => t.DePlaca && t.Tensao < 4))
+            {
+                var alto = fontes.Where(f => f.V > baixo.Tensao + 0.6).OrderByDescending(f => f.V).FirstOrDefault();
+                if (alto.Texto is null) continue;
+                yield return new Estouro(baixo.Peca,
+                    $"o {baixo.Pino} (a saída de {Volts(baixo.Tensao)} do regulador) está ligado em {Volts(alto.V)} ({alto.Texto}). "
+                    + $"Se ficar assim: os {Volts(alto.V)} entram pela saída do regulador e chegam no chip, que aguenta no máximo "
+                    + "3,6 V: na bancada a placa queima. Nunca ligue dois trilhos de tensões diferentes no mesmo fio.",
+                    Queimou: false) { Pino = baixo.Pino, Marca = $"{Volts(alto.V)} num pino de {Volts(baixo.Tensao)}" };
+            }
+        }
+
+        // ---- 12 e 13) as pecas: a de 5 V no 3,3 V, e a de 3,3 V no 5 V ----
+        foreach (var peca in circuito.Pecas)
+        {
+            var def = Catalogo.Obter(peca.Tipo);
+            if (def is null) continue;
+            bool pede5 = PedemCincoVolts.TryGetValue(peca.Tipo, out var pede);
+            bool so3 = SoTresVolts.TryGetValue(peca.Tipo, out double maximo);
+            if (!pede5 && !so3) continue;
+            foreach (var pino in def.Pinos.Where(p => EhAlimentacao(p.Nome)))
+            {
+                if (Achar(redes, rede, peca.Id, pino.Nome) is not { } ponto) continue;
+                double v = ponto.TensaoDeTrilho;
+                if (v <= 0) continue;
+                if (pede5 && v < pede.Minimo)
+                {
+                    yield return new Estouro(peca.Id,
+                        $"precisa de {Volts(pede.Minimo)} ou mais e está no {Volts(v)}. Se ficar assim: {pede.Sintoma}. "
+                        + "Ligue o VCC no 5V (ou no VIN) da placa.",
+                        Queimou: false) { Pino = pino.Nome, Marca = $"{Volts(v)} numa peça de 5 V" };
+                    break;
+                }
+                if (so3 && v > maximo)
+                {
+                    yield return new Estouro(peca.Id,
+                        $"aguenta no máximo {Volts(maximo)} no {pino.Nome} e está no {Volts(v)}. Se ficar assim: na bancada "
+                        + "ele queima em segundos. Ligue no 3V3 da placa (e ponha um capacitor de 10 µF no VCC).",
+                        Queimou: false) { Pino = pino.Nome, Marca = $"{Volts(v)} numa peça de {Volts(maximo)}" };
+                    break;
+                }
+            }
+        }
+    }
+
+    static string NomeDe(Circuito circuito, string idDaPeca)
+        => circuito.Achar(idDaPeca) is { } p ? Catalogo.Obter(p.Tipo)?.Nome ?? p.Tipo : idDaPeca;
 
     /// <summary>Tensão que um pino de alimentação de placa entrega.</summary>
     static double TensaoDoPino(string nome, PerfilPlaca perfil)

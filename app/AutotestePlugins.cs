@@ -18,9 +18,9 @@ public static partial class Autoteste
         if (wokwi is null) return;
         Plugins.RegistrarInstalados();
         Conferir("plugins: o bloco do Wokwi tem categoria, autor, o arquivo e a versao do programa em que foi instalado",
-            wokwi.Categoria == "Importação" && wokwi.Autor.Length > 0 && wokwi.Arquivos.SequenceEqual([System.IO.Path.Combine("wokwi", "wokwi.cs")])
+            wokwi.Categoria == "Importação e exportação" && wokwi.Autor.Length > 0 && wokwi.Arquivos.SequenceEqual([System.IO.Path.Combine("wokwi", "wokwi.cs")])
             && wokwi.Instalado is { } inst && inst.Programa == Plugins.VersaoDoPrograma && inst.Versao == wokwi.Versao
-            && Plugins.Categorias.Contains("Importação"),
+            && Plugins.Categorias.Contains("Importação e exportação"),
             $"{wokwi.Categoria} | {wokwi.Autor} | {string.Join(",", wokwi.Arquivos)} | {wokwi.Instalado}");
 
         const string diagrama = """
@@ -64,6 +64,47 @@ public static partial class Autoteste
                 && sem.Ignorados.Count == 5 && sem.Ignorados.All(t => t.StartsWith("wokwi-") || t.StartsWith("board-"))
                 && sem.Circuito.Pecas.Select(p => p.Id).Order().SequenceEqual(["ds1", "led2"]),
                 Tipos(sem) + " | ignorados: " + string.Join(",", sem.Ignorados));
+            Conferir("sem o plugin, os pinos do Wokwi tambem nao viram os daqui (o ENABLE do A4988, o 4 da DevKitC)",
+                FormatoWokwi.PinoDoWokwi("a4988", "ENABLE") is null && FormatoWokwi.PinoDoWokwi("esp32-devkit-v1", "4") is null
+                && FormatoWokwi.PinoDoWokwi("a4988", "EN") == "EN",
+                $"{FormatoWokwi.PinoDoWokwi("a4988", "ENABLE")} {FormatoWokwi.PinoDoWokwi("esp32-devkit-v1", "4")}");
+            Conferir("sem o plugin, o Exportar nao oferece o formato do Wokwi", Plugins.Exportadores.Count == 0,
+                string.Join(",", Plugins.Exportadores.Select(p => p.Formato)));
+
+            // ---- a exportacao para o Wokwi, e a volta ----
+            Plugins.Ligar("wokwi", true);
+            Conferir("com o plugin, os pinos do Wokwi viram os daqui (ENABLE -> EN, 4 -> D4, GND.1 da Pico -> GND)",
+                FormatoWokwi.PinoDoWokwi("a4988", "ENABLE") == "EN" && FormatoWokwi.PinoDoWokwi("esp32-devkit-v1", "4") == "D4"
+                && FormatoWokwi.PinoDoWokwi("pi-pico", "GND.1") == "GND",
+                $"{FormatoWokwi.PinoDoWokwi("a4988", "ENABLE")} {FormatoWokwi.PinoDoWokwi("esp32-devkit-v1", "4")} {FormatoWokwi.PinoDoWokwi("pi-pico", "GND.1")}");
+
+            var c = new Circuito();
+            c.Pecas.AddRange([
+                new PecaNoCircuito { Id = "esp", Tipo = "esp32-s3-devkit", X = 0, Y = 0 },
+                new PecaNoCircuito { Id = "drv", Tipo = "a4988", X = 300, Y = 0 },
+                new PecaNoCircuito { Id = "lcd", Tipo = "lcd1602-i2c", X = 500, Y = 0 },
+                new PecaNoCircuito { Id = "led1", Tipo = "led", X = 300, Y = 200 },
+                new PecaNoCircuito { Id = "m1", Tipo = "motor-dc", X = 500, Y = 300 },
+            ]);
+            c.Fios.Add(new Fio { DePeca = "drv", DePino = "EN", ParaPeca = "esp", ParaPino = "EN" });
+            c.Fios.Add(new Fio { DePeca = "led1", DePino = "A", ParaPeca = "esp", ParaPino = "4" });
+            var formato = Plugins.Exportadores.FirstOrDefault(p => p.Id == "wokwi");
+            string deles = ExportarWokwi.Gerar(c, "teste", "eu", formato);
+            string daqui = ExportarWokwi.Gerar(c, "teste", "eu");
+            Conferir("exportar para o Wokwi: as pecas com os nomes de la (board-, wokwi-, o LCD com pins=i2c, circuitsketch- no que eles nao tem) e os pinos de la",
+                formato?.Formato == "Wokwi" && deles.Contains("\"board-esp32-s3-devkitc-1\"") && deles.Contains("\"wokwi-a4988\"")
+                && deles.Contains("\"wokwi-lcd1602\"") && deles.Contains("\"pins\": \"i2c\"") && deles.Contains("\"wokwi-led\"")
+                && deles.Contains("\"circuitsketch-motor-dc\"") && deles.Contains("\"drv:ENABLE\"") && deles.Contains("\"esp:RST\""),
+                deles.Length > 700 ? deles[..700] : deles);
+            Conferir("o Exportar normal continua com os nomes daqui",
+                !daqui.Contains("wokwi-") && !daqui.Contains("board-") && daqui.Contains("\"lcd1602-i2c\"") && daqui.Contains("\"drv:EN\""),
+                daqui.Length > 400 ? daqui[..400] : daqui);
+            var volta = ImportarWokwi.Ler(deles);
+            Conferir("o que foi para o Wokwi volta igual: as pecas, o LCD com modulo e os fios nos mesmos pinos",
+                volta.Ignorados.Count == 0 && volta.FiosPerdidos.Count == 0
+                && c.Pecas.All(p => volta.Circuito.Achar(p.Id)?.Tipo == p.Tipo)
+                && volta.Circuito.Fios.Any(f => f.DePeca == "drv" && f.DePino == "EN" && f.ParaPino == "EN"),
+                Tipos(volta) + " | perdidos: " + string.Join(";", volta.FiosPerdidos));
         }
         finally { Plugins.Ligar("wokwi", era); }
 
@@ -83,7 +124,7 @@ public static partial class Autoteste
             """)]);
         Conferir("plugins: a classe e achada pelo Nome, o gancho pela assinatura, e sem o Nome o erro diz o que falta",
             semNome.Erro is not null && bom is { Erro: null, Nome: "Bom", Versao: "2.1" } && bom.TipoImportado is not null
-            && bom.TipoImportado("xyz-led", t => t == "led") == "led",
+            && bom.TipoImportado("xyz-led", null, t => t == "led") == "led",
             $"{semNome.Erro} | {bom.Erro} {bom.Nome} {bom.Versao}");
     }
 }

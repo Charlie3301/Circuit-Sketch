@@ -134,13 +134,23 @@
     "Id": "placa",
     "Tipo": "esp-12f",
     "X": 80,
-    "Y": 100
+    "Y": 100,
+    "Usb": true
    },
    {
     "Id": "matriz",
     "Tipo": "neopixel-matrix",
     "X": 320,
     "Y": 20
+   },
+   {
+    "Id": "fonte",
+    "Tipo": "power-bank",
+    "X": 300,
+    "Y": 330,
+    "Volts": 5.0,
+    "MiliAmperes": 2100,
+    "MiliAmperesHora": 6500
    }
   ],
   "Fios": [
@@ -154,18 +164,26 @@
    },
    {
     "DePeca": "matriz",
-    "DePino": "VCC",
-    "ParaPeca": "placa",
-    "ParaPino": "VCC",
-    "Cor": "#D6202A",
-    "Estilo": "solto"
-   },
-   {
-    "DePeca": "matriz",
     "DePino": "DIN",
     "ParaPeca": "placa",
     "ParaPino": "GPIO4",
     "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "matriz",
+    "DePino": "VCC",
+    "ParaPeca": "fonte",
+    "ParaPino": "+",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "fonte",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
     "Estilo": "solto"
    }
   ]

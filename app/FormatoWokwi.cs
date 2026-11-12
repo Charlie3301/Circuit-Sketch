@@ -10,9 +10,10 @@ namespace Simulador.App;
 /// as cores, e os pinos dos arquivos deles. O <see cref="ExportarWokwi"/> escreve
 /// e o <see cref="ImportarWokwi"/> le.
 ///
-/// As pecas vao com os nomes daqui ("led", "esp32-s3-devkit"), sem prefixo. Os
-/// nomes do Wokwi ("wokwi-led", "board-esp32-s3-devkitc-1") sao do plugin do
-/// Wokwi (plugins/wokwi): e ele que abre os arquivos de la.
+/// As pecas e os pinos vao com os nomes daqui ("led", "esp32-s3-devkit"), sem
+/// prefixo. Os nomes do Wokwi ("wokwi-led", "board-esp32-s3-devkitc-1", o ENABLE
+/// do A4988) sao do plugin do Wokwi (plugins/wokwi): e ele que abre os arquivos de
+/// la e que escreve no formato deles.
 /// </summary>
 public static class FormatoWokwi
 {
@@ -32,96 +33,31 @@ public static class FormatoWokwi
     /// exportacao escreve. Os nomes do Wokwi ("wokwi-led", "board-esp32-s3-devkitc-1")
     /// sao do plugin do Wokwi (plugins/wokwi) -- desligado, eles nao abrem.
     /// </summary>
-    public static string TipoDoWokwi(string deles)
+    public static string TipoDoWokwi(string deles, IReadOnlyDictionary<string, string> atributos = null)
     {
         if (string.IsNullOrEmpty(deles)) return null;
         if (deles.StartsWith(PrefixoNosso, StringComparison.Ordinal) && Catalogo.Obter(deles[PrefixoNosso.Length..]) is not null)
             return deles[PrefixoNosso.Length..];
         if (Catalogo.Obter(deles) is not null) return deles;
-        return Plugins.TipoImportado(deles);
+        return Plugins.TipoImportado(deles, atributos);
     }
 
     // =====================================================================
     //  os pinos
     // =====================================================================
 
-    static Dictionary<string, string> Portas(string saida) => new() { ["Q"] = saida };
-
-    /// <summary>Os pinos com nome diferente nos arquivos do Wokwi, por peca (o daqui e o de la), para abrir os deles.</summary>
-    static readonly Dictionary<string, Dictionary<string, string>> PinosDiferentes = new()
-    {
-        // O A4988 deles tem um GND so, e os nomes inteiros.
-        ["a4988"] = new() { ["EN"] = "ENABLE", ["RST"] = "RESET", ["SLP"] = "SLEEP", ["GND.2"] = "GND" },
-        // O Uno e a Mega deles nao tem os pinos do ICSP: vao os da barra, que sao os mesmos.
-        ["arduino-uno"] = new() { ["12.2"] = "12", ["13.2"] = "13", ["11.2"] = "11", ["5V.2"] = "5V", ["RESET.2"] = "RESET",
-                                  ["GND.4"] = "GND.1", ["5V.3"] = "5V", ["GND.5"] = "GND.2" },
-        ["arduino-mega"] = new() { ["50.2"] = "50", ["52.2"] = "52", ["51.2"] = "51", ["5V.3"] = "5V", ["RESET.2"] = "RESET",
-                                   ["GND.6"] = "GND.1", ["5V.4"] = "5V", ["GND.7"] = "GND.2" },
-        // As DevKits da Espressif: o nosso EN e o RST da serigrafia (e do
-        // Wokwi), e la todo pino de energia repetido e numerado desde o 1.
-        ["esp32-s3-devkit"] = new() { ["EN"] = "RST", ["3V3"] = "3V3.1", ["GND"] = "GND.1" },
-        ["esp32-s2-devkit"] = new() { ["EN"] = "RST", ["GND"] = "GND.1" },
-        ["esp32-c3-devkit"] = new() { ["EN"] = "RST", ["3V3"] = "3V3.1", ["5V"] = "5V.1", ["GND"] = "GND.1" },
-        ["esp32-c6-devkit"] = new() { ["EN"] = "RST", ["GND"] = "GND.1", ["NC"] = "NC0", ["NC.2"] = "NC1" },
-        ["esp32-h2-devkit"] = new() { ["EN"] = "RST", ["GND"] = "GND.1" },
-        ["and-gate"] = Portas("OUT"), ["or-gate"] = Portas("OUT"), ["xor-gate"] = Portas("OUT"),
-        ["nand-gate"] = Portas("OUT"), ["nor-gate"] = Portas("OUT"), ["xnor-gate"] = Portas("OUT"),
-        ["not-gate"] = Portas("OUT"), ["mux-2"] = Portas("OUT"), ["buffer-gate"] = Portas("OUT"),
-        ["flip-flop-d"] = new() { ["NQ"] = "NOTQ" },
-        ["flip-flop-dsr"] = new() { ["NQ"] = "NOTQ" },
-        // A Pico deles numera todos os GND (o primeiro e GND.1).
-        ["pi-pico"] = new() { ["GND"] = "GND.1" },
-        ["pi-pico-w"] = new() { ["GND"] = "GND.1" },
-    };
-
     /// <summary>
-    /// O nome do pino daqui. Nulo quando nao existe mesmo -- melhor perder o
-    /// fio e dizer qual do que criar um fio que aponta para o nada.
+    /// O nome do pino daqui. O nome exato vale direto; o resto (os pinos com outro
+    /// nome nos arquivos do Wokwi, o numero do GPIO da DevKitC) e dos plugins. Nulo
+    /// quando nao existe mesmo -- melhor perder o fio e dizer qual do que criar um
+    /// fio que aponta para o nada.
     /// </summary>
     public static string PinoDoWokwi(string tipo, string pino)
     {
         var def = tipo is null ? null : Catalogo.Obter(tipo);
         if (def is null) return pino;
-
-        bool Existe(string n) => def.Pinos.Any(x => x.Nome == n);
-        if (Existe(pino)) return pino;
-        if (PinosDiferentes.TryGetValue(tipo, out var mapa))
-            foreach (var (nosso, deles) in mapa)
-                if (deles == pino && Existe(nosso)) return nosso;
-
-        // ESP32: o diagrama da DevKitC traz o numero do GPIO, a placa daqui
-        // tem o nome da serigrafia.
-        foreach (string tentativa in Alternativas(pino))
-            if (Existe(tentativa)) return tentativa;
-
-        // "GND.2" pedido numa peca que so tem "GND", e o contrario.
-        string semSufixo = pino.Contains('.') ? pino[..pino.IndexOf('.')] : null;
-        if (semSufixo is not null && Existe(semSufixo)) return semSufixo;
-        return def.Pinos.FirstOrDefault(x => x.Nome.StartsWith(pino + ".", StringComparison.Ordinal))?.Nome;
-    }
-
-    static IEnumerable<string> Alternativas(string pino)
-    {
-        switch (pino)
-        {
-            case "16": yield return "RX2"; break;
-            case "17": yield return "TX2"; break;
-            case "1": yield return "TX0"; break;
-            case "3": yield return "RX0"; break;
-            case "TX": yield return "TX0"; yield return "TX2"; break;
-            case "RX": yield return "RX0"; yield return "RX2"; break;
-            // A entrada de 5 V: "VIN" na DevKit V1, "5V" num diagrama escrito a mao.
-            case "5V": yield return "VIN"; yield return "VUSB"; break;
-            case "VIN": yield return "5V"; break;
-            case "VCC": yield return "VIN"; yield return "5V"; yield return "3V3"; break;
-            case "3.3V": case "3V": yield return "3V3"; break;
-            case "3V3": yield return "3.3V"; break;
-            // O reset: RST nas DevKits novas, EN na DevKit V1.
-            case "RST": yield return "EN"; break;
-        }
-        yield return "D" + pino;                            // 4 -> D4
-        if (pino.StartsWith('D')) yield return pino[1..];   // D4 -> 4
-        yield return "GPIO" + pino;
+        if (def.Pinos.Any(x => x.Nome == pino)) return pino;
+        return Plugins.PinoImportado(tipo, pino, [.. def.Pinos.Select(x => x.Nome)]);
     }
 
     // =====================================================================

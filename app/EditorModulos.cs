@@ -186,8 +186,12 @@ public partial class EditorCircuito
     /// Depois da conta de energia do quadro -- a do quadro anterior nao serve: no
     /// comeco da execucao ela ainda nao existe, e o begin() do sketch ja procura o sensor.
     /// </summary>
+    /// <summary>Os avisos dos DS18B20 deste quadro (o pull-up que falta), para os selos.</summary>
+    readonly List<Estouro> avisosDeUmFio = [];
+
     void AplicarUmFio(Bancada bancada, Netlist rede, Energia conta)
     {
+        avisosDeUmFio.Clear();
         foreach (var peca in Atual.Pecas)
         {
             if (peca.Tipo != "ds18b20") continue;
@@ -205,8 +209,15 @@ public partial class EditorCircuito
             sensor.Alimentado = ligado;
             sensor.Parasita = parasita;
             if (Comportamento.De(peca.Tipo) is { } comp) sensor.Temperatura = comp.ValorReal(peca.Giro);
-            if (!puxado && ligado) maq.Avisar("DS18B20: o fio DQ precisa de um resistor de pull-up (4,7 kohm) para o VCC; "
-                                              + "sem ele o fio nao sobe e o sensor nao responde.");
+            if (!puxado && ligado)
+            {
+                maq.Avisar("DS18B20: o fio DQ precisa de um resistor de pull-up (4,7 kohm) para o VCC; "
+                           + "sem ele o fio nao sobe e o sensor nao responde.");
+                avisosDeUmFio.Add(new Estouro(peca.Id,
+                    "o fio DQ precisa de um resistor de pull-up de 4,7 kΩ para o VCC. Se ficar assim: o fio de 1-Wire "
+                    + "não sobe, nenhum sensor responde e a leitura dá -127 °C.", Queimou: false)
+                    { Pino = "DQ", Marca = "falta o pull-up de 4,7 kΩ" });
+            }
         }
     }
 

@@ -254,7 +254,7 @@
                         <!-- CIRCUITO EM JSON -->
                         <MenuItem Header="Importar circuito (diagram.json)..."
                                   InputGestureText="Ctrl+I" Click="ImportarDoWokwi"/>
-                        <MenuItem Header="Exportar circuito (diagram.json)..."
+                        <MenuItem x:Name="miExportar" Header="Exportar circuito (diagram.json)..."
                                   Click="ExportarParaWokwi"/>
                         <MenuItem x:Name="miExportarHex"
                                   Header="Exportar programa gravável (.hex)..."

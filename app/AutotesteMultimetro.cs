@@ -327,6 +327,9 @@ public static partial class Autoteste
             Conferir("barra: o nome e o autor aparecem do lado dos botoes de mandar o codigo, e a contagem de pecas saiu",
                 nome == "Semaforo da turma" && autor == "por Prof. Joao" && !dica.Contains("arraste no vazio"),
                 $"'{nome}' '{autor}' dica='{dica}'");
+            var itens = janela.TesteItensDeExportar();
+            Conferir("menu: com o plugin do Wokwi ligado, aparece o \"Exportar para o Wokwi\" logo abaixo do Exportar",
+                itens.Contains("Exportar para o Wokwi (diagram.json)..."), string.Join(" | ", itens));
         }
         finally { janela.TesteParar(); }
     }

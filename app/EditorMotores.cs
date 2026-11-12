@@ -392,6 +392,7 @@ public partial class EditorCircuito
         achados.AddRange(avisosDePasso);
         achados.AddRange(avisosDeServo);
         achados.AddRange(avisosDeEsc);
+        achados.AddRange(avisosDeUmFio);
         achados.AddRange(EstourosDosReguladores(conta));
 
         // A placa que recebeu tensao demais num pino de alimentacao -- sem o

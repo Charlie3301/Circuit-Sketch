@@ -111,12 +111,14 @@ public static class ImportarWokwi
                     id = id.Replace(':', '_');
                 }
 
-                string tipo = FormatoWokwi.TipoDoWokwi(tipoWokwi);
                 parte.TryGetProperty("attrs", out var attrs);
-
-                // O LCD deles troca de conector por atributo: pins="i2c" sao
-                // quatro vias (GND, VCC, SDA, SCL) em vez das dezesseis.
-                if (tipo is "lcd1602" or "lcd2004" && Atributo(attrs, "pins") == "i2c") tipo += "-i2c";
+                // Os atributos de texto vao junto para o plugin: o LCD do Wokwi troca de
+                // conector pelo pins="i2c" (e aqui e outra peca).
+                var atributosDeTexto = new Dictionary<string, string>();
+                if (attrs.ValueKind == JsonValueKind.Object)
+                    foreach (var campo in attrs.EnumerateObject())
+                        if (campo.Value.ValueKind == JsonValueKind.String) atributosDeTexto[campo.Name] = campo.Value.GetString();
+                string tipo = FormatoWokwi.TipoDoWokwi(tipoWokwi, atributosDeTexto);
 
                 if (tipo is null || Catalogo.Obter(tipo) is null)
                 {

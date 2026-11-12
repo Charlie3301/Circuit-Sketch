@@ -157,7 +157,7 @@ public static partial class Autoteste
                 && !saiu.Contains("circuitsketch-"), saiu.Length > 400 ? saiu[..400] : saiu);
             Conferir("tipos: os nomes do Wokwi (e o circuitsketch- da Alpha 24) abrem como os daqui (a S3 nao vira a DevKit V1)",
                 nossos.Zip(deles).All(z => FormatoWokwi.TipoDoWokwi(z.Second) == z.First && FormatoWokwi.TipoDoWokwi(z.First) == z.First),
-                string.Join(", ", deles.Select(FormatoWokwi.TipoDoWokwi)));
+                string.Join(", ", deles.Select(d => FormatoWokwi.TipoDoWokwi(d))));
             Conferir("pinos: o A4988 deles chama EN de ENABLE, e abre no EN",
                 FormatoWokwi.PinoDoWokwi("a4988", "ENABLE") == "EN" && FormatoWokwi.PinoDoWokwi("a4988", "EN") == "EN", "a4988");
         }

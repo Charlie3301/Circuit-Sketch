@@ -26,7 +26,32 @@ public static class ExportarWokwi
 {
     /// <param name="nome">O "name" (o nome do projeto). Nulo: o do circuito.</param>
     /// <param name="autor">O "author". Nulo: o do circuito.</param>
-    public static string Gerar(Circuito circuito, string nome = null, string autor = null)
+    /// <param name="para">O plugin do formato de fora (o do Wokwi); null: o diagrama daqui, com os nomes daqui.</param>
+    public static string Gerar(Circuito circuito, string nome = null, string autor = null, Plugins.Plugin para = null)
+    {
+        formatoDeFora = para;
+        try { return GerarNoFormato(circuito, nome, autor); }
+        finally { formatoDeFora = null; }
+    }
+
+    /// <summary>O plugin do formato em que o diagrama esta sendo escrito agora (null: o daqui).</summary>
+    [ThreadStatic] static Plugins.Plugin formatoDeFora;
+
+    static string TipoEscrito(string tipo)
+    {
+        if (formatoDeFora?.TipoExportado is not { } exporta) return tipo;
+        try { return exporta(tipo) ?? tipo; }
+        catch { return tipo; }
+    }
+
+    static string PinoEscrito(string tipo, string pino)
+    {
+        if (formatoDeFora?.PinoExportado is not { } exporta) return pino;
+        try { return exporta(tipo, pino) ?? pino; }
+        catch { return pino; }
+    }
+
+    static string GerarNoFormato(Circuito circuito, string nome, string autor)
     {
         var texto = new StringBuilder();
         texto.Append("{\n");
@@ -84,7 +109,7 @@ public static class ExportarWokwi
     {
         var campos = new List<(string Chave, string Valor)>
         {
-            ("type", FormatoWokwi.Aspas(peca.Tipo)),
+            ("type", FormatoWokwi.Aspas(TipoEscrito(peca.Tipo))),
             ("id", FormatoWokwi.Aspas(peca.Id)),
             ("top", FormatoWokwi.Num(peca.Y)),
             ("left", FormatoWokwi.Num(peca.X)),
@@ -123,6 +148,14 @@ public static class ExportarWokwi
     {
         var a = new List<(string, string)>();
         void Por(string chave, string valor) => a.Add((chave, valor));
+
+        // O que o formato de fora pede a mais (o pins="i2c" do LCD com modulo, no Wokwi).
+        if (formatoDeFora?.AtributosExportados is { } extras)
+        {
+            Dictionary<string, string> doFormato = null;
+            try { doFormato = extras(p.Tipo); } catch { }
+            foreach (var (chave, valor) in doFormato ?? []) Por(chave, valor);
+        }
         static string Exato(double v) => v.ToString("0.########", CultureInfo.InvariantCulture);
 
         switch (p.Tipo)
@@ -196,8 +229,8 @@ public static class ExportarWokwi
         if (pecaDe is null || pecaPara is null) return null;
         if (Catalogo.Obter(pecaDe.Tipo) is null || Catalogo.Obter(pecaPara.Tipo) is null) return null;
 
-        string de = $"{pecaDe.Id}:{fio.DePino}";
-        string para = $"{pecaPara.Id}:{fio.ParaPino}";
+        string de = $"{pecaDe.Id}:{PinoEscrito(pecaDe.Tipo, fio.DePino)}";
+        string para = $"{pecaPara.Id}:{PinoEscrito(pecaPara.Tipo, fio.ParaPino)}";
         return $"    [ {FormatoWokwi.Aspas(de)}, {FormatoWokwi.Aspas(para)}, "
                + $"{FormatoWokwi.Aspas(FormatoWokwi.CorDoFioParaWokwi(fio.Cor))}, {Rota(circuito, fio)} ]";
     }

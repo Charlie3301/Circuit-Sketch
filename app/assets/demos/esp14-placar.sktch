@@ -139,13 +139,23 @@
     "Id": "placa",
     "Tipo": "esp-14",
     "X": 80,
-    "Y": 100
+    "Y": 100,
+    "Usb": true
    },
    {
     "Id": "anel",
     "Tipo": "led-ring",
     "X": 320,
     "Y": 20
+   },
+   {
+    "Id": "fonte",
+    "Tipo": "power-bank",
+    "X": 300,
+    "Y": 330,
+    "Volts": 5.0,
+    "MiliAmperes": 2100,
+    "MiliAmperesHora": 6500
    }
   ],
   "Fios": [
@@ -159,18 +169,26 @@
    },
    {
     "DePeca": "anel",
-    "DePino": "VCC",
-    "ParaPeca": "placa",
-    "ParaPino": "VCC",
-    "Cor": "#D6202A",
-    "Estilo": "solto"
-   },
-   {
-    "DePeca": "anel",
     "DePino": "DIN",
     "ParaPeca": "placa",
     "ParaPino": "GPIO0",
     "Cor": "#00A651",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "anel",
+    "DePino": "VCC",
+    "ParaPeca": "fonte",
+    "ParaPino": "+",
+    "Cor": "#D6202A",
+    "Estilo": "solto"
+   },
+   {
+    "DePeca": "fonte",
+    "DePino": "-",
+    "ParaPeca": "placa",
+    "ParaPino": "GND",
+    "Cor": "#1A1A1A",
     "Estilo": "solto"
    }
   ]

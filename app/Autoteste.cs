@@ -152,6 +152,8 @@ public static partial class Autoteste
         Bloco("Visao_CinzaTransparente", Visao_CinzaTransparente);
         Bloco("Depurador_AoVivo", Depurador_AoVivo);
         Bloco("Barra_NomeDoCircuito", Barra_NomeDoCircuito);
+        Bloco("Queima_NivelDeTensao", Queima_NivelDeTensao);
+        Bloco("Avisos_SelosNoCircuito", Avisos_SelosNoCircuito);
         Bloco("Sensores_Redesenhados", Sensores_Redesenhados);
         Bloco("Esp8266_Redesenhadas", Esp8266_Redesenhadas);
         Bloco("Pcb_Base", Pcb_Base);

@@ -1160,6 +1160,7 @@ public partial class MainWindow : Window
         editor.ApagarQueimaduras();
         faltasPerdoadas.Clear();
         avisosDeLigacao.Clear();
+        queimadosNaRodada.Clear();
         servidoresAbertos.Clear();
         avisouDoRitmo = false;
 
@@ -1262,6 +1263,7 @@ public partial class MainWindow : Window
     /// </summary>
     void MontarMenusDinamicos(object s = null, RoutedEventArgs e = null)
     {
+        MontarExportarDosPlugins();
         miRecentes.Items.Clear();
         var lista = Recentes.Ler();
 
@@ -2378,21 +2380,71 @@ public partial class MainWindow : Window
     internal string TesteHex()
         => Montador.Juntar(CodigoPrincipal() ?? "").Hex();
 
-    void ExportarParaWokwi(object s = null, RoutedEventArgs e = null)
+    /// <summary>
+    /// O "Exportar": o diagrama daqui, ou -- com um plugin de formato ligado, como o
+    /// do Wokwi -- o diagrama no formato de fora (a escolha e o "Tipo" do dialogo).
+    /// </summary>
+    void ExportarParaWokwi(object s = null, RoutedEventArgs e = null) => Exportar(null);
+
+    void Exportar(Plugins.Plugin para)
     {
+        var formatos = Plugins.Exportadores;
         var dlg = new Microsoft.Win32.SaveFileDialog
         {
-            Filter = "Diagrama (diagram.json)|*.json",
+            Filter = string.Join("|", new[] { "Diagrama do CircuitSketch (diagram.json)|*.json" }
+                .Concat(formatos.Select(f => $"Diagrama para o {f.Formato} (diagram.json)|*.json"))),
+            FilterIndex = para is null ? 1 : formatos.ToList().IndexOf(para) + 2,
             FileName = "diagram.json"
         };
         if (dlg.ShowDialog() != true) return;
+        var formato = dlg.FilterIndex >= 2 && dlg.FilterIndex - 2 < formatos.Count ? formatos[dlg.FilterIndex - 2] : null;
 
         try
         {
-            File.WriteAllText(dlg.FileName, DiagramaDoCircuito());
-            Aviso($"exportado: {editor.Atual.Pecas.Count} peças, {editor.Atual.Fios.Count} fios");
+            File.WriteAllText(dlg.FileName, ExportarWokwi.Gerar(editor.Atual, NomeDoProjeto(), AutorDoProjeto(), formato));
+            if (formato is null)
+            {
+                Aviso($"exportado: {editor.Atual.Pecas.Count} peças, {editor.Atual.Fios.Count} fios");
+                return;
+            }
+            // A peca que o formato de fora nao tem sai como "circuitsketch-<nome>": la
+            // ela aparece como desconhecida, e aqui volta inteira. Melhor dizer agora.
+            var soNossas = editor.Atual.Pecas.Select(x => x.Tipo).Distinct()
+                .Where(t => formato.TipoExportado(t)?.StartsWith(FormatoWokwi.PrefixoNosso, StringComparison.Ordinal) == true)
+                .ToList();
+            Aviso(soNossas.Count == 0
+                ? $"exportado para o {formato.Formato}: {editor.Atual.Pecas.Count} peças, {editor.Atual.Fios.Count} fios"
+                : $"exportado para o {formato.Formato}; ele não tem {string.Join(", ", soNossas.Take(5))}"
+                  + (soNossas.Count > 5 ? " e outras" : "") + " (ficam no arquivo para voltar para cá)");
         }
         catch (Exception ex) { Erro($"não deu para exportar: {ex.Message}"); }
+    }
+
+    /// <summary>"Exportar para o Wokwi (diagram.json)...", um por plugin de formato ligado, logo abaixo do Exportar.</summary>
+    void MontarExportarDosPlugins()
+    {
+        foreach (var velho in menuOpcoes.Items.OfType<MenuItem>().Where(m => m.Tag is "exportar-plugin").ToList())
+            menuOpcoes.Items.Remove(velho);
+        int onde = menuOpcoes.Items.IndexOf(miExportar);
+        foreach (var formato in Plugins.Exportadores)
+        {
+            var item = new MenuItem
+            {
+                Header = $"Exportar para o {formato.Formato} (diagram.json)...",
+                Tag = "exportar-plugin",
+                ToolTip = $"Pelo plugin {formato.Nome}: o circuito com os nomes de peças e pinos do {formato.Formato}",
+            };
+            var esse = formato;
+            item.Click += (_, _) => Exportar(esse);
+            menuOpcoes.Items.Insert(++onde, item);
+        }
+    }
+
+    /// <summary>Para o teste: os itens do menu que os plugins puseram.</summary>
+    internal List<string> TesteItensDeExportar()
+    {
+        MontarExportarDosPlugins();
+        return [.. menuOpcoes.Items.OfType<MenuItem>().Where(m => m.Tag is "exportar-plugin").Select(m => (string)m.Header)];
     }
 
     void ImportarDoWokwi(object s = null, RoutedEventArgs e = null)
@@ -4798,6 +4850,7 @@ public partial class MainWindow : Window
         avisouDoRitmo = false;
         celularAbertoNestaRodada = false;
         avisosDeLigacao.Clear();
+        queimadosNaRodada.Clear();
         servidoresAbertos.Clear();
 
         // O radio do computador pode ter mudado desde a ultima execucao:
@@ -6392,15 +6445,19 @@ public partial class MainWindow : Window
     {
         // Desligada nas configuracoes: nada queima -- mas na bancada queima,
         // e a janela de configuracoes diz isso ao lado da caixa.
-        if (!Preferencias.Ligado(Preferencias.SimularQueima, true)) return;
+        if (!Preferencias.Ligado(Preferencias.SimularQueima, true)) { editor.MostrarAvisos([]); return; }
         bool noMonitor = Preferencias.Ligado(Preferencias.AvisosNoMonitor, true);
 
         // As ligacoes com a placa (Queima) e a corrente de verdade (a conta de
         // energia do quadro): esta segunda e a que ve o LED na bateria.
+        // Cada aviso ganha o selo dele no circuito, em cima da peca (ou do pino); o que
+        // queimou fica com o selo vermelho ate a proxima rodada.
+        var naTela = new List<Estouro>();
         foreach (var estouro in Queima.Conferir(editor.Atual, rede, bancada)
                                      .Concat(editor.EstourosPelaEnergia()))
         {
             if (editor.EstaQueimada(estouro.Peca)) continue;
+            if (!estouro.Queimou) naTela.Add(estouro);
 
             var alvo = editor.Atual.Achar(estouro.Peca);
             string comoChama = alvo is null ? "peça"
@@ -6418,6 +6475,7 @@ public partial class MainWindow : Window
             }
 
             editor.Queimar(estouro.Peca);
+            queimadosNaRodada[estouro.Peca] = estouro;
 
             var peca = editor.Atual.Achar(estouro.Peca);
             string nome = peca is null ? "peça"
@@ -6434,7 +6492,12 @@ public partial class MainWindow : Window
                 foreach (var (_, m) in bancada.Todas)
                     lock (m.Trava) m.Serial.Add($"💥 {nome} queimou: {estouro.Motivo}");
         }
+        naTela.AddRange(queimadosNaRodada.Values.Where(q => editor.EstaQueimada(q.Peca)));
+        editor.MostrarAvisos(naTela);
     }
+
+    /// <summary>O que queimou nesta rodada, e por que: o selo vermelho fica ate a proxima.</summary>
+    readonly Dictionary<string, Estouro> queimadosNaRodada = [];
 
     /// <summary>
     /// Reconstroi o painel a partir da lista da Maquina. Antes era
