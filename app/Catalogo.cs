@@ -604,6 +604,7 @@ public static class Catalogo
         "ir-obstacle-sensor" => "Sensor de obstaculo infravermelho (FC-51)",
         "tcrt5000" => "Sensor reflexivo TCRT5000 (seguidor de linha)",
         "hc-05" => "Modulo Bluetooth HC-05",
+        "ds18b20" => "Sensor de temperatura DS18B20",
         "gas-sensor" => "Sensor de gas",
         "heart-beat-sensor" => "Sensor de batimento",
         "big-sound-sensor" => "Sensor de som (grande)",
@@ -697,7 +698,7 @@ public static class Catalogo
         "hc-sr04" or "dht22" or "photoresistor-sensor" or "ntc-temperature-sensor"
             or "pir-motion-sensor" or "flame-sensor" or "gas-sensor"
             or "heart-beat-sensor" or "big-sound-sensor" or "small-sound-sensor"
-            or "mpu6050" or "hx711" or "dht11" or "ir-obstacle-sensor" or "tcrt5000" => "Sensores",
+            or "mpu6050" or "hx711" or "dht11" or "ir-obstacle-sensor" or "tcrt5000" or "ds18b20" => "Sensores",
 
         "buzzer" or "ks2e-m-dc5" or "alto-falante" or "modulo-rele-1" or "modulo-rele-2" or "modulo-rele-4" => "Atuadores",
 

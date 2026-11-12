@@ -4929,6 +4929,36 @@
   "metades": false
  },
  {
+  "id": "ds18b20",
+  "largura": 29,
+  "altura": 49,
+  "pinos": [
+   {
+    "nome": "GND",
+    "x": 4.76,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "GND (pino 1)"
+   },
+   {
+    "nome": "DQ",
+    "x": 14.36,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Dados do 1-Wire (pino 2): no pino da placa, com um resistor de 4,7 kohm para o VCC (o pull-up)"
+   },
+   {
+    "nome": "VCC",
+    "x": 23.96,
+    "y": 46.87,
+    "sinais": [],
+    "descricao": "Alimentacao VDD (pino 3): 3,0 a 5,5 V; ligado no GND, o sensor funciona no modo parasita"
+   }
+  ],
+  "variantes": [],
+  "metades": false
+ },
+ {
   "id": "esc",
   "largura": 378,
   "altura": 151,

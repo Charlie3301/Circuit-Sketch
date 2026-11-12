@@ -7,6 +7,7 @@
 #include <LittleFS.h>
 #include <Adafruit_NeoPixel.h>
 #include <DHT.h>
+#include <OneWire.h>
 #if defined(ARDUINO_ARCH_RP2040)
 #include "pico/time.h"
 #endif
@@ -269,6 +270,24 @@ void cs_py_fita_escrever(int p, const uint8_t *b, size_t n)
     /* Os bytes como vao no fio: verde, vermelho, azul. */
     for (size_t i = 0; i < leds; i++) f->setPixelColor((uint16_t)i, b[3 * i + 1], b[3 * i], b[3 * i + 2]);
     f->show();
+}
+
+/* ---- o _onewire: um OneWire do simulador por pino ---- */
+static OneWire *umFio(int p)
+{
+    static std::map<int, OneWire *> fios;
+    OneWire *&o = fios[p];
+    if (!o) o = new OneWire((uint8_t)p);
+    return o;
+}
+
+extern "C" int cs_py_umfio_reset(int p) { return umFio(p)->reset(); }
+
+extern "C" int cs_py_umfio_bit(int p, int mestre)
+{
+    if (mestre) return umFio(p)->read_bit();
+    umFio(p)->write_bit(0);
+    return 0;
 }
 
 bool cs_py_dht_medir(int p, int tipo, float *temperatura, float *umidade)

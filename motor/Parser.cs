@@ -49,6 +49,9 @@ public class Parser(List<Token> toks)
         "void","int","long","short","char","float","double","bool","boolean","byte",
         "unsigned","signed","const","static","volatile","String","word",
 
+        // O endereco de um DS18B20 (o "typedef uint8_t DeviceAddress[8];" do DallasTemperature).
+        "DeviceAddress",
+
         // Qualificadores que nao mudam o valor, so o compilador. Um
         // projeto de varios arquivos comeca com "constexpr uint32_t
         // PERIODO = 40;" e "extern GnssState gnss;" -- sem eles na
@@ -102,7 +105,17 @@ public class Parser(List<Token> toks)
     readonly HashSet<string> estruturas = [];
 
     /// <summary>"typedef uint8_t pino_t;" e "using Pino = uint8_t;": o nome e o tipo de verdade.</summary>
-    readonly Dictionary<string, string> apelidos = [];
+    readonly Dictionary<string, string> apelidos = new() { ["DeviceAddress"] = "uint8_t*" };
+
+    /// <summary>
+    /// Os apelidos de vetor e o tamanho de cada um: "typedef uint8_t DeviceAddress[8];"
+    /// (o do DallasTemperature ja vem aqui). "DeviceAddress a;" e o "uint8_t a[8];"
+    /// -- um vetor de verdade, e nao um ponteiro solto; no parametro continua ponteiro.
+    /// </summary>
+    readonly Dictionary<string, Expr> vetoresApelidados = new() { ["DeviceAddress"] = new Literal(8, null, true, false, 0) };
+
+    /// <summary>O tamanho do apelido de vetor do ultimo tipo lido (null se nao era um).</summary>
+    Expr ultimoVetorApelidado;
 
     /// <summary>Namespaces declarados: "Bounce2::Button" e so "Button".</summary>
     readonly HashSet<string> espacos = [];
@@ -519,7 +532,17 @@ public class Parser(List<Token> toks)
         // "typedef void Tratador(int);": o tipo de funcao sem o ponteiro.
         string nome = Avancar().Texto;
         if (Checar("(")) { p = Fecha(p) + 1; alvo = "funcao*"; }
-        while (Aceitar("[")) { if (!Checar("]")) AnalisarExpr(); Exigir("]"); alvo = SemPonteiro(alvo) + "*"; }
+        Expr tamanhoDoVetor = null;
+        int dimensoes = 0;
+        while (Aceitar("["))
+        {
+            Expr t = Checar("]") ? null : AnalisarExpr();
+            Exigir("]");
+            if (dimensoes++ == 0) tamanhoDoVetor = t;
+            alvo = SemPonteiro(alvo) + "*";
+        }
+        if (dimensoes == 1 && tamanhoDoVetor is not null) vetoresApelidados[nome] = tamanhoDoVetor;
+        else vetoresApelidados.Remove(nome);
 
         // "typedef int Par, *PonteiroPar;" -- mais de um nome.
         var nomes = new List<string> { nome };
@@ -1027,6 +1050,7 @@ public class Parser(List<Token> toks)
         ultimoExterno = false;
         ultimoReferencia = false;
         ultimoEstatico = false;
+        ultimoVetorApelidado = null;
 
         var partes = new List<string>();
         while (Atual.Tipo == T.Id && (tipos.Contains(Atual.Texto) || apelidos.ContainsKey(Atual.Texto)))
@@ -1069,6 +1093,8 @@ public class Parser(List<Token> toks)
             throw new ErroDeSintaxe("tipo esperado", Atual.Linha);
 
         string tipo = string.Join(" ", partes);
+        if (partes.Count == 1 && !ponteiro && !ultimoReferencia && vetoresApelidados.TryGetValue(partes[0], out var tamanho))
+            ultimoVetorApelidado = tamanho;
         if (partes.Count == 1)
         {
             string resolvido = Resolver(partes[0]);
@@ -1483,9 +1509,17 @@ public class Parser(List<Token> toks)
         var saida = new List<Cmd>();
         string tipoDoNome = tipo;
 
+        // "DeviceAddress a, b;": cada nome e um "uint8_t a[8]" (o "*b" e ponteiro mesmo).
+        Expr vetorDoApelido = ultimoVetorApelidado;
+        ultimoVetorApelidado = null;
+        bool nomeComPonteiro = false;
+
         while (true)
         {
+            bool doApelido = vetorDoApelido is not null && !nomeComPonteiro && !Checar("[");
+            if (doApelido) tipoDoNome = SemPonteiro(tipoDoNome);
             var (arr, tam, itens, ini, colunas, args, dims) = AnalisarSufixoDecl(tipoDoNome);
+            if (doApelido) { arr = true; tam = vetorDoApelido; }
 
             // "uint8_t ligado : 1;" -- campo de bits.
             if (dentroDeClasse && Aceitar(":")) AnalisarExpr();
@@ -1504,6 +1538,7 @@ public class Parser(List<Token> toks)
                 p++;
             }
             if (ponteiro) tipoDoNome += "*";
+            nomeComPonteiro = ponteiro;
             nome = SemEspaco(Avancar().Texto);
         }
     }

@@ -20,6 +20,9 @@ uint64_t mp_hal_time_ns(void);
 
 #define MP_HAL_PIN_FMT "%u"
 #define mp_hal_pin_obj_t int
+/* O fio de 1-Wire do simulador (o _onewire): o reset com a presenca e um bit (1 = solta o fio, e le). */
+int cs_py_umfio_reset(int pino);
+int cs_py_umfio_bit(int pino, int mestre);
 mp_hal_pin_obj_t machine_pin_get_id(mp_obj_t pin_in);
 #define mp_hal_get_pin_obj(o) machine_pin_get_id(o)
 #define mp_hal_pin_name(p) (p)

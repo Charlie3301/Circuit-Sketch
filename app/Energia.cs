@@ -1000,6 +1000,8 @@ public sealed partial class Energia
         "ir-obstacle-sensor" => 115,
         "tcrt5000" => 380,
         "hc-05" => 150,
+        // O DS18B20 converte com ~1 mA.
+        "ds18b20" => 5000,
         // O TM1637 aceso (~35 mA) e a matriz do MAX7219 (~100 mA, a meia luz).
         "tm1637" => 150,
         "max7219-matriz" => 50,

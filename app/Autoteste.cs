@@ -144,6 +144,7 @@ public static partial class Autoteste
         Bloco("Chips_595", Chips_595);
         Bloco("Pecas_IrEBluetooth", Pecas_IrEBluetooth);
         Bloco("Monitor_Baud", Monitor_Baud);
+        Bloco("Sensor_Ds18b20", Sensor_Ds18b20);
         Bloco("Sensores_Redesenhados", Sensores_Redesenhados);
         Bloco("Esp8266_Redesenhadas", Esp8266_Redesenhadas);
         Bloco("Pcb_Base", Pcb_Base);

@@ -752,6 +752,24 @@ public class Maquina
     /// <summary>As portas seriais que o sketch ligou (begin): e nelas que chega o que vem pelo fio.</summary>
     public readonly List<PortaSerial> Portas = [];
 
+    /// <summary>
+    /// O fio de 1-Wire de cada pino (os DS18B20 pendurados nele): o editor poe
+    /// os aparelhos e diz se ha o pull-up; o OneWire do sketch fala com eles.
+    /// </summary>
+    readonly Dictionary<int, BarramentoUmFio> fiosUmFio = [];
+
+    public BarramentoUmFio UmFio(int gpio)
+    {
+        lock (fiosUmFio)
+        {
+            if (!fiosUmFio.TryGetValue(gpio, out var b)) fiosUmFio[gpio] = b = new BarramentoUmFio();
+            return b;
+        }
+    }
+
+    /// <summary>Os pinos que ja tem um fio de 1-Wire.</summary>
+    public IReadOnlyList<int> PinosComUmFio { get { lock (fiosUmFio) return [.. fiosUmFio.Keys]; } }
+
     public List<PortaSerial> PortasNoPino(int gpio)
     {
         lock (Portas) return [.. Portas.Where(p => p.Ligada && p.Rx == gpio)];
@@ -2257,6 +2275,8 @@ public class Maquina
         Lcd = null;
         Oled = null;
         lock (Portas) Portas.Clear();
+        // Os sensores do fio continuam la (quem cuida deles e o editor): so voltam ao estado de quando ligam.
+        lock (fiosUmFio) foreach (var fio in fiosUmFio.Values) fio.Religar();
         I2c.Zerar();
         i2c1?.Zerar();
         lock (i2cPorSoftware) i2cPorSoftware.Clear();

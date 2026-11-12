@@ -821,6 +821,14 @@ public partial class Interpretador(Programa prog, Maquina maq)
                     obj.Pino = Arg(0);
                     break;
 
+                // O fio de 1-Wire: "OneWire oneWire(4); DallasTemperature sensores(&oneWire);"
+                case "OneWire":
+                    obj.Pino = d.Args.Count > 0 ? Arg(0) : -1;
+                    break;
+                case "DallasTemperature":
+                    obj.Pino = d.Args.Count > 0 && ObjetoDoArgumento(d.Args[0], amb) is { } fioDoSensor ? fioDoSensor.Pino : -1;
+                    break;
+
                 case "sensors_event_t":
                     MontarEventoDeSensor(obj);
                     break;
@@ -2624,6 +2632,14 @@ public partial class Interpretador(Programa prog, Maquina maq)
 
         // A BLE da ESP32: "BLEDevice::init("nome")", "BLEUUID((uint16_t)0x180F)".
         if (fn.Nome.StartsWith("BLEDevice::", StringComparison.Ordinal)) return ChamarBleDevice(fn.Nome, c, amb);
+
+        // As contas estaticas do 1-Wire: "OneWire::crc8(endereco, 7)", "DallasTemperature::toFahrenheit(c)".
+        if (fn.Nome.StartsWith("OneWire::", StringComparison.Ordinal)) return ChamarUmFioEstatico(fn.Nome["OneWire::".Length..], c, amb);
+        if (fn.Nome is "DallasTemperature::toFahrenheit" or "DallasTemperature::toCelsius")
+        {
+            double graus = c.Args.Count > 0 ? Avaliar(c.Args[0], amb).Num : 0;
+            return Valor.DeReal(fn.Nome.EndsWith("toFahrenheit") ? graus * 1.8 + 32 : (graus - 32) / 1.8);
+        }
         if (fn.Nome == "BLEUUID")
             return Valor.DeReferencia(new Objeto("BLEUUID")
             {
@@ -3376,6 +3392,10 @@ public partial class Interpretador(Programa prog, Maquina maq)
 
         switch (obj.Classe)
         {
+            // ---------- o 1-Wire: o OneWire e o DallasTemperature ----------
+            case "OneWire": return ChamarUmFio(obj, metodo, args, c, amb);
+            case "DallasTemperature": return ChamarDallas(obj, metodo, args, c, amb);
+
             // ---------- DHT: temperatura e umidade ----------
             case "DHT":
                 switch (metodo)

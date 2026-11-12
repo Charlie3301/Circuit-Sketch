@@ -719,9 +719,9 @@ public static class CompiladorNativo
     /// </summary>
     static readonly HashSet<string> Imitados = new(
         ["Adafruit_GFX.h", "Adafruit_ILI9341.h", "Adafruit_MPU6050.h", "Adafruit_NeoPixel.h", "Adafruit_SH110X.h", "Adafruit_SSD1306.h",
-         "Adafruit_ST7735.h", "Adafruit_ST7789.h", "Adafruit_ST77xx.h", "Adafruit_Sensor.h", "Audio.h", "DHT.h", "ESP32Servo.h", "HX711.h",
+         "Adafruit_ST7735.h", "Adafruit_ST7789.h", "Adafruit_ST77xx.h", "Adafruit_Sensor.h", "Audio.h", "DHT.h", "DallasTemperature.h", "ESP32Servo.h", "HX711.h",
          "IRrecv.h", "IRremote.h", "IRremote.hpp", "IRremoteESP8266.h", "IRutils.h", "Keypad.h", "LedControl.h", "LiquidCrystal.h",
-         "LiquidCrystal_I2C.h", "MPU6050.h", "PubSubClient.h", "RF24.h", "nRF24L01.h", "printf.h", "RTClib.h", "Servo.h", "SoftwareSerial.h",
+         "LiquidCrystal_I2C.h", "MPU6050.h", "OneWire.h", "PubSubClient.h", "RF24.h", "nRF24L01.h", "printf.h", "RTClib.h", "Servo.h", "SoftwareSerial.h",
          "Stepper.h", "TM1637Display.h", "UniversalTelegramBot.h", "WebSocketsServer.h",
          "NimBLEDevice.h", "NimBLEBeacon.h", "NimBLEEddystoneTLM.h", "NimBLEStream.h", "NimBLEServer.h", "NimBLEClient.h", "NimBLEScan.h", "NimBLEAdvertising.h",
          "NimBLEAdvertisementData.h", "NimBLEAdvertisedDevice.h", "NimBLEUUID.h", "NimBLEAddress.h", "NimBLECharacteristic.h", "NimBLEService.h", "NimBLEDescriptor.h", "NimBLE2904.h", "NimBLERemoteCharacteristic.h", "NimBLERemoteService.h", "NimBLERemoteDescriptor.h", "NimBLEConnInfo.h", "NimBLEAttValue.h", "NimBLEUtils.h"],

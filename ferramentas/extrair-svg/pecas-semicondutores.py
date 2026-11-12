@@ -16,6 +16,7 @@ SVG leva o nome do tipo); os outros saem como "tipo-modelo":
   - mosfet-n / mosfet-p : o TO-220 (G, D, S) -- o mesmo desenho do 7805
     (pecas-reguladores.py), nas medidas do JEDEC: IRLZ44N, IRF520, IRFZ44N,
     IRF540N, IRF3205, IRL540N, IRLB8721 / IRF9540N, IRF4905, IRF9Z34N.
+  - ds18b20 : o sensor de temperatura de 1-Wire no mesmo TO-92 (GND, DQ, VDD).
   - optoacoplador : o PC817 (e o EL817, o LTV-817, o TLP521-1) visto de cima, o
     DIP-4 branco com as fileiras a 7,62 mm: pino 1 (anodo) embaixo a esquerda,
     com a bolinha, e dai no sentido anti-horario: 2 catodo, 3 emissor, 4
@@ -126,6 +127,14 @@ guardar('transistor-npn', l, a, [(n, x, yp, desc_npn[n]) for n, x in zip('EBC', 
 guardar('transistor-pnp', l, a, [(n, x, yp, desc_pnp[n]) for n, x in zip('EBC', xs)])
 guardar('transistor-npn-cbe', l, a, [(n, x, yp, desc_npn[n]) for n, x in zip('CBE', xs)])
 guardar('transistor-pnp-cbe', l, a, [(n, x, yp, desc_pnp[n]) for n, x in zip('CBE', xs)])
+
+# O DS18B20 (a ficha da Maxim): o mesmo TO-92 de frente, a face plana com a marcacao da
+# peca (sem o logotipo do fabricante); as pernas na ordem da ficha, GND, DQ e VDD.
+to92('ds18b20', [('18B20', 0.85, CLARO), ('2347C4', 0.62, LOTE), ('+346AB', 0.62, LOTE)])
+desc_ds = {'GND': 'GND (pino 1)',
+           'DQ': 'Dados do 1-Wire (pino 2): no pino da placa, com um resistor de 4,7 kohm para o VCC (o pull-up)',
+           'VCC': 'Alimentacao VDD (pino 3): 3,0 a 5,5 V; ligado no GND, o sensor funciona no modo parasita'}
+guardar('ds18b20', l, a, [(n, x, yp, desc_ds[n]) for n, x in zip(['GND', 'DQ', 'VCC'], xs)])
 
 
 # =====================================================================

@@ -126,10 +126,34 @@ def main():
     open(agora, 'w', encoding='utf-8', newline='\n').write(
         '/* Modificado (CircuitSketch): so com o ESP-NOW ligado (a ESP32). */\n#include "py/mpconfig.h"\n#if MICROPY_PY_ESPNOW\n'
         + texto.rstrip() + '\n\n#endif /* MICROPY_PY_ESPNOW (CircuitSketch) */\n')
+    # O _onewire: os bits no fio do simulador (os DS18B20 da bancada), e nao nos pinos com o tempo.
+    um_fio = os.path.join(SRC, 'extmod', 'modonewire.c')
+    texto = open(um_fio, encoding='utf-8').read()
+    inicio = texto.index('static int onewire_bus_reset(')
+    fim = texto.index('/******************************************************************************/\n// MicroPython bindings')
+    open(um_fio, 'w', encoding='utf-8', newline='\n').write(texto[:inicio] + NOVO_ONEWIRE + texto[fim:])
     congelar(mp)
     gerar(mp)
     copiar(os.path.join(mp, 'LICENSE'), os.path.join(DESTINO, 'LICENSE'))
 
+
+# O _onewire do simulador (ver acima): o reset, a leitura e a escrita de um bit.
+NOVO_ONEWIRE = '''/* Modificado (CircuitSketch): os bits vao ao fio de 1-Wire do simulador (o
+ * BarramentoUmFio), e nao aos pinos com o tempo de cada intervalo -- os DS18B20
+ * da bancada respondem por la, e o onewire.py e o ds18x20.py ficam os de verdade. */
+static int onewire_bus_reset(mp_hal_pin_obj_t pin) {
+    return cs_py_umfio_reset(pin);
+}
+
+static int onewire_bus_readbit(mp_hal_pin_obj_t pin) {
+    return cs_py_umfio_bit(pin, 1);
+}
+
+static void onewire_bus_writebit(mp_hal_pin_obj_t pin, int value) {
+    cs_py_umfio_bit(pin, value ? 1 : 0);
+}
+
+'''
 
 # A familia vem na linha de comando, como o CompiladorNativo passa (as macros da IDE).
 FAMILIAS = {'esp32': ['-DESP32=ESP32', '-DCONFIG_IDF_TARGET_ESP32=1'], 'rp2040': ['-DARDUINO_ARCH_RP2040=1']}

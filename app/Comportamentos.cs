@@ -188,6 +188,12 @@ public record Comportamento
             Grandeza = "temperatura", PinoDaGrandeza = "SDA",
             Rotulo = "Temperatura", Minimo = -40, Maximo = 80, Unidade = "C"
         },
+        // O DS18B20: a temperatura de cada um vai ao chip dele no fio de 1-Wire (EditorCircuito).
+        ["ds18b20"] = new()
+        {
+            Grandeza = "temperatura", PinoDaGrandeza = "DQ",
+            Rotulo = "Temperatura", Minimo = -55, Maximo = 125, Unidade = "C"
+        },
         ["dht11"] = new()
         {
             Grandeza = "temperatura", PinoDaGrandeza = "DATA",

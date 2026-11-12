@@ -315,7 +315,9 @@ public partial class EditorCircuito
                                                        // as saidas da logica acendem LED pela conta (Alpha 25)
                                                        || Logica.EhPecaDeLogica(p.Tipo)
                                                        // e os modulos com LED de energia (Alpha 25)
-                                                       || LuzesDosModulos.ContainsKey(p.Tipo));
+                                                       || LuzesDosModulos.ContainsKey(p.Tipo)
+                                                       // o DS18B20: a alimentacao e o pull-up do DQ
+                                                       || p.Tipo == "ds18b20");
         if (!energia)
         {
             relogioDosMotores.Reset();

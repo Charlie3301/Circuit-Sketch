@@ -175,6 +175,55 @@ public partial class EditorCircuito
         return vcc is null || gnd is null ? 0 : conta.TensaoDoPino(peca.Id, vcc.Nome) - conta.TensaoDoPino(peca.Id, gnd.Nome);
     }
 
+    /// <summary>
+    /// Um resistor do fio deste pino para a alimentacao: o pull-up que o 1-Wire
+    /// precisa (o 4,7 kohm do DQ). Vale o que tiver um lado no fio e o outro
+    /// com 2,5 V ou mais; o resistor para o GND (o pull-down) nao conta.
+    /// </summary>
+    /// <summary>
+    /// Os DS18B20: o chip de cada um no fio de 1-Wire do pino do DQ, com a temperatura
+    /// do controle, a alimentacao (o VDD, ou o modo parasita) e o pull-up do fio.
+    /// Depois da conta de energia do quadro -- a do quadro anterior nao serve: no
+    /// comeco da execucao ela ainda nao existe, e o begin() do sketch ja procura o sensor.
+    /// </summary>
+    void AplicarUmFio(Bancada bancada, Netlist rede, Energia conta)
+    {
+        foreach (var peca in Atual.Pecas)
+        {
+            if (peca.Tipo != "ds18b20") continue;
+            int dq = rede.GpioDe(Atual, peca.Id, "DQ");
+            if (dq < 0 || MaquinaDaPeca(bancada, rede, peca) is not { } maq) continue;
+            double vdd = conta is null ? 0 : conta.TensaoDoPino(peca.Id, "VCC") - conta.TensaoDoPino(peca.Id, "GND");
+            bool parasita = rede.RaizDe(Netlist.No(peca.Id, "VCC")) is { } raizVdd
+                            && raizVdd == rede.RaizDe(Netlist.No(peca.Id, "GND"));
+            bool puxado = PullUpNoFio(peca, "DQ", rede, conta);
+            var fio = maq.UmFio(dq);
+            fio.Puxado = puxado;
+            var sensor = fio.Aparelho(peca.Id, () => UmFio.RomDe(peca.Id));
+            bool ligado = vdd >= 3.0 || parasita && puxado;
+            if (ligado && !sensor.Alimentado) sensor.Religar();
+            sensor.Alimentado = ligado;
+            sensor.Parasita = parasita;
+            if (Comportamento.De(peca.Tipo) is { } comp) sensor.Temperatura = comp.ValorReal(peca.Giro);
+            if (!puxado && ligado) maq.Avisar("DS18B20: o fio DQ precisa de um resistor de pull-up (4,7 kohm) para o VCC; "
+                                              + "sem ele o fio nao sobe e o sensor nao responde.");
+        }
+    }
+
+    bool PullUpNoFio(PecaNoCircuito peca, string pino, Netlist rede, Energia conta)
+    {
+        if (conta is null) return false;
+        string raiz = rede.RaizDe(Netlist.No(peca.Id, pino));
+        if (raiz is null) return false;
+        foreach (var r in Atual.Pecas)
+        {
+            if (r.Tipo != "resistor" || r.Ohms > 47_000) continue;
+            if (rede.RaizDe(Netlist.No(r.Id, "1")) != raiz && rede.RaizDe(Netlist.No(r.Id, "2")) != raiz) continue;
+            if (Math.Max(conta.TensaoDoPino(r.Id, "1"), conta.TensaoDoPino(r.Id, "2")) >= 2.5) return true;
+        }
+        return false;
+    }
+
     /// <summary>A rede da bancada, para as luzes do roteador (a janela entrega).</summary>
     public Simulador.Rede RedeDoRoteador { get; set; }
 

@@ -45,6 +45,8 @@ public static class FormatoWokwi
         "stepper-motor", "tilt-switch", "wifi-ap",
         // O registrador de deslocamento: os pinos com os nomes deles (DS, SHCP, STCP, MR, OE, Q0..Q7, Q7S).
         "74hc595",
+        // O DS18B20 (GND, DQ, VCC).
+        "ds18b20",
     ];
 
     /// <summary>As pecas com nome diferente la (as placas novas sao "board-", nao "wokwi-").</summary>

@@ -18,7 +18,7 @@ public static class Bibliotecas
     public static readonly string[] Conhecidas =
     [
         "Servo", "LiquidCrystal", "LiquidCrystal_I2C",
-        "DHT", "Adafruit_NeoPixel", "Stepper", "Keypad",
+        "DHT", "Adafruit_NeoPixel", "Stepper", "Keypad", "OneWire", "DallasTemperature",
         "Adafruit_MPU6050", "MPU6050", "sensors_event_t", "RTC_DS1307", "DateTime", "HX711",
         "Adafruit_SSD1306", "IRrecv", "decode_results", "Adafruit_ILI9341",
         "Adafruit_ST7789", "Adafruit_ST7735", "Adafruit_SH1106G", "TM1637Display", "LedControl",

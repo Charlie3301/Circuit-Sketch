@@ -5119,7 +5119,7 @@ public partial class EditorCircuito : Border
             // O joystick em repouso fica no CENTRO, e nao no canto: os
             // dois eixos de um analogico solto ficam na metade da faixa.
             // Giro nasce em 0, que punha a alavanca no canto de baixo.
-            Giro = tipo == "analog-joystick" ? 0.5 : 0,
+            Giro = tipo == "analog-joystick" ? 0.5 : tipo == "ds18b20" ? 80.0 / 180 : 0,      // o DS18B20 nasce nos 25 graus
         };
         // O regulador com trimpot sai de fabrica nos 5 V.
         if (Reguladores.VoltsDeFabrica(tipo) is { } volts) peca.Volts = volts;
@@ -6144,6 +6144,7 @@ public partial class EditorCircuito : Border
         AplicarRadios(bancada, rede);
         AplicarChips(bancada, rede);
         var contaDoQuadro = AplicarEnergiaDoQuadro(bancada, rede);
+        AplicarUmFio(bancada, rede, contaDoQuadro);
         AplicarMotoresDePasso(bancada, rede, segundosDoQuadro);
         AplicarServos(bancada, rede, segundosDoQuadro);
         AplicarEscs(bancada, rede, segundosDoQuadro);
