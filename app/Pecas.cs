@@ -122,9 +122,19 @@ public static class Pecas
     /// </summary>
     static readonly Dictionary<ImageSource, ImageSource> cinzas = [];
 
+    /// <summary>A opacidade da peca na visao de circuito: apagada, para os fios coloridos aparecerem.</summary>
+    public const double OpacidadeDoCinza = 0.55;
+
+    static readonly HashSet<ImageSource> emCinza = [];
+
+    /// <summary>A imagem e uma das cinzas (para o teste da visao de circuito).</summary>
+    public static bool EhCinza(ImageSource imagem) => imagem is not null && emCinza.Contains(imagem);
+
     public static ImageSource Cinza(ImageSource fonte, double largura, double altura)
     {
         if (fonte is null) return null;
+        // A ja cinza fica como esta: passar de novo apagaria a peca um pouco mais a cada quadro.
+        if (emCinza.Contains(fonte)) return fonte;
         if (cinzas.TryGetValue(fonte, out var pronta)) return pronta;
         if (largura <= 0 || altura <= 0) return fonte;
 
@@ -140,11 +150,26 @@ public static class Pecas
 
             alvo.Render(desenho);
 
-            var cinza = new System.Windows.Media.Imaging.FormatConvertedBitmap(
-                alvo, PixelFormats.Gray32Float, null, 0);
+            // Cinza E transparente, pixel a pixel. O FormatConvertedBitmap para
+            // Gray32Float jogava fora o alfa: o fundo transparente da peca virava
+            // preto, e cada peca aparecia dentro de uma caixa preta. Aqui o
+            // alfa fica (vezes a opacidade), e o cinza e a luminancia do pixel
+            // (ja multiplicada pelo alfa, como o Pbgra32 guarda).
+            int passo = l * 4;
+            var pixels = new byte[passo * a];
+            alvo.CopyPixels(pixels, passo, 0);
+            for (int i = 0; i < pixels.Length; i += 4)
+            {
+                double luz = 0.114 * pixels[i] + 0.587 * pixels[i + 1] + 0.299 * pixels[i + 2];
+                byte cinzaDoPixel = (byte)Math.Clamp(Math.Round(luz * OpacidadeDoCinza), 0, 255);
+                pixels[i] = pixels[i + 1] = pixels[i + 2] = cinzaDoPixel;
+                pixels[i + 3] = (byte)Math.Round(pixels[i + 3] * OpacidadeDoCinza);
+            }
+            var cinza = System.Windows.Media.Imaging.BitmapSource.Create(l, a, 192, 192, PixelFormats.Pbgra32, null, pixels, passo);
             cinza.Freeze();
 
             cinzas[fonte] = cinza;
+            emCinza.Add(cinza);
             return cinza;
         }
         catch

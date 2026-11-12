@@ -76,6 +76,8 @@ public sealed partial class Energia
     static Energia Media(List<(Energia Conta, double Peso)> trechos)
     {
         var base_ = trechos.MaxBy(t => t.Peso).Conta;
+        // As tensoes de cada trecho, antes da media: a parte alternada do multimetro (EnergiaMedida.cs).
+        var tensoesDosTrechos = trechos.Select(t => (new Dictionary<string, double>(t.Conta.tensaoPorNo), t.Peso)).ToList();
         void MediaDe<T>(Func<Energia, Dictionary<T, double>> tabela)
         {
             var soma = new Dictionary<T, double>();
@@ -87,6 +89,7 @@ public sealed partial class Energia
             foreach (var (chave, valor) in soma) destino[chave] = valor;
         }
         MediaDe(c => c.tensaoPorNo);
+        base_.tensoesDosTrechos = tensoesDosTrechos;
         MediaDe(c => c.correntePorPeca);
         MediaDe(c => c.correntePorNo);
         MediaDe(c => c.correnteDoRamo);

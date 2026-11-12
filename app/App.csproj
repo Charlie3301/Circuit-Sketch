@@ -168,6 +168,14 @@
   </ItemGroup>
 
   <!--
+    Os plugins (um .cs por pasta, compilados pelo programa quando ele abre):
+    o primeiro e o do Wokwi, que le os nomes das pecas dos diagram.json deles.
+  -->
+  <ItemGroup>
+    <Content Include="..\plugins\**\*" LinkBase="plugins" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+
+  <!--
     As licencas do que o programa usa de fora (a fonte do display da
     Adafruit, os desenhos do wokwi-elements, a fonte do framebuf do
     MicroPython): vao ao lado do executavel, como elas pedem.

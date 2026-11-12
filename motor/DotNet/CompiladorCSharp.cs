@@ -40,6 +40,9 @@ public static class CompiladorCSharp
     static readonly Lazy<List<MetadataReference>> doNet = new(() =>
         [.. Basic.Reference.Assemblies.Net100.References.All.Where(r => !(r.Display ?? "").Contains("System.Net.Http", StringComparison.OrdinalIgnoreCase))]);
 
+    /// <summary>As mesmas referencias do .NET, para quem mais compila C# no programa (os plugins).</summary>
+    internal static IReadOnlyList<MetadataReference> ReferenciasDoNet => doNet.Value;
+
     /// <summary>A API das placas (DotNet/Api/*.cs, dentro do motor), compilada uma vez.</summary>
     static readonly Lazy<(byte[] Imagem, MetadataReference Referencia)> api = new(() =>
     {

@@ -234,7 +234,7 @@ public static partial class Autoteste
             string json = ExportarWokwi.Gerar(c);
             var volta = ImportarWokwi.Ler(json).Circuito;
             Conferir("regulador: o diagram.json leva o modelo (7812) e a saida dos ajustaveis (9 V, 5 V)",
-                json.Contains("circuitsketch-regulador-7805") && volta.Achar("u1")?.Modelo == "7812"
+                json.Contains("\"regulador-7805\"") && volta.Achar("u1")?.Modelo == "7812"
                 && volta.Achar("u2")?.Volts == 9 && volta.Achar("u3")?.Volts == 5,
                 json.Length > 400 ? json[..400] : json);
         }

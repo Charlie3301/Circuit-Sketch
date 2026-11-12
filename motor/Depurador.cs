@@ -50,6 +50,9 @@ public sealed class Depurador
     volatile bool pausaPedida;
     volatile bool modoPasso;
 
+    /// <summary>As variaveis ao vivo: o proximo comando (ou o delay) tira um retrato e segue.</summary>
+    volatile bool retratoPedido;
+
     // Onde parou por último. Enquanto a execução estiver DENTRO desse
     // comando (mais fundo que ele), a mesma linha não para de novo.
     int linhaDaPausa = -1;
@@ -75,6 +78,35 @@ public sealed class Depurador
 
     /// <summary>Disparado na thread do sketch ao voltar a rodar.</summary>
     public event Action Retomou;
+
+    /// <summary>
+    /// O retrato pedido pelo <see cref="PedirRetrato"/>: disparado NA THREAD DO SKETCH,
+    /// que nao para -- tira a copia e segue.
+    /// </summary>
+    public event Action<Retrato> Retratou;
+
+    /// <summary>
+    /// As variaveis ao vivo: pede um retrato sem pausar. O sketch interpretado o
+    /// tira no proximo comando; o compilado, no proximo delay (de dentro da
+    /// ponte); se nenhum dos dois vier, <see cref="GlobaisAgora"/> le as globais
+    /// do compilado direto da memoria.
+    /// </summary>
+    public void PedirRetrato()
+    {
+        retratoPedido = true;
+        maq.PausaPedida = true;
+    }
+
+    /// <summary>As globais do sketch compilado, lidas agora (de qualquer thread); null no interpretador.</summary>
+    public Retrato GlobaisAgora()
+        => Nativa?.GlobaisAoVivo() is { } globais ? new Retrato(-1, globais) : null;
+
+    void TirarRetrato(int linha, Ambiente amb)
+    {
+        retratoPedido = false;
+        try { Retratou?.Invoke(new Retrato(linha, amb?.Listar() ?? [])); }
+        catch { }
+    }
 
     public bool Pausado { get; private set; }
 
@@ -145,6 +177,8 @@ public sealed class Depurador
         profundidadeAtual = profundidade;
         ambienteAtual = amb;
 
+        if (retratoPedido && c is not (CmdBloco or CmdVazio)) TirarRetrato(c.Linha, amb);
+
         // Bloco e comando vazio não são lugar de parar: seria uma pausa
         // numa chave "{" sem nada acontecendo.
         if (c is CmdBloco or CmdVazio) return;
@@ -167,6 +201,18 @@ public sealed class Depurador
     /// <summary>Chamado pela Máquina de dentro de um delay quando há pedido.</summary>
     void PausarDentroDaEspera()
     {
+        // As variaveis ao vivo: o retrato dentro do delay, e o sketch segue dormindo.
+        if (retratoPedido)
+        {
+            if (Nativa is { } compilado)
+            {
+                retratoPedido = false;
+                try { if (compilado.RetratoNaEspera() is { } retrato) Retratou?.Invoke(retrato); }
+                catch { }
+            }
+            else TirarRetrato(linhaAtual, ambienteAtual);
+        }
+
         if (!pausaPedida || modoPasso)
         {
             maq.PausaPedida = false;

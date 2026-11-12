@@ -84,7 +84,7 @@ public static class ExportarWokwi
     {
         var campos = new List<(string Chave, string Valor)>
         {
-            ("type", FormatoWokwi.Aspas(FormatoWokwi.TipoParaWokwi(peca.Tipo))),
+            ("type", FormatoWokwi.Aspas(peca.Tipo)),
             ("id", FormatoWokwi.Aspas(peca.Id)),
             ("top", FormatoWokwi.Num(peca.Y)),
             ("left", FormatoWokwi.Num(peca.X)),
@@ -129,7 +129,6 @@ public static class ExportarWokwi
         {
             case "led": Por("color", FormatoWokwi.CorDoLedParaWokwi(p.Cor)); break;
             case "resistor": Por("value", FormatoWokwi.Num(p.Ohms <= 0 ? 220 : p.Ohms)); break;
-            case "lcd1602-i2c" or "lcd2004-i2c": Por("pins", "i2c"); break;
             case "texto": Por("text", p.Nome ?? ""); break;
             case "servo" when FormatoWokwi.BracoParaWokwi(p.Braco) is { } horn: Por("horn", horn); break;
             // A cor da capa do botao de 12 mm e o "color" do Wokwi.
@@ -197,8 +196,8 @@ public static class ExportarWokwi
         if (pecaDe is null || pecaPara is null) return null;
         if (Catalogo.Obter(pecaDe.Tipo) is null || Catalogo.Obter(pecaPara.Tipo) is null) return null;
 
-        string de = $"{pecaDe.Id}:{FormatoWokwi.PinoParaWokwi(pecaDe.Tipo, fio.DePino)}";
-        string para = $"{pecaPara.Id}:{FormatoWokwi.PinoParaWokwi(pecaPara.Tipo, fio.ParaPino)}";
+        string de = $"{pecaDe.Id}:{fio.DePino}";
+        string para = $"{pecaPara.Id}:{fio.ParaPino}";
         return $"    [ {FormatoWokwi.Aspas(de)}, {FormatoWokwi.Aspas(para)}, "
                + $"{FormatoWokwi.Aspas(FormatoWokwi.CorDoFioParaWokwi(fio.Cor))}, {Rota(circuito, fio)} ]";
     }

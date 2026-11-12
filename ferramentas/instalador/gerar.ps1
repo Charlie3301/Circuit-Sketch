@@ -85,7 +85,7 @@ Get-ChildItem -LiteralPath $publicacao -File |
 foreach ($pasta in Get-ChildItem -LiteralPath $publicacao -Directory) {
     Copy-Item -LiteralPath $pasta.FullName -Destination $pacoteApp -Recurse
 }
-foreach ($pasta in 'nativo', 'bibliotecas', 'licencas') {
+foreach ($pasta in 'nativo', 'bibliotecas', 'licencas', 'plugins') {
     if (-not (Test-Path -LiteralPath (Join-Path $pacoteApp $pasta))) { throw "Falta a pasta $pasta na publicacao" }
 }
 foreach ($nativa in 'wpfgfx_cor3.dll', 'PresentationNative_cor3.dll', 'vcruntime140_cor3.dll') {

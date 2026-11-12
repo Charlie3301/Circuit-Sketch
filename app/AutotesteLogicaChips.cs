@@ -200,8 +200,8 @@ public static partial class Autoteste
             """;
             var ci = ImportarWokwi.Ler(diagrama).Circuito;
             string volta = ExportarWokwi.Gerar(ci);
-            Conferir("wokwi: o wokwi-gate-buffer vira a porta BUFFER, e volta com o mesmo nome",
-                ci.Pecas.FirstOrDefault()?.Tipo == "buffer-gate" && volta.Contains("wokwi-gate-buffer"), ci.Pecas.FirstOrDefault()?.Tipo ?? "(nada)");
+            Conferir("wokwi: o wokwi-gate-buffer vira a porta BUFFER, e sai com o nome daqui",
+                ci.Pecas.FirstOrDefault()?.Tipo == "buffer-gate" && volta.Contains("\"buffer-gate\""), ci.Pecas.FirstOrDefault()?.Tipo ?? "(nada)");
         }
 
         {

@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -801,8 +802,161 @@ public class JanelaConfiguracoes : Window
                 () => { ajustes.AbrirBibliotecas(); Close(); });
 
         var plugins = Grupo(painel, "Plugins");
+        Nota(plugins, "Cada plugin é uma pasta com arquivos .cs dentro de \"plugins\", ao lado do programa. "
+                      + "Ele roda código no seu computador: só coloque plugins de quem você confia.");
+        MontarPlugins(plugins);
+        Botao(plugins, "Abrir a pasta de plugins", () =>
+        {
+            try
+            {
+                Directory.CreateDirectory(Plugins.Pasta);
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $"\"{Plugins.Pasta}\"") { UseShellExecute = true });
+            }
+            catch (Exception ex) { MessageBox.Show(this, ex.Message, "Plugins"); }
+        });
         Nota(plugins, "O carregamento de componentes e microcontroladores de "
                       + "terceiros entra depois que o programa estiver fechado.");
+    }
+
+    /// <summary>
+    /// A lista dos plugins, como a dos add-ons do Blender: a busca e a categoria em cima,
+    /// e um bloco por plugin -- a caixa de ligar, "Categoria: Nome", e aberto, a descricao,
+    /// a versao, quando foi instalado, o autor e os arquivos.
+    /// </summary>
+    void MontarPlugins(StackPanel painel)
+    {
+        Plugins.RegistrarInstalados();
+        if (Plugins.Todos.Count == 0)
+        {
+            Nota(painel, "Nenhum plugin na pasta.");
+            return;
+        }
+
+        string categoria = null;     // null: todas
+        var procura = new TextBox
+        {
+            Style = (Style)Application.Current.FindResource("CampoEscuro"),
+            Width = 220,
+            Margin = new Thickness(0, 0, 10, 0),
+            ToolTip = "Procurar pelo nome, pela descrição ou pelo autor",
+        };
+        var valorDaCategoria = Valor("Todas");
+        var blocos = new StackPanel { Margin = new Thickness(0, 8, 0, 0) };
+
+        var filtros = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 9, 0, 0) };
+        filtros.Children.Add(procura);
+        var linhaDaCategoria = new StackPanel();
+        Escolha(linhaDaCategoria, "Categoria", valorDaCategoria,
+            new (string, Action)[] { ("Todas", () => { categoria = null; Refazer(); }) }
+                .Concat(Plugins.Categorias.Select(c => (c, (Action)(() => { categoria = c; Refazer(); })))));
+        if (linhaDaCategoria.Children.Count > 0 && linhaDaCategoria.Children[0] is FrameworkElement escolha)
+        {
+            linhaDaCategoria.Children.Clear();
+            escolha.Margin = new Thickness(0);
+            filtros.Children.Add(escolha);
+        }
+        painel.Children.Add(filtros);
+        painel.Children.Add(blocos);
+        procura.TextChanged += (_, _) => Refazer();
+        Refazer();
+
+        void Refazer()
+        {
+            valorDaCategoria.Text = categoria ?? "Todas";
+            blocos.Children.Clear();
+            string termo = procura.Text.Trim();
+            var vistos = Plugins.Todos
+                .Where(p => categoria is null || p.Categoria == categoria)
+                .Where(p => termo.Length == 0 || new[] { p.Nome, p.Descricao, p.Autor, p.Categoria }
+                    .Any(t => t?.Contains(termo, StringComparison.CurrentCultureIgnoreCase) == true))
+                .ToList();
+            if (vistos.Count == 0) Nota(blocos, "Nenhum plugin com esse filtro.");
+            foreach (var plugin in vistos) blocos.Children.Add(BlocoDoPlugin(plugin));
+        }
+    }
+
+    Border BlocoDoPlugin(Plugins.Plugin plugin)
+    {
+        var corpo = new Grid { Margin = new Thickness(22, 8, 0, 0), Visibility = Visibility.Collapsed };
+        corpo.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        corpo.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+        void Linha(string rotulo, string texto, string cor = Tema.Texto)
+        {
+            if (string.IsNullOrEmpty(texto)) return;
+            int n = corpo.RowDefinitions.Count;
+            corpo.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            var r = new TextBlock
+            {
+                Text = rotulo, Foreground = Tema.Pincel(Tema.TextoFraco), FontSize = 11,
+                Margin = new Thickness(0, 3, 12, 0), HorizontalAlignment = HorizontalAlignment.Right,
+            };
+            var v = new TextBlock
+            {
+                Text = texto, Foreground = Tema.Pincel(cor), FontSize = 11,
+                TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 0, 0),
+            };
+            Grid.SetRow(r, n); Grid.SetRow(v, n); Grid.SetColumn(v, 1);
+            corpo.Children.Add(r);
+            corpo.Children.Add(v);
+        }
+
+        Linha("Descrição:", plugin.Descricao);
+        Linha("Versão:", plugin.Versao);
+        if (plugin.Instalado is { } instalado)
+            Linha("Instalado:", $"na {instalado.Programa}, em {instalado.Dia}"
+                                + (instalado.Versao == plugin.Versao || instalado.Versao.Length == 0 ? "" : $" (com a versão {instalado.Versao})"));
+        Linha("Autor:", plugin.Autor);
+        Linha("Arquivo:", string.Join(", ", plugin.Arquivos.Select(a => Path.Combine("plugins", a))));
+        Linha("Erro:", plugin.Erro, Tema.Erro);
+
+        var seta = new TextBlock
+        {
+            Text = "▸", Foreground = Tema.Pincel(Tema.TextoFraco), FontSize = 10,
+            Width = 14, VerticalAlignment = VerticalAlignment.Center, Cursor = Cursors.Hand,
+        };
+        var caixa = new CheckBox
+        {
+            IsChecked = plugin.Ligado,
+            IsEnabled = plugin.Erro is null,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(0, 0, 8, 0),
+            ToolTip = plugin.Erro is null ? "Ligar ou desligar o plugin" : "Não carregou: veja o erro",
+        };
+        string id = plugin.Id;
+        caixa.Checked += (_, _) => Plugins.Ligar(id, true);
+        caixa.Unchecked += (_, _) => Plugins.Ligar(id, false);
+        var nome = new TextBlock { VerticalAlignment = VerticalAlignment.Center, Cursor = Cursors.Hand, FontSize = 12 };
+        nome.Inlines.Add(new System.Windows.Documents.Run(plugin.Categoria + ": ") { Foreground = Tema.Pincel(Tema.TextoFraco) });
+        nome.Inlines.Add(new System.Windows.Documents.Run(plugin.Nome)
+        {
+            Foreground = Tema.Pincel(plugin.Erro is null ? Tema.TextoForte : Tema.Erro), FontWeight = FontWeights.SemiBold,
+        });
+
+        var cabeca = new StackPanel { Orientation = Orientation.Horizontal, Background = Brushes.Transparent };
+        cabeca.Children.Add(seta);
+        cabeca.Children.Add(caixa);
+        cabeca.Children.Add(nome);
+        void Abrir(object s, MouseButtonEventArgs e)
+        {
+            bool aberto = corpo.Visibility == Visibility.Visible;
+            corpo.Visibility = aberto ? Visibility.Collapsed : Visibility.Visible;
+            seta.Text = aberto ? "▸" : "▾";
+        }
+        seta.MouseLeftButtonDown += Abrir;
+        nome.MouseLeftButtonDown += Abrir;
+
+        var dentro = new StackPanel();
+        dentro.Children.Add(cabeca);
+        dentro.Children.Add(corpo);
+        return new Border
+        {
+            Style = (Style)Application.Current.FindResource("Cartao"),
+            Padding = new Thickness(10, 7, 10, 7),
+            Margin = new Thickness(0, 0, 0, 6),
+            Tag = "plugin:" + plugin.Id,
+            Child = dentro,
+        };
     }
 
     void MontarAjuda(StackPanel painel)

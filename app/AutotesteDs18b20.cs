@@ -18,10 +18,9 @@ public static partial class Autoteste
         // ---- a peca ----
         {
             var d = Catalogo.Obter("ds18b20");
-            Conferir("DS18B20: o TO-92 com as pernas GND, DQ e VCC (a ordem da ficha), na categoria Sensores, e o wokwi-ds18b20",
+            Conferir("DS18B20: o TO-92 com as pernas GND, DQ e VCC (a ordem da ficha), na categoria Sensores, e o wokwi-ds18b20 abre nele",
                 d is not null && Pecas.Existe("ds18b20") && d.Pinos.Select(p => p.Nome).SequenceEqual(["GND", "DQ", "VCC"])
-                && d.Categoria == "Sensores" && FormatoWokwi.TipoDoWokwi("wokwi-ds18b20") == "ds18b20"
-                && FormatoWokwi.TipoParaWokwi("ds18b20") == "wokwi-ds18b20",
+                && d.Categoria == "Sensores" && FormatoWokwi.TipoDoWokwi("wokwi-ds18b20") == "ds18b20",
                 d is null ? "(sem a peca)" : string.Join(",", d.Pinos.Select(p => p.Nome)));
         }
 

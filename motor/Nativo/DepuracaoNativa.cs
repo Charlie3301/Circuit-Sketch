@@ -162,6 +162,39 @@ public sealed unsafe class DepuracaoNativa
         return comando;
     }
 
+    /// <summary>
+    /// As variaveis ao vivo do compilado, de dentro de um delay (na thread do sketch):
+    /// o mesmo retrato da pausa, mas sem parar. Null sem linha do sketch na pilha.
+    /// </summary>
+    public Depurador.Retrato RetratoNaEspera()
+    {
+        byte* contexto = (byte*)contextoDaPonte();
+        if (contexto is null) return null;
+        var variaveis = Variaveis(contexto, subirAteOSketch: true, out int linha);
+        return linha <= 0 ? null : new Depurador.Retrato(linha, variaveis);
+    }
+
+    /// <summary>
+    /// As globais do sketch, lidas da memoria agora, de qualquer thread: o sketch que
+    /// nunca chama delay (um laco cheio) tambem mostra as variaveis ao vivo.
+    /// </summary>
+    public List<Ambiente.VariavelVista> GlobaisAoVivo()
+    {
+        lock (Dbg.Trava)
+        {
+            var coleta = new Coleta(this, null, 0) { Globais = true };
+            var alca = GCHandle.Alloc(coleta);
+            try
+            {
+                foreach (string nome in CompiladorNativo.NomesDasGlobais(sketch))
+                    Dbg.SymEnumSymbolsW(Dbg.Processo, baseDoModulo, nome, (IntPtr)(delegate* unmanaged<IntPtr, uint, IntPtr, int>)&UmSimbolo,
+                                        GCHandle.ToIntPtr(alca));
+            }
+            finally { alca.Free(); }
+            return coleta.Vistas;
+        }
+    }
+
     // =====================================================================
     //  as variaveis
     // =====================================================================

@@ -157,6 +157,7 @@ public partial class MainWindow : Window
             {
                 CompiladorNativo.AquecerEmSegundoPlano(texto => Dispatcher.BeginInvoke(() => console.Info(texto)));
                 CompiladorCSharp.AquecerEmSegundoPlano();
+                Plugins.AquecerEmSegundoPlano(() => Dispatcher.BeginInvoke(Plugins.RegistrarInstalados));
             }
         }
 
@@ -165,8 +166,17 @@ public partial class MainWindow : Window
         // por segundo, e registrar cada uma afogaria o que importa.
         editor.EnergiaMudou += () =>
         {
-            if (modoDaTela == "circuito") MostrarNoStatus(editor.ResumoDaEnergia());
+            if (modoDaTela != "circuito") return;
+            MostrarNoStatus(editor.ResumoDaEnergia());
+            AtualizarMultimetro();
         };
+
+        // O multimetro (a aba MULTÍMETRO): as pontas, a chave e a ponta do clique esquerdo.
+        editor.PontasMudaram += AtualizarMultimetro;
+        painelMultimetro.FuncaoMudou += AtualizarMultimetro;
+        painelMultimetro.PontaAtivaMudou += () => editor.PretaNoEsquerdo = painelMultimetro.PretaNoEsquerdo;
+        // Rodar e parar mudam o que o multimetro le (parado, so o ohmimetro tem o que medir).
+        btParar.IsEnabledChanged += (_, _) => { contaParada = null; AtualizarMultimetro(); };
 
         editor.Mudou += () =>
         {
@@ -174,6 +184,9 @@ public partial class MainWindow : Window
             ReconstruirRede();
             RefletirDiagrama();
             AtualizarComponentes();
+            AtualizarNomeNaBarra();
+            contaParada = null;
+            AtualizarMultimetro();
         };
         editor.SelecaoMudou += AtualizarDica;
         editor.SelecaoMudou += SincronizarPlacaDoEditor;
@@ -1012,6 +1025,10 @@ public partial class MainWindow : Window
             ? Visibility.Visible : Visibility.Collapsed;
 
         editor.VisaoDeEnergia = nome == "circuito";
+        editor.SoMedir = nome == "circuito";
+        painelMultimetro.Visibility = nome == "circuito" ? Visibility.Visible : Visibility.Collapsed;
+        if (nome != "circuito") painelMultimetro.Silenciar();
+        contaParada = null;
         editor.AplicarGrade();
 
         foreach (var (botao, qual) in new[]
@@ -1023,15 +1040,48 @@ public partial class MainWindow : Window
             botao.Background = ativo ? Tema.Pincel(Tema.Borda) : Brushes.Transparent;
         }
 
-        if (nome == "circuito") Aviso(editor.ResumoDaEnergia());
+        if (nome == "circuito") { Aviso(editor.ResumoDaEnergia()); AtualizarMultimetro(); }
         else if (nome == "descricao") txtDescricao.Focus();
         else if (nome == "componentes") AtualizarComponentes(forcar: true);
 
-        // Saindo da visão de circuito, o resumo dela não vale mais nada
+        // Saindo do multímetro, o resumo dele não vale mais nada
         // -- e ficava na barra, falando de cores que já não estavam na
         // tela. Volta o estado da simulação no lugar.
-        if (nome != "circuito" && txtStatus.Text.StartsWith("visão de circuito"))
+        if (nome != "circuito" && txtStatus.Text.StartsWith("multímetro"))
             MostrarNoStatus(editor.EmSimulacao ? "rodando..." : "parado.");
+    }
+
+    /// <summary>A conta de energia do circuito parado, para o ohmimetro (refeita quando o circuito muda).</summary>
+    Energia contaParada;
+
+    /// <summary>
+    /// A leitura do multimetro: a conta da simulacao (ou, parado, a do circuito sem
+    /// energia, que basta ao ohmimetro), as pontas do editor e a chave do painel.
+    /// </summary>
+    void AtualizarMultimetro()
+    {
+        if (modoDaTela != "circuito" || painelMultimetro is null) return;
+        bool rodando = editor.EmSimulacao;
+        Energia conta;
+        if (rodando) conta = editor.EnergiaAtual;
+        else
+        {
+            try { conta = contaParada ??= editor.CalcularEnergia(bancada, rede); }
+            catch { conta = null; }
+        }
+        var leitura = Multimetro.Medir(painelMultimetro.Funcao, conta, editor.PontaVermelha, editor.PontaPreta, rodando, editor.Atual);
+        painelMultimetro.Mostrar(leitura, editor.PontaVermelha?.Rotulo, editor.PontaPreta?.Rotulo);
+        editor.TextoDaLeitura = leitura.Curta;
+    }
+
+    /// <summary>Para o teste: o multimetro agora.</summary>
+    internal PainelMultimetro TesteMultimetro => painelMultimetro;
+
+    /// <summary>Para o teste: refaz a leitura agora (sem esperar a proxima conta de energia).</summary>
+    internal LeituraDoMultimetro TesteMedir()
+    {
+        AtualizarMultimetro();
+        return painelMultimetro.UltimaLeitura;
     }
 
     /// <summary>
@@ -1178,6 +1228,9 @@ public partial class MainWindow : Window
         // janela desabilitada nao aceita peca arrastada.
         if (paleta is not null) { paleta.Activate(); return; }
 
+        // No multimetro nao se poe peca: adicionar volta para a SIMULAÇÃO.
+        if (modoDaTela == "circuito") MostrarModo("simulacao");
+
         paleta = new JanelaPecas(this)
         {
             AoEscolher = tipo =>
@@ -1305,6 +1358,8 @@ public partial class MainWindow : Window
             var demo = Demos.Todas.First(d => d.Recurso == recurso);
             RecomecarSessao($"exemplo aberto: {demo.Placa} — {demo.Nome}");
 
+            // O exemplo nao tem arquivo: o nome dele (na barra e no diagram.json) e o do exemplo.
+            circuito.Nome ??= $"{demo.Placa} — {demo.Nome}";
             editor.Carregar(circuito);
             editor.RecarregarChips();
             editor.AplicarGrade();
@@ -2327,7 +2382,7 @@ public partial class MainWindow : Window
     {
         var dlg = new Microsoft.Win32.SaveFileDialog
         {
-            Filter = "Diagrama do Wokwi (diagram.json)|*.json",
+            Filter = "Diagrama (diagram.json)|*.json",
             FileName = "diagram.json"
         };
         if (dlg.ShowDialog() != true) return;
@@ -2335,20 +2390,7 @@ public partial class MainWindow : Window
         try
         {
             File.WriteAllText(dlg.FileName, DiagramaDoCircuito());
-
-            // Peca sem equivalente la sai como "circuitsketch-<nome>": o
-            // Wokwi avisa que nao conhece e abre o resto (e aqui ela volta
-            // inteira). Melhor dizer agora do que a pessoa descobrir la.
-            var soNossas = editor.Atual.Pecas
-                .Select(x => x.Tipo)
-                .Where(t => FormatoWokwi.TipoParaWokwi(t).StartsWith(FormatoWokwi.PrefixoNosso, StringComparison.Ordinal))
-                .Distinct().ToList();
-
-            Aviso(soNossas.Count == 0
-                ? $"exportado: {editor.Atual.Pecas.Count} peças, "
-                  + $"{editor.Atual.Fios.Count} fios"
-                : $"exportado; o Wokwi não tem {string.Join(", ", soNossas.Take(5))}"
-                  + (soNossas.Count > 5 ? " e outras" : "") + " (ficam no arquivo para voltar para cá)");
+            Aviso($"exportado: {editor.Atual.Pecas.Count} peças, {editor.Atual.Fios.Count} fios");
         }
         catch (Exception ex) { Erro($"não deu para exportar: {ex.Message}"); }
     }
@@ -2357,7 +2399,7 @@ public partial class MainWindow : Window
     {
         var dlg = new Microsoft.Win32.OpenFileDialog
         {
-            Filter = "Diagrama do Wokwi (diagram.json)|*.json",
+            Filter = "Diagrama (diagram.json)|*.json",
             FileName = "diagram.json"
         };
         if (dlg.ShowDialog() != true) return;
@@ -2386,7 +2428,11 @@ public partial class MainWindow : Window
             var faltou = new List<string>();
             if (r.Ignorados.Count > 0)
                 faltou.Add($"{r.Ignorados.Count} tipo(s) sem equivalente ("
-                           + string.Join(", ", r.Ignorados) + ")");
+                           + string.Join(", ", r.Ignorados) + ")"
+                           // as pecas do Wokwi so abrem com o plugin dele
+                           + (r.Ignorados.Any(t => t.StartsWith("wokwi-", StringComparison.Ordinal) || t.StartsWith("board-", StringComparison.Ordinal))
+                              && !Plugins.Todos.Any(p => p.Id == "wokwi" && p.Ligado)
+                                  ? " -- as pecas do Wokwi precisam do plugin do Wokwi ligado (Configuracoes > Plugins)" : ""));
             if (r.FiosPerdidos.Count > 0)
                 faltou.Add($"{r.FiosPerdidos.Count} fio(s) sem pino aqui ("
                            + string.Join("; ", r.FiosPerdidos.Take(4))
@@ -3660,7 +3706,12 @@ public partial class MainWindow : Window
         switch (tecla)
         {
             case Key.Escape:
-                if (editor.LigandoFio) { editor.CancelarFio(); Aviso("ligação cancelada"); }
+                if (modoDaTela == "circuito" && !noTexto && (editor.PontaVermelha is not null || editor.PontaPreta is not null))
+                {
+                    editor.TirarPontas();
+                    Aviso("multímetro: pontas tiradas.");
+                }
+                else if (editor.LigandoFio) { editor.CancelarFio(); Aviso("ligação cancelada"); }
                 else editor.Focus();
                 e.Handled = true;
                 return;
@@ -3684,6 +3735,15 @@ public partial class MainWindow : Window
         if (!comModificador && !AtalhoDeUmaTeclaVale()
             && acao is not ("rodar" or "pausar" or "pausa-na-linha" or "passo"))
             return;
+
+        // No multimetro o circuito nao se edita: so se mede.
+        if (modoDaTela == "circuito" && !noTexto
+            && acao is "desfazer" or "refazer" or "colar" or "girar" or "espelhar" or "excluir")
+        {
+            Aviso("no multímetro o circuito não se edita: volte para SIMULAÇÃO para mexer nele.");
+            e.Handled = true;
+            return;
+        }
 
         switch (acao)
         {
@@ -4384,6 +4444,9 @@ public partial class MainWindow : Window
 
     // ---- ganchos dos botoes da placa ----
     internal EditorCircuito TesteEditorCircuito => editor;
+
+    /// <summary>Para o teste: o nome, o autor e a dica da barra de cima.</summary>
+    internal (string Nome, string Autor, string Dica) TesteBarraDeCima => (txtNomeDoCircuito.Text, txtAutorDoCircuito.Text, txtDica.Text);
     internal void TesteNovoCircuito() => ComecarCircuitoNovo();
 
     /// <summary>Para o teste: o "Novo projeto" do menu, com as configuracoes.</summary>
@@ -5218,6 +5281,8 @@ public partial class MainWindow : Window
             Dispatcher.BeginInvoke(() => AoPausar(depurador, idDaPlaca, retrato));
         depurador.Retomou += () =>
             Dispatcher.BeginInvoke(() => AoRetomar(depurador, idDaPlaca));
+        depurador.Retratou += retrato =>
+            Dispatcher.BeginInvoke(() => AoRetratar(depurador, idDaPlaca, retrato));
         interpretador.Depurador = depurador;
         depuradores[idDaPlaca] = depurador;
         return interpretador;
@@ -5570,6 +5635,9 @@ public partial class MainWindow : Window
         bool pausado = rodando && placaPausada is not null;
 
         btPausar.IsEnabled = rodando;
+        btAoVivo.IsEnabled = rodando;
+        if (!rodando && aoVivo && painelVariaveis.Visibility == Visibility.Visible && placaPausada is null)
+            painelVariaveis.Visibility = Visibility.Collapsed;
         btPausar.Content = pausado ? "▶" : "❚❚";
         btPausar.ToolTip = pausado ? "Continuar (F6)" : "Pausar (F6)";
         btPasso.IsEnabled = pausado;
@@ -5588,10 +5656,76 @@ public partial class MainWindow : Window
             ICSharpCode.AvalonEdit.Rendering.KnownLayer.Background);
     }
 
-    void MostrarVariaveis(string idDaPlaca, Depurador.Retrato retrato)
+    // ================= variaveis ao vivo =================
+
+    /// <summary>O painel das variaveis atualizando com o sketch rodando (o botao x=).</summary>
+    bool aoVivo;
+    DispatcherTimer relogioAoVivo;
+    DateTime ultimoRetratoAoVivo = DateTime.MinValue;
+
+    void AlternarAoVivo(object s = null, RoutedEventArgs e = null)
+    {
+        aoVivo = !aoVivo;
+        btAoVivo.Opacity = aoVivo ? 1 : 0.75;
+        btAoVivo.BorderBrush = aoVivo ? new SolidColorBrush(Color.FromRgb(0x76, 0xD7, 0xC4)) : null;
+        btAoVivo.BorderThickness = new Thickness(aoVivo ? 2 : 0);
+        if (aoVivo)
+        {
+            relogioAoVivo ??= new DispatcherTimer(TimeSpan.FromMilliseconds(250), DispatcherPriority.Background, (_, _) => PedirRetratoAoVivo(), Dispatcher);
+            relogioAoVivo.Start();
+            PedirRetratoAoVivo();
+            Aviso("variáveis ao vivo: o painel acompanha o sketch rodando.");
+        }
+        else
+        {
+            relogioAoVivo?.Stop();
+            if (placaPausada is null) painelVariaveis.Visibility = Visibility.Collapsed;
+            Aviso("variáveis ao vivo desligadas.");
+        }
+    }
+
+    /// <summary>A placa das variaveis ao vivo: a do codigo no editor, ou a unica rodando.</summary>
+    string PlacaAoVivo()
+        => placaDoEditor is not null && depuradores.ContainsKey(placaDoEditor) ? placaDoEditor : depuradores.Keys.FirstOrDefault();
+
+    void PedirRetratoAoVivo()
+    {
+        if (!aoVivo || !btParar.IsEnabled || placaPausada is not null) return;
+        if (PlacaAoVivo() is not { } placa || !depuradores.TryGetValue(placa, out var depurador)) return;
+        depurador.PedirRetrato();
+
+        // O compilado que nunca chama delay (um laco cheio) nao atende o pedido:
+        // as globais dele vem direto da memoria.
+        if ((DateTime.UtcNow - ultimoRetratoAoVivo).TotalMilliseconds > 700 && depurador.GlobaisAgora() is { } globais)
+            MostrarVariaveis(placa, globais, aoVivoAgora: true);
+    }
+
+    void AoRetratar(Depurador depurador, string idDaPlaca, Depurador.Retrato retrato)
+    {
+        if (!aoVivo || placaPausada is not null || !btParar.IsEnabled) return;
+        if (!depuradores.TryGetValue(idDaPlaca, out var atual) || atual != depurador || PlacaAoVivo() != idDaPlaca) return;
+        ultimoRetratoAoVivo = DateTime.UtcNow;
+        MostrarVariaveis(idDaPlaca, retrato, aoVivoAgora: true);
+    }
+
+    /// <summary>Para o teste: liga ou desliga as variaveis ao vivo.</summary>
+    internal void TesteAoVivo(bool ligar)
+    {
+        if (aoVivo != ligar) AlternarAoVivo();
+    }
+
+    /// <summary>Para o teste: o titulo e o texto do painel das variaveis.</summary>
+    internal (string Titulo, string Texto, bool Visivel) TestePainelDeVariaveis
+        => (txtTituloVariaveis.Text, textoDasVariaveis, painelVariaveis.Visibility == Visibility.Visible);
+
+    void MostrarVariaveis(string idDaPlaca, Depurador.Retrato retrato, bool aoVivoAgora = false)
     {
         string dona = bancada.Quantas > 1 ? NomeCurtoDaPlaca(idDaPlaca).Trim('[', ']') + " · " : "";
-        txtTituloVariaveis.Text = $"PAUSADO · {dona}LINHA {retrato.Linha}";
+        txtTituloVariaveis.Text = aoVivoAgora
+            ? retrato.Linha > 0 ? $"AO VIVO · {dona}LINHA {retrato.Linha}" : $"AO VIVO · {dona}GLOBAIS"
+            : $"PAUSADO · {dona}LINHA {retrato.Linha}";
+        txtTituloVariaveis.Foreground = Tema.Pincel(aoVivoAgora ? Tema.Destaque : Tema.Aviso);
+        painelVariaveis.BorderBrush = Tema.Pincel(aoVivoAgora ? Tema.Destaque : Tema.BordaDoAviso);
 
         var linhas = txtVariaveis.Inlines;
         linhas.Clear();
@@ -5617,7 +5751,7 @@ public partial class MainWindow : Window
 
         textoDasVariaveis = string.Join(" | ", resumo);
         painelVariaveis.Visibility = Visibility.Visible;
-        rolagemVariaveis.ScrollToTop();
+        if (!aoVivoAgora) rolagemVariaveis.ScrollToTop();
     }
 
     // ================= painel de rede e bluetooth =================
@@ -6491,8 +6625,18 @@ public partial class MainWindow : Window
             : nome.Split(' ')[0];
     }
 
+    /// <summary>O nome do circuito e o autor, na barra de cima, do lado do Verificar e do Mandar.</summary>
+    void AtualizarNomeNaBarra()
+    {
+        if (txtNomeDoCircuito is null) return;
+        txtNomeDoCircuito.Text = NomeDoProjeto();
+        string autor = AutorDoProjeto();
+        txtAutorDoCircuito.Text = string.IsNullOrWhiteSpace(autor) ? "" : "por " + autor;
+    }
+
     void AtualizarDica()
     {
+        AtualizarNomeNaBarra();
         if (editor.QuantidadeSelecionada > 1)
         {
             txtDica.Text = $"{editor.QuantidadeSelecionada} peças selecionadas · "
@@ -6513,9 +6657,10 @@ public partial class MainWindow : Window
             return;
         }
 
+        // Sem nada selecionado a dica fica vazia (a contagem de pecas e fios saiu
+        // daqui: o lugar agora e do nome do circuito, do lado do Mandar).
         txtDica.Text = def is null
-            ? $"{editor.Atual.Pecas.Count} peças · {editor.Atual.Fios.Count} fios · "
-              + "arraste no vazio para selecionar · A adiciona"
+            ? ""
             : peca.Tipo == "resistor"
                 ? $"Resistor {peca.Ohms:0} Ω · R gira · Del exclui"
                 : $"{def.Nome} · {def.Pinos.Count} pinos · R gira · Del exclui";

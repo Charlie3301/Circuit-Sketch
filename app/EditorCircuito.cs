@@ -288,8 +288,11 @@ public partial class EditorCircuito : Border
     public Energia EnergiaAtual => energia;
 
     internal bool EstaEmCinzaParaTeste(string idDaPeca)
-        => visuais.TryGetValue(idDaPeca, out var v) && v is Image img
-           && img.Source is System.Windows.Media.Imaging.FormatConvertedBitmap;
+        => visuais.TryGetValue(idDaPeca, out var v) && v is Image img && Pecas.EhCinza(img.Source);
+
+    /// <summary>Para o teste: a imagem da peca na tela agora.</summary>
+    internal ImageSource ImagemNaTelaParaTeste(string idDaPeca)
+        => visuais.TryGetValue(idDaPeca, out var v) && v is Image img ? img.Source : null;
 
     static readonly Dictionary<NivelDeEnergia, Color> CoresDaEnergia = new()
     {
@@ -324,10 +327,10 @@ public partial class EditorCircuito : Border
         // Rodando mas ainda sem a primeira medida: ela sai em menos de um
         // quarto de segundo. Mandar "rode a simulação" aqui era o erro.
         if (energia is null && EmSimulacao)
-            return "visão de circuito: medindo por onde a corrente passa…";
+            return "multímetro: medindo por onde a corrente passa…";
 
         if (energia is null)
-            return "visão de circuito: rode a simulação para ver por onde a corrente passa.";
+            return "multímetro: rode a simulação para ver por onde a corrente passa.";
 
         int demais = 0, ok = 0, pouca = 0;
         foreach (var peca in Atual.Pecas)
@@ -340,7 +343,7 @@ public partial class EditorCircuito : Border
             }
         }
 
-        return $"visão de circuito · amarelo: corrente aceitável ({ok}) · "
+        return $"multímetro · amarelo: corrente aceitável ({ok}) · "
                + $"vermelho: corrente demais ({demais}) · azul: corrente de menos ({pouca})";
     }
 
@@ -381,7 +384,8 @@ public partial class EditorCircuito : Border
                 fontesOriginais[peca.Id] = fontesOriginais.GetValueOrDefault(peca.Id)
                                            ?? img.Source;
                 // O tamanho da imagem, e nao o da caixa: a placa com sobra e mais larga.
-                var cinza = Pecas.Cinza(img.Source, double.IsNaN(img.Width) ? Geometria.Tamanho(peca, def).Largura : img.Width,
+                // Sempre da imagem original: a da tela ja e a cinza depois do primeiro quadro.
+                var cinza = Pecas.Cinza(fontesOriginais[peca.Id], double.IsNaN(img.Width) ? Geometria.Tamanho(peca, def).Largura : img.Width,
                                         double.IsNaN(img.Height) ? Geometria.Tamanho(peca, def).Altura : img.Height);
                 if (!ReferenceEquals(img.Source, cinza)) img.Source = cinza;
             }
@@ -1133,6 +1137,8 @@ public partial class EditorCircuito : Border
 
         Drop += (_, e) =>
         {
+            // No multimetro nao se poe peca.
+            if (SoMedir) return;
             if (e.Data.GetData(JanelaPecas.FormatoArrasto) is not string tipo) return;
 
             var p = e.GetPosition(this);
@@ -3744,6 +3750,10 @@ public partial class EditorCircuito : Border
             || Math.Abs(agora.Y - desceu.Value.Y) > FolgaDoClique) return;
 
         var noMundo = NoMundo(agora);
+
+        // No multimetro o direito e a ponta preta, e nao o menu (que edita).
+        if (SoMedir) { CliqueDireitoNoMultimetro(noMundo); return; }
+
         var acerto = Resolver(noMundo);
 
         // Clicar com o direito numa peca que nao estava selecionada
@@ -4089,7 +4099,17 @@ public partial class EditorCircuito : Border
 
         // Clique duplo num canto o desfaz, como no Wokwi. O Canvas nao
         // tem MouseDoubleClick (isso e de Control), entao vem da contagem.
+        // O multimetro: o esquerdo e a ponta vermelha, e nada se edita (EditorMultimetro.cs).
+        if (SoMedir)
+        {
+            if (ApertarNoMultimetro(NoMundo(e), e.GetPosition(this), Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))) e.Handled = true;
+            return;
+        }
+
         if (e.ClickCount == 2 && RemoverDobraEm(NoMundo(e))) { e.Handled = true; return; }
+
+        // Clicar de novo no mesmo lugar: a camada de baixo (EditorCamadas.cs).
+        if (ApertarDeNovo(NoMundo(e))) { e.Handled = true; return; }
 
         if (Apertar(NoMundo(e))) e.Handled = true;
     }
@@ -4265,6 +4285,13 @@ public partial class EditorCircuito : Border
         if (!selecionadas.Contains(peca.Id)) Selecionar(peca.Id, somar);
         else if (somar) { Selecionar(peca.Id, true); return false; }
 
+        PrepararArrasto(peca, p);
+        return false;
+    }
+
+    /// <summary>A peca (e o grupo selecionado, e o que esta espetado nela) na mao, pronta para arrastar.</summary>
+    void PrepararArrasto(PecaNoCircuito peca, Point p)
+    {
         RedesenharFios();
 
         arrastando = peca.Id;
@@ -4292,7 +4319,6 @@ public partial class EditorCircuito : Border
                     carona.Add((outra.Id, outra.X - peca.X, outra.Y - peca.Y));
 
         CaptureMouse();
-        return false;
     }
 
     readonly List<(string id, double dx, double dy)> carona = [];
@@ -4760,6 +4786,7 @@ public partial class EditorCircuito : Border
     /// <summary>Soltar o botao do mouse, sem WPF no meio.</summary>
     internal void Soltar()
     {
+        if (SoltarPanDoMultimetro()) return;
         if (SoltarMancheDoRadio()) return;
 
         bool tinhaBotaoDePlaca = BootPressionado.Count > 0 || ResetSegurado.Count > 0
@@ -4857,11 +4884,13 @@ public partial class EditorCircuito : Border
             arrastando = null;
             carona.Clear();
             DevolverParaFixa();
-            if (moveuDeVerdade) Mudou?.Invoke();
+            if (moveuDeVerdade) { Mudou?.Invoke(); ultimoClique = null; }
             else if (pegou == suporteDoClique && Atual.Achar(pegou) is { } suporte && Catalogo.Obter(suporte.Tipo) is { } defSuporte)
                 AlternarPilha(suporte, Baterias.SlotNoPonto(suporte.Tipo, Geometria.PontoLocal(suporte, defSuporte, pegouEm)));
             suporteDoClique = null;
         }
+
+        TerminarCliqueDeNovo();
     }
 
     /// <summary>O suporte de pilhas que ja estava selecionado quando o clique comecou.</summary>
@@ -5036,6 +5065,7 @@ public partial class EditorCircuito : Border
         deslocamento.Y = ancoraTela.Y - ancoraMundo.Y * novo;
         AplicarGrade();
         PedirCacheDaFixa();
+        if (soMedir) DesenharPontas();     // as pontas tem o mesmo tamanho na tela em qualquer zoom
     }
 
     // ================= comandos =================

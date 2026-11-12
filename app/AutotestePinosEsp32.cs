@@ -105,12 +105,10 @@ public static partial class Autoteste
             var def = Catalogo.Obter(tipo);
             var nossos = def.Pinos.Select(p => p.Nome).ToHashSet();
             var faltam = deles.Split(' ').Where(n => FormatoWokwi.PinoDoWokwi(tipo, n) is not { } nosso || !nossos.Contains(nosso)).ToList();
-            var idaEVolta = def.Pinos.Where(p => FormatoWokwi.PinoDoWokwi(tipo, FormatoWokwi.PinoParaWokwi(tipo, p.Nome)) != p.Nome)
-                                     .Select(p => p.Nome).ToList();
-            var foraDeles = def.Pinos.Select(p => FormatoWokwi.PinoParaWokwi(tipo, p.Nome)).Where(n => !deles.Split(' ').Contains(n)).ToList();
-            Conferir($"{tipo}: cada pino do Wokwi tem o seu aqui, e cada um daqui vai e volta pelo nome de la",
-                faltam.Count == 0 && idaEVolta.Count == 0 && foraDeles.Count == 0,
-                $"sem par: {string.Join(",", faltam)}; nao voltam: {string.Join(",", idaEVolta)}; fora: {string.Join(",", foraDeles)}");
+            var mudam = def.Pinos.Where(p => FormatoWokwi.PinoDoWokwi(tipo, p.Nome) != p.Nome).Select(p => p.Nome).ToList();
+            Conferir($"{tipo}: cada pino do Wokwi tem o seu aqui, e cada um daqui abre com o mesmo nome",
+                faltam.Count == 0 && mudam.Count == 0,
+                $"sem par: {string.Join(",", faltam)}; mudam: {string.Join(",", mudam)}");
         }
 
         // ---- o projeto antigo: o fio no 16/17 da C6 (e no 24/23 da H2) passa para o TX/RX ----

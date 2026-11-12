@@ -226,13 +226,13 @@ public static partial class Autoteste
             Conferir("rp2.bootsel_button() na ESP32: o erro diz que o modulo e da Pico", erro?.Contains("rp2") == true, erro ?? "rodou");
         }
 
-        // ---- os nomes do Wokwi vao e voltam ----
+        // ---- os pinos: os daqui abrem com o mesmo nome, e o GND.1 do Wokwi e o GND ----
         foreach (string tipo in PlacasPico)
         {
             var def = Catalogo.Obter(tipo);
-            var idaEVolta = def.Pinos.Where(p => FormatoWokwi.PinoDoWokwi(tipo, FormatoWokwi.PinoParaWokwi(tipo, p.Nome)) != p.Nome)
-                                     .Select(p => p.Nome).ToList();
-            Conferir($"{tipo}: cada pino vai e volta pelo nome do Wokwi", idaEVolta.Count == 0, string.Join(",", idaEVolta));
+            var mudam = def.Pinos.Where(p => FormatoWokwi.PinoDoWokwi(tipo, p.Nome) != p.Nome).Select(p => p.Nome).ToList();
+            Conferir($"{tipo}: cada pino abre com o mesmo nome, e o GND.1 do Wokwi no GND",
+                mudam.Count == 0 && FormatoWokwi.PinoDoWokwi(tipo, "GND.1") is { } gnd && gnd.StartsWith("GND"), string.Join(",", mudam));
         }
     }
 }

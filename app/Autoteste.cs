@@ -145,6 +145,13 @@ public static partial class Autoteste
         Bloco("Pecas_IrEBluetooth", Pecas_IrEBluetooth);
         Bloco("Monitor_Baud", Monitor_Baud);
         Bloco("Sensor_Ds18b20", Sensor_Ds18b20);
+        Bloco("Plugins_Wokwi", Plugins_Wokwi);
+        Bloco("Multimetro_Medidas", Multimetro_Medidas);
+        Bloco("Camadas_CliqueDeNovo", Camadas_CliqueDeNovo);
+        Bloco("Paleta_SemTravar", Paleta_SemTravar);
+        Bloco("Visao_CinzaTransparente", Visao_CinzaTransparente);
+        Bloco("Depurador_AoVivo", Depurador_AoVivo);
+        Bloco("Barra_NomeDoCircuito", Barra_NomeDoCircuito);
         Bloco("Sensores_Redesenhados", Sensores_Redesenhados);
         Bloco("Esp8266_Redesenhadas", Esp8266_Redesenhadas);
         Bloco("Pcb_Base", Pcb_Base);
@@ -2331,11 +2338,11 @@ public static partial class Autoteste
             Conferir("wokwi: nenhum fio de I2C aponta para pino inexistente",
                 !ci.FiosQuebrados().Any(), string.Join("; ", ci.FiosQuebrados()));
 
-            // E a volta: exportar devolve o mesmo atributo, para o
-            // diagrama abrir no Wokwi do jeito que entrou.
+            // E a volta: o LCD com modulo sai com o nome daqui, e volta o mesmo.
             string devolta = ExportarWokwi.Gerar(ci);
-            Conferir("wokwi: exportar devolve o atributo pins=i2c",
-                devolta.Contains("\"pins\": \"i2c\"") && devolta.Contains("wokwi-lcd2004"),
+            Conferir("diagrama: o LCD com modulo sai como lcd2004-i2c (o nome daqui) e volta com modulo",
+                devolta.Contains("\"lcd2004-i2c\"") && !devolta.Contains("wokwi-")
+                && ImportarWokwi.Ler(devolta).Circuito.Pecas.Count(x => x.Tipo is "lcd1602-i2c" or "lcd2004-i2c") == 2,
                 devolta[..Math.Min(400, devolta.Length)]);
         }
 
@@ -3453,13 +3460,11 @@ public static partial class Autoteste
         string json = ExportarWokwi.Gerar(c);
         saida.AppendLine($"        gerado: {json.Length} caracteres");
 
-        // A placa daqui e a DevKit V1, e o Wokwi tem a MESMA (o elemento
-        // wokwi-esp32-devkit-v1, com a mesma serigrafia): o pino sai com o nome
-        // que tem aqui, e o desenho la fica igual ao daqui. (Ate a Alpha 23 ela
-        // saia como a DevKitC de 38 pinos, outra placa, com o pino por numero.)
+        // A placa sai com o nome daqui (sem o "wokwi-", que e do plugin), e o
+        // pino com a serigrafia.
         string esp = placa.Id;
-        Conferir("exportar: a placa sai como a mesma DevKit V1 do Wokwi",
-            json.Contains("\"wokwi-esp32-devkit-v1\""), "tipo da placa");
+        Conferir("exportar: a placa sai como esp32-devkit-v1, o nome daqui",
+            json.Contains("\"esp32-devkit-v1\"") && !json.Contains("wokwi-"), "tipo da placa");
         Conferir("exportar: os pinos da DevKit V1 saem com a serigrafia (D4, RX2)",
             json.Contains($"\"{esp}:D4\"") && json.Contains($"\"{esp}:RX2\""), json[..Math.Min(400, json.Length)]);
 

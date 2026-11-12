@@ -25,9 +25,8 @@ public static partial class Autoteste
                 def is null ? "sem peca" : string.Join(",", tem));
             Conferir($"{tipo}: tem desenho", Pecas.Existe(tipo));
         }
-        Conferir("o de 1 canal sai no diagram.json como o wokwi-relay-module (e volta)",
-            FormatoWokwi.TipoParaWokwi("modulo-rele-1") == "wokwi-relay-module"
-            && FormatoWokwi.TipoDoWokwi("wokwi-relay-module") == "modulo-rele-1", FormatoWokwi.TipoParaWokwi("modulo-rele-1"));
+        Conferir("o wokwi-relay-module do Wokwi abre como o de 1 canal",
+            FormatoWokwi.TipoDoWokwi("wokwi-relay-module") == "modulo-rele-1", FormatoWokwi.TipoDoWokwi("wokwi-relay-module") ?? "(nada)");
 
         static void Pino(Maquina m, int p, bool alto)
         {

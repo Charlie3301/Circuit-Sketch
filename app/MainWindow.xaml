@@ -178,6 +178,17 @@
                  placa DE VERDADE, pela USB; o Rodar da esquerda e o
                  simulador. -->
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <!-- O nome do circuito e o autor (o "name" e o "author" do
+                     diagram.json), do lado de quem manda o codigo. -->
+                <StackPanel x:Name="painelNomeDoCircuito" VerticalAlignment="Center" Margin="0,0,12,0"
+                            ToolTip="O nome do circuito e o autor: os mesmos do diagram.json (mudam na aba dele)">
+                    <TextBlock x:Name="txtNomeDoCircuito" FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextoForte}" HorizontalAlignment="Right"
+                               TextTrimming="CharacterEllipsis" MaxWidth="260"/>
+                    <TextBlock x:Name="txtAutorDoCircuito" FontSize="10"
+                               Foreground="{DynamicResource TextoFraco}" HorizontalAlignment="Right"
+                               TextTrimming="CharacterEllipsis" MaxWidth="260"/>
+                </StackPanel>
                 <Button x:Name="btVerificar" Style="{StaticResource Redondo}" Background="#00878F"
                         Content="&#x2713;" FontSize="17" Click="Verificar"
                         ToolTip="Verificar o código: o simulador e o compilador do Arduino (Ctrl+R)"/>
@@ -200,6 +211,10 @@
                     Content="❚❚" FontSize="12" ToolTip="Pausar (F6)" Click="PausarOuContinuar" IsEnabled="False"/>
             <Button x:Name="btPasso" Style="{StaticResource Redondo}" Background="#7D3C98"
                     Content="▶❚" FontSize="12" ToolTip="Andar uma linha (F10)" Click="Passo" IsEnabled="False"/>
+            <!-- As variaveis ao vivo: o painel delas atualizando com o sketch rodando, sem pausar. -->
+            <Button x:Name="btAoVivo" Style="{StaticResource Redondo}" Background="#117A65"
+                    Content="x=" FontSize="12" FontWeight="Bold" Click="AlternarAoVivo" IsEnabled="False"
+                    ToolTip="Variáveis ao vivo: ver as variáveis do sketch mudando enquanto ele roda, sem pausar"/>
             <Button Style="{StaticResource Redondo}" Background="#1668C1" Content="+"
                     FontSize="21" ToolTip="Adicionar componente (A)"
                     Click="AdicionarPeca"/>
@@ -287,7 +302,7 @@
 
             <Button x:Name="btModoSimulacao" Content="SIMULAÇÃO" Tag="simulacao"
                     Style="{StaticResource Modo}" Click="TrocarModo"/>
-            <Button x:Name="btModoCircuito" Content="VISÃO DE CIRCUITO" Tag="circuito"
+            <Button x:Name="btModoCircuito" Content="MULTÍMETRO" Tag="circuito"
                     Style="{StaticResource Modo}" Click="TrocarModo"/>
             <Button x:Name="btModoComponentes" Content="COMPONENTES" Tag="componentes"
                     Style="{StaticResource Modo}" Click="TrocarModo"/>
@@ -311,6 +326,10 @@
             <Border CornerRadius="6" BorderBrush="{DynamicResource Borda}" BorderThickness="1">
                 <local:EditorCircuito x:Name="editor"/>
             </Border>
+
+            <!-- O multimetro: so na aba MULTÍMETRO, no canto de cima da direita. -->
+            <local:PainelMultimetro x:Name="painelMultimetro" Visibility="Collapsed"
+                                    HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,12,12,0"/>
 
             <Border x:Name="painelDescricao" Visibility="Collapsed"
                     CornerRadius="6" BorderBrush="{DynamicResource Borda}"

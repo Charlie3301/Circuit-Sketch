@@ -398,29 +398,20 @@ public class JanelaPecas : Window
         };
         moldura.SetResourceReference(Border.BackgroundProperty, Tema.Campo);
 
-        var arte = Pecas.Talvez(peca.Id) ?? Pecas.Talvez($"{peca.Id}-corpo");
-        if (arte is not null)
-        {
-            moldura.Child = new Image
-            {
-                Source = arte,
-                Stretch = Stretch.Uniform,
-                Margin = new Thickness(3)
-            };
-        }
+        // A miniatura vem depois, sob demanda: so a linha que aparece na tela
+        // a pede, e em segundo plano. Montar as ~200 de uma vez (cada uma lendo
+        // o SVG da peca) travava a janela por segundos no "+".
+        string idDaPeca = peca.Id;
+        if (miniaturas.TryGetValue(idDaPeca, out var pronta)) PorMiniatura(moldura, pronta, idDaPeca);
         else
-        {
-            // Protoboard nao tem SVG: e desenhada em tempo de execucao.
-            var simbolo = new TextBlock
+            moldura.Loaded += (_, _) =>
             {
-                Text = "▤",
-                FontSize = 17,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
+                if (moldura.Child is not null) return;
+                moldura.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, () =>
+                {
+                    if (moldura.Child is null) PorMiniatura(moldura, Miniatura(idDaPeca), idDaPeca);
+                });
             };
-            simbolo.SetResourceReference(TextBlock.ForegroundProperty, Tema.TextoFraco);
-            moldura.Child = simbolo;
-        }
         linha.Children.Add(moldura);
 
         var textos = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
@@ -434,6 +425,60 @@ public class JanelaPecas : Window
         linha.Children.Add(textos);
 
         return new ListBoxItem { Content = linha, Tag = peca.Id, Padding = new Thickness(2) };
+    }
+
+    /// <summary>As miniaturas prontas (um bitmap pequeno por peca; null: a peca nao tem desenho).</summary>
+    static readonly Dictionary<string, ImageSource> miniaturas = [];
+
+    /// <summary>Quantas miniaturas ja foram feitas (para o teste).</summary>
+    internal static int MiniaturasProntas => miniaturas.Count;
+
+    /// <summary>
+    /// A miniatura da peca: o desenho dela num bitmap de 38x28 (o dobro de pixels,
+    /// para a tela de alta densidade). O desenho vetorial inteiro de uma placa
+    /// tem milhares de caminhos -- redesenha-lo a cada rolagem pesava tambem.
+    /// </summary>
+    internal static ImageSource Miniatura(string id)
+    {
+        if (miniaturas.TryGetValue(id, out var pronta)) return pronta;
+        ImageSource feita = null;
+        var arte = Pecas.Talvez(id) ?? Pecas.Talvez($"{id}-corpo");
+        if (arte is not null && arte.Width > 0 && arte.Height > 0)
+        {
+            const double Largura = 38, Altura = 28;
+            double escala = Math.Min(Largura / arte.Width, Altura / arte.Height);
+            double w = arte.Width * escala, h = arte.Height * escala;
+            var desenho = new DrawingVisual();
+            using (var ctx = desenho.RenderOpen())
+                ctx.DrawImage(arte, new Rect((Largura - w) / 2, (Altura - h) / 2, w, h));
+            var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(
+                (int)(Largura * 2), (int)(Altura * 2), 192, 192, PixelFormats.Pbgra32);
+            bitmap.Render(desenho);
+            bitmap.Freeze();
+            feita = bitmap;
+        }
+        miniaturas[id] = feita;
+        return feita;
+    }
+
+    static void PorMiniatura(Border moldura, ImageSource arte, string id)
+    {
+        if (arte is not null)
+        {
+            moldura.Child = new Image { Source = arte, Stretch = Stretch.Uniform, Margin = new Thickness(3) };
+            return;
+        }
+        // Protoboard nao tem SVG: e desenhada em tempo de execucao.
+        var simbolo = new TextBlock
+        {
+            Text = "▤",
+            FontSize = 17,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Tag = id,
+        };
+        simbolo.SetResourceReference(TextBlock.ForegroundProperty, Tema.TextoFraco);
+        moldura.Child = simbolo;
     }
 
     static int OrdemCategoria(string c) => c switch

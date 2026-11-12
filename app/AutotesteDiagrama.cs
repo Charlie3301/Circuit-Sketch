@@ -55,12 +55,12 @@ public static partial class Autoteste
             && linhas[3] == "  \"author\": \"Prof. Joao\"," && linhas[4] == "  \"editor\": \"circuitsketch\","
             && linhas[5] == "  \"parts\": [", string.Join(" | ", linhas.Take(6)));
         Conferir("formato: a peca curta fica numa linha so, com espaco dentro das chaves",
-            linhas.Any(l => l == "    { \"type\": \"wokwi-led\", \"id\": \"led1\", \"top\": 40, \"left\": 300, \"attrs\": { \"color\": \"green\" } },"),
+            linhas.Any(l => l == "    { \"type\": \"led\", \"id\": \"led1\", \"top\": 40, \"left\": 300, \"attrs\": { \"color\": \"green\" } },"),
             string.Join(" | ", linhas.Where(l => l.Contains("led1")).Take(2)));
         Conferir("formato: nenhuma linha de peca passa da largura do editor deles",
             linhas.All(l => l.Length <= FormatoWokwi.Largura + 1), linhas.Max(l => l.Length).ToString());
         Conferir("formato: a peca comprida abre um campo por linha",
-            json.Contains("    {\n      \"type\": \"circuitsketch-motor-brushless\",\n      \"id\": \"motor1\","), "motor");
+            json.Contains("    {\n      \"type\": \"motor-brushless\",\n      \"id\": \"motor1\","), "motor");
         Conferir("formato: a ligacao e [de, para, cor, caminho], uma por linha, com a cor pelo nome",
             json.Contains("    [ \"esp1:D2\", \"r1:1\", \"red\", [] ]"), string.Join(" | ", linhas.Where(l => l.Contains("esp1:D2"))));
         Conferir("formato: cor fora da paleta deles vai em hexadecimal (e volta igual)",
@@ -144,19 +144,22 @@ public static partial class Autoteste
                 && aplicada.Achar("esp1")?.Sketch?.Contains("loop") == true, "sketch/cartao");
         }
 
-        // ---- os tipos: as placas e pecas de la com o nome de la ----
+        // ---- os tipos: aqui sem prefixo; os de la (pelo plugin do Wokwi) e os da Alpha 24 abrem ----
         {
             string[] nossos = ["esp32-s3-devkit", "esp32-c3-devkit", "pi-pico-w", "stm32-bluepill", "and-gate", "ssd1306-i2c", "a4988", "motor-dc"];
-            var deles = nossos.Select(FormatoWokwi.TipoParaWokwi).ToList();
-            saida.AppendLine("        tipos la: " + string.Join(", ", deles));
-            Conferir("tipos: as placas novas saem como 'board-' (S3, C3, Pico W, Blue Pill), as do Wokwi como 'wokwi-', as daqui como 'circuitsketch-'",
-                deles.SequenceEqual(["board-esp32-s3-devkitc-1", "board-esp32-c3-devkitm-1", "board-pi-pico-w", "board-stm32-bluepill",
-                                     "wokwi-gate-and-2", "board-ssd1306", "wokwi-a4988", "circuitsketch-motor-dc"]),
-                string.Join(", ", deles));
-            Conferir("tipos: e voltam (a S3 nao vira mais a DevKit V1, como ate a Alpha 23)",
-                nossos.Zip(deles).All(z => FormatoWokwi.TipoDoWokwi(z.Second) == z.First), string.Join(", ", deles.Select(FormatoWokwi.TipoDoWokwi)));
-            Conferir("pinos: o A4988 deles chama EN de ENABLE (e volta EN)",
-                FormatoWokwi.PinoParaWokwi("a4988", "EN") == "ENABLE" && FormatoWokwi.PinoDoWokwi("a4988", "ENABLE") == "EN", "a4988");
+            string[] deles = ["board-esp32-s3-devkitc-1", "board-esp32-c3-devkitm-1", "board-pi-pico-w", "board-stm32-bluepill",
+                              "wokwi-gate-and-2", "board-ssd1306", "wokwi-a4988", "circuitsketch-motor-dc"];
+            var circ = new Circuito();
+            foreach (var (t, i) in nossos.Select((t, i) => (t, i))) circ.Pecas.Add(new PecaNoCircuito { Id = $"p{i}", Tipo = t, X = 300 * i });
+            string saiu = ExportarWokwi.Gerar(circ);
+            Conferir("tipos: o diagrama sai com os nomes daqui, sem 'wokwi-', 'board-' nem 'circuitsketch-'",
+                nossos.All(t => saiu.Contains($"\"type\": \"{t}\"")) && !saiu.Contains("wokwi-") && !saiu.Contains("board-")
+                && !saiu.Contains("circuitsketch-"), saiu.Length > 400 ? saiu[..400] : saiu);
+            Conferir("tipos: os nomes do Wokwi (e o circuitsketch- da Alpha 24) abrem como os daqui (a S3 nao vira a DevKit V1)",
+                nossos.Zip(deles).All(z => FormatoWokwi.TipoDoWokwi(z.Second) == z.First && FormatoWokwi.TipoDoWokwi(z.First) == z.First),
+                string.Join(", ", deles.Select(FormatoWokwi.TipoDoWokwi)));
+            Conferir("pinos: o A4988 deles chama EN de ENABLE, e abre no EN",
+                FormatoWokwi.PinoDoWokwi("a4988", "ENABLE") == "EN" && FormatoWokwi.PinoDoWokwi("a4988", "EN") == "EN", "a4988");
         }
     }
 }
