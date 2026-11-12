@@ -48,7 +48,7 @@ public class JanelaPecas : Window
     public JanelaPecas(Window dono)
     {
         Owner = dono;
-        Title = "Adicionar componente";
+        Title = Idioma.T("Adicionar componente");
         Width = 520;
         Height = 600;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
@@ -94,8 +94,7 @@ public class JanelaPecas : Window
 
         var dica = new TextBlock
         {
-            Text = "Arraste para a tela  ·  Enter ou duplo clique põe no meio"
-                   + "  ·  Ctrl+Tab troca de aba  ·  Esc fecha",
+            Text = Idioma.T("Arraste para a tela  ·  Enter ou duplo clique põe no meio  ·  Ctrl+Tab troca de aba  ·  Esc fecha"),
             FontSize = 11,
             Margin = new Thickness(2, 8, 0, 0),
             TextWrapping = TextWrapping.Wrap
@@ -168,7 +167,7 @@ public class JanelaPecas : Window
 
             if (daFamilia.Count == 0) return saida;
 
-            saida.Add(new ItemDaPaleta(subaba.ToUpperInvariant(), null, 0));
+            saida.Add(new ItemDaPaleta(Catalogo.NomeDaFamilia(subaba).ToUpperInvariant(), null, 0));
             foreach (var peca in daFamilia) saida.Add(new ItemDaPaleta(null, peca, 1));
             return saida;
         }
@@ -185,7 +184,7 @@ public class JanelaPecas : Window
         foreach (var categoria in pecas.GroupBy(peca => peca.Categoria)
                                        .OrderBy(g => OrdemCategoria(g.Key)))
         {
-            saida.Add(new ItemDaPaleta(categoria.Key.ToUpperInvariant(), null, 0));
+            saida.Add(new ItemDaPaleta(NomeDaCategoria(categoria.Key).ToUpperInvariant(), null, 0));
 
             // Fora de "Placas" a familia e null para todo mundo, entao
             // sai um grupo so, sem subcabecalho e sem recuo a mais. O
@@ -195,7 +194,7 @@ public class JanelaPecas : Window
                          .OrderBy(g => g.Key is null ? -1 : ordemDaFamilia.IndexOf(g.Key)))
             {
                 if (familia.Key is not null)
-                    saida.Add(new ItemDaPaleta(familia.Key.ToUpperInvariant(), null, 1));
+                    saida.Add(new ItemDaPaleta(Catalogo.NomeDaFamilia(familia.Key).ToUpperInvariant(), null, 1));
 
                 foreach (var peca in familia.OrderBy(peca => peca.Nome))
                     saida.Add(new ItemDaPaleta(null, peca, familia.Key is null ? 1 : 2));
@@ -218,7 +217,7 @@ public class JanelaPecas : Window
 
         var texto = new TextBlock
         {
-            Text = nome,
+            Text = NomeDaAba(nome),
             FontSize = 11,
             FontWeight = ativa ? FontWeights.SemiBold : FontWeights.Normal,
         };
@@ -280,8 +279,8 @@ public class JanelaPecas : Window
                 Content = new TextBlock
                 {
                     Text = abaAtual == AbaTudo
-                        ? "Nada com esse nome."
-                        : $"Nada com esse nome em \u201c{abaAtual}\u201d. Tente na aba Tudo.",
+                        ? Idioma.T("Nada com esse nome.")
+                        : Idioma.T("Nada com esse nome em \u201c{0}\u201d. Tente na aba Tudo.", NomeDaAba(abaAtual)),
                     Foreground = Tema.Pincel(Tema.TextoFraco),
                     FontSize = 12,
                     TextWrapping = TextWrapping.Wrap,
@@ -335,7 +334,7 @@ public class JanelaPecas : Window
         cabecalho.Cursor = Cursors.Hand;
         cabecalho.Focusable = false;
         cabecalho.Content = $"{(aberta ? "\u25BE" : "\u25B8")}  {item.Cabecalho}" + (aberta ? "" : $"  ({quantas})");
-        cabecalho.ToolTip = aberta ? "Recolher esta categoria" : "Mostrar as pecas desta categoria";
+        cabecalho.ToolTip = aberta ? Idioma.T("Recolher esta categoria") : Idioma.T("Mostrar as pecas desta categoria");
         cabecalho.PreviewMouseLeftButtonDown += (_, e) =>
         {
             if (!Recolhidas.Remove(item.Cabecalho)) Recolhidas.Add(item.Cabecalho);
@@ -419,7 +418,7 @@ public class JanelaPecas : Window
         nomeDaPeca.SetResourceReference(TextBlock.ForegroundProperty, Tema.Texto);
         textos.Children.Add(nomeDaPeca);
 
-        var pinos = new TextBlock { Text = $"{peca.Pinos.Count} pinos", FontSize = 10 };
+        var pinos = new TextBlock { Text = Idioma.T("{0} pinos", peca.Pinos.Count), FontSize = 10 };
         pinos.SetResourceReference(TextBlock.ForegroundProperty, Tema.TextoFraco);
         textos.Children.Add(pinos);
         linha.Children.Add(textos);
@@ -480,6 +479,22 @@ public class JanelaPecas : Window
         simbolo.SetResourceReference(TextBlock.ForegroundProperty, Tema.TextoFraco);
         moldura.Child = simbolo;
     }
+
+    /// <summary>A aba como aparece na tira: as chaves "Tudo" e "Componentes" se traduzem; a familia, so o "Outras".</summary>
+    static string NomeDaAba(string aba)
+        => aba == AbaTudo ? Idioma.T("Tudo") : aba == AbaComponentes ? Idioma.T("Componentes") : Catalogo.NomeDaFamilia(aba);
+
+    /// <summary>A categoria como aparece no cabecalho. A do catalogo e chave (sem acento); esta e a da tela.</summary>
+    static string NomeDaCategoria(string categoria) => categoria switch
+    {
+        "Base" => Idioma.T("Base"), "Placas" => Idioma.T("Placas"), "Saida" => Idioma.T("Saída"),
+        "Entrada" => Idioma.T("Entrada"), "Sensores" => Idioma.T("Sensores"), "Atuadores" => Idioma.T("Atuadores"),
+        "Motores" => Idioma.T("Motores"), "Modulos" => Idioma.T("Módulos"), "Rede" => Idioma.T("Rede"),
+        "Alimentacao" => Idioma.T("Alimentação"), "Logica" => Idioma.T("Lógica"), "Passivos" => Idioma.T("Passivos"),
+        "Semicondutores" => Idioma.T("Semicondutores"), "Chips" => Idioma.T("Chips"), "Anotacao" => Idioma.T("Anotação"),
+        "Outros" => Idioma.T("Outros"),
+        _ => Idioma.T(categoria),
+    };
 
     static int OrdemCategoria(string c) => c switch
     {

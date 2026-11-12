@@ -83,8 +83,8 @@ public partial class EditorCircuito
     {
         if (EnergiaDoQuadro?.RegulagemDe(peca.Id) is not { } e || e.Entrada < 0.5) return null;
         double t = TemperaturaDoRegulador(peca.Id);
-        if (emProtecaoTermica.Contains(peca.Id)) return $"🔥 {t:0} °C · proteção térmica";
-        if (e.SobreTensao) return $"⚠ {e.Entrada:0.#} V na entrada";
+        if (emProtecaoTermica.Contains(peca.Id)) return Idioma.T("🔥 {0:0} °C · proteção térmica", t);
+        if (e.SobreTensao) return Idioma.T("⚠ {0:0.#} V na entrada", e.Entrada);
         string texto = $"{e.Saida:0.0} V · {e.CorrenteDeSaida:0.00} A";
         if (t >= 60) texto += $" · {(t >= 100 ? "🔥 " : "")}{t:0} °C";
         return texto;
@@ -98,17 +98,13 @@ public partial class EditorCircuito
         var e = EnergiaDoQuadro?.RegulagemDe(id);
         double t = TemperaturaDoRegulador(id);
         if (e is null || e.Entrada < 0.5)
-            return curta ? "sem entrada" : $"Sem tensão na entrada: ligue o + da bateria no {Reguladores.PinosDe(peca.Tipo).Entrada} e o - no GND.";
-        if (EstaQueimada(id)) return curta ? "queimou" : "Queimou: a entrada passou do máximo da ficha.";
+            return curta ? Idioma.T("sem entrada") : Idioma.T("Sem tensão na entrada: ligue o + da bateria no {0} e o - no GND.", Reguladores.PinosDe(peca.Tipo).Entrada);
+        if (EstaQueimada(id)) return curta ? Idioma.T("queimou") : Idioma.T("Queimou: a entrada passou do máximo da ficha.");
         if (curta)
             return $"{e.Entrada:0.0} → {e.Saida:0.0} V · {e.CorrenteDeSaida:0.00} A" + (t >= 40 ? $" · {t:0} °C" : "")
-                   + (emProtecaoTermica.Contains(id) ? " · desligou" : "");
+                   + (emProtecaoTermica.Contains(id) ? " · " + Idioma.T("desligou") : "");
         double eficiencia = e.Entrada * e.CorrenteDeEntrada > 1e-6 ? e.Saida * e.CorrenteDeSaida / (e.Entrada * e.CorrenteDeEntrada) : 0;
-        return $"Entrada {e.Entrada:0.00} V ({e.CorrenteDeEntrada:0.000} A), saída {e.Saida:0.00} V ({e.CorrenteDeSaida:0.000} A). "
-               + $"Esquenta {e.Potencia:0.00} W ({eficiencia:0%} de eficiência), o chip a {t:0} °C."
-               + (emProtecaoTermica.Contains(id) ? " A proteção térmica desligou a saída até ele esfriar." : "")
-               + (e.EmQueda ? $" A entrada não dá a folga: a saída ficou abaixo dos {e.Nominal:0.#} V." : "")
-               + (e.Limitando ? " A carga pede mais que o limite: ele segura a corrente." : "");
+        return Idioma.T("Entrada {0:0.00} V ({1:0.000} A), saída {2:0.00} V ({3:0.000} A). Esquenta {4:0.00} W ({5:0%} de eficiência), o chip a {6:0} °C.{7}{8}{9}", e.Entrada, e.CorrenteDeEntrada, e.Saida, e.CorrenteDeSaida, e.Potencia, eficiencia, t, (emProtecaoTermica.Contains(id) ? Idioma.T(" A proteção térmica desligou a saída até ele esfriar.") : ""), (e.EmQueda ? Idioma.T(" A entrada não dá a folga: a saída ficou abaixo dos {0:0.#} V.", e.Nominal) : ""), (e.Limitando ? Idioma.T(" A carga pede mais que o limite: ele segura a corrente.") : ""));
     }
 
     /// <summary>O modelo (78xx, AMS1117) ou a saida do trimpot (LM2596, MT3608) do regulador selecionado.</summary>
@@ -139,12 +135,12 @@ public partial class EditorCircuito
         {
             if (!Reguladores.EhRegulador(peca.Tipo) || conta.RegulagemDe(peca.Id) is not { } e) continue;
             var ficha = Reguladores.Da(peca);
-            string nome = "o " + Reguladores.NomeCurto(peca);
+            string nome = Idioma.T("o {0}", Reguladores.NomeCurto(peca));
 
             if (e.SobreTensao)
             {
                 achados.Add(new Estouro(peca.Id,
-                    $"{nome} recebeu {e.Entrada:0.#} V na entrada, e o máximo dele é {ficha.EntradaMaxima:0} V: queimou."));
+                    Idioma.T("{0} recebeu {1:0.#} V na entrada, e o máximo dele é {2:0} V: queimou.", nome, e.Entrada, ficha.EntradaMaxima)));
                 continue;
             }
 
@@ -152,29 +148,24 @@ public partial class EditorCircuito
             {
                 var antes = antesDaProtecao.GetValueOrDefault(peca.Id) ?? e;
                 achados.Add(new Estouro(peca.Id,
-                    $"{nome} chegou a {Desliga:0} °C e a proteção térmica desligou a saída: ele estava esquentando "
-                    + $"{antes.Potencia:0.#} W ({antes.Entrada:0.#} V na entrada, {antes.Saida:0.#} V e {antes.CorrenteDeSaida:0.##} A na saída). "
-                    + (ficha.Tipo == TipoDeRegulador.Linear
-                        ? "Sem dissipador ele aguenta ~1,5 W. Use um dissipador, uma entrada mais baixa, ou um regulador chaveado (LM2596)."
-                        : "Diminua a carga, ou use um modulo maior."), Queimou: false));
+                    Idioma.T("{0} chegou a {1:0} °C e a proteção térmica desligou a saída: ele estava esquentando {2:0.#} W ({3:0.#} V na entrada, {4:0.#} V e {5:0.##} A na saída). {6}", nome, Desliga, antes.Potencia, antes.Entrada, antes.Saida, antes.CorrenteDeSaida, (ficha.Tipo == TipoDeRegulador.Linear
+                        ? Idioma.T("Sem dissipador ele aguenta ~1,5 W. Use um dissipador, uma entrada mais baixa, ou um regulador chaveado (LM2596).")
+                        : Idioma.T("Diminua a carga, ou use um modulo maior."))), Queimou: false));
                 continue;
             }
 
             if (e.Limitando)
                 achados.Add(new Estouro(peca.Id,
-                    $"a saída do {Reguladores.NomeCurto(peca)} está pedindo mais que o limite dele (~{ficha.LimiteDeCorrente:0.#} A): "
-                    + $"ele segura a corrente e a tensão cai para {e.Saida:0.#} V. Confira se a saída não está em curto.", Queimou: false));
+                    Idioma.T("a saída do {0} está pedindo mais que o limite dele (~{1:0.#} A): ele segura a corrente e a tensão cai para {2:0.#} V. Confira se a saída não está em curto.", Reguladores.NomeCurto(peca), ficha.LimiteDeCorrente, e.Saida), Queimou: false));
             else if (e.SoPassando && e.Entrada >= ficha.EntradaMinima && e.CorrenteDeSaida > 0.001)
                 achados.Add(new Estouro(peca.Id,
-                    $"{nome} só sobe a tensão: com {e.Entrada:0.#} V na entrada ele não chega aos {e.Nominal:0.#} V ajustados -- "
-                    + $"sai a entrada menos o diodo ({e.Saida:0.#} V). Para baixar a tensão, use um step-down (LM2596).", Queimou: false));
+                    Idioma.T("{0} só sobe a tensão: com {1:0.#} V na entrada ele não chega aos {2:0.#} V ajustados -- sai a entrada menos o diodo ({3:0.#} V). Para baixar a tensão, use um step-down (LM2596).", nome, e.Entrada, e.Nominal, e.Saida), Queimou: false));
             else if (e.EmQueda && e.CorrenteDeSaida > 0.001)
                 achados.Add(new Estouro(peca.Id,
-                    $"{nome} precisa de ~{ficha.Folga:0.#} V a mais na entrada: com {e.Entrada:0.#} V ele só dá {e.Saida:0.#} V "
-                    + $"(e não {e.Nominal:0.#} V).", Queimou: false));
+                    Idioma.T("{0} precisa de ~{1:0.#} V a mais na entrada: com {2:0.#} V ele só dá {3:0.#} V (e não {4:0.#} V).", nome, ficha.Folga, e.Entrada, e.Saida, e.Nominal), Queimou: false));
             else if (!e.Ligado && ficha.Tipo == TipoDeRegulador.Abaixador && e.Entrada > 0.5)
                 achados.Add(new Estouro(peca.Id,
-                    $"{nome} precisa de pelo menos {ficha.EntradaMinima:0.#} V na entrada para funcionar (tem {e.Entrada:0.#} V).", Queimou: false));
+                    Idioma.T("{0} precisa de pelo menos {1:0.#} V na entrada para funcionar (tem {2:0.#} V).", nome, ficha.EntradaMinima, e.Entrada), Queimou: false));
         }
         return achados;
     }

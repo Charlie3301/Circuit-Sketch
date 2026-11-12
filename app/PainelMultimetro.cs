@@ -24,11 +24,11 @@ public sealed class PainelMultimetro : Border
 {
     static readonly (FuncaoDoMultimetro Funcao, double Angulo, string Dica)[] Posicoes =
     [
-        (FuncaoDoMultimetro.TensaoAlternada, -76, "Tensão alternada (V~): o PWM e o tone, em valor eficaz"),
-        (FuncaoDoMultimetro.TensaoContinua, -38, "Tensão contínua (V⎓)"),
-        (FuncaoDoMultimetro.Resistencia, 0, "Resistência (Ω): entre as duas pontas"),
-        (FuncaoDoMultimetro.Continuidade, 38, "Continuidade (·))): bipa abaixo de 50 Ω"),
-        (FuncaoDoMultimetro.Corrente, 76, "Corrente (A): a que passa pelo que a ponta vermelha toca"),
+        (FuncaoDoMultimetro.TensaoAlternada, -76, Idioma.T("Tensão alternada (V~): o PWM e o tone, em valor eficaz")),
+        (FuncaoDoMultimetro.TensaoContinua, -38, Idioma.T("Tensão contínua (V⎓)")),
+        (FuncaoDoMultimetro.Resistencia, 0, Idioma.T("Resistência (Ω): entre as duas pontas")),
+        (FuncaoDoMultimetro.Continuidade, 38, Idioma.T("Continuidade (·))): bipa abaixo de 50 Ω")),
+        (FuncaoDoMultimetro.Corrente, 76, Idioma.T("Corrente (A): a que passa pelo que a ponta vermelha toca")),
     ];
 
     static readonly Color Ambar = Color.FromRgb(0xFF, 0xC8, 0x57);
@@ -82,7 +82,7 @@ public sealed class PainelMultimetro : Border
         topo.Children.Add(auto);
         topo.Children.Add(new TextBlock
         {
-            Text = "MULTÍMETRO DIGITAL", FontSize = 8.5, FontWeight = FontWeights.Bold,
+            Text = Idioma.T("MULTÍMETRO DIGITAL"), FontSize = 8.5, FontWeight = FontWeights.Bold,
             Foreground = new SolidColorBrush(Color.FromRgb(0xC8, 0xCB, 0xD0)),
         });
         pilha.Children.Add(topo);
@@ -110,8 +110,7 @@ public sealed class PainelMultimetro : Border
 
         pilha.Children.Add(new TextBlock
         {
-            Text = "Esquerdo: ponta vermelha · direito ou Shift+clique: preta · "
-                   + "arraste no vazio para andar · Esc tira as pontas",
+            Text = Idioma.T("Esquerdo: ponta vermelha · direito ou Shift+clique: preta · arraste no vazio para andar · Esc tira as pontas"),
             FontSize = 9, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(2, 7, 2, 0),
             Foreground = new SolidColorBrush(Color.FromRgb(0x8E, 0x94, 0x9C)),
         });
@@ -186,7 +185,7 @@ public sealed class PainelMultimetro : Border
 
         // Clicar no botao gira para a proxima; a roda do mouse gira para os dois lados.
         disco.Cursor = Cursors.Hand;
-        disco.ToolTip = "Girar a chave (a roda do mouse também gira)";
+        disco.ToolTip = Idioma.T("Girar a chave (a roda do mouse também gira)");
         disco.MouseLeftButtonDown += (_, e) => { Girar(+1); e.Handled = true; };
         pega.MouseLeftButtonDown += (_, e) => { Girar(+1); e.Handled = true; };
         tela.MouseWheel += (_, e) => { Girar(e.Delta > 0 ? -1 : +1); e.Handled = true; };
@@ -337,8 +336,8 @@ public sealed class PainelMultimetro : Border
         linha.Children.Add(textos);
 
         linha.ToolTip = preta
-            ? "A ponta preta. Clique aqui para o clique esquerdo encostar a preta (bom no trackpad)."
-            : "A ponta vermelha. Clique aqui para o clique esquerdo voltar a encostar a vermelha.";
+            ? Idioma.T("A ponta preta. Clique aqui para o clique esquerdo encostar a preta (bom no trackpad).")
+            : Idioma.T("A ponta vermelha. Clique aqui para o clique esquerdo voltar a encostar a vermelha.");
         linha.MouseLeftButtonDown += (_, e) =>
         {
             if (PretaNoEsquerdo == preta) return;
@@ -366,9 +365,9 @@ public sealed class PainelMultimetro : Border
         UltimaLeitura = leitura;
         visor.Mostrar(leitura);
         txtNota.Text = leitura?.Nota ?? "";
-        txtVermelha.Text = ondeVermelha ?? "solta";
+        txtVermelha.Text = ondeVermelha ?? Idioma.T("solta");
         txtPreta.Text = ondePreta ?? (Funcao is FuncaoDoMultimetro.Resistencia or FuncaoDoMultimetro.Continuidade
-            ? "solta" : "solta (o terra conta)");
+            ? Idioma.T("solta") : Idioma.T("solta (o terra conta)"));
         Bipar(leitura?.Bipe == true);
     }
 
@@ -464,14 +463,14 @@ public sealed class VisorLcd : FrameworkElement
                            new Point(x, 1));
         if (funcao == FuncaoDoMultimetro.TensaoAlternada) Aviso("AC", 4);
         if (funcao is FuncaoDoMultimetro.TensaoContinua or FuncaoDoMultimetro.Corrente) Aviso("DC", 4);
-        Aviso("AUTO", 26);
+        Aviso(Idioma.T("AUTO"), 26);
         if (funcao == FuncaoDoMultimetro.Continuidade)
         {
             dc.DrawEllipse(Aceso, null, new Point(64, 8), 1.6, 1.6);
             var arcos = Geometry.Parse("M 67,4.5 A 4,4 0 0 1 67,11.5 M 70,2.5 A 6.5,6.5 0 0 1 70,13.5 M 73,1 A 9,9 0 0 1 73,15");
             dc.DrawGeometry(null, new Pen(leitura?.Bipe == true ? Aceso : Apagado, 1.3), arcos);
         }
-        if (funcao == FuncaoDoMultimetro.Continuidade && leitura?.Bipe == true) Aviso("BIP", 84);
+        if (funcao == FuncaoDoMultimetro.Continuidade && leitura?.Bipe == true) Aviso(Idioma.T("BIP"), 84);
 
         // Os digitos: o texto do visor em quatro casas, alinhado a direita.
         string texto = leitura?.Visor ?? "----";

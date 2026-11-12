@@ -48,7 +48,7 @@ public sealed record ModeloDeMotor(string Nome, double Resistencia, double Ke, d
     /// 6 V, 1,5 A travado com 6 V; 0,4 e 0,8 kg.cm de torque travado.
     /// </summary>
     public static readonly ModeloDeMotor MotorTT = new(
-        "motor TT amarelo",
+        Idioma.N("motor TT amarelo"),
         Resistencia: 4.0,
         Ke: 0.20474, Kt: 0.05811,
         Inercia: 3.7e-4,
@@ -85,7 +85,7 @@ public sealed record ModeloDeMotor(string Nome, double Resistencia, double Ke, d
     {
         if (peca is null) return null;
         if (peca.Modelo == "personalizado" && peca.Ficha is { } propria && FichasDeMotor.Para(peca.Tipo).Length > 0)
-            return propria.Ficha(peca.Tipo == "motor-brushless").Modelo() with { Nome = "motor personalizado" };
+            return propria.Ficha(peca.Tipo == "motor-brushless").Modelo() with { Nome = Idioma.N("motor personalizado") };
         if (peca.Modelo is { } id && id is not ("130" or "a2212-1000") && FichasDeMotor.Achar(peca.Tipo, id) is { } ficha)
             return ficha.Modelo();
         return De(peca.Tipo);

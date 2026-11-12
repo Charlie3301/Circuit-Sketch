@@ -33,7 +33,7 @@ public static class Baterias
     {
         public string Curto => Nome[..Nome.IndexOf(' ', Nome.StartsWith("LiPo", StringComparison.Ordinal) ? 5 : 0)] switch
         {
-            "Bateria" => Tipo == "bateria-9v" ? "9 V" : "Chumbo 12 V",
+            "Bateria" => Tipo == "bateria-9v" ? "9 V" : Idioma.N("Chumbo 12 V"),
             "Power" => "Power bank",
             var curto => curto,
         };
@@ -41,22 +41,22 @@ public static class Baterias
 
     public static readonly Pacote[] Pacotes =
     [
-        new("bateria-9v", "Bateria 9 V (6F22)", 9.0, 500, 550,
-            "A alcalina retangular com clip: ~550 mAh, ate ~0,5 A. Boa para o Arduino parado; fraca para motor."),
-        new("lipo-1s-500", "LiPo 1S 3,7 V 500 mAh", 3.7, 1000, 500,
-            "A LiPo pequena de uma celula (503035), com a placa de protecao e o conector JST-PH: a das placas com carregador."),
-        new("lipo-2s-2200", "LiPo 2S 7,4 V 2200 mAh", 7.4, 55000, 2200,
-            "Duas celulas, 25C (ate 55 A), conector XT60 e o plugue de balanceamento."),
-        new("lipo-3s-2200", "LiPo 3S 11,1 V 2200 mAh", 11.1, 66000, 2200,
-            "Tres celulas, 30C (ate 66 A): a do A2212 com a helice 1045."),
-        new("lipo-4s-1500", "LiPo 4S 14,8 V 1500 mAh", 14.8, 150000, 1500,
-            "Quatro celulas, 100C (ate 150 A): a do drone de 5 polegadas."),
-        new("lipo-6s-1300", "LiPo 6S 22,2 V 1300 mAh", 22.2, 130000, 1300,
-            "Seis celulas, 100C (ate 130 A): a dos drones de 6S."),
+        new("bateria-9v", Idioma.N("Bateria 9 V (6F22)"), 9.0, 500, 550,
+            Idioma.T("A alcalina retangular com clip: ~550 mAh, ate ~0,5 A. Boa para o Arduino parado; fraca para motor.")),
+        new("lipo-1s-500", Idioma.N("LiPo 1S 3,7 V 500 mAh"), 3.7, 1000, 500,
+            Idioma.T("A LiPo pequena de uma celula (503035), com a placa de protecao e o conector JST-PH: a das placas com carregador.")),
+        new("lipo-2s-2200", Idioma.N("LiPo 2S 7,4 V 2200 mAh"), 7.4, 55000, 2200,
+            Idioma.T("Duas celulas, 25C (ate 55 A), conector XT60 e o plugue de balanceamento.")),
+        new("lipo-3s-2200", Idioma.N("LiPo 3S 11,1 V 2200 mAh"), 11.1, 66000, 2200,
+            Idioma.T("Tres celulas, 30C (ate 66 A): a do A2212 com a helice 1045.")),
+        new("lipo-4s-1500", Idioma.N("LiPo 4S 14,8 V 1500 mAh"), 14.8, 150000, 1500,
+            Idioma.T("Quatro celulas, 100C (ate 150 A): a do drone de 5 polegadas.")),
+        new("lipo-6s-1300", Idioma.N("LiPo 6S 22,2 V 1300 mAh"), 22.2, 130000, 1300,
+            Idioma.T("Seis celulas, 100C (ate 130 A): a dos drones de 6S.")),
         new("power-bank", "Power bank 5 V 10000 mAh", 5.0, 2100, 6500,
-            "A saida USB de 5 V, ate 2,1 A. Os 10000 mAh sao das celulas de 3,7 V: a 5 V rendem uns 6500 mAh."),
-        new("bateria-chumbo-12v", "Bateria de chumbo 12 V 7 Ah", 12.0, 20000, 7000,
-            "A selada (VRLA) de alarme e nobreak: pesada, barata, aguenta uns 20 A."),
+            Idioma.T("A saida USB de 5 V, ate 2,1 A. Os 10000 mAh sao das celulas de 3,7 V: a 5 V rendem uns 6500 mAh.")),
+        new("bateria-chumbo-12v", Idioma.N("Bateria de chumbo 12 V 7 Ah"), 12.0, 20000, 7000,
+            Idioma.T("A selada (VRLA) de alarme e nobreak: pesada, barata, aguenta uns 20 A.")),
     ];
 
     public static Pacote PacoteDe(string tipo) => Array.Find(Pacotes, p => p.Tipo == tipo);
@@ -79,22 +79,22 @@ public static class Baterias
     [
         new("aa", "AA", 14.5, 50.5, 15.6, [1, 2, 3, 4, 6, 8], 4,
         [
-            new("alcalina", "Alcalina 1,5 V", 1.5, 1000, 2500),
-            new("nimh", "NiMH recarregável 1,2 V", 1.2, 4000, 2000),
+            new("alcalina", Idioma.T("Alcalina 1,5 V"), 1.5, 1000, 2500),
+            new("nimh", Idioma.T("NiMH recarregável 1,2 V"), 1.2, 4000, 2000),
         ]),
         new("aaa", "AAA", 10.5, 44.5, 11.6, [1, 2, 3, 4], 4,
         [
-            new("alcalina", "Alcalina 1,5 V", 1.5, 500, 1100),
-            new("nimh", "NiMH recarregável 1,2 V", 1.2, 2000, 800),
+            new("alcalina", Idioma.T("Alcalina 1,5 V"), 1.5, 500, 1100),
+            new("nimh", Idioma.T("NiMH recarregável 1,2 V"), 1.2, 2000, 800),
         ]),
         new("18650", "18650", 18.6, 65.2, 20.6, [1, 2, 3, 4], 2,
         [
-            new("comum", "Li-ion 3,7 V 2600 mAh", 3.7, 5000, 2600),
-            new("alta-descarga", "Li-ion 3,6 V 3000 mAh (alta descarga, 15 A)", 3.6, 15000, 3000),
+            new("comum", Idioma.T("Li-ion 3,7 V 2600 mAh"), 3.7, 5000, 2600),
+            new("alta-descarga", Idioma.T("Li-ion 3,6 V 3000 mAh (alta descarga, 15 A)"), 3.6, 15000, 3000),
         ]),
         new("cr2032", "CR2032", 20.0, 3.2, 0, [1], 1,
         [
-            new("litio", "Lítio 3 V 220 mAh", 3.0, 20, 220),
+            new("litio", Idioma.T("Lítio 3 V 220 mAh"), 3.0, 20, 220),
         ]),
     ];
 
@@ -236,12 +236,12 @@ public static class Baterias
     public static PecaDef DefDoSuporte(string tipo)
     {
         if (SuporteDe(tipo) is not { } s || LeiauteDe(tipo) is not { } l) return null;
-        string nome = s.Formato.Id == "cr2032" ? "Suporte de bateria CR2032"
-                    : $"Suporte de pilhas {s.Formato.Nome} ({s.Slots}×)";
+        string nome = s.Formato.Id == "cr2032" ? Idioma.T("Suporte de bateria CR2032")
+                    : Idioma.T("Suporte de pilhas {0} ({1}×)", s.Formato.Nome, s.Slots);
         return new PecaDef(tipo, nome, l.Largura, l.Altura,
         [
-            new PinoDef("+", Math.Round(l.Mais.X, 2), Math.Round(l.Mais.Y, 2), ["power"], "Fio vermelho: o positivo das pilhas em serie"),
-            new PinoDef("-", Math.Round(l.Menos.X, 2), Math.Round(l.Menos.Y, 2), ["power"], "Fio preto: o negativo (terra)"),
+            new PinoDef("+", Math.Round(l.Mais.X, 2), Math.Round(l.Mais.Y, 2), ["power"], Idioma.T("Fio vermelho: o positivo das pilhas em serie")),
+            new PinoDef("-", Math.Round(l.Menos.X, 2), Math.Round(l.Menos.Y, 2), ["power"], Idioma.T("Fio preto: o negativo (terra)")),
         ], "Alimentacao");
     }
 

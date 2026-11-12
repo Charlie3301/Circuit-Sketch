@@ -46,7 +46,7 @@ public static class Dialogos
 
         var cancelar = new Button
         {
-            Content = "Cancelar",
+            Content = Idioma.T("Cancelar"),
             Style = (Style)Application.Current.FindResource("BotaoPequeno"),
             IsCancel = true,
         };

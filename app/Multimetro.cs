@@ -53,14 +53,14 @@ public static class Multimetro
         LeituraDoMultimetro Vazio(string nota) => new("----", unidadeBase, null, false, false, nota);
 
         if (vermelha is null)
-            return Vazio("Encoste a ponta vermelha: botão esquerdo num pino, furo ou fio.");
+            return Vazio(Idioma.T("Encoste a ponta vermelha: botão esquerdo num pino, furo ou fio."));
 
         bool ohmimetro = funcao is FuncaoDoMultimetro.Resistencia or FuncaoDoMultimetro.Continuidade;
         if (!ohmimetro && !rodando)
             return new LeituraDoMultimetro(funcao == FuncaoDoMultimetro.Corrente ? "0.000" : "0.000", unidadeBase, 0, false, false,
-                "Circuito parado: rode a simulação (F5) para ter tensão e corrente.");
+                Idioma.T("Circuito parado: rode a simulação (F5) para ter tensão e corrente."));
         if (conta is null)
-            return Vazio(rodando ? "Medindo…" : "Sem a conta do circuito.");
+            return Vazio(rodando ? "Medindo…" : Idioma.T("Sem a conta do circuito."));
 
         string raizVermelha = RaizDa(conta, vermelha, circuito);
         string raizPreta = preta is null ? null : RaizDa(conta, preta, circuito);
@@ -74,9 +74,9 @@ public static class Multimetro
                     ? conta.ContinuaEntre(raizVermelha, raizPreta)
                     : conta.AlternadaEntre(raizVermelha, raizPreta);
                 var (visor, unidade) = Formatar(v, "V");
-                string nota = preta is null ? "Sem a ponta preta: medindo contra o terra (GND) do circuito." : null;
+                string nota = preta is null ? Idioma.T("Sem a ponta preta: medindo contra o terra (GND) do circuito.") : null;
                 if (funcao == FuncaoDoMultimetro.TensaoAlternada && Math.Abs(v) < 1e-4)
-                    nota ??= "Sem parte alternada aqui: é tensão contínua (o V~ mede o PWM e o tone).";
+                    nota ??= Idioma.T("Sem parte alternada aqui: é tensão contínua (o V~ mede o PWM e o tone).");
                 return new LeituraDoMultimetro(visor, unidade, v, false, false, nota);
             }
 
@@ -87,20 +87,20 @@ public static class Multimetro
                               && conta.CorrentesDePeca.ContainsKey(peca.Id);
                 double i = daPeca ? conta.CorrenteDaPeca(peca.Id) : conta.CorrenteDoNo(raizVermelha);
                 var (visor, unidade) = Formatar(i, "A");
-                string alvo = daPeca ? Catalogo.Obter(peca.Tipo)?.Nome ?? peca.Id : "o fio / o nó";
-                return new LeituraDoMultimetro(visor, unidade, i, false, false, $"A corrente que passa por {alvo}.");
+                string alvo = daPeca ? Catalogo.Obter(peca.Tipo)?.Nome ?? peca.Id : Idioma.T("o fio / o nó");
+                return new LeituraDoMultimetro(visor, unidade, i, false, false, Idioma.T("A corrente que passa por {0}.", alvo));
             }
 
             default:
             {
                 if (preta is null)
-                    return Vazio("Encoste a ponta preta: botão direito (ou Shift+clique) no outro lado.");
+                    return Vazio(Idioma.T("Encoste a ponta preta: botão direito (ou Shift+clique) no outro lado."));
                 double? r = conta.ResistenciaEntre(raizVermelha, raizPreta);
                 bool fora = r is null || r > ForaDaFaixaDoOhmimetro;
                 bool bipe = funcao == FuncaoDoMultimetro.Continuidade && !fora && r < LimiteDaContinuidade;
                 string nota = rodando && Math.Abs(conta.ContinuaEntre(raizVermelha, raizPreta)) > 0.05
-                    ? "Circuito ligado: no de verdade, meça a resistência com ele desligado."
-                    : fora ? "Sem caminho entre as pontas (circuito aberto)." : null;
+                    ? Idioma.T("Circuito ligado: no de verdade, meça a resistência com ele desligado.")
+                    : fora ? Idioma.T("Sem caminho entre as pontas (circuito aberto).") : null;
                 if (fora) return new LeituraDoMultimetro("OL", r is null ? "MΩ" : "MΩ", null, true, false, nota);
                 var (visor, unidade) = Formatar(r.Value, "Ω");
                 return new LeituraDoMultimetro(visor, unidade, r, false, bipe, nota);
@@ -155,10 +155,10 @@ public static class Multimetro
     /// <summary>O nome da funcao, como no painel e na barra.</summary>
     public static string Nome(FuncaoDoMultimetro funcao) => funcao switch
     {
-        FuncaoDoMultimetro.TensaoAlternada => "tensão alternada (V~)",
-        FuncaoDoMultimetro.TensaoContinua => "tensão contínua (V⎓)",
-        FuncaoDoMultimetro.Resistencia => "resistência (Ω)",
-        FuncaoDoMultimetro.Continuidade => "continuidade (·)))",
-        _ => "corrente (A)",
+        FuncaoDoMultimetro.TensaoAlternada => Idioma.T("tensão alternada (V~)"),
+        FuncaoDoMultimetro.TensaoContinua => Idioma.T("tensão contínua (V⎓)"),
+        FuncaoDoMultimetro.Resistencia => Idioma.T("resistência (Ω)"),
+        FuncaoDoMultimetro.Continuidade => Idioma.T("continuidade (·)))"),
+        _ => Idioma.T("corrente (A)"),
     };
 }

@@ -21,7 +21,7 @@ public sealed record ModeloDeServo(
         // MG996R: 0,17 s/60 graus a 4,8 V (0,14 a 6 V); trava com 2,5 A.
         new ModeloDeServo("servo-mg996r", "servo MG996R", 353, 0.010, 0.70, 2.5, 4.0, 8.4),
         // FS90R: rotacao continua, 110 rpm a 4,8 V (130 a 6 V).
-        new ModeloDeServo("servo-360", "servo 360 graus (FS90R)", 0, 0.006, 0.20, 0.55, 3.0, 7.2,
+        new ModeloDeServo("servo-360", Idioma.T("servo 360 graus (FS90R)"), 0, 0.006, 0.20, 0.55, 3.0, 7.2,
                           Continuo: true, Rpm: 110),
     }.ToDictionary(m => m.Tipo);
 
@@ -95,22 +95,21 @@ public partial class EditorCircuito
             if (volts > modelo.TensaoMaxima)
             {
                 avisosDeServo.Add(new Estouro(peca.Id,
-                    $"o {modelo.Nome} recebeu {volts:0.#} V no V+, e o maximo dele e {modelo.TensaoMaxima:0.#} V: queimou."));
+                    Idioma.T("o {0} recebeu {1:0.#} V no V+, e o maximo dele e {2:0.#} V: queimou.", modelo.Nome, volts, modelo.TensaoMaxima)));
                 continue;
             }
             if (pulso is null)
             {
                 if (rede.PinoDe(Atual, peca.Id, "PWM").Gpio >= 0 && !GndComumComPlaca(peca, "GND", rede))
                     avisosDeServo.Add(new Estouro(peca.Id,
-                        $"o GND do {modelo.Nome} nao esta no GND da placa: sem a referencia em comum, ele nao entende o pulso.",
+                        Idioma.T("o GND do {0} nao esta no GND da placa: sem a referencia em comum, ele nao entende o pulso.", modelo.Nome),
                         Queimou: false));
                 continue;
             }
             if (volts < modelo.TensaoMinima)
             {
                 avisosDeServo.Add(new Estouro(peca.Id,
-                    $"o {modelo.Nome} recebe o pulso, mas o V+ esta com {volts:0.#} V: ele precisa de 4,8 a 6 V "
-                    + "(o 5V/VIN da placa ou uma fonte, com o GND em comum) para girar.", Queimou: false));
+                    Idioma.T("o {0} recebe o pulso, mas o V+ esta com {1:0.#} V: ele precisa de 4,8 a 6 V (o 5V/VIN da placa ou uma fonte, com o GND em comum) para girar.", modelo.Nome, volts), Queimou: false));
                 continue;
             }
 
@@ -138,8 +137,7 @@ public partial class EditorCircuito
 
             if (volts < 4.5)
                 avisosDeServo.Add(new Estouro(peca.Id,
-                    $"o {modelo.Nome} esta com {volts:0.#} V no V+, abaixo dos 4,8 V dele: gira fraco e devagar "
-                    + "(e o pico de corrente pode reiniciar a placa). Alimente com 5 V.", Queimou: false));
+                    Idioma.T("o {0} esta com {1:0.#} V no V+, abaixo dos 4,8 V dele: gira fraco e devagar (e o pico de corrente pode reiniciar a placa). Alimente com 5 V.", modelo.Nome, volts), Queimou: false));
         }
 
         var vivas = Atual.Pecas.Select(p => p.Id).ToHashSet();

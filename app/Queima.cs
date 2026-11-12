@@ -124,7 +124,7 @@ public static class Queima
             if (!ponto.TerraDePlaca || ponto.TensaoDeTrilho <= 0) continue;
             foreach (string placa in Placas(circuito))
                 achados.Add(new Estouro(placa,
-                    "curto: alimentação ligada direto no GND"));
+                    Idioma.T("curto: alimentação ligada direto no GND")));
         }
 
         // ---- 2) saída em HIGH direto no terra ----
@@ -133,7 +133,7 @@ public static class Queima
             if (!ponto.TerraDePlaca || !ponto.SaidaLigada || ponto.Resistor) continue;
             foreach (string placa in Placas(circuito))
                 achados.Add(new Estouro(placa,
-                    $"curto: o pino {ponto.Gpio} está em HIGH e ligado direto no GND"));
+                    Idioma.T("curto: o pino {0} está em HIGH e ligado direto no GND", ponto.Gpio)));
         }
 
         // ---- 3) saída em LOW direto na alimentação ----
@@ -146,7 +146,7 @@ public static class Queima
             if (emBaixo.Placa is null) continue;
 
             achados.Add(new Estouro(emBaixo.Placa,
-                $"curto: o pino {emBaixo.Gpio} está em LOW e ligado direto na alimentação"));
+                Idioma.T("curto: o pino {0} está em LOW e ligado direto na alimentação", emBaixo.Gpio)));
         }
 
         // ---- 4) duas saídas brigando no mesmo nó ----
@@ -163,13 +163,12 @@ public static class Queima
             var baixa = ponto.Saidas.First(s => !s.Alto);
 
             string onde = alta.Placa == baixa.Placa
-                ? $"os pinos {alta.Gpio} e {baixa.Gpio} da mesma placa"
-                : $"o pino {alta.Gpio} de uma placa e o {baixa.Gpio} da outra";
+                ? Idioma.T("os pinos {0} e {1} da mesma placa", alta.Gpio, baixa.Gpio)
+                : Idioma.T("o pino {0} de uma placa e o {1} da outra", alta.Gpio, baixa.Gpio);
 
             foreach (string placa in new[] { alta.Placa, baixa.Placa }.Distinct())
                 achados.Add(new Estouro(placa,
-                    $"conflito digital: {onde} estão ligados entre si, "
-                    + "um em HIGH e o outro em LOW"));
+                    Idioma.T("conflito digital: {0} estão ligados entre si, um em HIGH e o outro em LOW", onde)));
         }
 
         // ---- 5) LED sem resistor ----
@@ -209,7 +208,7 @@ public static class Queima
 
             if (positivoNoTerra && terraNoPositivo)
                 achados.Add(new Estouro(peca.Id,
-                    "ligada ao contrário: o VCC no GND e o GND na alimentação"));
+                    Idioma.T("ligada ao contrário: o VCC no GND e o GND na alimentação")));
         }
 
         // ---- 7) atuador pendurado num pino de dados ----
@@ -233,9 +232,7 @@ public static class Queima
 
                 string nome = Catalogo.Obter(peca.Tipo)?.Nome ?? peca.Tipo;
                 achados.Add(new Estouro(saida.Placa,
-                    $"o {nome} está sendo alimentado pelo pino {saida.Gpio}: "
-                    + $"ele puxa ~{precisa:0} mA e a porta entrega {saida.Corrente:0} mA. "
-                    + "Alimente pelo 5V/VIN e use o pino só para o sinal."));
+                    Idioma.T("o {0} está sendo alimentado pelo pino {1}: ele puxa ~{2:0} mA e a porta entrega {3:0} mA. Alimente pelo 5V/VIN e use o pino só para o sinal.", nome, saida.Gpio, precisa, saida.Corrente)));
             }
         }
 
@@ -258,18 +255,13 @@ public static class Queima
                 {
                     double v = fonte.TensaoDeTrilho;
                     achados.Add(new Estouro(peca.Id,
-                        $"alto-falante ligado direto no {Volts(v)}: os 8 Ω puxam {v / 8 * 1000:0} mA, "
-                        + $"{v * v / 8:0.#} W numa bobina de 0,5 W, e ela queima. O alto-falante vai na saída "
-                        + "de um amplificador (o MAX98357A, pelo I2S)"));
+                        Idioma.T("alto-falante ligado direto no {0}: os 8 Ω puxam {1:0} mA, {2:0.#} W numa bobina de 0,5 W, e ela queima. O alto-falante vai na saída de um amplificador (o MAX98357A, pelo I2S)", Volts(v), v / 8 * 1000, v * v / 8)));
                     break;
                 }
                 var saida = fonte.Saidas.FirstOrDefault(s => s.Alto);
                 if (saida.Placa is null) continue;
                 achados.Add(new Estouro(saida.Placa,
-                    $"alto-falante direto no pino {saida.Gpio}: os 8 Ω pediriam uns {saida.Tensao / 8 * 1000:0} mA "
-                    + $"e a porta segura a corrente em {saida.Corrente:0} mA, no limite dela. O som sai fraco e "
-                    + "a porta trabalha fora da faixa. Use um amplificador (o MAX98357A, pelo I2S, ou um "
-                    + "transistor), ou pelo menos um resistor de 100 Ω em série.",
+                    Idioma.T("alto-falante direto no pino {0}: os 8 Ω pediriam uns {1:0} mA e a porta segura a corrente em {2:0} mA, no limite dela. O som sai fraco e a porta trabalha fora da faixa. Use um amplificador (o MAX98357A, pelo I2S, ou um transistor), ou pelo menos um resistor de 100 Ω em série.", saida.Gpio, saida.Tensao / 8 * 1000, saida.Corrente),
                     Queimou: false));
                 break;
             }
@@ -305,8 +297,7 @@ public static class Queima
         // Trilho: a fonte não tem limite de corrente. Queima sempre.
         if (fonte.TensaoDeTrilho > 0)
             return new Estouro(idDaPeca,
-                $"LED ligado sem resistor no {Volts(fonte.TensaoDeTrilho)}: "
-                + "o trilho não limita a corrente e ele queima");
+                Idioma.T("LED ligado sem resistor no {0}: o trilho não limita a corrente e ele queima", Volts(fonte.TensaoDeTrilho)));
 
         var saida = fonte.Saidas.FirstOrDefault(s => s.Alto);
         if (saida.Placa is null) return null;
@@ -317,15 +308,10 @@ public static class Queima
 
         if (saida.Tensao >= 4.5)
             return new Estouro(idDaPeca,
-                $"LED direto no pino {saida.Gpio}, sem resistor: com 5 V sobram "
-                + $"{sobra:0.#} V em cima do LED e a porta passa dos "
-                + $"{saida.Corrente:0} mA");
+                Idioma.T("LED direto no pino {0}, sem resistor: com 5 V sobram {1:0.#} V em cima do LED e a porta passa dos {2:0} mA", saida.Gpio, sobra, saida.Corrente));
 
         return new Estouro(idDaPeca,
-            $"LED direto no pino {saida.Gpio}, sem resistor. A porta de "
-            + $"{Volts(saida.Tensao)} segura a corrente em {saida.Corrente:0} mA e o LED "
-            + "sobrevive, mas está fora da faixa: na bancada ele perde brilho com o tempo. "
-            + "Ponha 220 Ω.",
+            Idioma.T("LED direto no pino {0}, sem resistor. A porta de {1} segura a corrente em {2:0} mA e o LED sobrevive, mas está fora da faixa: na bancada ele perde brilho com o tempo. Ponha 220 Ω.", saida.Gpio, Volts(saida.Tensao), saida.Corrente),
             Queimou: false);
     }
 
@@ -355,9 +341,7 @@ public static class Queima
                 var ponto = Achar(redes, rede, peca.Id, bobina);
                 if (ponto is null || ponto.Resistor || ponto.Saidas.Count == 0) continue;
                 return new Estouro(peca.Id,
-                    $"o motor de passo esta com as bobinas direto nos GPIOs (o {bobina} no pino {ponto.Saidas[0].Gpio}): "
-                    + "no simulador a sequencia anda, mas na bancada cada bobina do NEMA 17 pede ~1 A e o motor nem se mexe. "
-                    + "Use um driver (A4988, DRV8825) -- ou, para treinar a sequencia, o 28BYJ-48 com o ULN2003.",
+                    Idioma.T("o motor de passo esta com as bobinas direto nos GPIOs (o {0} no pino {1}): no simulador a sequencia anda, mas na bancada cada bobina do NEMA 17 pede ~1 A e o motor nem se mexe. Use um driver (A4988, DRV8825) -- ou, para treinar a sequencia, o 28BYJ-48 com o ULN2003.", bobina, ponto.Saidas[0].Gpio),
                     Queimou: false);
             }
             return null;
@@ -382,18 +366,12 @@ public static class Queima
 
             if (peca.Tipo == "motor-brushless")
                 return new Estouro(peca.Id,
-                    $"o {nome} está com a fase {fio} direto no pino {saida.Gpio}: o brushless pede "
-                    + "ampères em cada fase, chaveadas em sequência, e a porta entrega "
-                    + $"{saida.Corrente:0} mA. Ele não gira assim; as três fases vão num ESC "
-                    + "(ou num driver trifásico), e o pino só manda o sinal do ESC.",
+                    Idioma.T("o {0} está com a fase {1} direto no pino {2}: o brushless pede ampères em cada fase, chaveadas em sequência, e a porta entrega {3:0} mA. Ele não gira assim; as três fases vão num ESC (ou num driver trifásico), e o pino só manda o sinal do ESC.", nome, fio, saida.Gpio, saida.Corrente),
                     Queimou: false);
 
             double pede = saida.Tensao / modelo.Resistencia * 1000;
             return new Estouro(peca.Id,
-                $"o {nome} está ligado direto no pino {saida.Gpio}: a porta entrega uns "
-                + $"{saida.Corrente:0} mA e o motor pede até {pede:0} mA na partida, então ele mal "
-                + "sai do lugar. E, sem diodo, o pico de tensão ao desligar o motor pode matar a "
-                + "porta. Use uma ponte H (L298N, L9110S, TB6612), um transistor com diodo ou um relé.",
+                Idioma.T("o {0} está ligado direto no pino {1}: a porta entrega uns {2:0} mA e o motor pede até {3:0} mA na partida, então ele mal sai do lugar. E, sem diodo, o pico de tensão ao desligar o motor pode matar a porta. Use uma ponte H (L298N, L9110S, TB6612), um transistor com diodo ou um relé.", nome, saida.Gpio, saida.Corrente, pede),
                 Queimou: false);
         }
 
@@ -405,10 +383,7 @@ public static class Queima
             double v = ponto.TensaoDeTrilho;
             double pede = v / modelo.Resistencia * 1000;
             return new Estouro(peca.Id,
-                $"o {nome} está alimentado pelo {Volts(v)} da placa: na partida ele puxa até "
-                + $"{pede:0} mA, mais do que o regulador (ou a USB) segura. Na bancada a tensão "
-                + "cai e a placa reinicia na hora em que o motor liga (o \"brownout\"). Alimente o "
-                + "motor por fora, com pilhas ou fonte, e o GND em comum com a placa.",
+                Idioma.T("o {0} está alimentado pelo {1} da placa: na partida ele puxa até {2:0} mA, mais do que o regulador (ou a USB) segura. Na bancada a tensão cai e a placa reinicia na hora em que o motor liga (o \"brownout\"). Alimente o motor por fora, com pilhas ou fonte, e o GND em comum com a placa.", nome, Volts(v), pede),
                 Queimou: false);
         }
 
@@ -538,16 +513,16 @@ public static class Queima
     /// </summary>
     static readonly Dictionary<string, (double Minimo, string Sintoma)> PedemCincoVolts = new()
     {
-        ["hc-sr04"] = (4.5, "o pulso do sensor sai fraco e o eco não volta: a distância lida fica em 0"),
-        ["lcd1602"] = (4.5, "o contraste some e os caracteres não aparecem"),
-        ["lcd2004"] = (4.5, "o contraste some e os caracteres não aparecem"),
-        ["lcd1602-i2c"] = (4.5, "o contraste some e os caracteres não aparecem"),
-        ["lcd2004-i2c"] = (4.5, "o contraste some e os caracteres não aparecem"),
-        ["gas-sensor"] = (4.5, "o aquecedor do MQ-2 não esquenta e a leitura não vale"),
-        ["max7219-matriz"] = (4.0, "o MAX7219 pede de 4 a 5,5 V: a matriz pisca ou apaga"),
-        ["neopixel"] = (3.5, "o WS2812 pede pelo menos 3,5 V: as cores saem erradas"),
-        ["led-ring"] = (3.5, "o WS2812 pede pelo menos 3,5 V: as cores saem erradas"),
-        ["neopixel-matrix"] = (3.5, "o WS2812 pede pelo menos 3,5 V: as cores saem erradas"),
+        ["hc-sr04"] = (4.5, Idioma.T("o pulso do sensor sai fraco e o eco não volta: a distância lida fica em 0")),
+        ["lcd1602"] = (4.5, Idioma.T("o contraste some e os caracteres não aparecem")),
+        ["lcd2004"] = (4.5, Idioma.T("o contraste some e os caracteres não aparecem")),
+        ["lcd1602-i2c"] = (4.5, Idioma.T("o contraste some e os caracteres não aparecem")),
+        ["lcd2004-i2c"] = (4.5, Idioma.T("o contraste some e os caracteres não aparecem")),
+        ["gas-sensor"] = (4.5, Idioma.T("o aquecedor do MQ-2 não esquenta e a leitura não vale")),
+        ["max7219-matriz"] = (4.0, Idioma.T("o MAX7219 pede de 4 a 5,5 V: a matriz pisca ou apaga")),
+        ["neopixel"] = (3.5, Idioma.T("o WS2812 pede pelo menos 3,5 V: as cores saem erradas")),
+        ["led-ring"] = (3.5, Idioma.T("o WS2812 pede pelo menos 3,5 V: as cores saem erradas")),
+        ["neopixel-matrix"] = (3.5, Idioma.T("o WS2812 pede pelo menos 3,5 V: as cores saem erradas")),
     };
 
     /// <summary>As pecas que aguentam no maximo 3,6 V no VCC: com 5 V, queimam.</summary>
@@ -580,11 +555,11 @@ public static class Queima
             // a marca nao pisca com o LED).
             var fontes = new List<(string Texto, double V, string Dono, bool Saida)>();
             foreach (var t in ponto.Trilhos)
-                fontes.Add(($"o {t.Pino} do {NomeDe(circuito, t.Peca)}", t.Tensao, t.Peca, false));
+                fontes.Add((Idioma.T("o {0} do {1}", t.Pino, NomeDe(circuito, t.Peca)), t.Tensao, t.Peca, false));
             foreach (var saida in ponto.Saidas)
-                fontes.Add(($"o pino {saida.Gpio} do {NomeDe(circuito, saida.Placa)}, em OUTPUT", saida.Tensao, saida.Placa, true));
+                fontes.Add((Idioma.T("o pino {0} do {1}, em OUTPUT", saida.Gpio, NomeDe(circuito, saida.Placa)), saida.Tensao, saida.Placa, true));
             foreach (var m in ponto.SaidasDeModulo)
-                fontes.Add(($"a saída {m.Pino} do {NomeDe(circuito, m.Peca)}, alimentado com {Volts(m.Tensao)}", m.Tensao, m.Peca, false));
+                fontes.Add((Idioma.T("a saída {0} do {1}, alimentado com {2}", m.Pino, NomeDe(circuito, m.Peca), Volts(m.Tensao)), m.Tensao, m.Peca, false));
             if (fontes.Count == 0) continue;
 
             // ---- 10 e 11) as portas de dados das placas ----
@@ -598,11 +573,8 @@ public static class Queima
                 if (maior.Texto is not null)
                 {
                     yield return new Estouro(placa,
-                        $"o pino {pino} recebe {Volts(maior.V)} ({maior.Texto}), e a porta do {NomeDe(circuito, placa)} é de "
-                        + $"{Volts(logica)}. Se ficar assim: a corrente entra pelos diodos de proteção da porta, ela esquenta "
-                        + "e pode queimar com o tempo (ou o chip trava e reinicia). Ponha um divisor de tensão (1 kΩ em série "
-                        + "e 2 kΩ para o GND) ou um conversor de nível lógico.",
-                        Queimou: false) { Pino = pino, Marca = $"{Volts(maior.V)} numa porta de {Volts(logica)}" };
+                        Idioma.T("o pino {0} recebe {1} ({2}), e a porta do {3} é de {4}. Se ficar assim: a corrente entra pelos diodos de proteção da porta, ela esquenta e pode queimar com o tempo (ou o chip trava e reinicia). Ponha um divisor de tensão (1 kΩ em série e 2 kΩ para o GND) ou um conversor de nível lógico.", pino, Volts(maior.V), maior.Texto, NomeDe(circuito, placa), Volts(logica)),
+                        Queimou: false) { Pino = pino, Marca = Idioma.T("{0} numa porta de {1}", Volts(maior.V), Volts(logica)) };
                     continue;
                 }
 
@@ -611,11 +583,8 @@ public static class Queima
                 var menor = outras.Where(f => f.V > 0 && f.V < logica - 1).OrderBy(f => f.V).FirstOrDefault();
                 if (menor.Texto is null || outras.Any(f => f.V >= logica - 0.5)) continue;
                 yield return new Estouro(placa,
-                    $"o pino {pino} recebe {Volts(menor.V)} ({menor.Texto}), e a porta do {NomeDe(circuito, placa)} é de "
-                    + $"{Volts(logica)}. Se ficar assim: o HIGH de {Volts(menor.V)} fica perto do limite que a porta entende "
-                    + "como HIGH (uns 3 V no ATmega). Costuma funcionar, mas sem folga: com ruído ou fio comprido a leitura "
-                    + "falha às vezes. Para garantir, use um conversor de nível lógico.",
-                    Queimou: false) { Pino = pino, Marca = $"{Volts(menor.V)} numa porta de {Volts(logica)}" };
+                    Idioma.T("o pino {0} recebe {1} ({2}), e a porta do {3} é de {4}. Se ficar assim: o HIGH de {1} fica perto do limite que a porta entende como HIGH (uns 3 V no ATmega). Costuma funcionar, mas sem folga: com ruído ou fio comprido a leitura falha às vezes. Para garantir, use um conversor de nível lógico.", pino, Volts(menor.V), menor.Texto, NomeDe(circuito, placa), Volts(logica)),
+                    Queimou: false) { Pino = pino, Marca = Idioma.T("{0} numa porta de {1}", Volts(menor.V), Volts(logica)) };
             }
 
             // ---- 13) 5 V no 3V3 de uma placa: dois trilhos diferentes no mesmo fio ----
@@ -624,10 +593,8 @@ public static class Queima
                 var alto = fontes.Where(f => f.V > baixo.Tensao + 0.6).OrderByDescending(f => f.V).FirstOrDefault();
                 if (alto.Texto is null) continue;
                 yield return new Estouro(baixo.Peca,
-                    $"o {baixo.Pino} (a saída de {Volts(baixo.Tensao)} do regulador) está ligado em {Volts(alto.V)} ({alto.Texto}). "
-                    + $"Se ficar assim: os {Volts(alto.V)} entram pela saída do regulador e chegam no chip, que aguenta no máximo "
-                    + "3,6 V: na bancada a placa queima. Nunca ligue dois trilhos de tensões diferentes no mesmo fio.",
-                    Queimou: false) { Pino = baixo.Pino, Marca = $"{Volts(alto.V)} num pino de {Volts(baixo.Tensao)}" };
+                    Idioma.T("o {0} (a saída de {1} do regulador) está ligado em {2} ({3}). Se ficar assim: os {2} entram pela saída do regulador e chegam no chip, que aguenta no máximo 3,6 V: na bancada a placa queima. Nunca ligue dois trilhos de tensões diferentes no mesmo fio.", baixo.Pino, Volts(baixo.Tensao), Volts(alto.V), alto.Texto),
+                    Queimou: false) { Pino = baixo.Pino, Marca = Idioma.T("{0} num pino de {1}", Volts(alto.V), Volts(baixo.Tensao)) };
             }
         }
 
@@ -647,17 +614,15 @@ public static class Queima
                 if (pede5 && v < pede.Minimo)
                 {
                     yield return new Estouro(peca.Id,
-                        $"precisa de {Volts(pede.Minimo)} ou mais e está no {Volts(v)}. Se ficar assim: {pede.Sintoma}. "
-                        + "Ligue o VCC no 5V (ou no VIN) da placa.",
-                        Queimou: false) { Pino = pino.Nome, Marca = $"{Volts(v)} numa peça de 5 V" };
+                        Idioma.T("precisa de {0} ou mais e está no {1}. Se ficar assim: {2}. Ligue o VCC no 5V (ou no VIN) da placa.", Volts(pede.Minimo), Volts(v), pede.Sintoma),
+                        Queimou: false) { Pino = pino.Nome, Marca = Idioma.T("{0} numa peça de 5 V", Volts(v)) };
                     break;
                 }
                 if (so3 && v > maximo)
                 {
                     yield return new Estouro(peca.Id,
-                        $"aguenta no máximo {Volts(maximo)} no {pino.Nome} e está no {Volts(v)}. Se ficar assim: na bancada "
-                        + "ele queima em segundos. Ligue no 3V3 da placa (e ponha um capacitor de 10 µF no VCC).",
-                        Queimou: false) { Pino = pino.Nome, Marca = $"{Volts(v)} numa peça de {Volts(maximo)}" };
+                        Idioma.T("aguenta no máximo {0} no {1} e está no {2}. Se ficar assim: na bancada ele queima em segundos. Ligue no 3V3 da placa (e ponha um capacitor de 10 µF no VCC).", Volts(maximo), pino.Nome, Volts(v)),
+                        Queimou: false) { Pino = pino.Nome, Marca = Idioma.T("{0} numa peça de {1}", Volts(v), Volts(maximo)) };
                     break;
                 }
             }

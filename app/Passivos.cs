@@ -26,10 +26,10 @@ public static class Passivos
                    ("100n", "100 nF (104)", 100e-9), ("220n", "220 nF (224)", 220e-9), ("470n", "470 nF (474)", 470e-9),
                    ("1u", "1 µF", 1e-6) }
             .Select(c => new FichaDePassivo(c.Item1, c.Item2, c.Item3, Volts: 50, Resistencia: 0.05)),
-        new("10n-poliester", "10 nF poliéster (2A103J)", 10e-9, Volts: 100, Resistencia: 0.03),
-        new("100n-poliester", "100 nF poliéster (2A104J)", 100e-9, Volts: 100, Resistencia: 0.03),
-        new("100n-filme", "100 nF filme, caixa (63 V)", 100e-9, Volts: 63, Resistencia: 0.02),
-        new("1u-filme", "1 µF filme, caixa (63 V)", 1e-6, Volts: 63, Resistencia: 0.02),
+        new("10n-poliester", Idioma.T("10 nF poliéster (2A103J)"), 10e-9, Volts: 100, Resistencia: 0.03),
+        new("100n-poliester", Idioma.T("100 nF poliéster (2A104J)"), 100e-9, Volts: 100, Resistencia: 0.03),
+        new("100n-filme", Idioma.T("100 nF filme, caixa (63 V)"), 100e-9, Volts: 63, Resistencia: 0.02),
+        new("1u-filme", Idioma.T("1 µF filme, caixa (63 V)"), 1e-6, Volts: 63, Resistencia: 0.02),
     ];
 
     // Os eletroliticos de aluminio (a ESR cai com o tamanho da lata) e os de
@@ -44,8 +44,8 @@ public static class Passivos
                    ("470u-16v", "470 µF 16 V", 470e-6, 16, 0.2), ("470u-35v", "470 µF 35 V", 470e-6, 35, 0.15),
                    ("1000u-16v", "1000 µF 16 V", 1000e-6, 16, 0.12), ("2200u-16v", "2200 µF 16 V", 2200e-6, 16, 0.08),
                    ("3300u-16v", "3300 µF 16 V", 3300e-6, 16, 0.06),
-                   ("1u-35v-tantalo", "1 µF 35 V tântalo", 1e-6, 35, 5.0), ("10u-16v-tantalo", "10 µF 16 V tântalo", 10e-6, 16, 2.0),
-                   ("47u-10v-tantalo", "47 µF 10 V tântalo", 47e-6, 10, 0.9) }
+                   ("1u-35v-tantalo", Idioma.T("1 µF 35 V tântalo"), 1e-6, 35, 5.0), ("10u-16v-tantalo", Idioma.T("10 µF 16 V tântalo"), 10e-6, 16, 2.0),
+                   ("47u-10v-tantalo", Idioma.T("47 µF 10 V tântalo"), 47e-6, 10, 0.9) }
             .Select(c => new FichaDePassivo(c.Item1, c.Item2, c.Item3, c.Item4, c.Item5)),
     ];
 

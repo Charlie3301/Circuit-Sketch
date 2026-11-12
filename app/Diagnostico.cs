@@ -31,7 +31,7 @@ public static class Diagnostico
         }
         catch (Exception e)
         {
-            return $"NAO ABRIU: {e.GetType().Name}: {e.Message}";
+            return Idioma.T("NAO ABRIU: {0}: {1}", e.GetType().Name, e.Message);
         }
 
         saida.AppendLine($"arquivo   : {Path.GetFileName(caminho)}");

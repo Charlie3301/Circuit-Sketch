@@ -356,19 +356,19 @@ public class Circuito
         circuito = null;
         erro = null;
 
-        if (string.IsNullOrWhiteSpace(json)) { erro = "o arquivo esta vazio"; return false; }
+        if (string.IsNullOrWhiteSpace(json)) { erro = Idioma.T("o arquivo esta vazio"); return false; }
 
         try
         {
             circuito = JsonSerializer.Deserialize<Circuito>(json);
-            if (circuito is null) { erro = "o JSON nao descreve um circuito"; return false; }
+            if (circuito is null) { erro = Idioma.T("o JSON nao descreve um circuito"); return false; }
         }
         catch (JsonException e)
         {
             // A mensagem do .NET traz linha e coluna, que e exatamente o
             // que a pessoa precisa para achar a virgula que falta.
             erro = e.LineNumber is not null
-                ? $"linha {e.LineNumber + 1}: {PrimeiraFrase(e.Message)}"
+                ? Idioma.T("linha {0}: {1}", e.LineNumber + 1, PrimeiraFrase(e.Message))
                 : PrimeiraFrase(e.Message);
             return false;
         }
@@ -382,7 +382,7 @@ public class Circuito
         var semTipo = circuito.Pecas.FirstOrDefault(p => Catalogo.Obter(p.Tipo) is null);
         if (semTipo is not null)
         {
-            erro = $"a peca '{semTipo.Tipo}' nao existe no catalogo";
+            erro = Idioma.T("a peca '{0}' nao existe no catalogo", semTipo.Tipo);
             circuito = null;
             return false;
         }
@@ -391,7 +391,7 @@ public class Circuito
             .FirstOrDefault(g => g.Key is not null && g.Count() > 1);
         if (repetido is not null)
         {
-            erro = $"o id '{repetido.Key}' aparece em mais de uma peca";
+            erro = Idioma.T("o id '{0}' aparece em mais de uma peca", repetido.Key);
             circuito = null;
             return false;
         }
@@ -487,11 +487,11 @@ public class Circuito
                 var def = peca is null ? null : Catalogo.Obter(peca.Tipo);
                 if (def is null)
                 {
-                    yield return $"{idPeca}:{nomePino} (peça não existe)";
+                    yield return Idioma.T("{0}:{1} (peça não existe)", idPeca, nomePino);
                 }
                 else if (def.Pinos.All(p => p.Nome != nomePino))
                 {
-                    yield return $"{peca.Tipo}:{nomePino} (pino não existe)";
+                    yield return Idioma.T("{0}:{1} (pino não existe)", peca.Tipo, nomePino);
                 }
             }
         }

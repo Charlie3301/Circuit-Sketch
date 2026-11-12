@@ -82,6 +82,19 @@ public static class Idioma
         return catalogo is not null || codigo is null or "" or Original;
     }
 
+    /// <summary>
+    /// Quanto do idioma esta traduzido, de 0 a 1 (o original e 1). A janela de
+    /// configuracoes mostra o numero ao lado do nome enquanto a traducao anda.
+    /// </summary>
+    public static double Progresso(string codigo)
+    {
+        if (string.IsNullOrEmpty(codigo) || codigo == Original) return 1;
+        var catalogo = Ler($"idiomas/{codigo}.json");
+        if (catalogo is null) return 0;
+        if (catalogo.Completo || catalogo.Textos.Count == 0) return catalogo.Completo ? 1 : 0;
+        return catalogo.Textos.Values.Count(t => !string.IsNullOrEmpty(t)) / (double)catalogo.Textos.Count;
+    }
+
     /// <summary>O idioma do Windows, se houver catalogo para ele (senao, o original).</summary>
     public static string DoSistema()
     {
@@ -96,6 +109,13 @@ public static class Idioma
     public static string T(string texto)
         => texto is not null && textos.TryGetValue(texto, out string traducao) && !string.IsNullOrEmpty(traducao)
             ? traducao : texto;
+
+    /// <summary>
+    /// Marca a frase para o catalogo SEM traduzir agora: para tabelas de dados
+    /// cujo texto so vira tela depois (o nome de um braco de servo, de uma cor),
+    /// e que la e passado por <see cref="T(string)"/>. Devolve a propria frase.
+    /// </summary>
+    public static string N(string texto) => texto;
 
     /// <summary>A frase com valores dentro ({0}, {1:0.0}), na cultura do idioma.</summary>
     public static string T(string formato, params object[] valores) => string.Format(cultura, T(formato), valores);

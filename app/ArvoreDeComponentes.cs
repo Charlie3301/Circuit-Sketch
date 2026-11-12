@@ -74,6 +74,12 @@ public sealed record ItemDeComponente(
 
     /// <summary>O pino da peca deste par.</summary>
     public string PinoDaPeca { get; init; }
+
+    /// <summary>O tipo da peca da linha (o da protoboard, num grupo delas): a miniatura do cartao.</summary>
+    public string Tipo { get; init; }
+
+    /// <summary>A linha e um par de pinos (placa &gt; peca), e nao uma peca.</summary>
+    public bool EhPar => PinoDaPlaca is not null;
 }
 
 /// <summary>
@@ -171,10 +177,11 @@ public static class ArvoreDeComponentes
 
                     filhos.Add(new ItemDeComponente(
                         peca.Id, Titulo(peca),
-                        dona is not null ? "ligada na " + Titulo(dona)
-                                         : "sem ligação com placa nenhuma",
+                        dona is not null ? Idioma.T("ligada na ") + Titulo(dona)
+                                         : Idioma.T("sem ligação com placa nenhuma"),
                         2, [])
                     {
+                        Tipo = peca.Tipo,
                         Estado = Queimou(peca.Id) ? EstadoDaLigacao.Erro
                                : dona is not null ? EstadoDaLigacao.Ligado
                                                   : EstadoDaLigacao.SemLigacao,
@@ -188,8 +195,8 @@ public static class ArvoreDeComponentes
 
             raiz.Add(new ItemDeComponente(
                 doTipo.Count == 1 ? doTipo[0].Id : null, titulo,
-                espetadas == 0 ? "nada espetado" : $"{espetadas} peça(s) espetadas",
-                1, filhos));
+                espetadas == 0 ? Idioma.T("nada espetado") : Idioma.T("{0} peça(s) espetadas", espetadas),
+                1, filhos) { Tipo = grupo.Key });
         }
 
         // ---- 3) placas que nao estao em protoboard nenhuma ----
@@ -206,9 +213,10 @@ public static class ArvoreDeComponentes
 
             raiz.Add(new ItemDeComponente(
                 peca.Id, Titulo(peca),
-                protoboards.Count > 0 ? "fora da protoboard e sem ligação" : "sem ligação",
+                protoboards.Count > 0 ? Idioma.T("fora da protoboard e sem ligação") : Idioma.T("sem ligação"),
                 1, [])
             {
+                Tipo = peca.Tipo,
                 Estado = Queimou(peca.Id) ? EstadoDaLigacao.Erro : EstadoDaLigacao.SemLigacao,
             });
         }
@@ -260,12 +268,14 @@ public static class ArvoreDeComponentes
             filhos.Add(new ItemDeComponente(
                 vizinha.Id, "> " + Titulo(vizinha), null, nivel + 1, pinos)
             {
+                Tipo = vizinha.Tipo,
                 Estado = estado,
             });
         }
 
         return new ItemDeComponente(placa.Id, Titulo(placa), null, nivel, filhos)
         {
+            Tipo = placa.Tipo,
             Estado = queimou(placa.Id) ? EstadoDaLigacao.Erro : EstadoDaLigacao.Neutro,
         };
     }

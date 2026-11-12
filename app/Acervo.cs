@@ -76,80 +76,80 @@ public static class Acervo
     /// <summary>As que o motor executa, com o que cada uma serve.</summary>
     static readonly BibliotecaDoAcervo[] DoSimulador =
     [
-        new("Servo", "Servo.h", "Gira um servo de 0 a 180 graus.", "Servo", true),
+        new("Servo", "Servo.h", Idioma.T("Gira um servo de 0 a 180 graus."), "Servo", true),
 
         // Na ESP32 o servo e ESTA: a Servo.h da Arduino nao compila para
         // ela, e todo tutorial de ESP32 inclui a ESP32Servo.
-        new("ESP32Servo", "ESP32Servo.h", "Servo na ESP32 (a Servo.h da Arduino nao roda nela).",
+        new("ESP32Servo", "ESP32Servo.h", Idioma.T("Servo na ESP32 (a Servo.h da Arduino nao roda nela)."),
             "Servo, ESP32PWM", true),
-        new("LiquidCrystal", "LiquidCrystal.h", "LCD 16x2 e 20x4 ligado por fios.",
+        new("LiquidCrystal", "LiquidCrystal.h", Idioma.T("LCD 16x2 e 20x4 ligado por fios."),
             "LiquidCrystal", true),
-        new("LiquidCrystal_I2C", "LiquidCrystal_I2C.h", "O mesmo LCD, com o modulo I2C.",
+        new("LiquidCrystal_I2C", "LiquidCrystal_I2C.h", Idioma.T("O mesmo LCD, com o modulo I2C."),
             "LiquidCrystal_I2C", true),
-        new("DHT sensor library", "DHT.h", "Temperatura e umidade do DHT11 e DHT22.",
+        new("DHT sensor library", "DHT.h", Idioma.T("Temperatura e umidade do DHT11 e DHT22."),
             "DHT", true),
-        new("OneWire", "OneWire.h", "O fio de 1-Wire: o reset, os bits, a busca das ROMs e o CRC.",
+        new("OneWire", "OneWire.h", Idioma.T("O fio de 1-Wire: o reset, os bits, a busca das ROMs e o CRC."),
             "OneWire", true),
-        new("DallasTemperature", "DallasTemperature.h", "Temperatura dos DS18B20 pendurados num fio de 1-Wire.",
+        new("DallasTemperature", "DallasTemperature.h", Idioma.T("Temperatura dos DS18B20 pendurados num fio de 1-Wire."),
             "DallasTemperature, DeviceAddress", true),
-        new("Adafruit NeoPixel", "Adafruit_NeoPixel.h", "Fitas, aneis e matrizes de LED.",
+        new("Adafruit NeoPixel", "Adafruit_NeoPixel.h", Idioma.T("Fitas, aneis e matrizes de LED."),
             "Adafruit_NeoPixel", true),
-        new("Stepper", "Stepper.h", "Motor de passo por quatro pinos.", "Stepper", true),
-        new("Keypad", "Keypad.h", "Teclado matricial de 4x4.", "Keypad", true),
-        new("Adafruit SSD1306", "Adafruit_SSD1306.h", "Display OLED de 128x64.",
+        new("Stepper", "Stepper.h", Idioma.T("Motor de passo por quatro pinos."), "Stepper", true),
+        new("Keypad", "Keypad.h", Idioma.T("Teclado matricial de 4x4."), "Keypad", true),
+        new("Adafruit SSD1306", "Adafruit_SSD1306.h", Idioma.T("Display OLED de 128x64."),
             "Adafruit_SSD1306", true),
-        new("Adafruit ILI9341", "Adafruit_ILI9341.h", "Display TFT colorido.",
+        new("Adafruit ILI9341", "Adafruit_ILI9341.h", Idioma.T("Display TFT colorido."),
             "Adafruit_ILI9341", true),
-        new("Adafruit ST7789", "Adafruit_ST7789.h", "Display colorido de 240x240.",
+        new("Adafruit ST7789", "Adafruit_ST7789.h", Idioma.T("Display colorido de 240x240."),
             "Adafruit_ST7789", true),
-        new("IRremote", "IRremote.h", "Recebe o codigo do controle infravermelho.",
+        new("IRremote", "IRremote.h", Idioma.T("Recebe o codigo do controle infravermelho."),
             "IRrecv, decode_results", true),
-        new("MPU6050", "MPU6050.h", "Acelerometro e giroscopio.",
+        new("MPU6050", "MPU6050.h", Idioma.T("Acelerometro e giroscopio."),
             "Adafruit_MPU6050, MPU6050", true),
-        new("RTCLib", "RTClib.h", "Relogio de tempo real DS1307.", "RTC_DS1307", true),
-        new("HX711", "HX711.h", "Celula de carga.", "HX711", true),
-        new("SD", "SD.h", "Arquivos no cartao microSD.", "SD, File", true),
-        new("Wire", "Wire.h", "O barramento I2C.", "Wire", true),
-        new("SPI", "SPI.h", "O barramento SPI.", "SPI", true),
-        new("WiFi", "WiFi.h", "Rede sem fio da ESP32 e da Nano RP2040.", "WiFi", true),
-        new("WebServer", "WebServer.h", "Servidor de paginas na propria placa.",
+        new("RTCLib", "RTClib.h", Idioma.T("Relogio de tempo real DS1307."), "RTC_DS1307", true),
+        new("HX711", "HX711.h", Idioma.T("Celula de carga."), "HX711", true),
+        new("SD", "SD.h", Idioma.T("Arquivos no cartao microSD."), "SD, File", true),
+        new("Wire", "Wire.h", Idioma.T("O barramento I2C."), "Wire", true),
+        new("SPI", "SPI.h", Idioma.T("O barramento SPI."), "SPI", true),
+        new("WiFi", "WiFi.h", Idioma.T("Rede sem fio da ESP32 e da Nano RP2040."), "WiFi", true),
+        new("WebServer", "WebServer.h", Idioma.T("Servidor de paginas na propria placa."),
             "WebServer, WiFiServer", true),
-        new("HTTPClient", "HTTPClient.h", "Pedidos HTTP para fora.", "HTTPClient", true),
+        new("HTTPClient", "HTTPClient.h", Idioma.T("Pedidos HTTP para fora."), "HTTPClient", true),
         new("PubSubClient", "PubSubClient.h", "MQTT.", "PubSubClient", true),
-        new("BluetoothSerial", "BluetoothSerial.h", "Bluetooth classico da ESP32.",
+        new("BluetoothSerial", "BluetoothSerial.h", Idioma.T("Bluetooth classico da ESP32."),
             "BluetoothSerial", true),
         new("BLE", "BLEDevice.h",
-            "Bluetooth LE da ESP32: servidor GATT, servicos, caracteristicas e notificacoes.",
+            Idioma.T("Bluetooth LE da ESP32: servidor GATT, servicos, caracteristicas e notificacoes."),
             "BLEDevice, BLEServer, BLEService, BLECharacteristic", true),
-        new("RF24", "RF24.h", "Radio NRF24L01.", "RF24", true),
+        new("RF24", "RF24.h", Idioma.T("Rádio NRF24L01."), "RF24", true),
 
         // O SDK em C da Raspberry Pi Pico. Nao e biblioteca do
         // Arduino: e o jeito oficial de programar a Pico sem ele, e o
         // pedido da Alpha 18 o chama de "Pi Pico SDK (Avançado)".
         new("Pico SDK", "pico/stdlib.h",
-            "O SDK em C da Raspberry Pi Pico: gpio_put, sleep_ms, o main().",
+            Idioma.T("O SDK em C da Raspberry Pi Pico: gpio_put, sleep_ms, o main()."),
             "gpio_put, gpio_set_dir, sleep_ms", true),
         new("Pico SDK — ADC", "hardware/adc.h",
-            "Conversor analogico da Pico, pelo SDK em C.",
+            Idioma.T("Conversor analogico da Pico, pelo SDK em C."),
             "adc_init, adc_read", true),
         new("Pico SDK — PWM", "hardware/pwm.h",
-            "PWM da Pico, pelo SDK em C.",
+            Idioma.T("PWM da Pico, pelo SDK em C."),
             "pwm_set_gpio_level", true),
         // O ESP8266 tem os proprios nomes de arquivo, mas a mesma API da
         // ESP32 -- e o que a NodeMCU e os modulos ESP-01 a ESP-14 incluem.
-        new("ESP8266WiFi", "ESP8266WiFi.h", "WiFi do ESP8266 (NodeMCU e modulos ESP-01 a ESP-14).",
+        new("ESP8266WiFi", "ESP8266WiFi.h", Idioma.T("WiFi do ESP8266 (NodeMCU e modulos ESP-01 a ESP-14)."),
             "WiFi, WiFiClient, WiFiServer", true),
-        new("ESP8266WebServer", "ESP8266WebServer.h", "Servidor de paginas no ESP8266.",
+        new("ESP8266WebServer", "ESP8266WebServer.h", Idioma.T("Servidor de paginas no ESP8266."),
             "ESP8266WebServer", true),
-        new("ESP8266HTTPClient", "ESP8266HTTPClient.h", "Pedidos HTTP no ESP8266.",
+        new("ESP8266HTTPClient", "ESP8266HTTPClient.h", Idioma.T("Pedidos HTTP no ESP8266."),
             "HTTPClient", true),
-        new("ESP-Now", "esp_now.h", "Mensagens diretas entre ESP32.",
+        new("ESP-Now", "esp_now.h", Idioma.T("Mensagens diretas entre ESP32."),
             "esp_now_send, esp_now_init", true),
         new("UniversalTelegramBot", "UniversalTelegramBot.h",
-            "Bot do Telegram. Fala com a api.telegram.org de verdade.",
+            Idioma.T("Bot do Telegram. Fala com a api.telegram.org de verdade."),
             "UniversalTelegramBot", true),
         new("Preferences", "Preferences.h",
-            "Memoria da ESP32 que sobrevive ao reset.", "Preferences", true),
+            Idioma.T("Memoria da ESP32 que sobrevive ao reset."), "Preferences", true),
     ];
 
     /// <summary>
@@ -215,8 +215,8 @@ public static class Acervo
             lista.Add(new BibliotecaDoAcervo(
                 junto.Nome,
                 principal,
-                (string.IsNullOrWhiteSpace(frase) ? "" : frase.Trim() + " ")
-                + "Vem com o simulador, em código C: roda no modo nativo, como na placa.",
+                (string.IsNullOrWhiteSpace(frase) ? "" : Idioma.T(frase.Trim()) + " ")
+                + Idioma.T("Vem com o simulador, em código C: roda no modo nativo, como na placa."),
                 principal,
                 true));
         }
@@ -249,7 +249,7 @@ public static class Acervo
                     nome,
                     principal,
                     (string.IsNullOrWhiteSpace(frase) ? "" : frase.Trim() + " ")
-                    + "Instalada por você: o simulador roda o código C++ dela.",
+                    + Idioma.T("Instalada por você: o simulador roda o código C++ dela."),
                     string.Join(", ", cabecalhos.Take(4)),
                     false)
                 {
@@ -441,8 +441,7 @@ public static class Acervo
         if (!Directory.EnumerateFiles(origem, "*.*", SearchOption.AllDirectories)
                 .Any(a => Path.GetExtension(a).ToLowerInvariant() is ".h" or ".hpp" or ".hh"))
             throw new InvalidOperationException(
-                "Essa pasta não tem nenhum arquivo .h, então não parece uma biblioteca do Arduino. "
-                + "Escolha a pasta que tem os .h (ou a src/ dentro dela).");
+                Idioma.T("Essa pasta não tem nenhum arquivo .h, então não parece uma biblioteca do Arduino. Escolha a pasta que tem os .h (ou a src/ dentro dela)."));
 
         string nome = NomeDaBiblioteca(origem);
         string destino = Path.Combine(Pasta, nome);
@@ -496,7 +495,7 @@ public static class Acervo
         {
             string alvo = Path.GetFullPath(Path.Combine(destino, entrada.FullName));
             if (!alvo.StartsWith(raiz, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidOperationException($"O .zip tem um caminho que sai da pasta: {entrada.FullName}");
+                throw new InvalidOperationException(Idioma.T("O .zip tem um caminho que sai da pasta: {0}", entrada.FullName));
 
             if (entrada.FullName.EndsWith('/') || entrada.FullName.EndsWith('\\'))
             {
@@ -506,7 +505,7 @@ public static class Acervo
 
             total += entrada.Length;
             if (total > Teto)
-                throw new InvalidOperationException("O .zip passa de 200 MB: grande demais para uma biblioteca.");
+                throw new InvalidOperationException(Idioma.T("O .zip passa de 200 MB: grande demais para uma biblioteca."));
 
             Directory.CreateDirectory(Path.GetDirectoryName(alvo));
             entrada.ExtractToFile(alvo, overwrite: true);

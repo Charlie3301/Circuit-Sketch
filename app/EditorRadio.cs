@@ -210,7 +210,7 @@ public partial class EditorCircuito
         var canais = CanaisDoControle(peca);
         string texto = ligado
             ? $"1 {canais[0],4:0} 2 {canais[1],4:0}\n3 {canais[2],4:0} 4 {canais[3],4:0}\n5 {canais[4],4:0} 6 {canais[5],4:0}"
-            : "\n  desligado";
+            : Idioma.T("\n  desligado");
         if (d.Tela.Text != texto) d.Tela.Text = texto;
         d.Tela.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         var tela = Local(85.6, 163.3);

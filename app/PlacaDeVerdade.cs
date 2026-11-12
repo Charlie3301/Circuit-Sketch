@@ -173,10 +173,10 @@ public static class PlacaDeVerdade
     /// <summary>O conversor USB-serial pelo VID/PID -- o que da para dizer de uma ESP32 generica.</summary>
     static string ConversorDe(string vid, string pid) => (vid?.ToUpperInvariant(), pid?.ToUpperInvariant()) switch
     {
-        ("0X10C4", _) => "conversor CP210x (ESP32, NodeMCU...)",
-        ("0X1A86", _) => "conversor CH340 (ESP32, NodeMCU, Nano...)",
-        ("0X0403", _) => "conversor FTDI",
-        ("0X303A", _) => "ESP32 com USB nativo (S2, S3, C3...)",
+        ("0X10C4", _) => Idioma.T("conversor CP210x (ESP32, NodeMCU...)"),
+        ("0X1A86", _) => Idioma.T("conversor CH340 (ESP32, NodeMCU, Nano...)"),
+        ("0X0403", _) => Idioma.T("conversor FTDI"),
+        ("0X303A", _) => Idioma.T("ESP32 com USB nativo (S2, S3, C3...)"),
         ("0X2E8A", _) => "Raspberry Pi Pico",
         _ => null,
     };
@@ -246,7 +246,7 @@ public static class PlacaDeVerdade
                                      CancellationToken cancelar)
     {
         if (Cli is null)
-            return new Resultado(false, "a Arduino IDE 2 nao esta instalada neste computador", null);
+            return new Resultado(false, Idioma.T("a Arduino IDE 2 nao esta instalada neste computador"), null);
 
         var args = new List<string> { "compile", "--fqbn", fqbn };
         if (Directory.Exists(Acervo.Pasta)) { args.Add("--libraries"); args.Add(Acervo.Pasta); }
@@ -260,7 +260,7 @@ public static class PlacaDeVerdade
 
         if (cancelar.IsCancellationRequested) return new Resultado(false, "cancelado", memoria);
         if (codigo == 0)
-            return new Resultado(true, porta is null ? "compilou" : $"mandou para a placa em {porta}", memoria);
+            return new Resultado(true, porta is null ? "compilou" : Idioma.T("mandou para a placa em {0}", porta), memoria);
         return new Resultado(false, Explicar(tudo, porta, fqbn), memoria);
     }
 
@@ -278,6 +278,18 @@ public static class PlacaDeVerdade
         return junto.Length > 0 ? junto : null;
     }
 
+    static string FaltaNaIde(string biblioteca, string cabecalho)
+        => Idioma.T("falta a biblioteca \"{0}\" ({1}) na Arduino IDE. No simulador ela ja vem junto; para a placa, instale pelo Gerenciador de Bibliotecas da IDE (ou pelo botao ao lado).", biblioteca, cabecalho);
+
+    /// <summary>
+    /// A biblioteca que o <see cref="Explicar"/> disse faltar na IDE, ou null.
+    /// Compara com a frase montada, e nao com um pedaço do texto: assim vale
+    /// em qualquer idioma.
+    /// </summary>
+    public static string BibliotecaQueFalta(string resumo)
+        => string.IsNullOrEmpty(resumo) ? null
+           : Acervo.Todas().FirstOrDefault(b => resumo.Contains(FaltaNaIde(b.Nome, b.Cabecalho), StringComparison.Ordinal))?.Nome;
+
     /// <summary>O que deu errado, do jeito que a pessoa entende, a partir do que o compilador disse.</summary>
     public static string Explicar(string saida, string porta, string fqbn)
     {
@@ -289,14 +301,13 @@ public static class PlacaDeVerdade
             string cabecalho = semArquivo.Groups[1].Value;
             string biblioteca = Acervo.Todas().FirstOrDefault(b => b.Cabecalho == cabecalho)?.Nome;
             return biblioteca is not null
-                ? $"falta a biblioteca \"{biblioteca}\" ({cabecalho}) na Arduino IDE. No simulador ela ja vem "
-                  + "junto; para a placa, instale pelo Gerenciador de Bibliotecas da IDE (ou pelo botao ao lado)."
-                : $"o compilador nao achou {cabecalho}: a biblioteca dele nao esta instalada na Arduino IDE.";
+                ? FaltaNaIde(biblioteca, cabecalho)
+                : Idioma.T("o compilador nao achou {0}: a biblioteca dele nao esta instalada na Arduino IDE.", cabecalho);
         }
 
         if (s.Contains("Platform '", StringComparison.Ordinal) && s.Contains("not found", StringComparison.Ordinal)
             || s.Contains("platform not installed", StringComparison.OrdinalIgnoreCase))
-            return $"o nucleo {NucleoDe(fqbn)} nao esta instalado na Arduino IDE (Ferramentas > Placa > Gerenciador de Placas).";
+            return Idioma.T("o nucleo {0} nao esta instalado na Arduino IDE (Ferramentas > Placa > Gerenciador de Placas).", NucleoDe(fqbn));
 
         if (porta is not null)
         {
@@ -304,26 +315,24 @@ public static class PlacaDeVerdade
                 || s.Contains("could not open port", StringComparison.OrdinalIgnoreCase)
                 || s.Contains("PermissionError", StringComparison.Ordinal)
                 || s.Contains("Acesso negado", StringComparison.OrdinalIgnoreCase))
-                return $"a porta {porta} esta ocupada: feche o monitor serial da Arduino IDE (ou outro programa usando a porta) e tente de novo.";
+                return Idioma.T("a porta {0} esta ocupada: feche o monitor serial da Arduino IDE (ou outro programa usando a porta) e tente de novo.", porta);
 
             if (s.Contains("Failed to connect to ESP32", StringComparison.Ordinal)
                 || s.Contains("No serial data received", StringComparison.Ordinal)
                 || s.Contains("Wrong boot mode", StringComparison.Ordinal))
-                return "a ESP32 nao entrou no modo de gravacao: segure o botao BOOT da placa enquanto aparece "
-                       + "\"Connecting...\" e solte quando comecar a gravar.";
+                return Idioma.T("a ESP32 nao entrou no modo de gravacao: segure o botao BOOT da placa enquanto aparece \"Connecting...\" e solte quando comecar a gravar.");
 
             if (s.Contains("not in sync", StringComparison.Ordinal) || s.Contains("programmer is not responding", StringComparison.Ordinal))
-                return $"a placa em {porta} nao respondeu ao gravador: confira se e mesmo um {fqbn} (o Nano antigo usa "
-                       + "o \"Old Bootloader\") e se a porta e a certa.";
+                return Idioma.T("a placa em {0} nao respondeu ao gravador: confira se e mesmo um {1} (o Nano antigo usa o \"Old Bootloader\") e se a porta e a certa.", porta, fqbn);
         }
 
         var erro = System.Text.RegularExpressions.Regex.Match(s, @"\.ino:(\d+):(\d+): error: (.+)");
         if (erro.Success)
-            return $"linha {erro.Groups[1].Value}: {erro.Groups[3].Value.Trim()}";
+            return Idioma.T("linha {0}: {1}", erro.Groups[1].Value, erro.Groups[3].Value.Trim());
 
         var ultima = s.Replace("\r\n", "\n").Split('\n').Select(l => l.Trim())
             .LastOrDefault(l => l.Length > 0 && (l.Contains("rror", StringComparison.Ordinal) || l.Contains("falh", StringComparison.OrdinalIgnoreCase)));
-        return ultima ?? "o compilador do Arduino recusou (veja a saida completa na aba PLACA)";
+        return ultima ?? Idioma.T("o compilador do Arduino recusou (veja a saida completa na aba PLACA)");
     }
 
     /// <summary>Instala um nucleo pela IDE: "esp32:esp32".</summary>
@@ -372,7 +381,7 @@ public static class PlacaDeVerdade
     static string Rodar(IEnumerable<string> args, int prazoMs, out string erro)
     {
         erro = null;
-        if (Cli is null) { erro = "sem arduino-cli"; return null; }
+        if (Cli is null) { erro = Idioma.T("sem arduino-cli"); return null; }
         try
         {
             using var processo = Process.Start(Inicio(args));
@@ -381,7 +390,7 @@ public static class PlacaDeVerdade
             if (!processo.WaitForExit(prazoMs))
             {
                 try { processo.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
-                erro = "o arduino-cli demorou demais";
+                erro = Idioma.T("o arduino-cli demorou demais");
                 return null;
             }
             erro = falha.Result;
@@ -418,7 +427,7 @@ public static class PlacaDeVerdade
         }
         catch (Exception e) when (e is System.ComponentModel.Win32Exception or InvalidOperationException or IOException)
         {
-            linha?.Invoke("nao consegui rodar o arduino-cli: " + e.Message);
+            linha?.Invoke(Idioma.T("nao consegui rodar o arduino-cli: {0}", e.Message));
             return -1;
         }
     }

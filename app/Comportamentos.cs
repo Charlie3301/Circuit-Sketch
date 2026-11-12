@@ -22,7 +22,7 @@ public record Comportamento
     public bool DigitalInvertido { get; init; }
 
     /// <summary>Rotulo do controle na tab do objeto.</summary>
-    public string Rotulo { get; init; } = "Valor";
+    public string Rotulo { get; init; } = Idioma.N("Valor");
 
     /// <summary>Controle de liga/desliga em vez de deslizante.</summary>
     public bool Chave { get; init; }
@@ -107,7 +107,7 @@ public record Comportamento
         ["photoresistor-sensor"] = new()
         {
             Analogicos = ["AO"], Digitais = ["DO"],
-            DigitalInvertido = true, Rotulo = "Luz", Unidade = "lux",
+            DigitalInvertido = true, Rotulo = Idioma.N("Luz"), Unidade = "lux",
             Escala = Lux, Saida = giro => FracaoDoLdr(Lux(giro)),
         },
 
@@ -118,29 +118,29 @@ public record Comportamento
         // ligado a qualquer perna lia a luz direto, montado como fosse.
         ["ldr"] = new()
         {
-            Grandeza = "ldr:luz", Rotulo = "Luz", Unidade = "lux", Escala = Lux,
+            Grandeza = "ldr:luz", Rotulo = Idioma.N("Luz"), Unidade = "lux", Escala = Lux,
         },
         ["gas-sensor"] = new()
         {
             Analogicos = ["AOUT"], Digitais = ["DOUT"],
-            DigitalInvertido = true, Rotulo = "Gas"
+            DigitalInvertido = true, Rotulo = Idioma.N("Gás")
         },
         ["flame-sensor"] = new()
         {
             Analogicos = ["AOUT"], Digitais = ["DOUT"],
-            DigitalInvertido = true, Rotulo = "Chama"
+            DigitalInvertido = true, Rotulo = Idioma.N("Chama")
         },
         // O KY-037 e o KY-038 (os do kit da Joy-IT): o comparador poe o DOUT
         // em HIGH com o som acima do limiar (a documentacao da Joy-IT).
         ["big-sound-sensor"] = new()
         {
             Analogicos = ["AOUT"], Digitais = ["DOUT"],
-            DigitalInvertido = false, Rotulo = "Som"
+            DigitalInvertido = false, Rotulo = Idioma.N("Som")
         },
         ["small-sound-sensor"] = new()
         {
             Analogicos = ["AOUT"], Digitais = ["DOUT"],
-            DigitalInvertido = false, Rotulo = "Som"
+            DigitalInvertido = false, Rotulo = Idioma.N("Som")
         },
 
         // ---- so analogico ----
@@ -149,21 +149,21 @@ public record Comportamento
         // tutorial dava uma temperatura que o controle nao mostrava.
         ["ntc-temperature-sensor"] = new()
         {
-            Analogicos = ["OUT"], Rotulo = "Temperatura",
+            Analogicos = ["OUT"], Rotulo = Idioma.N("Temperatura"),
             Minimo = -24, Maximo = 80, Unidade = "°C",
             Saida = giro => FracaoDoNtc(-24 + 104 * giro),
         },
-        ["heart-beat-sensor"] = new() { Analogicos = ["OUT"], Rotulo = "Pulso" },
-        ["slide-potentiometer"] = new() { Analogicos = ["SIG"], Rotulo = "Posicao" },
+        ["heart-beat-sensor"] = new() { Analogicos = ["OUT"], Rotulo = Idioma.N("Pulso") },
+        ["slide-potentiometer"] = new() { Analogicos = ["SIG"], Rotulo = Idioma.N("Posição") },
 
         // ---- so digital ----
-        ["tilt-switch"] = new() { Digitais = ["OUT"], Chave = true, Rotulo = "Inclinado" },
-        ["pir-motion-sensor"] = new() { Digitais = ["OUT"], Chave = true, Rotulo = "Movimento" },
+        ["tilt-switch"] = new() { Digitais = ["OUT"], Chave = true, Rotulo = Idioma.N("Inclinado") },
+        ["pir-motion-sensor"] = new() { Digitais = ["OUT"], Chave = true, Rotulo = Idioma.N("Movimento") },
         // O FC-51: o OUT vai a LOW com um obstaculo na frente (dentro do alcance do trimpot).
-        ["ir-obstacle-sensor"] = new() { Digitais = ["OUT"], DigitalInvertido = true, Chave = true, Rotulo = "Obstaculo" },
+        ["ir-obstacle-sensor"] = new() { Digitais = ["OUT"], DigitalInvertido = true, Chave = true, Rotulo = Idioma.N("Obstáculo") },
         // O TCRT5000: a superficie clara devolve o infravermelho e o S vai a LOW; a linha preta, HIGH.
-        ["tcrt5000"] = new() { Digitais = ["S"], DigitalInvertido = true, Chave = true, Rotulo = "Superficie clara" },
-        ["slide-switch"] = new() { Digitais = ["1", "2", "3"], Chave = true, Rotulo = "Ligada" },
+        ["tcrt5000"] = new() { Digitais = ["S"], DigitalInvertido = true, Chave = true, Rotulo = Idioma.N("Superfície clara") },
+        ["slide-switch"] = new() { Digitais = ["1", "2", "3"], Chave = true, Rotulo = Idioma.N("Ligada") },
 
         // ---- saidas ----
         ["rgb-led"] = new() { Saidas = ["R", "G", "B"] },
@@ -172,7 +172,7 @@ public record Comportamento
             Saidas = ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10"]
         },
         ["7segment"] = new() { Saidas = ["A", "B", "C", "D", "E", "F", "G", "DP"] },
-        ["ks2e-m-dc5"] = new() { Saidas = ["COIL1", "COIL2"], Rotulo = "Rele" },
+        ["ks2e-m-dc5"] = new() { Saidas = ["COIL1", "COIL2"], Rotulo = Idioma.N("Relé") },
 
         // ---- grandezas lidas por biblioteca ----
         // Nao ha pino "analogico": quem le e o objeto do sketch
@@ -181,38 +181,38 @@ public record Comportamento
         ["hc-sr04"] = new()
         {
             Grandeza = "distancia", PinoDaGrandeza = "ECHO",
-            Rotulo = "Distancia", Maximo = 400, Unidade = "cm"
+            Rotulo = Idioma.N("Distância"), Maximo = 400, Unidade = "cm"
         },
         ["dht22"] = new()
         {
             Grandeza = "temperatura", PinoDaGrandeza = "SDA",
-            Rotulo = "Temperatura", Minimo = -40, Maximo = 80, Unidade = "C"
+            Rotulo = Idioma.N("Temperatura"), Minimo = -40, Maximo = 80, Unidade = "C"
         },
         // O DS18B20: a temperatura de cada um vai ao chip dele no fio de 1-Wire (EditorCircuito).
         ["ds18b20"] = new()
         {
             Grandeza = "temperatura", PinoDaGrandeza = "DQ",
-            Rotulo = "Temperatura", Minimo = -55, Maximo = 125, Unidade = "C"
+            Rotulo = Idioma.N("Temperatura"), Minimo = -55, Maximo = 125, Unidade = "C"
         },
         ["dht11"] = new()
         {
             Grandeza = "temperatura", PinoDaGrandeza = "DATA",
-            Rotulo = "Temperatura", Minimo = 0, Maximo = 50, Unidade = "C"
+            Rotulo = Idioma.N("Temperatura"), Minimo = 0, Maximo = 50, Unidade = "C"
         },
         ["hx711"] = new()
         {
-            Grandeza = "hx711:peso", Rotulo = "Peso", Maximo = 5000, Unidade = "g"
+            Grandeza = "hx711:peso", Rotulo = Idioma.N("Peso"), Maximo = 5000, Unidade = "g"
         },
         ["mpu6050"] = new()
         {
-            Grandeza = "mpu:ax", Rotulo = "Inclinacao",
+            Grandeza = "mpu:ax", Rotulo = Idioma.N("Inclinação"),
             Minimo = -16384, Maximo = 16384, Unidade = ""
         },
-        ["membrane-keypad"] = new() { Grandeza = "keypad:tecla", Rotulo = "Tecla" },
-        ["ir-remote"] = new() { Grandeza = "ir:codigo", Rotulo = "Codigo IR", Maximo = 255 },
+        ["membrane-keypad"] = new() { Grandeza = "keypad:tecla", Rotulo = Idioma.N("Tecla") },
+        ["ir-remote"] = new() { Grandeza = "ir:codigo", Rotulo = Idioma.N("Código IR"), Maximo = 255 },
         ["clock-generator"] = new()
         {
-            Grandeza = "clock:hz", Rotulo = "Frequencia",
+            Grandeza = "clock:hz", Rotulo = Idioma.N("Frequência"),
             Minimo = 0.5, Maximo = 20, Unidade = "Hz"
         },
     };

@@ -102,7 +102,7 @@ public partial class EditorCircuito
         }
         string curto = corte > 0 ? motivo[..corte] : motivo;
         if (curto.Length > 46) curto = curto[..45].TrimEnd(' ', ',') + "…";
-        return curto.Length > 0 ? char.ToUpperInvariant(curto[0]) + curto[1..] : "Aviso";
+        return curto.Length > 0 ? char.ToUpperInvariant(curto[0]) + curto[1..] : Idioma.T("Aviso");
     }
 
     void DesenharAvisos()
@@ -193,7 +193,7 @@ public partial class EditorCircuito
                     Padding = new Thickness(8, 6, 8, 6),
                     Content = new TextBlock
                     {
-                        Text = (aviso.Queimou ? "Queimou: " : "") + aviso.Motivo,
+                        Text = (aviso.Queimou ? Idioma.T("Queimou: ") : "") + aviso.Motivo,
                         TextWrapping = TextWrapping.Wrap, MaxWidth = 380,
                         Foreground = Tema.Pincel(Tema.Texto), FontSize = 12,
                     },
@@ -218,7 +218,7 @@ public partial class EditorCircuito
                 ToolTip = new ToolTip
                 {
                     Background = Tema.Pincel(Tema.Painel),
-                    Content = new TextBlock { Text = "Fechar este aviso (ignorar)", Foreground = Tema.Pincel(Tema.Texto) },
+                    Content = new TextBlock { Text = Idioma.T("Fechar este aviso (ignorar)"), Foreground = Tema.Pincel(Tema.Texto) },
                 },
                 Child = new TextBlock
                 {

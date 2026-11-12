@@ -94,7 +94,7 @@ public partial class MainWindow
         try { Clipboard.SetText(texto); }
         catch (System.Runtime.InteropServices.COMException) { return; }
 
-        Aviso("console copiado.");
+        Aviso(Idioma.T("console copiado."));
     }
 
     /// <summary>Para o teste: o console inteiro em texto.</summary>

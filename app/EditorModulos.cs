@@ -211,12 +211,10 @@ public partial class EditorCircuito
             if (Comportamento.De(peca.Tipo) is { } comp) sensor.Temperatura = comp.ValorReal(peca.Giro);
             if (!puxado && ligado)
             {
-                maq.Avisar("DS18B20: o fio DQ precisa de um resistor de pull-up (4,7 kohm) para o VCC; "
-                           + "sem ele o fio nao sobe e o sensor nao responde.");
+                maq.Avisar(Idioma.T("DS18B20: o fio DQ precisa de um resistor de pull-up (4,7 kohm) para o VCC; sem ele o fio nao sobe e o sensor nao responde."));
                 avisosDeUmFio.Add(new Estouro(peca.Id,
-                    "o fio DQ precisa de um resistor de pull-up de 4,7 kΩ para o VCC. Se ficar assim: o fio de 1-Wire "
-                    + "não sobe, nenhum sensor responde e a leitura dá -127 °C.", Queimou: false)
-                    { Pino = "DQ", Marca = "falta o pull-up de 4,7 kΩ" });
+                    Idioma.T("o fio DQ precisa de um resistor de pull-up de 4,7 kΩ para o VCC. Se ficar assim: o fio de 1-Wire não sobe, nenhum sensor responde e a leitura dá -127 °C."), Queimou: false)
+                    { Pino = "DQ", Marca = Idioma.T("falta o pull-up de 4,7 kΩ") });
             }
         }
     }

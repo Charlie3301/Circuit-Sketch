@@ -33,7 +33,7 @@ public partial class MainWindow
         //
         // É a parte que o pedido chama de "conexões de pinos": trocar o
         // D2 por um D4 sem desenhar o fio de novo.
-        var pinos = new MenuItem { Header = "Ligar na placa em…" };
+        var pinos = new MenuItem { Header = Idioma.T("Ligar na placa em…") };
         foreach (var opcao in PinosDaPlacaDoFio(fio))
         {
             var escolha = new MenuItem
@@ -51,7 +51,7 @@ public partial class MainWindow
         if (pinos.Items.Count > 0) menu.Items.Add(pinos);
 
         // ---- a cor ----
-        var cores = new MenuItem { Header = "Cor do fio" };
+        var cores = new MenuItem { Header = Idioma.T("Cor do fio") };
         foreach (var (nome, hex) in CoresDeFio)
         {
             string valor = hex;
@@ -80,13 +80,13 @@ public partial class MainWindow
         // "Onde os fios vão", a outra metade do pedido. Arrastar os
         // cantos continua sendo no desenho; o que a lista resolve é o
         // caso inverso -- desfazer um traçado que ficou ruim.
-        var tracado = new MenuItem { Header = "Traçado" };
+        var tracado = new MenuItem { Header = Idioma.T("Traçado") };
 
         foreach (var (rotulo, estilo) in new[]
                  {
-                     ("solto (curva)", Fio.EstiloSolto),
-                     ("reto", Fio.EstiloReto),
-                     ("em degrau", Fio.EstiloDegrau),
+                     (Idioma.T("solto (curva)"), Fio.EstiloSolto),
+                     (Idioma.T("reto"), Fio.EstiloReto),
+                     (Idioma.T("em degrau"), Fio.EstiloDegrau),
                  })
         {
             string qual = estilo;
@@ -105,7 +105,7 @@ public partial class MainWindow
 
         var endireitar = new MenuItem
         {
-            Header = $"Tirar os cantos ({fio.Dobras.Count})",
+            Header = Idioma.T("Tirar os cantos ({0})", fio.Dobras.Count),
             IsEnabled = fio.Dobras.Count > 0,
         };
         endireitar.Click += (_, _) => MexerNoFio(fio.Dobras.Clear);
@@ -114,11 +114,11 @@ public partial class MainWindow
         menu.Items.Add(tracado);
         menu.Items.Add(new Separator());
 
-        var achar = new MenuItem { Header = "Mostrar no circuito" };
+        var achar = new MenuItem { Header = Idioma.T("Mostrar no circuito") };
         achar.Click += (_, _) => MostrarFioNoCircuito(fio);
         menu.Items.Add(achar);
 
-        var apagar = new MenuItem { Header = "Apagar este fio" };
+        var apagar = new MenuItem { Header = Idioma.T("Apagar este fio") };
         apagar.Click += (_, _) => MexerNoFio(() => editor.Atual.Fios.Remove(fio));
         menu.Items.Add(apagar);
 
@@ -160,7 +160,7 @@ public partial class MainWindow
             else fio.ParaPino = pino;
         });
 
-        Aviso($"fio ligado em {pino}.");
+        Aviso(Idioma.T("fio ligado em {0}.", pino));
     }
 
     /// <summary>Seleciona o fio no desenho e leva a tela até ele.</summary>

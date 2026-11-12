@@ -63,7 +63,7 @@ public partial class EditorCircuito
         : AmperesDoEsc(esc) switch { <= 12 => (2, 3), >= 60 => (2, 6), _ => (2, 4) };
 
     static string NomeDoEsc(PecaNoCircuito esc) => esc.Tipo == "esc-4em1"
-        ? $"ESC 4-em-1 de {AmperesDoEsc(esc):0} A" : $"ESC de {AmperesDoEsc(esc):0} A";
+        ? Idioma.T("ESC 4-em-1 de {0:0} A", AmperesDoEsc(esc)) : Idioma.T("ESC de {0:0} A", AmperesDoEsc(esc));
 
     /// <summary>
     /// O motor brushless nas fases deste ESC, e o sentido (+1/-1) pela ordem
@@ -107,7 +107,7 @@ public partial class EditorCircuito
             var esc = canal.Esc;
             if (!escs.TryGetValue(canal.Chave, out var est))
                 escs[canal.Chave] = est = new EstadoDoEsc { Peca = esc.Id, Canal = canal.Numero };
-            string qual = canal.Numero > 0 ? $"o canal {canal.Numero} do {NomeDoEsc(esc)}" : $"o {NomeDoEsc(esc)}";
+            string qual = canal.Numero > 0 ? Idioma.T("o canal {0} do {1}", canal.Numero, NomeDoEsc(esc)) : Idioma.T("o {0}", NomeDoEsc(esc));
             var (celMin, celMax) = CelulasDoEsc(esc);
 
             double volts = EnergiaDoQuadro is { } conta
@@ -122,7 +122,7 @@ public partial class EditorCircuito
             {
                 if (!est.Queimado)
                     avisosDeEsc.Add(new Estouro(esc.Id,
-                        $"{qual} e de {celMin}S a {celMax}S (ate {celMax * 4.2:0.#} V) e recebeu {volts:0.#} V: queimou."));
+                        Idioma.T("{0} e de {1}S a {2}S (ate {3:0.#} V) e recebeu {4:0.#} V: queimou.", qual, celMin, celMax, celMax * 4.2, volts)));
                 est.Fase = FaseDoEsc.Desligado;
                 est.Acelerador = 0;
                 AcelerarMotorDoEsc(motor, 0, sentido, segundos);
@@ -134,7 +134,7 @@ public partial class EditorCircuito
                 est.Acelerador = 0;
                 if (pulso is not null)
                     avisosDeEsc.Add(new Estouro(esc.Id,
-                        $"{qual} recebe o sinal, mas esta sem bateria (BAT+ e BAT-): ele precisa de uma LiPo de {celMin}S a {celMax}S.",
+                        Idioma.T("{0} recebe o sinal, mas esta sem bateria (BAT+ e BAT-): ele precisa de uma LiPo de {1}S a {2}S.", qual, celMin, celMax),
                         Queimou: false));
                 AcelerarMotorDoEsc(motor, 0, sentido, segundos);
                 continue;
@@ -178,8 +178,7 @@ public partial class EditorCircuito
                     }
                     if (comSinal && us > 1100 && est.Tempo > 1.0)
                         avisosDeEsc.Add(new Estouro(esc.Id,
-                            $"o ESC nao arma: o acelerador esta em {us:0} us. Ele so arma com o acelerador embaixo (1000 us) por meio segundo -- "
-                            + "no codigo, esc.writeMicroseconds(1000) e um delay antes de acelerar.", Queimou: false));
+                            Idioma.T("o ESC nao arma: o acelerador esta em {0:0} us. Ele so arma com o acelerador embaixo (1000 us) por meio segundo -- no codigo, esc.writeMicroseconds(1000) e um delay antes de acelerar.", us), Queimou: false));
                     break;
 
                 case FaseDoEsc.Armado:
@@ -200,7 +199,7 @@ public partial class EditorCircuito
             if (est.Fase != FaseDoEsc.Armado) est.Acelerador = 0;
             if (motor is not null && faltando && est.Acelerador > 0)
                 avisosDeEsc.Add(new Estouro(esc.Id,
-                    "uma fase do motor brushless esta sem fio no ESC: com duas fases ele so treme (e o ESC pode queimar). Ligue A, B e C.",
+                    Idioma.T("uma fase do motor brushless esta sem fio no ESC: com duas fases ele so treme (e o ESC pode queimar). Ligue A, B e C."),
                     Queimou: false));
 
             double aplicado = motor is null || faltando ? 0 : est.Acelerador * volts * sentido;
@@ -219,8 +218,7 @@ public partial class EditorCircuito
             {
                 est.Queimado = true;
                 avisosDeEsc.Add(new Estouro(esc.Id,
-                    $"{qual} passou mais de um segundo com {noMotor:0} A no motor, e ele e de {limite:0} A: queimou. "
-                    + "Use um ESC acima da corrente maxima do motor (com folga), ou uma helice menor."));
+                    Idioma.T("{0} passou mais de um segundo com {1:0} A no motor, e ele e de {2:0} A: queimou. Use um ESC acima da corrente maxima do motor (com folga), ou uma helice menor.", qual, noMotor, limite)));
             }
         }
 
@@ -257,10 +255,10 @@ public partial class EditorCircuito
     string TextoDoEsc(EstadoDoEsc est) => est.Fase switch
     {
         FaseDoEsc.Desligado => null,
-        FaseDoEsc.Partida => "ESC ligando ♪",
-        FaseDoEsc.Calibrando => "ESC calibrando: baixe o acelerador",
-        FaseDoEsc.AguardandoBaixo => "ESC aguardando acelerador baixo",
-        FaseDoEsc.Armado => $"ESC armado · {est.Acelerador * 100:0}%",
+        FaseDoEsc.Partida => Idioma.T("ESC ligando ♪"),
+        FaseDoEsc.Calibrando => Idioma.T("ESC calibrando: baixe o acelerador"),
+        FaseDoEsc.AguardandoBaixo => Idioma.T("ESC aguardando acelerador baixo"),
+        FaseDoEsc.Armado => Idioma.T("ESC armado · {0:0}%", est.Acelerador * 100),
         _ => null,
     };
 

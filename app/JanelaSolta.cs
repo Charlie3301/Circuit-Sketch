@@ -204,7 +204,7 @@ public class JanelaSolta : Window
         this.nome = nome;
         this.principal = principal;
 
-        Title = "CircuitSketch — " + titulo + "  (arraste para cima do programa para reacoplar)";
+        Title = Idioma.T("CircuitSketch — {0}  (arraste para cima do programa para reacoplar)", titulo);
         Width = 720;
         Height = 480;
         MinWidth = 320;
@@ -232,7 +232,7 @@ public class JanelaSolta : Window
             BorderBrush = new SolidColorBrush(Color.FromRgb(0x00, 0x97, 0x9D)),
             Child = new TextBlock
             {
-                Text = "solte aqui para reacoplar",
+                Text = Idioma.T("solte aqui para reacoplar"),
                 FontSize = 12,
                 Foreground = new SolidColorBrush(Color.FromRgb(0xE8, 0xF4, 0xF5)),
                 HorizontalAlignment = HorizontalAlignment.Center,

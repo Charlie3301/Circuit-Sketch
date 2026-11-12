@@ -114,7 +114,7 @@ public static class Analisador
     public static string Tempo(double us)
     {
         double a = Math.Abs(us);
-        var br = CultureInfo.GetCultureInfo("pt-BR");
+        var br = Idioma.Cultura;
         if (a < 1) return (us * 1000).ToString("0.#", br) + " ns";
         if (a < 1000) return us.ToString(a < 10 ? "0.##" : "0.#", br) + " µs";
         if (a < 1_000_000) return (us / 1000).ToString(a < 10_000 ? "0.###" : "0.#", br) + " ms";
@@ -124,7 +124,7 @@ public static class Analisador
     /// <summary>Frequência do jeito que se lê: "490,2 Hz", "5 kHz".</summary>
     public static string Frequencia(double hz)
     {
-        var br = CultureInfo.GetCultureInfo("pt-BR");
+        var br = Idioma.Cultura;
         return hz >= 1000 ? (hz / 1000).ToString("0.###", br) + " kHz" : hz.ToString("0.#", br) + " Hz";
     }
 
@@ -205,11 +205,11 @@ public static class Analisador
                     break;
                 }
 
-            texto.Append(" · período ").Append(Tempo(periodo))
+            texto.Append(" · ").Append(Idioma.T("período")).Append(' ').Append(Tempo(periodo))
                  .Append(" · ").Append(Frequencia(1e6 / periodo));
             if (alto > 0 && alto < periodo)
-                texto.Append(" · ").Append((alto / periodo * 100).ToString("0.#", CultureInfo.GetCultureInfo("pt-BR")))
-                     .Append("% alto");
+                texto.Append(" · ").Append((alto / periodo * 100).ToString("0.#", Idioma.Cultura))
+                     .Append(Idioma.T("% alto"));
         }
 
         return texto.ToString();

@@ -142,14 +142,16 @@ public partial class EditorCircuito
     {
         var placa = Atual.Achar(idDaPlaca);
         if (placa is null) return "";
-        if (queimadasPelaAlimentacao.Contains(idDaPlaca)) return "queimou pela alimentação";
-        if (TemCaboUsb(placa, Atual)) return placa.Usb is null ? "na USB" : "na USB (cabo ligado)";
+        if (queimadasPelaAlimentacao.Contains(idDaPlaca)) return Idioma.T("queimou pela alimentação");
+        if (TemCaboUsb(placa, Atual)) return placa.Usb is null ? Idioma.T("na USB") : Idioma.T("na USB (cabo ligado)");
         return EnergiaDoQuadro?.AlimentacaoDe(idDaPlaca) switch
         {
-            { Queimou: true, Motivo: var m } => $"queimou: {m}",
-            { Ligada: true, Pino: { } pino } a => $"pela bateria, {a.Volts:0.#} V no {pino}" + (a.Motivo is { } m ? $" ({m})" : ""),
-            { Motivo: { } motivo } => "sem energia: " + motivo,
-            _ => "sem energia: sem o cabo USB (há bateria no circuito)",
+            { Queimou: true, Motivo: var m } => Idioma.T("queimou: {0}", m),
+            { Ligada: true, Pino: { } pino } a => a.Motivo is { } m
+                ? Idioma.T("pela bateria, {0:0.#} V no {1} ({2})", a.Volts, pino, m)
+                : Idioma.T("pela bateria, {0:0.#} V no {1}", a.Volts, pino),
+            { Motivo: { } motivo } => Idioma.T("sem energia: {0}", motivo),
+            _ => Idioma.T("sem energia: sem o cabo USB (há bateria no circuito)"),
         };
     }
 
@@ -158,15 +160,15 @@ public partial class EditorCircuito
     {
         var placa = Atual.Achar(idDaPlaca);
         if (placa is null) return "";
-        if (queimadasPelaAlimentacao.Contains(idDaPlaca)) return "queimou";
-        if (TemCaboUsb(placa, Atual)) return "na USB";
+        if (queimadasPelaAlimentacao.Contains(idDaPlaca)) return Idioma.T("queimou");
+        if (TemCaboUsb(placa, Atual)) return Idioma.T("na USB");
         return EnergiaDoQuadro?.AlimentacaoDe(idDaPlaca) switch
         {
-            { Queimou: true, Pino: { } pino } a => $"queima: {a.Volts:0.0} V no {pino}",
-            { Ligada: true, Pino: { } pino } a => $"bateria: {a.Volts:0.0} V no {pino}",
-            { Ligada: true } => "ligada",
-            { Pino: { } pino } a => $"sem energia ({a.Volts:0.0} V no {pino})",
-            _ => "sem energia",
+            { Queimou: true, Pino: { } pino } a => Idioma.T("queima: {0:0.0} V no {1}", a.Volts, pino),
+            { Ligada: true, Pino: { } pino } a => Idioma.T("bateria: {0:0.0} V no {1}", a.Volts, pino),
+            { Ligada: true } => Idioma.T("ligada"),
+            { Pino: { } pino } a => Idioma.T("sem energia ({0:0.0} V no {1})", a.Volts, pino),
+            _ => Idioma.T("sem energia"),
         };
     }
 
@@ -190,10 +192,10 @@ public partial class EditorCircuito
             if (EmSimulacao && !TemCaboUsb(placa, Atual))
                 texto = EnergiaDoQuadro?.AlimentacaoDe(placa.Id) switch
                 {
-                    _ when queimadasPelaAlimentacao.Contains(placa.Id) => "💥 queimou pela alimentação",
-                    { Ligada: true, Pino: { } pino } a => $"🔋 {a.Volts:0.0} V no {pino}",
-                    _ when PlacaComEnergia(placa.Id) => "🔋 ligada",
-                    _ => "⏻ sem energia",
+                    _ when queimadasPelaAlimentacao.Contains(placa.Id) => Idioma.T("💥 queimou pela alimentação"),
+                    { Ligada: true, Pino: { } pino } a => Idioma.T("🔋 {0:0.0} V no {1}", a.Volts, pino),
+                    _ when PlacaComEnergia(placa.Id) => Idioma.T("🔋 ligada"),
+                    _ => Idioma.T("⏻ sem energia"),
                 };
             MostrarRotuloAcima(placa, texto);
         }
@@ -405,11 +407,8 @@ public partial class EditorCircuito
                 queimadasPelaAlimentacao.Add(placa.Id);
                 bool temVin = Catalogo.Obter(placa.Tipo)?.Pinos.Any(p => p.Nome == "VIN") == true;
                 achados.Add(new Estouro(placa.Id, queimou.Direto
-                    ? $"{motivo}: esse pino vai direto no chip, sem regulador no caminho. "
-                      + (temVin ? "Ligue a bateria no VIN (que passa pelo regulador da placa), ou ponha" : "Ponha")
-                      + $" um regulador antes do {pino}."
-                    : $"{motivo}: o regulador da placa não aguenta. Use uma bateria de tensão menor nesse pino, "
-                      + $"ou ponha um regulador step-down antes do {pino}."));
+                    ? Idioma.T("{0}: esse pino vai direto no chip, sem regulador no caminho. {1} um regulador antes do {2}.", motivo, (temVin ? Idioma.T("Ligue a bateria no VIN (que passa pelo regulador da placa), ou ponha") : Idioma.T("Ponha")), pino)
+                    : Idioma.T("{0}: o regulador da placa não aguenta. Use uma bateria de tensão menor nesse pino, ou ponha um regulador step-down antes do {1}.", motivo, pino)));
             }
 
         foreach (var peca in Atual.Pecas)
@@ -429,9 +428,7 @@ public partial class EditorCircuito
                         excessoDesde[(peca.Id, pino.Nome)] = desde = tempoDaEnergia;
                     if (tempoDaEnergia - desde < 1.0) continue;
                     achados.Add(new Estouro(peca.Id,
-                        $"a saida {pino.Nome} do {driver.Nome} esta com {a:0.0#} A, e o maximo dele e "
-                        + $"{driver.CorrenteMaxima:0.0#} A por canal: na bancada ele esquenta e a protecao termica "
-                        + "desliga a saida. Use um driver maior ou um motor que puxe menos.",
+                        Idioma.T("a saida {0} do {1} esta com {2:0.0#} A, e o maximo dele e {3:0.0#} A por canal: na bancada ele esquenta e a protecao termica desliga a saida. Use um driver maior ou um motor que puxe menos.", pino.Nome, driver.Nome, a, driver.CorrenteMaxima),
                         Queimou: false));
                     break;
                 }
@@ -450,16 +447,14 @@ public partial class EditorCircuito
                         excessoDesde[(peca.Id, "motor")] = desde = tempoDaEnergia;
                     if (tempoDaEnergia - desde >= 2.0)
                         achados.Add(new Estouro(peca.Id,
-                            $"o motor ({fichaDoMotor.Nome}) esta puxando {noMotor:0.#} A, e a ficha dele aguenta "
-                            + $"{fichaDoMotor.CorrenteMaxima:0.#} A: trabalhando assim ele esquenta. "
-                            + "Diminua a tensao ou a carga (a helice), ou use um motor maior.", Queimou: false));
+                            Idioma.T("o motor ({0}) esta puxando {1:0.#} A, e a ficha dele aguenta {2:0.#} A: trabalhando assim ele esquenta. Diminua a tensao ou a carga (a helice), ou use um motor maior.", fichaDoMotor.Nome, noMotor, fichaDoMotor.CorrenteMaxima), Queimou: false));
                 }
             }
 
             switch (peca.Tipo)
             {
                 case "led":
-                    AvaliarLed(peca, conta.CorrenteDoRamo(peca.Id, "led"), "o LED");
+                    AvaliarLed(peca, conta.CorrenteDoRamo(peca.Id, "led"), Idioma.T("o LED"));
                     break;
                 case "capacitor":
                 case "capacitor-eletrolitico":
@@ -545,11 +540,11 @@ public partial class EditorCircuito
                 }
                 case "rgb-led":
                     foreach (string cor in new[] { "R", "G", "B" })
-                        AvaliarLed(peca, conta.CorrenteDoRamo(peca.Id, cor), $"a cor {cor} do LED RGB");
+                        AvaliarLed(peca, conta.CorrenteDoRamo(peca.Id, cor), Idioma.T("a cor {0} do LED RGB", cor));
                     break;
                 case "led-bar-graph":
                     for (int k = 1; k <= 10; k++)
-                        AvaliarLed(peca, conta.CorrenteDoRamo(peca.Id, k.ToString()), $"o LED {k} da barra");
+                        AvaliarLed(peca, conta.CorrenteDoRamo(peca.Id, k.ToString()), Idioma.T("o LED {0} da barra", k));
                     break;
                 case var bateria when Netlist.EhBateria(bateria):
                 {
@@ -558,14 +553,11 @@ public partial class EditorCircuito
                     double maxima = Math.Max(1, ficha.MiliAmperes) / 1000.0;
                     if (i > maxima * 5)
                         achados.Add(new Estouro(peca.Id,
-                            $"a bateria esta em curto: {i:0.0} A saindo de uma bateria de {ficha.MiliAmperes:0} mA. "
-                            + "Na bancada ela esquenta e se esgota em minutos (a pilha de litio pode inchar). "
-                            + "Confira se o + nao encosta no - por um fio ou por uma peca sem resistencia.",
+                            Idioma.T("a bateria esta em curto: {0:0.0} A saindo de uma bateria de {1:0} mA. Na bancada ela esquenta e se esgota em minutos (a pilha de litio pode inchar). Confira se o + nao encosta no - por um fio ou por uma peca sem resistencia.", i, ficha.MiliAmperes),
                             Queimou: false));
                     else if (i > maxima * 1.2)
                         achados.Add(new Estouro(peca.Id,
-                            $"a bateria esta entregando {i * 1000:0} mA, acima dos {ficha.MiliAmperes:0} mA que aguenta: "
-                            + "a tensao cai e ela esquenta. Use uma bateria maior ou pilhas em paralelo.",
+                            Idioma.T("a bateria esta entregando {0:0} mA, acima dos {1:0} mA que aguenta: a tensao cai e ela esquenta. Use uma bateria maior ou pilhas em paralelo.", i * 1000, ficha.MiliAmperes),
                             Queimou: false));
                     break;
                 }
@@ -578,13 +570,12 @@ public partial class EditorCircuito
             double ma = Math.Abs(amperes) * 1000;
             if (ma <= 30) return;
             double volts = Atual.Pecas.Where(p => Netlist.EhBateria(p.Tipo)).Select(p => Baterias.FichaDe(p).Volts).DefaultIfEmpty(0).Max();
-            string resistor = volts > 2.5 ? $" Com {volts:0.#} V, uns {ResistorDoLed(volts)} Ω em série." : "";
+            string resistor = volts > 2.5 ? Idioma.T(" Com {0:0.#} V, uns {1} Ω em série.", volts, ResistorDoLed(volts)) : "";
             achados.Add(ma > 50
                 ? new Estouro(peca.Id,
-                    $"{quem} passou {ma:0} mA, e o maximo dele e 30 mA: queimou. Sem nada para segurar a corrente, "
-                    + $"o LED puxa o que a fonte da.{resistor}")
+                    Idioma.T("{0} passou {1:0} mA, e o maximo dele e 30 mA: queimou. Sem nada para segurar a corrente, o LED puxa o que a fonte da.{2}", quem, ma, resistor))
                 : new Estouro(peca.Id,
-                    $"{quem} esta com {ma:0} mA, acima dos 30 mA do maximo: acende forte, esquenta e dura pouco.{resistor}",
+                    Idioma.T("{0} esta com {1:0} mA, acima dos 30 mA do maximo: acende forte, esquenta e dura pouco.{2}", quem, ma, resistor),
                     Queimou: false));
         }
     }

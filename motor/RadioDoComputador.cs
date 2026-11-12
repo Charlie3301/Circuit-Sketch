@@ -67,7 +67,7 @@ public static class RadioDoComputador
     /// <summary>As redes que o computador enxerga. Vazio quando nao da.</summary>
     public static List<RedeVista> Redes()
     {
-        if (Desligado) { MotivoDoWifi = "a consulta ao WiFi do computador está desligada"; return []; }
+        if (Desligado) { MotivoDoWifi = Idioma.T("a consulta ao WiFi do computador está desligada"); return []; }
 
         lock (trava)
         {
@@ -83,7 +83,7 @@ public static class RadioDoComputador
     {
         if (Desligado)
         {
-            MotivoDoBluetooth = "a consulta ao Bluetooth do computador está desligada";
+            MotivoDoBluetooth = Idioma.T("a consulta ao Bluetooth do computador está desligada");
             return [];
         }
 
@@ -116,7 +116,7 @@ public static class RadioDoComputador
 
         if (saida is null)
         {
-            MotivoDoWifi = erro ?? "não consegui falar com o Windows sobre o WiFi";
+            MotivoDoWifi = erro ?? Idioma.T("não consegui falar com o Windows sobre o WiFi");
             return [];
         }
 
@@ -126,14 +126,14 @@ public static class RadioDoComputador
             || saida.Contains("no interface", StringComparison.OrdinalIgnoreCase)
             || saida.Contains("nenhuma interface", StringComparison.OrdinalIgnoreCase))
         {
-            MotivoDoWifi = "este computador não tem adaptador de WiFi ligado";
+            MotivoDoWifi = Idioma.T("este computador não tem adaptador de WiFi ligado");
             return [];
         }
 
         var achadas = Ler(saida);
         MotivoDoWifi = achadas.Count > 0
             ? null
-            : "o WiFi do computador não encontrou nenhuma rede";
+            : Idioma.T("o WiFi do computador não encontrou nenhuma rede");
         return achadas;
     }
 
@@ -218,7 +218,7 @@ public static class RadioDoComputador
 
         if (saida is null)
         {
-            MotivoDoBluetooth = erro ?? "não consegui falar com o Windows sobre o Bluetooth";
+            MotivoDoBluetooth = erro ?? Idioma.T("não consegui falar com o Windows sobre o Bluetooth");
             return [];
         }
 
@@ -230,7 +230,7 @@ public static class RadioDoComputador
 
         if (nomes.Count == 0)
         {
-            MotivoDoBluetooth = "este computador não tem Bluetooth ligado";
+            MotivoDoBluetooth = Idioma.T("este computador não tem Bluetooth ligado");
             return [];
         }
 
@@ -245,7 +245,7 @@ public static class RadioDoComputador
 
         MotivoDoBluetooth = aparelhos.Count > 0
             ? null
-            : "o computador tem Bluetooth, mas nenhum aparelho pareado";
+            : Idioma.T("o computador tem Bluetooth, mas nenhum aparelho pareado");
         return aparelhos;
     }
 
@@ -282,7 +282,7 @@ public static class RadioDoComputador
             if (!processo.WaitForExit(8000))
             {
                 try { processo.Kill(true); } catch (InvalidOperationException) { }
-                erro = "a consulta ao Windows demorou demais";
+                erro = Idioma.T("a consulta ao Windows demorou demais");
                 return null;
             }
 

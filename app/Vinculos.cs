@@ -165,32 +165,32 @@ public static class Vinculos
     /// <summary>As acoes que cada tipo de peca aceita, na ordem da tela.</summary>
     public static IReadOnlyList<(string Acao, string Rotulo)> Acoes(string tipo) => tipo switch
     {
-        "pushbutton" or "pushbutton-6mm" or "micro-switch" => [(Apertar, "Apertar")],
+        "pushbutton" or "pushbutton-6mm" or "micro-switch" => [(Apertar, Idioma.T("Apertar"))],
 
         "analog-joystick" =>
         [
-            (Cima, "Cima"), (Baixo, "Baixo"), (Esquerda, "Esquerda"),
-            (Direita, "Direita"), (Apertar, "Apertar o manche"),
+            (Cima, Idioma.T("Cima")), (Baixo, Idioma.T("Baixo")), (Esquerda, Idioma.T("Esquerda")),
+            (Direita, Idioma.T("Direita")), (Apertar, Idioma.T("Apertar o manche")),
         ],
 
-        "slide-switch" or "tilt-switch" or "pir-motion-sensor" => [(Alternar, "Ligar/desligar")],
+        "slide-switch" or "tilt-switch" or "pir-motion-sensor" => [(Alternar, Idioma.T("Ligar/desligar"))],
 
-        "pendrive-usb" => [(Alternar, "Tirar/pôr o pendrive")],
+        "pendrive-usb" => [(Alternar, Idioma.T("Tirar/pôr o pendrive"))],
 
         "radio-controle" =>
         [
-            (Mais, "Acelerar"), (Menos, "Reduzir o acelerador"),
-            ("leme-esq", "Leme ←"), ("leme-dir", "Leme →"),
-            (Esquerda, "Aileron ←"), (Direita, "Aileron →"),
-            (Cima, "Profundor ↑"), (Baixo, "Profundor ↓"),
-            ("chave-a", "Chave SWA"), ("chave-b", "Chave SWB"),
+            (Mais, Idioma.T("Acelerar")), (Menos, Idioma.T("Reduzir o acelerador")),
+            ("leme-esq", Idioma.T("Leme ←")), ("leme-dir", Idioma.T("Leme →")),
+            (Esquerda, Idioma.T("Aileron ←")), (Direita, Idioma.T("Aileron →")),
+            (Cima, Idioma.T("Profundor ↑")), (Baixo, Idioma.T("Profundor ↓")),
+            ("chave-a", Idioma.T("Chave SWA")), ("chave-b", Idioma.T("Chave SWB")),
         ],
 
         "potentiometer" or "slide-potentiometer" =>
-            [(Mais, "Aumentar"), (Menos, "Diminuir")],
+            [(Mais, Idioma.T("Aumentar")), (Menos, Idioma.T("Diminuir"))],
 
         // A roda anda um clique por toque; o botao dela e o OK.
-        "ky-040" => [(Mais, "Girar para a direita"), (Menos, "Girar para a esquerda"), (Apertar, "Apertar a roda")],
+        "ky-040" => [(Mais, Idioma.T("Girar para a direita")), (Menos, Idioma.T("Girar para a esquerda")), (Apertar, Idioma.T("Apertar a roda"))],
 
         _ => [],
     };
@@ -208,16 +208,16 @@ public static class Vinculos
     /// <summary>Nome curto de cada controle do gamepad, na ordem da lista.</summary>
     public static readonly (string Codigo, string Rotulo)[] DoControle =
     [
-        ("g:A", "Botão A"), ("g:B", "Botão B"), ("g:X", "Botão X"), ("g:Y", "Botão Y"),
-        ("g:LB", "LB"), ("g:RB", "RB"), ("g:LT", "Gatilho LT"), ("g:RT", "Gatilho RT"),
+        ("g:A", Idioma.T("Botão A")), ("g:B", Idioma.T("Botão B")), ("g:X", Idioma.T("Botão X")), ("g:Y", Idioma.T("Botão Y")),
+        ("g:LB", "LB"), ("g:RB", "RB"), ("g:LT", Idioma.T("Gatilho LT")), ("g:RT", Idioma.T("Gatilho RT")),
         ("g:Start", "Start"), ("g:Back", "Back"),
-        ("g:Cima", "Direcional ↑"), ("g:Baixo", "Direcional ↓"),
-        ("g:Esquerda", "Direcional ←"), ("g:Direita", "Direcional →"),
-        ("g:L3", "Apertar o manche esquerdo"), ("g:R3", "Apertar o manche direito"),
-        ("g:LSCima", "Manche esquerdo ↑"), ("g:LSBaixo", "Manche esquerdo ↓"),
-        ("g:LSEsquerda", "Manche esquerdo ←"), ("g:LSDireita", "Manche esquerdo →"),
-        ("g:RSCima", "Manche direito ↑"), ("g:RSBaixo", "Manche direito ↓"),
-        ("g:RSEsquerda", "Manche direito ←"), ("g:RSDireita", "Manche direito →"),
+        ("g:Cima", Idioma.T("Direcional ↑")), ("g:Baixo", Idioma.T("Direcional ↓")),
+        ("g:Esquerda", Idioma.T("Direcional ←")), ("g:Direita", Idioma.T("Direcional →")),
+        ("g:L3", Idioma.T("Apertar o manche esquerdo")), ("g:R3", Idioma.T("Apertar o manche direito")),
+        ("g:LSCima", Idioma.T("Manche esquerdo ↑")), ("g:LSBaixo", Idioma.T("Manche esquerdo ↓")),
+        ("g:LSEsquerda", Idioma.T("Manche esquerdo ←")), ("g:LSDireita", Idioma.T("Manche esquerdo →")),
+        ("g:RSCima", Idioma.T("Manche direito ↑")), ("g:RSBaixo", Idioma.T("Manche direito ↓")),
+        ("g:RSEsquerda", Idioma.T("Manche direito ←")), ("g:RSDireita", Idioma.T("Manche direito →")),
     ];
 
     /// <summary>Quanto o controle esta acionando este vinculo, de 0 a 1.</summary>
@@ -286,7 +286,7 @@ public static class Vinculos
     public static string Rotulo(string vinculo)
     {
         if (string.IsNullOrEmpty(vinculo)) return "—";
-        if (vinculo.Contains('|')) return string.Join(" ou ", vinculo.Split('|').Select(Rotulo));
+        if (vinculo.Contains('|')) return string.Join(" " + Idioma.T("ou") + " ", vinculo.Split('|').Select(Rotulo));
         if (TeclaDe(vinculo) is { } tecla) return NomeDaTecla(tecla);
 
         foreach (var (codigo, rotulo) in DoControle)
@@ -297,7 +297,7 @@ public static class Vinculos
     /// <summary>Nome curto e legivel de uma tecla ("J", "Espaço", "Enter").</summary>
     public static string NomeDaTecla(Key tecla) => tecla switch
     {
-        Key.Space => "Espaço",
+        Key.Space => Idioma.T("Espaço"),
         Key.Return => "Enter",
         Key.Escape => "Esc",
         Key.Left => "←",

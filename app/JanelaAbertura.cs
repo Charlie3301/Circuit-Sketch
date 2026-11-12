@@ -34,9 +34,9 @@ public class JanelaAbertura : Window
 
     static readonly string[] Boasvindas =
     [
-        "bem-vindo", "bom te ver de novo", "vamos montar alguma coisa",
-        "o ferro de solda está frio", "sem fumaça hoje, espero",
-        "de volta à bancada", "que circuito é o de hoje?",
+        Idioma.T("bem-vindo"), Idioma.T("bom te ver de novo"), Idioma.T("vamos montar alguma coisa"),
+        Idioma.T("o ferro de solda está frio"), Idioma.T("sem fumaça hoje, espero"),
+        Idioma.T("de volta à bancada"), Idioma.T("que circuito é o de hoje?"),
     ];
 
     /// <summary>Placa escolhida para um circuito novo, se foi essa a escolha.</summary>
@@ -172,7 +172,7 @@ public class JanelaAbertura : Window
         // O autor, no canto de baixo, do lado oposto ao nome do programa.
         faixa.Children.Add(new TextBlock
         {
-            Text = "por Emannuel Serafim Oliveira",
+            Text = Idioma.T("por Emannuel Serafim Oliveira"),
             Foreground = claro,
             FontSize = 12,
             Opacity = 0.85,
@@ -410,10 +410,9 @@ public class JanelaAbertura : Window
             TextWrapping = TextWrapping.Wrap,
         };
         texto.Inlines.Add(new System.Windows.Documents.Run("⚠  ") { Foreground = Destaque });
-        texto.Inlines.Add(new System.Windows.Documents.Run($"Versão de teste ({versao}). ") { FontWeight = FontWeights.SemiBold });
+        texto.Inlines.Add(new System.Windows.Documents.Run(Idioma.T("Versão de teste ({0}). ", versao)) { FontWeight = FontWeights.SemiBold });
         texto.Inlines.Add(new System.Windows.Documents.Run(
-            "O CircuitSketch está em desenvolvimento: esta não é a versão final. Pode ter erros, "
-            + "e o que aparece aqui ainda vai mudar."));
+            Idioma.T("O CircuitSketch está em desenvolvimento: esta não é a versão final. Pode ter erros, e o que aparece aqui ainda vai mudar.")));
 
         return new Border
         {
@@ -440,7 +439,7 @@ public class JanelaAbertura : Window
     UIElement Placas()
     {
         var coluna = new StackPanel();
-        coluna.Children.Add(Titulo("NOVO CIRCUITO"));
+        coluna.Children.Add(Titulo(Idioma.T("NOVO CIRCUITO")));
 
         // A última placa usada vem primeiro: quem está no meio de um
         // trabalho abre o programa dez vezes na mesma placa.
@@ -456,7 +455,7 @@ public class JanelaAbertura : Window
         {
             var mais = new Button
             {
-                Content = "Mais placas ▾",
+                Content = Idioma.T("Mais placas ▾"),
                 Style = (Style)FindResource("BotaoDaAbertura"),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(0, 6, 0, 0),
@@ -494,7 +493,7 @@ public class JanelaAbertura : Window
                      .GroupBy(p => Catalogo.Familia(p.Id) ?? "Outras")
                      .OrderBy(g => ordem.IndexOf(g.Key) is int i && i >= 0 ? i : int.MaxValue))
         {
-            var familia = new MenuItem { Header = $"{grupo.Key}  ({grupo.Count()})" };
+            var familia = new MenuItem { Header = $"{Catalogo.NomeDaFamilia(grupo.Key)}  ({grupo.Count()})" };
 
             foreach (var perfil in grupo)
             {
@@ -530,7 +529,7 @@ public class JanelaAbertura : Window
         {
             var marca = new TextBlock
             {
-                Text = "última",
+                Text = Idioma.T("última"),
                 Foreground = Destaque,
                 FontSize = 10,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -568,14 +567,14 @@ public class JanelaAbertura : Window
     UIElement Projetos()
     {
         var coluna = new StackPanel();
-        coluna.Children.Add(Titulo("PROJETOS RECENTES"));
+        coluna.Children.Add(Titulo(Idioma.T("PROJETOS RECENTES")));
 
         var lista = Recentes.Ler();
         if (lista.Count == 0)
         {
             coluna.Children.Add(new TextBlock
             {
-                Text = "Nenhum ainda. Comece por uma placa, ou abra um arquivo .sktch.",
+                Text = Idioma.T("Nenhum ainda. Comece por uma placa, ou abra um arquivo .sktch."),
                 Foreground = Fraco,
                 FontSize = 12,
                 TextWrapping = TextWrapping.Wrap,
@@ -591,7 +590,7 @@ public class JanelaAbertura : Window
         {
             var mais = new Button
             {
-                Content = "Mais projetos ▾",
+                Content = Idioma.T("Mais projetos ▾"),
                 Style = (Style)FindResource("BotaoDaAbertura"),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(0, 6, 0, 0),
@@ -679,9 +678,9 @@ public class JanelaAbertura : Window
             var quando = File.GetLastWriteTime(caminho);
             var faz = DateTime.Now - quando;
 
-            if (faz.TotalMinutes < 60) return $"há {Math.Max(1, (int)faz.TotalMinutes)} min";
-            if (faz.TotalHours < 24) return $"há {(int)faz.TotalHours} h";
-            if (faz.TotalDays < 30) return $"há {(int)faz.TotalDays} dia(s)";
+            if (faz.TotalMinutes < 60) return Idioma.T("há {0} min", Math.Max(1, (int)faz.TotalMinutes));
+            if (faz.TotalHours < 24) return Idioma.T("há {0} h", (int)faz.TotalHours);
+            if (faz.TotalDays < 30) return Idioma.T("há {0} dia(s)", (int)faz.TotalDays);
             return quando.ToString("dd/MM/yyyy");
         }
         catch { return ""; }
@@ -700,11 +699,11 @@ public class JanelaAbertura : Window
 
         var esquerda = new StackPanel { Orientation = Orientation.Horizontal };
 
-        var abrir = Botao("Abrir…", () =>
+        var abrir = Botao(Idioma.T("Abrir…"), () =>
         {
             var dlg = new Microsoft.Win32.OpenFileDialog
             {
-                Filter = "Projeto do simulador (*.sktch)|*.sktch|Todos os arquivos|*.*",
+                Filter = Idioma.T("Projeto do simulador (*.sktch)|*.sktch|Todos os arquivos|*.*"),
             };
             if (dlg.ShowDialog() == true) EscolherProjeto(dlg.FileName);
         });
@@ -713,7 +712,7 @@ public class JanelaAbertura : Window
         string ultimo = Preferencias.Texto(Preferencias.UltimoProjeto);
         if (!string.IsNullOrWhiteSpace(ultimo) && File.Exists(ultimo))
         {
-            esquerda.Children.Add(Botao("Voltar à última sessão",
+            esquerda.Children.Add(Botao(Idioma.T("Voltar à última sessão"),
                 () => EscolherProjeto(ultimo)));
         }
 
@@ -724,7 +723,7 @@ public class JanelaAbertura : Window
             Orientation = Orientation.Horizontal,
             HorizontalAlignment = HorizontalAlignment.Right,
         };
-        direita.Children.Add(Botao("Roadmap", MostrarRoadmap));
+        direita.Children.Add(Botao(Idioma.T("Roadmap"), MostrarRoadmap));
         DockPanel.SetDock(direita, Dock.Right);
         linha.Children.Add(direita);
 

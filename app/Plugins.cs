@@ -187,7 +187,7 @@ public static class Plugins
             var erros = r.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).Take(3)
                          .Select(d => $"{Path.GetFileName(d.Location.SourceTree?.FilePath ?? "")}"
                                       + $"({d.Location.GetLineSpan().StartLinePosition.Line + 1}): {d.GetMessage()}");
-            return new Plugin { Id = id, Nome = id, Categoria = "Outros", Erro = "não compilou: " + string.Join(" | ", erros) };
+            return new Plugin { Id = id, Nome = id, Categoria = "Outros", Erro = Idioma.T("não compilou: {0}", string.Join(" | ", erros)) };
         }
 
         ms.Position = 0;
@@ -224,6 +224,6 @@ public static class Plugins
                 Formato = exporta is null ? null : Constante("Formato") is { Length: > 0 } formato ? formato : nome,
             };
         }
-        return new Plugin { Id = id, Nome = id, Categoria = "Outros", Erro = "nenhuma classe com \"public const string Nome\"" };
+        return new Plugin { Id = id, Nome = id, Categoria = "Outros", Erro = Idioma.T("nenhuma classe com \"public const string Nome\"") };
     }
 }

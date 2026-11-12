@@ -88,7 +88,7 @@ public sealed class FichaPersonalizada
         // Ficha antiga (sem medidas): o tamanho do motor padrao do tipo.
         double a = MedidaA > 0 ? MedidaA : semEscova ? 22 : 20;
         double b = MedidaB > 0 ? MedidaB : semEscova ? 12 : 25;
-        return new("personalizado", "motor personalizado", semEscova, Volts, RpmOuKv,
+        return new("personalizado", Idioma.N("motor personalizado"), semEscova, Volts, RpmOuKv,
             Resistencia, CorrenteVazio, CorrenteMaxima, Inercia, a, b, Math.Max(1, ParesDePolos));
     }
 }

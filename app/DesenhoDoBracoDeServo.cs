@@ -44,10 +44,10 @@ public partial class EditorCircuito
     public static bool TemBraco(string tipo) => tipo is not null && EixosDosServos.ContainsKey(tipo);
 
     static readonly (string Id, string Nome)[] BracosMicro =
-        [("nenhum", "Nenhum"), ("simples", "Simples"), ("duplo", "Duplo"), ("cruz", "Cruz")];
+        [("nenhum", Idioma.T("Nenhum")), ("simples", Idioma.T("Simples")), ("duplo", Idioma.T("Duplo")), ("cruz", Idioma.T("Cruz"))];
 
     static readonly (string Id, string Nome)[] BracosGrandes =
-        [.. BracosMicro, ("estrela", "Estrela (6 braços)"), ("disco", "Disco")];
+        [.. BracosMicro, ("estrela", Idioma.T("Estrela (6 braços)")), ("disco", Idioma.T("Disco"))];
 
     /// <summary>Os bracos que este servo aceita (vazio: nao e servo).</summary>
     internal static (string Id, string Nome)[] OpcoesDeBraco(string tipo)

@@ -56,7 +56,7 @@ public class JanelaBibliotecas : Window
 
         try { Owner = dono; } catch (InvalidOperationException) { }
 
-        Title = "Bibliotecas";
+        Title = Idioma.T("Bibliotecas");
         Width = 760;
         Height = 620;
         MinWidth = 560;
@@ -72,14 +72,14 @@ public class JanelaBibliotecas : Window
 
         // As abas: o que ja esta aqui, e o indice da Arduino na internet.
         var abas = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 12, 0, 0) };
-        abaInstaladas = Aba("Instaladas e do simulador", () => TrocarAba(false));
-        abaInternet = Aba("Na internet (índice da Arduino)", () => TrocarAba(true));
+        abaInstaladas = Aba(Idioma.T("Instaladas e do simulador"), () => TrocarAba(false));
+        abaInternet = Aba(Idioma.T("Na internet (índice da Arduino)"), () => TrocarAba(true));
         abas.Children.Add(abaInstaladas);
         abas.Children.Add(abaInternet);
         topo.Children.Add(abas);
 
         busca.Style = (Style)Application.Current.FindResource("CampoEscuro");
-        busca.ToolTip = "Procurar biblioteca pelo nome ou pelo #include";
+        busca.ToolTip = Idioma.T("Procurar biblioteca pelo nome ou pelo #include");
         esperaDaBusca = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
         esperaDaBusca.Tick += (_, _) => { esperaDaBusca.Stop(); Preencher(); };
         busca.TextChanged += (_, _) =>
@@ -93,7 +93,7 @@ public class JanelaBibliotecas : Window
         // O mesmo texto-fantasma da busca das configurações. Sem ele o
         // campo era uma faixa vazia sem explicação -- a dica só aparecia
         // parando o mouse em cima, e ninguém para o mouse numa faixa vazia.
-        dica.Text = "Buscar pelo nome ou pelo #include";
+        dica.Text = Idioma.T("Buscar pelo nome ou pelo #include");
         dica.Foreground = Tema.Pincel(Tema.TextoFraco);
         dica.FontSize = 12;
         dica.IsHitTestVisible = false;
@@ -110,7 +110,7 @@ public class JanelaBibliotecas : Window
 
         // A situacao do indice e o andamento do download (so na aba da internet).
         var linhaDaSituacao = new DockPanel { Margin = new Thickness(0, 8, 0, 0) };
-        atualizarIndice = Botao("Atualizar o índice", () => _ = CarregarIndice(atualizar: true));
+        atualizarIndice = Botao(Idioma.T("Atualizar o índice"), () => _ = CarregarIndice(atualizar: true));
         atualizarIndice.Margin = new Thickness(8, 0, 0, 0);
         DockPanel.SetDock(atualizarIndice, Dock.Right);
         linhaDaSituacao.Children.Add(atualizarIndice);
@@ -141,11 +141,11 @@ public class JanelaBibliotecas : Window
             Margin = new Thickness(0, 12, 0, 0),
         };
         DockPanel.SetDock(barra, Dock.Bottom);
-        barra.Children.Add(Botao("Instalar de um .zip…", InstalarZip));
-        barra.Children.Add(Botao("Instalar de uma pasta…", Instalar));
-        barra.Children.Add(Botao("Abrir a pasta das bibliotecas", AbrirPasta));
+        barra.Children.Add(Botao(Idioma.T("Instalar de um .zip…"), InstalarZip));
+        barra.Children.Add(Botao(Idioma.T("Instalar de uma pasta…"), Instalar));
+        barra.Children.Add(Botao(Idioma.T("Abrir a pasta das bibliotecas"), AbrirPasta));
 
-        var fechar = Botao("Fechar", Close);
+        var fechar = Botao(Idioma.T("Fechar"), Close);
         fechar.Margin = new Thickness(0);          // encosta na borda da lista
         DockPanel.SetDock(fechar, Dock.Right);
         barra.Children.Add(fechar);
@@ -178,7 +178,7 @@ public class JanelaBibliotecas : Window
         abaInstaladas.FontWeight = internet ? FontWeights.Normal : FontWeights.SemiBold;
         abaInternet.FontWeight = internet ? FontWeights.SemiBold : FontWeights.Normal;
         blocoDaSituacao.Visibility = internet ? Visibility.Visible : Visibility.Collapsed;
-        dica.Text = internet ? "Buscar no índice da Arduino (nome, #include ou assunto)" : "Buscar pelo nome ou pelo #include";
+        dica.Text = internet ? Idioma.T("Buscar no índice da Arduino (nome, #include ou assunto)") : Idioma.T("Buscar pelo nome ou pelo #include");
         if (internet && indice is null && !carregando) _ = CarregarIndice(atualizar: false);
         Preencher();
     }
@@ -189,7 +189,7 @@ public class JanelaBibliotecas : Window
         if (carregando || instalando) return;
         carregando = true;
         atualizarIndice.IsEnabled = false;
-        situacao.Text = atualizar ? "Baixando o índice da Arduino…" : "Carregando o índice das bibliotecas…";
+        situacao.Text = atualizar ? Idioma.T("Baixando o índice da Arduino…") : Idioma.T("Carregando o índice das bibliotecas…");
         Preencher();
         try
         {
@@ -211,7 +211,7 @@ public class JanelaBibliotecas : Window
         string cache = System.IO.Path.Combine(BibliotecasOnline.PastaDoCache, "library_index.json.gz");
         string quando = System.IO.File.Exists(cache)
             ? System.IO.File.GetLastWriteTime(cache).ToString("dd/MM/yyyy HH:mm") : "agora";
-        return $"Índice da Arduino: {indice?.Quantas ?? 0:N0} bibliotecas (baixado em {quando}).";
+        return Idioma.T("Índice da Arduino: {0:N0} bibliotecas (baixado em {1}).", indice?.Quantas ?? 0, quando);
     }
 
     /// <summary>A aba da internet: o que o sketch pede (sem busca) ou o que a busca acha.</summary>
@@ -219,8 +219,8 @@ public class JanelaBibliotecas : Window
     {
         if (indice is null)
         {
-            lista.Children.Add(Aviso(carregando ? "Carregando o índice…"
-                : "Sem o índice ainda. Com a internet ligada, clique em \"Atualizar o índice\"."));
+            lista.Children.Add(Aviso(carregando ? Idioma.T("Carregando o índice…")
+                : Idioma.T("Sem o índice ainda. Com a internet ligada, clique em \"Atualizar o índice\".")));
             return;
         }
 
@@ -232,14 +232,14 @@ public class JanelaBibliotecas : Window
             var sem = Acervo.SemDono(sketch);
             if (sem.Count == 0)
             {
-                lista.Children.Add(Aviso("Digite o nome da biblioteca, o #include (ex.: Adafruit_BMP280.h) ou um assunto (ex.: ultrassom)."));
+                lista.Children.Add(Aviso(Idioma.T("Digite o nome da biblioteca, o #include (ex.: Adafruit_BMP280.h) ou um assunto (ex.: ultrassom).")));
                 return;
             }
-            lista.Children.Add(Aviso($"Quem fornece o que o sketch pede ({string.Join(", ", sem)}):"));
+            lista.Children.Add(Aviso(Idioma.T("Quem fornece o que o sketch pede ({0}):", string.Join(", ", sem))));
             foreach (string cabecalho in sem)
             {
                 var quem = indice.QuemTem(cabecalho);
-                if (quem.Count == 0) lista.Children.Add(Aviso($"Nenhuma biblioteca do índice fornece <{cabecalho}>."));
+                if (quem.Count == 0) lista.Children.Add(Aviso(Idioma.T("Nenhuma biblioteca do índice fornece <{0}>.", cabecalho)));
                 foreach (var b in quem.Take(3))
                     if (!achadas.Contains(b)) achadas.Add(b);
             }
@@ -249,7 +249,7 @@ public class JanelaBibliotecas : Window
             // O #include primeiro: "DHT.h" acha quem o fornece, e nao so quem tem "DHT" no nome.
             if (filtro.EndsWith(".h", StringComparison.OrdinalIgnoreCase)) achadas.AddRange(indice.QuemTem(filtro));
             achadas.AddRange(indice.Buscar(filtro, 60).Where(b => !achadas.Contains(b)));
-            if (achadas.Count == 0) lista.Children.Add(Aviso("Nenhuma biblioteca do índice com esse nome."));
+            if (achadas.Count == 0) lista.Children.Add(Aviso(Idioma.T("Nenhuma biblioteca do índice com esse nome.")));
         }
 
         var instaladas = Acervo.Instaladas().Select(b => b.Nome).ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -280,7 +280,7 @@ public class JanelaBibliotecas : Window
 
         bool jaTem = instaladas.Contains(b.Nome) || instaladas.Contains(Acervo.NomeLimpo(b.Nome));
         bool doSimulador = b.Cabecalhos.Count > 0 && b.Cabecalhos.All(Acervo.EhDoSimulador);
-        var acao = Botao(doSimulador ? "Já roda" : jaTem ? "Reinstalar" : "Instalar", () => _ = Instalar(b));
+        var acao = Botao(doSimulador ? Idioma.T("Já roda") : jaTem ? Idioma.T("Reinstalar") : Idioma.T("Instalar"), () => _ = Instalar(b));
         acao.Margin = new Thickness(10, 0, 0, 0);
         acao.VerticalAlignment = VerticalAlignment.Center;
         acao.IsEnabled = !instalando && !doSimulador;
@@ -296,7 +296,7 @@ public class JanelaBibliotecas : Window
         titulo.Children.Add(new TextBlock
         {
             Text = $"  {b.Versao}" + (string.IsNullOrWhiteSpace(b.Autor) ? "" : $" · {b.Autor}")
-                   + (doSimulador ? "  · o simulador já tem por dentro" : jaTem ? "  · instalada" : ""),
+                   + (doSimulador ? "  · " + Idioma.T("o simulador já tem por dentro") : jaTem ? "  · " + Idioma.T("instalada") : ""),
             Foreground = Tema.Pincel(doSimulador || jaTem ? Tema.Destaque : Tema.TextoFraco),
             FontSize = 11,
             VerticalAlignment = VerticalAlignment.Center,
@@ -317,8 +317,8 @@ public class JanelaBibliotecas : Window
         coluna.Children.Add(new TextBlock
         {
             Text = Acervo.EmTexto(b.Size)
-                   + (b.Dependencias.Count > 0 ? $" · precisa de: {string.Join(", ", b.Dependencias.Select(d => d.Nome))}" : "")
-                   + (b.Architectures.Count > 0 && !b.Architectures.Contains("*") ? $" · placas: {string.Join(", ", b.Architectures)}" : ""),
+                   + (b.Dependencias.Count > 0 ? Idioma.T(" · precisa de: {0}", string.Join(", ", b.Dependencias.Select(d => d.Nome))) : "")
+                   + (b.Architectures.Count > 0 && !b.Architectures.Contains("*") ? Idioma.T(" · placas: {0}", string.Join(", ", b.Architectures)) : ""),
             Foreground = Tema.Pincel(Tema.TextoFraco), FontSize = 11, Margin = new Thickness(0, 3, 0, 0), TextWrapping = TextWrapping.Wrap,
         });
         linha.Children.Add(coluna);
@@ -337,7 +337,7 @@ public class JanelaBibliotecas : Window
         try { plano = indice.ParaInstalar(alvo, jaInstaladas); }
         catch (Exception e)
         {
-            Avisar(e.Message, "Não deu para instalar");
+            Avisar(e.Message, Idioma.T("Não deu para instalar"));
             return;
         }
         if (plano.Count == 0) return;
@@ -345,9 +345,8 @@ public class JanelaBibliotecas : Window
         string itens = string.Join("\n", plano.Select(b => $"  • {b.Nome} {b.Versao} ({Acervo.EmTexto(b.Size)})"));
         if (!SemPerguntarParaTeste
             && MessageBox.Show(this,
-                $"Baixar de downloads.arduino.cc e instalar:\n\n{itens}\n\nTotal: {Acervo.EmTexto(plano.Sum(b => b.Size))}."
-                + (plano.Count > 1 ? "\n\nAs outras são dependências: a biblioteca não funciona sem elas." : ""),
-                "Instalar biblioteca", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+                Idioma.T("Baixar de downloads.arduino.cc e instalar:\n\n{0}\n\nTotal: {1}.{2}", itens, Acervo.EmTexto(plano.Sum(b => b.Size)), (plano.Count > 1 ? Idioma.T("\n\nAs outras são dependências: a biblioteca não funciona sem elas.") : "")),
+                Idioma.T("Instalar biblioteca"), MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
             return;
 
         instalando = true;
@@ -360,24 +359,23 @@ public class JanelaBibliotecas : Window
             {
                 var b = plano[i];
                 int k = i;
-                situacao.Text = $"Baixando {b.Nome} {b.Versao} ({k + 1} de {plano.Count})…";
+                situacao.Text = Idioma.T("Baixando {0} {1} ({2} de {3})…", b.Nome, b.Versao, k + 1, plano.Count);
                 Preencher();
                 var andamento = new Progress<double>(f => progresso.Value = (k + Math.Clamp(f, 0, 1)) / plano.Count);
                 nomes.Add(await BibliotecasOnline.BaixarEInstalarAsync(Navegador, b, andamento, cancelar.Token));
             }
-            situacao.Text = $"Instalada(s): {string.Join(", ", nomes)}.";
+            situacao.Text = Idioma.T("Instalada(s): {0}.", string.Join(", ", nomes));
             InstaladasParaTeste.AddRange(nomes);
             if (!SemPerguntarParaTeste)
                 MessageBox.Show(this,
-                    $"{string.Join(", ", nomes)}: instalada(s).\n\n"
-                    + "Quando o sketch fizer o #include, o simulador roda o código C++ que vem dentro.",
-                    "Biblioteca instalada", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Idioma.T("{0}: instalada(s).\n\nQuando o sketch fizer o #include, o simulador roda o código C++ que vem dentro.", string.Join(", ", nomes)),
+                    Idioma.T("Biblioteca instalada"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
-        catch (OperationCanceledException) { situacao.Text = "Download cancelado."; }
+        catch (OperationCanceledException) { situacao.Text = Idioma.T("Download cancelado."); }
         catch (Exception e)
         {
-            situacao.Text = (nomes.Count > 0 ? $"Instalada(s): {string.Join(", ", nomes)}. " : "") + "Falhou: " + e.Message;
-            Avisar(e.Message, "Não deu para instalar");
+            situacao.Text = (nomes.Count > 0 ? Idioma.T("Instalada(s): {0}. ", string.Join(", ", nomes)) : "") + "Falhou: " + e.Message;
+            Avisar(e.Message, Idioma.T("Não deu para instalar"));
         }
         finally
         {
@@ -413,8 +411,8 @@ public class JanelaBibliotecas : Window
         coluna.Children.Add(new TextBlock
         {
             Text = sem.Count == 0
-                ? "Este sketch não pede nenhuma biblioteca de fora."
-                : $"O sketch pede {sem.Count} biblioteca(s) que o simulador não executa:",
+                ? Idioma.T("Este sketch não pede nenhuma biblioteca de fora.")
+                : Idioma.T("O sketch pede {0} biblioteca(s) que o simulador não executa:", sem.Count),
             Foreground = Tema.Pincel(sem.Count == 0 ? Tema.TextoFraco : Tema.TextoForte),
             FontSize = 12,
             TextWrapping = TextWrapping.Wrap,
@@ -433,14 +431,13 @@ public class JanelaBibliotecas : Window
             });
             coluna.Children.Add(new TextBlock
             {
-                Text = "Baixe pelo índice da Arduino (o botão abaixo), ou instale a pasta ou o .zip, "
-                       + "como na Arduino IDE: o simulador passa a rodar o código C++ dela.",
+                Text = Idioma.T("Baixe pelo índice da Arduino (o botão abaixo), ou instale a pasta ou o .zip, como na Arduino IDE: o simulador passa a rodar o código C++ dela."),
                 Foreground = Tema.Pincel(Tema.TextoFraco),
                 FontSize = 11,
                 Margin = new Thickness(0, 6, 0, 0),
                 TextWrapping = TextWrapping.Wrap,
             });
-            var procurar = Botao("Procurar na internet", () => { busca.Text = ""; TrocarAba(true); });
+            var procurar = Botao(Idioma.T("Procurar na internet"), () => { busca.Text = ""; TrocarAba(true); });
             procurar.Margin = new Thickness(0, 7, 0, 0);
             procurar.HorizontalAlignment = HorizontalAlignment.Left;
             coluna.Children.Add(procurar);
@@ -460,19 +457,20 @@ public class JanelaBibliotecas : Window
             return;
         }
 
+        // Sem ligar para acento: "radio" acha o "Rádio NRF24L01.".
+        var comparador = System.Globalization.CultureInfo.InvariantCulture.CompareInfo;
+        const System.Globalization.CompareOptions opcoes =
+            System.Globalization.CompareOptions.IgnoreCase | System.Globalization.CompareOptions.IgnoreNonSpace;
+        bool Tem(string texto) => comparador.IndexOf(texto ?? "", filtro, opcoes) >= 0;
         var todas = Acervo.Todas()
-            .Where(b => filtro.Length == 0
-                        || b.Nome.Contains(filtro, StringComparison.OrdinalIgnoreCase)
-                        || b.Cabecalho.Contains(filtro, StringComparison.OrdinalIgnoreCase)
-                        || (b.Classes ?? "").Contains(filtro, StringComparison.OrdinalIgnoreCase)
-                        || (b.Resumo ?? "").Contains(filtro, StringComparison.OrdinalIgnoreCase))
+            .Where(b => filtro.Length == 0 || Tem(b.Nome) || Tem(b.Cabecalho) || Tem(b.Classes) || Tem(b.Resumo))
             .ToList();
 
         if (todas.Count == 0)
         {
             lista.Children.Add(new TextBlock
             {
-                Text = "nenhuma biblioteca com esse nome (procure na aba \"Na internet\")",
+                Text = Idioma.T("nenhuma biblioteca com esse nome (procure na aba \"Na internet\")"),
                 Foreground = Tema.Pincel(Tema.TextoFraco),
                 FontSize = 12,
                 Margin = new Thickness(2, 10, 0, 0),
@@ -499,10 +497,10 @@ public class JanelaBibliotecas : Window
 
         if (!biblioteca.DoSimulador)
         {
-            var tirar = Botao("Remover", () =>
+            var tirar = Botao(Idioma.T("Remover"), () =>
             {
                 if (MessageBox.Show(this,
-                        $"Remover \"{biblioteca.Nome}\" das bibliotecas instaladas?",
+                        Idioma.T("Remover \"{0}\" das bibliotecas instaladas?", biblioteca.Nome),
                         "CircuitSketch", MessageBoxButton.YesNo,
                         MessageBoxImage.Question) != MessageBoxResult.Yes)
                     return;
@@ -510,7 +508,7 @@ public class JanelaBibliotecas : Window
                 try { Acervo.Remover(biblioteca); }
                 catch (Exception e)
                 {
-                    MessageBox.Show(this, e.Message, "Não deu para remover",
+                    MessageBox.Show(this, e.Message, Idioma.T("Não deu para remover"),
                         MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 Preencher();
@@ -533,7 +531,7 @@ public class JanelaBibliotecas : Window
         });
         titulo.Children.Add(new TextBlock
         {
-            Text = biblioteca.DoSimulador ? "  roda no simulador" : "  instalada por você",
+            Text = biblioteca.DoSimulador ? Idioma.T("  roda no simulador") : Idioma.T("  instalada por você"),
             Foreground = Tema.Pincel(biblioteca.DoSimulador ? Tema.Destaque : Tema.TextoFraco),
             FontSize = 11,
             VerticalAlignment = VerticalAlignment.Center,
@@ -562,8 +560,8 @@ public class JanelaBibliotecas : Window
             coluna.Children.Add(new TextBlock
             {
                 Text = biblioteca.DoSimulador
-                    ? "objetos: " + biblioteca.Classes
-                    : $"{biblioteca.Arquivos} cabeçalho(s): {biblioteca.Classes}",
+                    ? Idioma.T("objetos: ") + biblioteca.Classes
+                    : Idioma.T("{0} cabeçalho(s): {1}", biblioteca.Arquivos, biblioteca.Classes),
                 Foreground = Tema.Pincel(Tema.TextoFraco),
                 FontSize = 11,
                 Margin = new Thickness(0, 3, 0, 0),
@@ -579,7 +577,7 @@ public class JanelaBibliotecas : Window
     {
         var dlg = new Microsoft.Win32.OpenFolderDialog
         {
-            Title = "Escolha a pasta da biblioteca (a que tem os .h dentro)",
+            Title = Idioma.T("Escolha a pasta da biblioteca (a que tem os .h dentro)"),
         };
         if (dlg.ShowDialog() != true) return;
 
@@ -589,7 +587,7 @@ public class JanelaBibliotecas : Window
         }
         catch (Exception e)
         {
-            MessageBox.Show(this, e.Message, "Não deu para instalar",
+            MessageBox.Show(this, e.Message, Idioma.T("Não deu para instalar"),
                 MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
@@ -598,8 +596,8 @@ public class JanelaBibliotecas : Window
     {
         var dlg = new Microsoft.Win32.OpenFileDialog
         {
-            Title = "Escolha o .zip da biblioteca (o que o GitHub ou o site dela entrega)",
-            Filter = "Biblioteca compactada (*.zip)|*.zip",
+            Title = Idioma.T("Escolha o .zip da biblioteca (o que o GitHub ou o site dela entrega)"),
+            Filter = Idioma.T("Biblioteca compactada (*.zip)|*.zip"),
         };
         if (dlg.ShowDialog(this) != true) return;
 
@@ -609,7 +607,7 @@ public class JanelaBibliotecas : Window
         }
         catch (Exception e)
         {
-            MessageBox.Show(this, e.Message, "Não deu para instalar",
+            MessageBox.Show(this, e.Message, Idioma.T("Não deu para instalar"),
                 MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
@@ -618,11 +616,9 @@ public class JanelaBibliotecas : Window
     {
         Preencher();
         MessageBox.Show(this,
-            $"\"{nome}\" entrou no acervo.\n\n"
-            + "Quando o sketch fizer o #include dela, o simulador roda o código C++ "
-            + "que vem dentro. Se ela mexer direto nos registradores de um chip "
-            + "específico, o erro diz em que arquivo e linha isso acontece.",
-            "Biblioteca instalada", MessageBoxButton.OK, MessageBoxImage.Information);
+            Idioma.T("\"{0}\" entrou no acervo.\n\nQuando o sketch fizer o #include dela, o simulador roda o código C++ que vem dentro. "
+                     + "Se ela mexer direto nos registradores de um chip específico, o erro diz em que arquivo e linha isso acontece.", nome),
+            Idioma.T("Biblioteca instalada"), MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     void AbrirPasta()
@@ -638,7 +634,7 @@ public class JanelaBibliotecas : Window
         }
         catch (Exception e)
         {
-            MessageBox.Show(this, e.Message, "Não deu para abrir a pasta",
+            MessageBox.Show(this, e.Message, Idioma.T("Não deu para abrir a pasta"),
                 MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }

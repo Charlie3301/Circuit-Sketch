@@ -328,10 +328,10 @@ public partial class EditorCircuito : Border
         // Rodando mas ainda sem a primeira medida: ela sai em menos de um
         // quarto de segundo. Mandar "rode a simulação" aqui era o erro.
         if (energia is null && EmSimulacao)
-            return "multímetro: medindo por onde a corrente passa…";
+            return Idioma.T("multímetro: medindo por onde a corrente passa…");
 
         if (energia is null)
-            return "multímetro: rode a simulação para ver por onde a corrente passa.";
+            return Idioma.T("multímetro: rode a simulação para ver por onde a corrente passa.");
 
         int demais = 0, ok = 0, pouca = 0;
         foreach (var peca in Atual.Pecas)
@@ -344,8 +344,7 @@ public partial class EditorCircuito : Border
             }
         }
 
-        return $"multímetro · amarelo: corrente aceitável ({ok}) · "
-               + $"vermelho: corrente demais ({demais}) · azul: corrente de menos ({pouca})";
+        return Idioma.T("multímetro · amarelo: corrente aceitável ({0}) · vermelho: corrente demais ({1}) · azul: corrente de menos ({2})", ok, demais, pouca);
     }
 
     void AtualizarEnergia(Bancada bancada, Netlist rede)
@@ -2377,9 +2376,9 @@ public partial class EditorCircuito : Border
     /// <summary>Cores em que as mini de 170 sao vendidas.</summary>
     internal static readonly (string id, string nome, string hex)[] CoresDeProtoboard =
     [
-        ("branca", "Branca", "#F0EFE9"), ("vermelha", "Vermelha", "#D94A4A"),
-        ("azul", "Azul", "#3E6FD0"), ("verde", "Verde", "#3FA35C"),
-        ("amarela", "Amarela", "#E8C33A"), ("preta", "Preta", "#3A3A3C"),
+        ("branca", Idioma.T("Branca"), "#F0EFE9"), ("vermelha", Idioma.T("Vermelha"), "#D94A4A"),
+        ("azul", Idioma.T("Azul"), "#3E6FD0"), ("verde", Idioma.T("Verde"), "#3FA35C"),
+        ("amarela", Idioma.T("Amarela"), "#E8C33A"), ("preta", Idioma.T("Preta"), "#3A3A3C"),
     ];
 
     static Color CorDaProtoboard(PecaNoCircuito peca)
@@ -2402,8 +2401,8 @@ public partial class EditorCircuito : Border
     /// <summary>As cores da mascara de solda (e a fenolite, a marrom sem mascara).</summary>
     internal static readonly (string id, string nome, string hex)[] CoresDePcb =
     [
-        ("verde", "Verde", "#1E6B3C"), ("azul", "Azul", "#1F4F9E"), ("preta", "Preta", "#1C1D20"),
-        ("vermelha", "Vermelha", "#A3242A"), ("roxa", "Roxa", "#5B2A86"), ("fenolite", "Fenolite", "#C8955A"),
+        ("verde", Idioma.T("Verde"), "#1E6B3C"), ("azul", Idioma.T("Azul"), "#1F4F9E"), ("preta", Idioma.T("Preta"), "#1C1D20"),
+        ("vermelha", Idioma.T("Vermelha"), "#A3242A"), ("roxa", Idioma.T("Roxa"), "#5B2A86"), ("fenolite", Idioma.T("Fenolite"), "#C8955A"),
     ];
 
     /// <summary>O tamanho da PCB selecionada, em furos: troca o tipo da peca (o tamanho e o tipo).</summary>
@@ -3084,13 +3083,13 @@ public partial class EditorCircuito : Border
 
             string problema = null;
             if (tipoDaPlaca is not ("esp32-s3-devkit" or "esp32-s2-devkit"))
-                problema = "só a ESP32-S3 (e a S2) tem o USB OTG que lê um pendrive";
+                problema = Idioma.T("só a ESP32-S3 (e a S2) tem o USB OTG que lê um pendrive");
             else if (placaMenos != placaMais || gpioMenos != 19 || gpioMais != 20)
-                problema = "o D- vai no GPIO19 e o D+ no GPIO20, que são os pinos do USB OTG";
+                problema = Idioma.T("o D- vai no GPIO19 e o D+ no GPIO20, que são os pinos do USB OTG");
             else if (!rede.AlcancaFonte(Atual, peca.Id, "VBUS", terra: false))
-                problema = "o VBUS precisa dos 5 V da placa";
+                problema = Idioma.T("o VBUS precisa dos 5 V da placa");
             else if (!rede.AlcancaFonte(Atual, peca.Id, "GND", terra: true))
-                problema = "o GND do pendrive não está ligado";
+                problema = Idioma.T("o GND do pendrive não está ligado");
 
             yield return (peca, placa is null ? null : bancada.De(placa), problema);
         }
@@ -4604,7 +4603,7 @@ public partial class EditorCircuito : Border
     }
 
     static string TextoDaAnotacao(PecaNoCircuito peca)
-        => string.IsNullOrWhiteSpace(peca.Nome) ? "escreva aqui" : peca.Nome;
+        => string.IsNullOrWhiteSpace(peca.Nome) ? Idioma.T("escreva aqui") : peca.Nome;
 
     /// <summary>
     /// Quanto cada anotacao ocupa depois de medida.
@@ -5233,9 +5232,9 @@ public partial class EditorCircuito : Border
     /// <summary>As cores das ESCs (o termo-retratil da simples, a placa da 4-em-1).</summary>
     internal static readonly (string id, string nome, string hex)[] CoresDeEsc =
     [
-        ("azul", "Azul", "#1f5fb4"), ("preto", "Preto", "#26282c"), ("vermelho", "Vermelho", "#c0392b"),
-        ("verde", "Verde", "#1e8449"), ("roxo", "Roxo", "#6c3483"), ("laranja", "Laranja", "#d35400"),
-        ("rosa", "Rosa", "#d6337a"),
+        ("azul", Idioma.T("Azul"), "#1f5fb4"), ("preto", Idioma.T("Preto"), "#26282c"), ("vermelho", Idioma.T("Vermelho"), "#c0392b"),
+        ("verde", Idioma.T("Verde"), "#1e8449"), ("roxo", Idioma.T("Roxo"), "#6c3483"), ("laranja", Idioma.T("Laranja"), "#d35400"),
+        ("rosa", Idioma.T("Rosa"), "#d6337a"),
     ];
 
     /// <summary>As correntes que cada ESC tem desenho (as das lojas).</summary>

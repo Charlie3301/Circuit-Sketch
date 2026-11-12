@@ -16,9 +16,7 @@ public sealed partial class Energia
     public IReadOnlyDictionary<string, double> Tensoes => tensaoPorNo;
 
     internal string Diagnostico()
-        => $"{nos.Count} nos, {fontes.Count} fontes, {ramos.Count} ramos: "
-           + string.Join(" | ", fontes.Select(f => $"no{f.No}={f.Tensao:0.0}V/{f.Resistencia:0.##}"))
-           + " || " + string.Join(" | ", ramos.Select(r => $"{r.A}-{r.B} {r.Resistencia:0}ohm"));
+        => Idioma.T("{0} nos, {1} fontes, {2} ramos: {3} || {4}", nos.Count, fontes.Count, ramos.Count, string.Join(" | ", fontes.Select(f => $"no{f.No}={f.Tensao:0.0}V/{f.Resistencia:0.##}")), string.Join(" | ", ramos.Select(r => Idioma.T("{0}-{1} {2:0}ohm", r.A, r.B, r.Resistencia))));
     public IReadOnlyDictionary<string, double> CorrentesDePeca => correntePorPeca;
 
     public double TensaoDoNo(string raiz)
@@ -273,8 +271,7 @@ public sealed partial class Energia
                 && LigadoEmTrilhoDePlaca(peca.Id, def.Logica) && !GndDePlaca(peca.Id, def.Terra))
             {
                 AvisosDosDrivers.Add(new Estouro(peca.Id,
-                    $"o {def.Nome} tira a logica ({def.Logica}) da placa, mas o GND dele nao esta ligado no GND da placa: "
-                    + "a corrente nao tem por onde voltar, e a logica fica sem energia. Ligue os dois GND.",
+                    Idioma.T("o {0} tira a logica ({1}) da placa, mas o GND dele nao esta ligado no GND da placa: a corrente nao tem por onde voltar, e a logica fica sem energia. Ligue os dois GND.", def.Nome, def.Logica),
                     Queimou: false));
                 continue;
             }
@@ -282,7 +279,7 @@ public sealed partial class Energia
             if (vPotencia > def.PotenciaMaxima * 1.1)
             {
                 AvisosDosDrivers.Add(new Estouro(peca.Id,
-                    $"o {def.Nome} recebeu {vPotencia:0.#} V no {def.Potencia}, e o maximo dele e {def.PotenciaMaxima:0.#} V: queimou."));
+                    Idioma.T("o {0} recebeu {1:0.#} V no {2}, e o maximo dele e {3:0.#} V: queimou.", def.Nome, vPotencia, def.Potencia, def.PotenciaMaxima)));
                 continue;
             }
             if (vLogica < def.LogicaMinima)
@@ -290,12 +287,8 @@ public sealed partial class Energia
                 // So reclama quando ha energia no motor: sem nada ligado, nao ha o que avisar.
                 if (vPotencia > 1 && def.Logica is not null)
                     AvisosDosDrivers.Add(new Estouro(peca.Id, peca.Tipo == "l298n"
-                        ? $"o L298N esta com {vPotencia:0.#} V no 12V, e abaixo de 7 V o regulador dele nao faz os 5 V da logica: "
-                          + "ligue os 5 V da placa no pino 5V do modulo (com o GND em comum)."
-                        : $"o {def.Nome} esta sem a alimentacao logica: o pino {def.Logica} precisa de pelo menos "
-                          + $"{def.LogicaMinima:0.#} V ("
-                          + (def.LogicaMinima > 3.3 ? "os 5 V da placa, no VIN -- os 3,3 V nao bastam" : "os 3,3 V ou os 5 V da placa")
-                          + ").",
+                        ? Idioma.T("o L298N esta com {0:0.#} V no 12V, e abaixo de 7 V o regulador dele nao faz os 5 V da logica: ligue os 5 V da placa no pino 5V do modulo (com o GND em comum).", vPotencia)
+                        : Idioma.T("o {0} esta sem a alimentacao logica: o pino {1} precisa de pelo menos {2:0.#} V ({3}).", def.Nome, def.Logica, def.LogicaMinima, (def.LogicaMinima > 3.3 ? Idioma.T("os 5 V da placa, no VIN -- os 3,3 V nao bastam") : Idioma.T("os 3,3 V ou os 5 V da placa"))),
                         Queimou: false));
                 continue;
             }
@@ -303,7 +296,7 @@ public sealed partial class Energia
             {
                 if (vPotencia > 0.5)
                     AvisosDosDrivers.Add(new Estouro(peca.Id,
-                        $"o {def.Nome} precisa de pelo menos {def.PotenciaMinima:0.#} V no {def.Potencia} e esta com {vPotencia:0.#} V: as saidas nao ligam.",
+                        Idioma.T("o {0} precisa de pelo menos {1:0.#} V no {2} e esta com {3:0.#} V: as saidas nao ligam.", def.Nome, def.PotenciaMinima, def.Potencia, vPotencia),
                         Queimou: false));
                 continue;
             }
@@ -325,8 +318,7 @@ public sealed partial class Energia
 
             if (semGndComum)
                 AvisosDosDrivers.Add(new Estouro(peca.Id,
-                    $"o {def.Nome} recebe os sinais da placa, mas o GND dele nao esta ligado no GND da placa: "
-                    + "sem a referencia em comum, ele nao entende o HIGH e o LOW. Ligue os dois GND.",
+                    Idioma.T("o {0} recebe os sinais da placa, mas o GND dele nao esta ligado no GND da placa: sem a referencia em comum, ele nao entende o HIGH e o LOW. Ligue os dois GND.", def.Nome),
                     Queimou: false));
         }
     }

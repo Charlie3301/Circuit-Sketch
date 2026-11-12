@@ -151,11 +151,11 @@ public sealed class ChipsNoCircuito
                 alvo.Interpretador.Preparar();
 
                 if (!alvo.Interpretador.EhChip())
-                    alvo.Erro = $"{chip.Nome}: falta chipInit() ou chipLoop() no .chip.ino.";
+                    alvo.Erro = Idioma.T("{0}: falta chipInit() ou chipLoop() no .chip.ino.", chip.Nome);
                 else
                     alvo.Interpretador.IniciarChip();
             }
-            catch (ErroDeSintaxe e) { alvo.Erro = $"{chip.Nome}: linha {e.Linha}: {e.Message}"; }
+            catch (ErroDeSintaxe e) { alvo.Erro = Idioma.T("{0}: linha {1}: {2}", chip.Nome, e.Linha, e.Message); }
             catch (ErroDeExecucao e) { alvo.Erro = $"{chip.Nome}: {e.Message}"; }
 
             rodando[peca.Id] = alvo;

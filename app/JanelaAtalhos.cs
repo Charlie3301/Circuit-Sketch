@@ -10,7 +10,7 @@ public class JanelaAtalhos : Window
     {
         try { Owner = dono; } catch (InvalidOperationException) { }
 
-        Title = "Atalhos do teclado";
+        Title = Idioma.T("Atalhos do teclado");
         Width = 520;
         Height = 560;
         ResizeMode = ResizeMode.NoResize;
@@ -21,8 +21,7 @@ public class JanelaAtalhos : Window
 
         coluna.Children.Add(new TextBlock
         {
-            Text = "Clique em Trocar e aperte a tecla. Rodando um circuito com "
-                 + "teclas vinculadas às peças, os atalhos de uma tecla só ficam calados.",
+            Text = Idioma.T("Clique em Trocar e aperte a tecla. Rodando um circuito com teclas vinculadas às peças, os atalhos de uma tecla só ficam calados."),
             Foreground = Tema.Pincel(Tema.TextoFraco),
             FontSize = 12,
             TextWrapping = TextWrapping.Wrap,
@@ -41,7 +40,7 @@ public class JanelaAtalhos : Window
 
         var voltar = new Button
         {
-            Content = "Voltar ao padrão",
+            Content = Idioma.T("Voltar ao padrão"),
             Style = (Style)FindResource("BotaoPequeno"),
             Margin = new Thickness(0, 0, 8, 0),
         };
@@ -54,7 +53,7 @@ public class JanelaAtalhos : Window
 
         var fechar = new Button
         {
-            Content = "Fechar",
+            Content = Idioma.T("Fechar"),
             Style = (Style)FindResource("BotaoPequeno"),
         };
         fechar.Click += (_, _) => Close();
@@ -85,7 +84,7 @@ public class JanelaAtalhos : Window
 
         var trocar = new Button
         {
-            Content = "Trocar",
+            Content = Idioma.T("Trocar"),
             Style = (Style)FindResource("BotaoPequeno"),
             Width = 70,
         };
@@ -117,7 +116,7 @@ public class JanelaAtalhos : Window
 
         trocar.Click += (_, _) =>
         {
-            trocar.Content = "aperte…";
+            trocar.Content = Idioma.T("aperte…");
             atual.Text = "…";
 
             void Pegar(object _, KeyEventArgs ev)
@@ -129,7 +128,7 @@ public class JanelaAtalhos : Window
                     or Key.LeftShift or Key.RightShift) return;
 
                 PreviewKeyDown -= Pegar;
-                trocar.Content = "Trocar";
+                trocar.Content = Idioma.T("Trocar");
 
                 if (tecla == Key.Escape)
                 {
@@ -143,8 +142,8 @@ public class JanelaAtalhos : Window
                 {
                     atual.Text = AtalhosDoPrograma.Rotulo(acao.Id);
                     MessageBox.Show(this,
-                        $"{AtalhosDoPrograma.Rotulo(tecla, mods)} já é de \"{conflito}\".",
-                        "Atalho ocupado", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Idioma.T("{0} já é de \"{1}\".", AtalhosDoPrograma.Rotulo(tecla, mods), conflito),
+                        Idioma.T("Atalho ocupado"), MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 

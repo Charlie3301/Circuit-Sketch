@@ -115,6 +115,10 @@ public static class Demos
     }
 
     /// <summary>O submenu da demo em "Exemplos prontos".</summary>
+    /// <summary>O grupo como aparece no menu (a chave fica em portugues).</summary>
+    public static string NomeDoGrupo(string grupo)
+        => grupo == GrupoDasLinguagens ? Idioma.T("Linguagens") : Catalogo.NomeDaFamilia(grupo);
+
     public static string GrupoDe(Demo demo)
         => demo.Grupo ?? Catalogo.Familia(TipoDaPlaca(demo)) ?? "Outras";
 
@@ -154,79 +158,79 @@ public static class Demos
     public static readonly Demo[] Todas =
     [
         // ---- ESP32 ----
-        new("esp32-semaforo",         "Semáforo",          "ESP32"),
-        new("esp32-wifi-servidor",    "Servidor web (WiFi)", "ESP32"),
+        new("esp32-semaforo",         Idioma.T("Semáforo"),          "ESP32"),
+        new("esp32-wifi-servidor",    Idioma.T("Servidor web (WiFi)"), "ESP32"),
         new("esp32-mqtt",             "MQTT",              "ESP32"),
-        new("esp32-bluetooth",        "Controle por Bluetooth", "ESP32"),
-        new("esp32-espnow",           "ESP-NOW: duas placas conversando", "ESP32"),
-        new("esp32s2-relogio-ntp", "Relógio pela internet (NTP) no OLED", "ESP32-S2 DevKit"),
-        new("esp32s3-anel-neopixel", "Anel NeoPixel com três efeitos", "ESP32-S3 DevKit"),
-        new("esp32s3-base-zero", "BASE ZERO: jogo 3D no estilo DOOM", "ESP32-S3 DevKit"),
-        new("esp32s3-doom", "ESP32-DOOM: o DOOM de verdade (PrBoom, em C)", "ESP32-S3 DevKit"),
-        new("esp32s3-player-dap", "Player de música (DAP): cartão, pendrive, roda e bateria", "ESP32-S3 DevKit"),
-        new("esp32c3-estufa", "Estufa: DHT22, janela com servo e LCD", "ESP32-C3 DevKit"),
-        new("esp32c3-ble-lampada", "Lâmpada BLE: o celular controla pelo Bluetooth LE", "ESP32-C3 DevKit"),
-        new("esp32c6-alarme", "Alarme com sensor de presença", "ESP32-C6 DevKit"),
-        new("esp32h2-estacionamento", "Sensor de estacionamento (ultrassom)", "ESP32-H2 DevKit"),
+        new("esp32-bluetooth",        Idioma.T("Controle por Bluetooth"), "ESP32"),
+        new("esp32-espnow",           Idioma.T("ESP-NOW: duas placas conversando"), "ESP32"),
+        new("esp32s2-relogio-ntp", Idioma.T("Relógio pela internet (NTP) no OLED"), "ESP32-S2 DevKit"),
+        new("esp32s3-anel-neopixel", Idioma.T("Anel NeoPixel com três efeitos"), "ESP32-S3 DevKit"),
+        new("esp32s3-base-zero", Idioma.T("BASE ZERO: jogo 3D no estilo DOOM"), "ESP32-S3 DevKit"),
+        new("esp32s3-doom", Idioma.T("ESP32-DOOM: o DOOM de verdade (PrBoom, em C)"), "ESP32-S3 DevKit"),
+        new("esp32s3-player-dap", Idioma.T("Player de música (DAP): cartão, pendrive, roda e bateria"), "ESP32-S3 DevKit"),
+        new("esp32c3-estufa", Idioma.T("Estufa: DHT22, janela com servo e LCD"), "ESP32-C3 DevKit"),
+        new("esp32c3-ble-lampada", Idioma.T("Lâmpada BLE: o celular controla pelo Bluetooth LE"), "ESP32-C3 DevKit"),
+        new("esp32c6-alarme", Idioma.T("Alarme com sensor de presença"), "ESP32-C6 DevKit"),
+        new("esp32h2-estacionamento", Idioma.T("Sensor de estacionamento (ultrassom)"), "ESP32-H2 DevKit"),
 
         // ---- ESP8266 ----
-        new("nodemcu-servidor", "Servidor web: LED e botão na página", "NodeMCU (ESP8266)"),
-        new("esp01-tomada-mqtt", "Tomada inteligente por MQTT", "ESP-01"),
+        new("nodemcu-servidor", Idioma.T("Servidor web: LED e botão na página"), "NodeMCU (ESP8266)"),
+        new("esp01-tomada-mqtt", Idioma.T("Tomada inteligente por MQTT"), "ESP-01"),
         new("esp02-campainha", "Campainha musical", "ESP-02"),
-        new("esp03-termo-higrometro", "Termo-higrômetro com DHT11", "ESP-03"),
-        new("esp04-semaforo-pedestre", "Semáforo com botão de pedestre", "ESP-04"),
-        new("esp05-calculadora", "Calculadora pela serial (com analisador no TX)", "ESP-05"),
-        new("esp06-genius", "Jogo Genius", "ESP-06"),
-        new("esp07-scanner-wifi", "Scanner de redes WiFi com barra de sinal", "ESP-07"),
-        new("esp08-reflexo", "Jogo de reflexo", "ESP-08"),
-        new("esp09-dado", "Dado eletrônico", "ESP-09"),
-        new("esp10-ponte-serial-web", "Ponte entre a serial e uma página web", "ESP-10"),
-        new("esp11-minuteria", "Minuteria de escada", "ESP-11"),
-        new("esp12-balanca", "Balança com HX711 e OLED", "ESP-12"),
-        new("esp12e-rgb-navegador", "Cor do LED RGB pelo navegador", "ESP-12E"),
-        new("esp12f-luminaria-mqtt", "Luminária NeoPixel por MQTT", "ESP-12F"),
-        new("esp13-fechadura", "Fechadura com teclado e senha", "ESP-13"),
-        new("esp14-placar", "Placar no anel de LEDs, pelo MQTT", "ESP-14"),
+        new("esp03-termo-higrometro", Idioma.T("Termo-higrômetro com DHT11"), "ESP-03"),
+        new("esp04-semaforo-pedestre", Idioma.T("Semáforo com botão de pedestre"), "ESP-04"),
+        new("esp05-calculadora", Idioma.T("Calculadora pela serial (com analisador no TX)"), "ESP-05"),
+        new("esp06-genius", Idioma.T("Jogo Genius"), "ESP-06"),
+        new("esp07-scanner-wifi", Idioma.T("Scanner de redes WiFi com barra de sinal"), "ESP-07"),
+        new("esp08-reflexo", Idioma.T("Jogo de reflexo"), "ESP-08"),
+        new("esp09-dado", Idioma.T("Dado eletrônico"), "ESP-09"),
+        new("esp10-ponte-serial-web", Idioma.T("Ponte entre a serial e uma página web"), "ESP-10"),
+        new("esp11-minuteria", Idioma.T("Minuteria de escada"), "ESP-11"),
+        new("esp12-balanca", Idioma.T("Balança com HX711 e OLED"), "ESP-12"),
+        new("esp12e-rgb-navegador", Idioma.T("Cor do LED RGB pelo navegador"), "ESP-12E"),
+        new("esp12f-luminaria-mqtt", Idioma.T("Luminária NeoPixel por MQTT"), "ESP-12F"),
+        new("esp13-fechadura", Idioma.T("Fechadura com teclado e senha"), "ESP-13"),
+        new("esp14-placar", Idioma.T("Placar no anel de LEDs, pelo MQTT"), "ESP-14"),
 
         // ---- Arduino ----
-        new("uno-botao",              "Botão e LED",       "Arduino Uno"),
-        new("uno-analisador",         "Analisador lógico: PWM, som, servo, serial e shiftOut", "Arduino Uno"),
-        new("mega-barra",             "Barra de LEDs",     "Arduino Mega"),
-        new("nano-potenciometro",     "Potenciômetro",     "Arduino Nano"),
+        new("uno-botao",              Idioma.T("Botão e LED"),       "Arduino Uno"),
+        new("uno-analisador",         Idioma.T("Analisador lógico: PWM, som, servo, serial e shiftOut"), "Arduino Uno"),
+        new("mega-barra",             Idioma.T("Barra de LEDs"),     "Arduino Mega"),
+        new("nano-potenciometro",     Idioma.T("Potenciômetro"),     "Arduino Nano"),
         new("rp2040-servo",           "Servo",             "Nano RP2040"),
-        new("franzininho-vela", "Vela eletrônica", "Franzininho"),
-        new("attiny85-luz-noturna", "Luz noturna automática", "ATtiny85"),
+        new("franzininho-vela", Idioma.T("Vela eletrônica"), "Franzininho"),
+        new("attiny85-luz-noturna", Idioma.T("Luz noturna automática"), "ATtiny85"),
 
         // ---- Raspberry Pi ----
         //
         // A Pico e a Pico W tem tres demos cada, uma por jeito de
         // programa-las: o core do Arduino, o MicroPython e o SDK em C.
-        new("pico-piano", "Piano de oito teclas (Arduino)", "Raspberry Pi Pico"),
-        new("pico-joystick-oled", "Joystick e OLED (MicroPython)", "Raspberry Pi Pico"),
-        new("pico-sdk-respirar", "LED respirando com PWM (SDK em C)", "Raspberry Pi Pico"),
-        new("picow-estacao-web", "Estação do tempo na web (Arduino)", "Raspberry Pi Pico W"),
-        new("picow-mqtt", "MQTT em MicroPython", "Raspberry Pi Pico W"),
-        new("picow-sdk-voltimetro", "Voltímetro com o ADC (SDK em C)", "Raspberry Pi Pico W"),
+        new("pico-piano", Idioma.T("Piano de oito teclas (Arduino)"), "Raspberry Pi Pico"),
+        new("pico-joystick-oled", Idioma.T("Joystick e OLED (MicroPython)"), "Raspberry Pi Pico"),
+        new("pico-sdk-respirar", Idioma.T("LED respirando com PWM (SDK em C)"), "Raspberry Pi Pico"),
+        new("picow-estacao-web", Idioma.T("Estação do tempo na web (Arduino)"), "Raspberry Pi Pico W"),
+        new("picow-mqtt", Idioma.T("MQTT em MicroPython"), "Raspberry Pi Pico W"),
+        new("picow-sdk-voltimetro", Idioma.T("Voltímetro com o ADC (SDK em C)"), "Raspberry Pi Pico W"),
 
         // ---- STM32 ----
-        new("stm32-blink",            "LED e botão",       "STM32 Blue Pill"),
-        new("nucleo-l031-termometro", "Termômetro com NTC e alarme", "ST Nucleo-L031K6"),
-        new("nucleo-c031-relogio-rtc", "Relógio com RTC e LCD", "ST Nucleo-C031C6"),
+        new("stm32-blink",            Idioma.T("LED e botão"),       "STM32 Blue Pill"),
+        new("nucleo-l031-termometro", Idioma.T("Termômetro com NTC e alarme"), "ST Nucleo-L031K6"),
+        new("nucleo-c031-relogio-rtc", Idioma.T("Relógio com RTC e LCD"), "ST Nucleo-C031C6"),
 
         // ---- uma por linguagem ----
         //
         // Cada uma faz um projeto que combina com ela, e nao mais o mesmo
         // pisca-pisca: os contratos do SPARK, os bits do Cowgol, o PORTB
         // inteiro num OUT do Assembly.
-        new("ada-semaforo", "Semáforo em Ada", "Arduino Uno", GrupoDasLinguagens),
-        new("spark-termostato", "Termostato com contratos em SPARK", "Arduino Uno", GrupoDasLinguagens),
-        new("cowgol-contador", "Contador de apertos em Cowgol", "Arduino Uno", GrupoDasLinguagens),
-        new("millipascal-respirar", "LED respirando em Millipascal", "Arduino Uno", GrupoDasLinguagens),
-        new("rust-sirene", "Sirene em Rust", "Arduino Uno", GrupoDasLinguagens),
-        new("csharp-medidor-de-luz", "Medidor de luz em C#", "ESP32", GrupoDasLinguagens),
+        new("ada-semaforo", Idioma.T("Semáforo em Ada"), "Arduino Uno", GrupoDasLinguagens),
+        new("spark-termostato", Idioma.T("Termostato com contratos em SPARK"), "Arduino Uno", GrupoDasLinguagens),
+        new("cowgol-contador", Idioma.T("Contador de apertos em Cowgol"), "Arduino Uno", GrupoDasLinguagens),
+        new("millipascal-respirar", Idioma.T("LED respirando em Millipascal"), "Arduino Uno", GrupoDasLinguagens),
+        new("rust-sirene", Idioma.T("Sirene em Rust"), "Arduino Uno", GrupoDasLinguagens),
+        new("csharp-medidor-de-luz", Idioma.T("Medidor de luz em C#"), "ESP32", GrupoDasLinguagens),
 
         // O Assembly e AVR: so roda num ATmega.
-        new("assembly-contador", "Contador binário em Assembly", "Arduino Uno", GrupoDasLinguagens),
+        new("assembly-contador", Idioma.T("Contador binário em Assembly"), "Arduino Uno", GrupoDasLinguagens),
     ];
 
     /// <summary>

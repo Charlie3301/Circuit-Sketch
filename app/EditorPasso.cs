@@ -111,22 +111,22 @@ public partial class EditorCircuito
         // ---- o que travou, em palavras ----
         if (gpioStep < 0) return;
         if (vmot > def.VmotMaxima * 1.1)
-            avisosDePasso.Add(new Estouro(peca.Id, $"o {def.Nome} recebeu {vmot:0.#} V no VMOT, e o maximo dele e {def.VmotMaxima:0} V: queimou."));
+            avisosDePasso.Add(new Estouro(peca.Id, Idioma.T("o {0} recebeu {1:0.#} V no VMOT, e o maximo dele e {2:0} V: queimou.", def.Nome, vmot, def.VmotMaxima)));
         else if (vmot < def.VmotMinima)
             avisosDePasso.Add(new Estouro(peca.Id,
                 vmot < 0.5
-                    ? $"o {def.Nome} esta sem alimentacao no VMOT: o motor precisa de uma fonte de {def.VmotMinima:0.#} V ou mais ali (o + dela no VMOT, o - no GND)."
-                    : $"o {def.Nome} esta com {vmot:0.#} V no VMOT, e o minimo dele e {def.VmotMinima:0.#} V: com menos, ele nao liga (os 5 V da placa nao bastam).",
+                    ? Idioma.T("o {0} esta sem alimentacao no VMOT: o motor precisa de uma fonte de {1:0.#} V ou mais ali (o + dela no VMOT, o - no GND).", def.Nome, def.VmotMinima)
+                    : Idioma.T("o {0} esta com {1:0.#} V no VMOT, e o minimo dele e {2:0.#} V: com menos, ele nao liga (os 5 V da placa nao bastam).", def.Nome, vmot, def.VmotMinima),
                 Queimou: false));
         else if (def.Vdd is not null && vdd < 3.0)
-            avisosDePasso.Add(new Estouro(peca.Id, $"o {def.Nome} esta sem a logica: o VDD precisa dos 3,3 V ou 5 V da placa.", Queimou: false));
+            avisosDePasso.Add(new Estouro(peca.Id, Idioma.T("o {0} esta sem a logica: o VDD precisa dos 3,3 V ou 5 V da placa.", def.Nome), Queimou: false));
         else if (rst != 1)
             avisosDePasso.Add(new Estouro(peca.Id, rst < 0
-                ? $"o RST do {def.Nome} esta solto: ele fica em reset e o motor nao anda. Ligue o RST no SLP (o jeito do esquema da Pololu) ou num pino em HIGH."
-                : $"o RST do {def.Nome} esta em LOW: o driver fica em reset e o motor nao anda.", Queimou: false));
+                ? Idioma.T("o RST do {0} esta solto: ele fica em reset e o motor nao anda. Ligue o RST no SLP (o jeito do esquema da Pololu) ou num pino em HIGH.", def.Nome)
+                : Idioma.T("o RST do {0} esta em LOW: o driver fica em reset e o motor nao anda.", def.Nome), Queimou: false));
         else if (!gnd)
             avisosDePasso.Add(new Estouro(peca.Id,
-                $"o GND do {def.Nome} nao esta ligado no GND da placa: sem a referencia em comum, ele nao ve os pulsos do STEP.",
+                Idioma.T("o GND do {0} nao esta ligado no GND da placa: sem a referencia em comum, ele nao ve os pulsos do STEP.", def.Nome),
                 Queimou: false));
     }
 
@@ -177,8 +177,7 @@ public partial class EditorCircuito
                 if (driver is null) { anguloPorDriver.Remove(motor.Id); continue; }
                 if (misturado)
                     avisosDePasso.Add(new Estouro(motor.Id,
-                        "as bobinas do motor de passo estao misturadas nas saidas do driver: cada par (1A/1B, 2A/2B) "
-                        + "tem que ser UMA bobina (A+ e A-, ou B+ e B-). Assim o motor so treme.", Queimou: false));
+                        Idioma.T("as bobinas do motor de passo estao misturadas nas saidas do driver: cada par (1A/1B, 2A/2B) tem que ser UMA bobina (A+ e A-, ou B+ e B-). Assim o motor so treme."), Queimou: false));
                 double passos = contadoresDePasso.TryGetValue(driver.Id, out var c) ? c.Passos : 0;
                 anguloPorDriver[motor.Id] = misturado ? 0 : sentido * passos * EixoDePasso.GrausPorPassoNema;
             }
@@ -221,8 +220,7 @@ public partial class EditorCircuito
         {
             if (fases.Any(f => rede.PinoDe(Atual, motor.Id, f).Gpio >= 0))
                 avisosDePasso.Add(new Estouro(motor.Id,
-                    "o 28BYJ-48 esta com as fases direto nos GPIOs: cada bobina pede ~80 mA e a porta nao chaveia isso. "
-                    + "Ligue o motor no ULN2003 (o conector de 5 fios) e os IN1..IN4 nos GPIOs.", Queimou: false));
+                    Idioma.T("o 28BYJ-48 esta com as fases direto nos GPIOs: cada bobina pede ~80 mA e a porta nao chaveia isso. Ligue o motor no ULN2003 (o conector de 5 fios) e os IN1..IN4 nos GPIOs."), Queimou: false));
             return;
         }
 
@@ -233,11 +231,11 @@ public partial class EditorCircuito
         bool gnd = GndComumComPlaca(uln, "-", rede);
         if (!alimentado)
             avisosDePasso.Add(new Estouro(uln.Id,
-                "o 28BYJ-48 precisa do fio vermelho no + do ULN2003, e de 5 V ali (o + e o - da placa do driver na fonte).",
+                Idioma.T("o 28BYJ-48 precisa do fio vermelho no + do ULN2003, e de 5 V ali (o + e o - da placa do driver na fonte)."),
                 Queimou: false));
         else if (!gnd)
             avisosDePasso.Add(new Estouro(uln.Id,
-                "o - do ULN2003 nao esta no GND da placa: sem a referencia em comum, as entradas IN1..IN4 nao ligam as fases.",
+                Idioma.T("o - do ULN2003 nao esta no GND da placa: sem a referencia em comum, as entradas IN1..IN4 nao ligam as fases."),
                 Queimou: false));
 
         if (maq is null || !alimentado || !gnd) return;

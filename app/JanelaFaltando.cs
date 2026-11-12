@@ -35,7 +35,7 @@ public class JanelaFaltando : Window
 
         try { Owner = dono; } catch (InvalidOperationException) { }
 
-        Title = "Falta biblioteca";
+        Title = Idioma.T("Falta biblioteca");
         Width = 620;
         SizeToContent = SizeToContent.Height;
         MaxHeight = 620;
@@ -53,8 +53,8 @@ public class JanelaFaltando : Window
         topo.Children.Add(new TextBlock
         {
             Text = faltando.Count == 1
-                ? "O sketch pede uma biblioteca que o simulador não tem."
-                : $"O sketch pede {faltando.Count} bibliotecas que o simulador não tem.",
+                ? Idioma.T("O sketch pede uma biblioteca que o simulador não tem.")
+                : Idioma.T("O sketch pede {0} bibliotecas que o simulador não tem.", faltando.Count),
             Foreground = Tema.Pincel(Tema.TextoForte),
             FontSize = 14,
             FontWeight = FontWeights.SemiBold,
@@ -64,12 +64,8 @@ public class JanelaFaltando : Window
         topo.Children.Add(new TextBlock
         {
             Text = linguagem == Linguagem.MicroPython
-                ? "Em MicroPython os módulos vêm dentro do firmware da placa: não há "
-                  + "pasta para instalar. O simulador implementa os que implementa, e "
-                  + "os que faltam estão listados abaixo."
-                : "Baixe pelo índice oficial da Arduino (o mesmo da Arduino IDE; a internet só é "
-                  + "usada para isso), ou, se a biblioteca já está na Arduino IDE deste computador, "
-                  + "copie daqui mesmo.",
+                ? Idioma.T("Em MicroPython os módulos vêm dentro do firmware da placa: não há pasta para instalar. O simulador implementa os que implementa, e os que faltam estão listados abaixo.")
+                : Idioma.T("Baixe pelo índice oficial da Arduino (o mesmo da Arduino IDE; a internet só é usada para isso), ou, se a biblioteca já está na Arduino IDE deste computador, copie daqui mesmo."),
             Foreground = Tema.Pincel(Tema.TextoFraco),
             FontSize = 12,
             Margin = new Thickness(0, 6, 0, 0),
@@ -87,10 +83,10 @@ public class JanelaFaltando : Window
         };
         DockPanel.SetDock(barra, Dock.Bottom);
 
-        barra.Children.Add(Botao("Procurar numa pasta…", ProcurarNaMao, destaque: false));
-        barra.Children.Add(Botao("Rodar assim mesmo", () => { Prosseguir = true; Close(); },
+        barra.Children.Add(Botao(Idioma.T("Procurar numa pasta…"), ProcurarNaMao, destaque: false));
+        barra.Children.Add(Botao(Idioma.T("Rodar assim mesmo"), () => { Prosseguir = true; Close(); },
                                  destaque: false));
-        barra.Children.Add(Botao("Cancelar", Close, destaque: true));
+        barra.Children.Add(Botao(Idioma.T("Cancelar"), Close, destaque: true));
 
         raiz.Children.Add(barra);
 
@@ -133,7 +129,7 @@ public class JanelaFaltando : Window
         // espaco que pediu, e o texto ao lado ocupa o resto.
         if (f.DoProjeto)
         {
-            var criar = Botao("Criar o arquivo", () => Criar(f), destaque: true);
+            var criar = Botao(Idioma.T("Criar o arquivo"), () => Criar(f), destaque: true);
             criar.Margin = new Thickness(12, 0, 0, 0);
             criar.VerticalAlignment = VerticalAlignment.Center;
             DockPanel.SetDock(criar, Dock.Right);
@@ -143,12 +139,12 @@ public class JanelaFaltando : Window
         {
             // Da internet (o indice da Arduino) sempre; do disco, quando achou.
             var botoes = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(12, 0, 0, 0) };
-            var baixar = Botao("Baixar da internet…", () => BaixarDaInternet(f), destaque: f.Candidata is null);
+            var baixar = Botao(Idioma.T("Baixar da internet…"), () => BaixarDaInternet(f), destaque: f.Candidata is null);
             baixar.Margin = new Thickness(0);
             botoes.Children.Add(baixar);
             if (f.Candidata is not null)
             {
-                var instalar = Botao($"Copiar daqui ({f.TamanhoEmTexto})", () => Instalar(f), destaque: true);
+                var instalar = Botao(Idioma.T("Copiar daqui ({0})", f.TamanhoEmTexto), () => Instalar(f), destaque: true);
                 instalar.Margin = new Thickness(0, 6, 0, 0);
                 botoes.Children.Insert(0, instalar);
                 baixar.Margin = new Thickness(0, 6, 0, 0);
@@ -171,12 +167,10 @@ public class JanelaFaltando : Window
         coluna.Children.Add(new TextBlock
         {
             Text = f.DoProjeto
-                ? "Escrito com aspas: é um arquivo DESTE projeto, e não uma biblioteca. "
-                  + "Ele deveria estar numa aba ao lado do sketch, e não está."
+                ? Idioma.T("Escrito com aspas: é um arquivo DESTE projeto, e não uma biblioteca. Ele deveria estar numa aba ao lado do sketch, e não está.")
                 : f.Candidata is null
-                ? "Não está nas pastas da Arduino IDE deste computador: baixe pelo índice da Arduino."
-                : $"Achei em {f.Candidata}\n"
-                  + $"{f.Arquivos} arquivo(s), {f.TamanhoEmTexto} em disco.",
+                ? Idioma.T("Não está nas pastas da Arduino IDE deste computador: baixe pelo índice da Arduino.")
+                : Idioma.T("Achei em {0}\n{1} arquivo(s), {2} em disco.", f.Candidata, f.Arquivos, f.TamanhoEmTexto),
             Foreground = Tema.Pincel(Tema.TextoFraco),
             FontSize = 11,
             Margin = new Thickness(0, 5, 0, 0),
@@ -186,7 +180,7 @@ public class JanelaFaltando : Window
         if (f.Candidata is not null && !f.DoProjeto)
             coluna.Children.Add(new TextBlock
             {
-                Text = "Instalando, o simulador passa a rodar o código C++ dela.",
+                Text = Idioma.T("Instalando, o simulador passa a rodar o código C++ dela."),
                 Foreground = Tema.Pincel(Tema.TextoFraco),
                 FontSize = 11,
                 FontStyle = FontStyles.Italic,
@@ -221,9 +215,8 @@ public class JanelaFaltando : Window
             Instalou = true;
 
             MessageBox.Show(this,
-                $"'{nome}' foi copiada para o acervo ({f.TamanhoEmTexto}).\n\n"
-                + "O simulador passa a rodar o código C++ dela.",
-                "Biblioteca instalada", MessageBoxButton.OK, MessageBoxImage.Information);
+                Idioma.T("'{0}' foi copiada para o acervo ({1}).\n\nO simulador passa a rodar o código C++ dela.", nome, f.TamanhoEmTexto),
+                Idioma.T("Biblioteca instalada"), MessageBoxButton.OK, MessageBoxImage.Information);
 
             faltando.Remove(f);
             if (faltando.Count == 0) { Prosseguir = true; Close(); return; }
@@ -231,8 +224,8 @@ public class JanelaFaltando : Window
         }
         catch (Exception e)
         {
-            MessageBox.Show(this, "Não deu para copiar: " + e.Message,
-                "Biblioteca", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, Idioma.T("Não deu para copiar: {0}", e.Message),
+                Idioma.T("Biblioteca"), MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
@@ -255,7 +248,7 @@ public class JanelaFaltando : Window
     {
         var dialogo = new Microsoft.Win32.OpenFolderDialog
         {
-            Title = "Escolha a pasta da biblioteca",
+            Title = Idioma.T("Escolha a pasta da biblioteca"),
         };
         if (dialogo.ShowDialog(this) != true) return;
 
@@ -266,16 +259,16 @@ public class JanelaFaltando : Window
             Instalou = true;
 
             MessageBox.Show(this,
-                $"'{nome}' foi copiada para o acervo ({Acervo.EmTexto(bytes)}).",
-                "Biblioteca instalada", MessageBoxButton.OK, MessageBoxImage.Information);
+                Idioma.T("'{0}' foi copiada para o acervo ({1}).", nome, Acervo.EmTexto(bytes)),
+                Idioma.T("Biblioteca instalada"), MessageBoxButton.OK, MessageBoxImage.Information);
 
             Prosseguir = true;
             Close();
         }
         catch (Exception e)
         {
-            MessageBox.Show(this, "Não deu para copiar: " + e.Message,
-                "Biblioteca", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, Idioma.T("Não deu para copiar: {0}", e.Message),
+                Idioma.T("Biblioteca"), MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 

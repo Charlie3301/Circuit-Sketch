@@ -162,7 +162,7 @@ public sealed class ModulosHc05
         if (m.ModoAt)
         {
             m.Porta.Baud = 38400;
-            rede?.Anotar(m.Uart, "bt", "HC-05 no modo de comandos AT (o EN estava em HIGH ao ligar): 38400 baud");
+            rede?.Anotar(m.Uart, "bt", Idioma.T("HC-05 no modo de comandos AT (o EN estava em HIGH ao ligar): 38400 baud"));
             return;
         }
         m.Porta.Baud = m.Cfg.Baud;
@@ -209,8 +209,7 @@ public sealed class ModulosHc05
                 {
                     // O modulo de verdade fica calado: o comando so vale com o CR antes do LF.
                     if (!m.AvisouFimDeLinha && linha.Trim().Length > 0)
-                        rede?.Anotar(m.Uart, "bt", "HC-05: o comando AT precisa terminar com CR e LF "
-                                                   + "(no monitor, \"Ambos NL e CR\"); sem o CR ele nao responde");
+                        rede?.Anotar(m.Uart, "bt", Idioma.T("HC-05: o comando AT precisa terminar com CR e LF (no monitor, \"Ambos NL e CR\"); sem o CR ele nao responde"));
                     m.AvisouFimDeLinha = true;
                     continue;
                 }

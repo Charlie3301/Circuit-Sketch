@@ -53,7 +53,7 @@ public static class Semicondutores
         new("2n5551", "2N5551 (160 V)", false, 120, 0.6, 0.625),
         new("s8050", "S8050", false, 200, 0.5, 0.625),
         new("s9013", "S9013", false, 150, 0.5, 0.625),
-        new("s9014", "S9014 (baixo ruído)", false, 300, 0.1, 0.45),
+        new("s9014", Idioma.T("S9014 (baixo ruído)"), false, 300, 0.1, 0.45),
         new("mpsa13", "MPSA13 (Darlington)", false, 5000, 0.5, 0.625, Vbe: 1.3, Vcesat: 1.0),
         new("mpsa42", "MPSA42 (300 V)", false, 60, 0.5, 0.625),
     ];
@@ -66,7 +66,7 @@ public static class Semicondutores
         new("2n5401", "2N5401 (150 V)", true, 120, 0.6, 0.625),
         new("s8550", "S8550", true, 200, 0.5, 0.625),
         new("s9012", "S9012", true, 150, 0.5, 0.625),
-        new("s9015", "S9015 (baixo ruído)", true, 300, 0.1, 0.45),
+        new("s9015", Idioma.T("S9015 (baixo ruído)"), true, 300, 0.1, 0.45),
         new("mpsa92", "MPSA92 (300 V)", true, 60, 0.5, 0.625),
     ];
 
@@ -76,7 +76,7 @@ public static class Semicondutores
         new("bc547", "BC547", false, 250, 0.1, 0.5),
         new("bc546", "BC546 (65 V)", false, 200, 0.1, 0.5),
         new("bc548", "BC548", false, 250, 0.1, 0.5),
-        new("bc549", "BC549 (baixo ruído)", false, 400, 0.1, 0.5),
+        new("bc549", Idioma.T("BC549 (baixo ruído)"), false, 400, 0.1, 0.5),
         new("bc337", "BC337", false, 250, 0.8, 0.625),
     ];
 
@@ -207,7 +207,7 @@ public static class Semicondutores
     /// <summary>Para a barra: (modelo, nome) de cada opcao, e o modelo de agora.</summary>
     public static (string Modelo, string Nome)[] Opcoes(string tipo) =>
         EhBipolar(tipo) ? [.. Bipolares(tipo).Select(f => (f.Modelo, $"{f.Nome} ({f.CorrenteMaxima:0.#} A)"))]
-        : EhMosfet(tipo) ? [.. Mosfets(tipo).Select(f => (f.Modelo, $"{f.Nome} (liga com {(f.CanalP ? "-" : "")}{f.Limiar + Math.Sqrt(f.CorrenteMaxima / 4 / f.K):0.#} V)"))]
+        : EhMosfet(tipo) ? [.. Mosfets(tipo).Select(f => (f.Modelo, Idioma.T("{0} (liga com {1}{2:0.#} V)", f.Nome, (f.CanalP ? "-" : ""), f.Limiar + Math.Sqrt(f.CorrenteMaxima / 4 / f.K))))]
         : EhOpto(tipo) ? [.. Optoacopladores(tipo).Select(f => (f.Modelo, $"{f.Nome} (CTR {f.Ctr * 100:0}%)"))]
         : tipo == "fusivel" ? [.. Fusiveis.Select(f => (f.Modelo, f.Nome))]
         : tipo == "varistor" ? [.. Varistores.Select(f => (f.Modelo, f.Nome))]

@@ -49,9 +49,9 @@ public class JanelaConfiguracoes : Window
 {
     static readonly (string Id, string Nome)[] Tracados =
     [
-        ("solto", "Solto (curva)"),
-        ("reto", "Reto (linha direta)"),
-        ("degrau", "Degrau (em L)"),
+        ("solto", Idioma.T("Solto (curva)")),
+        ("reto", Idioma.T("Reto (linha direta)")),
+        ("degrau", Idioma.T("Degrau (em L)")),
     ];
 
     /// <summary>Um assunto da lista da esquerda. Grupo separa com linha.</summary>
@@ -77,7 +77,7 @@ public class JanelaConfiguracoes : Window
 
         try { Owner = dono; } catch (InvalidOperationException) { }
 
-        Title = "Configurações";
+        Title = Idioma.T("Configurações");
         Width = 820;
         Height = 560;
         MinWidth = 640;
@@ -158,7 +158,7 @@ public class JanelaConfiguracoes : Window
         var coluna = new DockPanel { Margin = new Thickness(8, 10, 8, 10) };
 
         busca.Style = (Style)Application.Current.FindResource("CampoEscuro");
-        busca.ToolTip = "Procurar uma configuração pelo nome";
+        busca.ToolTip = Idioma.T("Procurar uma configuração pelo nome");
         busca.TextChanged += (_, _) => Filtrar();
 
         // O texto-fantasma fica POR CIMA do campo, e nao dentro dele: um
@@ -166,7 +166,7 @@ public class JanelaConfiguracoes : Window
         // por "Buscar" e a lista abriria vazia.
         var dica = new TextBlock
         {
-            Text = "Buscar",
+            Text = Idioma.T("Buscar"),
             Foreground = Tema.Pincel(Tema.TextoFraco),
             FontSize = 12,
             IsHitTestVisible = false,
@@ -229,7 +229,7 @@ public class JanelaConfiguracoes : Window
         if (!algum)
             lista.Children.Add(new TextBlock
             {
-                Text = "nada com esse nome",
+                Text = Idioma.T("nada com esse nome"),
                 Foreground = Tema.Pincel(Tema.TextoFraco),
                 FontSize = 11,
                 Margin = new Thickness(6, 4, 0, 0),
@@ -315,32 +315,39 @@ public class JanelaConfiguracoes : Window
     //  Os assuntos
     // =====================================================================
 
+    /// <summary>
+    /// As palavras de busca de um assunto: as do idioma em uso e as do portugues
+    /// juntas -- quem usa o programa em ingles e procura "tema" tambem acha.
+    /// </summary>
+    static string Palavras(string original)
+        => Idioma.T(original) is var traduzidas && traduzidas != original ? traduzidas + " " + original : original;
+
     void Registrar()
     {
-        assuntos.Add(new("circuito", "Circuito", "grade fio traçado cor espessura grossura", MontarCircuito));
-        assuntos.Add(new("circuito", "Aparência", "tema claro escuro cores escala zoom interface", MontarAparencia));
-        assuntos.Add(new("circuito", "Tela e janela",
-            "tamanho resolução monitor maximizado 1366 768", MontarTela));
+        assuntos.Add(new("circuito", Idioma.T("Circuito"), Palavras(Idioma.N("grade fio traçado cor espessura grossura")), MontarCircuito));
+        assuntos.Add(new("circuito", Idioma.T("Aparência"), Palavras(Idioma.N("tema claro escuro cores escala zoom interface")), MontarAparencia));
+        assuntos.Add(new("circuito", Idioma.T("Tela e janela"),
+            Palavras(Idioma.N("tamanho resolução monitor maximizado 1366 768")), MontarTela));
 
-        assuntos.Add(new("codigo", "Editor de código",
-            "fonte letra tamanho linha número recuo tab espaço parênteses chaves aspas zoom", MontarEditor));
-        assuntos.Add(new("codigo", "Monitor serial",
-            "serial hora tempo linhas rolar fim de linha enviar enter limpar", MontarMonitor));
-        assuntos.Add(new("codigo", "Simulação",
-            "rodar demo queimar queima som buzzer volume avisos selos aviso fechar ignorar", MontarSimulacao));
+        assuntos.Add(new("codigo", Idioma.T("Editor de código"),
+            Palavras(Idioma.N("fonte letra tamanho linha número recuo tab espaço parênteses chaves aspas zoom")), MontarEditor));
+        assuntos.Add(new("codigo", Idioma.T("Monitor serial"),
+            Palavras(Idioma.N("serial hora tempo linhas rolar fim de linha enviar enter limpar")), MontarMonitor));
+        assuntos.Add(new("codigo", Idioma.T("Simulação"),
+            Palavras(Idioma.N("rodar demo queimar queima som buzzer volume avisos selos aviso fechar ignorar")), MontarSimulacao));
 
-        assuntos.Add(new("arquivos", "Arquivos e projetos",
-            "salvar sozinho automático cópia backup bak recentes placa circuito novo", MontarArquivos));
+        assuntos.Add(new("arquivos", Idioma.T("Arquivos e projetos"),
+            Palavras(Idioma.N("salvar sozinho automático cópia backup bak recentes placa circuito novo")), MontarArquivos));
 
-        assuntos.Add(new("entrada", "Atalhos do teclado", "teclas comandos", MontarAtalhos));
-        assuntos.Add(new("entrada", "Ao abrir o programa", "abertura splash reabrir último", MontarAbertura));
+        assuntos.Add(new("entrada", Idioma.T("Atalhos do teclado"), Palavras(Idioma.N("teclas comandos")), MontarAtalhos));
+        assuntos.Add(new("entrada", Idioma.T("Ao abrir o programa"), Palavras(Idioma.N("abertura splash reabrir último")), MontarAbertura));
 
-        assuntos.Add(new("rede", "Rede e servidor", "internet wifi http servidor", MontarRede));
-        assuntos.Add(new("rede", "Bluetooth", "bt serial celular", MontarBluetooth));
+        assuntos.Add(new("rede", Idioma.T("Rede e servidor"), Palavras(Idioma.N("internet wifi http servidor")), MontarRede));
+        assuntos.Add(new("rede", Idioma.T("Bluetooth"), Palavras(Idioma.N("bt serial celular")), MontarBluetooth));
 
-        assuntos.Add(new("fim", "Bibliotecas e plugins",
-            "biblioteca include lib instalar língua tradução", MontarIdioma));
-        assuntos.Add(new("fim", "Ajuda", "socorro atalhos manual padrão fábrica restaurar", MontarAjuda));
+        assuntos.Add(new("fim", Idioma.T("Bibliotecas e plugins"),
+            Palavras(Idioma.N("biblioteca include lib instalar língua tradução idioma")), MontarIdioma));
+        assuntos.Add(new("fim", Idioma.T("Ajuda"), Palavras(Idioma.N("socorro atalhos manual padrão fábrica restaurar")), MontarAjuda));
     }
 
     // =====================================================================
@@ -387,34 +394,34 @@ public class JanelaConfiguracoes : Window
 
     void MontarCircuito(StackPanel painel)
     {
-        var grupo = Grupo(painel, "Fundo");
-        Caixa(grupo, "Mostrar a grade do fundo", ajustes.LerGrade(), ligado =>
+        var grupo = Grupo(painel, Idioma.T("Fundo"));
+        Caixa(grupo, Idioma.T("Mostrar a grade do fundo"), ajustes.LerGrade(), ligado =>
         {
             ajustes.DefinirGrade(ligado);
             Preferencias.Definir(Preferencias.Grade, ligado);
         });
 
-        var fios = Grupo(painel, "Fios");
+        var fios = Grupo(painel, Idioma.T("Fios"));
 
         var nomeDoTracado = Valor(NomeDoTracado(ajustes.LerEstiloDoFio()));
-        Escolha(fios, "Traçado", nomeDoTracado, Tracados.Select(t => (t.Nome, (Action)(() =>
+        Escolha(fios, Idioma.T("Traçado"), nomeDoTracado, Tracados.Select(t => (t.Nome, (Action)(() =>
         {
             ajustes.DefinirEstiloDoFio(t.Id);
             Preferencias.Definir(Preferencias.EstiloDoFio, t.Id);
             nomeDoTracado.Text = t.Nome;
         }))));
-        Nota(fios, "Vale para os fios que já estão no circuito e para os próximos.");
+        Nota(fios, Idioma.T("Vale para os fios que já estão no circuito e para os próximos."));
 
         var nomeDaCor = Valor(NomeDaCor(ajustes.Cores, ajustes.LerCorDoFio()));
-        Escolha(fios, "Cor do próximo fio", nomeDaCor,
+        Escolha(fios, Idioma.T("Cor do próximo fio"), nomeDaCor,
             ajustes.Cores.Select(c => (c.Nome, (Action)(() =>
             {
                 ajustes.DefinirCorDoFio(c.Hex);
                 nomeDaCor.Text = c.Nome;
             }))));
 
-        EscolhaGuardada(fios, "Espessura", Preferencias.EspessuraDoFio, "normal",
-            [("fina", "Fina"), ("normal", "Normal"), ("grossa", "Grossa (para projetor)")]);
+        EscolhaGuardada(fios, Idioma.T("Espessura"), Preferencias.EspessuraDoFio, "normal",
+            [("fina", Idioma.T("Fina")), ("normal", Idioma.T("Normal")), ("grossa", Idioma.T("Grossa (para projetor)"))]);
     }
 
     /// <summary>
@@ -427,23 +434,20 @@ public class JanelaConfiguracoes : Window
         foreach (var grupo in Tema.Paletas.GroupBy(p => p.Grupo))
         {
             var caixa = Grupo(painel, grupo.Key == Tema.GrupoBasicos
-                ? "Tema" : $"Temas — {grupo.Key.ToLowerInvariant()}");
+                ? Idioma.T("Tema") : grupo.Key == Tema.GrupoDasPlacas ? Idioma.T("Temas — das placas") : Idioma.T("Temas — cores"));
 
             var grade = new WrapPanel { Margin = new Thickness(0, 8, 0, 0) };
             foreach (var paleta in grupo) grade.Children.Add(Amostra(paleta));
             caixa.Children.Add(grade);
         }
 
-        Nota(painel, $"Tema atual: {Tema.NomeDe(Tema.Atual)}. Troca as cores do programa; "
-                     + "o circuito continua igual.");
+        Nota(painel, Idioma.T("Tema atual: {0}. Troca as cores do programa; o circuito continua igual.", Tema.NomeDe(Tema.Atual)));
 
-        var tamanho = Grupo(painel, "Tamanho da interface");
-        EscolhaGuardada(tamanho, "Escala", Preferencias.EscalaDaInterface, "100",
-            [("75", "75%"), ("90", "90%"), ("100", "100% (de fábrica)"), ("110", "110%"),
+        var tamanho = Grupo(painel, Idioma.T("Tamanho da interface"));
+        EscolhaGuardada(tamanho, Idioma.T("Escala"), Preferencias.EscalaDaInterface, "100",
+            [("75", "75%"), ("90", "90%"), ("100", Idioma.T("100% (de fábrica)")), ("110", "110%"),
              ("125", "125%"), ("150", "150%"), ("175", "175%")]);
-        Nota(tamanho, "Deixa o programa inteiro maior ou menor: botões, letras e painéis. "
-                      + "Maior ajuda no projetor e em tela de alta resolução; menor ajuda "
-                      + "no notebook de 1366 × 768.");
+        Nota(tamanho, Idioma.T("Deixa o programa inteiro maior ou menor: botões, letras e painéis. Maior ajuda no projetor e em tela de alta resolução; menor ajuda no notebook de 1366 × 768."));
     }
 
     /// <summary>Um cartao com as cores do tema, que aplica o tema no clique.</summary>
@@ -533,7 +537,7 @@ public class JanelaConfiguracoes : Window
             BorderBrush = atual ? Tema.Pincel(Tema.Destaque) : Tema.Pincel(Tema.Borda),
             Background = De(paleta, Tema.Fundo),
             Cursor = Cursors.Hand,
-            ToolTip = atual ? $"{paleta.Nome} (em uso)" : $"Usar o tema {paleta.Nome}",
+            ToolTip = atual ? Idioma.T("{0} (em uso)", paleta.Nome) : Idioma.T("Usar o tema {0}", paleta.Nome),
             Tag = paleta.Id,
             Child = desenho,
         };
@@ -544,34 +548,32 @@ public class JanelaConfiguracoes : Window
     void MontarTela(StackPanel painel)
     {
         var area = SystemParameters.WorkArea;
-        var grupo = Grupo(painel, "Tamanho da janela");
+        var grupo = Grupo(painel, Idioma.T("Tamanho da janela"));
 
-        Nota(grupo, $"Área útil desta tela: {area.Width:0} × {area.Height:0} pixels.");
+        Nota(grupo, Idioma.T("Área útil desta tela: {0:0} × {1:0} pixels.", area.Width, area.Height));
 
-        Caixa(grupo, "Lembrar o tamanho e a posição ao fechar",
+        Caixa(grupo, Idioma.T("Lembrar o tamanho e a posição ao fechar"),
             Preferencias.Ligado(Preferencias.LembrarJanela, false),
             ligado => Preferencias.Definir(Preferencias.LembrarJanela, ligado));
 
-        Caixa(grupo, "Abrir maximizado",
+        Caixa(grupo, Idioma.T("Abrir maximizado"),
             Preferencias.Ligado(Preferencias.AbrirMaximizado, false),
             ligado => Preferencias.Definir(Preferencias.AbrirMaximizado, ligado));
 
         if (ajustes.CaberNaTela is not null)
-            Botao(grupo, "Ajustar a janela à tela agora", () =>
+            Botao(grupo, Idioma.T("Ajustar a janela à tela agora"), () =>
             {
                 ajustes.CaberNaTela();
                 Close();
             });
 
         Nota(grupo,
-            "Em tela de 1366 × 768 o programa já abre encolhido para caber. "
-            + "Se a janela tiver ficado maior que a tela por causa de um monitor "
-            + "trocado, este botão devolve ela para dentro.");
+            Idioma.T("Em tela de 1366 × 768 o programa já abre encolhido para caber. Se a janela tiver ficado maior que a tela por causa de um monitor trocado, este botão devolve ela para dentro."));
     }
 
     void MontarEditor(StackPanel painel)
     {
-        var letra = Grupo(painel, "Letra");
+        var letra = Grupo(painel, Idioma.T("Letra"));
 
         // So as fontes de largura fixa que este computador tem: codigo em
         // letra proporcional desalinha tudo.
@@ -580,99 +582,94 @@ public class JanelaConfiguracoes : Window
                              "Lucida Console", "JetBrains Mono", "Fira Code" }
                      .Where(instaladas.Contains).Select(f => (f, f)).ToList();
         if (fontes.Count == 0) fontes.Add(("Consolas", "Consolas"));
-        EscolhaGuardada(letra, "Fonte", Preferencias.FonteDoCodigo, "Consolas", fontes);
+        EscolhaGuardada(letra, Idioma.T("Fonte"), Preferencias.FonteDoCodigo, "Consolas", fontes);
 
-        EscolhaGuardada(letra, "Tamanho", Preferencias.TamanhoDoCodigo, "12",
+        EscolhaGuardada(letra, Idioma.T("Tamanho"), Preferencias.TamanhoDoCodigo, "12",
             Numeros(9, 10, 11, 12, 13, 14, 16, 18, 20, 24));
-        CaixaGuardada(letra, "Aumentar e diminuir com Ctrl + roda do mouse",
+        CaixaGuardada(letra, Idioma.T("Aumentar e diminuir com Ctrl + roda do mouse"),
             Preferencias.ZoomComRoda, true);
 
-        var aparece = Grupo(painel, "Como o código aparece");
-        CaixaGuardada(aparece, "Número das linhas", Preferencias.NumerosDeLinha, true);
-        CaixaGuardada(aparece, "Destacar a linha do cursor", Preferencias.DestacarLinha, true);
-        CaixaGuardada(aparece, "Quebrar as linhas compridas", Preferencias.QuebrarLinhas, false);
-        CaixaGuardada(aparece, "Mostrar espaços e tabulações", Preferencias.MostrarEspacos, false);
+        var aparece = Grupo(painel, Idioma.T("Como o código aparece"));
+        CaixaGuardada(aparece, Idioma.T("Número das linhas"), Preferencias.NumerosDeLinha, true);
+        CaixaGuardada(aparece, Idioma.T("Destacar a linha do cursor"), Preferencias.DestacarLinha, true);
+        CaixaGuardada(aparece, Idioma.T("Quebrar as linhas compridas"), Preferencias.QuebrarLinhas, false);
+        CaixaGuardada(aparece, Idioma.T("Mostrar espaços e tabulações"), Preferencias.MostrarEspacos, false);
 
-        var digitando = Grupo(painel, "Digitando");
-        EscolhaGuardada(digitando, "Recuo", Preferencias.TamanhoDoRecuo, "2",
-            [("2", "2 espaços (o da Arduino IDE)"), ("4", "4 espaços"), ("8", "8 espaços")]);
-        CaixaGuardada(digitando, "A tecla Tab põe espaços", Preferencias.TabViraEspacos, true);
-        CaixaGuardada(digitando, "Fechar ( [ { e aspas sozinho", Preferencias.FecharPares, true);
-        Nota(digitando, "Como na Arduino IDE 2: abrir um parêntese já põe o que fecha, e o "
-                        + "Enter entre as chaves desce a de fechar para a linha de baixo.");
+        var digitando = Grupo(painel, Idioma.T("Digitando"));
+        EscolhaGuardada(digitando, Idioma.T("Recuo"), Preferencias.TamanhoDoRecuo, "2",
+            [("2", Idioma.T("2 espaços (o da Arduino IDE)")), ("4", Idioma.T("4 espaços")), ("8", Idioma.T("8 espaços"))]);
+        CaixaGuardada(digitando, Idioma.T("A tecla Tab põe espaços"), Preferencias.TabViraEspacos, true);
+        CaixaGuardada(digitando, Idioma.T("Fechar ( [ { e aspas sozinho"), Preferencias.FecharPares, true);
+        Nota(digitando, Idioma.T("Como na Arduino IDE 2: abrir um parêntese já põe o que fecha, e o Enter entre as chaves desce a de fechar para a linha de baixo."));
     }
 
     void MontarMonitor(StackPanel painel)
     {
-        var mostrar = Grupo(painel, "Mostrar");
-        CaixaGuardada(mostrar, "A hora de cada linha (em ms desde que a placa ligou)",
+        var mostrar = Grupo(painel, Idioma.T("Mostrar"));
+        CaixaGuardada(mostrar, Idioma.T("A hora de cada linha (em ms desde que a placa ligou)"),
             Preferencias.TempoNoSerial, true);
-        CaixaGuardada(mostrar, "Rolar sozinho até a última linha", Preferencias.RolarSerial, true);
-        EscolhaGuardada(mostrar, "Linhas guardadas", Preferencias.LinhasNoSerial, "400",
+        CaixaGuardada(mostrar, Idioma.T("Rolar sozinho até a última linha"), Preferencias.RolarSerial, true);
+        EscolhaGuardada(mostrar, Idioma.T("Linhas guardadas"), Preferencias.LinhasNoSerial, "400",
             Numeros(200, 400, 1000, 5000));
-        EscolhaGuardada(mostrar, "Tamanho da letra", Preferencias.TamanhoDoSerial, "11",
+        EscolhaGuardada(mostrar, Idioma.T("Tamanho da letra"), Preferencias.TamanhoDoSerial, "11",
             Numeros(9, 10, 11, 12, 13, 14, 16));
-        Nota(mostrar, "O monitor da Arduino IDE recebe todas as linhas; o limite é só o da tela.");
+        Nota(mostrar, Idioma.T("O monitor da Arduino IDE recebe todas as linhas; o limite é só o da tela."));
 
-        var enviar = Grupo(painel, "Enviar");
-        EscolhaGuardada(enviar, "Fim de linha", Preferencias.FimDeLinha, "lf",
-            [("nada", "Nenhum"), ("lf", "Nova linha (\\n)"), ("cr", "Retorno de carro (\\r)"),
-             ("crlf", "Os dois (\\r\\n)")]);
-        Nota(enviar, "O que vai depois do texto quando se aperta Enter, como a caixa do monitor "
-                     + "da Arduino IDE. O readStringUntil('\\n') precisa da nova linha.");
+        var enviar = Grupo(painel, Idioma.T("Enviar"));
+        EscolhaGuardada(enviar, Idioma.T("Fim de linha"), Preferencias.FimDeLinha, "lf",
+            [("nada", Idioma.T("Nenhum")), ("lf", Idioma.T("Nova linha (\\n)")), ("cr", Idioma.T("Retorno de carro (\\r)")),
+             ("crlf", Idioma.T("Os dois (\\r\\n)"))]);
+        Nota(enviar, Idioma.T("O que vai depois do texto quando se aperta Enter, como a caixa do monitor "
+                     + "da Arduino IDE. O readStringUntil('\\n') precisa da nova linha."));
 
-        var rodar = Grupo(painel, "A cada Rodar");
-        CaixaGuardada(rodar, "Limpar o monitor", Preferencias.LimparSerialAoRodar, true);
-        CaixaGuardada(rodar, "Mostrar no monitor os avisos de ligação e de queima",
+        var rodar = Grupo(painel, Idioma.T("A cada Rodar"));
+        CaixaGuardada(rodar, Idioma.T("Limpar o monitor"), Preferencias.LimparSerialAoRodar, true);
+        CaixaGuardada(rodar, Idioma.T("Mostrar no monitor os avisos de ligação e de queima"),
             Preferencias.AvisosNoMonitor, true);
     }
 
     void MontarSimulacao(StackPanel painel)
     {
-        var abrir = Grupo(painel, "Ao abrir");
-        CaixaGuardada(abrir, "Rodar o projeto assim que ele abre", Preferencias.RodarAoAbrirProjeto, true);
-        CaixaGuardada(abrir, "Rodar a demo assim que ela abre", Preferencias.RodarAoAbrirDemo, false);
+        var abrir = Grupo(painel, Idioma.T("Ao abrir"));
+        CaixaGuardada(abrir, Idioma.T("Rodar o projeto assim que ele abre"), Preferencias.RodarAoAbrirProjeto, true);
+        CaixaGuardada(abrir, Idioma.T("Rodar a demo assim que ela abre"), Preferencias.RodarAoAbrirDemo, false);
 
-        var pecas = Grupo(painel, "Componentes");
-        CaixaGuardada(pecas, "Queimar o componente ligado errado", Preferencias.SimularQueima, true);
-        Nota(pecas, "Desligado, o LED sem resistor e o curto não queimam aqui — mas queimam na "
-                    + "bancada. É bom só para montar rápido; para aprender, deixe ligado.");
+        var pecas = Grupo(painel, Idioma.T("Componentes"));
+        CaixaGuardada(pecas, Idioma.T("Queimar o componente ligado errado"), Preferencias.SimularQueima, true);
+        Nota(pecas, Idioma.T("Desligado, o LED sem resistor e o curto não queimam aqui — mas queimam na bancada. É bom só para montar rápido; para aprender, deixe ligado."));
 
-        CaixaGuardada(pecas, "Mostrar os avisos em cima das peças", Preferencias.SelosDeAviso, true);
-        Nota(pecas, "O selo amarelo (ou vermelho, no que queimou) em cima da peça ou do pino, com o motivo "
-                    + "na dica do mouse. O X de cada selo fecha aquele aviso, e o projeto guarda isso: "
-                    + "reaberto, ele continua fechado.");
+        CaixaGuardada(pecas, Idioma.T("Mostrar os avisos em cima das peças"), Preferencias.SelosDeAviso, true);
+        Nota(pecas, Idioma.T("O selo amarelo (ou vermelho, no que queimou) em cima da peça ou do pino, com o motivo na dica do mouse. O X de cada selo fecha aquele aviso, e o projeto guarda isso: reaberto, ele continua fechado."));
         if (ajustes.EsquecerAvisosFechados is not null)
-            Botao(pecas, "Mostrar de novo os avisos fechados deste projeto", () => ajustes.EsquecerAvisosFechados());
+            Botao(pecas, Idioma.T("Mostrar de novo os avisos fechados deste projeto"), () => ajustes.EsquecerAvisosFechados());
 
-        var som = Grupo(painel, "Som");
-        CaixaGuardada(som, "Som do buzzer", Preferencias.SomDoBuzzer, true);
-        EscolhaGuardada(som, "Volume", Preferencias.VolumeDoBuzzer, "medio",
-            [("baixo", "Baixo"), ("medio", "Médio"), ("alto", "Alto")]);
+        var som = Grupo(painel, Idioma.T("Som"));
+        CaixaGuardada(som, Idioma.T("Som do buzzer"), Preferencias.SomDoBuzzer, true);
+        EscolhaGuardada(som, Idioma.T("Volume"), Preferencias.VolumeDoBuzzer, "medio",
+            [("baixo", Idioma.T("Baixo")), ("medio", Idioma.T("Médio")), ("alto", Idioma.T("Alto"))]);
     }
 
     void MontarArquivos(StackPanel painel)
     {
-        var salvar = Grupo(painel, "Salvar");
-        EscolhaGuardada(salvar, "Salvar sozinho", Preferencias.SalvarSozinho, "0",
-            [("0", "Nunca"), ("1", "A cada minuto"), ("2", "A cada 2 minutos"),
-             ("5", "A cada 5 minutos"), ("10", "A cada 10 minutos")]);
-        Nota(salvar, "Só o projeto que já tem arquivo, e só quando mudou. Circuito novo e demo "
-                     + "precisam do primeiro Ctrl+S, que pergunta onde guardar.");
-        CaixaGuardada(salvar, "Guardar a versão anterior como .bak ao salvar",
+        var salvar = Grupo(painel, Idioma.T("Salvar"));
+        EscolhaGuardada(salvar, Idioma.T("Salvar sozinho"), Preferencias.SalvarSozinho, "0",
+            [("0", Idioma.T("Nunca")), ("1", Idioma.T("A cada minuto")), ("2", Idioma.T("A cada 2 minutos")),
+             ("5", Idioma.T("A cada 5 minutos")), ("10", Idioma.T("A cada 10 minutos"))]);
+        Nota(salvar, Idioma.T("Só o projeto que já tem arquivo, e só quando mudou. Circuito novo e demo precisam do primeiro Ctrl+S, que pergunta onde guardar."));
+        CaixaGuardada(salvar, Idioma.T("Guardar a versão anterior como .bak ao salvar"),
             Preferencias.CopiaDeSeguranca, false);
 
-        var recentes = Grupo(painel, "Projetos recentes");
-        EscolhaGuardada(recentes, "Quantos na lista", Preferencias.QuantosRecentes, "8",
+        var recentes = Grupo(painel, Idioma.T("Projetos recentes"));
+        EscolhaGuardada(recentes, Idioma.T("Quantos na lista"), Preferencias.QuantosRecentes, "8",
             Numeros(5, 8, 12, 20, 30));
 
-        var novo = Grupo(painel, "Circuito novo");
-        EscolhaGuardada(novo, "Começa com a placa", Preferencias.PlacaDoCircuitoNovo, "",
-            [("", "Nenhuma (escolher na paleta)"), .. ajustes.Placas.Select(p => (p.Id, p.Nome))]);
-        Nota(novo, "O \"Novo projeto\" do menu. A tela de abertura continua oferecendo todas.");
+        var novo = Grupo(painel, Idioma.T("Circuito novo"));
+        EscolhaGuardada(novo, Idioma.T("Começa com a placa"), Preferencias.PlacaDoCircuitoNovo, "",
+            [("", Idioma.T("Nenhuma (escolher na paleta)")), .. ajustes.Placas.Select(p => (p.Id, p.Nome))]);
+        Nota(novo, Idioma.T("O \"Novo projeto\" do menu. A tela de abertura continua oferecendo todas."));
 
         // O "author" do diagram.json, como no Wokwi. Vazio: o usuario do Windows.
-        var autoria = Grupo(painel, "Autor dos projetos");
+        var autoria = Grupo(painel, Idioma.T("Autor dos projetos"));
         var campo = new TextBox
         {
             Text = Preferencias.Texto(Preferencias.Autor, ""),
@@ -685,47 +682,42 @@ public class JanelaConfiguracoes : Window
         campo.LostFocus += (_, _) => Guardar();
         campo.KeyDown += (_, ev) => { if (ev.Key == Key.Enter) Guardar(); };
         autoria.Children.Add(campo);
-        Nota(autoria, $"O \"author\" do diagram.json dos projetos novos (o Wokwi grava o mesmo campo). "
-                      + $"Vazio, vai o usuário do Windows ({Environment.UserName}). Cada projeto pode ter o "
-                      + "seu: é só mudar a linha \"author\" na aba diagram.json.");
+        Nota(autoria, Idioma.T("O \"author\" do diagram.json dos projetos novos (o Wokwi grava o mesmo campo). Vazio, vai o usuário do Windows ({0}). Cada projeto pode ter o seu: na aba DESCRIÇÃO (ou na linha \"author\" do diagram.json).", Environment.UserName));
     }
 
     void MontarAtalhos(StackPanel painel)
     {
-        var grupo = Grupo(painel, "Teclas do programa");
-        Nota(grupo, "Rodar, salvar, girar, apagar e o resto. "
-                    + "Durante a simulação o teclado é do circuito.");
-        Botao(grupo, "Ver e trocar atalhos", () => new JanelaAtalhos(this).ShowDialog());
+        var grupo = Grupo(painel, Idioma.T("Teclas do programa"));
+        Nota(grupo, Idioma.T("Rodar, salvar, girar, apagar e o resto. Durante a simulação o teclado é do circuito."));
+        Botao(grupo, Idioma.T("Ver e trocar atalhos"), () => new JanelaAtalhos(this).ShowDialog());
     }
 
     void MontarAbertura(StackPanel painel)
     {
-        var grupo = Grupo(painel, "Tela de abertura");
-        Caixa(grupo, "Mostrar a tela de abertura",
+        var grupo = Grupo(painel, Idioma.T("Tela de abertura"));
+        Caixa(grupo, Idioma.T("Mostrar a tela de abertura"),
             Preferencias.Ligado(Preferencias.MostrarAbertura, true),
             ligado => Preferencias.Definir(Preferencias.MostrarAbertura, ligado));
-        Nota(grupo, "A tela com as placas e os projetos recentes, ao abrir o programa.");
+        Nota(grupo, Idioma.T("A tela com as placas e os projetos recentes, ao abrir o programa."));
 
-        var ultimo = Grupo(painel, "Último projeto");
-        CaixaGuardada(ultimo, "Reabrir o último projeto no lugar da tela de abertura",
+        var ultimo = Grupo(painel, Idioma.T("Último projeto"));
+        CaixaGuardada(ultimo, Idioma.T("Reabrir o último projeto no lugar da tela de abertura"),
             Preferencias.ReabrirUltimo, false);
-        Nota(ultimo, "Para quem continua sempre de onde parou. Se o arquivo tiver sido "
-                     + "apagado ou movido, volta a tela de abertura.");
+        Nota(ultimo, Idioma.T("Para quem continua sempre de onde parou. Se o arquivo tiver sido apagado ou movido, volta a tela de abertura."));
     }
 
     void MontarRede(StackPanel painel)
     {
-        var grupo = Grupo(painel, "Internet");
-        Caixa(grupo, "Usar a internet deste computador", ajustes.LerInternet(), ligado =>
+        var grupo = Grupo(painel, Idioma.T("Internet"));
+        Caixa(grupo, Idioma.T("Usar a internet deste computador"), ajustes.LerInternet(), ligado =>
         {
             ajustes.DefinirInternet(ligado);
             Preferencias.Definir(Preferencias.UsarInternet, ligado);
         });
-        Nota(grupo, "Desligada, os pedidos falham como numa placa sem rede — "
-                    + "e o painel diz por quê.");
+        Nota(grupo, Idioma.T("Desligada, os pedidos falham como numa placa sem rede — e o painel diz por quê."));
 
-        var radio = Grupo(painel, "WiFi deste computador");
-        Caixa(radio, "Procurar redes com o WiFi da máquina",
+        var radio = Grupo(painel, Idioma.T("WiFi deste computador"));
+        Caixa(radio, Idioma.T("Procurar redes com o WiFi da máquina"),
             Preferencias.UsarRadioDoComputador,
             ligado =>
             {
@@ -733,89 +725,78 @@ public class JanelaConfiguracoes : Window
                 RadioDoComputador.Desligado = !ligado;
                 RadioDoComputador.Esquecer();
             });
-        Nota(radio, "Ligado, o WiFi.scanNetworks() do sketch lista as redes que este "
-                    + "computador enxerga de verdade. A placa simulada não tem rádio: "
-                    + "ela vê o que a máquina vê, e a conexão continua sendo simulada. "
-                    + "Desligado, voltam as redes de mentira.");
+        Nota(radio, Idioma.T("Ligado, o WiFi.scanNetworks() do sketch lista as redes que este computador enxerga de verdade. A placa simulada não tem rádio: ela vê o que a máquina vê, e a conexão continua sendo simulada. Desligado, voltam as redes de mentira."));
 
-        var navegador = Grupo(painel, "Servidor da placa");
-        Caixa(navegador, "Abrir a página no navegador quando a placa subir um servidor",
+        var navegador = Grupo(painel, Idioma.T("Servidor da placa"));
+        Caixa(navegador, Idioma.T("Abrir a página no navegador quando a placa subir um servidor"),
             Preferencias.AbrirServidorNoNavegador,
             ligado => Preferencias.Definir(Preferencias.AbrirServidor, ligado));
-        Nota(navegador, "É o que acontece com uma placa de verdade na rede: ela anuncia "
-                        + "o endereço e você abre. Aqui o endereço é um localhost, porque "
-                        + "a placa é simulada — mas a página é a que o sketch serve.");
+        Nota(navegador, Idioma.T("É o que acontece com uma placa de verdade na rede: ela anuncia o endereço e você abre. Aqui o endereço é um localhost, porque a placa é simulada — mas a página é a que o sketch serve."));
 
-        var servidores = Grupo(painel, "Servidores agora");
+        var servidores = Grupo(painel, Idioma.T("Servidores agora"));
         Nota(servidores, ajustes.LerServidores());
-        Botao(servidores, "Abrir o painel Rede", () => { ajustes.AbrirPainelDeRede(); Close(); });
+        Botao(servidores, Idioma.T("Abrir o painel Rede"), () => { ajustes.AbrirPainelDeRede(); Close(); });
     }
 
     void MontarBluetooth(StackPanel painel)
     {
-        var grupo = Grupo(painel, "Dispositivos");
+        var grupo = Grupo(painel, Idioma.T("Dispositivos"));
         Nota(grupo, ajustes.LerBluetooth());
-        Botao(grupo, "Abrir o painel Bluetooth",
+        Botao(grupo, Idioma.T("Abrir o painel Bluetooth"),
             () => { ajustes.AbrirPainelDeBluetooth(); Close(); });
 
-        var simulado = Grupo(painel, "Celular simulado");
-        CaixaGuardada(simulado, "Abrir o celular sozinho quando uma placa ligar o Bluetooth",
+        var simulado = Grupo(painel, Idioma.T("Celular simulado"));
+        CaixaGuardada(simulado, Idioma.T("Abrir o celular sozinho quando uma placa ligar o Bluetooth"),
                       Preferencias.AbrirCelularSozinho, true);
-        Nota(simulado, "Ele abre uma vez por rodada, quando o sketch chama SerialBT.begin() ou começa a anunciar "
-                       + "pelo BLE. Desligado, o celular só abre pelo botão do painel Bluetooth.");
+        Nota(simulado, Idioma.T("Ele abre uma vez por rodada, quando o sketch chama SerialBT.begin() ou começa a anunciar pelo BLE. Desligado, o celular só abre pelo botão do painel Bluetooth."));
 
-        var celular = Grupo(painel, "Celular de verdade");
-        Nota(celular, "Com o Bluetooth do computador ligado, a placa que chama SerialBT.begin(\"nome\") "
-                      + "aparece no rádio do computador como o serviço \"CircuitSketch nome\". No celular: "
-                      + "pareie com este computador (nas configurações de Bluetooth do Windows), abra o app de "
-                      + "terminal Bluetooth (no Android, o Serial Bluetooth Terminal) e conecte no computador. "
-                      + "O que o celular manda chega no SerialBT.read() do sketch.");
-        CaixaGuardada(celular, "Usar o Bluetooth deste computador para o celular de verdade",
+        var celular = Grupo(painel, Idioma.T("Celular de verdade"));
+        Nota(celular, Idioma.T("Com o Bluetooth do computador ligado, a placa que chama SerialBT.begin(\"nome\") aparece no rádio do computador como o serviço \"CircuitSketch nome\". No celular: pareie com este computador (nas configurações de Bluetooth do Windows), abra o app de terminal Bluetooth (no Android, o Serial Bluetooth Terminal) e conecte no computador. O que o celular manda chega no SerialBT.read() do sketch."));
+        CaixaGuardada(celular, Idioma.T("Usar o Bluetooth deste computador para o celular de verdade"),
                       Preferencias.BluetoothDoComputador, true);
         if (ServicoBluetoothDoPc.Motivo is { } motivo)
-            Nota(celular, "Na última vez: " + motivo + ".");
+            Nota(celular, Idioma.T("Na última vez: {0}.", motivo));
 
-        var doPc = Grupo(painel, "Bluetooth deste computador");
+        var doPc = Grupo(painel, Idioma.T("Bluetooth deste computador"));
         Nota(doPc, RadioDoComputador.Desligado
-            ? "A consulta ao computador está desligada em WiFi deste computador."
+            ? Idioma.T("A consulta ao computador está desligada em WiFi deste computador.")
             : RadioDoComputador.Bluetooths().Count > 0
-                ? "Aparelhos que a máquina conhece: "
+                ? Idioma.T("Aparelhos que a máquina conhece: ")
                   + string.Join(", ", RadioDoComputador.Bluetooths())
-                : "Não foi possível usar o Bluetooth deste computador: "
-                  + (RadioDoComputador.MotivoDoBluetooth ?? "motivo desconhecido")
-                  + ". As conexões entre a placa e o celular continuam simuladas.");
+                : Idioma.T("Não foi possível usar o Bluetooth deste computador: {0}. As conexões entre a placa e o celular continuam simuladas.", (RadioDoComputador.MotivoDoBluetooth ?? Idioma.T("motivo desconhecido"))));
+    }
+
+    /// <summary>O nome do idioma na lista: "English", ou "English — 62%" enquanto a traducao anda.</summary>
+    internal static string NomeDoIdioma(string codigo, string nome)
+    {
+        double feito = Idioma.Progresso(codigo);
+        return feito >= 1 ? nome : $"{nome} — {Math.Floor(feito * 100):0}%";
     }
 
     void MontarIdioma(StackPanel painel)
     {
         var grupo = Grupo(painel, Idioma.T("Idioma"));
 
-        // So os idiomas com o catalogo completo: caixa que nao faz nada (ou
-        // que deixa metade da tela em cada lingua) e pior do que caixa nenhuma.
-        var idiomas = Idioma.Disponiveis(soCompletos: true);
-        if (idiomas.Count > 1)
-        {
-            EscolhaGuardada(grupo, Idioma.T("Idioma da interface"), Preferencias.Idioma, Idioma.Original,
-                [.. idiomas.Select(i => (i.Codigo, i.Nome))]);
-            Nota(grupo, Idioma.T("O idioma novo vale ao reabrir o CircuitSketch."));
-        }
-        else
-            Nota(grupo, "Português por enquanto. Os outros idiomas entram quando "
-                        + "estiverem prontos — caixa que não faz nada é pior do que "
-                        + "caixa nenhuma.");
+        // Todos os idiomas com catalogo; o que ainda nao esta completo vem com
+        // a porcentagem traduzida ao lado do nome ("English — 62%"), para
+        // ninguem escolher achando que a tela inteira vai mudar.
+        var idiomas = Idioma.Disponiveis();
+        EscolhaGuardada(grupo, Idioma.T("Idioma da interface"), Preferencias.Idioma, Idioma.Original,
+            [.. idiomas.Select(i => (i.Codigo, NomeDoIdioma(i.Codigo, i.Nome)))]);
+        Nota(grupo, Idioma.T("O idioma novo vale ao reabrir o CircuitSketch."));
+        if (idiomas.Any(i => Idioma.Progresso(i.Codigo) < 1))
+            Nota(grupo, Idioma.T("Idioma com porcentagem ainda está sendo traduzido: o que falta aparece em português."));
 
-        var bibliotecas = Grupo(painel, "Bibliotecas");
-        Nota(bibliotecas, "Quais o simulador executa, quais o seu sketch pede, "
-                          + "e instalar uma de fora (a pasta ou o .zip) — o simulador roda o código C++ dela.");
+        var bibliotecas = Grupo(painel, Idioma.T("Bibliotecas"));
+        Nota(bibliotecas, Idioma.T("Quais o simulador executa, quais o seu sketch pede, e instalar uma de fora (a pasta ou o .zip) — o simulador roda o código C++ dela."));
         if (ajustes.AbrirBibliotecas is not null)
-            Botao(bibliotecas, "Abrir o gerenciador de bibliotecas",
+            Botao(bibliotecas, Idioma.T("Abrir o gerenciador de bibliotecas"),
                 () => { ajustes.AbrirBibliotecas(); Close(); });
 
-        var plugins = Grupo(painel, "Plugins");
-        Nota(plugins, "Cada plugin é uma pasta com arquivos .cs dentro de \"plugins\", ao lado do programa. "
-                      + "Ele roda código no seu computador: só coloque plugins de quem você confia.");
+        var plugins = Grupo(painel, Idioma.T("Plugins"));
+        Nota(plugins, Idioma.T("Cada plugin é uma pasta com arquivos .cs dentro de \"plugins\", ao lado do programa. Ele roda código no seu computador: só coloque plugins de quem você confia."));
         MontarPlugins(plugins);
-        Botao(plugins, "Abrir a pasta de plugins", () =>
+        Botao(plugins, Idioma.T("Abrir a pasta de plugins"), () =>
         {
             try
             {
@@ -824,8 +805,7 @@ public class JanelaConfiguracoes : Window
             }
             catch (Exception ex) { MessageBox.Show(this, ex.Message, "Plugins"); }
         });
-        Nota(plugins, "O carregamento de componentes e microcontroladores de "
-                      + "terceiros entra depois que o programa estiver fechado.");
+        Nota(plugins, Idioma.T("O carregamento de componentes e microcontroladores de terceiros entra depois que o programa estiver fechado."));
     }
 
     /// <summary>
@@ -838,7 +818,7 @@ public class JanelaConfiguracoes : Window
         Plugins.RegistrarInstalados();
         if (Plugins.Todos.Count == 0)
         {
-            Nota(painel, "Nenhum plugin na pasta.");
+            Nota(painel, Idioma.T("Nenhum plugin na pasta."));
             return;
         }
 
@@ -848,17 +828,17 @@ public class JanelaConfiguracoes : Window
             Style = (Style)Application.Current.FindResource("CampoEscuro"),
             Width = 220,
             Margin = new Thickness(0, 0, 10, 0),
-            ToolTip = "Procurar pelo nome, pela descrição ou pelo autor",
+            ToolTip = Idioma.T("Procurar pelo nome, pela descrição ou pelo autor"),
         };
-        var valorDaCategoria = Valor("Todas");
+        var valorDaCategoria = Valor(Idioma.T("Todas"));
         var blocos = new StackPanel { Margin = new Thickness(0, 8, 0, 0) };
 
         var filtros = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 9, 0, 0) };
         filtros.Children.Add(procura);
         var linhaDaCategoria = new StackPanel();
-        Escolha(linhaDaCategoria, "Categoria", valorDaCategoria,
-            new (string, Action)[] { ("Todas", () => { categoria = null; Refazer(); }) }
-                .Concat(Plugins.Categorias.Select(c => (c, (Action)(() => { categoria = c; Refazer(); })))));
+        Escolha(linhaDaCategoria, Idioma.T("Categoria"), valorDaCategoria,
+            new (string, Action)[] { (Idioma.T("Todas"), () => { categoria = null; Refazer(); }) }
+                .Concat(Plugins.Categorias.Select(c => (Idioma.T(c), (Action)(() => { categoria = c; Refazer(); })))));
         if (linhaDaCategoria.Children.Count > 0 && linhaDaCategoria.Children[0] is FrameworkElement escolha)
         {
             linhaDaCategoria.Children.Clear();
@@ -872,15 +852,15 @@ public class JanelaConfiguracoes : Window
 
         void Refazer()
         {
-            valorDaCategoria.Text = categoria ?? "Todas";
+            valorDaCategoria.Text = categoria is null ? Idioma.T("Todas") : Idioma.T(categoria);
             blocos.Children.Clear();
             string termo = procura.Text.Trim();
             var vistos = Plugins.Todos
                 .Where(p => categoria is null || p.Categoria == categoria)
-                .Where(p => termo.Length == 0 || new[] { p.Nome, p.Descricao, p.Autor, p.Categoria }
+                .Where(p => termo.Length == 0 || new[] { p.Nome, p.Descricao, p.Autor, p.Categoria, Idioma.T(p.Descricao), Idioma.T(p.Categoria) }
                     .Any(t => t?.Contains(termo, StringComparison.CurrentCultureIgnoreCase) == true))
                 .ToList();
-            if (vistos.Count == 0) Nota(blocos, "Nenhum plugin com esse filtro.");
+            if (vistos.Count == 0) Nota(blocos, Idioma.T("Nenhum plugin com esse filtro."));
             foreach (var plugin in vistos) blocos.Children.Add(BlocoDoPlugin(plugin));
         }
     }
@@ -911,14 +891,14 @@ public class JanelaConfiguracoes : Window
             corpo.Children.Add(v);
         }
 
-        Linha("Descrição:", plugin.Descricao);
-        Linha("Versão:", plugin.Versao);
+        Linha(Idioma.T("Descrição:"), Idioma.T(plugin.Descricao));
+        Linha(Idioma.T("Versão:"), plugin.Versao);
         if (plugin.Instalado is { } instalado)
-            Linha("Instalado:", $"na {instalado.Programa}, em {instalado.Dia}"
-                                + (instalado.Versao == plugin.Versao || instalado.Versao.Length == 0 ? "" : $" (com a versão {instalado.Versao})"));
-        Linha("Autor:", plugin.Autor);
-        Linha("Arquivo:", string.Join(", ", plugin.Arquivos.Select(a => Path.Combine("plugins", a))));
-        Linha("Erro:", plugin.Erro, Tema.Erro);
+            Linha(Idioma.T("Instalado:"), Idioma.T("na {0}, em {1}", instalado.Programa, instalado.Dia)
+                                + (instalado.Versao == plugin.Versao || instalado.Versao.Length == 0 ? "" : Idioma.T(" (com a versão {0})", instalado.Versao)));
+        Linha(Idioma.T("Autor:"), plugin.Autor);
+        Linha(Idioma.T("Arquivo:"), string.Join(", ", plugin.Arquivos.Select(a => Path.Combine("plugins", a))));
+        Linha(Idioma.T("Erro:"), plugin.Erro, Tema.Erro);
 
         var seta = new TextBlock
         {
@@ -931,13 +911,13 @@ public class JanelaConfiguracoes : Window
             IsEnabled = plugin.Erro is null,
             VerticalAlignment = VerticalAlignment.Center,
             Margin = new Thickness(0, 0, 8, 0),
-            ToolTip = plugin.Erro is null ? "Ligar ou desligar o plugin" : "Não carregou: veja o erro",
+            ToolTip = plugin.Erro is null ? Idioma.T("Ligar ou desligar o plugin") : Idioma.T("Não carregou: veja o erro"),
         };
         string id = plugin.Id;
         caixa.Checked += (_, _) => Plugins.Ligar(id, true);
         caixa.Unchecked += (_, _) => Plugins.Ligar(id, false);
         var nome = new TextBlock { VerticalAlignment = VerticalAlignment.Center, Cursor = Cursors.Hand, FontSize = 12 };
-        nome.Inlines.Add(new System.Windows.Documents.Run(plugin.Categoria + ": ") { Foreground = Tema.Pincel(Tema.TextoFraco) });
+        nome.Inlines.Add(new System.Windows.Documents.Run(Idioma.T(plugin.Categoria) + ": ") { Foreground = Tema.Pincel(Tema.TextoFraco) });
         nome.Inlines.Add(new System.Windows.Documents.Run(plugin.Nome)
         {
             Foreground = Tema.Pincel(plugin.Erro is null ? Tema.TextoForte : Tema.Erro), FontWeight = FontWeights.SemiBold,
@@ -971,18 +951,16 @@ public class JanelaConfiguracoes : Window
 
     void MontarAjuda(StackPanel painel)
     {
-        var grupo = Grupo(painel, "Manual");
-        Nota(grupo, "A lista do que dá para fazer no circuito, no código e no teclado.");
-        Botao(grupo, "Abrir a ajuda", () => ajustes.AbrirAjuda());
+        var grupo = Grupo(painel, Idioma.T("Manual"));
+        Nota(grupo, Idioma.T("A lista do que dá para fazer no circuito, no código e no teclado."));
+        Botao(grupo, Idioma.T("Abrir a ajuda"), () => ajustes.AbrirAjuda());
 
-        var fabrica = Grupo(painel, "Configurações de fábrica");
-        Nota(fabrica, "Volta todas as configurações ao que o programa traz de fábrica: tema, "
-                      + "editor, monitor, simulação, arquivos e janela. Os projetos e a lista de "
-                      + "recentes ficam como estão.");
-        Botao(fabrica, "Voltar tudo ao padrão", () =>
+        var fabrica = Grupo(painel, Idioma.T("Configurações de fábrica"));
+        Nota(fabrica, Idioma.T("Volta todas as configurações ao que o programa traz de fábrica: tema, editor, monitor, simulação, arquivos e janela. Os projetos e a lista de recentes ficam como estão."));
+        Botao(fabrica, Idioma.T("Voltar tudo ao padrão"), () =>
         {
-            var r = MessageBox.Show(this, "Voltar todas as configurações ao padrão de fábrica?",
-                "Configurações de fábrica", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var r = MessageBox.Show(this, Idioma.T("Voltar todas as configurações ao padrão de fábrica?"),
+                Idioma.T("Configurações de fábrica"), MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (r != MessageBoxResult.Yes) return;
             RestaurarPadroes();
         });
@@ -1005,7 +983,7 @@ public class JanelaConfiguracoes : Window
     // =====================================================================
 
     static string NomeDoTracado(string id)
-        => Tracados.FirstOrDefault(t => t.Id == id).Nome ?? "Solto (curva)";
+        => Tracados.FirstOrDefault(t => t.Id == id).Nome ?? Idioma.T("Solto (curva)");
 
     static string NomeDaCor((string Nome, string Hex)[] cores, string hex)
         => cores.FirstOrDefault(c => c.Hex == hex).Nome ?? hex;

@@ -100,7 +100,7 @@ public sealed partial class Energia
             double volts = TensaoEntre(placa.Id, entrada.Pino, terra);
             if (volts > entrada.Queima)
                 return new(false, entrada.Pino, volts,
-                    $"recebeu {volts:0.#} V no pino {entrada.Pino}, que aguenta até {entrada.Maximo:0.#} V",
+                    Idioma.T("recebeu {0:0.#} V no pino {1}, que aguenta até {2:0.#} V", volts, entrada.Pino, entrada.Maximo),
                     Queimou: true, Direto: entrada.Direto);
         }
         return null;
@@ -172,7 +172,7 @@ public sealed partial class Energia
             if (demais.Entrada is not null)
             {
                 alimentacao[placa.Id] = new(false, demais.Entrada.Pino, demais.Volts,
-                    $"recebeu {demais.Volts:0.#} V no pino {demais.Entrada.Pino}, que aguenta até {demais.Entrada.Maximo:0.#} V",
+                    Idioma.T("recebeu {0:0.#} V no pino {1}, que aguenta até {2:0.#} V", demais.Volts, demais.Entrada.Pino, demais.Entrada.Maximo),
                     Queimou: true, Direto: demais.Entrada.Direto);
                 continue;
             }
@@ -183,15 +183,13 @@ public sealed partial class Energia
                 var fraca = medidas.Where(m => m.Volts > 0.5).OrderByDescending(m => m.Volts).FirstOrDefault();
                 var pinos = entradas.Select(e => e.Pino).Distinct().Take(3).ToList();
                 alimentacao[placa.Id] = new(false, fraca.Entrada?.Pino, fraca.Volts, fraca.Entrada is not null
-                    ? $"{fraca.Volts:0.##} V no pino {fraca.Entrada.Pino} não bastam: ela precisa de {fraca.Entrada.Minimo:0.#} V ali para ligar"
-                    : "sem o cabo USB (há bateria no circuito), e nenhuma bateria chega no "
-                      + (pinos.Count > 1 ? string.Join(", ", pinos.SkipLast(1)) + " ou " + pinos[^1] : pinos[0])
-                      + " dela (com o − no GND)");
+                    ? Idioma.T("{0:0.##} V no pino {1} não bastam: ela precisa de {2:0.#} V ali para ligar", fraca.Volts, fraca.Entrada.Pino, fraca.Entrada.Minimo)
+                    : Idioma.T("sem o cabo USB (há bateria no circuito), e nenhuma bateria chega no {0} dela (com o − no GND)", (pinos.Count > 1 ? string.Join(", ", pinos.SkipLast(1)) + " " + Idioma.T("ou") + " " + pinos[^1] : pinos[0])));
                 continue;
             }
 
             alimentacao[placa.Id] = new(true, boa.Entrada.Pino, boa.Volts,
-                boa.Volts > boa.Entrada.Maximo ? $"acima dos {boa.Entrada.Maximo:0.#} V do pino, o regulador esquenta" : null);
+                boa.Volts > boa.Entrada.Maximo ? Idioma.T("acima dos {0:0.#} V do pino, o regulador esquenta", boa.Entrada.Maximo) : null);
 
             // Ligada so com a simulacao rodando (como a da USB): parada, ou
             // antes do Rodar a ligar, ela nao puxa nada e o regulador fica apagado.

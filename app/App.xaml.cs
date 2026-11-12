@@ -138,10 +138,10 @@ public partial class App : Application
 
         var etapas = new Queue<(int esperaMs, string rotulo, Action acao)>();
         etapas.Enqueue((300, "inicio", null));
-        etapas.Enqueue((2200, "depois de RODAR", janela.TesteRodar));
-        etapas.Enqueue((800, "depois de PARAR", janela.TesteParar));
-        etapas.Enqueue((1800, "depois de RODAR de novo", janela.TesteRodar));
-        etapas.Enqueue((600, "depois de PARAR de novo", janela.TesteParar));
+        etapas.Enqueue((2200, Idioma.T("depois de RODAR"), janela.TesteRodar));
+        etapas.Enqueue((800, Idioma.T("depois de PARAR"), janela.TesteParar));
+        etapas.Enqueue((1800, Idioma.T("depois de RODAR de novo"), janela.TesteRodar));
+        etapas.Enqueue((600, Idioma.T("depois de PARAR de novo"), janela.TesteParar));
 
         var passo = new System.Windows.Threading.DispatcherTimer();
 
@@ -187,8 +187,12 @@ public partial class App : Application
         // O idioma (Alpha 25): o escolhido nas configuracoes. Enquanto os
         // catalogos estao pela metade, o padrao e o portugues original (e nao
         // o do Windows, que daria metade da tela em cada lingua). Os testes
-        // conferem os textos em portugues: neles, sempre o original.
-        Idioma.Usar(Armazem.Isolado ? Idioma.Original : Preferencias.Texto(Preferencias.Idioma, Idioma.Original));
+        // conferem os textos em portugues: neles, sempre o original -- a nao
+        // ser que o comando peca outro com "--idioma en" (a varredura da tela
+        // em ingles roda assim, num processo so dela).
+        int iIdioma = Array.IndexOf(e.Args, "--idioma");
+        Idioma.Usar(!Armazem.Isolado ? Preferencias.Texto(Preferencias.Idioma, Idioma.Original)
+                    : iIdioma >= 0 && iIdioma + 1 < e.Args.Length ? e.Args[iIdioma + 1] : Idioma.Original);
 
         DispatcherUnhandledException += (_, ev) =>
         {
@@ -198,7 +202,7 @@ public partial class App : Application
             // prenderia o roteiro inteiro. La a excecao vai para o
             // relatorio, que e o lugar dela.
             if (!Passeio.Ativo)
-                MessageBox.Show(ev.Exception.Message, "Erro no simulador",
+                MessageBox.Show(ev.Exception.Message, Idioma.T("Erro no simulador"),
                                 MessageBoxButton.OK, MessageBoxImage.Error);
             ev.Handled = true;                 // nao derruba a janela
         };
@@ -234,8 +238,8 @@ public partial class App : Application
             buzina.Parar();
             Thread.Sleep(120);
             relato.AppendLine(buzina.Ativa
-                ? "placa de som respondeu"
-                : "sem saida de audio nesta maquina");
+                ? Idioma.T("placa de som respondeu")
+                : Idioma.T("sem saida de audio nesta maquina"));
             buzina.Dispose();
 
             if (iAudio + 1 < e.Args.Length && !e.Args[iAudio + 1].StartsWith("--"))

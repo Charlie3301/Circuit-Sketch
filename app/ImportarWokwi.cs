@@ -84,7 +84,7 @@ public static class ImportarWokwi
         using var doc = JsonDocument.Parse(json, Opcoes);
         var raiz = doc.RootElement;
         if (raiz.ValueKind != JsonValueKind.Object)
-            return estrito ? Recusa("o diagrama tem que ser um objeto { ... }") : new Resultado(circuito, []);
+            return estrito ? Recusa(Idioma.T("o diagrama tem que ser um objeto { ... }")) : new Resultado(circuito, []);
 
         circuito.Nome = Texto(raiz, "name");
         circuito.Autor = Texto(raiz, "author");
@@ -104,12 +104,12 @@ public static class ImportarWokwi
                 string id = Texto(parte, "id");
                 if (string.IsNullOrEmpty(tipoWokwi) || string.IsNullOrEmpty(id))
                 {
-                    if (estrito) return Recusa("toda peca precisa de \"type\" e \"id\"");
+                    if (estrito) return Recusa(Idioma.T("toda peca precisa de \"type\" e \"id\""));
                     continue;
                 }
                 if (id.Contains(':'))
                 {
-                    if (estrito) return Recusa($"o id '{id}' tem ':', que separa a peca do pino nas ligacoes");
+                    if (estrito) return Recusa(Idioma.T("o id '{0}' tem ':', que separa a peca do pino nas ligacoes", id));
                     id = id.Replace(':', '_');
                 }
 
@@ -124,14 +124,14 @@ public static class ImportarWokwi
 
                 if (tipo is null || Catalogo.Obter(tipo) is null)
                 {
-                    if (estrito) return Recusa($"a peca '{tipoWokwi}' nao existe no catalogo");
+                    if (estrito) return Recusa(Idioma.T("a peca '{0}' nao existe no catalogo", tipoWokwi));
                     ignorados.Add(tipoWokwi);
                     continue;
                 }
 
                 if (porId.ContainsKey(id))
                 {
-                    if (estrito) return Recusa($"o id '{id}' aparece em mais de uma peca");
+                    if (estrito) return Recusa(Idioma.T("o id '{0}' aparece em mais de uma peca", id));
                     int n = 2;
                     while (porId.ContainsKey($"{id}_{n}")) n++;
                     id = $"{id}_{n}";

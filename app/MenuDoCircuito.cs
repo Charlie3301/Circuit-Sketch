@@ -38,11 +38,11 @@ public partial class MainWindow
         // Estes tres valem em qualquer lugar: sao do circuito, e nao do
         // que esta debaixo do ponteiro.
         Separar(menu);
-        Item(menu, "Desfazer", "desfazer", Desfazer);
-        Item(menu, "Refazer", "refazer", Refazer);
+        Item(menu, Idioma.T("Desfazer"), "desfazer", Desfazer);
+        Item(menu, Idioma.T("Refazer"), "refazer", Refazer);
         Separar(menu);
-        Item(menu, "Ajustar à tela", "ajustar", (_, _) => editor.Ajustar());
-        Item(menu, "Adicionar componente…", "adicionar", (_, _) => AdicionarPeca());
+        Item(menu, Idioma.T("Ajustar à tela"), "ajustar", (_, _) => editor.Ajustar());
+        Item(menu, Idioma.T("Adicionar componente…"), "adicionar", (_, _) => AdicionarPeca());
 
         editor.ContextMenu = menu;
         menu.IsOpen = true;
@@ -56,25 +56,25 @@ public partial class MainWindow
         menu.Items.Add(new MenuItem
         {
             Header = quantas > 1
-                ? $"{quantas} peças selecionadas"
-                : Catalogo.Obter(peca?.Tipo)?.Nome ?? "peça",
+                ? Idioma.T("{0} peças selecionadas", quantas)
+                : Catalogo.Obter(peca?.Tipo)?.Nome ?? Idioma.T("peça"),
             IsEnabled = false,
             FontWeight = FontWeights.SemiBold,
         });
         Separar(menu);
 
-        Item(menu, "Girar 90°", "girar", Girar);
-        Item(menu, "Espelhar", "espelhar", Espelhar);
+        Item(menu, Idioma.T("Girar 90°"), "girar", Girar);
+        Item(menu, Idioma.T("Espelhar"), "espelhar", Espelhar);
         Separar(menu);
-        Item(menu, "Copiar", "copiar", Copiar);
-        Item(menu, "Colar", "colar", Colar);
+        Item(menu, Idioma.T("Copiar"), "copiar", Copiar);
+        Item(menu, Idioma.T("Colar"), "colar", Colar);
 
         // Duplicar e copiar e colar num passo so: e o que se faz o tempo
         // todo montando uma fileira de LEDs.
-        Item(menu, "Duplicar", null, (_, _) => { editor.Copiar(); editor.Colar(); });
+        Item(menu, Idioma.T("Duplicar"), null, (_, _) => { editor.Copiar(); editor.Colar(); });
 
         Separar(menu);
-        Item(menu, "Excluir", "excluir", Excluir);
+        Item(menu, Idioma.T("Excluir"), "excluir", Excluir);
 
         if (quantas != 1 || peca is null) return;
 
@@ -83,22 +83,22 @@ public partial class MainWindow
         // A placa tem o seu proprio par de acoes: o codigo e dela.
         if (PerfilPlaca.EhPlaca(peca.Tipo))
         {
-            Item(menu, "Mostrar o código desta placa", null, (_, _) =>
+            Item(menu, Idioma.T("Mostrar o código desta placa"), null, (_, _) =>
             {
                 placaDoEditor = peca.Id;
                 AbrirArquivoDoProjeto(null);
                 MostrarCodigoDaPlaca();
             });
-            Item(menu, "Reiniciar (RESET)", null, (_, _) =>
+            Item(menu, Idioma.T("Reiniciar (RESET)"), null, (_, _) =>
             {
                 SegurarReset(peca.Id);
                 SoltarReset(peca.Id);
             });
         }
 
-        Item(menu, "Renomear…", null, (_, _) =>
+        Item(menu, Idioma.T("Renomear…"), null, (_, _) =>
         {
-            string novo = Dialogos.Perguntar(this, "Nome da peça", peca.Nome ?? "");
+            string novo = Dialogos.Perguntar(this, Idioma.T("Nome da peça"), peca.Nome ?? "");
             if (novo is not null) editor.DefinirNome(peca, novo);
         });
     }
@@ -107,13 +107,13 @@ public partial class MainWindow
     {
         menu.Items.Add(new MenuItem
         {
-            Header = "fio",
+            Header = Idioma.T("fio"),
             IsEnabled = false,
             FontWeight = FontWeights.SemiBold,
         });
         Separar(menu);
 
-        var cores = new MenuItem { Header = "Cor do fio" };
+        var cores = new MenuItem { Header = Idioma.T("Cor do fio") };
         foreach (var (nome, hex) in CoresDeFio)
         {
             string cor = hex;
@@ -123,12 +123,12 @@ public partial class MainWindow
         }
         menu.Items.Add(cores);
 
-        var estilos = new MenuItem { Header = "Formato" };
+        var estilos = new MenuItem { Header = Idioma.T("Formato") };
         foreach (var (id, nome) in new[]
                  {
-                     (Fio.EstiloSolto, "Solto"),
-                     (Fio.EstiloReto, "Reto"),
-                     (Fio.EstiloDegrau, "Em degrau"),
+                     (Fio.EstiloSolto, Idioma.T("Solto")),
+                     (Fio.EstiloReto, Idioma.T("Reto")),
+                     (Fio.EstiloDegrau, Idioma.T("Em degrau")),
                  })
         {
             string qual = id;
@@ -139,14 +139,14 @@ public partial class MainWindow
         menu.Items.Add(estilos);
 
         Separar(menu);
-        Item(menu, "Excluir o fio", "excluir", Excluir);
+        Item(menu, Idioma.T("Excluir o fio"), "excluir", Excluir);
     }
 
     void MontarParaOVazio(ContextMenu menu)
     {
-        Item(menu, "Colar", "colar", Colar);
+        Item(menu, Idioma.T("Colar"), "colar", Colar);
         Separar(menu);
-        Item(menu, "Ligar ou desligar a grade", "grade", (_, _) => DefinirGrade(!editor.MostrarGrade));
+        Item(menu, Idioma.T("Ligar ou desligar a grade"), "grade", (_, _) => DefinirGrade(!editor.MostrarGrade));
     }
 
     /// <summary>

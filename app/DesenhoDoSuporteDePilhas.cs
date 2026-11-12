@@ -117,7 +117,7 @@ public partial class EditorCircuito
                     dc.DrawEllipse(null, Caneta(Color.FromRgb(0xB5, 0xBB, 0xC2), 0.25 * mm), centro, r - 1.0 * mm, r - 1.0 * mm);
                     Texto("+", 4.2 * mm, Color.FromRgb(0x4A, 0x4F, 0x56), new Point(centro.X, centro.Y - 4.6 * mm));
                     Texto("CR2032", 2.9 * mm, Color.FromRgb(0x3A, 0x3E, 0x44), new Point(centro.X, centro.Y + 0.6 * mm));
-                    Texto("3V  LÍTIO", 1.8 * mm, Color.FromRgb(0x5A, 0x5F, 0x66), new Point(centro.X, centro.Y + 4.0 * mm));
+                    Texto(Idioma.T("3V  LÍTIO"), 1.8 * mm, Color.FromRgb(0x5A, 0x5F, 0x66), new Point(centro.X, centro.Y + 4.0 * mm));
                 }
                 else
                 {

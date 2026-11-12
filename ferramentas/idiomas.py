@@ -7,7 +7,12 @@ script:
 
   - acha toda frase marcada para traducao:
       C#   : Idioma.T("Salvar projeto")  /  Idioma.T("{0} pecas", n)
+             Idioma.N("Braco curto") -- marca sem traduzir (tabela de dados
+             que so vira tela depois, por um Idioma.T(variavel))
       XAML : Header="{local:T 'Salvar projeto'}"
+      e o que vem junto e aparece na tela: o "sentence=" do library.properties
+      das bibliotecas da pasta bibliotecas, e o Descricao e a Categoria dos
+      plugins da pasta plugins (a tela os passa por Idioma.T)
   - acrescenta as frases novas a cada catalogo (com "" -- ainda nao
     traduzida), sem tocar no que ja foi traduzido;
   - guarda em "_obsoletos" as traducoes de frases que sairam do codigo (nada
@@ -29,10 +34,14 @@ BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CATALOGOS = os.path.join(BASE, 'motor', 'idiomas')
 PASTAS = ['app', 'motor']
 
-# Uma string C# comum (com os escapes) logo depois de Idioma.T(
-C_SHARP = re.compile(r'Idioma\.T\(\s*"((?:[^"\\\n]|\\.)*)"')
+# Uma string C# comum (com os escapes) logo depois de Idioma.T( -- ou varias
+# somadas ("..." + "..."), que o compilador junta numa so: a chave e a soma.
+C_SHARP = re.compile(r'Idioma\.[TN]\(\s*((?:"(?:[^"\\\n]|\\.)*"\s*\+\s*)*"(?:[^"\\\n]|\\.)*")(?!\s*\+)')
 XAML = re.compile(r"\{local:T\s+'((?:[^'\\]|\\.)*)'\s*\}")
 MARCA = re.compile(r'\{(\d+)(?:[,:][^}]*)?\}')
+# Num plugin: public const string Descricao = "..." + "...";
+PLUGIN = re.compile(r'const\s+string\s+(Descricao|Categoria)\s*=\s*((?:"(?:[^"\\\n]|\\.)*"\s*\+?\s*)+);')
+LITERAL = re.compile(r'"((?:[^"\\\n]|\\.)*)"')
 ESCAPES = {'n': '\n', 't': '\t', 'r': '\r', '"': '"', '\\': '\\', "'": "'", '0': '\0'}
 
 
@@ -68,10 +77,31 @@ def frases_do_codigo():
                 texto = io.open(caminho, encoding='utf-8-sig').read()
                 padrao = XAML if nome.endswith('.xaml') else C_SHARP
                 for m in padrao.finditer(texto):
-                    frase = desescapar(m.group(1))
+                    frase = desescapar(m.group(1)) if padrao is XAML else ''.join(desescapar(p) for p in LITERAL.findall(m.group(1)))
                     if frase:
                         linha = texto.count('\n', 0, m.start()) + 1
                         achadas.setdefault(frase, f'{os.path.relpath(caminho, BASE)}:{linha}')
+
+    # O que vem junto e a tela mostra, mas nao e codigo do programa: a frase
+    # do library.properties das bibliotecas que acompanham o simulador, e a
+    # descricao e a categoria dos plugins da pasta plugins.
+    for raiz, dirs, arquivos in os.walk(os.path.join(BASE, 'bibliotecas')):
+        if 'library.properties' in arquivos:
+            caminho = os.path.join(raiz, 'library.properties')
+            for linha, texto in enumerate(io.open(caminho, encoding='utf-8-sig'), 1):
+                if texto.startswith('sentence=') and texto[9:].strip():
+                    achadas.setdefault(texto[9:].strip(), f'{os.path.relpath(caminho, BASE)}:{linha}')
+    for raiz, dirs, arquivos in os.walk(os.path.join(BASE, 'plugins')):
+        for nome in arquivos:
+            if not nome.endswith('.cs'):
+                continue
+            caminho = os.path.join(raiz, nome)
+            texto = io.open(caminho, encoding='utf-8-sig').read()
+            for m in PLUGIN.finditer(texto):
+                frase = ''.join(desescapar(p) for p in LITERAL.findall(m.group(2)))
+                if frase:
+                    linha = texto.count('\n', 0, m.start()) + 1
+                    achadas.setdefault(frase, f'{os.path.relpath(caminho, BASE)}:{linha}')
     return achadas
 
 

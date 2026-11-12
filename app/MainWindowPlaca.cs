@@ -46,7 +46,7 @@ public partial class MainWindow
 
         GuardarCodigoDoEditor();
         var placa = PlacaDoEditor();
-        if (placa is null) { Erro("não há placa no circuito para verificar."); return; }
+        if (placa is null) { Erro(Idioma.T("não há placa no circuito para verificar.")); return; }
 
         var (doSimulador, simuladorAceitou) = await ConferirNoSimulador(placa);
 
@@ -59,7 +59,7 @@ public partial class MainWindow
             return;
         }
 
-        if (simuladorAceitou) Aviso(doSimulador + "; o compilador do Arduino confere agora (aba PLACA)…");
+        if (simuladorAceitou) Aviso(doSimulador + Idioma.T("; o compilador do Arduino confere agora (aba PLACA)…"));
         ComecarNaPlaca(placa, fqbn, null);
     }
 
@@ -81,7 +81,7 @@ public partial class MainWindow
             else
             {
                 verificando = true;
-                console.Info($"verificando {NomeDaPlaca(placa)}…");
+                console.Info(Idioma.T("verificando {0}…", NomeDaPlaca(placa)));
                 try { prog = await Task.Run(() => Compilador.CompilarProjeto(projeto)); }
                 finally { verificando = false; }
             }
@@ -92,12 +92,12 @@ public partial class MainWindow
                 var conta = Memoria.Estimar(prog, perfil);
                 if (conta.Estourou)
                 {
-                    Erro($"{NomeDaPlaca(placa)}: não cabe na placa — {conta.PorQueNaoCabe()}");
+                    Erro(Idioma.T("{0}: não cabe na placa — {1}", NomeDaPlaca(placa), conta.PorQueNaoCabe()));
                     return (null, false);
                 }
             }
 
-            return ($"{NomeDaPlaca(placa)}: o simulador aceitou o código", true);
+            return (Idioma.T("{0}: o simulador aceitou o código", NomeDaPlaca(placa)), true);
         }
         catch (Exception ex) when (ex is ErroDeSintaxe or ErroDeExecucao)
         {
@@ -111,14 +111,13 @@ public partial class MainWindow
     {
         var linguagem = Compilador.Detectar(placa.Sketch ?? "");
         if (linguagem == Linguagem.MicroPython)
-            return "MicroPython não passa pelo compilador do Arduino: na placa de verdade ele vai pelo Thonny ou pelo mpremote";
+            return Idioma.T("MicroPython não passa pelo compilador do Arduino: na placa de verdade ele vai pelo Thonny ou pelo mpremote");
         if (linguagem != Linguagem.Arduino)
-            return $"o compilador do Arduino é para C++; {Compilador.Nome(linguagem)} fica só no simulador";
+            return Idioma.T("o compilador do Arduino é para C++; {0} fica só no simulador", Compilador.Nome(linguagem));
         if (fqbn is null)
-            return $"a {PerfilPlaca.De(placa.Tipo)?.Nome ?? placa.Tipo} não tem um núcleo do Arduino para compilar";
+            return Idioma.T("a {0} não tem um núcleo do Arduino para compilar", PerfilPlaca.De(placa.Tipo)?.Nome ?? placa.Tipo);
         if (PlacaDeVerdade.Cli is null)
-            return "para compilar e mandar para a placa de verdade, instale a Arduino IDE 2 (arduino.cc/en/software) — "
-                   + "o simulador usa o compilador que vem dentro dela";
+            return Idioma.T("para compilar e mandar para a placa de verdade, instale a Arduino IDE 2 (arduino.cc/en/software) — o simulador usa o compilador que vem dentro dela");
         return null;
     }
 
@@ -136,7 +135,7 @@ public partial class MainWindow
 
         GuardarCodigoDoEditor();
         var placa = PlacaDoEditor();
-        if (placa is null) { Erro("não há placa no circuito para mandar."); return; }
+        if (placa is null) { Erro(Idioma.T("não há placa no circuito para mandar.")); return; }
 
         MostrarAba("placa");
         string fqbn = PlacaDeVerdade.FqbnDe(placa.Tipo);
@@ -147,13 +146,12 @@ public partial class MainWindow
             return;
         }
 
-        EstadoDaPlaca(placa, "procurando as placas ligadas na USB…");
+        EstadoDaPlaca(placa, Idioma.T("procurando as placas ligadas na USB…"));
         portasVistas = await Task.Run(PlacaDeVerdade.Portas);
 
         if (portasVistas.Count == 0)
         {
-            string nenhuma = "nenhuma placa na USB: ligue a placa no computador (com um cabo de dados, e não só de "
-                             + "carga) e aperte a seta de novo";
+            string nenhuma = Idioma.T("nenhuma placa na USB: ligue a placa no computador (com um cabo de dados, e não só de carga) e aperte a seta de novo");
             EstadoDaPlaca(placa, nenhuma);
             Erro(nenhuma + ".");
             AtualizarRotuloDaPorta();
@@ -166,7 +164,7 @@ public partial class MainWindow
                         : portasVistas.FirstOrDefault(p => p.Fqbn == fqbn));
         if (porta is null)
         {
-            EstadoDaPlaca(placa, $"há {portasVistas.Count} portas na USB: escolha a da placa em \"Escolher a porta\"");
+            EstadoDaPlaca(placa, Idioma.T("há {0} portas na USB: escolha a da placa em \"Escolher a porta\"", portasVistas.Count));
             AtualizarRotuloDaPorta();
             EscolherPortaDaPlaca();
             return;
@@ -177,15 +175,12 @@ public partial class MainWindow
 
         if (!Autoteste.Rodando && !Passeio.Ativo)
         {
-            string detectada = porta.Placa ?? "placa que o Windows não identificou";
+            string detectada = porta.Placa ?? Idioma.T("placa que o Windows não identificou");
             bool outra = porta.Fqbn is not null && porta.Fqbn != fqbn;
-            string pergunta = $"Mandar o código da {NomeDaPlaca(placa)} para a {porta.Endereco} ({detectada})?"
-                              + (outra
-                                  ? $"\n\nAtenção: nessa porta parece estar um(a) {porta.Placa}, e o código é para "
-                                    + $"{NomeDaPlaca(placa)} ({fqbn})."
-                                  : "")
-                              + "\n\nO programa que está na placa vai ser trocado por este.";
-            if (MessageBox.Show(this, pergunta, "Mandar para a placa", MessageBoxButton.YesNo,
+            string pergunta = Idioma.T("Mandar o código da {0} para a {1} ({2})?{3}\n\nO programa que está na placa vai ser trocado por este.", NomeDaPlaca(placa), porta.Endereco, detectada, (outra
+                                  ? Idioma.T("\n\nAtenção: nessa porta parece estar um(a) {0}, e o código é para {1} ({2}).", porta.Placa, NomeDaPlaca(placa), fqbn)
+                                  : ""));
+            if (MessageBox.Show(this, pergunta, Idioma.T("Mandar para a placa"), MessageBoxButton.YesNo,
                                 outra ? MessageBoxImage.Warning : MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return;
         }
@@ -198,7 +193,7 @@ public partial class MainWindow
     {
         if (PlacaDeVerdade.Cli is null)
         {
-            EstadoDaPlaca(PlacaDoEditor(), "sem a Arduino IDE 2 instalada, o simulador não enxerga as portas USB");
+            EstadoDaPlaca(PlacaDoEditor(), Idioma.T("sem a Arduino IDE 2 instalada, o simulador não enxerga as portas USB"));
             return;
         }
 
@@ -206,7 +201,7 @@ public partial class MainWindow
         var menu = new ContextMenu { PlacementTarget = btPortaPlaca };
 
         if (portasVistas.Count == 0)
-            menu.Items.Add(new MenuItem { Header = "nenhuma placa na USB", IsEnabled = false });
+            menu.Items.Add(new MenuItem { Header = Idioma.T("nenhuma placa na USB"), IsEnabled = false });
 
         foreach (var porta in portasVistas)
         {
@@ -224,7 +219,7 @@ public partial class MainWindow
             menu.Items.Add(item);
         }
 
-        var atualizar = new MenuItem { Header = "Procurar de novo" };
+        var atualizar = new MenuItem { Header = Idioma.T("Procurar de novo") };
         atualizar.Click += (_, _) => EscolherPortaDaPlaca();
         menu.Items.Add(new Separator());
         menu.Items.Add(atualizar);
@@ -238,7 +233,7 @@ public partial class MainWindow
     {
         var porta = portasVistas.FirstOrDefault(p => p.Endereco == portaEscolhida);
         txtPortaEscolhida.Text = portaEscolhida is null
-            ? portasVistas.Count == 0 ? "nenhuma placa na USB" : $"{portasVistas.Count} porta(s) — escolha uma"
+            ? portasVistas.Count == 0 ? Idioma.T("nenhuma placa na USB") : Idioma.T("{0} porta(s) — escolha uma", portasVistas.Count)
             : porta?.Placa is { } nome ? $"{portaEscolhida} — {nome}" : portaEscolhida;
     }
 
@@ -261,9 +256,8 @@ public partial class MainWindow
 
         string nucleo = PlacaDeVerdade.NucleoDe(fqbn);
         EstadoDaPlaca(placa, porta is null
-            ? $"compilando para {fqbn} com o compilador do Arduino… (a primeira vez de uma placa demora: "
-              + "ele compila o núcleo inteiro)"
-            : $"compilando e mandando para a {porta}…");
+            ? Idioma.T("compilando para {0} com o compilador do Arduino… (a primeira vez de uma placa demora: ele compila o núcleo inteiro)", fqbn)
+            : Idioma.T("compilando e mandando para a {0}…", porta));
         LogDaPlaca($"> arduino-cli compile --fqbn {fqbn}" + (porta is null ? "" : $" --upload -p {porta}"));
 
         Task.Run(() =>
@@ -290,14 +284,12 @@ public partial class MainWindow
 
         if (resultado.Resumo == "#nucleo")
         {
-            string semNucleo = $"o núcleo {nucleo} não está instalado na Arduino IDE";
+            string semNucleo = Idioma.T("o núcleo {0} não está instalado na Arduino IDE", nucleo);
             EstadoDaPlaca(placa, semNucleo);
             Erro(semNucleo + ".");
             if (!Autoteste.Rodando && !Passeio.Ativo
-                && MessageBox.Show(this, $"O núcleo {nucleo} (o que compila para {NomeDaPlaca(placa)}) não está "
-                                         + "instalado na Arduino IDE.\n\nInstalar agora? Ele é baixado da internet "
-                                         + "e pode ter centenas de MB.",
-                                   "Instalar o núcleo", MessageBoxButton.YesNo, MessageBoxImage.Question)
+                && MessageBox.Show(this, Idioma.T("O núcleo {0} (o que compila para {1}) não está instalado na Arduino IDE.\n\nInstalar agora? Ele é baixado da internet e pode ter centenas de MB.", nucleo, NomeDaPlaca(placa)),
+                                   Idioma.T("Instalar o núcleo"), MessageBoxButton.YesNo, MessageBoxImage.Question)
                    == MessageBoxResult.Yes)
                 InstalarNaIde(() => PlacaDeVerdade.InstalarNucleo(nucleo, l => Dispatcher.BeginInvoke(() => LogDaPlaca(l)),
                                                                   CancellationToken.None),
@@ -308,8 +300,8 @@ public partial class MainWindow
         if (resultado.Ok)
         {
             string feito = porta is null
-                ? $"{NomeDaPlaca(placa)}: o compilador do Arduino também aceitou"
-                : $"{NomeDaPlaca(placa)}: pronto, o código foi para a placa na {porta}";
+                ? Idioma.T("{0}: o compilador do Arduino também aceitou", NomeDaPlaca(placa))
+                : Idioma.T("{0}: pronto, o código foi para a placa na {1}", NomeDaPlaca(placa), porta);
             if (resultado.Memoria is not null) feito += " — " + resultado.Memoria;
             EstadoDaPlaca(placa, feito);
             Aviso(feito);
@@ -319,20 +311,20 @@ public partial class MainWindow
         if (resultado.Resumo == "cancelado")
         {
             EstadoDaPlaca(placa, "cancelado");
-            Aviso("compilação cancelada.");
+            Aviso(Idioma.T("compilação cancelada."));
             return;
         }
 
-        EstadoDaPlaca(placa, "compilador do Arduino: " + resultado.Resumo);
-        Erro("compilador do Arduino: " + resultado.Resumo);
+        EstadoDaPlaca(placa, Idioma.T("compilador do Arduino: {0}", resultado.Resumo));
+        Erro(Idioma.T("compilador do Arduino: {0}", resultado.Resumo));
 
         // A biblioteca que o simulador ja traz e a IDE ainda nao tem.
-        var falta = System.Text.RegularExpressions.Regex.Match(resultado.Resumo, "falta a biblioteca \"([^\"]+)\"");
-        if (falta.Success && !Autoteste.Rodando && !Passeio.Ativo
-            && MessageBox.Show(this, $"Instalar a biblioteca \"{falta.Groups[1].Value}\" na Arduino IDE agora?",
-                               "Instalar a biblioteca", MessageBoxButton.YesNo, MessageBoxImage.Question)
+        string falta = PlacaDeVerdade.BibliotecaQueFalta(resultado.Resumo);
+        if (falta is not null && !Autoteste.Rodando && !Passeio.Ativo
+            && MessageBox.Show(this, Idioma.T("Instalar a biblioteca \"{0}\" na Arduino IDE agora?", falta),
+                               Idioma.T("Instalar a biblioteca"), MessageBoxButton.YesNo, MessageBoxImage.Question)
                == MessageBoxResult.Yes)
-            InstalarNaIde(() => PlacaDeVerdade.InstalarBiblioteca(falta.Groups[1].Value,
+            InstalarNaIde(() => PlacaDeVerdade.InstalarBiblioteca(falta,
                                                                   l => Dispatcher.BeginInvoke(() => LogDaPlaca(l)),
                                                                   CancellationToken.None),
                           () => ComecarNaPlaca(placa, fqbn, porta));
@@ -344,14 +336,14 @@ public partial class MainWindow
         var cancelar = new CancellationTokenSource();
         trabalhoDaPlaca = cancelar;
         AtualizarBotoesDaPlaca();
-        LogDaPlaca("> instalando na Arduino IDE…");
+        LogDaPlaca(Idioma.T("> instalando na Arduino IDE…"));
 
         Task.Run(instalar).ContinueWith(t => Dispatcher.BeginInvoke(() =>
         {
             if (trabalhoDaPlaca == cancelar) trabalhoDaPlaca = null;
             AtualizarBotoesDaPlaca();
             if (t.IsCompletedSuccessfully && t.Result) depois();
-            else Erro("a instalação na Arduino IDE não deu certo (veja a aba PLACA).");
+            else Erro(Idioma.T("a instalação na Arduino IDE não deu certo (veja a aba PLACA)."));
         }));
     }
 
@@ -365,11 +357,11 @@ public partial class MainWindow
     void AtualizarBotoesDaPlaca()
     {
         bool ocupado = trabalhoDaPlaca is not null;
-        btVerificar.ToolTip = ocupado ? "Cancelar" : "Verificar o código: o simulador e o compilador do Arduino (Ctrl+R)";
-        btMandar.ToolTip = ocupado ? "Cancelar" : "Mandar para a placa de verdade, pela USB (Ctrl+U)";
+        btVerificar.ToolTip = ocupado ? Idioma.T("Cancelar") : Idioma.T("Verificar o código: o simulador e o compilador do Arduino (Ctrl+R)");
+        btMandar.ToolTip = ocupado ? Idioma.T("Cancelar") : Idioma.T("Mandar para a placa de verdade, pela USB (Ctrl+U)");
         btVerificar.Content = ocupado ? "■" : "✓";
         btMandar.Content = ocupado ? "■" : "➜";
-        btVerificarNaAba.Content = ocupado ? "Cancelar" : "Verificar";
+        btVerificarNaAba.Content = ocupado ? Idioma.T("Cancelar") : Idioma.T("Verificar");
         btMandarNaAba.IsEnabled = !ocupado;
     }
 
@@ -384,15 +376,14 @@ public partial class MainWindow
         var placa = PlacaDoEditor();
         string texto = placa is not null && PorQueNaoCompila(placa, PlacaDeVerdade.FqbnDe(placa.Tipo)) is { } porQueNao
             ? porQueNao
-            : "o visto (Ctrl+R) confere o código no simulador e no compilador do Arduino; a seta (Ctrl+U) "
-              + "compila e grava na placa ligada na USB";
+            : Idioma.T("o visto (Ctrl+R) confere o código no simulador e no compilador do Arduino; a seta (Ctrl+U) compila e grava na placa ligada na USB");
         EstadoDaPlaca(placa, texto);
     }
 
     void EstadoDaPlaca(PecaNoCircuito placa, string texto)
     {
         string qual = placa is null ? "" : $"{NomeDaPlaca(placa)} → {PlacaDeVerdade.FqbnDe(placa.Tipo) ?? "sem núcleo do Arduino"}";
-        string compilador = PlacaDeVerdade.Cli is null ? "Arduino IDE 2 não encontrada" : "compilador: arduino-cli da Arduino IDE";
+        string compilador = PlacaDeVerdade.Cli is null ? Idioma.T("Arduino IDE 2 não encontrada") : Idioma.T("compilador: arduino-cli da Arduino IDE");
         txtPlacaEstado.Text = $"{qual}  ·  {compilador}\n{texto}";
     }
 

@@ -68,7 +68,7 @@ public static class Tema
     static readonly List<Paleta> paletas =
     [
         // ================= básicos =================
-        Nova("escuro", "Escuro", GrupoBasicos, true, new()
+        Nova("escuro", Idioma.T("Escuro"), GrupoBasicos, true, new()
         {
             [Fundo] = Cor("#1E1E1E"), [Painel] = Cor("#252526"), [Campo] = Cor("#1B1B1B"),
             [Borda] = Cor("#3C3C3C"), [Texto] = Cor("#D4D4D4"), [TextoForte] = Cor("#EAEAEA"),
@@ -76,7 +76,7 @@ public static class Tema
             [FundoDoCircuito] = Cor("#101012"), [PontoDaGrade] = Cor("#2C2C30"),
             [Selecao] = Cor("#094771"),
         }),
-        Nova("claro", "Claro", GrupoBasicos, false, new()
+        Nova("claro", Idioma.T("Claro"), GrupoBasicos, false, new()
         {
             [Fundo] = Cor("#EFEFF1"), [Painel] = Cor("#FFFFFF"), [Campo] = Cor("#FFFFFF"),
             [Borda] = Cor("#C6C6CC"), [Texto] = Cor("#23232A"), [TextoForte] = Cor("#101014"),
@@ -142,42 +142,42 @@ public static class Tema
         // ================= cores =================
         // Escuros, com a cor no fundo e no destaque: e o que se aguenta
         // olhando por uma aula inteira.
-        Nova("azul", "Azul", GrupoDasCores, true, new()
+        Nova("azul", Idioma.T("Azul"), GrupoDasCores, true, new()
         {
             [Fundo] = Cor("#0D1626"), [Painel] = Cor("#13203A"), [Campo] = Cor("#0B1322"),
             [Borda] = Cor("#27406B"), [Texto] = Cor("#DCE7F7"), [TextoForte] = Cor("#F3F7FD"),
             [TextoFraco] = Cor("#8497B8"), [Destaque] = Cor("#2563EB"),
             [FundoDoCircuito] = Cor("#09111F"), [PontoDaGrade] = Cor("#1B2C4A"),
         }),
-        Nova("vermelho", "Vermelho", GrupoDasCores, true, new()
+        Nova("vermelho", Idioma.T("Vermelho"), GrupoDasCores, true, new()
         {
             [Fundo] = Cor("#1A0D0E"), [Painel] = Cor("#261214"), [Campo] = Cor("#150A0B"),
             [Borda] = Cor("#4D2227"), [Texto] = Cor("#F5DEDF"), [TextoForte] = Cor("#FDF3F3"),
             [TextoFraco] = Cor("#B08A8D"), [Destaque] = Cor("#DC2626"),
             [FundoDoCircuito] = Cor("#120809"), [PontoDaGrade] = Cor("#3A1A1E"),
         }),
-        Nova("verde", "Verde", GrupoDasCores, true, new()
+        Nova("verde", Idioma.T("Verde"), GrupoDasCores, true, new()
         {
             [Fundo] = Cor("#0C1A12"), [Painel] = Cor("#11261A"), [Campo] = Cor("#0A150E"),
             [Borda] = Cor("#214A31"), [Texto] = Cor("#DAF2E2"), [TextoForte] = Cor("#F1FBF4"),
             [TextoFraco] = Cor("#85AE93"), [Destaque] = Cor("#22C55E"),
             [FundoDoCircuito] = Cor("#08130C"), [PontoDaGrade] = Cor("#1A3624"),
         }),
-        Nova("amarelo", "Amarelo", GrupoDasCores, true, new()
+        Nova("amarelo", Idioma.T("Amarelo"), GrupoDasCores, true, new()
         {
             [Fundo] = Cor("#1A1709"), [Painel] = Cor("#25210D"), [Campo] = Cor("#151207"),
             [Borda] = Cor("#4D4418"), [Texto] = Cor("#F5EFD3"), [TextoForte] = Cor("#FDFAEE"),
             [TextoFraco] = Cor("#B3A876"), [Destaque] = Cor("#F2C300"),
             [FundoDoCircuito] = Cor("#121005"), [PontoDaGrade] = Cor("#3A3313"),
         }),
-        Nova("laranja", "Laranja", GrupoDasCores, true, new()
+        Nova("laranja", Idioma.T("Laranja"), GrupoDasCores, true, new()
         {
             [Fundo] = Cor("#1C1209"), [Painel] = Cor("#28190C"), [Campo] = Cor("#170F07"),
             [Borda] = Cor("#54341A"), [Texto] = Cor("#F7E4D2"), [TextoForte] = Cor("#FDF5EE"),
             [TextoFraco] = Cor("#B79778"), [Destaque] = Cor("#F28C28"),
             [FundoDoCircuito] = Cor("#140C05"), [PontoDaGrade] = Cor("#3E2812"),
         }),
-        Nova("rosa", "Rosa", GrupoDasCores, true, new()
+        Nova("rosa", Idioma.T("Rosa"), GrupoDasCores, true, new()
         {
             [Fundo] = Cor("#1C0D17"), [Painel] = Cor("#291321"), [Campo] = Cor("#170A13"),
             [Borda] = Cor("#56284A"), [Texto] = Cor("#F7DDEE"), [TextoForte] = Cor("#FDF2F9"),
@@ -208,7 +208,7 @@ public static class Tema
     static Color Cor(string hex) => (Color)ColorConverter.ConvertFromString(hex);
 
     public static string NomeDe(string id)
-        => paletas.FirstOrDefault(p => p.Id == id)?.Nome ?? "Escuro";
+        => paletas.FirstOrDefault(p => p.Id == id)?.Nome ?? Idioma.T("Escuro");
 
     public static Paleta De(string id) => paletas.FirstOrDefault(p => p.Id == id);
 

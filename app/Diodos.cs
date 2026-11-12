@@ -27,8 +27,8 @@ public static class Diodos
         new("1n4007", "1N4007", 0.70, 0.05, 1.0),
         new("1n4001", "1N4001 (50 V)", 0.70, 0.05, 1.0, Svg: "diodo-1n4001"),
         new("1n4004", "1N4004 (400 V)", 0.70, 0.05, 1.0, Svg: "diodo-1n4004"),
-        new("uf4007", "UF4007 (rápido)", 0.85, 0.08, 1.0, Svg: "diodo-uf4007"),
-        new("1n4148", "1N4148 (sinal)", 0.62, 1.0, 0.2, Svg: "diodo-1n4148"),
+        new("uf4007", Idioma.T("UF4007 (rápido)"), 0.85, 0.08, 1.0, Svg: "diodo-uf4007"),
+        new("1n4148", Idioma.T("1N4148 (sinal)"), 0.62, 1.0, 0.2, Svg: "diodo-1n4148"),
         new("1n5408", "1N5408", 0.75, 0.02, 3.0, Svg: "diodo-1n5408"),
         new("6a10", "6A10", 0.75, 0.01, 6.0, Svg: "diodo-6a10"),
     ];
@@ -52,7 +52,7 @@ public static class Diodos
         new("1n5817", "1N5817 (20 V)", 0.28, 0.05, 1.0, Svg: "diodo-schottky-1n5817"),
         new("1n5822", "1N5822", 0.30, 0.02, 3.0, Svg: "diodo-schottky-1n5822"),
         new("ss34", "SS34", 0.35, 0.03, 3.0, Svg: "diodo-schottky-ss34"),
-        new("bat85", "BAT85 (sinal)", 0.25, 2.0, 0.2, Svg: "diodo-schottky-bat85"),
+        new("bat85", Idioma.T("BAT85 (sinal)"), 0.25, 2.0, 0.2, Svg: "diodo-schottky-bat85"),
         new("sb560", "SB560", 0.40, 0.01, 5.0, Svg: "diodo-schottky-sb560"),
     ];
 

@@ -43,10 +43,13 @@ public class JanelaCartao : Window
                         List<(string Nome, int Tamanho, string Origem)> binariosNaPlaca = null,
                         Dictionary<string, byte[]> gravados = null,
                         Func<string, byte[]> lerDaPlaca = null,
-                        string titulo = "Cartão microSD",
+                        string titulo = null,
                         string pastaDoComputador = null)
     {
-        oQue = titulo.StartsWith("Pendrive", StringComparison.OrdinalIgnoreCase) ? "pendrive" : "cartão";
+        // O titulo chega sem traduzir ("Pendrive USB" ou "Cartão microSD"): e ele que diz o que e.
+        titulo ??= Idioma.N("Cartão microSD");
+        oQue = titulo.StartsWith("Pendrive", StringComparison.OrdinalIgnoreCase) ? Idioma.T("pendrive") : Idioma.T("cartão");
+        titulo = Idioma.T(titulo);
         PastaDoComputador = pastaDoComputador;
         this.arquivos = arquivos;
         this.doComputador = doComputador ?? new(StringComparer.OrdinalIgnoreCase);
@@ -72,9 +75,8 @@ public class JanelaCartao : Window
         raiz.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
         aviso.Text = somenteLeitura
-            ? "A simulação está rodando: aqui aparece o que o sketch gravou. Pare para editar."
-            : "Os arquivos de texto vão junto no .sktch, e os que o sketch gravou em bytes também; os do "
-              + $"computador (um WAD, uma imagem, um som) ficam lá e entram no {oQue}, em bytes, quando a simulação começa.";
+            ? Idioma.T("A simulação está rodando: aqui aparece o que o sketch gravou. Pare para editar.")
+            : Idioma.T("Os arquivos de texto vão junto no .sktch, e os que o sketch gravou em bytes também; os do computador (um WAD, uma imagem, um som) ficam lá e entram no {0}, em bytes, quando a simulação começa.", oQue);
         aviso.Foreground = Tema.Pincel(Tema.TextoFraco);
         aviso.FontSize = 11;
         aviso.TextWrapping = TextWrapping.Wrap;
@@ -87,11 +89,11 @@ public class JanelaCartao : Window
         var faixaDaPasta = new DockPanel { Margin = new Thickness(0, 0, 0, 10) };
         if (!somenteLeitura)
         {
-            tirarPasta = Botao("Tirar a pasta", () => { PastaDoComputador = null; MostrarPasta(); });
+            tirarPasta = Botao(Idioma.T("Tirar a pasta"), () => { PastaDoComputador = null; MostrarPasta(); });
             tirarPasta.Margin = new Thickness(8, 0, 0, 0);
             DockPanel.SetDock(tirarPasta, Dock.Right);
             faixaDaPasta.Children.Add(tirarPasta);
-            var usarPasta = Botao("Usar uma pasta do computador…", EscolherPasta);
+            var usarPasta = Botao(Idioma.T("Usar uma pasta do computador…"), EscolherPasta);
             usarPasta.Margin = new Thickness(8, 0, 0, 0);
             DockPanel.SetDock(usarPasta, Dock.Right);
             faixaDaPasta.Children.Add(usarPasta);
@@ -100,8 +102,7 @@ public class JanelaCartao : Window
         linhaDaPasta.FontSize = 12;
         linhaDaPasta.TextTrimming = TextTrimming.CharacterEllipsis;
         linhaDaPasta.VerticalAlignment = VerticalAlignment.Center;
-        linhaDaPasta.ToolTip = $"Tudo o que está na pasta, com as subpastas, aparece no {oQue} e é lido do disco só quando "
-                               + $"o sketch abre. O que o sketch grava fica no {oQue} simulado: a pasta nunca muda.";
+        linhaDaPasta.ToolTip = Idioma.T("Tudo o que está na pasta, com as subpastas, aparece no {0} e é lido do disco só quando o sketch abre. O que o sketch grava fica no {0} simulado: a pasta nunca muda.", oQue);
         faixaDaPasta.Children.Add(linhaDaPasta);
         Grid.SetRow(faixaDaPasta, 1);
         Grid.SetColumnSpan(faixaDaPasta, 2);
@@ -147,15 +148,15 @@ public class JanelaCartao : Window
 
         if (!somenteLeitura)
         {
-            barra.Children.Add(Botao("Novo arquivo", Novo));
-            barra.Children.Add(Botao("Carregar do computador", Carregar));
-            barra.Children.Add(Botao("Renomear", Renomear));
-            barra.Children.Add(Botao("Apagar", Apagar));
+            barra.Children.Add(Botao(Idioma.T("Novo arquivo"), Novo));
+            barra.Children.Add(Botao(Idioma.T("Carregar do computador"), Carregar));
+            barra.Children.Add(Botao(Idioma.T("Renomear"), Renomear));
+            barra.Children.Add(Botao(Idioma.T("Apagar"), Apagar));
         }
 
-        barra.Children.Add(Botao("Salvar no computador", Exportar));
+        barra.Children.Add(Botao(Idioma.T("Salvar no computador"), Exportar));
 
-        var fechar = Botao("Fechar", Close);
+        var fechar = Botao(Idioma.T("Fechar"), Close);
         fechar.HorizontalAlignment = HorizontalAlignment.Right;
         barra.Children.Add(fechar);
 
@@ -170,7 +171,7 @@ public class JanelaCartao : Window
     {
         var dlg = new Microsoft.Win32.OpenFolderDialog
         {
-            Title = $"A pasta que vira o {oQue} (as músicas do player, por exemplo)",
+            Title = Idioma.T("A pasta que vira o {0} (as músicas do player, por exemplo)", oQue),
         };
         if (PastaDoComputador is not null && Directory.Exists(PastaDoComputador)) dlg.InitialDirectory = PastaDoComputador;
         if (dlg.ShowDialog(this) != true) return;
@@ -185,15 +186,15 @@ public class JanelaCartao : Window
         string pasta = PastaDoComputador;
         if (pasta is null)
         {
-            linhaDaPasta.Text = $"Sem pasta do computador: o {oQue} tem só os arquivos da lista.";
+            linhaDaPasta.Text = Idioma.T("Sem pasta do computador: o {0} tem só os arquivos da lista.", oQue);
             return;
         }
         if (!Directory.Exists(pasta))
         {
-            linhaDaPasta.Text = $"Pasta do computador: {pasta} (NÃO ACHEI ESTA PASTA)";
+            linhaDaPasta.Text = Idioma.T("Pasta do computador: {0} (NÃO ACHEI ESTA PASTA)", pasta);
             return;
         }
-        linhaDaPasta.Text = $"Pasta do computador: {pasta} (contando…)";
+        linhaDaPasta.Text = Idioma.T("Pasta do computador: {0} (contando…)", pasta);
         Task.Run(() =>
         {
             long arquivos = 0, bytes = 0;
@@ -211,7 +212,7 @@ public class JanelaCartao : Window
         }).ContinueWith(t =>
         {
             if (PastaDoComputador != pasta) return;
-            linhaDaPasta.Text = $"Pasta do computador: {pasta} ({t.Result.arquivos:N0} arquivo(s), {Acervo.EmTexto(t.Result.bytes)})";
+            linhaDaPasta.Text = Idioma.T("Pasta do computador: {0} ({1:N0} arquivo(s), {2})", pasta, t.Result.arquivos, Acervo.EmTexto(t.Result.bytes));
         }, TaskScheduler.FromCurrentSynchronizationContext());
     }
 
@@ -249,8 +250,8 @@ public class JanelaCartao : Window
         {
             string rotulo = TipoDe(nome) switch
             {
-                Tipo.DoComputador => $"{nome}   ({TamanhoDoArquivo(doComputador[nome])}, do computador)",
-                Tipo.Gravado => $"{nome}   ({Acervo.EmTexto(gravados[nome].Length)}, gravado pelo sketch)",
+                Tipo.DoComputador => Idioma.T("{0}   ({1}, do computador)", nome, TamanhoDoArquivo(doComputador[nome])),
+                Tipo.Gravado => Idioma.T("{0}   ({1}, gravado pelo sketch)", nome, Acervo.EmTexto(gravados[nome].Length)),
                 Tipo.BinarioNaPlaca => $"{nome}   ({Acervo.EmTexto(binariosNaPlaca.First(b => b.Nome.Equals(nome, StringComparison.OrdinalIgnoreCase)).Tamanho)})",
                 _ => nome,
             };
@@ -267,8 +268,8 @@ public class JanelaCartao : Window
 
     static string TamanhoDoArquivo(string caminho)
     {
-        try { return File.Exists(caminho) ? Acervo.EmTexto(new FileInfo(caminho).Length) : "não achado"; }
-        catch (Exception) { return "não achado"; }
+        try { return File.Exists(caminho) ? Acervo.EmTexto(new FileInfo(caminho).Length) : Idioma.T("não achado"); }
+        catch (Exception) { return Idioma.T("não achado"); }
     }
 
     void Mostrar(string nome)
@@ -298,29 +299,20 @@ public class JanelaCartao : Window
                 string caminho = doComputador[nome];
                 bool existe = File.Exists(caminho);
                 conteudo.IsReadOnly = true;
-                conteudo.Text = $"Arquivo do computador. Ele entra no {oQue} do jeito que está, em bytes,\n"
-                                + "toda vez que a simulação começa:\n\n"
-                                + "  " + caminho + "\n"
-                                + "  " + (existe ? TamanhoDoArquivo(caminho) : $"NÃO ACHEI ESTE ARQUIVO: ele fica fora do {oQue} até você carregar de novo") + "\n\n"
-                                + "O .sktch guarda só o caminho, e não o arquivo: quem abrir o projeto em\n"
-                                + "outro computador põe o arquivo dele com \"Carregar do computador\".";
+                conteudo.Text = Idioma.T("Arquivo do computador. Ele entra no {0} do jeito que está, em bytes,\ntoda vez que a simulação começa:\n\n  {1}\n  {2}\n\nO .sktch guarda só o caminho, e não o arquivo: quem abrir o projeto em\noutro computador põe o arquivo dele com \"Carregar do computador\".", oQue, caminho, (existe ? TamanhoDoArquivo(caminho) : Idioma.T("NÃO ACHEI ESTE ARQUIVO: ele fica fora do {0} até você carregar de novo", oQue)));
                 break;
             }
 
             case Tipo.Gravado:
                 conteudo.IsReadOnly = true;
-                conteudo.Text = $"Arquivo em bytes que o sketch gravou no {oQue}: {Acervo.EmTexto(gravados[nome].Length)}.\n"
-                                + $"Ele fica no {oQue} (e vai junto no .sktch) até você apagar, como num {oQue} de verdade.\n\n"
-                                + EmHexa(gravados[nome]);
+                conteudo.Text = Idioma.T("Arquivo em bytes que o sketch gravou no {0}: {1}.\nEle fica no {0} (e vai junto no .sktch) até você apagar, como num {0} de verdade.\n\n{2}", oQue, Acervo.EmTexto(gravados[nome].Length), EmHexa(gravados[nome]));
                 break;
 
             default:
             {
                 var b = binariosNaPlaca.First(x => x.Nome.Equals(nome, StringComparison.OrdinalIgnoreCase));
                 conteudo.IsReadOnly = true;
-                conteudo.Text = $"Arquivo em bytes no {oQue}: {Acervo.EmTexto(b.Tamanho)}.\n\n"
-                                + (b.Origem is null ? $"O sketch gravou este arquivo (ele fica no {oQue} depois de parar)." : "Veio de " + b.Origem)
-                                + (lerDaPlaca?.Invoke(nome) is { } bytes ? "\n\n" + EmHexa(bytes) : "");
+                conteudo.Text = Idioma.T("Arquivo em bytes no {0}: {1}.\n\n{2}{3}", oQue, Acervo.EmTexto(b.Tamanho), (b.Origem is null ? Idioma.T("O sketch gravou este arquivo (ele fica no {0} depois de parar).", oQue) : Idioma.T("Veio de {0}", b.Origem)), (lerDaPlaca?.Invoke(nome) is { } bytes ? "\n\n" + EmHexa(bytes) : ""));
                 break;
             }
         }
@@ -340,13 +332,13 @@ public class JanelaCartao : Window
             for (int k = 0; k < n; k++) texto.Append(bytes[i + k] is >= 32 and < 127 ? (char)bytes[i + k] : '.');
             texto.Append('\n');
         }
-        if (bytes.Length > ate) texto.Append($"... (mais {bytes.Length - ate} bytes)");
+        if (bytes.Length > ate) texto.Append(Idioma.T("... (mais {0} bytes)", bytes.Length - ate));
         return texto.ToString();
     }
 
     void Novo()
     {
-        string nome = Perguntar("Nome do arquivo", "dados.txt");
+        string nome = Perguntar(Idioma.T("Nome do arquivo"), "dados.txt");
         if (nome is null) return;
 
         doComputador.Remove(nome);
@@ -378,9 +370,7 @@ public class JanelaCartao : Window
     {
         var dlg = new Microsoft.Win32.OpenFileDialog
         {
-            Filter = "Todos os arquivos|*.*"
-                     + "|Texto (*.txt;*.csv;*.md;*.json;*.h;*.py)|*.txt;*.csv;*.md;*.json;*.h;*.py"
-                     + "|WAD do DOOM (*.wad)|*.wad",
+            Filter = Idioma.T("Todos os arquivos|*.*|Texto (*.txt;*.csv;*.md;*.json;*.h;*.py)|*.txt;*.csv;*.md;*.json;*.h;*.py|WAD do DOOM (*.wad)|*.wad"),
             Multiselect = true,
         };
         if (dlg.ShowDialog() != true) return;
@@ -406,7 +396,7 @@ public class JanelaCartao : Window
             }
             catch (Exception e)
             {
-                MessageBox.Show(this, e.Message, "Não deu para ler",
+                MessageBox.Show(this, e.Message, Idioma.T("Não deu para ler"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
@@ -417,7 +407,7 @@ public class JanelaCartao : Window
     {
         if (aberto is null || TipoDe(aberto) == Tipo.BinarioNaPlaca) return;
 
-        string novo = Perguntar("Novo nome", aberto);
+        string novo = Perguntar(Idioma.T("Novo nome"), aberto);
         if (novo is null || novo == aberto) return;
 
         if (TipoDe(aberto) == Tipo.Gravado)
@@ -459,8 +449,8 @@ public class JanelaCartao : Window
         byte[] daPlaca = tipo == Tipo.BinarioNaPlaca ? lerDaPlaca?.Invoke(aberto) : null;
         if (tipo == Tipo.BinarioNaPlaca && daPlaca is null)
         {
-            MessageBox.Show(this, $"Este arquivo não está mais no {oQue}.",
-                "Salvar no computador", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(this, Idioma.T("Este arquivo não está mais no {0}.", oQue),
+                Idioma.T("Salvar no computador"), MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
@@ -476,7 +466,7 @@ public class JanelaCartao : Window
         }
         catch (Exception e)
         {
-            MessageBox.Show(this, e.Message, "Não deu para gravar",
+            MessageBox.Show(this, e.Message, Idioma.T("Não deu para gravar"),
                 MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }

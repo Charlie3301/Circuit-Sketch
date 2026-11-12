@@ -41,17 +41,21 @@
             </Setter>
         </Style>
 
+        <!-- As abas de baixo: a mesma pilula das de cima, menor. A escolhida
+             ganha o fundo (AtualizarAbas), como a do modo. -->
         <Style x:Key="Aba" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="{DynamicResource TextoFraco}"/>
             <Setter Property="FontSize" Value="10"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Margin" Value="0,0,16,0"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Margin" Value="0,0,2,0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="Transparent">
+                        <Border x:Name="f" Background="{TemplateBinding Background}"
+                                CornerRadius="4" Padding="8,0">
                             <!-- TextBlock explicito, e nao ContentPresenter: o
                                  estilo implicito de TextBlock do app pinta o
                                  texto gerado por ele e a aba escolhida nunca
@@ -59,8 +63,15 @@
                             <TextBlock Text="{TemplateBinding Content}"
                                        Foreground="{TemplateBinding Foreground}"
                                        FontSize="{TemplateBinding FontSize}"
-                                       FontWeight="{TemplateBinding FontWeight}"/>
+                                       FontWeight="{TemplateBinding FontWeight}"
+                                       FontStyle="{TemplateBinding FontStyle}"
+                                       VerticalAlignment="Center"/>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="f" Property="Background" Value="{DynamicResource Hover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -181,7 +192,7 @@
                 <!-- O nome do circuito e o autor (o "name" e o "author" do
                      diagram.json), do lado de quem manda o codigo. -->
                 <StackPanel x:Name="painelNomeDoCircuito" VerticalAlignment="Center" Margin="0,0,12,0"
-                            ToolTip="O nome do circuito e o autor: os mesmos do diagram.json (mudam na aba dele)">
+                            ToolTip="{local:T 'O nome do circuito e o autor: os mesmos do diagram.json (mudam na aba DESCRIÇÃO ou na do diagram.json)'}">
                     <TextBlock x:Name="txtNomeDoCircuito" FontSize="12" FontWeight="SemiBold"
                                Foreground="{DynamicResource TextoForte}" HorizontalAlignment="Right"
                                TextTrimming="CharacterEllipsis" MaxWidth="260"/>
@@ -191,37 +202,37 @@
                 </StackPanel>
                 <Button x:Name="btVerificar" Style="{StaticResource Redondo}" Background="#00878F"
                         Content="&#x2713;" FontSize="17" Click="Verificar"
-                        ToolTip="Verificar o código: o simulador e o compilador do Arduino (Ctrl+R)"/>
+                        ToolTip="{local:T 'Verificar o código: o simulador e o compilador do Arduino (Ctrl+R)'}"/>
                 <Button x:Name="btMandar" Style="{StaticResource Redondo}" Background="#00878F"
                         Content="&#x279C;" FontSize="16" Click="MandarParaPlaca"
-                        ToolTip="Mandar para a placa de verdade, pela USB (Ctrl+U)"/>
+                        ToolTip="{local:T 'Mandar para a placa de verdade, pela USB (Ctrl+U)'}"/>
             </StackPanel>
 
         <StackPanel Orientation="Horizontal">
 
             <Button x:Name="btRodar" Style="{StaticResource Redondo}"
-                    Background="#2FA84F" Content="▶" ToolTip="Rodar a simulação (F5)"
+                    Background="#2FA84F" Content="▶" ToolTip="{local:T 'Rodar a simulação (F5)'}"
                     Click="Rodar"/>
             <Button x:Name="btParar" Style="{StaticResource Redondo}"
-                    Background="#C0392B" Content="■" ToolTip="Parar (F5)"
+                    Background="#C0392B" Content="■" ToolTip="{local:T 'Parar (F5)'}"
                     Click="Parar" IsEnabled="False"/>
             <!-- Depurador. Ficam ao lado do rodar/parar porque sao o mesmo
                  assunto: o que o sketch esta fazendo agora. -->
             <Button x:Name="btPausar" Style="{StaticResource Redondo}" Background="#D68910"
-                    Content="❚❚" FontSize="12" ToolTip="Pausar (F6)" Click="PausarOuContinuar" IsEnabled="False"/>
+                    Content="❚❚" FontSize="12" ToolTip="{local:T 'Pausar (F6)'}" Click="PausarOuContinuar" IsEnabled="False"/>
             <Button x:Name="btPasso" Style="{StaticResource Redondo}" Background="#7D3C98"
-                    Content="▶❚" FontSize="12" ToolTip="Andar uma linha (F10)" Click="Passo" IsEnabled="False"/>
+                    Content="▶❚" FontSize="12" ToolTip="{local:T 'Andar uma linha (F10)'}" Click="Passo" IsEnabled="False"/>
             <!-- As variaveis ao vivo: o painel delas atualizando com o sketch rodando, sem pausar. -->
             <Button x:Name="btAoVivo" Style="{StaticResource Redondo}" Background="#117A65"
                     Content="x=" FontSize="12" FontWeight="Bold" Click="AlternarAoVivo" IsEnabled="False"
-                    ToolTip="Variáveis ao vivo: ver as variáveis do sketch mudando enquanto ele roda, sem pausar"/>
+                    ToolTip="{local:T 'Variáveis ao vivo: ver as variáveis do sketch mudando enquanto ele roda, sem pausar'}"/>
             <Button Style="{StaticResource Redondo}" Background="#1668C1" Content="+"
-                    FontSize="21" ToolTip="Adicionar componente (A)"
+                    FontSize="21" ToolTip="{local:T 'Adicionar componente (A)'}"
                     Click="AdicionarPeca"/>
 
             <Button x:Name="btMenu" Style="{StaticResource Redondo}" Background="{DynamicResource Borda}"
                     Foreground="{DynamicResource TextoForte}"
-                    Content="⋮" FontSize="19" ToolTip="Mais opções"
+                    Content="⋮" FontSize="19" ToolTip="{local:T 'Mais opções'}"
                     Click="AbrirMenu">
                 <Button.ContextMenu>
                     <ContextMenu x:Name="menuOpcoes" Background="{DynamicResource Painel}"
@@ -245,68 +256,68 @@
                         <Separator Background="{DynamicResource Borda}"/>
 
                         <!-- CODIGO DA PLACA -->
-                        <MenuItem Header="Enviar código para a placa (.ino)..."
+                        <MenuItem Header="{local:T 'Enviar código para a placa (.ino)...'}"
                                   Click="EnviarInoParaPlaca"/>
-                        <MenuItem Header="Baixar código da placa (.ino)..."
+                        <MenuItem Header="{local:T 'Baixar código da placa (.ino)...'}"
                                   Click="BaixarInoDaPlaca"/>
                         <Separator Background="{DynamicResource Borda}"/>
 
                         <!-- CIRCUITO EM JSON -->
-                        <MenuItem Header="Importar circuito (diagram.json)..."
+                        <MenuItem Header="{local:T 'Importar circuito (diagram.json)...'}"
                                   InputGestureText="Ctrl+I" Click="ImportarDoWokwi"/>
-                        <MenuItem x:Name="miExportar" Header="Exportar circuito (diagram.json)..."
+                        <MenuItem x:Name="miExportar" Header="{local:T 'Exportar circuito (diagram.json)...'}"
                                   Click="ExportarParaWokwi"/>
                         <MenuItem x:Name="miExportarHex"
-                                  Header="Exportar programa gravável (.hex)..."
-                                  ToolTip="Só para Assembly: o mesmo binário que rodou aqui"
+                                  Header="{local:T 'Exportar programa gravável (.hex)...'}"
+                                  ToolTip="{local:T 'Só para Assembly: o mesmo binário que rodou aqui'}"
                                   Click="ExportarHex"/>
                         <Separator Background="{DynamicResource Borda}"/>
 
                         <!-- EDITAR -->
-                        <MenuItem Header="Desfazer" InputGestureText="Ctrl+Z" Click="Desfazer"/>
-                        <MenuItem Header="Refazer" InputGestureText="Ctrl+Y" Click="Refazer"/>
+                        <MenuItem Header="{local:T 'Desfazer'}" InputGestureText="Ctrl+Z" Click="Desfazer"/>
+                        <MenuItem Header="{local:T 'Refazer'}" InputGestureText="Ctrl+Y" Click="Refazer"/>
                         <Separator Background="{DynamicResource Borda}"/>
 
                         <!-- VISUALIZAR -->
-                        <MenuItem Header="Ajustar à tela" InputGestureText="F" Click="Ajustar"/>
-                        <MenuItem Header="Mostrar a grade" InputGestureText="G"
+                        <MenuItem Header="{local:T 'Ajustar à tela'}" InputGestureText="F" Click="Ajustar"/>
+                        <MenuItem Header="{local:T 'Mostrar a grade'}" InputGestureText="G"
                                   Click="AlternarGrade"/>
-                        <MenuItem Header="Tela cheia" InputGestureText="Alt+Enter"
+                        <MenuItem Header="{local:T 'Tela cheia'}" InputGestureText="Alt+Enter"
                                   Click="TelaCheia"/>
                         <Separator Background="{DynamicResource Borda}"/>
 
                         <!-- FIOS -->
-                        <MenuItem x:Name="miFioSolto" Header="Fios: solto (curva)"
+                        <MenuItem x:Name="miFioSolto" Header="{local:T 'Fios: solto (curva)'}"
                                   IsCheckable="True" IsChecked="True"
                                   Tag="solto" Click="EstiloDeTodosOsFios"/>
-                        <MenuItem x:Name="miFioReto" Header="Fios: reto (linha direta)"
+                        <MenuItem x:Name="miFioReto" Header="{local:T 'Fios: reto (linha direta)'}"
                                   IsCheckable="True"
                                   Tag="reto" Click="EstiloDeTodosOsFios"/>
-                        <MenuItem x:Name="miFioDegrau" Header="Fios: degrau (em L)"
+                        <MenuItem x:Name="miFioDegrau" Header="{local:T 'Fios: degrau (em L)'}"
                                   IsCheckable="True"
                                   Tag="degrau" Click="EstiloDeTodosOsFios"/>
                         <Separator Background="{DynamicResource Borda}"/>
 
                         <!-- PROGRAMA -->
-                        <MenuItem x:Name="miInternet" Header="Usar a internet do computador"
+                        <MenuItem x:Name="miInternet" Header="{local:T 'Usar a internet do computador'}"
                                   IsCheckable="True" IsChecked="True" Click="AlternarInternet"/>
-                        <MenuItem Header="Novo chip..." Click="NovoChip"/>
-                        <MenuItem Header="Gerenciador de bibliotecas..." InputGestureText="Ctrl+Shift+I" Click="AbrirBibliotecas"/>
-                        <MenuItem Header="Configurações..." Click="AbrirConfiguracoes"/>
-                        <MenuItem Header="Ajuda e atalhos" InputGestureText="?" Click="Ajuda"/>
+                        <MenuItem Header="{local:T 'Novo chip...'}" Click="NovoChip"/>
+                        <MenuItem Header="{local:T 'Gerenciador de bibliotecas...'}" InputGestureText="Ctrl+Shift+I" Click="AbrirBibliotecas"/>
+                        <MenuItem Header="{local:T 'Configurações...'}" Click="AbrirConfiguracoes"/>
+                        <MenuItem Header="{local:T 'Ajuda e atalhos'}" InputGestureText="?" Click="Ajuda"/>
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
 
             <Border Width="1" Background="{DynamicResource Borda}" Margin="4,6,14,6"/>
 
-            <Button x:Name="btModoSimulacao" Content="SIMULAÇÃO" Tag="simulacao"
+            <Button x:Name="btModoSimulacao" Content="{local:T 'SIMULAÇÃO'}" Tag="simulacao"
                     Style="{StaticResource Modo}" Click="TrocarModo"/>
-            <Button x:Name="btModoCircuito" Content="MULTÍMETRO" Tag="circuito"
+            <Button x:Name="btModoCircuito" Content="{local:T 'MULTÍMETRO'}" Tag="circuito"
                     Style="{StaticResource Modo}" Click="TrocarModo"/>
-            <Button x:Name="btModoComponentes" Content="COMPONENTES" Tag="componentes"
+            <Button x:Name="btModoComponentes" Content="{local:T 'COMPONENTES'}" Tag="componentes"
                     Style="{StaticResource Modo}" Click="TrocarModo"/>
-            <Button x:Name="btModoDescricao" Content="DESCRIÇÃO" Tag="descricao"
+            <Button x:Name="btModoDescricao" Content="{local:T 'DESCRIÇÃO'}" Tag="descricao"
                     Style="{StaticResource Modo}" Click="TrocarModo"/>
 
             <TextBlock x:Name="txtDica" VerticalAlignment="Center" Margin="20,0,0,0"
@@ -331,46 +342,10 @@
             <local:PainelMultimetro x:Name="painelMultimetro" Visibility="Collapsed"
                                     HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,12,12,0"/>
 
-            <Border x:Name="painelDescricao" Visibility="Collapsed"
-                    CornerRadius="6" BorderBrush="{DynamicResource Borda}"
-                    BorderThickness="1" Background="{DynamicResource Campo}" Padding="14">
-                <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" FontSize="12"
-                               Foreground="{DynamicResource TextoFraco}"
-                               Text="O que este circuito faz, como ligar, o que falta. Vai junto no .sktch."/>
-                    <TextBox x:Name="txtDescricao" AcceptsReturn="True" AcceptsTab="True"
-                             TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
-                             Background="{DynamicResource Campo}" Foreground="{DynamicResource Texto}"
-                             CaretBrush="{DynamicResource Texto}" BorderBrush="{DynamicResource Borda}"
-                             BorderThickness="1" Padding="10,8" FontSize="13"
-                             VerticalContentAlignment="Top"/>
-                </DockPanel>
-            </Border>
-
-            <Border x:Name="painelComponentes" Visibility="Collapsed"
-                    CornerRadius="6" BorderBrush="{DynamicResource Borda}"
-                    BorderThickness="1" Background="{DynamicResource Campo}" Padding="14">
-                <DockPanel>
-                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
-                        <Button DockPanel.Dock="Right" Content="&#x2197;"
-                                Click="SoltarComponentes"
-                                ToolTip="Abrir a lista numa janela separada"
-                                Style="{StaticResource BotaoPequeno}"
-                                Padding="7,1" Margin="8,0,0,0"/>
-                        <TextBlock x:Name="txtResumoComponentes" DockPanel.Dock="Right"
-                                   FontSize="11" VerticalAlignment="Center"
-                                   Foreground="{DynamicResource TextoFraco}"/>
-                        <TextBlock FontSize="12" Foreground="{DynamicResource TextoFraco}"
-                                   Text="Tudo o que está no circuito. A seta abre e fecha; clicar seleciona a peça no desenho."/>
-                    </DockPanel>
-                    <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                  HorizontalScrollBarVisibility="Auto">
-                        <StackPanel x:Name="listaDeComponentes"/>
-                    </ScrollViewer>
-                </DockPanel>
-            </Border>
-
-            <!-- Tab do objeto selecionado: aparece sobre o canvas -->
+            <!-- Tab do objeto selecionado: aparece sobre o canvas. Vem ANTES
+                 das paginas de Componentes e Descricao: elas sao opacas e
+                 ficam por cima, e a barra do objeto nao cobre mais o
+                 comeco delas. -->
             <Border x:Name="barraObjeto" Visibility="Collapsed"
                     HorizontalAlignment="Left" VerticalAlignment="Top"
                     Margin="12" Padding="8,6" CornerRadius="6"
@@ -387,16 +362,100 @@
                                 VerticalAlignment="Center"/>
                     <Border Width="1" Background="{DynamicResource Borda}" Margin="8,2,8,2"/>
                     <Button x:Name="btGirar" Content="&#x21BB;" Click="Girar"
-                            ToolTip="Girar 90° (R)" Style="{StaticResource FerramentaObj}"/>
+                            ToolTip="{local:T 'Girar 90° (R)'}" Style="{StaticResource FerramentaObj}"/>
                     <Button x:Name="btEspelhar" Content="&#x21C6;" Click="Espelhar"
-                            ToolTip="Espelhar (M)" Style="{StaticResource FerramentaObj}"/>
+                            ToolTip="{local:T 'Espelhar (M)'}" Style="{StaticResource FerramentaObj}"/>
                     <Button x:Name="btApagar" Content="&#x1F5D1;" Click="Excluir"
-                            ToolTip="Excluir (Del)" Style="{StaticResource FerramentaObj}"/>
-                    <Button Content="?" Click="Ajuda" ToolTip="Ajuda"
+                            ToolTip="{local:T 'Excluir (Del)'}" Style="{StaticResource FerramentaObj}"/>
+                    <Button Content="?" Click="Ajuda" ToolTip="{local:T 'Ajuda'}"
                             Style="{StaticResource FerramentaObj}"/>
-                    <Button Content="&#x2715;" Click="LimparSelecao" ToolTip="Fechar"
+                    <Button Content="&#x2715;" Click="LimparSelecao" ToolTip="{local:T 'Fechar'}"
                             Style="{StaticResource FerramentaObj}"/>
                 </StackPanel>
+            </Border>
+
+            <!-- DESCRICAO: o nome, o autor e o texto do projeto, em cartoes
+                 como os das Configuracoes. O nome e o autor sao os mesmos da
+                 barra de cima e do "name"/"author" do diagram.json. -->
+            <Border x:Name="painelDescricao" Visibility="Collapsed"
+                    CornerRadius="6" BorderBrush="{DynamicResource Borda}"
+                    BorderThickness="1" Background="{DynamicResource Fundo}" Padding="20,16">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,14">
+                        <TextBlock Text="{local:T 'Descrição do projeto'}" FontSize="16" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextoForte}"/>
+                        <TextBlock Margin="0,3,0,0" FontSize="12" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource TextoFraco}"
+                                   Text="{local:T 'O que este circuito faz, como ligar, o que falta. Vai junto no .sktch.'}"/>
+                    </StackPanel>
+
+                    <Border DockPanel.Dock="Top" Style="{StaticResource Cartao}" Padding="14,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{local:T 'NOME DO CIRCUITO'}" Style="{StaticResource Titulo}"/>
+                                <Grid>
+                                    <TextBox x:Name="txtNomeNaDescricao" Padding="8,5" FontSize="13"
+                                             TextChanged="MudouNomeOuAutor"/>
+                                    <TextBlock x:Name="dicaNomeNaDescricao" IsHitTestVisible="False" Margin="11,0,0,0"
+                                               FontSize="13" Foreground="{DynamicResource TextoFraco}"/>
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="{local:T 'AUTOR'}" Style="{StaticResource Titulo}"/>
+                                <Grid>
+                                    <TextBox x:Name="txtAutorNaDescricao" Padding="8,5" FontSize="13"
+                                             TextChanged="MudouNomeOuAutor"/>
+                                    <TextBlock x:Name="dicaAutorNaDescricao" IsHitTestVisible="False" Margin="11,0,0,0"
+                                               FontSize="13" Foreground="{DynamicResource TextoFraco}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource Cartao}" Padding="14,12" Margin="0">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Text="{local:T 'DESCRIÇÃO'}" Style="{StaticResource Titulo}"/>
+                            <TextBox x:Name="txtDescricao" AcceptsReturn="True" AcceptsTab="True"
+                                     TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                     Padding="10,8" FontSize="13" VerticalContentAlignment="Top"/>
+                        </DockPanel>
+                    </Border>
+                </DockPanel>
+            </Border>
+
+            <!-- COMPONENTES: o circuito em cartoes: a placa com o que esta
+                 ligado nela, cada protoboard com o que esta espetado e o que
+                 ficou solto. Quem desenha os cartoes e o PainelDeComponentes. -->
+            <Border x:Name="painelComponentes" Visibility="Collapsed"
+                    CornerRadius="6" BorderBrush="{DynamicResource Borda}"
+                    BorderThickness="1" Background="{DynamicResource Fundo}" Padding="20,16,20,6">
+                <DockPanel>
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,14">
+                        <Button DockPanel.Dock="Right" Content="&#x2197;" VerticalAlignment="Top"
+                                Click="SoltarComponentes"
+                                ToolTip="{local:T 'Abrir a lista numa janela separada'}"
+                                Style="{StaticResource BotaoPequeno}"
+                                Padding="7,1" Margin="10,0,0,0"/>
+                        <StackPanel x:Name="resumoComponentes" DockPanel.Dock="Right" Orientation="Horizontal"
+                                    VerticalAlignment="Top"/>
+                        <StackPanel>
+                            <TextBlock Text="{local:T 'Componentes'}" FontSize="16" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextoForte}"/>
+                            <TextBlock Margin="0,3,0,0" FontSize="12" TextWrapping="Wrap"
+                                       Foreground="{DynamicResource TextoFraco}"
+                                       Text="{local:T 'Tudo o que está no circuito. Clicar seleciona a peça no desenho; a seta abre e fecha.'}"/>
+                        </StackPanel>
+                    </DockPanel>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel x:Name="listaDeComponentes" Margin="0,0,4,10"/>
+                    </ScrollViewer>
+                </DockPanel>
             </Border>
         </Grid>
 
@@ -438,7 +497,7 @@
                             <TextBlock x:Name="rotuloLinguagem" DockPanel.Dock="Right"
                                        Margin="10,0,0,0"
                                        Foreground="{DynamicResource TextoFraco}"
-                                       ToolTip="A linguagem sai do proprio codigo do sketch"
+                                       ToolTip="{local:T 'A linguagem sai do proprio codigo do sketch'}"
                                        FontSize="11" Text="Arduino (C++)"/>
                             <TextBlock x:Name="txtOutrasPlacas" DockPanel.Dock="Right"
                                        Margin="10,0,0,0"
@@ -456,12 +515,12 @@
                         <DockPanel>
                             <Button DockPanel.Dock="Right" Content="&#x2197;"
                                     Click="SoltarPainelDoCodigo"
-                                    ToolTip="Abrir o código numa janela separada"
+                                    ToolTip="{local:T 'Abrir o código numa janela separada'}"
                                     Style="{StaticResource BotaoPequeno}"
                                     Padding="7,1" Margin="6,0,0,0"/>
                             <Button x:Name="btMenuArquivos" DockPanel.Dock="Right"
                                     Content="&#x25BE;" Click="MenuDeArquivos"
-                                    ToolTip="Novo arquivo, renomear, carregar, apagar"
+                                    ToolTip="{local:T 'Novo arquivo, renomear, carregar, apagar'}"
                                     Style="{StaticResource BotaoPequeno}"
                                     Padding="8,1" Margin="6,0,0,0"/>
                             <Border DockPanel.Dock="Right" Width="1" Margin="4,3"
@@ -501,7 +560,7 @@
                     CornerRadius="6" Padding="8" Margin="0,0,0,8">
                 <DockPanel>
                     <TextBlock x:Name="txtTituloVariaveis" DockPanel.Dock="Top"
-                               Text="PAUSADO" Style="{StaticResource Titulo}"
+                               Text="{local:T 'PAUSADO'}" Style="{StaticResource Titulo}"
                                Foreground="{DynamicResource Aviso}"/>
                     <ScrollViewer x:Name="rolagemVariaveis" MaxHeight="150"
                                   VerticalScrollBarVisibility="Auto"
@@ -517,7 +576,7 @@
                           Grid.Row="3" Height="6" HorizontalAlignment="Stretch"
                           VerticalAlignment="Center" Background="Transparent"
                           ShowsPreview="True" Cursor="SizeNS"
-                          ToolTip="Arraste para dividir o espaço entre o código e este painel"/>
+                          ToolTip="{local:T 'Arraste para dividir o espaço entre o código e este painel'}"/>
 
             <Border x:Name="painelDeBaixo" Grid.Row="4"
                     Background="{DynamicResource Campo}" BorderBrush="{DynamicResource Borda}"
@@ -535,61 +594,37 @@
                          mesma linha, mas o botao fica PRESO na direita. Na
                          Alpha 18 ele vinha no fim da fileira e, na largura
                          normal da coluna, ficava cortado fora da borda. -->
+                    <!-- Uma fileira so, com as abas em pilula como as de cima
+                         (SIMULACAO, MULTIMETRO...). Ate a Alpha 24 cada aba tinha
+                         a seta dela e a fileira quebrava em duas linhas; agora a
+                         seta e uma so, na direita, e solta a aba que esta aberta
+                         (o "bluetooth acoplado e o serial fora" da Alpha 18
+                         continua: abre o serial, solta, volta ao bluetooth).
+                         Coluna estreita demais: a fileira rola de lado (roda do
+                         mouse), e nao quebra. -->
                     <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6" LastChildFill="True">
                     <Button DockPanel.Dock="Right" Content="&#x29C9;" Click="SoltarPainelDeBaixo"
-                            ToolTip="Abrir as quatro numa janela separada só"
+                            ToolTip="{local:T 'Abrir todas numa janela separada só'}"
                             Style="{StaticResource BotaoPequeno}"
+                            Padding="7,1" Margin="4,0,0,0"/>
+                    <Button x:Name="btSoltarAbaAberta" DockPanel.Dock="Right" Content="&#x2197;"
+                            Click="SoltarAbaDeBaixo" Style="{StaticResource BotaoPequeno}"
                             Padding="7,1" Margin="6,0,0,0"/>
-                    <!-- WrapPanel, e nao StackPanel: na largura padrao da coluna
-                         as quatro abas com as setas nao cabem numa linha, e o
-                         StackPanel cortava a ultima seta fora da borda. Aqui a
-                         sobra desce para a linha de baixo e nada some. -->
-                    <WrapPanel Orientation="Horizontal">
+                    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled"
+                                  PreviewMouseWheel="RolarAbasDeArquivo">
                         <StackPanel Orientation="Horizontal">
-                            <Button x:Name="btAbaConsole" Content="CONSOLE" Tag="console"
+                            <Button x:Name="btAbaConsole" Content="{local:T 'CONSOLE'}" Tag="console"
                                     Style="{StaticResource Aba}" Click="TrocarAba"/>
-                            <Button x:Name="btSoltarConsole" Content="&#x2197;" Tag="console"
-                                    Click="SoltarAbaDeBaixo" Style="{StaticResource BotaoPequeno}"
-                                    Padding="4,1" Margin="1,0,6,2"
-                                    ToolTip="Abrir o console numa janela separada"/>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <Button x:Name="btAbaSerial" Content="MONITOR SERIAL" Tag="serial"
+                            <Button x:Name="btAbaSerial" Content="{local:T 'MONITOR SERIAL'}" Tag="serial"
                                     Style="{StaticResource Aba}" Click="TrocarAba"/>
-                            <Button x:Name="btSoltarSerial" Content="&#x2197;" Tag="serial"
-                                    Click="SoltarAbaDeBaixo" Style="{StaticResource BotaoPequeno}"
-                                    Padding="4,1" Margin="1,0,6,2"
-                                    ToolTip="Abrir o monitor serial numa janela separada"/>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <Button x:Name="btAbaRede" Content="REDE" Tag="rede"
+                            <Button x:Name="btAbaRede" Content="{local:T 'REDE'}" Tag="rede"
                                     Style="{StaticResource Aba}" Click="TrocarAba"/>
-                            <Button x:Name="btSoltarRede" Content="&#x2197;" Tag="rede"
-                                    Click="SoltarAbaDeBaixo" Style="{StaticResource BotaoPequeno}"
-                                    Padding="4,1" Margin="1,0,6,2"
-                                    ToolTip="Abrir a rede numa janela separada"/>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <Button x:Name="btAbaBluetooth" Content="BLUETOOTH" Tag="bluetooth"
+                            <Button x:Name="btAbaBluetooth" Content="{local:T 'BLUETOOTH'}" Tag="bluetooth"
                                     Style="{StaticResource Aba}" Click="TrocarAba"/>
-                            <Button x:Name="btSoltarBluetooth" Content="&#x2197;" Tag="bluetooth"
-                                    Click="SoltarAbaDeBaixo" Style="{StaticResource BotaoPequeno}"
-                                    Padding="4,1" Margin="1,0,6,2"
-                                    ToolTip="Abrir o Bluetooth numa janela separada"/>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <Button x:Name="btAbaPlaca" Content="PLACA" Tag="placa"
+                            <Button x:Name="btAbaPlaca" Content="{local:T 'PLACA'}" Tag="placa"
                                     Style="{StaticResource Aba}" Click="TrocarAba"/>
-                            <Button x:Name="btSoltarPlaca" Content="&#x2197;" Tag="placa"
-                                    Click="SoltarAbaDeBaixo" Style="{StaticResource BotaoPequeno}"
-                                    Padding="4,1" Margin="1,0,4,2"
-                                    ToolTip="Abrir a placa de verdade numa janela separada"/>
                         </StackPanel>
-                    </WrapPanel>
+                    </ScrollViewer>
                     </DockPanel>
 
                     <!-- As quatro abas numa grade so, uma por cima da outra.
@@ -605,14 +640,14 @@
                          perdia na mensagem seguinte. -->
                     <DockPanel x:Name="abaConsole" Visibility="Collapsed">
                         <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4">
-                            <Button DockPanel.Dock="Right" Content="Copiar" Width="64"
+                            <Button DockPanel.Dock="Right" Content="{local:T 'Copiar'}" Width="64"
                                     Margin="6,0,0,0" Style="{StaticResource BotaoPequeno}"
                                     Click="CopiarConsole"
-                                    ToolTip="Copiar o console inteiro"/>
-                            <Button DockPanel.Dock="Right" Content="Limpar" Width="64"
+                                    ToolTip="{local:T 'Copiar o console inteiro'}"/>
+                            <Button DockPanel.Dock="Right" Content="{local:T 'Limpar'}" Width="64"
                                     Style="{StaticResource BotaoPequeno}"
                                     Click="LimparConsole"/>
-                            <TextBlock Text="o que o simulador fez — o que o sketch imprime fica no monitor serial"
+                            <TextBlock Text="{local:T 'o que o simulador fez — o que o sketch imprime fica no monitor serial'}"
                                        FontSize="11" VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis"
                                        Foreground="{DynamicResource TextoFraco}"/>
@@ -632,13 +667,13 @@
                         <DockPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
                             <!-- O baud do monitor, como o da IDE: diferente do Serial.begin,
                                  o texto sai embaralhado nos dois sentidos. -->
-                            <Button DockPanel.Dock="Right" x:Name="btBaudSerial" Content="9600 baud" Width="92"
+                            <Button DockPanel.Dock="Right" x:Name="btBaudSerial" Content="{local:T '9600 baud'}" Width="92"
                                     Margin="6,0,0,0" Style="{StaticResource BotaoPequeno}" Click="AbrirListaDeBaud"
-                                    ToolTip="O baud do monitor serial da placa do editor (o do Serial.begin do sketch)"/>
-                            <Button DockPanel.Dock="Right" Content="Enviar" Width="64" Margin="6,0,0,0"
+                                    ToolTip="{local:T 'O baud do monitor serial da placa do editor (o do Serial.begin do sketch)'}"/>
+                            <Button DockPanel.Dock="Right" Content="{local:T 'Enviar'}" Width="64" Margin="6,0,0,0"
                                     Style="{StaticResource BotaoPequeno}" Click="EnviarPeloSerial"/>
                             <TextBox x:Name="txtEntradaSerial" Style="{StaticResource CampoEscuro}"
-                                     ToolTip="Texto para o sketch (Serial.available / Serial.read)"
+                                     ToolTip="{local:T 'Texto para o sketch (Serial.available / Serial.read)'}"
                                      KeyDown="TeclaNaEntradaSerial"/>
                         </DockPanel>
                         <ScrollViewer x:Name="rolagemSerial" VerticalScrollBarVisibility="Auto"
@@ -655,13 +690,13 @@
                     <DockPanel x:Name="abaRede" Visibility="Collapsed">
                         <!-- Publicar no MQTT, como o app de celular da aula. -->
                         <DockPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
-                            <Button DockPanel.Dock="Right" Content="Publicar" Width="70" Margin="6,0,0,0"
+                            <Button DockPanel.Dock="Right" Content="{local:T 'Publicar'}" Width="70" Margin="6,0,0,0"
                                     Style="{StaticResource BotaoPequeno}" Click="PublicarNoMqtt"/>
                             <TextBox x:Name="txtTopicoMqtt" Width="160" Margin="0,0,6,0"
                                      Style="{StaticResource CampoEscuro}" Text="aula/teste"
-                                     ToolTip="Topico MQTT"/>
+                                     ToolTip="{local:T 'Topico MQTT'}"/>
                             <TextBox x:Name="txtMensagemMqtt" Style="{StaticResource CampoEscuro}"
-                                     ToolTip="Mensagem" KeyDown="TeclaNoMqtt"/>
+                                     ToolTip="{local:T 'Mensagem'}" KeyDown="TeclaNoMqtt"/>
                         </DockPanel>
                         <!-- O aviso de que o radio do computador nao pode ser
                              usado. Fica AQUI, e nao no monitor serial: o
@@ -687,20 +722,20 @@
                     <DockPanel x:Name="abaBluetooth" Visibility="Collapsed">
                         <!-- O celular da aula: acha a placa, conecta e conversa. -->
                         <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4">
-                            <Button DockPanel.Dock="Right" x:Name="btAbrirCelular" Content="Abrir o celular"
+                            <Button DockPanel.Dock="Right" x:Name="btAbrirCelular" Content="{local:T 'Abrir o celular'}"
                                     Width="120" Margin="6,0,0,0" Style="{StaticResource BotaoPequeno}"
                                     Click="AbrirCelular"
-                                    ToolTip="O celular simulado (1280x720): procura as placas, conversa pelo Bluetooth clássico e navega no BLE"/>
-                            <Button DockPanel.Dock="Right" x:Name="btConectarBt" Content="Conectar"
+                                    ToolTip="{local:T 'O celular simulado (1280x720): procura as placas, conversa pelo Bluetooth clássico e navega no BLE'}"/>
+                            <Button DockPanel.Dock="Right" x:Name="btConectarBt" Content="{local:T 'Conectar'}"
                                     Width="96" Margin="6,0,0,0" Style="{StaticResource BotaoPequeno}"
                                     Click="ConectarOuSairDoBluetooth"/>
                             <Button DockPanel.Dock="Left" x:Name="btDispositivosBt" Width="150"
-                                    Content="Escolher a placa" Style="{StaticResource BotaoPequeno}"
+                                    Content="{local:T 'Escolher a placa'}" Style="{StaticResource BotaoPequeno}"
                                     Click="AbrirListaDeBluetooth"
-                                    ToolTip="Placas com SerialBT.begin() chamado"/>
+                                    ToolTip="{local:T 'Placas com SerialBT.begin() chamado'}"/>
                             <TextBlock x:Name="txtBtEscolhido" Margin="10,0,0,0" FontSize="11"
                                        VerticalAlignment="Center" Foreground="{DynamicResource TextoFraco}"
-                                       Text="nenhuma placa com Bluetooth ligado"/>
+                                       Text="{local:T 'nenhuma placa com Bluetooth ligado'}"/>
                         </DockPanel>
                         <Border x:Name="avisoDeBluetooth" DockPanel.Dock="Top" Visibility="Collapsed"
                                 Margin="0,0,0,6" Padding="9,6" CornerRadius="4"
@@ -710,10 +745,10 @@
                                        TextWrapping="Wrap" Foreground="{DynamicResource Aviso}"/>
                         </Border>
                         <DockPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
-                            <Button DockPanel.Dock="Right" Content="Enviar" Width="64" Margin="6,0,0,0"
+                            <Button DockPanel.Dock="Right" Content="{local:T 'Enviar'}" Width="64" Margin="6,0,0,0"
                                     Style="{StaticResource BotaoPequeno}" Click="EnviarPeloBluetooth"/>
                             <TextBox x:Name="txtEntradaBt" Style="{StaticResource CampoEscuro}"
-                                     ToolTip="Texto para a placa conectada" KeyDown="TeclaNoBluetooth"/>
+                                     ToolTip="{local:T 'Texto para a placa conectada'}" KeyDown="TeclaNoBluetooth"/>
                         </DockPanel>
                         <ScrollViewer x:Name="rolagemBt" VerticalScrollBarVisibility="Auto">
                             <TextBlock x:Name="txtBluetooth" VerticalAlignment="Top" FontFamily="Consolas" FontSize="11"
@@ -725,17 +760,17 @@
                     <!-- placa de verdade: o compilador do Arduino e a USB -->
                     <DockPanel x:Name="abaPlaca" Visibility="Collapsed">
                         <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4">
-                            <Button DockPanel.Dock="Right" x:Name="btMandarNaAba" Content="Mandar para a placa"
+                            <Button DockPanel.Dock="Right" x:Name="btMandarNaAba" Content="{local:T 'Mandar para a placa'}"
                                     Margin="6,0,0,0" Style="{StaticResource BotaoPequeno}" Click="MandarParaPlaca"/>
-                            <Button DockPanel.Dock="Right" x:Name="btVerificarNaAba" Content="Verificar"
+                            <Button DockPanel.Dock="Right" x:Name="btVerificarNaAba" Content="{local:T 'Verificar'}"
                                     Margin="6,0,0,0" Style="{StaticResource BotaoPequeno}" Click="Verificar"/>
                             <Button DockPanel.Dock="Left" x:Name="btPortaPlaca" Width="150"
-                                    Content="Escolher a porta" Style="{StaticResource BotaoPequeno}"
+                                    Content="{local:T 'Escolher a porta'}" Style="{StaticResource BotaoPequeno}"
                                     Click="EscolherPortaDaPlaca"
-                                    ToolTip="As placas ligadas na USB deste computador"/>
+                                    ToolTip="{local:T 'As placas ligadas na USB deste computador'}"/>
                             <TextBlock x:Name="txtPortaEscolhida" Margin="10,0,0,0" FontSize="11"
                                        VerticalAlignment="Center" Foreground="{DynamicResource TextoFraco}"
-                                       TextTrimming="CharacterEllipsis" Text="nenhuma porta"/>
+                                       TextTrimming="CharacterEllipsis" Text="{local:T 'nenhuma porta'}"/>
                         </DockPanel>
                         <TextBlock x:Name="txtPlacaEstado" DockPanel.Dock="Top" Margin="0,0,0,6" FontSize="11"
                                    TextWrapping="Wrap" Foreground="{DynamicResource TextoFraco}"/>

@@ -315,6 +315,8 @@ public static partial class Autoteste
         Bloco("Chip_Proprio", Chip_Proprio);
         Bloco("Programa_JanelaCabeNaTela", Programa_JanelaCabeNaTela);
         Bloco("Pecas_TintaNaCaixa", Pecas_TintaNaCaixa);
+        // Por ultimo: as tabelas que nascem com a tela em ingles ficam em ingles ate o fim do processo.
+        Bloco("Idiomas_SobraDePortugues", Idiomas_SobraDePortugues);
 
         saida.AppendLine();
         saida.AppendLine($"{passou} passaram, {falhou} falharam");

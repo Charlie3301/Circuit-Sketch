@@ -150,7 +150,7 @@ public partial class EditorCircuito
         {
             var f = Atual.Fios[fio];
             return new PontaDoMultimetro(f.DePeca, f.DePino, fio, p,
-                $"fio {RotuloDoPino(f.DePeca, f.DePino)} → {RotuloDoPino(f.ParaPeca, f.ParaPino)}");
+                Idioma.T("fio {0} → {1}", RotuloDoPino(f.DePeca, f.DePino), RotuloDoPino(f.ParaPeca, f.ParaPino)));
         }
         return null;
     }
@@ -160,7 +160,7 @@ public partial class EditorCircuito
     {
         var peca = Atual.Achar(idDaPeca);
         if (peca is null) return $"{pino} ({idDaPeca})";
-        return Catalogo.EhProtoboard(peca.Tipo) ? $"furo {pino} ({peca.Id})" : $"{pino} ({peca.Id})";
+        return Catalogo.EhProtoboard(peca.Tipo) ? Idioma.T("furo {0} ({1})", pino, peca.Id) : $"{pino} ({peca.Id})";
     }
 
     /// <summary>

@@ -270,7 +270,7 @@ public static class Pecas
             {
                 LerSobra(nome, proprio);
                 var feito = Ler(proprio);
-                if (feito is null) { Falhou(nome, "SVG proprio nao pode ser lido"); return null; }
+                if (feito is null) { Falhou(nome, Idioma.T("SVG proprio nao pode ser lido")); return null; }
 
                 var quadroProprio = Enquadrar(feito, proprio, nome);
                 tintas[nome] = quadroProprio.Children.Count > 1
@@ -290,7 +290,7 @@ public static class Pecas
         string recurso = AcharRecurso(nome);
         if (recurso is null)
         {
-            Falhou(nome, "recurso embutido nao encontrado");
+            Falhou(nome, Idioma.T("recurso embutido nao encontrado"));
             return null;
         }
 
@@ -629,7 +629,7 @@ public static class Pecas
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 "circuitsketch-erros.log");
             File.AppendAllText(arquivo,
-                $"[{DateTime.Now:HH:mm:ss}] peca '{nome}' nao carregou: {motivo}{Environment.NewLine}");
+                Idioma.T("[{0:HH:mm:ss}] peca '{1}' nao carregou: {2}{3}", DateTime.Now, nome, motivo, Environment.NewLine));
         }
         catch { }
     }

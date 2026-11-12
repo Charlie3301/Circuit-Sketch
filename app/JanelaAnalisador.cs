@@ -55,7 +55,7 @@ public class JanelaAnalisador : Window
         janela = Analisador.JanelaDe(peca);
 
         try { Owner = dono; } catch (InvalidOperationException) { }
-        Title = "Analisador lógico" + (string.IsNullOrWhiteSpace(peca.Nome) ? "" : $" — {peca.Nome}");
+        Title = Idioma.T("Analisador lógico{0}", (string.IsNullOrWhiteSpace(peca.Nome) ? "" : $" — {peca.Nome}"));
         Width = 1000;
         Height = 560;
         MinWidth = 640;
@@ -66,27 +66,27 @@ public class JanelaAnalisador : Window
         // ---- a barra de cima ----
         var barra = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(10, 8, 10, 8) };
 
-        pausar = Botao("⏸ Pausar", "Congela a captura para medir (Espaço)", () => AlternarPausa());
+        pausar = Botao(Idioma.T("⏸ Pausar"), Idioma.T("Congela a captura para medir (Espaço)"), () => AlternarPausa());
         barra.Children.Add(pausar);
-        barra.Children.Add(Botao("−", "Afasta: mais tempo na tela (roda do mouse)", () => Zoom(1.25, 0.5)));
-        barra.Children.Add(Botao("+", "Aproxima: menos tempo na tela (roda do mouse)", () => Zoom(0.8, 0.5)));
+        barra.Children.Add(Botao("−", Idioma.T("Afasta: mais tempo na tela (roda do mouse)"), () => Zoom(1.25, 0.5)));
+        barra.Children.Add(Botao("+", Idioma.T("Aproxima: menos tempo na tela (roda do mouse)"), () => Zoom(0.8, 0.5)));
         escala.SetResourceReference(TextBlock.ForegroundProperty, Tema.Texto);
         barra.Children.Add(escala);
 
         var comDisparo = new CheckBox
         {
-            Content = "Disparo na subida",
+            Content = Idioma.T("Disparo na subida"),
             IsChecked = true,
             VerticalAlignment = VerticalAlignment.Center,
             Margin = new Thickness(4, 0, 14, 0),
-            ToolTip = "Começa a tela na última subida do primeiro canal com sinal: o sinal repetido fica parado",
+            ToolTip = Idioma.T("Começa a tela na última subida do primeiro canal com sinal: o sinal repetido fica parado"),
         };
         comDisparo.SetResourceReference(ForegroundProperty, Tema.Texto);
         comDisparo.Checked += (_, _) => disparo = true;
         comDisparo.Unchecked += (_, _) => disparo = false;
         barra.Children.Add(comDisparo);
 
-        barra.Children.Add(Botao("Salvar .vcd…", "Salva o que está na tela para abrir no PulseView ou no GTKWave",
+        barra.Children.Add(Botao(Idioma.T("Salvar .vcd…"), Idioma.T("Salva o que está na tela para abrir no PulseView ou no GTKWave"),
                                  SalvarVcd));
 
         // ---- os canais ----
@@ -121,7 +121,7 @@ public class JanelaAnalisador : Window
         tela.MouseLeftButtonUp += (_, _) => { arrastandoDe = null; tela.ReleaseMouseCapture(); };
 
         medida.SetResourceReference(TextBlock.ForegroundProperty, Tema.TextoFraco);
-        medida.Text = "Passe o mouse sobre um canal para medir. Clique e arraste para andar no tempo.";
+        medida.Text = Idioma.T("Passe o mouse sobre um canal para medir. Clique e arraste para andar no tempo.");
 
         var raiz = new DockPanel();
         DockPanel.SetDock(barra, Dock.Top);
@@ -162,7 +162,7 @@ public class JanelaAnalisador : Window
     {
         pausado = !pausado;
         if (pausado) fimCongelado = visto.Ate;
-        pausar.Content = pausado ? "▶ Continuar" : "⏸ Pausar";
+        pausar.Content = pausado ? Idioma.T("▶ Continuar") : Idioma.T("⏸ Pausar");
     }
 
     void Zoom(double fator, double onde)
@@ -200,7 +200,7 @@ public class JanelaAnalisador : Window
             : Analisador.Enquadrar(fontesVistas, janela, disparo);
 
         var (de, ate) = visto;
-        escala.Text = $"{Analisador.Tempo(janela)} na tela";
+        escala.Text = Idioma.T("{0} na tela", Analisador.Tempo(janela));
 
         tela.Children.Clear();
         rotulos.Children.Clear();
@@ -226,7 +226,7 @@ public class JanelaAnalisador : Window
 
             var origem = new TextBlock
             {
-                Text = fonte.Ligada ? $"GPIO {fonte.Gpio}" : "sem ligação",
+                Text = fonte.Ligada ? Idioma.T("GPIO {0}", fonte.Gpio) : Idioma.T("sem ligação"),
                 FontSize = 11,
                 Foreground = corFraca,
             };
@@ -342,7 +342,7 @@ public class JanelaAnalisador : Window
         string quando = $"t = {Analisador.Tempo(us - de)}";
 
         var onda = ondasVistas[canal];
-        if (onda is null) return $"{quando}  ·  D{canal} sem ligação";
+        if (onda is null) return Idioma.T("{0}  ·  D{1} sem ligação", quando, canal);
 
         return $"{quando}  ·  D{canal}: {Analisador.Medir(onda, us, ate)}";
     }
@@ -351,7 +351,7 @@ public class JanelaAnalisador : Window
     {
         var dlg = new Microsoft.Win32.SaveFileDialog
         {
-            Filter = "Captura do analisador (*.vcd)|*.vcd",
+            Filter = Idioma.T("Captura do analisador (*.vcd)|*.vcd"),
             FileName = "captura.vcd",
         };
         if (dlg.ShowDialog(this) != true) return;

@@ -8,8 +8,8 @@ public readonly record struct LinhaDoConsole(DateTime Quando, NivelDoConsole Niv
     /// <summary>A marca da coluna do meio. Largura fixa para as linhas alinharem.</summary>
     public string Marca => Nivel switch
     {
-        NivelDoConsole.Erro => "ERRO ",
-        NivelDoConsole.Aviso => "AVISO",
+        NivelDoConsole.Erro => Idioma.T("ERRO").PadRight(5),
+        NivelDoConsole.Aviso => Idioma.T("AVISO").PadRight(5),
         _ => "     ",
     };
 

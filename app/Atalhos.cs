@@ -8,32 +8,32 @@ public static class AtalhosDoPrograma
 {
     public static readonly AcaoDoPrograma[] Todas =
     [
-        new("rodar", "Rodar ou parar a simulação", Key.F5, ModifierKeys.None),
-        new("pausar", "Pausar ou continuar", Key.F6, ModifierKeys.None),
-        new("pausa-na-linha", "Ponto de parada na linha", Key.F9, ModifierKeys.None),
-        new("passo", "Andar uma linha", Key.F10, ModifierKeys.None),
-        new("verificar", "Verificar o código", Key.R, ModifierKeys.Control),
-        new("mandar", "Mandar para a placa de verdade", Key.U, ModifierKeys.Control),
+        new("rodar", Idioma.T("Rodar ou parar a simulação"), Key.F5, ModifierKeys.None),
+        new("pausar", Idioma.T("Pausar ou continuar"), Key.F6, ModifierKeys.None),
+        new("pausa-na-linha", Idioma.T("Ponto de parada na linha"), Key.F9, ModifierKeys.None),
+        new("passo", Idioma.T("Andar uma linha"), Key.F10, ModifierKeys.None),
+        new("verificar", Idioma.T("Verificar o código"), Key.R, ModifierKeys.Control),
+        new("mandar", Idioma.T("Mandar para a placa de verdade"), Key.U, ModifierKeys.Control),
 
-        new("novo", "Circuito novo", Key.N, ModifierKeys.Control),
-        new("salvar", "Salvar projeto", Key.S, ModifierKeys.Control),
-        new("salvar-como", "Salvar projeto como", Key.S, ModifierKeys.Control | ModifierKeys.Shift),
-        new("abrir", "Abrir projeto", Key.O, ModifierKeys.Control),
-        new("importar", "Importar do Wokwi", Key.I, ModifierKeys.Control),
-        new("bibliotecas", "Gerenciador de bibliotecas", Key.I, ModifierKeys.Control | ModifierKeys.Shift),   // o mesmo da Arduino IDE
-        new("monitor", "Ir para o monitor serial", Key.M, ModifierKeys.Control),
-        new("desfazer", "Desfazer", Key.Z, ModifierKeys.Control),
-        new("refazer", "Refazer", Key.Y, ModifierKeys.Control),
-        new("copiar", "Copiar", Key.C, ModifierKeys.Control),
-        new("colar", "Colar", Key.V, ModifierKeys.Control),
+        new("novo", Idioma.T("Circuito novo"), Key.N, ModifierKeys.Control),
+        new("salvar", Idioma.T("Salvar projeto"), Key.S, ModifierKeys.Control),
+        new("salvar-como", Idioma.T("Salvar projeto como"), Key.S, ModifierKeys.Control | ModifierKeys.Shift),
+        new("abrir", Idioma.T("Abrir projeto"), Key.O, ModifierKeys.Control),
+        new("importar", Idioma.T("Importar do Wokwi"), Key.I, ModifierKeys.Control),
+        new("bibliotecas", Idioma.T("Gerenciador de bibliotecas"), Key.I, ModifierKeys.Control | ModifierKeys.Shift),   // o mesmo da Arduino IDE
+        new("monitor", Idioma.T("Ir para o monitor serial"), Key.M, ModifierKeys.Control),
+        new("desfazer", Idioma.T("Desfazer"), Key.Z, ModifierKeys.Control),
+        new("refazer", Idioma.T("Refazer"), Key.Y, ModifierKeys.Control),
+        new("copiar", Idioma.T("Copiar"), Key.C, ModifierKeys.Control),
+        new("colar", Idioma.T("Colar"), Key.V, ModifierKeys.Control),
 
-        new("adicionar", "Adicionar componente", Key.A, ModifierKeys.None),
-        new("ajustar", "Ajustar à tela", Key.F, ModifierKeys.None),
-        new("grade", "Ligar ou desligar a grade", Key.G, ModifierKeys.None),
-        new("girar", "Girar a peça", Key.R, ModifierKeys.None),
-        new("espelhar", "Espelhar a peça", Key.M, ModifierKeys.None),
-        new("excluir", "Excluir o que está selecionado", Key.Delete, ModifierKeys.None),
-        new("ajuda", "Ajuda e atalhos", Key.OemQuestion, ModifierKeys.None),
+        new("adicionar", Idioma.T("Adicionar componente"), Key.A, ModifierKeys.None),
+        new("ajustar", Idioma.T("Ajustar à tela"), Key.F, ModifierKeys.None),
+        new("grade", Idioma.T("Ligar ou desligar a grade"), Key.G, ModifierKeys.None),
+        new("girar", Idioma.T("Girar a peça"), Key.R, ModifierKeys.None),
+        new("espelhar", Idioma.T("Espelhar a peça"), Key.M, ModifierKeys.None),
+        new("excluir", Idioma.T("Excluir o que está selecionado"), Key.Delete, ModifierKeys.None),
+        new("ajuda", Idioma.T("Ajuda e atalhos"), Key.OemQuestion, ModifierKeys.None),
     ];
 
     public static AcaoDoPrograma Acao(string id) => Todas.FirstOrDefault(a => a.Id == id);

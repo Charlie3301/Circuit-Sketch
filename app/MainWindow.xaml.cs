@@ -122,9 +122,9 @@ public partial class MainWindow : Window
 
     static readonly (string nome, string hex)[] CoresDeFio =
     [
-        ("Preto", "#000000"), ("Branco", "#F2F2F2"), ("Cinza", "#8C8C8C"), ("Roxo", "#8A4FBE"),
-        ("Azul", "#1668C1"), ("Verde", "#00A651"), ("Amarelo", "#F2C300"), ("Laranja", "#F07C1E"),
-        ("Vermelho", "#D6202A"), ("Marrom", "#8B4A1B"),
+        (Idioma.T("Preto"), "#000000"), (Idioma.T("Branco"), "#F2F2F2"), (Idioma.T("Cinza"), "#8C8C8C"), (Idioma.T("Roxo"), "#8A4FBE"),
+        (Idioma.T("Azul"), "#1668C1"), (Idioma.T("Verde"), "#00A651"), (Idioma.T("Amarelo"), "#F2C300"), (Idioma.T("Laranja"), "#F07C1E"),
+        (Idioma.T("Vermelho"), "#D6202A"), (Idioma.T("Marrom"), "#8B4A1B"),
     ];
 
     public MainWindow()
@@ -174,8 +174,7 @@ public partial class MainWindow : Window
         // O multimetro (a aba MULTÍMETRO): as pontas, a chave e a ponta do clique esquerdo.
         editor.PontasMudaram += AtualizarMultimetro;
         // O X de um selo de aviso: diz como trazer de volta.
-        editor.AvisoFechado += aviso => Aviso($"aviso fechado ({EditorCircuito.TextoDoSelo(aviso)}). "
-                                              + "Configurações > Simulação traz os fechados de volta.");
+        editor.AvisoFechado += aviso => Aviso(Idioma.T("aviso fechado ({0}). Configurações > Simulação traz os fechados de volta.", EditorCircuito.TextoDoSelo(aviso)));
         painelMultimetro.FuncaoMudou += AtualizarMultimetro;
         painelMultimetro.PontaAtivaMudou += () => editor.PretaNoEsquerdo = painelMultimetro.PretaNoEsquerdo;
         // Rodar e parar mudam o que o multimetro le (parado, so o ohmimetro tem o que medir).
@@ -222,14 +221,14 @@ public partial class MainWindow : Window
             if (!rodando) { if (preso) editor.EsquecerResetPorFio(id); return; }
             if (preso) SegurarReset(id, editor.PinoQueSegura(id) switch
             {
-                "3V3_EN" => "o 3V3_EN está ligado no GND: o regulador desliga e a placa fica apagada até ele sair.",
-                { } pino and not "RESET" => $"o {pino.Split('.')[0]} está ligado no GND: a placa fica parada até ele sair.",
-                _ => "o RESET está ligado no GND: a placa fica parada até ele sair.",
+                "3V3_EN" => Idioma.T("o 3V3_EN está ligado no GND: o regulador desliga e a placa fica apagada até ele sair."),
+                { } pino and not "RESET" => Idioma.T("o {0} está ligado no GND: a placa fica parada até ele sair.", pino.Split('.')[0]),
+                _ => Idioma.T("o RESET está ligado no GND: a placa fica parada até ele sair."),
             });
             else SoltarReset(id);
         };
         editor.PecaSolta += peca =>
-            Aviso($"adicionado: {Catalogo.Obter(peca.Tipo)?.Nome}");
+            Aviso(Idioma.T("adicionado: {0}", Catalogo.Obter(peca.Tipo)?.Nome));
 
         // Realce de sintaxe do Arduino, nao de C++ generico: as palavras
         // que ganham cor sao as que o motor entende.
@@ -383,10 +382,9 @@ public partial class MainWindow : Window
                 FontSize = 11,
                 Foreground = Tema.Pincel(nome == arquivoAberto ? Tema.TextoForte : Tema.TextoFraco),
                 ToolTip = nome is null
-                    ? "O programa desta placa"
+                    ? Idioma.T("O programa desta placa")
                     : nome == NomeDoDiagrama
-                        ? "O circuito em JSON. Da para editar: o desenho segue o que "
-                          + "estiver escrito aqui."
+                        ? Idioma.T("O circuito em JSON. Da para editar: o desenho segue o que estiver escrito aqui.")
                         : nome,
             };
             aba.Click += (s, _) => AbrirArquivoDoProjeto((string)((Button)s).Tag);
@@ -457,7 +455,7 @@ public partial class MainWindow : Window
         novo = null;
         erro = null;
         perdidos = 0;
-        if (string.IsNullOrWhiteSpace(texto)) { erro = "o arquivo esta vazio"; return false; }
+        if (string.IsNullOrWhiteSpace(texto)) { erro = Idioma.T("o arquivo esta vazio"); return false; }
 
         bool formatoVelho = texto.Contains("\"Pecas\"", StringComparison.Ordinal) && !texto.Contains("\"parts\"", StringComparison.Ordinal);
         if (formatoVelho) return Circuito.TentarDeJson(texto, out novo, out erro);
@@ -477,7 +475,7 @@ public partial class MainWindow : Window
             string frase = e.Message;
             int ponto = frase.IndexOf(". ", StringComparison.Ordinal);
             if (ponto > 0) frase = frase[..(ponto + 1)];
-            erro = e.LineNumber is not null ? $"linha {e.LineNumber + 1}: {frase}" : frase;
+            erro = e.LineNumber is not null ? Idioma.T("linha {0}: {1}", e.LineNumber + 1, frase) : frase;
             return false;
         }
     }
@@ -519,8 +517,8 @@ public partial class MainWindow : Window
 
         int quebrados = novo.FiosQuebrados().Count() + perdidos;
         Aviso(quebrados == 0
-            ? $"diagram.json aplicado: {novo.Pecas.Count} peças, {novo.Fios.Count} fios."
-            : $"diagram.json aplicado, mas {quebrados} fio(s) apontam para pino que não existe.");
+            ? Idioma.T("diagram.json aplicado: {0} peças, {1} fios.", novo.Pecas.Count, novo.Fios.Count)
+            : Idioma.T("diagram.json aplicado, mas {0} fio(s) apontam para pino que não existe.", quebrados));
     }
 
     /// <summary>
@@ -566,18 +564,19 @@ public partial class MainWindow : Window
     void SoltarPainelDeBaixo(object s = null, RoutedEventArgs e = null)
     {
         LembrarMedidas();
-        JanelaSolta.Alternar(this, PainelDeBaixo, "Monitor serial, rede e Bluetooth",
+        JanelaSolta.Alternar(this, PainelDeBaixo, Idioma.T("Monitor serial, rede e Bluetooth"),
                              painelDeBaixo);
     }
 
     /// <summary>A lista de componentes numa janela propria.</summary>
     void SoltarComponentes(object s = null, RoutedEventArgs e = null)
-        => JanelaSolta.Alternar(this, "componentes", "Componentes", painelComponentes);
+        => JanelaSolta.Alternar(this, "componentes", Idioma.T("Componentes"), painelComponentes);
 
+    /// <summary>A roda do mouse rola de lado uma fileira de abas (a dos arquivos e a de baixo).</summary>
     void RolarAbasDeArquivo(object s, MouseWheelEventArgs e)
     {
-        rolagemDasAbas.ScrollToHorizontalOffset(
-            rolagemDasAbas.HorizontalOffset - e.Delta);
+        var rolagem = s as ScrollViewer ?? rolagemDasAbas;
+        rolagem.ScrollToHorizontalOffset(rolagem.HorizontalOffset - e.Delta);
         e.Handled = true;
     }
 
@@ -641,17 +640,17 @@ public partial class MainWindow : Window
             menu.Items.Add(item);
         }
 
-        Item("Novo arquivo", NovoArquivoDoProjeto);
-        Item("Carregar arquivo…", CarregarArquivoDoProjeto);
-        Item("Renomear", RenomearArquivoDoProjeto, doUsuario);
-        Item("Apagar arquivo", ApagarArquivoDoProjeto, doUsuario);
+        Item(Idioma.T("Novo arquivo"), NovoArquivoDoProjeto);
+        Item(Idioma.T("Carregar arquivo…"), CarregarArquivoDoProjeto);
+        Item(Idioma.T("Renomear"), RenomearArquivoDoProjeto, doUsuario);
+        Item(Idioma.T("Apagar arquivo"), ApagarArquivoDoProjeto, doUsuario);
 
         menu.IsOpen = true;
     }
 
     void NovoArquivoDoProjeto()
     {
-        string nome = Dialogos.Perguntar(this, "Nome do arquivo novo", "anotacoes.md");
+        string nome = Dialogos.Perguntar(this, Idioma.T("Nome do arquivo novo"), "anotacoes.md");
         if (nome is null) return;
 
         if (!NomeDeArquivoVale(nome)) return;
@@ -667,8 +666,7 @@ public partial class MainWindow : Window
     {
         var dlg = new Microsoft.Win32.OpenFileDialog
         {
-            Filter = "Texto (*.txt;*.md;*.h;*.py;*.json;*.csv;*.ino)"
-                     + "|*.txt;*.md;*.h;*.py;*.json;*.csv;*.ino|Todos os arquivos|*.*",
+            Filter = Idioma.T("Texto (*.txt;*.md;*.h;*.py;*.json;*.csv;*.ino)|*.txt;*.md;*.h;*.py;*.json;*.csv;*.ino|Todos os arquivos|*.*"),
         };
         if (dlg.ShowDialog() != true) return;
 
@@ -692,7 +690,7 @@ public partial class MainWindow : Window
         if (arquivoAberto is null || arquivoAberto == NomeDoDiagrama) return;
 
         string velho = arquivoAberto;
-        string novo = Dialogos.Perguntar(this, "Novo nome", velho);
+        string novo = Dialogos.Perguntar(this, Idioma.T("Novo nome"), velho);
         if (novo is null || novo == velho) return;
 
         if (!NomeDeArquivoVale(novo)) return;
@@ -709,7 +707,7 @@ public partial class MainWindow : Window
     {
         if (arquivoAberto is null || arquivoAberto == NomeDoDiagrama) return;
 
-        if (MessageBox.Show(this, $"Apagar \"{arquivoAberto}\" do projeto?", "CircuitSketch",
+        if (MessageBox.Show(this, Idioma.T("Apagar \"{0}\" do projeto?", arquivoAberto), "CircuitSketch",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
             return;
 
@@ -724,14 +722,14 @@ public partial class MainWindow : Window
     {
         if (nome.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) >= 0)
         {
-            Erro($"\"{nome}\" tem caractere que não vale em nome de arquivo.");
+            Erro(Idioma.T("\"{0}\" tem caractere que não vale em nome de arquivo.", nome));
             return false;
         }
 
         if (nome.Equals(NomeDoDiagrama, StringComparison.OrdinalIgnoreCase)
             || nome.Equals(NomeDoSketch(), StringComparison.OrdinalIgnoreCase))
         {
-            Erro($"\"{nome}\" é o nome de uma aba que já existe.");
+            Erro(Idioma.T("\"{0}\" é o nome de uma aba que já existe.", nome));
             return false;
         }
 
@@ -835,14 +833,14 @@ public partial class MainWindow : Window
         var placas = editor.Atual.Placas().ToList();
 
         txtPlacaDoCodigo.Text = dona is null
-            ? "sem placa no circuito"
+            ? Idioma.T("sem placa no circuito")
             : PerfilPlaca.De(dona.Tipo)?.Nome ?? dona.Tipo;
 
         int qual = dona is null ? 0 : placas.FindIndex(x => x.Id == dona.Id) + 1;
-        txtOutrasPlacas.Text = placas.Count < 2 ? "" : $"placa {qual} de {placas.Count}";
+        txtOutrasPlacas.Text = placas.Count < 2 ? "" : Idioma.T("placa {0} de {1}", qual, placas.Count);
         txtOutrasPlacas.ToolTip = placas.Count < 2
             ? null
-            : "Clique na outra placa, no circuito, para ver o código dela";
+            : Idioma.T("Clique na outra placa, no circuito, para ver o código dela");
 
         AtualizarAbasDeArquivo();
     }
@@ -902,8 +900,8 @@ public partial class MainWindow : Window
             && AssinaturaAtual() != (circuitoSalvo ?? assinaturaInicial))
         {
             var r = MessageBox.Show(this,
-                "O projeto tem alterações não salvas.\n\nSalvar antes de sair?",
-                "Alterações não salvas",
+                Idioma.T("O projeto tem alterações não salvas.\n\nSalvar antes de sair?"),
+                Idioma.T("Alterações não salvas"),
                 MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
 
             if (r == MessageBoxResult.Cancel) { e.Cancel = true; return; }
@@ -1050,8 +1048,8 @@ public partial class MainWindow : Window
         // Saindo do multímetro, o resumo dele não vale mais nada
         // -- e ficava na barra, falando de cores que já não estavam na
         // tela. Volta o estado da simulação no lugar.
-        if (nome != "circuito" && txtStatus.Text.StartsWith("multímetro"))
-            MostrarNoStatus(editor.EmSimulacao ? "rodando..." : "parado.");
+        if (nome != "circuito" && txtStatus.Text.StartsWith(Idioma.T("multímetro")))
+            MostrarNoStatus(editor.EmSimulacao ? Idioma.T("rodando...") : Idioma.T("parado."));
     }
 
     /// <summary>A conta de energia do circuito parado, para o ohmimetro (refeita quando o circuito muda).</summary>
@@ -1192,14 +1190,14 @@ public partial class MainWindow : Window
 
     void Desfazer(object s = null, RoutedEventArgs e = null)
     {
-        if (posHistorico <= 0) { Aviso("nada para desfazer"); return; }
+        if (posHistorico <= 0) { Aviso(Idioma.T("nada para desfazer")); return; }
         posHistorico--;
         AplicarDoHistorico();
     }
 
     void Refazer(object s = null, RoutedEventArgs e = null)
     {
-        if (posHistorico >= historico.Count - 1) { Aviso("nada para refazer"); return; }
+        if (posHistorico >= historico.Count - 1) { Aviso(Idioma.T("nada para refazer")); return; }
         posHistorico++;
         AplicarDoHistorico();
     }
@@ -1216,7 +1214,7 @@ public partial class MainWindow : Window
         ReconstruirRede();
         aplicandoHistorico = false;
         AbrirArquivoDoProjeto(null);
-        Aviso($"histórico {posHistorico + 1}/{historico.Count}");
+        Aviso(Idioma.T("histórico {0}/{1}", posHistorico + 1, historico.Count));
     }
 
     // ================= comandos da barra =================
@@ -1244,7 +1242,7 @@ public partial class MainWindow : Window
             AoEscolher = tipo =>
             {
                 editor.Adicionar(tipo);
-                Aviso($"adicionado: {Catalogo.Obter(tipo)?.Nome}");
+                Aviso(Idioma.T("adicionado: {0}", Catalogo.Obter(tipo)?.Nome));
             }
         };
         paleta.Closed += (_, _) => paleta = null;
@@ -1259,9 +1257,9 @@ public partial class MainWindow : Window
     /// <summary>Nome, rotulo curto e explicacao de cada tracado.</summary>
     static readonly (string id, string curto, string dica)[] EstilosDeFio =
     [
-        (Fio.EstiloSolto, "solto", "Curva que cai entre as pontas"),
-        (Fio.EstiloReto, "reto", "Linha direta de ponta a ponta"),
-        (Fio.EstiloDegrau, "degrau", "Traçado em L, como no Wokwi"),
+        (Fio.EstiloSolto, "solto", Idioma.T("Curva que cai entre as pontas")),
+        (Fio.EstiloReto, "reto", Idioma.T("Linha direta de ponta a ponta")),
+        (Fio.EstiloDegrau, "degrau", Idioma.T("Traçado em L, como no Wokwi")),
     ];
 
     /// <summary>
@@ -1278,7 +1276,7 @@ public partial class MainWindow : Window
         {
             miRecentes.Items.Add(new MenuItem
             {
-                Header = "nenhum ainda",
+                Header = Idioma.T("nenhum ainda"),
                 IsEnabled = false
             });
         }
@@ -1297,8 +1295,8 @@ public partial class MainWindow : Window
             }
 
             miRecentes.Items.Add(new Separator());
-            var limpar = new MenuItem { Header = "Limpar a lista" };
-            limpar.Click += (_, _) => { Recentes.Limpar(); Aviso("lista de recentes limpa"); };
+            var limpar = new MenuItem { Header = Idioma.T("Limpar a lista") };
+            limpar.Click += (_, _) => { Recentes.Limpar(); Aviso(Idioma.T("lista de recentes limpa")); };
             miRecentes.Items.Add(limpar);
         }
 
@@ -1311,7 +1309,7 @@ public partial class MainWindow : Window
         // nome da placa que se tem na mao.
         foreach (var grupo in Demos.EmGrupos())
         {
-            var familia = new MenuItem { Header = $"{grupo.Key}  ({grupo.Count()})" };
+            var familia = new MenuItem { Header = $"{Demos.NomeDoGrupo(grupo.Key)}  ({grupo.Count()})" };
 
             if (grupo.Key == Demos.GrupoDasLinguagens)
             {
@@ -1353,7 +1351,7 @@ public partial class MainWindow : Window
     void AbrirDemo(string recurso)
     {
         string texto = Demos.Texto(recurso);
-        if (texto is null) { Erro($"demo '{recurso}' não veio no programa"); return; }
+        if (texto is null) { Erro(Idioma.T("demo '{0}' não veio no programa", recurso)); return; }
 
         try
         {
@@ -1365,7 +1363,7 @@ public partial class MainWindow : Window
             File.Delete(temporario);
 
             var demo = Demos.Todas.First(d => d.Recurso == recurso);
-            RecomecarSessao($"exemplo aberto: {demo.Placa} — {demo.Nome}");
+            RecomecarSessao(Idioma.T("exemplo aberto: {0} — {1}", demo.Placa, demo.Nome));
 
             // O exemplo nao tem arquivo: o nome dele (na barra e no diagram.json) e o do exemplo.
             circuito.Nome ??= $"{demo.Placa} — {demo.Nome}";
@@ -1386,8 +1384,8 @@ public partial class MainWindow : Window
             ReconstruirRede();
             editor.Ajustar();
 
-            Title = $"CircuitSketch - demo: {demo.Placa} {demo.Nome}";
-            Aviso($"demo carregada: {demo.Placa} — {demo.Nome}");
+            Title = Idioma.T("CircuitSketch - demo: {0} {1}", demo.Placa, demo.Nome);
+            Aviso(Idioma.T("demo carregada: {0} — {1}", demo.Placa, demo.Nome));
 
             // A demo aberta e nao mexida nao pede para ser salva ao fechar --
             // pedia, porque a comparacao era com o circuito de ANTES dela.
@@ -1397,7 +1395,7 @@ public partial class MainWindow : Window
             if (Preferencias.Ligado(Preferencias.RodarAoAbrirDemo, false))
                 Dispatcher.BeginInvoke(() => Rodar(), DispatcherPriority.Background);
         }
-        catch (Exception ex) { Erro($"não deu para abrir a demo: {ex.Message}"); }
+        catch (Exception ex) { Erro(Idioma.T("não deu para abrir a demo: {0}", ex.Message)); }
     }
 
     void EstiloDeTodosOsFios(object s, RoutedEventArgs e)
@@ -1406,7 +1404,7 @@ public partial class MainWindow : Window
         editor.DefinirEstiloDeTodos(estilo);
         MarcarEstiloNoMenu(estilo);
         Preferencias.Definir(Preferencias.EstiloDoFio, estilo);
-        Aviso($"todos os fios: {EstilosDeFio.First(x => x.id == estilo).curto}");
+        Aviso(Idioma.T("todos os fios: {0}", EstilosDeFio.First(x => x.id == estilo).curto));
     }
 
     void MarcarEstiloNoMenu(string estilo)
@@ -1421,7 +1419,7 @@ public partial class MainWindow : Window
     {
         barraObjeto.Visibility = Visibility.Visible;
         int quantos = editor.FiosSelecionados.Count;
-        txtObjeto.Text = quantos > 1 ? $"{quantos} fios" : "Fio";
+        txtObjeto.Text = quantos > 1 ? Idioma.T("{0} fios", quantos) : Idioma.T("Fio");
         opcoesObjeto.Children.Clear();
 
         // Com varios selecionados, a cor e o traçado valem para todos; a
@@ -1498,8 +1496,8 @@ public partial class MainWindow : Window
         var endireitar = new Button
         {
             Style = (Style)FindResource("AcaoObj"),
-            Content = "endireitar",
-            ToolTip = "Desfaz todos os cantos do fio"
+            Content = Idioma.T("endireitar"),
+            ToolTip = Idioma.T("Desfaz todos os cantos do fio")
         };
         endireitar.Click += (_, _) => { editor.EndireitarFios(); AtualizarBarraObjeto(); };
         opcoesObjeto.Children.Add(endireitar);
@@ -1507,8 +1505,8 @@ public partial class MainWindow : Window
         var otimizar = new Button
         {
             Style = (Style)FindResource("AcaoObj"),
-            Content = "otimizar",
-            ToolTip = "Remove fios repetidos e os que não mudam nada no circuito"
+            Content = Idioma.T("otimizar"),
+            ToolTip = Idioma.T("Remove fios repetidos e os que não mudam nada no circuito")
         };
         otimizar.Click += (_, _) => Otimizar();
         opcoesObjeto.Children.Add(otimizar);
@@ -1533,7 +1531,7 @@ public partial class MainWindow : Window
 
     string LeituraDoPot(PecaNoCircuito peca)
     {
-        if (peca.Tipo == "ky-040") return $"passo {(int)Math.Round(peca.Giro * 40)} / 40";
+        if (peca.Tipo == "ky-040") return Idioma.T("passo {0} / 40", (int)Math.Round(peca.Giro * 40));
 
         // Sensor com grandeza de verdade mostra a grandeza -- "24,0 °C",
         // "3.162 lux", "120 cm" --, e nao a leitura crua do conversor, que
@@ -1555,17 +1553,17 @@ public partial class MainWindow : Window
     {
         int tirados = editor.OtimizarFios();
         Aviso(tirados == 0
-            ? "nenhum fio sobrando"
-            : $"{tirados} fio(s) removido(s) por não mudarem o circuito");
+            ? Idioma.T("nenhum fio sobrando")
+            : Idioma.T("{0} fio(s) removido(s) por não mudarem o circuito", tirados));
     }
 
     // ---------------- tab do objeto selecionado ----------------
     static readonly (string id, string nome, string hex)[] CoresDeLed =
     [
-        ("vermelho", "Vermelho", "#E53935"), ("amarelo", "Amarelo", "#FDD835"),
-        ("verde", "Verde", "#43A047"), ("azul", "Azul", "#1E88E5"),
-        ("branco", "Branco", "#FAFAFA"), ("laranja", "Laranja", "#F57C00"),
-        ("roxo", "Roxo", "#8E24AA"),
+        ("vermelho", Idioma.T("Vermelho"), "#E53935"), ("amarelo", Idioma.T("Amarelo"), "#FDD835"),
+        ("verde", Idioma.T("Verde"), "#43A047"), ("azul", Idioma.T("Azul"), "#1E88E5"),
+        ("branco", Idioma.T("Branco"), "#FAFAFA"), ("laranja", Idioma.T("Laranja"), "#F57C00"),
+        ("roxo", Idioma.T("Roxo"), "#8E24AA"),
     ];
 
     /// <summary>
@@ -1607,10 +1605,10 @@ public partial class MainWindow : Window
         // Varias peças: só as ações que fazem sentido em grupo.
         if (quantas > 1)
         {
-            txtObjeto.Text = $"{quantas} peças";
+            txtObjeto.Text = Idioma.T("{0} peças", quantas);
             opcoesObjeto.Children.Add(new TextBlock
             {
-                Text = "girar, espelhar, copiar e excluir valem para todas",
+                Text = Idioma.T("girar, espelhar, copiar e excluir valem para todas"),
                 Foreground = new SolidColorBrush(Color.FromRgb(0x9A, 0x9A, 0x9A)),
                 FontSize = 11,
                 VerticalAlignment = VerticalAlignment.Center
@@ -1631,7 +1629,7 @@ public partial class MainWindow : Window
             Margin = new Thickness(0, 0, 12, 0),
             Style = (Style)FindResource("CampoEscuro"),
             Text = peca.Nome ?? "",
-            ToolTip = "Nome da peça, escrito embaixo dela no circuito",
+            ToolTip = Idioma.T("Nome da peça, escrito embaixo dela no circuito"),
             VerticalAlignment = VerticalAlignment.Center,
         };
         campoNome.TextChanged += (_, _) => editor.DefinirNome(peca, campoNome.Text, avisar: false);
@@ -1643,7 +1641,7 @@ public partial class MainWindow : Window
             campoNome.AcceptsReturn = true;
             campoNome.MaxLines = 3;
             campoNome.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-            campoNome.ToolTip = "O texto da anotação. Shift+Enter quebra a linha.";
+            campoNome.ToolTip = Idioma.T("O texto da anotação. Shift+Enter quebra a linha.");
         }
         campoNome.PreviewKeyDown += (_, ev) =>
         {
@@ -1655,7 +1653,7 @@ public partial class MainWindow : Window
 
         opcoesObjeto.Children.Add(new TextBlock
         {
-            Text = "Nome",
+            Text = Idioma.T("Nome"),
             Foreground = Cinza,
             FontSize = 11,
             Margin = new Thickness(0, 0, 6, 0),
@@ -1669,7 +1667,7 @@ public partial class MainWindow : Window
         {
             opcoesObjeto.Children.Add(new TextBlock
             {
-                Text = "Rede",
+                Text = Idioma.T("Rede"),
                 Foreground = Cinza,
                 FontSize = 11,
                 Margin = new Thickness(0, 0, 6, 0),
@@ -1679,7 +1677,7 @@ public partial class MainWindow : Window
 
             opcoesObjeto.Children.Add(new TextBlock
             {
-                Text = "Senha",
+                Text = Idioma.T("Senha"),
                 Foreground = Cinza,
                 FontSize = 11,
                 Margin = new Thickness(0, 0, 6, 0),
@@ -1693,10 +1691,10 @@ public partial class MainWindow : Window
         {
             var escala = new Button
             {
-                Content = $"Escala: {Analisador.Tempo(Analisador.JanelaDe(peca))} ▾",
+                Content = Idioma.T("Escala: {0} ▾", Analisador.Tempo(Analisador.JanelaDe(peca))),
                 Style = (Style)FindResource("BotaoPequeno"),
                 Margin = new Thickness(0, 0, 6, 0),
-                ToolTip = "Quanto tempo cabe na tela da peça",
+                ToolTip = Idioma.T("Quanto tempo cabe na tela da peça"),
                 VerticalAlignment = VerticalAlignment.Center,
             };
             escala.Click += (_, _) =>
@@ -1723,11 +1721,10 @@ public partial class MainWindow : Window
 
             var abrirAnalisador = new Button
             {
-                Content = "Abrir o analisador",
+                Content = Idioma.T("Abrir o analisador"),
                 Style = (Style)FindResource("BotaoPequeno"),
                 Margin = new Thickness(0, 0, 12, 0),
-                ToolTip = "Os oito canais grandes: zoom, pausa, medida no mouse e a serial "
-                          + "escrita em cima do fio. Salva .vcd para o PulseView.",
+                ToolTip = Idioma.T("Os oito canais grandes: zoom, pausa, medida no mouse e a serial escrita em cima do fio. Salva .vcd para o PulseView."),
                 VerticalAlignment = VerticalAlignment.Center,
             };
             abrirAnalisador.Click += (_, _) => AbrirAnalisador(peca);
@@ -1739,10 +1736,10 @@ public partial class MainWindow : Window
             int quantos = peca.Arquivos?.Count ?? 0;
             var arquivosDoCartao = new Button
             {
-                Content = peca.PastaDoComputador is not null ? "Arquivos (pasta)…" : quantos == 0 ? "Arquivos…" : $"Arquivos ({quantos})",
+                Content = peca.PastaDoComputador is not null ? Idioma.T("Arquivos (pasta)…") : quantos == 0 ? Idioma.T("Arquivos…") : Idioma.T("Arquivos ({0})", quantos),
                 Style = (Style)FindResource("BotaoPequeno"),
                 Margin = new Thickness(0, 0, 12, 0),
-                ToolTip = peca.Tipo == "pendrive-usb" ? "O que está gravado neste pendrive" : "O que está gravado neste cartão",
+                ToolTip = peca.Tipo == "pendrive-usb" ? Idioma.T("O que está gravado neste pendrive") : Idioma.T("O que está gravado neste cartão"),
                 VerticalAlignment = VerticalAlignment.Center,
             };
             arquivosDoCartao.Click += (_, _) => AbrirCartao(peca);
@@ -1756,11 +1753,11 @@ public partial class MainWindow : Window
             var encaixado = new CheckBox
             {
                 IsChecked = peca.Giro < 0.5,
-                Content = "encaixado",
+                Content = Idioma.T("encaixado"),
                 Foreground = new SolidColorBrush(Color.FromRgb(0xE6, 0xE6, 0xE6)),
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(0, 0, 12, 0),
-                ToolTip = "Tirar e pôr o pendrive (ou clique nele, no circuito)",
+                ToolTip = Idioma.T("Tirar e pôr o pendrive (ou clique nele, no circuito)"),
             };
             encaixado.Click += (s2, _) => editor.DefinirGiro(peca, ((CheckBox)s2).IsChecked == true ? 0 : 1);
             pendriveEmEdicao = (peca, encaixado);
@@ -1773,10 +1770,10 @@ public partial class MainWindow : Window
             int comTecla = peca.Teclas?.Count(x => !string.IsNullOrEmpty(x.Value)) ?? 0;
             var teclas = new Button
             {
-                Content = comTecla == 0 ? "Teclas…" : $"Teclas ({comTecla})",
+                Content = comTecla == 0 ? Idioma.T("Teclas…") : Idioma.T("Teclas ({0})", comTecla),
                 Style = (Style)FindResource("BotaoPequeno"),
                 Margin = new Thickness(0, 0, 12, 0),
-                ToolTip = "Controlar esta peça pelo teclado ou por um controle de vídeo game",
+                ToolTip = Idioma.T("Controlar esta peça pelo teclado ou por um controle de vídeo game"),
                 VerticalAlignment = VerticalAlignment.Center,
             };
             teclas.Click += (_, _) => EscolherTeclas(peca);
@@ -1886,7 +1883,7 @@ public partial class MainWindow : Window
             // como girá-lo.
             opcoesObjeto.Children.Add(new TextBlock
             {
-                Text = peca.Tipo == "ky-040" ? "Giro" : "Posição",
+                Text = peca.Tipo == "ky-040" ? Idioma.T("Giro") : Idioma.T("Posição"),
                 Foreground = new SolidColorBrush(Color.FromRgb(0x9A, 0x9A, 0x9A)),
                 FontSize = 10,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -1929,7 +1926,7 @@ public partial class MainWindow : Window
             // para os analogicos, liga/desliga para os de nivel logico.
             opcoesObjeto.Children.Add(new TextBlock
             {
-                Text = comp.Rotulo,
+                Text = Idioma.T(comp.Rotulo),
                 Foreground = new SolidColorBrush(Color.FromRgb(0x99, 0x99, 0x99)),
                 FontSize = 10,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -1941,7 +1938,7 @@ public partial class MainWindow : Window
                 var chave = new CheckBox
                 {
                     IsChecked = peca.Giro > 0.5,
-                    Content = peca.Giro > 0.5 ? "sim" : "nao",
+                    Content = peca.Giro > 0.5 ? Idioma.T("sim") : Idioma.T("nao"),
                     Foreground = new SolidColorBrush(Color.FromRgb(0xE6, 0xE6, 0xE6)),
                     VerticalAlignment = VerticalAlignment.Center
                 };
@@ -1949,7 +1946,7 @@ public partial class MainWindow : Window
                 {
                     var cb = (CheckBox)s2;
                     editor.DefinirGiro(peca, cb.IsChecked == true ? 1 : 0);
-                    cb.Content = cb.IsChecked == true ? "sim" : "nao";
+                    cb.Content = cb.IsChecked == true ? Idioma.T("sim") : Idioma.T("nao");
                 };
                 opcoesObjeto.Children.Add(chave);
             }
@@ -2031,8 +2028,8 @@ public partial class MainWindow : Window
             var centrar = new Button
             {
                 Style = (Style)FindResource("AcaoObj"),
-                Content = "centrar",
-                ToolTip = "Volta os dois eixos ao repouso, como o joystick solto"
+                Content = Idioma.T("centrar"),
+                ToolTip = Idioma.T("Volta os dois eixos ao repouso, como o joystick solto")
             };
             centrar.Click += (_, _) =>
             {
@@ -2048,7 +2045,7 @@ public partial class MainWindow : Window
             // já lia os bits, mas não havia nada na tela para clicar.
             opcoesObjeto.Children.Add(new TextBlock
             {
-                Text = "Chaves",
+                Text = Idioma.T("Chaves"),
                 Foreground = new SolidColorBrush(Color.FromRgb(0x9A, 0x9A, 0x9A)),
                 FontSize = 10,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -2065,7 +2062,7 @@ public partial class MainWindow : Window
                     Content = (k + 1).ToString(),
                     Padding = new Thickness(7, 3, 7, 3),
                     Margin = new Thickness(0, 0, 2, 0),
-                    ToolTip = $"Chave {k + 1}: {(ligada ? "ligada" : "desligada")}",
+                    ToolTip = Idioma.T("Chave {0}: {1}", k + 1, (ligada ? Idioma.T("ligada") : Idioma.T("desligada"))),
                     Background = ligada
                         ? new SolidColorBrush(Color.FromRgb(0x16, 0x68, 0xC1))
                         : new SolidColorBrush(Color.FromRgb(0x3C, 0x3C, 0x3C)),
@@ -2219,7 +2216,7 @@ public partial class MainWindow : Window
         {
             opcoesObjeto.Children.Add(new TextBlock
             {
-                Text = "Resistência",
+                Text = Idioma.T("Resistência"),
                 Foreground = new SolidColorBrush(Color.FromRgb(0x9A, 0x9A, 0x9A)),
                 FontSize = 10,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -2264,7 +2261,7 @@ public partial class MainWindow : Window
         {
             opcoesObjeto.Children.Add(new TextBlock
             {
-                Text = $"{def.Pinos.Count} pinos",
+                Text = Idioma.T("{0} pinos", def.Pinos.Count),
                 Foreground = new SolidColorBrush(Color.FromRgb(0x9A, 0x9A, 0x9A)),
                 FontSize = 11,
                 VerticalAlignment = VerticalAlignment.Center
@@ -2299,7 +2296,7 @@ public partial class MainWindow : Window
 
         opcoesObjeto.Children.Add(new TextBlock
         {
-            Text = escolheu ? "manda:" : "manda (automático):",
+            Text = escolheu ? Idioma.T("manda:") : Idioma.T("manda (automático):"),
             Foreground = new SolidColorBrush(Color.FromRgb(0xC8, 0xC8, 0xC8)),
             VerticalAlignment = VerticalAlignment.Center,
             Margin = new Thickness(0, 0, 6, 0)
@@ -2315,15 +2312,14 @@ public partial class MainWindow : Window
                 // mais bonita, mas o estilo do botao a sobrescreve.
                 Content = (id == vale ? "● " : "") + NomeCurtoDaPlaca(id).Trim('[', ']'),
                 ToolTip = id == vale
-                    ? "É esta placa que manda na peça agora"
-                    : "Fazer esta placa mandar na peça"
+                    ? Idioma.T("É esta placa que manda na peça agora")
+                    : Idioma.T("Fazer esta placa mandar na peça")
             };
             botao.Click += (_, _) =>
             {
                 editor.DefinirPlacaQueManda(id);
                 AtualizarBarraObjeto();
-                Aviso($"{Catalogo.Obter(peca.Tipo)?.Nome ?? peca.Tipo} agora obedece "
-                      + $"à {NomeCurtoDaPlaca(id).Trim('[', ']')}");
+                Aviso(Idioma.T("{0} agora obedece à {1}", Catalogo.Obter(peca.Tipo)?.Nome ?? peca.Tipo, NomeCurtoDaPlaca(id).Trim('[', ']')));
             };
             opcoesObjeto.Children.Add(botao);
         }
@@ -2350,19 +2346,18 @@ public partial class MainWindow : Window
 
         if (Compilador.Detectar(codigo) != Linguagem.Assembly)
         {
-            Erro("o .hex só existe para Assembly: as outras linguagens rodam "
-                 + "interpretadas, e não geram binário para gravar.");
+            Erro(Idioma.T("o .hex só existe para Assembly: as outras linguagens rodam interpretadas, e não geram binário para gravar."));
             return;
         }
 
         ProgramaMontado montado;
 
         try { montado = Montador.Juntar(codigo); }
-        catch (Exception ex) { Erro($"não montou: {ex.Message}"); return; }
+        catch (Exception ex) { Erro(Idioma.T("não montou: {0}", ex.Message)); return; }
 
         var dlg = new Microsoft.Win32.SaveFileDialog
         {
-            Filter = "Programa gravável (*.hex)|*.hex",
+            Filter = Idioma.T("Programa gravável (*.hex)|*.hex"),
             FileName = System.IO.Path.GetFileNameWithoutExtension(NomeDoSketch()) + ".hex",
         };
 
@@ -2372,15 +2367,13 @@ public partial class MainWindow : Window
         {
             File.WriteAllText(dlg.FileName, montado.Hex());
 
-            console.Info($"gravável exportado: {montado.Bytes} bytes "
-                         + $"({montado.Palavras} palavras) em {dlg.FileName}");
+            console.Info(Idioma.T("gravável exportado: {0} bytes ({1} palavras) em {2}", montado.Bytes, montado.Palavras, dlg.FileName));
 
-            console.Info("para gravar num Uno:  avrdude -c arduino -p m328p "
-                         + $"-P COM3 -U flash:w:{System.IO.Path.GetFileName(dlg.FileName)}:i");
+            console.Info(Idioma.T("para gravar num Uno:  avrdude -c arduino -p m328p -P COM3 -U flash:w:{0}:i", System.IO.Path.GetFileName(dlg.FileName)));
 
-            Aviso($"{montado.Bytes} bytes exportados — é o mesmo binário que rodou aqui.");
+            Aviso(Idioma.T("{0} bytes exportados — é o mesmo binário que rodou aqui.", montado.Bytes));
         }
-        catch (Exception ex) { Erro($"não deu para exportar: {ex.Message}"); }
+        catch (Exception ex) { Erro(Idioma.T("não deu para exportar: {0}", ex.Message)); }
     }
 
     /// <summary>Para o teste: o .hex do codigo que esta no editor.</summary>
@@ -2398,8 +2391,8 @@ public partial class MainWindow : Window
         var formatos = Plugins.Exportadores;
         var dlg = new Microsoft.Win32.SaveFileDialog
         {
-            Filter = string.Join("|", new[] { "Diagrama do CircuitSketch (diagram.json)|*.json" }
-                .Concat(formatos.Select(f => $"Diagrama para o {f.Formato} (diagram.json)|*.json"))),
+            Filter = string.Join("|", new[] { Idioma.T("Diagrama do CircuitSketch (diagram.json)|*.json") }
+                .Concat(formatos.Select(f => Idioma.T("Diagrama para o {0} (diagram.json)|*.json", f.Formato)))),
             FilterIndex = para is null ? 1 : formatos.ToList().IndexOf(para) + 2,
             FileName = "diagram.json"
         };
@@ -2411,7 +2404,7 @@ public partial class MainWindow : Window
             File.WriteAllText(dlg.FileName, ExportarWokwi.Gerar(editor.Atual, NomeDoProjeto(), AutorDoProjeto(), formato));
             if (formato is null)
             {
-                Aviso($"exportado: {editor.Atual.Pecas.Count} peças, {editor.Atual.Fios.Count} fios");
+                Aviso(Idioma.T("exportado: {0} peças, {1} fios", editor.Atual.Pecas.Count, editor.Atual.Fios.Count));
                 return;
             }
             // A peca que o formato de fora nao tem sai como "circuitsketch-<nome>": la
@@ -2420,11 +2413,10 @@ public partial class MainWindow : Window
                 .Where(t => formato.TipoExportado(t)?.StartsWith(FormatoWokwi.PrefixoNosso, StringComparison.Ordinal) == true)
                 .ToList();
             Aviso(soNossas.Count == 0
-                ? $"exportado para o {formato.Formato}: {editor.Atual.Pecas.Count} peças, {editor.Atual.Fios.Count} fios"
-                : $"exportado para o {formato.Formato}; ele não tem {string.Join(", ", soNossas.Take(5))}"
-                  + (soNossas.Count > 5 ? " e outras" : "") + " (ficam no arquivo para voltar para cá)");
+                ? Idioma.T("exportado para o {0}: {1} peças, {2} fios", formato.Formato, editor.Atual.Pecas.Count, editor.Atual.Fios.Count)
+                : Idioma.T("exportado para o {0}; ele não tem {1}{2} (ficam no arquivo para voltar para cá)", formato.Formato, string.Join(", ", soNossas.Take(5)), (soNossas.Count > 5 ? Idioma.T(" e outras") : "")));
         }
-        catch (Exception ex) { Erro($"não deu para exportar: {ex.Message}"); }
+        catch (Exception ex) { Erro(Idioma.T("não deu para exportar: {0}", ex.Message)); }
     }
 
     /// <summary>"Exportar para o Wokwi (diagram.json)...", um por plugin de formato ligado, logo abaixo do Exportar.</summary>
@@ -2437,9 +2429,9 @@ public partial class MainWindow : Window
         {
             var item = new MenuItem
             {
-                Header = $"Exportar para o {formato.Formato} (diagram.json)...",
+                Header = Idioma.T("Exportar para o {0} (diagram.json)...", formato.Formato),
                 Tag = "exportar-plugin",
-                ToolTip = $"Pelo plugin {formato.Nome}: o circuito com os nomes de peças e pinos do {formato.Formato}",
+                ToolTip = Idioma.T("Pelo plugin {0}: o circuito com os nomes de peças e pinos do {1}", formato.Nome, formato.Formato),
             };
             var esse = formato;
             item.Click += (_, _) => Exportar(esse);
@@ -2458,7 +2450,7 @@ public partial class MainWindow : Window
     {
         var dlg = new Microsoft.Win32.OpenFileDialog
         {
-            Filter = "Diagrama (diagram.json)|*.json",
+            Filter = Idioma.T("Diagrama (diagram.json)") + "|*.json",
             FileName = "diagram.json"
         };
         if (dlg.ShowDialog() != true) return;
@@ -2473,7 +2465,7 @@ public partial class MainWindow : Window
             GuardarCodigoDoEditor();
             string codigoAtual = CodigoPrincipal();
 
-            RecomecarSessao($"circuito importado: {System.IO.Path.GetFileName(dlg.FileName)}");
+            RecomecarSessao(Idioma.T("circuito importado: {0}", System.IO.Path.GetFileName(dlg.FileName)));
             editor.Carregar(r.Circuito);
             AdotarCodigo(codigoAtual);
             editor.AplicarGrade();
@@ -2486,25 +2478,22 @@ public partial class MainWindow : Window
             // circuito parece certo e nao funciona.
             var faltou = new List<string>();
             if (r.Ignorados.Count > 0)
-                faltou.Add($"{r.Ignorados.Count} tipo(s) sem equivalente ("
-                           + string.Join(", ", r.Ignorados) + ")"
+                faltou.Add(Idioma.T("{0} tipo(s) sem equivalente ({1})", r.Ignorados.Count, string.Join(", ", r.Ignorados))
                            // as pecas do Wokwi so abrem com o plugin dele
                            + (r.Ignorados.Any(t => t.StartsWith("wokwi-", StringComparison.Ordinal) || t.StartsWith("board-", StringComparison.Ordinal))
                               && !Plugins.Todos.Any(p => p.Id == "wokwi" && p.Ligado)
-                                  ? " -- as pecas do Wokwi precisam do plugin do Wokwi ligado (Configuracoes > Plugins)" : ""));
+                                  ? Idioma.T(" -- as pecas do Wokwi precisam do plugin do Wokwi ligado (Configuracoes > Plugins)") : ""));
             if (r.FiosPerdidos.Count > 0)
-                faltou.Add($"{r.FiosPerdidos.Count} fio(s) sem pino aqui ("
-                           + string.Join("; ", r.FiosPerdidos.Take(4))
-                           + (r.FiosPerdidos.Count > 4 ? "; ..." : "") + ")");
+                faltou.Add(Idioma.T("{0} fio(s) sem pino aqui ({1})", r.FiosPerdidos.Count,
+                           string.Join("; ", r.FiosPerdidos.Take(4)) + (r.FiosPerdidos.Count > 4 ? "; ..." : "")));
 
-            string resumo = $"importado: {r.Circuito.Pecas.Count} peças, "
-                            + $"{r.Circuito.Fios.Count} fios";
+            string resumo = Idioma.T("importado: {0} peças, {1} fios", r.Circuito.Pecas.Count, r.Circuito.Fios.Count);
             if (faltou.Count == 0) Aviso(resumo);
-            else Aviso(resumo + " -- fora: " + string.Join(" e ", faltou));
+            else Aviso(resumo + Idioma.T(" -- fora: {0}", string.Join(" " + Idioma.T("e") + " ", faltou)));
         }
         catch (Exception ex)
         {
-            Erro($"não consegui ler o diagram.json: {ex.Message}");
+            Erro(Idioma.T("não consegui ler o diagram.json: {0}", ex.Message));
         }
     }
 
@@ -2519,7 +2508,7 @@ public partial class MainWindow : Window
     void AlternarGrade(object s = null, RoutedEventArgs e = null)
     {
         DefinirGrade(!editor.MostrarGrade);
-        Aviso(editor.MostrarGrade ? "grade ligada" : "grade desligada");
+        Aviso(editor.MostrarGrade ? Idioma.T("grade ligada") : Idioma.T("grade desligada"));
     }
 
     void DefinirGrade(bool mostrar)
@@ -2582,7 +2571,7 @@ public partial class MainWindow : Window
             {
                 int quantos = editor.AvisosFechados;
                 editor.EsquecerAvisosFechados();
-                Aviso(quantos == 0 ? "nenhum aviso estava fechado." : $"{quantos} aviso(s) fechado(s) voltam a aparecer.");
+                Aviso(quantos == 0 ? Idioma.T("nenhum aviso estava fechado.") : Idioma.T("{0} aviso(s) fechado(s) voltam a aparecer.", quantos));
             },
             Aplicar = AplicarPreferencias,
             Placas = [.. PerfilPlaca.Conhecidos.Select(p => (p.Id, p.Nome))],
@@ -2735,7 +2724,7 @@ public partial class MainWindow : Window
 
         // Qual bateria: as prontas (o desenho e os numeros de fabrica) e a
         // personalizada, a de antes. Os numeros continuam editaveis.
-        (string Tipo, string Nome)[] tipos = [.. Baterias.Pacotes.Select(p => (p.Tipo, p.Curto)), ("bateria", "Personalizada")];
+        (string Tipo, string Nome)[] tipos = [.. Baterias.Pacotes.Select(p => (p.Tipo, p.Curto)), ("bateria", Idioma.N("Personalizada"))];
         opcoesObjeto.Children.Add(new TextBlock
         {
             Text = Idioma.T("Bateria"), Foreground = Cinza, FontSize = 10,
@@ -2744,13 +2733,13 @@ public partial class MainWindow : Window
         Escolha([.. tipos.Select(t => Idioma.T(t.Nome))], Array.FindIndex(tipos, t => t.Tipo == peca.Tipo),
                 i => { editor.DefinirTipoDaBateria(tipos[i].Tipo); AtualizarBarraObjeto(); DepoisDeMexerNaBateria(peca); });
 
-        Numero("Tensão", "V", peca.Volts, 0.1, 30,
+        Numero(Idioma.T("Tensão"), "V", peca.Volts, 0.1, 30,
                v => { peca.Volts = v; DepoisDeMexerNaBateria(peca); });
 
-        Numero("Corrente", "mA", peca.MiliAmperes, 1, 200000,
+        Numero(Idioma.T("Corrente"), "mA", peca.MiliAmperes, 1, 200000,
                v => { peca.MiliAmperes = v; DepoisDeMexerNaBateria(peca); });
 
-        Numero("Capacidade", "mAh", peca.MiliAmperesHora, 1, 100000,
+        Numero(Idioma.T("Capacidade"), "mAh", peca.MiliAmperesHora, 1, 100000,
                v => { peca.MiliAmperesHora = v; DepoisDeMexerNaBateria(peca); });
 
         // Mexeu nos numeros de uma pronta: o desenho fica, e a barra avisa.
@@ -2782,7 +2771,7 @@ public partial class MainWindow : Window
             VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
         });
 
-        Rotulo("Pilha");
+        Rotulo(Idioma.N("Pilha"));
         var formatos = Baterias.Formatos;
         Escolha([.. formatos.Select(f => f.Nome)], Array.IndexOf(formatos, formato), i =>
         {
@@ -2822,7 +2811,7 @@ public partial class MainWindow : Window
             VerticalAlignment = VerticalAlignment.Center,
             Margin = new Thickness(6, 0, 0, 0),
             Text = vazios > 0
-                ? Idioma.T(vazios == 1 ? "um slot vazio: o circuito fica aberto" : $"{vazios} slots vazios: o circuito fica aberto")
+                ? Idioma.T(vazios == 1 ? Idioma.T("um slot vazio: o circuito fica aberto") : Idioma.T("{0} slots vazios: o circuito fica aberto", vazios))
                 : $"{ficha.Volts:0.0#} V · {ficha.MiliAmperesHora:0} mAh · {Idioma.T("até")} {ficha.MiliAmperes / 1000:0.###} A · {DuracaoDaBateria(peca)}",
             ToolTip = Idioma.T("Clique numa pilha, com o suporte selecionado, para tirar ou pôr de volta."),
         });
@@ -2841,7 +2830,7 @@ public partial class MainWindow : Window
         {
             opcoesObjeto.Children.Add(new TextBlock
             {
-                Text = "Modelo", Foreground = Cinza, FontSize = 10,
+                Text = Idioma.T("Modelo"), Foreground = Cinza, FontSize = 10,
                 VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
             });
             Escolha([.. modelos.Select(m => m.Resumo)], Array.IndexOf(modelos, ficha), i =>
@@ -2849,18 +2838,16 @@ public partial class MainWindow : Window
                 editor.DefinirRegulador(modelos[i].Modelo, null);
                 AtualizarBarraObjeto();
                 var nova = modelos[i];
-                Aviso($"regulador {nova.Nome}: saída de {nova.Volts:0.#} V, até {nova.CorrenteMaxima:0.#} A; "
-                      + $"a entrada precisa de ~{nova.Volts + nova.Folga:0.#} V ou mais (máximo {nova.EntradaMaxima:0} V).");
+                Aviso(Idioma.T("regulador {0}: saída de {1:0.#} V, até {2:0.#} A; a entrada precisa de ~{3:0.#} V ou mais (máximo {4:0} V).", nova.Nome, nova.Volts, nova.CorrenteMaxima, nova.Volts + nova.Folga, nova.EntradaMaxima));
             });
         }
         else
         {
-            Numero("Saída", "V", Reguladores.SaidaDe(peca), ficha.AjusteMinimo, ficha.AjusteMaximo, v =>
+            Numero(Idioma.T("Saída"), "V", Reguladores.SaidaDe(peca), ficha.AjusteMinimo, ficha.AjusteMaximo, v =>
             {
                 editor.DefinirRegulador(null, v);
                 AtualizarBarraObjeto();
-                Aviso($"{ficha.Nome}: saída ajustada em {v:0.##} V (o trimpot)"
-                      + (ficha.Tipo == TipoDeRegulador.Abaixador ? $"; a entrada precisa de ~{v + ficha.Folga:0.#} V ou mais." : "; ele só sobe a tensão."));
+                Aviso(Idioma.T("{0}: saída ajustada em {1:0.##} V (o trimpot){2}", ficha.Nome, v, (ficha.Tipo == TipoDeRegulador.Abaixador ? Idioma.T("; a entrada precisa de ~{0:0.#} V ou mais.", v + ficha.Folga) : Idioma.T("; ele só sobe a tensão."))));
             });
         }
 
@@ -2885,12 +2872,12 @@ public partial class MainWindow : Window
     {
         opcoesObjeto.Children.Add(new TextBlock
         {
-            Text = "USB", Foreground = Cinza, FontSize = 10,
+            Text = Idioma.T("USB"), Foreground = Cinza, FontSize = 10,
             VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
         });
         bool automatico = EditorCircuito.TemCaboUsb(new PecaNoCircuito { Tipo = peca.Tipo }, editor.Atual);
-        Escolha([automatico ? "automático (cabo ligado: não há bateria)" : "automático (sem o cabo: há bateria)",
-                 "cabo ligado", "sem o cabo"],
+        Escolha([automatico ? Idioma.T("automático (cabo ligado: não há bateria)") : Idioma.T("automático (sem o cabo: há bateria)"),
+                 Idioma.T("cabo ligado"), Idioma.T("sem o cabo")],
             peca.Usb switch { null => 0, true => 1, false => 2 },
             i =>
             {
@@ -2927,10 +2914,10 @@ public partial class MainWindow : Window
 
         opcoesObjeto.Children.Add(new TextBlock
         {
-            Text = "Motor", Foreground = Cinza, FontSize = 10,
+            Text = Idioma.T("Motor"), Foreground = Cinza, FontSize = 10,
             VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
         });
-        Escolha([.. fichas.Select(f => f.Resumo), "Personalizado (a ficha do seu motor)"],
+        Escolha([.. fichas.Select(f => f.Resumo), Idioma.T("Personalizado (a ficha do seu motor)")],
             propria ? fichas.Length : Math.Max(0, Array.FindIndex(fichas, f => f.Id == (peca.Modelo ?? padrao))),
             i =>
             {
@@ -2954,18 +2941,18 @@ public partial class MainWindow : Window
         if (semEscova)
         {
             Numero("KV", "rpm/V", atual.RpmOuKv, 50, 30000, v => Mexer(f => f.RpmOuKv = v, true));
-            Numero("Estator Ø", "mm", atual.MedidaA, 5, 120, v => Mexer(f => f.MedidaA = v, true));
-            Numero("altura", "mm", atual.MedidaB, 2, 80, v => Mexer(f => f.MedidaB = v, true));
+            Numero(Idioma.T("Estator Ø"), "mm", atual.MedidaA, 5, 120, v => Mexer(f => f.MedidaA = v, true));
+            Numero(Idioma.T("altura"), "mm", atual.MedidaB, 2, 80, v => Mexer(f => f.MedidaB = v, true));
         }
         else
         {
-            Numero("Tensão", "V", atual.Volts, 0.5, 48, v => Mexer(f => f.Volts = v, true));
-            Numero("Sem carga", "rpm", atual.RpmOuKv, 10, 60000, v => Mexer(f => f.RpmOuKv = v, true));
-            Numero("Lata Ø", "mm", atual.MedidaA, 6, 90, v => Mexer(f => f.MedidaA = v, true));
-            Numero("compr.", "mm", atual.MedidaB, 8, 150, v => Mexer(f => f.MedidaB = v, true));
+            Numero(Idioma.T("Tensão"), "V", atual.Volts, 0.5, 48, v => Mexer(f => f.Volts = v, true));
+            Numero(Idioma.T("Sem carga"), "rpm", atual.RpmOuKv, 10, 60000, v => Mexer(f => f.RpmOuKv = v, true));
+            Numero(Idioma.T("Lata Ø"), "mm", atual.MedidaA, 6, 90, v => Mexer(f => f.MedidaA = v, true));
+            Numero(Idioma.T("compr."), "mm", atual.MedidaB, 8, 150, v => Mexer(f => f.MedidaB = v, true));
         }
         Numero("R", "Ω", atual.Resistencia, 0.002, 200, v => Mexer(f => f.Resistencia = v, false));
-        Numero("Máx.", "A", atual.CorrenteMaxima, 0.05, 300, v => Mexer(f => f.CorrenteMaxima = v, false));
+        Numero(Idioma.T("Máx."), "A", atual.CorrenteMaxima, 0.05, 300, v => Mexer(f => f.CorrenteMaxima = v, false));
     }
 
     /// <summary>
@@ -3002,8 +2989,7 @@ public partial class MainWindow : Window
         double volts = modelo.TensaoNominal;
         double rpm = (volts - modelo.AtritoSeco / modelo.Kt * modelo.Resistencia) / modelo.Ke * 60 / (2 * Math.PI);
         double travado = volts / modelo.Resistencia;
-        Aviso($"motor: {modelo.Nome} — com {volts:0.#} V, ~{rpm:0} rpm sem carga e {travado:0.#} A travado"
-              + (modelo.CorrenteMaxima > 0 ? $" (aguenta {modelo.CorrenteMaxima:0.#} A trabalhando)" : ""));
+        Aviso(Idioma.T("motor: {0} — com {1:0.#} V, ~{2:0} rpm sem carga e {3:0.#} A travado{4}", Idioma.T(modelo.Nome), volts, rpm, travado, (modelo.CorrenteMaxima > 0 ? Idioma.T(" (aguenta {0:0.#} A trabalhando)", modelo.CorrenteMaxima) : "")));
     }
 
     /// <summary>
@@ -3014,7 +3000,7 @@ public partial class MainWindow : Window
     {
         opcoesObjeto.Children.Add(new TextBlock
         {
-            Text = "Corrente", Foreground = Cinza, FontSize = 10,
+            Text = Idioma.T("Corrente"), Foreground = Cinza, FontSize = 10,
             VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
         });
         int[] opcoes = EditorCircuito.AmperagensDoEsc(peca.Tipo);
@@ -3027,7 +3013,7 @@ public partial class MainWindow : Window
                 ReconstruirRede();
                 AtualizarBarraObjeto();
                 var (min, max) = EditorCircuito.CelulasDoEsc(peca);
-                Aviso($"ESC de {opcoes[i]} A: bateria de {min}S a {max}S (ate {max * 4.2:0.#} V).");
+                Aviso(Idioma.T("ESC de {0} A: bateria de {1}S a {2}S (ate {3:0.#} V).", opcoes[i], min, max, max * 4.2));
             });
 
         string escolhida = peca.Acabamento ?? (peca.Tipo == "esc-4em1" ? "preto" : "azul");
@@ -3054,7 +3040,7 @@ public partial class MainWindow : Window
         var (cMin, cMax) = EditorCircuito.CelulasDoEsc(peca);
         opcoesObjeto.Children.Add(new TextBlock
         {
-            Text = $"{cMin}S a {cMax}S" + (peca.Tipo == "esc-4em1" ? " · 4 motores" : " · BEC 5 V"),
+            Text = Idioma.T("{0}S a {1}S", cMin, cMax) + (peca.Tipo == "esc-4em1" ? " · " + Idioma.T("4 motores") : " · BEC 5 V"),
             Foreground = Cinza, FontSize = 11, VerticalAlignment = VerticalAlignment.Center,
             Margin = new Thickness(6, 0, 0, 0),
         });
@@ -3065,8 +3051,7 @@ public partial class MainWindow : Window
         ReconstruirRede();
         RefletirDiagrama();
         AtualizarBarraObjeto();
-        Aviso($"bateria: {peca.Volts:0.#} V · {peca.MiliAmperes:0} mA · "
-              + $"{peca.MiliAmperesHora:0} mAh — {DuracaoDaBateria(peca)}");
+        Aviso(Idioma.T("bateria: {0:0.#} V · {1:0} mA · {2:0} mAh — {3}", peca.Volts, peca.MiliAmperes, peca.MiliAmperesHora, DuracaoDaBateria(peca)));
     }
 
     /// <summary>
@@ -3083,8 +3068,8 @@ public partial class MainWindow : Window
 
         double horas = ficha.MiliAmperesHora / ficha.MiliAmperes;
         return horas >= 1
-            ? $"dura ~{horas:0.#} h na corrente máxima"
-            : $"dura ~{horas * 60:0} min na corrente máxima";
+            ? Idioma.T("dura ~{0:0.#} h na corrente máxima", horas)
+            : Idioma.T("dura ~{0:0} min na corrente máxima", horas * 60);
     }
 
     /// <summary>Um campo de numero com rotulo e unidade, para a barra do objeto.</summary>
@@ -3113,14 +3098,14 @@ public partial class MainWindow : Window
         {
             if (!double.TryParse(campo.Text, out double v))
             {
-                Erro($"{rotulo}: '{campo.Text}' não é um número.");
+                Erro(Idioma.T("{0}: '{1}' não é um número.", rotulo, campo.Text));
                 campo.Text = valor.ToString("0.##");
                 return;
             }
 
             double preso = Math.Clamp(v, minimo, maximo);
             if (preso != v)
-                Aviso($"{rotulo} fica entre {minimo:0.##} e {maximo:0.##} {unidade}.");
+                Aviso(Idioma.T("{0} fica entre {1:0.##} e {2:0.##} {3}.", rotulo, minimo, maximo, unidade));
 
             campo.Text = preso.ToString("0.##");
             guardar(preso);
@@ -3157,8 +3142,7 @@ public partial class MainWindow : Window
         Left = caixa.Left;
         Top = caixa.Top;
 
-        Aviso($"janela ajustada para {Width:0}x{Height:0} "
-              + $"(área útil da tela: {area.Width:0}x{area.Height:0})");
+        Aviso(Idioma.T("janela ajustada para {0:0}x{1:0} (área útil da tela: {2:0}x{3:0})", Width, Height, area.Width, area.Height));
     }
 
     void AplicarPreferencias()
@@ -3285,11 +3269,11 @@ public partial class MainWindow : Window
     /// </summary>
     void NovoChip(object s = null, RoutedEventArgs e = null)
     {
-        string nome = Dialogos.Perguntar(this, "Nome do chip", "Contador");
+        string nome = Dialogos.Perguntar(this, Idioma.T("Nome do chip"), Idioma.T("Contador"));
         if (nome is null) return;
 
         string baseDoNome = ChipCustom.Identificador(nome)[ChipCustom.Prefixo.Length..];
-        if (baseDoNome.Length == 0) { Erro("esse nome não dá para usar em arquivo."); return; }
+        if (baseDoNome.Length == 0) { Erro(Idioma.T("esse nome não dá para usar em arquivo.")); return; }
 
         editor.Atual.Arquivos ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
@@ -3298,7 +3282,7 @@ public partial class MainWindow : Window
 
         if (editor.Atual.Arquivos.ContainsKey(oJson))
         {
-            Erro($"já existe um chip chamado \"{baseDoNome}\" neste projeto.");
+            Erro(Idioma.T("já existe um chip chamado \"{0}\" neste projeto.", baseDoNome));
             return;
         }
 
@@ -3309,8 +3293,7 @@ public partial class MainWindow : Window
         Empilhar();
         AbrirArquivoDoProjeto(oCodigo);
 
-        Aviso($"chip \"{nome}\" criado: edite {oJson} para os pinos e "
-              + $"{oCodigo} para o comportamento.");
+        Aviso(Idioma.T("chip \"{0}\" criado: edite {1} para os pinos e {2} para o comportamento.", nome, oJson, oCodigo));
     }
 
     internal JanelaBibliotecas TesteJanelaDeBibliotecas()
@@ -3333,7 +3316,7 @@ public partial class MainWindow : Window
         cartoesDaRodada = false;
 
         foreach (var (peca, maquina) in editor.CartoesDoCircuito(bancada, rede))
-            if (maquina is not null) GuardarArmazenamento(maquina.Cartao, peca, "cartão");
+            if (maquina is not null) GuardarArmazenamento(maquina.Cartao, peca, Idioma.T("cartão"));
         foreach (var (peca, maquina, _) in editor.PendrivesDoCircuito(bancada, rede))
             if (maquina is not null) GuardarArmazenamento(maquina.Pendrive, peca, "pendrive");
     }
@@ -3349,9 +3332,7 @@ public partial class MainWindow : Window
         {
             if (total + bytes.Length > MaiorCartaoNoProjeto)
             {
-                console.Aviso($"{oQue} \"{peca.Nome ?? peca.Id}\": {nome} ({Acervo.EmTexto(bytes.Length)}) é grande demais para "
-                              + $"ir dentro do projeto e sai do {oQue} ao parar. Salve-o no computador pela janela do {oQue} "
-                              + "enquanto a simulação roda.");
+                console.Aviso(Idioma.T("{0} \"{1}\": {2} ({3}) é grande demais para ir dentro do projeto e sai do {0} ao parar. Salve-o no computador pela janela do {0} enquanto a simulação roda.", oQue, peca.Nome ?? peca.Id, nome, Acervo.EmTexto(bytes.Length)));
                 continue;
             }
             total += bytes.Length;
@@ -3377,7 +3358,7 @@ public partial class MainWindow : Window
             foreach (var (nome, base64) in peca.ArquivosGravados)
             {
                 try { destino.GravarBinario(nome, Convert.FromBase64String(base64)); }
-                catch (FormatException) { console.Aviso($"{oQue} \"{nomeDaPeca}\": {nome} estava estragado no projeto e ficou de fora."); }
+                catch (FormatException) { console.Aviso(Idioma.T("{0} \"{1}\": {2} estava estragado no projeto e ficou de fora.", oQue, nomeDaPeca, nome)); }
             }
 
         if (peca.ArquivosDoComputador is not null)
@@ -3386,15 +3367,14 @@ public partial class MainWindow : Window
                 try { destino.GravarDoDisco(nome, caminho); }
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
                 {
-                    console.Aviso($"{oQue} \"{nomeDaPeca}\": não deu para ler {caminho} ({ex.Message}). "
-                                  + $"O {nome} fica fora do {oQue} nesta rodada.");
+                    console.Aviso(Idioma.T("{0} \"{1}\": não deu para ler {2} ({3}). O {4} fica fora do {0} nesta rodada.", oQue, nomeDaPeca, caminho, ex.Message, nome));
                 }
             }
 
         if (peca.PastaDoComputador is { } pasta)
         {
             if (Directory.Exists(pasta)) destino.PastaDoComputador = pasta;
-            else console.Aviso($"{oQue} \"{nomeDaPeca}\": não achei a pasta {pasta}; o {oQue} fica sem ela nesta rodada.");
+            else console.Aviso(Idioma.T("{0} \"{1}\": não achei a pasta {2}; o {0} fica sem ela nesta rodada.", oQue, nomeDaPeca, pasta));
         }
     }
 
@@ -3407,8 +3387,8 @@ public partial class MainWindow : Window
             Style = (Style)FindResource("CampoEscuro"),
             Text = (senha ? peca.Senha : peca.Ssid) ?? "",
             ToolTip = senha
-                ? "Senha da rede; deixe vazio para uma rede aberta"
-                : "Nome da rede que o WiFi.begin() do sketch tem que pedir",
+                ? Idioma.T("Senha da rede; deixe vazio para uma rede aberta")
+                : Idioma.T("Nome da rede que o WiFi.begin() do sketch tem que pedir"),
             VerticalAlignment = VerticalAlignment.Center,
         };
 
@@ -3466,7 +3446,7 @@ public partial class MainWindow : Window
                          rodando && memoria is not null ? memoria.Binarios() : null,
                          rodando ? null : gravados,
                          rodando && memoria is not null ? memoria.Bytes : null,
-                         ehPendrive ? "Pendrive USB" : "Cartão microSD",
+                         ehPendrive ? Idioma.N("Pendrive USB") : Idioma.N("Cartão microSD"),
                          peca.PastaDoComputador);
         janela.ShowDialog();
 
@@ -3619,8 +3599,8 @@ public partial class MainWindow : Window
         var linhas = new List<string>
         {
             redeSimulada.UsarInternet
-                ? "internet do computador: ligada"
-                : "internet do computador: desligada",
+                ? Idioma.T("internet do computador: ligada")
+                : Idioma.T("internet do computador: desligada"),
             ResumoDoBroker(),
         };
 
@@ -3642,23 +3622,22 @@ public partial class MainWindow : Window
     string ResumoDoBroker()
     {
         if (redeSimulada.PortaDoBroker > 0)
-            return $"broker MQTT em localhost:{redeSimulada.PortaDoBroker}";
+            return Idioma.T("broker MQTT em localhost:{0}", redeSimulada.PortaDoBroker);
 
         return btParar.IsEnabled
-            ? "broker MQTT só dentro do programa: a porta 1883 já é de outro broker "
-              + "neste computador, então apps de fora não enxergam as placas."
-            : "broker MQTT: abre em localhost:1883 quando a simulação roda.";
+            ? Idioma.T("broker MQTT só dentro do programa: a porta 1883 já é de outro broker neste computador, então apps de fora não enxergam as placas.")
+            : Idioma.T("broker MQTT: abre em localhost:1883 quando a simulação roda.");
     }
 
     string ResumoDoBluetooth()
     {
         var nomes = redeSimulada.DispositivosVisiveis().ToList();
         if (nomes.Count == 0)
-            return "nenhuma placa com SerialBT.begin() rodando agora.";
+            return Idioma.T("nenhuma placa com SerialBT.begin() rodando agora.");
 
         string conectado = redeSimulada.CelularConectadoEm;
         return string.Join("\n", nomes.Select(n =>
-            n == conectado ? $"{n} (conectada)" : n));
+            n == conectado ? Idioma.T("{0} (conectada)", n) : n));
     }
 
     void TelaCheia(object s = null, RoutedEventArgs e = null)
@@ -3751,7 +3730,7 @@ public partial class MainWindow : Window
               Alt+Enter .. tela cheia
               ? .......... esta ajuda
             """,
-            "Ajuda e atalhos", MessageBoxButton.OK, MessageBoxImage.Information);
+            Idioma.T("Ajuda e atalhos"), MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     // ================= atalhos =================
@@ -3774,9 +3753,9 @@ public partial class MainWindow : Window
                 if (modoDaTela == "circuito" && !noTexto && (editor.PontaVermelha is not null || editor.PontaPreta is not null))
                 {
                     editor.TirarPontas();
-                    Aviso("multímetro: pontas tiradas.");
+                    Aviso(Idioma.T("multímetro: pontas tiradas."));
                 }
-                else if (editor.LigandoFio) { editor.CancelarFio(); Aviso("ligação cancelada"); }
+                else if (editor.LigandoFio) { editor.CancelarFio(); Aviso(Idioma.T("ligação cancelada")); }
                 else editor.Focus();
                 e.Handled = true;
                 return;
@@ -3805,7 +3784,7 @@ public partial class MainWindow : Window
         if (modoDaTela == "circuito" && !noTexto
             && acao is "desfazer" or "refazer" or "colar" or "girar" or "espelhar" or "excluir")
         {
-            Aviso("no multímetro o circuito não se edita: volte para SIMULAÇÃO para mexer nele.");
+            Aviso(Idioma.T("no multímetro o circuito não se edita: volte para SIMULAÇÃO para mexer nele."));
             e.Handled = true;
             return;
         }
@@ -3889,7 +3868,7 @@ public partial class MainWindow : Window
         var janela = new Window
         {
             Owner = this,
-            Title = $"Teclas de {Catalogo.Obter(peca.Tipo)?.Nome ?? peca.Tipo}",
+            Title = Idioma.T("Teclas de {0}", Catalogo.Obter(peca.Tipo)?.Nome ?? peca.Tipo),
             SizeToContent = SizeToContent.Height,
             Width = 470,
             ResizeMode = ResizeMode.NoResize,
@@ -3901,8 +3880,7 @@ public partial class MainWindow : Window
 
         coluna.Children.Add(new TextBlock
         {
-            Text = "Vale enquanto a simulação estiver rodando. "
-                 + "Clique em \"Trocar\" e aperte a tecla, ou escolha um botão do controle.",
+            Text = Idioma.T("Vale enquanto a simulação estiver rodando. Clique em \"Trocar\" e aperte a tecla, ou escolha um botão do controle."),
             Foreground = Cinza,
             FontSize = 12,
             TextWrapping = TextWrapping.Wrap,
@@ -3938,7 +3916,7 @@ public partial class MainWindow : Window
 
             var limpar = new Button
             {
-                Content = "Tirar",
+                Content = Idioma.T("Tirar"),
                 Style = (Style)FindResource("BotaoPequeno"),
                 Margin = new Thickness(6, 0, 0, 0),
             };
@@ -3953,7 +3931,7 @@ public partial class MainWindow : Window
 
             var doControle = new Button
             {
-                Content = "Controle ▾",
+                Content = Idioma.T("Controle ▾"),
                 Style = (Style)FindResource("BotaoPequeno"),
                 Margin = new Thickness(6, 0, 0, 0),
             };
@@ -3978,12 +3956,12 @@ public partial class MainWindow : Window
 
             var trocar = new Button
             {
-                Content = "Trocar",
+                Content = Idioma.T("Trocar"),
                 Style = (Style)FindResource("BotaoPequeno"),
             };
             trocar.Click += (_, _) =>
             {
-                trocar.Content = "aperte…";
+                trocar.Content = Idioma.T("aperte…");
                 atual.Text = "…";
 
                 void Pegar(object _, KeyEventArgs ev)
@@ -3992,13 +3970,12 @@ public partial class MainWindow : Window
                     ev.Handled = true;
 
                     janela.PreviewKeyDown -= Pegar;
-                    trocar.Content = "Trocar";
+                    trocar.Content = Idioma.T("Trocar");
 
                     if (Vinculos.Reservada(tecla))
                     {
                         atual.Text = Vinculos.Rotulo(peca.Teclas.GetValueOrDefault(acao));
-                        Aviso($"a tecla {Vinculos.NomeDaTecla(tecla)} é do programa e "
-                              + "não pode virar atalho de peça");
+                        Aviso(Idioma.T("a tecla {0} é do programa e não pode virar atalho de peça", Vinculos.NomeDaTecla(tecla)));
                         return;
                     }
 
@@ -4018,7 +3995,7 @@ public partial class MainWindow : Window
 
         var fechar = new Button
         {
-            Content = "Fechar",
+            Content = Idioma.T("Fechar"),
             Style = (Style)FindResource("BotaoPequeno"),
             HorizontalAlignment = HorizontalAlignment.Right,
             Margin = new Thickness(0, 10, 0, 0),
@@ -4059,7 +4036,7 @@ public partial class MainWindow : Window
     {
         var dlg = new Microsoft.Win32.SaveFileDialog
         {
-            Filter = "Projeto do simulador (*.sktch)|*.sktch",
+            Filter = Idioma.T("Projeto do simulador (*.sktch)|*.sktch"),
             DefaultExt = Sktch.Extensao,
             FileName = caminhoDoProjeto is null ? "projeto" + Sktch.Extensao
                                                 : System.IO.Path.GetFileName(caminhoDoProjeto),
@@ -4096,14 +4073,14 @@ public partial class MainWindow : Window
             // o circuito esta na tela e acabou de ser dado por pronto.
             Miniaturas.Guardar(caminho, editor);
             Preferencias.Definir(Preferencias.UltimoProjeto, caminho);
-            Title = $"CircuitSketch - {System.IO.Path.GetFileName(caminho)}";
-            Aviso(sozinho ? $"salvo sozinho: {System.IO.Path.GetFileName(caminho)}"
-                          : $"projeto salvo em {System.IO.Path.GetFileName(caminho)}");
+            Title = Idioma.T("CircuitSketch - {0}", System.IO.Path.GetFileName(caminho));
+            Aviso(sozinho ? Idioma.T("salvo sozinho: {0}", System.IO.Path.GetFileName(caminho))
+                          : Idioma.T("projeto salvo em {0}", System.IO.Path.GetFileName(caminho)));
             return true;
         }
         catch (Exception ex)
         {
-            Erro($"não deu para salvar: {ex.Message}");
+            Erro(Idioma.T("não deu para salvar: {0}", ex.Message));
             return false;
         }
     }
@@ -4142,7 +4119,7 @@ public partial class MainWindow : Window
 
     void ComecarCircuitoNovo()
     {
-        RecomecarSessao("circuito novo");
+        RecomecarSessao(Idioma.T("circuito novo"));
         caminhoDoProjeto = null;
         editor.Carregar(new Circuito());
         editor.AplicarGrade();
@@ -4154,7 +4131,7 @@ public partial class MainWindow : Window
         RecomecarHistorico();
         ReconstruirRede();
         Title = "CircuitSketch";
-        Aviso("circuito novo: arraste uma placa da paleta (A) para comecar.");
+        Aviso(Idioma.T("circuito novo: arraste uma placa da paleta (A) para comecar."));
     }
 
     /// <summary>
@@ -4169,8 +4146,8 @@ public partial class MainWindow : Window
         if (AssinaturaAtual() == (circuitoSalvo ?? assinaturaInicial)) return true;
 
         var r = MessageBox.Show(this,
-            "O projeto tem alterações não salvas.\n\nSalvar antes?",
-            "Alterações não salvas", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+            Idioma.T("O projeto tem alterações não salvas.\n\nSalvar antes?"),
+            Idioma.T("Alterações não salvas"), MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
 
         if (r == MessageBoxResult.Cancel) return false;
         if (r != MessageBoxResult.Yes) return true;
@@ -4187,7 +4164,7 @@ public partial class MainWindow : Window
         var dlg = new Microsoft.Win32.OpenFileDialog
         {
             // O .json entra junto: e o que o programa salvava antes.
-            Filter = "Projeto do simulador (*.sktch;*.json)|*.sktch;*.json"
+            Filter = Idioma.T("Projeto do simulador (*.sktch;*.json)|*.sktch;*.json")
         };
         if (dlg.ShowDialog() != true) return;
 
@@ -4203,7 +4180,7 @@ public partial class MainWindow : Window
 
         if (arquivo is null || !File.Exists(arquivo))
         {
-            Aviso($"não achei nenhum .ino nem .py em: {caminho}");
+            Aviso(Idioma.T("não achei nenhum .ino nem .py em: {0}", caminho));
             return;
         }
 
@@ -4224,7 +4201,7 @@ public partial class MainWindow : Window
         GuardarCodigoDoEditor();
         circuitoSalvo = AssinaturaAtual();
         Recentes.Registrar(arquivo);
-        Title = $"CircuitSketch - {System.IO.Path.GetFileName(arquivo)}";
+        Title = Idioma.T("CircuitSketch - {0}", System.IO.Path.GetFileName(arquivo));
 
         // Veio da Arduino IDE: já começa rodando.
         Dispatcher.BeginInvoke(() => Rodar(), DispatcherPriority.Loaded);
@@ -4261,7 +4238,7 @@ public partial class MainWindow : Window
         try
         {
             var (circuito, codigo, descricao) = Sktch.AbrirCompleto(caminho);
-            RecomecarSessao($"projeto aberto: {System.IO.Path.GetFileName(caminho)}");
+            RecomecarSessao(Idioma.T("projeto aberto: {0}", System.IO.Path.GetFileName(caminho)));
             editor.Carregar(circuito);
             editor.RecarregarChips();
             editor.AplicarGrade();
@@ -4272,7 +4249,7 @@ public partial class MainWindow : Window
             RecomecarHistorico();
             ReconstruirRede();
             editor.Ajustar();
-            Title = $"CircuitSketch - {System.IO.Path.GetFileName(caminho)}";
+            Title = Idioma.T("CircuitSketch - {0}", System.IO.Path.GetFileName(caminho));
             Recentes.Registrar(caminho);
             Preferencias.Definir(Preferencias.UltimoProjeto, caminho);
             caminhoDoProjeto = caminho;
@@ -4286,16 +4263,16 @@ public partial class MainWindow : Window
             if (Preferencias.Ligado(Preferencias.RodarAoAbrirProjeto, true))
                 Dispatcher.BeginInvoke(() => Rodar(), DispatcherPriority.Background);
         }
-        catch (Exception ex) { Erro($"não deu para abrir: {ex.Message}"); }
+        catch (Exception ex) { Erro(Idioma.T("não deu para abrir: {0}", ex.Message)); }
     }
 
     /// <summary>Usado pelo modo de captura para mostrar a tab do objeto.</summary>
     /// <summary>Abre um circuito por caminho, sem dialogo.</summary>
     internal void CarregarCircuitoDe(string caminho)
     {
-        if (!File.Exists(caminho)) { Erro($"circuito nao encontrado: {caminho}"); return; }
+        if (!File.Exists(caminho)) { Erro(Idioma.T("circuito nao encontrado: {0}", caminho)); return; }
         var (circuito, codigo, descricao) = Sktch.AbrirCompleto(caminho);
-        RecomecarSessao($"projeto aberto: {System.IO.Path.GetFileName(caminho)}");
+        RecomecarSessao(Idioma.T("projeto aberto: {0}", System.IO.Path.GetFileName(caminho)));
         editor.Carregar(circuito);
         editor.RecarregarChips();
         editor.AplicarGrade();
@@ -4409,7 +4386,7 @@ public partial class MainWindow : Window
         {
             // O Erro() ja registra no console: registrar aqui tambem
             // punha a mesma frase duas vezes seguidas.
-            Erro($"não cabe na placa — {conta.PorQueNaoCabe()}");
+            Erro(Idioma.T("não cabe na placa — {0}", conta.PorQueNaoCabe()));
 
             interpretadores.Clear();
             depuradores.Clear();
@@ -4418,8 +4395,7 @@ public partial class MainWindow : Window
         }
 
         if (conta.RamApertada)
-            console.Aviso($"sobra pouca RAM ({conta.UsoDaRam:P0} em uso): "
-                          + "com o programa rodando, a placa pode reiniciar sozinha.");
+            console.Aviso(Idioma.T("sobra pouca RAM ({0:P0} em uso): com o programa rodando, a placa pode reiniciar sozinha.", conta.UsoDaRam));
 
         return true;
     }
@@ -4456,7 +4432,7 @@ public partial class MainWindow : Window
     /// <summary>Carrega um circuito pelo mesmo caminho de abrir arquivo.</summary>
     internal void TesteAbrir(Circuito c, string codigo)
     {
-        RecomecarSessao("projeto aberto: (teste)");
+        RecomecarSessao(Idioma.T("projeto aberto: (teste)"));
         editor.Carregar(c);
         editor.RecarregarChips();
         AdotarCodigo(codigo);
@@ -4606,9 +4582,7 @@ public partial class MainWindow : Window
         bool viva = execucoes.Values.Any(t => t is { IsAlive: true });
         int noPainel = painelSerial.Count;
 
-        return $"serial={linhas} algumLedLigado={algumLigado} "
-             + $"rodarHabilitado={btRodar.IsEnabled} pararHabilitado={btParar.IsEnabled} "
-             + $"threadViva={viva} painelSerial={noPainel}linhas";
+        return Idioma.T("serial={0} algumLedLigado={1} rodarHabilitado={2} pararHabilitado={3} threadViva={4} painelSerial={5}linhas", linhas, algumLigado, btRodar.IsEnabled, btParar.IsEnabled, viva, noPainel);
     }
 
     /// <summary>Varias de uma vez, para a captura mostrar a selecao multipla.</summary>
@@ -4643,7 +4617,7 @@ public partial class MainWindow : Window
         var dlg = new Microsoft.Win32.OpenFileDialog
         {
             Filter = "Sketch (*.ino;*.py)|*.ino;*.py"
-                     + "|Arduino (*.ino)|*.ino|MicroPython (*.py)|*.py|Todos (*.*)|*.*"
+                     + "|Arduino (*.ino)|*.ino|MicroPython (*.py)|*.py|" + Idioma.T("Todos") + " (*.*)|*.*"
         };
         if (dlg.ShowDialog() == true) CarregarSketch(dlg.FileName);
     }
@@ -4656,7 +4630,7 @@ public partial class MainWindow : Window
 
         if (string.IsNullOrWhiteSpace(codigo))
         {
-            Erro("esta placa ainda não tem código para baixar.");
+            Erro(Idioma.T("esta placa ainda não tem código para baixar."));
             return;
         }
 
@@ -4667,8 +4641,8 @@ public partial class MainWindow : Window
         var dlg = new Microsoft.Win32.SaveFileDialog
         {
             Filter = LinguagemDoEditor() == Linguagem.MicroPython
-                ? "Sketch MicroPython (*.py)|*.py|Sketch do Arduino (*.ino)|*.ino"
-                : "Sketch do Arduino (*.ino)|*.ino|Sketch MicroPython (*.py)|*.py",
+                ? Idioma.T("Sketch MicroPython (*.py)|*.py|Sketch do Arduino (*.ino)|*.ino")
+                : Idioma.T("Sketch do Arduino (*.ino)|*.ino|Sketch MicroPython (*.py)|*.py"),
             FileName = sugestao + Compilador.Extensao(LinguagemDoEditor()),
         };
         if (dlg.ShowDialog() != true) return;
@@ -4676,7 +4650,7 @@ public partial class MainWindow : Window
         try
         {
             File.WriteAllText(dlg.FileName, codigo);
-            Aviso($"código salvo em {System.IO.Path.GetFileName(dlg.FileName)}");
+            Aviso(Idioma.T("código salvo em {0}", System.IO.Path.GetFileName(dlg.FileName)));
         }
         catch (Exception erro) { Erro(erro.Message); }
     }
@@ -4712,12 +4686,11 @@ public partial class MainWindow : Window
 
         string nomes = string.Join(" + ", placas
             .Select(p => PerfilPlaca.De(p.Tipo)?.Nome ?? p.Tipo).Distinct());
-        string emFoco = PerfilPlaca.De(PlacaDoEditor()?.Tipo)?.Nome ?? "a primeira";
+        string emFoco = PerfilPlaca.De(PlacaDoEditor()?.Tipo)?.Nome ?? Idioma.T("a primeira");
 
         // Aviso, e nao erro: rodar duas placas passou a funcionar. O que
         // ainda vale dizer e que o monitor mostra uma de cada vez.
-        Aviso($"{placas.Count} placas ({nomes}) · cada uma roda o seu código · "
-              + $"o monitor e os controles são da {emFoco}");
+        Aviso(Idioma.T("{0} placas ({1}) · cada uma roda o seu código · o monitor e os controles são da {2}", placas.Count, nomes, emFoco));
     }
 
     void ConferirPlacaDaIde()
@@ -4729,8 +4702,7 @@ public partial class MainWindow : Window
 
         string naIde = PerfilPlaca.De(PlacaEscolhidaNaIde)?.Nome ?? PlacaEscolhidaNaIde;
         string noDesenho = PerfilPlaca.De(doCircuito.Tipo)?.Nome ?? doCircuito.Tipo;
-        Erro($"a Arduino IDE está em {naIde}, mas o circuito tem {noDesenho}. "
-             + "Quem manda na simulação é o circuito.");
+        Erro(Idioma.T("a Arduino IDE está em {0}, mas o circuito tem {1}. Quem manda na simulação é o circuito.", naIde, noDesenho));
     }
 
     /// <summary>
@@ -4763,7 +4735,7 @@ public partial class MainWindow : Window
             var (placaDoClock, scl) = rede.PinoDe(editor.Atual, peca.Id, "SCL");
             if (placaDoClock != placa || scl < 0)
             {
-                Aviso($"I2C: o SCL do {nome} nao esta ligado na placa -- sem o clock ele nao responde.");
+                Aviso(Idioma.T("I2C: o SCL do {0} nao esta ligado na placa -- sem o clock ele nao responde.", nome));
                 continue;
             }
 
@@ -4782,8 +4754,7 @@ public partial class MainWindow : Window
             var jaEstava = maq.I2c.Ligar(novo);
 
             if (jaEstava != novo)
-                Aviso($"I2C: {nome} e {jaEstava.Nome} disputam o endereco "
-                      + $"0x{endereco:X2} no mesmo fio. So um responde.");
+                Aviso(Idioma.T("I2C: {0} e {1} disputam o endereco 0x{2:X2} no mesmo fio. So um responde.", nome, jaEstava.Nome, endereco));
         }
     }
 
@@ -4807,8 +4778,7 @@ public partial class MainWindow : Window
         {
             var perfil = PerfilPlaca.De(PlacaDoEditor()?.Tipo);
             if (perfil is not null)
-                Aviso($"placa: {perfil.Nome} · ADC 0–{perfil.MaxAdc} · "
-                      + $"pinos 0–{perfil.NumPinos - 1}");
+                Aviso(Idioma.T("placa: {0} · ADC 0–{1} · pinos 0–{2}", perfil.Nome, perfil.MaxAdc, perfil.NumPinos - 1));
         }
 
         LigarAparelhosDeI2c();
@@ -4824,21 +4794,18 @@ public partial class MainWindow : Window
         {
             var (idPeca, placas) = entreDuas[0];
             var peca = editor.Atual.Achar(idPeca);
-            string nome = Catalogo.Obter(peca?.Tipo)?.Nome ?? peca?.Tipo ?? "peça";
-            string nomes = string.Join(" e ", placas.Select(NomeCurtoDaPlaca));
+            string nome = Catalogo.Obter(peca?.Tipo)?.Nome ?? peca?.Tipo ?? Idioma.T("peça");
+            string nomes = string.Join(" " + Idioma.T("e") + " ", placas.Select(NomeCurtoDaPlaca));
 
             // O aviso diz COMO resolver, e nao so o que esta errado.
-            Erro($"{nome} está ligado em duas placas ({nomes}) e vai obedecer à "
-                 + "primeira. Selecione a peça e escolha em \"manda\" qual placa vale"
-                 + (entreDuas.Count > 1 ? $" — e mais {entreDuas.Count - 1} peça(s) assim." : "."));
+            Erro(Idioma.T("{0} está ligado em duas placas ({1}) e vai obedecer à primeira. Selecione a peça e escolha em \"manda\" qual placa vale{2}", nome, nomes, (entreDuas.Count > 1 ? Idioma.T(" — e mais {0} peça(s) assim.", entreDuas.Count - 1) : ".")));
         }
 
         // Fio para pino que nao existe some do desenho calado. Melhor
         // dizer do que deixar o aluno procurando a ligacao que "sumiu".
         var quebrados = editor.Atual.FiosQuebrados().Distinct().ToList();
         if (quebrados.Count > 0)
-            Erro($"fio ligado em pino inexistente: {string.Join(", ", quebrados.Take(3))}"
-                 + (quebrados.Count > 3 ? $" e mais {quebrados.Count - 3}" : ""));
+            Erro(Idioma.T("fio ligado em pino inexistente: {0}{1}", string.Join(", ", quebrados.Take(3)), (quebrados.Count > 3 ? Idioma.T(" e mais {0}", quebrados.Count - 3) : "")));
 
         editor.MarcarPinosLigados(rede);
     }
@@ -4899,7 +4866,7 @@ public partial class MainWindow : Window
             m.PendriveConectado = null;
         }
         foreach (var (peca, maquina) in editor.CartoesDoCircuito(bancada, rede))
-            if (maquina is not null) CarregarArmazenamento(maquina.Cartao, peca, "cartão");
+            if (maquina is not null) CarregarArmazenamento(maquina.Cartao, peca, Idioma.T("cartão"));
 
         // O pendrive: encaixado (o clique no desenho tira e poe, com a
         // simulacao rodando) e ligado no USB OTG da placa.
@@ -4909,7 +4876,7 @@ public partial class MainWindow : Window
             CarregarArmazenamento(maquina.Pendrive, peca, "pendrive");
             if (problema is not null)
             {
-                console.Aviso($"pendrive \"{peca.Nome ?? peca.Id}\": {problema}. A placa não vai ver o pendrive.");
+                console.Aviso(Idioma.T("pendrive \"{0}\": {1}. A placa não vai ver o pendrive.", peca.Nome ?? peca.Id, problema));
                 continue;
             }
             var pendrive = peca;
@@ -4958,11 +4925,11 @@ public partial class MainWindow : Window
         ReconstruirRede();
 
         var placas = editor.Atual.Placas().ToList();
-        if (placas.Count == 0) { Erro("nao ha placa no circuito para rodar."); return; }
+        if (placas.Count == 0) { Erro(Idioma.T("nao ha placa no circuito para rodar.")); return; }
 
         console.Info(placas.Count == 1
-            ? $"compilando {NomeDaPlaca(placas[0])}…"
-            : $"compilando {placas.Count} placas…");
+            ? Idioma.T("compilando {0}…", NomeDaPlaca(placas[0]))
+            : Idioma.T("compilando {0} placas…", placas.Count));
 
         // Compila TODAS antes de comecar qualquer uma: metade rodando e
         // metade com erro de sintaxe seria pior de entender do que
@@ -5018,13 +4985,12 @@ public partial class MainWindow : Window
                 int arquivosC = prog.Nativos.Count(f => f.Nome.EndsWith(".c", StringComparison.OrdinalIgnoreCase));
                 if (arquivosC > 0)
                 {
-                    console.Info($"{NomeDaPlaca(placa)}: compilando {arquivosC} arquivo(s) em C (modo nativo)…");
+                    console.Info(Idioma.T("{0}: compilando {1} arquivo(s) em C (modo nativo)…", NomeDaPlaca(placa), arquivosC));
                     Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
                 }
                 interpretadores[placa.Id] = MontarInterpretador(placa.Id, prog);
 
-                console.Info($"{NomeDaPlaca(placa)}: compilou em "
-                             + Compilador.Nome(Compilador.Detectar(placa.Sketch ?? "")) + ".");
+                console.Info(Idioma.T("{0}: compilou em {1}.", NomeDaPlaca(placa), Compilador.Nome(Compilador.Detectar(placa.Sketch ?? ""))));
 
                 // O sketch cabe nesta placa? E a conta que a IDE
                 // imprime depois de compilar e que o simulador nunca
@@ -5059,15 +5025,15 @@ public partial class MainWindow : Window
         }
         else if (painelSerial.Count > 0)
         {
-            painelSerial.Add("——— rodando de novo ———");
+            painelSerial.Add("——— " + Idioma.T("rodando de novo") + " ———");
             RedesenharSerial();
         }
 
         // Execucao nova, monitor limpo -- e o que a IDE faz quando a
         // placa reinicia.
         MonitorIde.Comecar();
-        console.Info($"rodando {placas.Count} placa(s).");
-        Aviso("rodando...");
+        console.Info(Idioma.T("rodando {0} placa(s).", placas.Count));
+        Aviso(Idioma.T("rodando..."));
 
         // O pisca da lista de componentes: verde no que esta ligado, e
         // ele some para o branco. E a resposta visual a "o que
@@ -5089,8 +5055,7 @@ public partial class MainWindow : Window
             {
                 semEnergia.Add(id);
                 bancada.De(id).Desligar();
-                console.Aviso($"{NomeDaPlaca(placa)} {editor.SituacaoDaEnergia(id)}. Ela liga quando a energia chegar "
-                              + "(ou ligue o cabo USB na barra da placa).");
+                console.Aviso(Idioma.T("{0} {1}. Ela liga quando a energia chegar (ou ligue o cabo USB na barra da placa).", NomeDaPlaca(placa), editor.SituacaoDaEnergia(id)));
                 continue;
             }
 
@@ -5103,9 +5068,9 @@ public partial class MainWindow : Window
         {
             if (rede is not null) editor.RefletirEstado(bancada, rede);
             Aviso(semEnergia.Count == placas.Count
-                ? (placas.Count == 1 ? "a placa está sem energia: " + editor.SituacaoDaEnergia(placas[0].Id).Replace("sem energia: ", "") + "."
-                                     : "nenhuma placa tem energia: a bateria não chega nelas, e elas estão sem o cabo USB.")
-                : $"rodando — {semEnergia.Count} placa(s) sem energia (veja o monitor).");
+                ? (placas.Count == 1 ? Idioma.T("a placa está sem energia: {0}.", editor.SituacaoDaEnergia(placas[0].Id).Replace(Idioma.T("sem energia: "), ""))
+                                     : Idioma.T("nenhuma placa tem energia: a bateria não chega nelas, e elas estão sem o cabo USB."))
+                : Idioma.T("rodando — {0} placa(s) sem energia (veja o monitor).", semEnergia.Count));
         }
     }
 
@@ -5140,8 +5105,8 @@ public partial class MainWindow : Window
         if (rede is not null) editor.RefletirEstado(bancada, rede);
         string nome = NomeCurtoDaPlaca(idDaPlaca).Trim('[', ']');
         string porque = editor.SituacaoDaEnergia(idDaPlaca);
-        Aviso($"{nome} apagou — {porque}.");
-        console.Aviso($"{nome} apagou: {porque}.");
+        Aviso(Idioma.T("{0} apagou — {1}.", nome, porque));
+        console.Aviso(Idioma.T("{0} apagou: {1}.", nome, porque));
     }
 
     /// <summary>A energia chegou: a placa liga do zero (o boot e o setup()), como ao ligar a bateria na de verdade.</summary>
@@ -5173,8 +5138,8 @@ public partial class MainWindow : Window
         execucoes[idDaPlaca] = novaThread;
         novaThread.Start();
         string nome = NomeCurtoDaPlaca(idDaPlaca).Trim('[', ']');
-        Aviso($"{nome} ligou — {editor.SituacaoDaEnergia(idDaPlaca)}.");
-        console.Info($"{nome} ligou: {editor.SituacaoDaEnergia(idDaPlaca)}.");
+        Aviso(Idioma.T("{0} ligou — {1}.", nome, editor.SituacaoDaEnergia(idDaPlaca)));
+        console.Info(Idioma.T("{0} ligou: {1}.", nome, editor.SituacaoDaEnergia(idDaPlaca)));
     }
 
     /// <summary>
@@ -5209,13 +5174,8 @@ public partial class MainWindow : Window
         if (lido.Circuito.Pecas.Count <= editor.Atual.Pecas.Count) return;
 
         var resposta = MessageBox.Show(this,
-            "A descrição deste projeto tem um diagrama do Wokwi guardado dentro, com "
-            + $"{lido.Circuito.Pecas.Count} peças e {lido.Circuito.Fios.Count} fios."
-            + Environment.NewLine + Environment.NewLine
-            + $"O circuito aberto tem só {editor.Atual.Pecas.Count}."
-            + Environment.NewLine + Environment.NewLine
-            + "Montar o circuito da descrição?",
-            "Achei um circuito na descrição",
+            Idioma.T("A descrição deste projeto tem um diagrama do Wokwi guardado dentro, com {0} peças e {1} fios.{2}{2}O circuito aberto tem só {3}.{2}{2}Montar o circuito da descrição?", lido.Circuito.Pecas.Count, lido.Circuito.Fios.Count, Environment.NewLine, editor.Atual.Pecas.Count),
+            Idioma.T("Achei um circuito na descrição"),
             MessageBoxButton.YesNo, MessageBoxImage.Question);
 
         if (resposta != MessageBoxResult.Yes) return;
@@ -5238,11 +5198,9 @@ public partial class MainWindow : Window
         editor.Ajustar();
         Empilhar();
 
-        string aviso = $"circuito montado da descrição: {lido.Circuito.Pecas.Count} peças, "
-                       + $"{lido.Circuito.Fios.Count} fios";
+        string aviso = Idioma.T("circuito montado da descrição: {0} peças, {1} fios", lido.Circuito.Pecas.Count, lido.Circuito.Fios.Count);
         if (lido.Ignorados.Count > 0)
-            aviso += $" · {lido.Ignorados.Count} peça(s) sem equivalente aqui: "
-                     + string.Join(", ", lido.Ignorados.Distinct().Take(4));
+            aviso += Idioma.T(" · {0} peça(s) sem equivalente aqui: {1}", lido.Ignorados.Count, string.Join(", ", lido.Ignorados.Distinct().Take(4)));
 
         Aviso(aviso);
     }
@@ -5306,8 +5264,8 @@ public partial class MainWindow : Window
 
                     editor.Atual.Arquivos[nome] =
                         "// " + nome + Environment.NewLine
-                        + "// Este arquivo faltava no projeto: o sketch o inclui com "
-                        + "aspas, entao ele mora aqui do lado." + Environment.NewLine;
+                        + "// " + Idioma.T("Este arquivo faltava no projeto: o sketch o inclui com aspas, então ele mora aqui do lado.")
+                        + Environment.NewLine;
                 },
             };
             janela.ShowDialog();
@@ -5316,7 +5274,7 @@ public partial class MainWindow : Window
 
             if (!janela.Prosseguir)
             {
-                Erro("faltam bibliotecas: " + string.Join(", ", falta.Select(f => f.Cabecalho)));
+                Erro(Idioma.T("faltam bibliotecas: {0}", string.Join(", ", falta.Select(f => f.Cabecalho))));
                 return false;
             }
 
@@ -5363,13 +5321,13 @@ public partial class MainWindow : Window
     {
         if (!btParar.IsEnabled)
         {
-            Aviso("a simulação está parada: o RESET só faz efeito com a placa rodando (F5).");
+            Aviso(Idioma.T("a simulação está parada: o RESET só faz efeito com a placa rodando (F5)."));
             return;
         }
         if (!programas.ContainsKey(idDaPlaca)) return;
         if (semEnergia.Contains(idDaPlaca))
         {
-            Aviso(NomeCurtoDaPlaca(idDaPlaca).Trim('[', ']') + " está sem energia: o RESET não faz nada nela.");
+            Aviso(NomeCurtoDaPlaca(idDaPlaca).Trim('[', ']') + Idioma.T(" está sem energia: o RESET não faz nada nela."));
             return;
         }
 
@@ -5382,7 +5340,7 @@ public partial class MainWindow : Window
 
         maquina.Desligar();
         if (rede is not null) editor.RefletirEstado(bancada, rede);
-        Aviso(NomeCurtoDaPlaca(idDaPlaca).Trim('[', ']') + ": " + (motivo ?? "RESET segurado, solte para reiniciar."));
+        Aviso(NomeCurtoDaPlaca(idDaPlaca).Trim('[', ']') + ": " + (motivo ?? Idioma.T("RESET segurado, solte para reiniciar.")));
     }
 
     /// <summary>RESET solto: a placa recomeca do setup(), com o monitor seguindo.</summary>
@@ -5409,7 +5367,7 @@ public partial class MainWindow : Window
         var novaThread = new Thread(() => Executar(minha, idDaPlaca), PilhaDoSketch) { IsBackground = true, Priority = ThreadPriority.BelowNormal };
         execucoes[idDaPlaca] = novaThread;
         novaThread.Start();
-        Aviso(NomeCurtoDaPlaca(idDaPlaca).Trim('[', ']') + " reiniciou.");
+        Aviso(NomeCurtoDaPlaca(idDaPlaca).Trim('[', ']') + Idioma.T(" reiniciou."));
     }
 
     /// <summary>
@@ -5541,7 +5499,7 @@ public partial class MainWindow : Window
         foreach (var (_, m) in bancada.Todas) m.Desligar();
         if (rede is not null) editor.RefletirEstado(maq, rede);
 
-        Aviso("parado.");
+        Aviso(Idioma.T("parado."));
     }
 
     void PararExecucao()
@@ -5586,7 +5544,7 @@ public partial class MainWindow : Window
         fundoDaPausa = new FundoDaPausa(MarcadaNoCampo);
         margemDePausas = new MargemDePausas(MarcadaNoCampo)
         {
-            ToolTip = "Clique para marcar um ponto de parada (F9)"
+            ToolTip = Idioma.T("Clique para marcar um ponto de parada (F9)")
         };
         margemDePausas.Clicou += AlternarPausa;
 
@@ -5623,8 +5581,8 @@ public partial class MainWindow : Window
             depurador.DefinirPausas(linhas);
 
         RedesenharPausas();
-        Aviso(marcou ? $"ponto de parada na linha {linha}."
-                     : $"ponto de parada da linha {linha} tirado.");
+        Aviso(marcou ? Idioma.T("ponto de parada na linha {0}.", linha)
+                     : Idioma.T("ponto de parada da linha {0} tirado.", linha));
     }
 
     void PausarOuContinuar(object s = null, RoutedEventArgs e = null)
@@ -5636,12 +5594,12 @@ public partial class MainWindow : Window
             // Continua todas: com duas placas paradas, um "continuar" que
             // soltasse so uma deixaria a outra parada sem ninguem ver.
             foreach (var depurador in depuradores.Values) depurador.Continuar();
-            Aviso("rodando...");
+            Aviso(Idioma.T("rodando..."));
         }
         else
         {
             foreach (var depurador in depuradores.Values) depurador.Pausar();
-            Aviso("pausando...");
+            Aviso(Idioma.T("pausando..."));
         }
     }
 
@@ -5674,7 +5632,7 @@ public partial class MainWindow : Window
         MostrarVariaveis(idDaPlaca, retrato);
         RedesenharPausas();
         AtualizarBotoesDaPausa();
-        Aviso($"pausado na linha {retrato.Linha}. F6 continua, F10 anda uma linha.");
+        Aviso(Idioma.T("pausado na linha {0}. F6 continua, F10 anda uma linha.", retrato.Linha));
     }
 
     void AoRetomar(Depurador depurador, string idDaPlaca)
@@ -5705,7 +5663,7 @@ public partial class MainWindow : Window
         if (!rodando && aoVivo && painelVariaveis.Visibility == Visibility.Visible && placaPausada is null)
             painelVariaveis.Visibility = Visibility.Collapsed;
         btPausar.Content = pausado ? "▶" : "❚❚";
-        btPausar.ToolTip = pausado ? "Continuar (F6)" : "Pausar (F6)";
+        btPausar.ToolTip = pausado ? Idioma.T("Continuar (F6)") : Idioma.T("Pausar (F6)");
         btPasso.IsEnabled = pausado;
     }
 
@@ -5740,13 +5698,13 @@ public partial class MainWindow : Window
             relogioAoVivo ??= new DispatcherTimer(TimeSpan.FromMilliseconds(250), DispatcherPriority.Background, (_, _) => PedirRetratoAoVivo(), Dispatcher);
             relogioAoVivo.Start();
             PedirRetratoAoVivo();
-            Aviso("variáveis ao vivo: o painel acompanha o sketch rodando.");
+            Aviso(Idioma.T("variáveis ao vivo: o painel acompanha o sketch rodando."));
         }
         else
         {
             relogioAoVivo?.Stop();
             if (placaPausada is null) painelVariaveis.Visibility = Visibility.Collapsed;
-            Aviso("variáveis ao vivo desligadas.");
+            Aviso(Idioma.T("variáveis ao vivo desligadas."));
         }
     }
 
@@ -5788,8 +5746,8 @@ public partial class MainWindow : Window
     {
         string dona = bancada.Quantas > 1 ? NomeCurtoDaPlaca(idDaPlaca).Trim('[', ']') + " · " : "";
         txtTituloVariaveis.Text = aoVivoAgora
-            ? retrato.Linha > 0 ? $"AO VIVO · {dona}LINHA {retrato.Linha}" : $"AO VIVO · {dona}GLOBAIS"
-            : $"PAUSADO · {dona}LINHA {retrato.Linha}";
+            ? retrato.Linha > 0 ? Idioma.T("AO VIVO · {0}LINHA {1}", dona, retrato.Linha) : Idioma.T("AO VIVO · {0}GLOBAIS", dona)
+            : Idioma.T("PAUSADO · {0}LINHA {1}", dona, retrato.Linha);
         txtTituloVariaveis.Foreground = Tema.Pincel(aoVivoAgora ? Tema.Destaque : Tema.Aviso);
         painelVariaveis.BorderBrush = Tema.Pincel(aoVivoAgora ? Tema.Destaque : Tema.BordaDoAviso);
 
@@ -5798,7 +5756,7 @@ public partial class MainWindow : Window
         var resumo = new List<string>();
 
         if (retrato.Variaveis.Count == 0)
-            linhas.Add(new System.Windows.Documents.Run("nenhuma variável declarada até aqui")
+            linhas.Add(new System.Windows.Documents.Run(Idioma.T("nenhuma variável declarada até aqui"))
                 { Foreground = Cinza });
 
         foreach (var v in retrato.Variaveis)
@@ -5835,14 +5793,14 @@ public partial class MainWindow : Window
         AtualizarAbas();
     }
 
-    /// <summary>As tres abas de baixo, cada uma com o botao e o nome dela.</summary>
-    (UIElement Painel, Button Botao, string Nome, string Titulo)[] AbasDeBaixo() =>
+    /// <summary>As abas de baixo, cada uma com o botao, o nome, o titulo da janela solta e a dica da seta.</summary>
+    (UIElement Painel, Button Botao, string Nome, string Titulo, string Soltar)[] AbasDeBaixo() =>
     [
-        (abaConsole, btAbaConsole, "console", "Console"),
-        (abaSerial, btAbaSerial, "serial", "Monitor serial"),
-        (abaRede, btAbaRede, "rede", "Rede"),
-        (abaBluetooth, btAbaBluetooth, "bluetooth", "Bluetooth"),
-        (abaPlaca, btAbaPlaca, "placa", "Placa de verdade"),
+        (abaConsole, btAbaConsole, "console", Idioma.T("Console"), Idioma.T("Abrir o console numa janela separada")),
+        (abaSerial, btAbaSerial, "serial", Idioma.T("Monitor serial"), Idioma.T("Abrir o monitor serial numa janela separada")),
+        (abaRede, btAbaRede, "rede", Idioma.T("Rede"), Idioma.T("Abrir a rede numa janela separada")),
+        (abaBluetooth, btAbaBluetooth, "bluetooth", Idioma.T("Bluetooth"), Idioma.T("Abrir o Bluetooth numa janela separada")),
+        (abaPlaca, btAbaPlaca, "placa", Idioma.T("Placa de verdade"), Idioma.T("Abrir a placa de verdade numa janela separada")),
     ];
 
     /// <summary>
@@ -5891,19 +5849,28 @@ public partial class MainWindow : Window
             if (aqui is not null) abaDoPainel = aqui;
         }
 
-        foreach (var (painel, botao, nome, _) in AbasDeBaixo())
+        foreach (var (painel, botao, nome, _, soltar) in AbasDeBaixo())
         {
             bool solta = JanelaSolta.EstaSolto(nome);
+            bool aberta = !solta && abaDoPainel == nome;
 
             // Na janela dela a aba esta sempre a vista: quem manda na
             // visibilidade aqui e a escolha da tira, e la nao ha tira.
             painel.Visibility = solta || abaDoPainel == nome
                 ? Visibility.Visible : Visibility.Collapsed;
 
-            botao.Foreground = Tema.Pincel(!solta && abaDoPainel == nome
-                ? Tema.TextoForte : Tema.TextoFraco);
+            botao.Foreground = Tema.Pincel(aberta ? Tema.TextoForte : Tema.TextoFraco);
+            botao.Background = aberta ? Tema.Pincel(Tema.Borda) : Brushes.Transparent;
             botao.FontStyle = solta ? FontStyles.Italic : FontStyles.Normal;
-            botao.ToolTip = solta ? "Está numa janela separada · clique para trazer de volta" : null;
+            botao.ToolTip = solta ? Idioma.T("Está numa janela separada · clique para trazer de volta") : null;
+
+            // A seta unica da fileira solta a aba aberta (ou traz de volta,
+            // se todas ja sairam e a "aberta" e uma solta).
+            if (abaDoPainel == nome)
+            {
+                btSoltarAbaAberta.Tag = nome;
+                btSoltarAbaAberta.ToolTip = solta ? Idioma.T("Trazer de volta para este painel") : soltar;
+            }
         }
 
         // A aba da placa aberta sem nada rodando: diz para que ela serve.
@@ -5928,8 +5895,8 @@ public partial class MainWindow : Window
     {
         redeSimulada.UsarInternet = miInternet.IsChecked;
         Aviso(miInternet.IsChecked
-            ? "a rede do simulador pode usar a internet deste computador."
-            : "rede sem internet: as placas conversam entre si e com o computador.");
+            ? Idioma.T("a rede do simulador pode usar a internet deste computador.")
+            : Idioma.T("rede sem internet: as placas conversam entre si e com o computador."));
     }
 
     void EnviarPeloSerial(object s = null, RoutedEventArgs e = null)
@@ -5958,7 +5925,7 @@ public partial class MainWindow : Window
     void PublicarNoMqtt(object s = null, RoutedEventArgs e = null)
     {
         string topico = txtTopicoMqtt.Text.Trim();
-        if (topico.Length == 0) { Aviso("escreva o tópico antes de publicar."); return; }
+        if (topico.Length == 0) { Aviso(Idioma.T("escreva o tópico antes de publicar.")); return; }
 
         redeSimulada.PublicarDoPainel(topico, txtMensagemMqtt.Text);
         txtMensagemMqtt.Clear();
@@ -6028,14 +5995,14 @@ public partial class MainWindow : Window
     void AbrirListaDeBaud(object s = null, RoutedEventArgs e = null)
     {
         var peca = editor.Atual.Achar(placaDoEditor);
-        if (peca is null) { Aviso("não há placa no editor para o monitor serial."); return; }
+        if (peca is null) { Aviso(Idioma.T("não há placa no editor para o monitor serial.")); return; }
         var maquina = bancada.De(placaDoEditor);
         int doSketch = maquina?.BaudDaSerial ?? 0;
 
         var menu = new ContextMenu { PlacementTarget = btBaudSerial };
         var seguir = new MenuItem
         {
-            Header = doSketch > 0 ? $"Seguir o Serial.begin ({doSketch})" : "Seguir o Serial.begin",
+            Header = doSketch > 0 ? Idioma.T("Seguir o Serial.begin ({0})", doSketch) : Idioma.T("Seguir o Serial.begin"),
             IsChecked = peca.BaudDoMonitor is null,
         };
         seguir.Click += (_, _) => EscolherBaud(peca, null);
@@ -6043,7 +6010,7 @@ public partial class MainWindow : Window
         menu.Items.Add(new Separator());
         foreach (int baud in BaudsDoMonitor)
         {
-            var item = new MenuItem { Header = $"{baud} baud", IsChecked = peca.BaudDoMonitor == baud };
+            var item = new MenuItem { Header = Idioma.T("{0} baud", baud), IsChecked = peca.BaudDoMonitor == baud };
             item.Click += (_, _) => EscolherBaud(peca, baud);
             menu.Items.Add(item);
         }
@@ -6066,7 +6033,7 @@ public partial class MainWindow : Window
         var dispositivos = redeSimulada.DispositivosVisiveis();
         if (dispositivos.Count == 0)
         {
-            Aviso("nenhuma placa com Bluetooth ligado (falta SerialBT.begin no sketch).");
+            Aviso(Idioma.T("nenhuma placa com Bluetooth ligado (falta SerialBT.begin no sketch)."));
             return;
         }
 
@@ -6095,8 +6062,8 @@ public partial class MainWindow : Window
         }
 
         string nome = dispositivoBtEscolhido ?? redeSimulada.DispositivosVisiveis().FirstOrDefault();
-        if (nome is null) { Aviso("nenhuma placa com Bluetooth ligado (SerialBT.begin)."); return; }
-        if (!redeSimulada.ConectarCelular(nome)) Aviso($"não achei \"{nome}\".");
+        if (nome is null) { Aviso(Idioma.T("nenhuma placa com Bluetooth ligado (SerialBT.begin).")); return; }
+        if (!redeSimulada.ConectarCelular(nome)) Aviso(Idioma.T("não achei \"{0}\".", nome));
         AtualizarPainelDeRede();
     }
 
@@ -6106,7 +6073,7 @@ public partial class MainWindow : Window
         if (texto.Length == 0) return;
         if (!redeSimulada.EnviarDoCelular(texto + "\n"))
         {
-            Aviso("conecte o celular numa placa antes de enviar.");
+            Aviso(Idioma.T("conecte o celular numa placa antes de enviar."));
             return;
         }
         txtEntradaBt.Clear();
@@ -6171,14 +6138,12 @@ public partial class MainWindow : Window
         avisoDeRadio.Visibility = doWifi is null ? Visibility.Collapsed : Visibility.Visible;
         if (doWifi is not null)
             txtAvisoDeRadio.Text =
-                "Não foi possível usar o WiFi deste computador: " + doWifi + ". "
-                + "O simulador está mostrando redes simuladas no lugar das de verdade.";
+                Idioma.T("Não foi possível usar o WiFi deste computador: {0}. O simulador está mostrando redes simuladas no lugar das de verdade.", doWifi);
 
         avisoDeBluetooth.Visibility = doBt is null ? Visibility.Collapsed : Visibility.Visible;
         if (doBt is not null)
             txtAvisoDeBluetooth.Text =
-                "Não foi possível usar o Bluetooth deste computador: " + doBt + ". "
-                + "As conexões entre a placa e o celular continuam simuladas.";
+                Idioma.T("Não foi possível usar o Bluetooth deste computador: {0}. As conexões entre a placa e o celular continuam simuladas.", doBt);
     }
 
     /// <summary>Os endereços que o navegador deste computador alcança.</summary>
@@ -6218,10 +6183,8 @@ public partial class MainWindow : Window
                 Style = (Style)FindResource("BotaoPequeno"),
                 Margin = new Thickness(0, 0, 6, 0),
                 ToolTip = string.IsNullOrEmpty(ipDaPlaca)
-                    ? "Abre no navegador deste computador"
-                    : $"O sketch anuncia {ipDaPlaca}, que é o endereço da placa simulada."
-                      + Environment.NewLine
-                      + $"Do navegador desta máquina, a mesma página abre em {url}.",
+                    ? Idioma.T("Abre no navegador deste computador")
+                    : Idioma.T("O sketch anuncia {0}, que é o endereço da placa simulada.{1}Do navegador desta máquina, a mesma página abre em {2}.", ipDaPlaca, Environment.NewLine, url),
             };
             botao.Click += (_, _) => AbrirNoNavegador(url);
             linksDeRede.Children.Add(botao);
@@ -6230,7 +6193,7 @@ public partial class MainWindow : Window
         if (redeSimulada.PortaDoBroker > 0)
             linksDeRede.Children.Add(new TextBlock
             {
-                Text = $"broker MQTT: localhost:{redeSimulada.PortaDoBroker}",
+                Text = Idioma.T("broker MQTT: localhost:{0}", redeSimulada.PortaDoBroker),
                 Foreground = Cinza,
                 FontSize = 11,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -6257,7 +6220,7 @@ public partial class MainWindow : Window
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url)
             { UseShellExecute = true });
         }
-        catch (Exception ex) { Erro("nao consegui abrir o navegador: " + ex.Message); }
+        catch (Exception ex) { Erro(Idioma.T("nao consegui abrir o navegador: {0}", ex.Message)); }
     }
 
     void AtualizarDispositivosDeBluetooth()
@@ -6271,12 +6234,12 @@ public partial class MainWindow : Window
         if (dispositivoBtEscolhido is null || !dispositivos.Contains(dispositivoBtEscolhido))
             dispositivoBtEscolhido = conectado ?? dispositivos.FirstOrDefault();
 
-        txtBtEscolhido.Text = conectado is not null ? $"conectado em \"{conectado}\""
+        txtBtEscolhido.Text = conectado is not null ? Idioma.T("conectado em \"{0}\"", conectado)
             : dispositivoBtEscolhido is not null ? $"escolhida: \"{dispositivoBtEscolhido}\""
-            : "nenhuma placa com Bluetooth ligado";
+            : Idioma.T("nenhuma placa com Bluetooth ligado");
 
         btDispositivosBt.IsEnabled = dispositivos.Count > 0;
-        btConectarBt.Content = conectado is null ? "Conectar" : "Desconectar";
+        btConectarBt.Content = conectado is null ? Idioma.T("Conectar") : Idioma.T("Desconectar");
     }
 
     // ================= desenho =================
@@ -6294,7 +6257,7 @@ public partial class MainWindow : Window
             if (sono == sonoAvisado.GetValueOrDefault(id)) continue;
             sonoAvisado[id] = sono;
             if (sono is not null)
-                Aviso(NomeCurtoDaPlaca(id).Trim('[', ']') + " em sono profundo: " + sono + ".");
+                Aviso(NomeCurtoDaPlaca(id).Trim('[', ']') + Idioma.T(" em sono profundo: {0}.", sono));
         }
     }
 
@@ -6444,12 +6407,8 @@ public partial class MainWindow : Window
             string nome = NomeCurtoDaPlaca(id).Trim('[', ']');
             string chip = maquina.Perfil?.Processador ?? "chip";
             console.Aviso(assembly
-                ? $"{nome}: este computador está rodando o {chip} a {porcento}% da velocidade real. A lógica e a "
-                  + "contagem de ciclos continuam exatas — o .hex gravado roda no tempo certo na placa —, mas aqui a "
-                  + "tela anda mais devagar que ela."
-                : $"{nome}: este computador não acompanha o {chip} nas contas do sketch — está a {porcento}% da "
-                  + "velocidade real. O millis() e o delay() continuam no tempo certo, mas um laço de conta dá menos "
-                  + "voltas por segundo que na placa, e um tempo medido com micros() em volta de uma conta sai maior.");
+                ? Idioma.T("{0}: este computador está rodando o {1} a {2}% da velocidade real. A lógica e a contagem de ciclos continuam exatas — o .hex gravado roda no tempo certo na placa —, mas aqui a tela anda mais devagar que ela.", nome, chip, porcento)
+                : Idioma.T("{0}: este computador não acompanha o {1} nas contas do sketch — está a {2}% da velocidade real. O millis() e o delay() continuam no tempo certo, mas um laço de conta dá menos voltas por segundo que na placa, e um tempo medido com micros() em volta de uma conta sai maior.", nome, chip, porcento));
             return;
         }
     }
@@ -6473,7 +6432,7 @@ public partial class MainWindow : Window
             if (!estouro.Queimou) naTela.Add(estouro);
 
             var alvo = editor.Atual.Achar(estouro.Peca);
-            string comoChama = alvo is null ? "peça"
+            string comoChama = alvo is null ? Idioma.T("peça")
                 : Catalogo.Obter(alvo.Tipo)?.Nome ?? alvo.Tipo;
 
             if (!estouro.Queimou)
@@ -6491,10 +6450,10 @@ public partial class MainWindow : Window
             queimadosNaRodada[estouro.Peca] = estouro;
 
             var peca = editor.Atual.Achar(estouro.Peca);
-            string nome = peca is null ? "peça"
+            string nome = peca is null ? Idioma.T("peça")
                 : Catalogo.Obter(peca.Tipo)?.Nome ?? peca.Tipo;
 
-            Erro($"💥 {nome} queimou — {estouro.Motivo}");
+            Erro(Idioma.T("💥 {0} queimou — {1}", nome, estouro.Motivo));
             console.Aviso($"{nome}: {estouro.Motivo}");
 
             // Tambem no monitor: a barra de status some no proximo aviso
@@ -6503,7 +6462,7 @@ public partial class MainWindow : Window
             // a pessoa esta olhando, e perder o aviso e pior.
             if (noMonitor)
                 foreach (var (_, m) in bancada.Todas)
-                    lock (m.Trava) m.Serial.Add($"💥 {nome} queimou: {estouro.Motivo}");
+                    lock (m.Trava) m.Serial.Add(Idioma.T("💥 {0} queimou: {1}", nome, estouro.Motivo));
         }
         naTela.AddRange(queimadosNaRodada.Values.Where(q => editor.EstaQueimada(q.Peca)));
         // Desligados nas configuracoes: so a barra e o monitor avisam.
@@ -6581,8 +6540,7 @@ public partial class MainWindow : Window
             // O monitor desta placa num baud diferente do sketch: o texto vira lixo, como na IDE.
             bool errado = BaudErrado(id, maquina, out int doMonitor, out int doSketch);
             if (errado && avisouBaud.Add(id))
-                console.Aviso($"{(varias ? NomeCurtoDaPlaca(id) + " " : "")}o monitor está a {doMonitor} baud e o sketch "
-                              + $"abriu a serial a {doSketch}: o texto sai embaralhado. Escolha {doSketch} no baud do monitor.");
+                console.Aviso(Idioma.T("{0}o monitor está a {1} baud e o sketch abriu a serial a {2}: o texto sai embaralhado. Escolha {2} no baud do monitor.", (varias ? NomeCurtoDaPlaca(id) + " " : ""), doMonitor, doSketch));
             foreach (string linha in novas) painelSerial.Add(etiqueta + (errado ? LinhaEmbaralhada(linha) : linha));
         }
 
@@ -6696,7 +6654,7 @@ public partial class MainWindow : Window
     /// <summary>"ESP32 DevKit V1" -> "ESP32"; "Arduino Uno" -> "Uno".</summary>
     static string ApelidoDaPlaca(PecaNoCircuito peca)
     {
-        string nome = PerfilPlaca.De(peca?.Tipo)?.Nome ?? peca?.Tipo ?? "placa";
+        string nome = PerfilPlaca.De(peca?.Tipo)?.Nome ?? peca?.Tipo ?? Idioma.T("placa");
         return nome.StartsWith("Arduino ", StringComparison.Ordinal)
             ? nome["Arduino ".Length..]
             : nome.Split(' ')[0];
@@ -6708,16 +6666,66 @@ public partial class MainWindow : Window
         if (txtNomeDoCircuito is null) return;
         txtNomeDoCircuito.Text = NomeDoProjeto();
         string autor = AutorDoProjeto();
-        txtAutorDoCircuito.Text = string.IsNullOrWhiteSpace(autor) ? "" : "por " + autor;
+        txtAutorDoCircuito.Text = string.IsNullOrWhiteSpace(autor) ? "" : Idioma.T("por {0}", autor);
+        MostrarNomeEAutor();
     }
+
+    /// <summary>Escrevendo nos campos da aba Descricao por codigo (e nao a pessoa digitando).</summary>
+    bool mostrandoNomeEAutor;
+
+    /// <summary>
+    /// O nome e o autor nos campos da aba Descricao: o que esta escrito no
+    /// circuito, e embaixo, apagada, a dica do que vale sem nada escrito (o nome
+    /// do arquivo e o autor das configuracoes). O campo com o cursor nao e
+    /// tocado -- reescreve-lo levaria o cursor para o comeco a cada tecla.
+    /// </summary>
+    void MostrarNomeEAutor()
+    {
+        if (txtNomeNaDescricao is null || editor?.Atual is null) return;
+        mostrandoNomeEAutor = true;
+        try
+        {
+            string nome = editor.Atual.Nome ?? "", autor = editor.Atual.Autor ?? "";
+            if (!txtNomeNaDescricao.IsKeyboardFocused && txtNomeNaDescricao.Text.Trim() != nome) txtNomeNaDescricao.Text = nome;
+            if (!txtAutorNaDescricao.IsKeyboardFocused && txtAutorNaDescricao.Text.Trim() != autor) txtAutorNaDescricao.Text = autor;
+        }
+        finally { mostrandoNomeEAutor = false; }
+        dicaNomeNaDescricao.Text = txtNomeNaDescricao.Text.Length == 0 ? NomeDoProjeto() : "";
+        dicaAutorNaDescricao.Text = txtAutorNaDescricao.Text.Length == 0 ? AutorPadrao() : "";
+    }
+
+    /// <summary>
+    /// A pessoa mudou o nome ou o autor na aba Descricao: vai para o circuito
+    /// (e dali para o .sktch e para o "name"/"author" do diagram.json), para a
+    /// barra de cima e para a aba do diagram.json. Campo vazio volta ao padrao.
+    /// </summary>
+    void MudouNomeOuAutor(object s, TextChangedEventArgs e)
+    {
+        if (mostrandoNomeEAutor || txtAutorNaDescricao is null || dicaAutorNaDescricao is null || editor?.Atual is null) return;
+        string nome = txtNomeNaDescricao.Text.Trim(), autor = txtAutorNaDescricao.Text.Trim();
+        editor.Atual.Nome = nome.Length > 0 ? nome : null;
+        editor.Atual.Autor = autor.Length > 0 ? autor : null;
+        AtualizarNomeNaBarra();
+        RefletirDiagrama();
+    }
+
+    /// <summary>Para o teste: escreve o nome e o autor nos campos da aba Descricao, como a pessoa.</summary>
+    internal void TesteEscreverNomeEAutor(string nome, string autor)
+    {
+        txtNomeNaDescricao.Text = nome;
+        txtAutorNaDescricao.Text = autor;
+    }
+
+    /// <summary>Para o teste: os campos da aba Descricao e as dicas embaixo deles.</summary>
+    internal (string Nome, string DicaDoNome, string Autor, string DicaDoAutor) TesteCamposDaDescricao
+        => (txtNomeNaDescricao.Text, dicaNomeNaDescricao.Text, txtAutorNaDescricao.Text, dicaAutorNaDescricao.Text);
 
     void AtualizarDica()
     {
         AtualizarNomeNaBarra();
         if (editor.QuantidadeSelecionada > 1)
         {
-            txtDica.Text = $"{editor.QuantidadeSelecionada} peças selecionadas · "
-                           + "arraste para mover todas · Del exclui";
+            txtDica.Text = Idioma.T("{0} peças selecionadas · arraste para mover todas · Del exclui", editor.QuantidadeSelecionada);
             return;
         }
 
@@ -6728,9 +6736,8 @@ public partial class MainWindow : Window
         if (fios > 0)
         {
             txtDica.Text = fios == 1
-                ? $"fio selecionado · Del apaga · {editor.Atual.Fios.Count} fios no total"
-                : $"{fios} fios selecionados · Del apaga todos · "
-                  + $"{editor.Atual.Fios.Count} fios no total";
+                ? Idioma.T("fio selecionado · Del apaga · {0} fios no total", editor.Atual.Fios.Count)
+                : Idioma.T("{0} fios selecionados · Del apaga todos · {1} fios no total", fios, editor.Atual.Fios.Count);
             return;
         }
 
@@ -6739,8 +6746,8 @@ public partial class MainWindow : Window
         txtDica.Text = def is null
             ? ""
             : peca.Tipo == "resistor"
-                ? $"Resistor {peca.Ohms:0} Ω · R gira · Del exclui"
-                : $"{def.Nome} · {def.Pinos.Count} pinos · R gira · Del exclui";
+                ? Idioma.T("Resistor {0:0} Ω · R gira · Del exclui", peca.Ohms)
+                : Idioma.T("{0} · {1} pinos · R gira · Del exclui", def.Nome, def.Pinos.Count);
     }
 
     // ================= status =================

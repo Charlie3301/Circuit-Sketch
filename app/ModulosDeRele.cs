@@ -162,7 +162,7 @@ public partial class EditorCircuito
     IEnumerable<Estouro> AvisosDoModuloDeRele(PecaNoCircuito peca, Energia conta)
     {
         double vcc = conta.TensaoDoPino(peca.Id, "VCC") - conta.TensaoDoPino(peca.Id, "GND");
-        string nome = $"módulo de relé de {ModulosDeRele.Canais(peca.Tipo)} canal(is)";
+        string nome = Idioma.T("módulo de relé de {0} canal(is)", ModulosDeRele.Canais(peca.Tipo));
         if (vcc > ModulosDeRele.TensaoQueQueima)
         {
             yield return new Estouro(peca.Id, Idioma.T("o {0} recebeu {1:0.#} V no VCC: a bobina dos relés é de 5 V e queimou.", nome, vcc));

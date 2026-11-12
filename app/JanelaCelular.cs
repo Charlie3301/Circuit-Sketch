@@ -43,7 +43,7 @@ public sealed class JanelaCelular : Window
         this.rede = rede;
         try { Owner = dono; } catch (InvalidOperationException) { }
 
-        Title = "Celular (Bluetooth da ESP32)";
+        Title = Idioma.T("Celular (Bluetooth da ESP32)");
         Width = 1280;
         Height = 720;
         MinWidth = 900;
@@ -62,14 +62,14 @@ public sealed class JanelaCelular : Window
         var menu = new StackPanel { Background = Superficie, Margin = new Thickness(0) };
         menu.Children.Add(new TextBlock
         {
-            Text = "Bluetooth", FontSize = 22, FontWeight = FontWeights.SemiBold, Foreground = TextoForte,
+            Text = Idioma.T("Bluetooth"), FontSize = 22, FontWeight = FontWeights.SemiBold, Foreground = TextoForte,
             Margin = new Thickness(22, 22, 12, 4),
         });
         menu.Children.Add(new TextBlock
         {
-            Text = "o celular da aula", FontSize = 12, Foreground = TextoFraco, Margin = new Thickness(22, 0, 12, 20),
+            Text = Idioma.T("o celular da aula"), FontSize = 12, Foreground = TextoFraco, Margin = new Thickness(22, 0, 12, 20),
         });
-        foreach (var (texto, pagina) in new[] { ("Dispositivos", paginaDispositivos), ("Terminal (clássico)", paginaTerminal),
+        foreach (var (texto, pagina) in new[] { (Idioma.T("Dispositivos"), paginaDispositivos), (Idioma.T("Terminal (clássico)"), paginaTerminal),
                                                 ("BLE", paginaBle) })
         {
             var botao = BotaoDoMenu(texto);
@@ -299,9 +299,9 @@ public sealed class JanelaCelular : Window
         var pilha = new DockPanel();
         var topo = new StackPanel();
         DockPanel.SetDock(topo, Dock.Top);
-        topo.Children.Add(Titulo("Dispositivos"));
-        topo.Children.Add(Subtitulo("As placas que ligaram o Bluetooth na simulação. O clássico é o do SerialBT.begin(); "
-                                    + "o BLE aparece quando a placa começa a anunciar (BLEDevice::startAdvertising())."));
+        topo.Children.Add(Titulo(Idioma.T("Dispositivos")));
+        topo.Children.Add(Subtitulo(Idioma.T("As placas que ligaram o Bluetooth na simulação. O clássico é o do SerialBT.begin(); "
+                                    + "o BLE aparece quando a placa começa a anunciar (BLEDevice::startAdvertising()).")));
         pilha.Children.Add(topo);
 
         var colunas = new Grid();
@@ -310,7 +310,7 @@ public sealed class JanelaCelular : Window
         colunas.ColumnDefinitions.Add(new ColumnDefinition());
 
         var esquerda = new DockPanel();
-        var titulo1 = new TextBlock { Text = "BLUETOOTH CLÁSSICO", FontSize = 12, FontWeight = FontWeights.SemiBold,
+        var titulo1 = new TextBlock { Text = Idioma.T("BLUETOOTH CLÁSSICO"), FontSize = 12, FontWeight = FontWeights.SemiBold,
                                       Foreground = Destaque, Margin = new Thickness(4, 0, 0, 10) };
         DockPanel.SetDock(titulo1, Dock.Top);
         esquerda.Children.Add(titulo1);
@@ -318,7 +318,7 @@ public sealed class JanelaCelular : Window
         colunas.Children.Add(esquerda);
 
         var direita = new DockPanel();
-        var titulo2 = new TextBlock { Text = "BLE (ANUNCIANDO)", FontSize = 12, FontWeight = FontWeights.SemiBold,
+        var titulo2 = new TextBlock { Text = Idioma.T("BLE (ANUNCIANDO)"), FontSize = 12, FontWeight = FontWeights.SemiBold,
                                       Foreground = Destaque, Margin = new Thickness(4, 0, 0, 10) };
         DockPanel.SetDock(titulo2, Dock.Top);
         direita.Children.Add(titulo2);
@@ -345,7 +345,7 @@ public sealed class JanelaCelular : Window
         {
             bool conectado = rede.CelularConectadoEm == nome;
             var linha = new DockPanel();
-            var conectar = Botao(conectado ? "Abrir o terminal" : "Conectar", principal: !conectado);
+            var conectar = Botao(conectado ? Idioma.T("Abrir o terminal") : Idioma.T("Conectar"), principal: !conectado);
             conectar.Click += (_, _) =>
             {
                 if (rede.CelularConectadoEm != nome) rede.ConectarCelular(nome);
@@ -358,7 +358,7 @@ public sealed class JanelaCelular : Window
             textos.Children.Add(new TextBlock { Text = nome, FontSize = 16, Foreground = TextoForte });
             textos.Children.Add(new TextBlock
             {
-                Text = conectado ? "conectado (porta serial, SPP)" : "porta serial (SPP)",
+                Text = conectado ? Idioma.T("conectado (porta serial, SPP)") : Idioma.T("porta serial (SPP)"),
                 FontSize = 12, Foreground = conectado ? Verde : TextoFraco,
             });
             linha.Children.Add(textos);
@@ -367,7 +367,7 @@ public sealed class JanelaCelular : Window
         if (classicos.Count == 0)
             listaClassico.Children.Add(new TextBlock
             {
-                Text = "nenhuma placa com o SerialBT ligado", Foreground = TextoFraco, FontSize = 13,
+                Text = Idioma.T("nenhuma placa com o SerialBT ligado"), Foreground = TextoFraco, FontSize = 13,
                 Margin = new Thickness(4, 0, 0, 0),
             });
 
@@ -375,7 +375,7 @@ public sealed class JanelaCelular : Window
         foreach (var radio in bles)
         {
             var linha = new DockPanel();
-            var conectar = Botao("Conectar", principal: true);
+            var conectar = Botao(Idioma.T("Conectar"), principal: true);
             conectar.Click += (_, _) =>
             {
                 if (rede.ConectarBleDoCelular(radio))
@@ -396,7 +396,7 @@ public sealed class JanelaCelular : Window
             foreach (string uuid in radio.UuidsAnunciados)
                 textos.Children.Add(new TextBlock
                 {
-                    Text = "serviço " + (Ble.NomeDoUuid(uuid) is { } conhecido ? $"{conhecido} ({uuid})" : uuid),
+                    Text = Idioma.T("serviço {0}", (Ble.NomeDoUuid(uuid) is { } conhecido ? $"{conhecido} ({uuid})" : uuid)),
                     FontSize = 12, Foreground = TextoFraco,
                 });
             linha.Children.Add(textos);
@@ -406,9 +406,9 @@ public sealed class JanelaCelular : Window
         {
             // Conectada, a placa para de anunciar: ela aparece aqui, e nao na lista.
             var linha = new DockPanel();
-            var sair = Botao("Desconectar");
+            var sair = Botao(Idioma.T("Desconectar"));
             sair.Click += (_, _) => { rede.DesconectarBleDoCelular(); AtualizarBle(); };
-            var abrir = Botao("Abrir", principal: true);
+            var abrir = Botao(Idioma.T("Abrir"), principal: true);
             abrir.Click += (_, _) => { Mostrar(paginaBle); AtualizarBle(); };
             DockPanel.SetDock(sair, Dock.Right);
             DockPanel.SetDock(abrir, Dock.Right);
@@ -418,7 +418,7 @@ public sealed class JanelaCelular : Window
             textos.Children.Add(new TextBlock { Text = ligado.Nome, FontSize = 16, Foreground = TextoForte });
             textos.Children.Add(new TextBlock
             {
-                Text = "conectado -- enquanto isso, a placa não anuncia", FontSize = 12, Foreground = Verde,
+                Text = Idioma.T("conectado -- enquanto isso, a placa não anuncia"), FontSize = 12, Foreground = Verde,
             });
             linha.Children.Add(textos);
             listaBle.Children.Insert(0, Cartao(linha));
@@ -426,7 +426,7 @@ public sealed class JanelaCelular : Window
         if (bles.Count == 0 && rede.BleDoCelular is null)
             listaBle.Children.Add(new TextBlock
             {
-                Text = "nenhuma placa anunciando", Foreground = TextoFraco, FontSize = 13, Margin = new Thickness(4, 0, 0, 0),
+                Text = Idioma.T("nenhuma placa anunciando"), Foreground = TextoFraco, FontSize = 13, Margin = new Thickness(4, 0, 0, 0),
             });
     }
 
@@ -437,9 +437,9 @@ public sealed class JanelaCelular : Window
     readonly TextBlock terminalConectado = new() { FontSize = 13, Foreground = TextoFraco };
     readonly StackPanel linhasDoTerminal = new();
     readonly ScrollViewer rolagemDoTerminal = new() { VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
-    readonly TextBox entradaDoTerminal = Campo("Texto para a placa (Enter manda)");
+    readonly TextBox entradaDoTerminal = Campo(Idioma.T("Texto para a placa (Enter manda)"));
     int fimDeLinha;
-    readonly Button desconectarClassico = Botao("Desconectar");
+    readonly Button desconectarClassico = Botao(Idioma.T("Desconectar"));
     readonly string[] macros = ["", "", "", "", ""];
     readonly StringBuilder pedacoClassico = new();
     DateTime ultimoPedaco;
@@ -466,7 +466,7 @@ public sealed class JanelaCelular : Window
             int qual = i;
             var m = Botao($"M{i + 1}");
             m.Margin = new Thickness(0, 0, 8, 0);
-            m.ToolTip = "Toque: manda o texto guardado. Botão direito: guardar outro texto.";
+            m.ToolTip = Idioma.T("Toque: manda o texto guardado. Botão direito: guardar outro texto.");
             m.Click += (_, _) =>
             {
                 if (string.IsNullOrEmpty(macros[qual])) DefinirMacro(qual, m);
@@ -479,12 +479,12 @@ public sealed class JanelaCelular : Window
 
         var linhaDeEnvio = new DockPanel { Margin = new Thickness(0, 12, 0, 0) };
         DockPanel.SetDock(linhaDeEnvio, Dock.Bottom);
-        var enviar = Botao("Enviar", principal: true);
+        var enviar = Botao(Idioma.T("Enviar"), principal: true);
         enviar.Click += (_, _) => EnviarDoCampo();
         DockPanel.SetDock(enviar, Dock.Right);
         linhaDeEnvio.Children.Add(enviar);
-        var fim = Ciclo(["fim: CR+LF", "fim: LF", "fim: CR", "fim: nenhum"], i => fimDeLinha = i);
-        fim.ToolTip = "O que vai no fim de cada envio (toque para trocar)";
+        var fim = Ciclo([Idioma.T("fim: CR+LF"), Idioma.T("fim: LF"), Idioma.T("fim: CR"), Idioma.T("fim: nenhum")], i => fimDeLinha = i);
+        fim.ToolTip = Idioma.T("O que vai no fim de cada envio (toque para trocar)");
         DockPanel.SetDock(fim, Dock.Right);
         linhaDeEnvio.Children.Add(fim);
         entradaDoTerminal.KeyDown += (_, ev) =>
@@ -507,7 +507,7 @@ public sealed class JanelaCelular : Window
 
     void DefinirMacro(int qual, Button botao)
     {
-        string texto = Dialogos.Perguntar(this, $"Texto da macro M{qual + 1}", macros[qual]);
+        string texto = Dialogos.Perguntar(this, Idioma.T("Texto da macro M{0}", qual + 1), macros[qual]);
         if (texto is null) return;
         macros[qual] = texto;
         TrocarTexto(botao, string.IsNullOrEmpty(texto) ? $"M{qual + 1}" : texto.Length > 12 ? texto[..12] + "…" : texto);
@@ -525,7 +525,7 @@ public sealed class JanelaCelular : Window
     {
         if (rede.CelularConectadoEm is null)
         {
-            LinhaNoTerminal("não está conectado: escolha uma placa em Dispositivos", Amarelo);
+            LinhaNoTerminal(Idioma.T("não está conectado: escolha uma placa em Dispositivos"), Amarelo);
             return false;
         }
         rede.EnviarDoCelular(texto + FimDeLinha);
@@ -578,14 +578,14 @@ public sealed class JanelaCelular : Window
     {
         string agora = rede.CelularConectadoEm;
         terminalConectado.Text = agora is null
-            ? "desconectado -- escolha uma placa em Dispositivos"
-            : $"conectado em \"{agora}\" pelo Bluetooth clássico";
+            ? Idioma.T("desconectado -- escolha uma placa em Dispositivos")
+            : Idioma.T("conectado em \"{0}\" pelo Bluetooth clássico", agora);
         terminalConectado.Foreground = agora is null ? TextoFraco : Verde;
         desconectarClassico.Visibility = agora is null ? Visibility.Collapsed : Visibility.Visible;
         if (agora != conectadoAntes)
         {
-            if (agora is not null) LinhaNoTerminal($"conectado em \"{agora}\"", Destaque);
-            else if (conectadoAntes is not null) LinhaNoTerminal("conexão encerrada", Amarelo);
+            if (agora is not null) LinhaNoTerminal(Idioma.T("conectado em \"{0}\"", agora), Destaque);
+            else if (conectadoAntes is not null) LinhaNoTerminal(Idioma.T("conexão encerrada"), Amarelo);
             conectadoAntes = agora;
         }
     }
@@ -595,14 +595,14 @@ public sealed class JanelaCelular : Window
     // =====================================================================
 
     readonly TextBlock bleTitulo = Titulo("BLE"), bleDetalhe = new() { FontSize = 13, Foreground = TextoFraco };
-    readonly Button bleDesconectar = Botao("Desconectar");
-    readonly ToggleButton bleModoUart = Chave("Conversa (UART)");
+    readonly Button bleDesconectar = Botao(Idioma.T("Desconectar"));
+    readonly ToggleButton bleModoUart = Chave(Idioma.T("Conversa (UART)"));
     readonly StackPanel bleServicos = new();
     readonly ScrollViewer bleRolagem = new() { VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
     readonly DockPanel bleUart = new();
     readonly StackPanel uartLinhas = new();
     readonly ScrollViewer uartRolagem = new() { VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
-    readonly TextBox uartEntrada = Campo("Texto para a placa, pelo UART (Enter manda)");
+    readonly TextBox uartEntrada = Campo(Idioma.T("Texto para a placa, pelo UART (Enter manda)"));
     readonly Dictionary<CaracteristicaBle, TextBlock> valoresMostrados = [];
     readonly Dictionary<CaracteristicaBle, ToggleButton> chavesMostradas = [];
     RadioBle bleMostrado;
@@ -632,7 +632,7 @@ public sealed class JanelaCelular : Window
         // O UART: a conversa pelo servico Nordic UART.
         var envio = new DockPanel { Margin = new Thickness(0, 12, 0, 0) };
         DockPanel.SetDock(envio, Dock.Bottom);
-        var mandar = Botao("Enviar", principal: true);
+        var mandar = Botao(Idioma.T("Enviar"), principal: true);
         mandar.Click += (_, _) => EnviarUart();
         DockPanel.SetDock(mandar, Dock.Right);
         envio.Children.Add(mandar);
@@ -708,8 +708,8 @@ public sealed class JanelaCelular : Window
 
         if (radio is null)
         {
-            bleTitulo.Text = "BLE";
-            bleDetalhe.Text = "desconectado -- escolha uma placa que esteja anunciando, em Dispositivos";
+            bleTitulo.Text = Idioma.T("BLE");
+            bleDetalhe.Text = Idioma.T("desconectado -- escolha uma placa que esteja anunciando, em Dispositivos");
             bleDetalhe.Foreground = TextoFraco;
             if (bleMostrado is not null || servicosMostrados != 0)
             {
@@ -724,8 +724,7 @@ public sealed class JanelaCelular : Window
         }
 
         bleTitulo.Text = radio.Nome;
-        bleDetalhe.Text = $"{radio.Endereco.ToUpperInvariant()}   ·   {radio.Rssi} dBm   ·   conectado "
-                          + $"({(radio.NimBle ? "NimBLE" : "Bluedroid")} na placa)";
+        bleDetalhe.Text = Idioma.T("{0}   ·   {1} dBm   ·   conectado ({2} na placa)", radio.Endereco.ToUpperInvariant(), radio.Rssi, (radio.NimBle ? Idioma.T("NimBLE") : Idioma.T("Bluedroid")));
         bleDetalhe.Foreground = Verde;
 
         int quantos = radio.Visiveis().Count();
@@ -754,7 +753,7 @@ public sealed class JanelaCelular : Window
             var dentro = new StackPanel();
             dentro.Children.Add(new TextBlock
             {
-                Text = Ble.NomeDoUuid(servico.Uuid) ?? "Serviço", FontSize = 17, FontWeight = FontWeights.SemiBold,
+                Text = Ble.NomeDoUuid(servico.Uuid) ?? Idioma.T("Serviço"), FontSize = 17, FontWeight = FontWeights.SemiBold,
                 Foreground = TextoForte,
             });
             dentro.Children.Add(new TextBlock { Text = servico.Uuid, FontSize = 12, Foreground = TextoFraco,
@@ -767,7 +766,7 @@ public sealed class JanelaCelular : Window
         if (bleServicos.Children.Count == 0)
             bleServicos.Children.Add(new TextBlock
             {
-                Text = "a placa não iniciou nenhum serviço (pService->start())", Foreground = TextoFraco, FontSize = 13,
+                Text = Idioma.T("a placa não iniciou nenhum serviço (pService->start())"), Foreground = TextoFraco, FontSize = 13,
             });
     }
 
@@ -788,13 +787,13 @@ public sealed class JanelaCelular : Window
         var nome = new StackPanel();
         nome.Children.Add(new TextBlock
         {
-            Text = car.NomeConhecido ?? car.Descricao ?? "Característica", FontSize = 15, Foreground = TextoForte,
+            Text = car.NomeConhecido ?? car.Descricao ?? Idioma.T("Característica"), FontSize = 15, Foreground = TextoForte,
         });
         nome.Children.Add(new TextBlock { Text = car.Uuid, FontSize = 12, Foreground = TextoFraco,
                                           FontFamily = new FontFamily("Consolas") });
         var etiquetas = new WrapPanel { Margin = new Thickness(0, 4, 0, 0) };
-        foreach (var (tem, texto) in new[] { (car.Le, "LER"), (car.Escreve, "ESCREVER"), (car.EscreveSemResposta, "ESCREVER SEM RESPOSTA"),
-                                             (car.Notifica, "NOTIFICAR"), (car.Indica, "INDICAR") })
+        foreach (var (tem, texto) in new[] { (car.Le, Idioma.T("LER")), (car.Escreve, Idioma.T("ESCREVER")), (car.EscreveSemResposta, Idioma.T("ESCREVER SEM RESPOSTA")),
+                                             (car.Notifica, Idioma.T("NOTIFICAR")), (car.Indica, Idioma.T("INDICAR")) })
             if (tem)
                 etiquetas.Children.Add(new Border
                 {
@@ -808,7 +807,7 @@ public sealed class JanelaCelular : Window
 
         var valor = new TextBlock
         {
-            Text = "valor: " + (car.Le ? "(toque em Ler)" : "—"), FontSize = 13, Foreground = TextoForte,
+            Text = Idioma.T("valor: {0}", (car.Le ? Idioma.T("(toque em Ler)") : "—")), FontSize = 13, Foreground = TextoForte,
             FontFamily = new FontFamily("Consolas"), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0),
         };
         valoresMostrados[car] = valor;
@@ -816,17 +815,17 @@ public sealed class JanelaCelular : Window
 
         if (car.Le)
         {
-            var ler = Botao("Ler");
+            var ler = Botao(Idioma.T("Ler"));
             ler.Click += (_, _) =>
             {
                 var lido = rede.LerDoCelular(car);
-                valor.Text = "valor: " + (lido is null ? "(a placa recusou a leitura)" : Ble.Mostrar(lido));
+                valor.Text = Idioma.T("valor: {0}", (lido is null ? Idioma.T("(a placa recusou a leitura)") : Ble.Mostrar(lido)));
             };
             botoes.Children.Add(ler);
         }
         if (car.Notifica || car.Indica)
         {
-            var assinar = Chave(car.Notifica ? "Notificações" : "Indicações", car.Assinada);
+            var assinar = Chave(car.Notifica ? Idioma.T("Notificações") : Idioma.T("Indicações"), car.Assinada);
             assinar.Checked += (_, _) =>
             {
                 if (!car.Assinada && !rede.AssinarDoCelular(car, true)) assinar.IsChecked = false;
@@ -841,11 +840,11 @@ public sealed class JanelaCelular : Window
         if (car.Escreve || car.EscreveSemResposta)
         {
             var linhaDeEscrita = new DockPanel { Margin = new Thickness(0, 8, 0, 0) };
-            var enviar = Botao("Escrever", principal: true);
+            var enviar = Botao(Idioma.T("Escrever"), principal: true);
             bool emHexa = false;
-            var modo = Ciclo(["Texto", "Hexa"], i => emHexa = i == 1);
-            modo.ToolTip = "Toque para trocar entre texto e bytes em hexa";
-            var campo = Campo("Texto, ou bytes em hexa (01 FF 3A) com Hexa");
+            var modo = Ciclo([Idioma.T("Texto"), Idioma.T("Hexa")], i => emHexa = i == 1);
+            modo.ToolTip = Idioma.T("Toque para trocar entre texto e bytes em hexa");
+            var campo = Campo(Idioma.T("Texto, ou bytes em hexa (01 FF 3A) com Hexa"));
             enviar.Click += (_, _) =>
             {
                 byte[] dados;
@@ -857,8 +856,8 @@ public sealed class JanelaCelular : Window
                 }
                 else dados = Encoding.UTF8.GetBytes(campo.Text);
                 valor.Text = rede.EscreverDoCelular(car, dados)
-                    ? "escrito: " + Ble.Mostrar(dados)
-                    : "a placa recusou a escrita";
+                    ? Idioma.T("escrito: ") + Ble.Mostrar(dados)
+                    : Idioma.T("a placa recusou a escrita");
             };
             DockPanel.SetDock(enviar, Dock.Right);
             DockPanel.SetDock(modo, Dock.Right);
@@ -875,7 +874,7 @@ public sealed class JanelaCelular : Window
         Dispatcher.BeginInvoke(() =>
         {
             if (valoresMostrados.TryGetValue(car, out var valor))
-                valor.Text = $"notificação {DateTime.Now:HH:mm:ss}: {Ble.Mostrar(dados)}";
+                valor.Text = Idioma.T("notificação {0:HH:mm:ss}: {1}", DateTime.Now, Ble.Mostrar(dados));
             if (car.Uuid == Ble.UartTx)
                 LinhaDoUart(TextoArduino.Corrigir(TextoArduino.DeBytes(dados)).TrimEnd('\r', '\n'), TextoForte);
         });
@@ -885,7 +884,7 @@ public sealed class JanelaCelular : Window
     {
         Dispatcher.BeginInvoke(() =>
         {
-            LinhaDoUart("a conexão BLE caiu (a placa desconectou ou reiniciou)", Amarelo);
+            LinhaDoUart(Idioma.T("a conexão BLE caiu (a placa desconectou ou reiniciou)"), Amarelo);
             AtualizarBle();
         });
     }
