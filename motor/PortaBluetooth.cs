@@ -212,7 +212,7 @@ public sealed class ServicoBluetoothDoPc
     {
         if (!OperatingSystem.IsWindows())
         {
-            Motivo = "o Bluetooth do computador só é usado no Windows";
+            Motivo = Idioma.T("o Bluetooth do computador só é usado no Windows");
             return null;
         }
 
@@ -229,7 +229,7 @@ public sealed class ServicoBluetoothDoPc
             {
                 int erro = Marshal.GetLastPInvokeError();
                 socket.Close();
-                Motivo = $"o Windows não aceitou o serviço de porta serial no Bluetooth (erro {erro})";
+                Motivo = Idioma.T("o Windows não aceitou o serviço de porta serial no Bluetooth (erro {0})", erro);
                 return null;
             }
 
@@ -244,11 +244,11 @@ public sealed class ServicoBluetoothDoPc
             Motivo = e.SocketErrorCode switch
             {
                 SocketError.NetworkDown =>
-                    "o Bluetooth do computador está desligado (ligue em Configurações do Windows > Bluetooth e rode de novo)",
+                    Idioma.T("o Bluetooth do computador está desligado (ligue em Configurações do Windows > Bluetooth e rode de novo)"),
                 SocketError.AddressFamilyNotSupported or SocketError.ProtocolNotSupported
                     or SocketError.SocketNotSupported or SocketError.ProtocolFamilyNotSupported =>
-                    "este computador não tem Bluetooth",
-                _ => "o Windows recusou o Bluetooth: " + e.Message,
+                    Idioma.T("este computador não tem Bluetooth"),
+                _ => Idioma.T("o Windows recusou o Bluetooth: {0}", e.Message),
             };
             return null;
         }
@@ -257,7 +257,7 @@ public sealed class ServicoBluetoothDoPc
                                       or EntryPointNotFoundException)
         {
             socket?.Close();
-            Motivo = "o Bluetooth do computador não pode ser usado: " + e.Message;
+            Motivo = Idioma.T("o Bluetooth do computador não pode ser usado: {0}", e.Message);
             return null;
         }
     }
@@ -272,7 +272,7 @@ public sealed class ServicoBluetoothDoPc
 
             lock (trava) conexoes.Add(cliente);
             aparelho.Avisar(DispositivoBt.EventoClienteAbriu, "celular");
-            aparelho.AnotarDoRadio($"um celular conectou pelo Bluetooth do computador em \"{Nome}\"");
+            aparelho.AnotarDoRadio(Idioma.T("um celular conectou pelo Bluetooth do computador em \"{0}\"", Nome));
 
             new Thread(() => Atender(cliente)) { IsBackground = true, Name = "bluetooth do pc cliente" }.Start();
         }
@@ -289,8 +289,8 @@ public sealed class ServicoBluetoothDoPc
                 if (quantos <= 0) break;
                 aparelho.Entrada.Adicionar(balde[..quantos]);
                 aparelho.Avisar(DispositivoBt.EventoDados, "celular");
-                aparelho.AnotarDoRadio("celular → " + TextoArduino.Corrigir(
-                    TextoArduino.DeBytes(balde[..quantos]).TrimEnd('\r', '\n')));
+                aparelho.AnotarDoRadio(Idioma.T("celular → {0}", TextoArduino.Corrigir(
+                    TextoArduino.DeBytes(balde[..quantos]).TrimEnd('\r', '\n'))));
             }
         }
         catch (SocketException) { }
@@ -303,7 +303,7 @@ public sealed class ServicoBluetoothDoPc
             if (saiu && !fechado)
             {
                 aparelho.Avisar(DispositivoBt.EventoFechou, "celular");
-                aparelho.AnotarDoRadio("o celular desconectou do Bluetooth do computador");
+                aparelho.AnotarDoRadio(Idioma.T("o celular desconectou do Bluetooth do computador"));
             }
         }
     }
@@ -442,7 +442,7 @@ public sealed class ServicoBluetoothDoPc
                     dwSize = Marshal.SizeOf<WSAQUERYSET>(),
                     lpszServiceInstanceName = nome,
                     lpServiceClassId = guid,
-                    lpszComment = "porta serial de uma placa do CircuitSketch",
+                    lpszComment = Idioma.T("porta serial de uma placa do CircuitSketch"),
                     dwNameSpace = NS_BTH,
                     dwNumberOfCsAddrs = 1,
                     lpcsaBuffer = csaddr,

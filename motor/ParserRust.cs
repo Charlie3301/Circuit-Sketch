@@ -48,7 +48,7 @@ public class ParserRust(List<Token> tokens)
 
     Token Exigir(string t)
     {
-        if (!Eh(t)) throw new ErroDeSintaxe($"esperava '{t}' e veio '{Atual.Texto}'", Linha);
+        if (!Eh(t)) throw new ErroDeSintaxe(Idioma.T("esperava '{0}' e veio '{1}'", t, Atual.Texto), Linha);
         return Comer();
     }
 
@@ -86,7 +86,7 @@ public class ParserRust(List<Token> tokens)
 
             if (Aceitar(";")) continue;
 
-            throw new ErroDeSintaxe($"não esperava '{Atual.Texto}' no topo do arquivo", Linha);
+            throw new ErroDeSintaxe(Idioma.T("não esperava '{0}' no topo do arquivo", Atual.Texto), Linha);
         }
 
         return Montar(globais, funcoes);
@@ -787,7 +787,7 @@ public class ParserRust(List<Token> tokens)
             return alvo;
         }
 
-        throw new ErroDeSintaxe($"não esperava '{t.Texto}' numa expressão", linha);
+        throw new ErroDeSintaxe(Idioma.T("não esperava '{0}' numa expressão", t.Texto), linha);
     }
 
     /// <summary>

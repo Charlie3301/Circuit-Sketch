@@ -52,14 +52,13 @@ public sealed unsafe partial class ModuloNativo
                 lock (barramentos) bus = host is >= 1 and <= 3 ? barramentos[host] : null;
                 if (sd is null)
                 {
-                    Maquina.Avisar($"cartao SD: nenhum modulo microSD tem o CS no GPIO {cs}.");
+                    Maquina.Avisar(Idioma.T("cartao SD: nenhum modulo microSD tem o CS no GPIO {0}.", cs));
                     return 0x107;   // ESP_ERR_TIMEOUT: o cartao nao respondeu
                 }
                 if (bus is not null && ((sd.Mosi >= 0 && sd.Mosi != bus.Mosi) || (sd.Sck >= 0 && sd.Sck != bus.Sclk)
                                         || (sd.Miso >= 0 && sd.Miso != bus.Miso)))
                 {
-                    Maquina.Avisar($"cartao SD: o modulo no CS {cs} nao esta ligado no MOSI {bus.Mosi}, MISO {bus.Miso} "
-                                   + $"e SCK {bus.Sclk} que o codigo usa.");
+                    Maquina.Avisar(Idioma.T("cartao SD: o modulo no CS {0} nao esta ligado no MOSI {1}, MISO {2} e SCK {3} que o codigo usa.", cs, bus.Mosi, bus.Miso, bus.Sclk));
                     return 0x107;
                 }
             }

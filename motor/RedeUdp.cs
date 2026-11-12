@@ -83,8 +83,8 @@ public sealed partial class Rede
         AbrirNoComputador(nova);
         lock (trava) portasUdp.Add(nova);
         Anotar(dona, "udp", nova.PortaNoComputador > 0
-            ? $"abriu a porta UDP {porta} (no computador: 127.0.0.1:{nova.PortaNoComputador})"
-            : $"abriu a porta UDP {porta}");
+            ? Idioma.T("abriu a porta UDP {0} (no computador: 127.0.0.1:{1})", porta, nova.PortaNoComputador)
+            : Idioma.T("abriu a porta UDP {0}", porta));
         return nova;
     }
 
@@ -160,7 +160,7 @@ public sealed partial class Rede
         }
         if (!NaRede(origem) && !Wifi(origem).ModoAp)
         {
-            Anotar(origem, "aviso", $"UDP para {host}:{porta}: a placa não está no WiFi");
+            Anotar(origem, "aviso", Idioma.T("UDP para {0}:{1}: a placa não está no WiFi", host, porta));
             return false;
         }
         string ipDeQuem = Wifi(origem).Ip;
@@ -202,7 +202,7 @@ public sealed partial class Rede
 
         if (!UsarInternet)
         {
-            Anotar(origem, "udp", $"{host}:{porta}: sem internet (menu ⋮ > Rede usa a internet do computador)");
+            Anotar(origem, "udp", Idioma.T("{0}:{1}: sem internet (menu ⋮ > Rede usa a internet do computador)", host, porta));
             return false;
         }
         try

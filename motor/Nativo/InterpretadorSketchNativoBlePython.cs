@@ -138,8 +138,7 @@ public partial class Interpretador
             string id = maq.Perfil?.Id ?? "";
             if (!id.StartsWith("esp32", StringComparison.Ordinal) || ModuloNativo.Chip(id) == "esp32s2")
             {
-                maq.Avisar($"bluetooth.BLE().active(True): a {maq.Perfil?.Nome ?? id} nao tem Bluetooth -- no MicroPython "
-                           + "dela o modulo bluetooth nem existe.");
+                maq.Avisar(Idioma.T("bluetooth.BLE().active(True): a {0} nao tem Bluetooth -- no MicroPython dela o modulo bluetooth nem existe.", maq.Perfil?.Nome ?? id));
                 return Valor.DeTexto("");
             }
             if (!LigarRadio("ble", 0)) return Valor.DeTexto("");

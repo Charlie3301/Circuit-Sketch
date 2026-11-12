@@ -60,8 +60,7 @@ public static class CompiladorCSharp
         using var ms = new MemoryStream();
         var r2 = comp.Emit(ms);
         if (!r2.Success)
-            throw new ErroDeExecucao("a API das placas para o C# nao compilou: "
-                + string.Join(" | ", r2.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).Take(5)), 0);
+            throw new ErroDeExecucao(Idioma.T("a API das placas para o C# nao compilou: {0}", string.Join(" | ", r2.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).Take(5))), 0);
         byte[] imagem = ms.ToArray();
         return (imagem, MetadataReference.CreateFromImage(imagem));
     });
@@ -139,7 +138,7 @@ public static class CompiladorCSharp
                      .ThenBy(e => e.Location.GetLineSpan().StartLinePosition.Line).First();
         var span = d.Location.GetLineSpan();
         int linha = span.StartLinePosition.Line + 1;
-        string mais = erros.Count > 1 ? $" (e mais {erros.Count - 1} erro{(erros.Count > 2 ? "s" : "")})" : "";
+        string mais = erros.Count > 1 ? Idioma.T(" (e mais {0} erro{1})", erros.Count - 1, (erros.Count > 2 ? "s" : "")) : "";
         string texto = $"{d.Id}: {d.GetMessage(System.Globalization.CultureInfo.InvariantCulture)}{mais}";
         string arquivo = span.Path ?? "Program.cs";
         if (arquivo == "Program.cs" || !d.Location.IsInSource) return new ErroDeSintaxe(texto, d.Location.IsInSource ? linha : 0);

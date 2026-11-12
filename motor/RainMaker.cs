@@ -20,7 +20,7 @@ public sealed class RainMakerDaPlaca(Maquina dona)
     public void Conectou()
     {
         Conectada = true;
-        dona.Rede?.Anotar(dona, "rainmaker", "conectou na nuvem do RainMaker (a bancada faz o papel dela)");
+        dona.Rede?.Anotar(dona, "rainmaker", Idioma.T("conectou na nuvem do RainMaker (a bancada faz o papel dela)"));
     }
 
     public void Relatar(string dispositivo, string parametro, string valor)

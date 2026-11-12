@@ -154,8 +154,7 @@ public static class LexerPython
                         toks.Add(new Token(T.Sai, "<sai>", 0, false, linha));
                         if (col > recuos.Peek())
                             throw new ErroDeSintaxe(
-                                "a indentacao desta linha nao bate com nenhum bloco aberto. "
-                                + "Confira se misturou espaco com tab.", linha);
+                                Idioma.T("a indentacao desta linha nao bate com nenhum bloco aberto. Confira se misturou espaco com tab."), linha);
                     }
 
                 i = j;
@@ -203,7 +202,7 @@ public static class LexerPython
                 string marca = new(c, 3);
                 int fim = src.IndexOf(marca, i + 3, StringComparison.Ordinal);
                 if (fim < 0)
-                    throw new ErroDeSintaxe("texto de tres aspas sem fechamento", linha);
+                    throw new ErroDeSintaxe(Idioma.T("texto de tres aspas sem fechamento"), linha);
 
                 string corpo = src[(i + 3)..fim];
                 toks.Add(new Token(T.Str, corpo, 0, false, linha));
@@ -235,7 +234,7 @@ public static class LexerPython
                     i++;
                 }
                 if (i >= src.Length || src[i] == '\n')
-                    throw new ErroDeSintaxe("texto sem fechamento", linha);
+                    throw new ErroDeSintaxe(Idioma.T("texto sem fechamento"), linha);
                 i++;
 
                 toks.Add(new Token(T.Str, sb.ToString(),
@@ -296,7 +295,7 @@ public static class LexerPython
             var op = Ops.FirstOrDefault(
                 o => i + o.Length <= src.Length && src.AsSpan(i, o.Length).SequenceEqual(o));
             if (op is null)
-                throw new ErroDeSintaxe($"caractere inesperado '{c}'", linha);
+                throw new ErroDeSintaxe(Idioma.T("caractere inesperado '{0}'", c), linha);
 
             if (op is "(" or "[" or "{") abertos++;
             if (op is ")" or "]" or "}") abertos = Math.Max(0, abertos - 1);

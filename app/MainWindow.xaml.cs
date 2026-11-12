@@ -2793,7 +2793,7 @@ public partial class MainWindow : Window
         }
         if (formato.Slots.Length > 1)
         {
-            Rotulo("Slots");
+            Rotulo(Idioma.N("Slots"));
             Escolha([.. formato.Slots.Select(n => n.ToString(System.Globalization.CultureInfo.InvariantCulture))], Array.IndexOf(formato.Slots, slots), i =>
             {
                 editor.DefinirTipoDaBateria(Baterias.TipoDoSuporte(formato.Id, formato.Slots[i]));
@@ -5988,7 +5988,7 @@ public partial class MainWindow : Window
         var maquina = placaDoEditor is null ? null : bancada.De(placaDoEditor);
         var peca = editor.Atual.Achar(placaDoEditor);
         int baud = peca?.BaudDoMonitor ?? (maquina?.BaudDaSerial is > 0 and var b ? b : 9600);
-        string rotulo = $"{baud} baud";
+        string rotulo = Idioma.T("{0} baud", baud);
         if (!Equals(btBaudSerial.Content, rotulo)) btBaudSerial.Content = rotulo;
     }
 

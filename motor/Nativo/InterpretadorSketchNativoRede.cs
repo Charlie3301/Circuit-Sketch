@@ -99,7 +99,7 @@ public partial class Interpretador
             case "__abort":
                 // Na ESP32 o abort() e um panico: a placa reinicia. Nas outras, ela para ali.
                 if (EhDaFamiliaEsp32 || EhEsp8266) throw Reiniciar(ReinicioDaPlaca.PeloPanico, 0, 0);
-                throw new ErroDeExecucao("o programa chamou abort(): a placa parou aqui.", 0);
+                throw new ErroDeExecucao(Idioma.T("o programa chamou abort(): a placa parou aqui."), 0);
             case "__matter_comissionada": return Valor.DeBool(maq.Matter.Comissionada);
             case "__matter_proxima": return Valor.DeTexto(maq.Matter.ProximaEscrita());
             case "__matter_relatar":

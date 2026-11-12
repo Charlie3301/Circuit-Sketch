@@ -80,8 +80,7 @@ public partial class Interpretador
             if (SpiDaEsp32Classica && numero == 3) (b.Sck, b.Miso, b.Mosi, b.Ss) = (18, 19, 23, 5);        // VSPI
             else if (SpiDaEsp32Classica && numero == 2) (b.Sck, b.Miso, b.Mosi, b.Ss) = (14, 12, 13, 15);  // HSPI
             else if (SpiDaEsp32Classica && numero == 1)
-                throw new ErroDeExecucao("SPIClass(FSPI) na ESP32 e o barramento da memoria flash (GPIO 6 a 11): usar ele "
-                                         + "trava a placa. Use HSPI ou VSPI.", linha);
+                throw new ErroDeExecucao(Idioma.T("SPIClass(FSPI) na ESP32 e o barramento da memoria flash (GPIO 6 a 11): usar ele trava a placa. Use HSPI ou VSPI."), linha);
             else if (numero == 0)
             {
                 var padrao = BarramentoGlobal("SPI");
@@ -152,7 +151,7 @@ public partial class Interpretador
     /// <summary>O modo 0..3, do numero do core.</summary>
     int ModoDoSpi(int n) => EhAvr ? (n >> 2) & 3 : n & 3;
 
-    string NomeDoPinoSpi(int p) => EhAvr ? $"pino {p}" : $"GPIO {p}";
+    string NomeDoPinoSpi(int p) => EhAvr ? Idioma.T("pino {0}", p) : $"GPIO {p}";
 
     // =====================================================================
     //  os metodos
@@ -177,15 +176,13 @@ public partial class Interpretador
                 if (args.Count > 0)
                 {
                     if (!(EhFamiliaEsp32 || Chip == "ESP8266"))
-                        throw new ErroDeExecucao($"SPI.begin() com pinos e da ESP32: no {maq.Perfil?.Nome} o SPI "
-                                                 + (EhAvr ? "tem pinos fixos." : "troca de pinos com setRX/setTX/setSCK (Pico) ou setMOSI/setMISO/setSCLK (STM32)."),
+                        throw new ErroDeExecucao(Idioma.T("SPI.begin() com pinos e da ESP32: no {0} o SPI {1}", maq.Perfil?.Nome, (EhAvr ? Idioma.T("tem pinos fixos.") : Idioma.T("troca de pinos com setRX/setTX/setSCK (Pico) ou setMOSI/setMISO/setSCLK (STM32)."))),
                                                  c.Linha);
                     (b.Sck, b.Miso, b.Mosi) = (A(0), A(1), A(2));
                     if (args.Count > 3) b.Ss = A(3);
                 }
                 if (b.Sck < 0 || b.Mosi < 0)
-                    throw new ErroDeExecucao($"{b.Nome}.begin(): {(b.Sck < 0 ? "o SCK" : "o MOSI")} nao tem pino. "
-                                             + (EhFamiliaEsp32 ? "Passe os pinos: begin(sck, miso, mosi, ss)." : $"A {maq.Perfil?.Nome} nao tem SPI de hardware."),
+                    throw new ErroDeExecucao(Idioma.T("{0}.begin(): {1} nao tem pino. {2}", b.Nome, (b.Sck < 0 ? Idioma.T("o SCK") : Idioma.T("o MOSI")), (EhFamiliaEsp32 ? Idioma.T("Passe os pinos: begin(sck, miso, mosi, ss).") : Idioma.T("A {0} nao tem SPI de hardware.", maq.Perfil?.Nome))),
                                              c.Linha);
                 b.Iniciado = true;
 
@@ -319,7 +316,7 @@ public partial class Interpretador
                 return Valor.Vazio;
         }
 
-        throw new ErroDeExecucao($"{b.Nome}.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("{0}.{1}() ainda nao e suportado pelo simulador.", b.Nome, metodo), c.Linha);
     }
 
     /// <summary>
@@ -384,8 +381,7 @@ public partial class Interpretador
                 if (!avisouDoSpiSemBegin)
                 {
                     avisouDoSpiSemBegin = true;
-                    maq.Avisar($"{Origens.Onde(linha)}: {b.Nome}.transfer() antes do {b.Nome}.begin(): no AVR o SPI esta "
-                               + "desligado, o byte nunca termina de sair, e a placa trava aqui para sempre.");
+                    maq.Avisar(Idioma.T("{0}: {1}.transfer() antes do {2}.begin(): no AVR o SPI esta desligado, o byte nunca termina de sair, e a placa trava aqui para sempre.", Origens.Onde(linha), b.Nome, b.Nome));
                 }
                 while (true)
                 {
@@ -396,8 +392,7 @@ public partial class Interpretador
             if (!avisouDoSpiSemBegin)
             {
                 avisouDoSpiSemBegin = true;
-                maq.Avisar($"{Origens.Onde(linha)}: {b.Nome}.transfer() antes do {b.Nome}.begin(): na placa nada sai "
-                           + "pelos pinos, e o que volta e 0.");
+                maq.Avisar(Idioma.T("{0}: {1}.transfer() antes do {2}.begin(): na placa nada sai pelos pinos, e o que volta e 0.", Origens.Onde(linha), b.Nome, b.Nome));
             }
             return 0;
         }
@@ -449,8 +444,9 @@ public partial class Interpretador
     /// SCK do barramento. Nulo: esta certo -- ou o circuito nao diz (a linha
     /// de comando sem --aparelhos).
     /// </summary>
-    string ProblemaNaLigacaoDoSd(int cs, BarramentoDoSketch b)
+    string ProblemaNaLigacaoDoSd(int cs, BarramentoDoSketch b, out bool doCs)
     {
+        doCs = false;
         if (maq.AparelhosSpi?.Invoke() is not { } aparelhos) return null;
         var cartoes = aparelhos.Where(a => a.Tipo == "sd").ToList();
         if (cartoes.Count == 0) return null;
@@ -459,22 +455,23 @@ public partial class Interpretador
         if (sd is null)
         {
             int ligado = cartoes[0].Cs;
+            doCs = true;
             return ligado < 0
-                ? $"o CS do cartao nao esta ligado na placa (o begin() usa o {NomeDoPinoSpi(cs)})"
-                : $"o CS do cartao esta no {NomeDoPinoSpi(ligado)}, e o begin() usa o {NomeDoPinoSpi(cs)}";
+                ? Idioma.T("o CS do cartao nao esta ligado na placa (o begin() usa o {0})", NomeDoPinoSpi(cs))
+                : Idioma.T("o CS do cartao esta no {0}, e o begin() usa o {1}", NomeDoPinoSpi(ligado), NomeDoPinoSpi(cs));
         }
 
         string Linha(string nome, int doCartao, int doBarramento)
-            => doCartao < 0 ? $"o {nome} do cartao nao esta ligado na placa"
+            => doCartao < 0 ? Idioma.T("o {0} do cartao nao esta ligado na placa", nome)
                : doBarramento >= 0 && doCartao != doBarramento
-                   ? $"o {nome} do cartao esta no {NomeDoPinoSpi(doCartao)}, e o SPI da placa usa o {NomeDoPinoSpi(doBarramento)}"
+                   ? Idioma.T("o {0} do cartao esta no {1}, e o SPI da placa usa o {2}", nome, NomeDoPinoSpi(doCartao), NomeDoPinoSpi(doBarramento))
                    : null;
-        return Linha("SCK", sd.Sck, b.Sck) ?? Linha("DI (o MOSI)", sd.Mosi, b.Mosi) ?? Linha("DO (o MISO)", sd.Miso, b.Miso);
+        return Linha("SCK", sd.Sck, b.Sck) ?? Linha(Idioma.T("DI (o MOSI)"), sd.Mosi, b.Mosi) ?? Linha(Idioma.T("DO (o MISO)"), sd.Miso, b.Miso);
     }
 
     /// <summary>Como trocar os pinos do SPI, em cada placa -- a dica do aviso.</summary>
     string DicaDosPinosDoSpi(BarramentoDoSketch b)
-        => EhFamiliaEsp32 ? $" Ligue nos pinos do SPI (SCK {b.Sck}, MISO {b.Miso}, MOSI {b.Mosi}) ou chame SPI.begin(sck, miso, mosi, cs) com os da ligacao antes do SD.begin()."
-           : EhAvr ? $" No {maq.Perfil?.Nome} o SPI e fixo: SCK no {b.Sck}, MISO no {b.Miso}, MOSI no {b.Mosi}."
-           : $" O SPI da placa usa SCK {b.Sck}, MISO {b.Miso} e MOSI {b.Mosi}.";
+        => EhFamiliaEsp32 ? Idioma.T(" Ligue nos pinos do SPI (SCK {0}, MISO {1}, MOSI {2}) ou chame SPI.begin(sck, miso, mosi, cs) com os da ligacao antes do SD.begin().", b.Sck, b.Miso, b.Mosi)
+           : EhAvr ? Idioma.T(" No {0} o SPI e fixo: SCK no {1}, MISO no {2}, MOSI no {3}.", maq.Perfil?.Nome, b.Sck, b.Miso, b.Mosi)
+           : Idioma.T(" O SPI da placa usa SCK {0}, MISO {1} e MOSI {2}.", b.Sck, b.Miso, b.Mosi);
 }

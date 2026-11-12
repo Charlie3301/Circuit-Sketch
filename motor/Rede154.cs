@@ -17,7 +17,7 @@ public sealed partial class Rede
             if (ligar) radios154.TryAdd(placa, new Queue<byte[]>());
             else radios154.Remove(placa);
         }
-        Anotar(placa, "802.15.4", ligar ? "radio ligado" : "radio desligado");
+        Anotar(placa, "802.15.4", ligar ? Idioma.T("radio ligado") : Idioma.T("radio desligado"));
     }
 
     /// <summary>O quadro vai ao ar: cada outra placa ligada recebe o canal (1 byte) e os bytes.</summary>

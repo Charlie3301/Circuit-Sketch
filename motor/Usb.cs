@@ -48,7 +48,7 @@ public sealed class UsbDaPlaca(Maquina dona)
     {
         Conectada = true;
         Interfaces = interfaces ?? "";
-        Anotar($"a placa apareceu no computador pelo USB ({(Interfaces.Length > 0 ? Interfaces : "sem interfaces")})");
+        Anotar(Idioma.T("a placa apareceu no computador pelo USB ({0})", (Interfaces.Length > 0 ? Interfaces : Idioma.T("sem interfaces"))));
     }
 
     /// <summary>Um relatorio HID que a placa mandou: o protocolo (1 teclado, 2 mouse, 0 o resto) e os bytes.</summary>
@@ -56,7 +56,7 @@ public sealed class UsbDaPlaca(Maquina dona)
     {
         if (protocolo == 1 || (protocolo == 0 && dados.Length == 8 && id is 0 or 1)) Teclado(dados);
         else if (protocolo == 2 || (protocolo == 0 && id == 2 && dados.Length >= 3)) Mouse(dados);
-        else Anotar($"hid relatorio {id}: {Convert.ToHexString(dados)}");
+        else Anotar(Idioma.T("hid relatorio {0}: {1}", id, Convert.ToHexString(dados)));
     }
 
     /// <summary>O relatorio do teclado: o modificador, um byte reservado e ate 6 teclas.</summary>
@@ -83,7 +83,7 @@ public sealed class UsbDaPlaca(Maquina dona)
                     {
                         string feita = linha.ToString();
                         linha.Clear();
-                        Anotar($"teclado USB digitou: {feita}");
+                        Anotar(Idioma.T("teclado USB digitou: {0}", feita));
                     }
                     else linha.Append(ch);
                 }
@@ -133,7 +133,7 @@ public sealed class UsbDaPlaca(Maquina dona)
         {
             Cliques++;
             string botao = (apertou & 1) != 0 ? "esquerdo" : (apertou & 2) != 0 ? "direito" : "meio";
-            Anotar($"mouse USB clicou ({botao}) em {MouseX},{MouseY}");
+            Anotar(Idioma.T("mouse USB clicou ({0}) em {1},{2}", botao, MouseX, MouseY));
         }
         botoes = novos;
     }
@@ -146,9 +146,9 @@ public sealed class UsbDaPlaca(Maquina dona)
         if (p.Length < 4) return;
         int status = p[1] & 0xF0, canal = (p[1] & 0x0F) + 1;
         string nota = $"{Notas[p[2] % 12]}{p[2] / 12 - 1}";
-        if (status == 0x90 && p[3] > 0) Anotar($"midi nota {nota} ligou (velocidade {p[3]}, canal {canal})");
-        else if (status == 0x80 || status == 0x90) Anotar($"midi nota {nota} desligou (canal {canal})");
-        else if (status == 0xB0) Anotar($"midi controle {p[2]} = {p[3]} (canal {canal})");
+        if (status == 0x90 && p[3] > 0) Anotar(Idioma.T("midi nota {0} ligou (velocidade {1}, canal {2})", nota, p[3], canal));
+        else if (status == 0x80 || status == 0x90) Anotar(Idioma.T("midi nota {0} desligou (canal {1})", nota, canal));
+        else if (status == 0xB0) Anotar(Idioma.T("midi controle {0} = {1} (canal {2})", p[2], p[3], canal));
         else Anotar($"midi {Convert.ToHexString(p)}");
     }
 

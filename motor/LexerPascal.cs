@@ -186,7 +186,7 @@ public static class LexerPascal
                                                      && s.AsSpan(i, op.Length).SequenceEqual(op));
 
             if (achado is null)
-                throw new ErroDeSintaxe($"não entendi o símbolo '{c}'", linha);
+                throw new ErroDeSintaxe(Idioma.T("não entendi o símbolo '{0}'", c), linha);
 
             saida.Add(new Token(T.Op, achado, 0, false, linha));
             i += achado.Length;

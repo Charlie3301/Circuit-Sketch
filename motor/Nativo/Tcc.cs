@@ -68,13 +68,13 @@ static unsafe class Tcc
             string caminho = Path.Combine(pasta, "tcc", "libtcc.dll");
             if (!File.Exists(caminho))
             {
-                erro = "o compilador de C (libtcc.dll) nao esta em " + caminho;
+                erro = Idioma.T("o compilador de C (libtcc.dll) nao esta em {0}", caminho);
                 return false;
             }
             try { dll = NativeLibrary.Load(caminho); }
             catch (Exception e)
             {
-                erro = "nao deu para carregar o compilador de C: " + e.Message;
+                erro = Idioma.T("nao deu para carregar o compilador de C: {0}", e.Message);
                 return false;
             }
             TrocarSetjmp(dll);

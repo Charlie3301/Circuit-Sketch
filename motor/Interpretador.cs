@@ -18,7 +18,11 @@ namespace Simulador;
 enum Desvio : byte { Nenhum, Break, Continue, Retorno }
 
 public class ErroDeExecucao(string msg, int linha)
-    : Exception($"{Origens.Onde(linha)}: {msg}") { }
+    : Exception($"{Origens.Onde(linha)}: {msg}")
+{
+    /// <summary>A mensagem sem o "linha 7: " da frente.</summary>
+    public string Texto { get; } = msg;
+}
 
 /// <summary>Interrupcao pedida pela interface (botao Parar).</summary>
 public class ExecucaoInterrompida : Exception;
@@ -167,13 +171,11 @@ public partial class Interpretador(Programa prog, Maquina maq)
         }
         if (c.Args.Count < 2 || c.Args[1] is not Variavel alvo)
             throw new ErroDeExecucao(
-                "attachInterrupt() espera o nome de uma funcao no 2o argumento, "
-                + "como em attachInterrupt(0, contar, FALLING).", c.Linha);
+                Idioma.T("attachInterrupt() espera o nome de uma funcao no 2o argumento, como em attachInterrupt(0, contar, FALLING)."), c.Linha);
 
         if (!funcoes.ContainsKey(alvo.Nome))
             throw new ErroDeExecucao(
-                $"attachInterrupt() aponta para '{alvo.Nome}()', que nao existe "
-                + "neste sketch.", c.Linha);
+                Idioma.T("attachInterrupt() aponta para '{0}()', que nao existe neste sketch.", alvo.Nome), c.Linha);
 
         int pino = (int)Avaliar(c.Args[0], amb).Num;
         int borda = c.Args.Count > 2
@@ -325,8 +327,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
         // quem vigia sao os watchdogs de cada chip (InterpretadorCiclos).
         if (++passos > LimitePassos && !maq.TempoReal)
             throw new ErroDeExecucao(
-                $"loop preso: passou de {LimitePassos} passos sem sair. " +
-                "Falta um delay() ou uma condicao de saida?", c.Linha);
+                Idioma.T("loop preso: passou de {0} passos sem sair. Falta um delay() ou uma condicao de saida?", LimitePassos), c.Linha);
 
         CobrarComando();
 
@@ -464,7 +465,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
             case CmdCom com: ExecCom(com, amb); break;
 
             default:
-                throw new ErroDeExecucao($"comando nao suportado: {c.GetType().Name}", c.Linha);
+                throw new ErroDeExecucao(Idioma.T("comando nao suportado: {0}", c.GetType().Name), c.Linha);
         }
     }
 
@@ -950,8 +951,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
         }
 
         throw new ErroDeExecucao(
-            $"a classe '{d.Classe}' ainda nao e suportada. Suportadas: "
-            + string.Join(", ", Bibliotecas.Conhecidas), d.Linha);
+            Idioma.T("a classe '{0}' ainda nao e suportada. Suportadas: {1}", d.Classe, string.Join(", ", Bibliotecas.Conhecidas)), d.Linha);
     }
 
     Valor ValorInicialDoCampo(CmdDecl campo, Ambiente amb)
@@ -1123,7 +1123,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 CompletarLinha();
                 if (linha.Itens.Count > colunas)
                     throw new ErroDeExecucao(
-                        $"linha com {linha.Itens.Count} itens num vetor de {colunas} colunas", d.Linha);
+                        Idioma.T("linha com {0} itens num vetor de {1} colunas", linha.Itens.Count, colunas), d.Linha);
                 foreach (var dentro in linha.Itens) itens.Add(Coagir(Avaliar(dentro, amb), d.Tipo));
                 CompletarLinha();
                 continue;
@@ -1137,8 +1137,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 var bytes = TextoArduino.ParaBytes(valor.Texto);
                 if (bytes.Length >= colunas)
                     throw new ErroDeExecucao(
-                        $"o texto \"{valor.Texto}\" tem {bytes.Length} letras e nao cabe numa linha de "
-                        + $"{colunas} (sobra lugar para o '\\0' so ate {colunas - 1})", d.Linha);
+                        Idioma.T("o texto \"{0}\" tem {1} letras e nao cabe numa linha de {2} (sobra lugar para o '\\0' so ate {3})", valor.Texto, bytes.Length, colunas, colunas - 1), d.Linha);
                 CompletarLinha();
                 foreach (byte b in bytes) itens.Add(Coagir(deCaractere ? Valor.DeCaractere(b) : Valor.DeInt(b), d.Tipo));
                 CompletarLinha();
@@ -1323,11 +1322,9 @@ public partial class Interpretador(Programa prog, Maquina maq)
 
                 if (EhRegistradorDoAvr(v.Nome))
                     throw new ErroDeExecucao(
-                        $"'{v.Nome}' e um registrador do chip AVR (ATmega/ATtiny). Este codigo mexe direto "
-                        + "no hardware do microcontrolador, e o C++ do simulador nao roda isso -- so o "
-                        + "Assembly roda registrador. Se veio de uma biblioteca, ela so funciona na placa.",
+                        Idioma.T("'{0}' e um registrador do chip AVR (ATmega/ATtiny). Este codigo mexe direto no hardware do microcontrolador, e o C++ do simulador nao roda isso -- so o Assembly roda registrador. Se veio de uma biblioteca, ela so funciona na placa.", v.Nome),
                         v.Linha);
-                throw new ErroDeExecucao($"variavel '{v.Nome}' nao foi declarada", v.Linha);
+                throw new ErroDeExecucao(Idioma.T("variavel '{0}' nao foi declarada", v.Nome), v.Linha);
 
             case Indice ix:
             {
@@ -1347,7 +1344,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                     int noObjeto = (int)Avaliar(ix.Idx, amb).Num;
                     if (noObjeto < 0 || noObjeto >= vetorDoObjeto.Length)
                         throw new ErroDeExecucao(
-                            $"indice {noObjeto} fora do vetor '{doMembro.Nome}' (0..{vetorDoObjeto.Length - 1})", ix.Linha);
+                            Idioma.T("indice {0} fora do vetor '{1}' (0..{2})", noObjeto, doMembro.Nome, vetorDoObjeto.Length - 1), ix.Linha);
                     return vetorDoObjeto[noObjeto];
                 }
 
@@ -1382,7 +1379,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                         {
                             int noDevolvido = (int)Avaliar(ix.Idx, amb).Num;
                             if (noDevolvido < 0 || noDevolvido >= devolvido.Length)
-                                throw new ErroDeExecucao($"indice {noDevolvido} fora do vetor (0..{devolvido.Length - 1})", ix.Linha);
+                                throw new ErroDeExecucao(Idioma.T("indice {0} fora do vetor (0..{1})", noDevolvido, devolvido.Length - 1), ix.Linha);
                             return devolvido[noDevolvido];
                         }
 
@@ -1396,7 +1393,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                                 ? alvoAvaliado.Texto[noTexto] : 0);
                         }
                     }
-                    throw new ErroDeExecucao("indexacao so funciona em vetores", ix.Linha);
+                    throw new ErroDeExecucao(Idioma.T("indexacao so funciona em vetores"), ix.Linha);
                 }
                 int i = (int)Avaliar(ix.Idx, amb).Num;
 
@@ -1406,13 +1403,13 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 {
                     if (i < 0 || (i + 1) * largura > arr.Length)
                         throw new ErroDeExecucao(
-                            $"linha {i} fora do vetor '{av.Nome}' (0..{arr.Length / largura - 1})", ix.Linha);
+                            Idioma.T("linha {0} fora do vetor '{1}' (0..{2})", i, av.Nome, arr.Length / largura - 1), ix.Linha);
                     return Valor.DeTexto(TextoDoVetor(arr[(i * largura)..((i + 1) * largura)]));
                 }
 
                 if (i < 0 || i >= arr.Length)
                     throw new ErroDeExecucao(
-                        $"indice {i} fora do vetor '{av.Nome}' (0..{arr.Length - 1})", ix.Linha);
+                        Idioma.T("indice {0} fora do vetor '{1}' (0..{2})", i, av.Nome, arr.Length - 1), ix.Linha);
                 return arr[i];
             }
 
@@ -1440,7 +1437,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                     // e "buffer[0]" sao o mesmo no C.
                     "*" => x.Referencia is Valor[] { Length: > 0 } apontado ? apontado[0] : x,
                     "~" => Valor.DeInt(~(long)x.Num),
-                    _ => throw new ErroDeExecucao($"operador '{u.Op}' nao suportado", u.Linha)
+                    _ => throw new ErroDeExecucao(Idioma.T("operador '{0}' nao suportado", u.Op), u.Linha)
                 };
             }
 
@@ -1473,7 +1470,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                         alvoDaLista.Campos[campoDaLista] = valorDaLista;
                     return Valor.DeReferencia(alvoDaLista);
                 }
-                throw new ErroDeExecucao("atribuir uma lista entre chaves so vale para uma struct", ac.Linha);
+                throw new ErroDeExecucao(Idioma.T("atribuir uma lista entre chaves so vale para uma struct"), ac.Linha);
             }
 
             case Atribuicao a:
@@ -1520,13 +1517,12 @@ public partial class Interpretador(Programa prog, Maquina maq)
             case Membro m2 when m2.Obj is Variavel dono2
                                 && amb.BuscarObjeto(dono2.Nome, out var alvo2):
                 throw new ErroDeExecucao(
-                    $"'{dono2.Nome}' nao tem o campo '{m2.Nome}'. "
-                    + (alvo2.Campos.Count == 0
-                       ? "Este objeto nao expoe campos."
-                       : "Tem: " + string.Join(", ", alvo2.Campos.Keys)), m2.Linha);
+                    Idioma.T("'{0}' nao tem o campo '{1}'. {2}", dono2.Nome, m2.Nome, (alvo2.Campos.Count == 0
+                       ? Idioma.T("Este objeto nao expoe campos.")
+                       : Idioma.T("Tem: {0}", string.Join(", ", alvo2.Campos.Keys)))), m2.Linha);
 
             case Membro m3:
-                throw new ErroDeExecucao($"'{m3.Nome}' nao pode ser lido assim", m3.Linha);
+                throw new ErroDeExecucao(Idioma.T("'{0}' nao pode ser lido assim", m3.Nome), m3.Linha);
 
             case ListaLiteral ll:
                 return MontarLista(ll, amb);
@@ -1551,7 +1547,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 return Valor.DeReferencia(new Rotina { Anonima = fa, Captura = amb });
 
             default:
-                throw new ErroDeExecucao($"expressao nao suportada: {e.GetType().Name}", e.Linha);
+                throw new ErroDeExecucao(Idioma.T("expressao nao suportada: {0}", e.GetType().Name), e.Linha);
         }
     }
 
@@ -1575,8 +1571,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
         bool CaminhoRecusado(string caminho)
         {
             if (!EhDaFamiliaEsp32 || caminho.StartsWith('/')) return false;
-            maq.Avisar($"SD.{metodo}(\"{caminho}\"): na ESP32 o caminho do cartao comeca com \"/\" -- "
-                       + $"escreva \"/{caminho}\". Sem a barra a biblioteca recusa, e o arquivo nao abre.");
+            maq.Avisar(Idioma.T("SD.{0}(\"{1}\"): na ESP32 o caminho do cartao comeca com \"/\" -- escreva \"/{2}\". Sem a barra a biblioteca recusa, e o arquivo nao abre.", metodo, caminho, caminho));
             return true;
         }
 
@@ -1589,12 +1584,11 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 // outro ("SD.begin(5, hspi)"). A biblioteca liga o SPI.
                 var barramento = args.Count > 1 ? BarramentoDoArgumento(args[1]) : BarramentoGlobal("SPI");
                 int cs = args.Count > 0 ? (int)args[0].Num : barramento.Ss;
-                if (maq.Cartao.Presente && ProblemaNaLigacaoDoSd(cs, barramento) is { } problema)
+                if (maq.Cartao.Presente && ProblemaNaLigacaoDoSd(cs, barramento, out bool doCs) is { } problema)
                 {
-                    string ligacao = $"SD.begin() devolveu false: {problema} -- na placa o cartao nao responde."
-                                     + (problema.StartsWith("o CS", StringComparison.Ordinal)
-                                        ? " O numero do begin() e o pino onde o fio do CS esta."
-                                        : DicaDosPinosDoSpi(barramento));
+                    string ligacao = Idioma.T("SD.begin() devolveu false: {0} -- na placa o cartao nao responde.{1}", problema, (doCs
+                                        ? Idioma.T(" O numero do begin() e o pino onde o fio do CS esta.")
+                                        : DicaDosPinosDoSpi(barramento)));
                     lock (maq.Trava)
                         if (!maq.Avisos.Contains(ligacao)) maq.Avisos.Add(ligacao);
                     return Valor.DeBool(false);
@@ -1609,10 +1603,8 @@ public partial class Interpretador(Programa prog, Maquina maq)
 
                 if (!maq.Cartao.Montar())
                 {
-                    const string semCartao =
-                        "SD.begin() devolveu false: nao ha cartao microSD ligado nesta placa. "
-                        + "Ponha a peca no circuito e ligue o CS, o SCK, o MOSI, o MISO "
-                        + "e a alimentacao dela.";
+                    string semCartao =
+                        Idioma.T("SD.begin() devolveu false: nao ha cartao microSD ligado nesta placa. Ponha a peca no circuito e ligue o CS, o SCK, o MOSI, o MISO e a alimentacao dela.");
 
                     lock (maq.Trava)
                         if (!maq.Avisos.Contains(semCartao)) maq.Avisos.Add(semCartao);
@@ -1672,12 +1664,11 @@ public partial class Interpretador(Programa prog, Maquina maq)
         }
 
         throw new ErroDeExecucao(
-            $"SD.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+            Idioma.T("SD.{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
-    const string AvisoDoCartao =
-        "cartao microSD: o que o sketch grava fica na peca do cartao quando a simulacao para "
-        + "(e vai junto no .sktch). Dois cliques na peca mostram os arquivos.";
+    static readonly string AvisoDoCartao =
+        Idioma.T("cartao microSD: o que o sketch grava fica na peca do cartao quando a simulacao para (e vai junto no .sktch). Dois cliques na peca mostram os arquivos.");
 
     /// <summary>
     /// O ultimo arquivo que SD.open() devolveu, esperando para ser
@@ -1901,7 +1892,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
         }
 
         throw new ErroDeExecucao(
-            $"IrReceiver.{metodo}() ainda nao e suportado pelo simulador", c.Linha);
+            Idioma.T("IrReceiver.{0}() ainda nao e suportado pelo simulador", metodo), c.Linha);
     }
 
     Valor Operar(Binaria b, Ambiente amb)
@@ -1943,11 +1934,11 @@ public partial class Interpretador(Programa prog, Maquina maq)
             case "-": return Num(a - c, inteiro);
             case "*": return Num(a * c, inteiro);
             case "/":
-                if (c == 0) throw new ErroDeExecucao("divisao por zero", b.Linha);
+                if (c == 0) throw new ErroDeExecucao(Idioma.T("divisao por zero"), b.Linha);
                 // Divisao inteira quando ambos sao inteiros: pega estudante desprevenido.
                 return inteiro ? Valor.DeInt(Math.Truncate(a / c)) : Valor.DeReal(a / c);
             case "%":
-                if (c == 0) throw new ErroDeExecucao("resto por zero", b.Linha);
+                if (c == 0) throw new ErroDeExecucao(Idioma.T("resto por zero"), b.Linha);
                 return Valor.DeInt((long)a % (long)c);
             case "==": return Valor.DeBool(x.EhTexto || y.EhTexto ? x.Mostrar() == y.Mostrar() : a == c);
             case "!=": return Valor.DeBool(x.EhTexto || y.EhTexto ? x.Mostrar() != y.Mostrar() : a != c);
@@ -1960,7 +1951,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
             case "^": return Valor.DeInt((long)a ^ (long)c);
             case "<<": return Valor.DeInt((long)a << (int)c);
             case ">>": return Valor.DeInt((long)a >> (int)c);
-            default: throw new ErroDeExecucao($"operador '{b.Op}' nao suportado", b.Linha);
+            default: throw new ErroDeExecucao(Idioma.T("operador '{0}' nao suportado", b.Op), b.Linha);
         }
     }
 
@@ -2041,7 +2032,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 // "PORTB |= _BV(PB5);": cada bit vira um pino.
                 if (EscreverRegistradorDoAvr(va.Nome, v)) break;
                 if (EhRegistradorDoAvr(va.Nome)) Avaliar(va, amb);
-                throw new ErroDeExecucao($"variavel '{va.Nome}' nao foi declarada", va.Linha);
+                throw new ErroDeExecucao(Idioma.T("variavel '{0}' nao foi declarada", va.Nome), va.Linha);
 
             // "*p = 5": o apontado. Num vetor, o primeiro item.
             case Unaria { Op: "*" } apontado:
@@ -2056,7 +2047,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 int k = (int)Avaliar(ixm.Idx, amb).Num;
                 if (k < 0 || k >= vetorDoObjeto.Length)
                     throw new ErroDeExecucao(
-                        $"indice {k} fora do vetor '{membroDoVetor.Nome}' (0..{vetorDoObjeto.Length - 1})", ixm.Linha);
+                        Idioma.T("indice {0} fora do vetor '{1}' (0..{2})", k, membroDoVetor.Nome, vetorDoObjeto.Length - 1), ixm.Linha);
                 vetorDoObjeto[k] = NoLugar(vetorDoObjeto[k], v);
                 break;
             }
@@ -2068,10 +2059,9 @@ public partial class Interpretador(Programa prog, Maquina maq)
 
             case Indice ix2 when PosicaoNoVetor(ix2, amb, out var vetorNd, out int plano, out var faltam, out string nomeNd):
                 if (faltam.Length > 0)
-                    throw new ErroDeExecucao($"'{nomeNd}' tem mais dimensoes: falta indice para chegar num item "
-                                             + "(no C++, \"array type is not assignable\")", ix2.Linha);
+                    throw new ErroDeExecucao(Idioma.T("'{0}' tem mais dimensoes: falta indice para chegar num item (no C++, \"array type is not assignable\")", nomeNd), ix2.Linha);
                 if (plano < 0 || plano >= vetorNd.Length)
-                    throw new ErroDeExecucao($"indice fora do vetor '{nomeNd}' (ele tem {vetorNd.Length} itens ao todo)", ix2.Linha);
+                    throw new ErroDeExecucao(Idioma.T("indice fora do vetor '{0}' (ele tem {1} itens ao todo)", nomeNd, vetorNd.Length), ix2.Linha);
                 vetorNd[plano] = NoLugar(vetorNd[plano], v);
                 break;
 
@@ -2080,7 +2070,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 int i = (int)Avaliar(ix.Idx, amb).Num;
                 if (i < 0 || i >= arr.Length)
                     throw new ErroDeExecucao(
-                        $"indice {i} fora do vetor '{av.Nome}' (0..{arr.Length - 1})", ix.Linha);
+                        Idioma.T("indice {0} fora do vetor '{1}' (0..{2})", i, av.Nome, arr.Length - 1), ix.Linha);
                 // Vetor de char continua de char: "msg[0] = 65" guarda 'A'.
                 arr[i] = NoLugar(arr[i], v);
                 break;
@@ -2105,7 +2095,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 break;
 
             default:
-                throw new ErroDeExecucao("destino de atribuicao invalido", alvo.Linha);
+                throw new ErroDeExecucao(Idioma.T("destino de atribuicao invalido"), alvo.Linha);
         }
     }
 
@@ -2140,14 +2130,12 @@ public partial class Interpretador(Programa prog, Maquina maq)
         string porque = chip switch
         {
             "ATtiny85" or "ATmega2560" =>
-                $"o {chip} também é AVR, mas os endereços de E/S e a ligação das portas "
-                + "com os pinos são outros -- o programa acenderia o pino errado",
-            _ => $"o {chip} não é AVR: ele tem outro conjunto de instruções",
+                Idioma.T("o {0} também é AVR, mas os endereços de E/S e a ligação das portas com os pinos são outros -- o programa acenderia o pino errado", chip),
+            _ => Idioma.T("o {0} não é AVR: ele tem outro conjunto de instruções", chip),
         };
 
         throw new ErroDeExecucao(
-            $"o Assembly está validado para o ATmega328P (Arduino Uno e Nano); "
-            + $"na {maq.Perfil?.Nome ?? "placa"}, {porque}.", 1);
+            Idioma.T("o Assembly está validado para o ATmega328P (Arduino Uno e Nano); na {0}, {1}.", maq.Perfil?.Nome ?? Idioma.T("placa"), porque), 1);
     }
 
     /// <summary>
@@ -2165,7 +2153,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
     Avr Avr()
         => avr ??= Prog?.Montado is ProgramaMontado montado
             ? new Avr(montado, maq)
-            : throw new Exception("este programa nao tem codigo de maquina montado");
+            : throw new Exception(Idioma.T("este programa nao tem codigo de maquina montado"));
 
     // ---------------- constantes Arduino ----------------
     static readonly Dictionary<string, Valor> Constantes = new()
@@ -2324,7 +2312,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
             {
                 if (c.Args.Count < 2 || !VetorDoArgumento(c.Args[0], amb, out var destino))
                     throw new ErroDeExecucao(
-                        $"String.{metodo}(vetor, tamanho): o primeiro argumento e o vetor que recebe o texto", c.Linha);
+                        Idioma.T("String.{0}(vetor, tamanho): o primeiro argumento e o vetor que recebe o texto", metodo), c.Linha);
                 int cabe = Math.Min(N(1), destino.Length);
                 if (cabe <= 0) return Valor.Vazio;
                 int desde = c.Args.Count > 2 ? Math.Max(0, N(2)) : 0;
@@ -2417,16 +2405,14 @@ public partial class Interpretador(Programa prog, Maquina maq)
             {
                 int i = N(0);
                 if (i < 0 || i >= texto.Length)
-                    throw new ErroDeExecucao($"std::string::at({i}) fora do texto (tamanho {texto.Length}): na placa isso "
-                                             + "lanca std::out_of_range, ninguem pega, e o abort() reinicia a placa.", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("std::string::at({0}) fora do texto (tamanho {1}): na placa isso lanca std::out_of_range, ninguem pega, e o abort() reinicia a placa.", i, texto.Length), c.Linha);
                 return Valor.DeCaractere(texto[i]);
             }
             case "substr":
             {
                 int ini = N(0);
                 if (ini > texto.Length)
-                    throw new ErroDeExecucao($"std::string::substr({ini}) depois do fim do texto (tamanho {texto.Length}): "
-                                             + "na placa isso lanca std::out_of_range e a placa reinicia.", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("std::string::substr({0}) depois do fim do texto (tamanho {1}): na placa isso lanca std::out_of_range e a placa reinicia.", ini, texto.Length), c.Linha);
                 int quantos = args.Count > 1 ? (int)Math.Clamp((long)args[1].Num, 0, texto.Length - ini) : texto.Length - ini;
                 return Valor.DeTexto(texto.Substring(Math.Max(0, ini), quantos));
             }
@@ -2457,7 +2443,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
 
             default:
                 throw new ErroDeExecucao(
-                    $"String.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+                    Idioma.T("String.{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
         }
     }
 
@@ -2520,8 +2506,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 // No C++ compilado o "SPI1" e o nome que o core da ao segundo barramento
                 // da ESP32 (o SPIClass(HSPI), o SPI(1) do MicroPython): o sketch nao o escreve.
                 if (o.Nome == "SPI1" && Chip != "RP2040" && !(RodaNativo && EhFamiliaEsp32))
-                    throw new ErroDeExecucao($"'SPI1' nao existe no core da {maq.Perfil?.Nome}: o outro barramento e um "
-                                             + (EhFamiliaEsp32 ? "SPIClass (\"SPIClass hspi(HSPI);\")." : "SPIClass declarado no sketch."), c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("'SPI1' nao existe no core da {0}: o outro barramento e um {1}", maq.Perfil?.Nome, (EhFamiliaEsp32 ? "SPIClass (\"SPIClass hspi(HSPI);\")." : Idioma.T("SPIClass declarado no sketch."))), c.Linha);
                 return ChamarSpi(BarramentoGlobal(o.Nome), m.Nome, c, amb);
             }
             if (o.Nome == "SD") return ChamarCartao(m.Nome, c, amb);
@@ -2567,9 +2552,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
             }
 
             throw new ErroDeExecucao(
-                $"'{o.Nome}.{m.Nome}()': o objeto '{o.Nome}' nao foi declarado neste sketch, "
-                + "ou a biblioteca dele ainda nao existe no simulador. "
-                + "As conhecidas estao em: " + string.Join(", ", Bibliotecas.Conhecidas), c.Linha);
+                Idioma.T("'{0}.{1}()': o objeto '{2}' nao foi declarado neste sketch, ou a biblioteca dele ainda nao existe no simulador. As conhecidas estao em: {3}", o.Nome, m.Nome, o.Nome, string.Join(", ", Bibliotecas.Conhecidas)), c.Linha);
         }
 
         // O mesmo para um literal ou expressao: "String(x).length()".
@@ -2748,8 +2731,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
             // conta de bits. Nos outros cores a funcao nao existe.
             case "analogReadMilliVolts":
                 if (!EhFamiliaEsp32)
-                    throw new ErroDeExecucao($"analogReadMilliVolts() so existe no core da ESP32; no {maq.Perfil.Processador} "
-                        + "a conta e analogRead(pino) * tensao de referencia / leitura maxima.", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("analogReadMilliVolts() so existe no core da ESP32; no {0} a conta e analogRead(pino) * tensao de referencia / leitura maxima.", maq.Perfil.Processador), c.Linha);
                 if (RitmoDaCpu) maq.GastarProcessador(Custos.AnalogReadUs);
                 return DoTipo((int)Math.Round(maq.AnalogRead((int)A(0)) * 3300.0 / maq.Perfil.MaxAdc), TipoC.UInt);
             case "analogWrite": maq.AnalogWriteNaResolucao((int)A(0), A(1)); return Valor.Vazio;
@@ -2761,7 +2743,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
             case "rgbLedWrite":
             {
                 if (!EhFamiliaEsp32)
-                    throw new ErroDeExecucao($"{fn.Nome}() so existe no core da ESP32.", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("{0}() so existe no core da ESP32.", fn.Nome), c.Linha);
                 int pinoRgb = (int)A(0);
                 if (!maq.Fitas.TryGetValue(pinoRgb, out var fitaRgb)) maq.Fitas[pinoRgb] = fitaRgb = new Fita(1);
                 fitaRgb.Definir(0, Fita.Montar((int)A(1), (int)A(2), (int)A(3)));
@@ -2780,8 +2762,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 int modo = (int)A(0);
                 if (!maq.Perfil.De8Bits) return Valor.Vazio;
                 if (modo == Maquina.ReferenciaInterna2V56 && maq.Perfil.Processador == "ATmega328P")
-                    throw new ErroDeExecucao("INTERNAL2V56 nao existe no ATmega328P (Uno, Nano): a referencia interna dele e "
-                        + "so a de 1,1 V (INTERNAL).", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("INTERNAL2V56 nao existe no ATmega328P (Uno, Nano): a referencia interna dele e so a de 1,1 V (INTERNAL)."), c.Linha);
                 maq.ReferenciaAnalogica = modo;
                 return Valor.Vazio;
             }
@@ -2911,9 +2892,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
             // precisa: o conversor deles e de 10 bits.
             case "analogReadResolution":
                 if (!maq.Perfil.MudaResolucaoDoAdc)
-                    throw new ErroDeExecucao($"analogReadResolution() nao existe no core do "
-                        + $"{maq.Perfil.Processador}: o conversor dele e de 10 bits, e o analogRead "
-                        + "ja vai de 0 a 1023.", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("analogReadResolution() nao existe no core do {0}: o conversor dele e de 10 bits, e o analogRead ja vai de 0 a 1023.", maq.Perfil.Processador), c.Linha);
                 maq.ResolucaoDoAdc = Math.Clamp((int)A(0), 1, 16);
                 return Valor.Vazio;
 
@@ -2957,8 +2936,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
             // bits: analogWriteRange(1023) faz o analogWrite ir de 0 a 1023.
             case "analogWriteRange":
                 if (maq.Perfil.Processador is not ("ESP8266" or "RP2040"))
-                    throw new ErroDeExecucao($"analogWriteRange() e do core do ESP8266 e do da "
-                        + $"Pico; no {maq.Perfil.Processador} use analogWriteResolution().", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("analogWriteRange() e do core do ESP8266 e do da Pico; no {0} use analogWriteResolution().", maq.Perfil.Processador), c.Linha);
                 maq.MaximoDoPwm = Math.Max(1, (int)A(0));
                 return Valor.Vazio;
             case "analogWriteFreq":
@@ -3010,8 +2988,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 if (k < t.Length && (t[k] == '-' || t[k] == '+')) k++;
                 while (k < t.Length && Uri.IsHexDigit(t[k]) && Convert.ToInt32(t[k].ToString(), 16) < Math.Max(2, base10)) k++;
                 if (k == 0 || k == 1 && t[0] is '-' or '+')
-                    throw new ErroDeExecucao($"std::{fn.Nome}(\"{t}\"): nao ha numero no comeco do texto -- na placa isso "
-                                             + "lanca std::invalid_argument, ninguem pega, e o abort() reinicia a placa.", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("std::{0}(\"{1}\"): nao ha numero no comeco do texto -- na placa isso lanca std::invalid_argument, ninguem pega, e o abort() reinicia a placa.", fn.Nome, t), c.Linha);
                 long n = Convert.ToInt64(t[..k].TrimStart('+'), Math.Max(2, base10) is 2 or 8 or 16 ? base10 : 10);
                 return DoTipo(n, fn.Nome switch { "stoi" => TipoC.Int, "stoul" => TipoC.ULong, "stoull" => TipoC.ULongLong,
                                                   "stoll" => TipoC.LongLong, _ => TipoC.Long });
@@ -3022,8 +2999,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 int k = 0;
                 while (k < t.Length && (char.IsDigit(t[k]) || t[k] is '.' or '-' or '+' or 'e' or 'E')) k++;
                 if (!double.TryParse(t[..k], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double d))
-                    throw new ErroDeExecucao($"std::{fn.Nome}(\"{t}\"): nao ha numero no comeco do texto -- na placa isso "
-                                             + "lanca std::invalid_argument e a placa reinicia.", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("std::{0}(\"{1}\"): nao ha numero no comeco do texto -- na placa isso lanca std::invalid_argument e a placa reinicia.", fn.Nome, t), c.Linha);
                 return DoTipo(d, fn.Nome == "stof" ? TipoC.Float : TipoC.Double);
             }
 
@@ -3044,7 +3020,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
             case "map":
             {
                 double v = A(0), i1 = A(1), i2 = A(2), o1 = A(3), o2 = A(4);
-                if (i2 - i1 == 0) throw new ErroDeExecucao("map() com faixa de entrada zero", c.Linha);
+                if (i2 - i1 == 0) throw new ErroDeExecucao(Idioma.T("map() com faixa de entrada zero"), c.Linha);
                 return Valor.DeInt(Math.Truncate((v - i1) * (o2 - o1) / (i2 - i1) + o1));
             }
             // Macros no Arduino (e std::abs na ESP32): o tipo do valor fica.
@@ -3140,8 +3116,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
             {
                 if (maq.Perfil.De8Bits)
                 {
-                    maq.Avisar($"{fn.Nome}() num {maq.Perfil.Processador} compila, mas nao sai em "
-                               + "lugar nenhum: o AVR nao tem saida padrao. Use Serial.print.");
+                    maq.Avisar(Idioma.T("{0}() num {1} compila, mas nao sai em lugar nenhum: o AVR nao tem saida padrao. Use Serial.print.", fn.Nome, maq.Perfil.Processador));
                     return Valor.DeInt(0);
                 }
                 string impresso = fn.Nome switch
@@ -3188,8 +3163,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
             case "analogReadTemp":
             {
                 if (!EhRp2040)
-                    throw new ErroDeExecucao("analogReadTemp() e do core da Raspberry Pi Pico: "
-                        + "so as placas com RP2040 tem o sensor de temperatura dentro do chip.", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("analogReadTemp() e do core da Raspberry Pi Pico: so as placas com RP2040 tem o sensor de temperatura dentro do chip."), c.Linha);
                 double vref = args.Count > 0 ? A(0) : 3.3;
                 double volts = maq.LeituraDoSensorDeTemperatura * vref / 4096.0;
                 return Valor.DeReal(27.0 - (volts - 0.706) / 0.001721);
@@ -3254,8 +3228,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
         // Um ponteiro de funcao que ainda nao recebeu funcao nenhuma.
         if (amb.Buscar(fn.Nome, out var vazio) && !vazio.EhTexto && vazio.Referencia is null)
             throw new ErroDeExecucao(
-                $"'{fn.Nome}' e uma variavel (vale {vazio.Mostrar()}), e nao uma funcao. Se ela guarda "
-                + "um ponteiro de funcao, ainda nao recebeu nenhuma -- na placa, isso trava o chip.", c.Linha);
+                Idioma.T("'{0}' e uma variavel (vale {1}), e nao uma funcao. Se ela guarda um ponteiro de funcao, ainda nao recebeu nenhuma -- na placa, isso trava o chip.", fn.Nome, vazio.Mostrar()), c.Linha);
 
         // Uma funcao do C nativo (os .c do projeto e das bibliotecas).
         if (TemNativa(fn.Nome, out var nativa)) return ChamarNativa(fn.Nome, nativa, args, c.Linha);
@@ -3271,7 +3244,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 return temporario.Classe == "IPAddress" ? ValorDoObjeto(temporario) : Valor.DeReferencia(temporario);
         }
 
-        throw new ErroDeExecucao($"funcao '{fn.Nome}()' ainda nao e suportada pelo simulador", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("funcao '{0}()' ainda nao e suportada pelo simulador", fn.Nome), c.Linha);
     }
 
     Valor ChamarSerial(string metodo, Chamada c, Ambiente amb)
@@ -3337,7 +3310,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
         if (maq.LigadosAoPino is not null) PortaGlobal("Serial", c.Linha).Atualizar();
         if (ChamarFluxo(maq.EntradaSerial, metodo, args, out var lido)) return lido;
 
-        throw new ErroDeExecucao($"Serial.{metodo}() ainda nao e suportado", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("Serial.{0}() ainda nao e suportado", metodo), c.Linha);
     }
 
     Valor ChamarObjeto(Objeto obj, string metodo, Chamada c, Ambiente amb)
@@ -3740,12 +3713,12 @@ public partial class Interpretador(Programa prog, Maquina maq)
                     return Valor.DeBool(obj.Pino >= 0);
 
                 default:
-                    throw new ErroDeExecucao($"Servo.{metodo}() nao e suportado", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("Servo.{0}() nao e suportado", metodo), c.Linha);
             }
         }
 
         if (obj.Lcd is null)
-            throw new ErroDeExecucao($"objeto '{obj.Classe}' sem display associado", c.Linha);
+            throw new ErroDeExecucao(Idioma.T("objeto '{0}' sem display associado", obj.Classe), c.Linha);
 
         switch (metodo)
         {
@@ -3775,7 +3748,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
             case "createChar":
             {
                 if (c.Args.Count < 2 || !VetorDoArgumento(c.Args[1], amb, out var linhas))
-                    throw new ErroDeExecucao("lcd.createChar(n, desenho): o desenho tem que ser um vetor de 8 bytes", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("lcd.createChar(n, desenho): o desenho tem que ser um vetor de 8 bytes"), c.Linha);
                 obj.Lcd.DefinirGlifo((int)A(0), [.. linhas.Select(v => (int)(long)v.Num)]);
                 return Valor.Vazio;
             }
@@ -3807,7 +3780,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                 return Valor.Vazio;
             default:
                 throw new ErroDeExecucao(
-                    $"'{obj.Classe}.{metodo}()' ainda nao e suportado", c.Linha);
+                    Idioma.T("'{0}.{1}()' ainda nao e suportado", obj.Classe, metodo), c.Linha);
         }
     }
 
@@ -3859,7 +3832,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
                                        out var lida))
                 return DataEm(new DateTimeOffset(lida, TimeSpan.Zero).ToUnixTimeSeconds());
 
-            throw new ErroDeExecucao($"DateTime(\"{texto}\"): nao entendi a data", linha);
+            throw new ErroDeExecucao(Idioma.T("DateTime(\"{0}\"): nao entendi a data", texto), linha);
         }
 
         int N(int k) => k < args.Count ? (int)args[k].Num : 0;
@@ -3872,7 +3845,7 @@ public partial class Interpretador(Programa prog, Maquina maq)
         }
         catch (ArgumentOutOfRangeException)
         {
-            throw new ErroDeExecucao($"DateTime({ano}, {N(1)}, {N(2)}): essa data nao existe", linha);
+            throw new ErroDeExecucao(Idioma.T("DateTime({0}, {1}, {2}): essa data nao existe", ano, N(1), N(2)), linha);
         }
     }
 

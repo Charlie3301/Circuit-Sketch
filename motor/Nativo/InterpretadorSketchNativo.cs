@@ -90,7 +90,7 @@ public partial class Interpretador
         if (alvo is null && nome == "__sdmmc_begin")
         {
             if (maq.Cartao.Montar()) return Valor.DeBool(true);
-            maq.Avisar("SD_MMC.begin() devolveu false: nao ha cartao microSD ligado nesta placa.");
+            maq.Avisar(Idioma.T("SD_MMC.begin() devolveu false: nao ha cartao microSD ligado nesta placa."));
             return Valor.DeBool(false);
         }
 

@@ -153,6 +153,6 @@ public partial class Interpretador
             case "setDebounceTime": case "begin":
                 return Valor.Vazio;
         }
-        throw new ErroDeExecucao($"Keypad::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("Keypad::{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 }

@@ -235,7 +235,7 @@ static class PacoteMqtt
             if ((b & 128) == 0) break;
             multiplicador *= 128;
         }
-        if (tamanho > 1 << 20) throw new IOException("pacote MQTT grande demais");
+        if (tamanho > 1 << 20) throw new IOException(Idioma.T("pacote MQTT grande demais"));
 
         var corpo = new byte[tamanho];
         int lidos = 0;
@@ -423,7 +423,7 @@ sealed class ConexaoMqtt
                 var seguro = new System.Net.Security.SslStream(bruto, false,
                     conferirCertificado ? null : (_, _, _, _) => true);
                 Esperar(seguro.AuthenticateAsClientAsync(host), tempoMs, desistir, c.tcp,
-                        $"negociar o TLS com {host}");
+                        Idioma.T("negociar o TLS com {0}", host));
                 bruto = seguro;
             }
 
@@ -431,17 +431,17 @@ sealed class ConexaoMqtt
             c.fluxo.ReadTimeout = tempoMs;
 
             c.Enviar(PacoteMqtt.Connect, PacoteMqtt.CorpoConnect(id, usuario, senha, keepAlive, testamento));
-            var resposta = PacoteMqtt.Ler(c.fluxo) ?? throw new IOException("o broker fechou a conexão");
+            var resposta = PacoteMqtt.Ler(c.fluxo) ?? throw new IOException(Idioma.T("o broker fechou a conexão"));
             if ((resposta.Cabecalho & 0xF0) != PacoteMqtt.Connack || resposta.Corpo.Length < 2)
-                throw new IOException("o broker respondeu algo que não é MQTT");
+                throw new IOException(Idioma.T("o broker respondeu algo que não é MQTT"));
             if (resposta.Corpo[1] != 0)
                 throw new RecusaDoBroker(resposta.Corpo[1], resposta.Corpo[1] switch
                 {
-                    4 => "o broker recusou o usuário ou a senha",
-                    5 => "o broker exige autorização (usuário e senha)",
-                    2 => "o broker recusou o id do cliente",
-                    3 => "o broker está indisponível",
-                    _ => $"o broker recusou a conexão (código {resposta.Corpo[1]})",
+                    4 => Idioma.T("o broker recusou o usuário ou a senha"),
+                    5 => Idioma.T("o broker exige autorização (usuário e senha)"),
+                    2 => Idioma.T("o broker recusou o id do cliente"),
+                    3 => Idioma.T("o broker está indisponível"),
+                    _ => Idioma.T("o broker recusou a conexão (código {0})", resposta.Corpo[1]),
                 });
 
             c.fluxo.ReadTimeout = Timeout.Infinite;
@@ -474,7 +474,7 @@ sealed class ConexaoMqtt
             if (relogio.ElapsedMilliseconds > tempoMs)
             {
                 fechar?.Dispose();
-                throw new TimeoutException($"tempo esgotado ao {oque}");
+                throw new TimeoutException(Idioma.T("tempo esgotado ao {0}", oque));
             }
         }
     }
@@ -554,7 +554,7 @@ sealed class ConexaoMqtt
         var tarefa = ConectarRapidoAsync(host, porta, cancelar.Token);
         try
         {
-            Esperar(tarefa, tempoMs, desistir, null, $"conectar em {host}:{porta}");
+            Esperar(tarefa, tempoMs, desistir, null, Idioma.T("conectar em {0}:{1}", host, porta));
         }
         catch
         {
@@ -629,7 +629,7 @@ sealed class ConexaoMqtt
     {
         lock (escrita)
         {
-            if (fluxo is null || fechada) throw new IOException("sem conexão com o broker");
+            if (fluxo is null || fechada) throw new IOException(Idioma.T("sem conexão com o broker"));
             PacoteMqtt.Escrever(fluxo, cabecalho, corpo);
             Interlocked.Exchange(ref ultimoEnvio, Environment.TickCount64);
         }

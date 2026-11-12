@@ -33,16 +33,16 @@ public class ParserPython(List<Token> toks)
     Token Exigir(string s)
     {
         if (!Checar(s))
-            throw new ErroDeSintaxe($"esperava '{s}' mas encontrei '{Mostrar(Atual)}'", Atual.Linha);
+            throw new ErroDeSintaxe(Idioma.T("esperava '{0}' mas encontrei '{1}'", s, Mostrar(Atual)), Atual.Linha);
         return Avancar();
     }
 
     static string Mostrar(Token t) => t.Tipo switch
     {
-        T.Nova => "fim da linha",
-        T.Entra => "um bloco indentado",
-        T.Sai => "o fim do bloco",
-        T.Fim => "o fim do arquivo",
+        T.Nova => Idioma.T("fim da linha"),
+        T.Entra => Idioma.T("um bloco indentado"),
+        T.Sai => Idioma.T("o fim do bloco"),
+        T.Fim => Idioma.T("o fim do arquivo"),
         _ => t.Texto
     };
 
@@ -63,7 +63,7 @@ public class ParserPython(List<Token> toks)
         if (Atual.Tipo == T.Nova) { Avancar(); fechouALinha = true; return; }
         if (Atual.Tipo is T.Fim or T.Sai) { fechouALinha = true; return; }
         throw new ErroDeSintaxe(
-            $"esperava o fim da linha mas encontrei '{Mostrar(Atual)}'", Atual.Linha);
+            Idioma.T("esperava o fim da linha mas encontrei '{0}'", Mostrar(Atual)), Atual.Linha);
     }
 
     /// <summary>
@@ -165,7 +165,7 @@ public class ParserPython(List<Token> toks)
             // aparecem em codigo colado: recusar com nome.
             if (Checar("*") || Checar("**"))
                 throw new ErroDeSintaxe(
-                    "parametro com * ou ** ainda nao e suportado", Atual.Linha);
+                    Idioma.T("parametro com * ou ** ainda nao e suportado"), Atual.Linha);
 
             string arg = Avancar().Texto;
 
@@ -210,7 +210,7 @@ public class ParserPython(List<Token> toks)
         Avancar();
         if (Atual.Tipo != T.Entra)
             throw new ErroDeSintaxe(
-                "esperava um bloco indentado depois dos dois-pontos", Atual.Linha);
+                Idioma.T("esperava um bloco indentado depois dos dois-pontos"), Atual.Linha);
         Avancar();
 
         var corpo = new List<Cmd>();
@@ -231,7 +231,7 @@ public class ParserPython(List<Token> toks)
 
         if (Atual.Tipo == T.Id && Recusadas.TryGetValue(Atual.Texto, out var oQue))
             throw new ErroDeSintaxe(
-                $"{oQue} ainda nao e suportado pelo simulador", linha);
+                Idioma.T("{0} ainda nao e suportado pelo simulador", oQue), linha);
 
         if (Checar("import") || Checar("from")) return AnalisarImport();
         if (Checar("try")) return AnalisarTente();
@@ -239,12 +239,12 @@ public class ParserPython(List<Token> toks)
         if (Checar("raise")) return AnalisarLevanta();
         if (Checar("assert")) return AnalisarAfirma();
         if (Checar("class")) throw new ErroDeSintaxe(
-            "classe dentro de funcao ou de bloco ainda nao e suportada: declare a classe no comeco do arquivo", linha);
+            Idioma.T("classe dentro de funcao ou de bloco ainda nao e suportada: declare a classe no comeco do arquivo"), linha);
         if (Checar("if")) return AnalisarSe();
         if (Checar("while")) return AnalisarEnquanto();
         if (Checar("for")) return AnalisarPara();
         if (Checar("def")) throw new ErroDeSintaxe(
-            "funcao dentro de outra ainda nao e suportada", linha);
+            Idioma.T("funcao dentro de outra ainda nao e suportada"), linha);
 
         if (Aceitar("pass")) { ExigirFimDeLinha(); return new CmdVazio(linha); }
         if (Aceitar("break")) { ExigirFimDeLinha(); return new CmdBreak(linha); }
@@ -446,7 +446,7 @@ public class ParserPython(List<Token> toks)
         {
             Avancar();
             if (Atual.Tipo != T.Entra)
-                throw new ErroDeSintaxe("esperava o corpo da classe, indentado", Atual.Linha);
+                throw new ErroDeSintaxe(Idioma.T("esperava o corpo da classe, indentado"), Atual.Linha);
             Avancar();
             while (Atual.Tipo is not (T.Sai or T.Fim))
             {
@@ -499,7 +499,7 @@ public class ParserPython(List<Token> toks)
             finalmente = AnalisarBloco();
         }
         if (casos.Count == 0 && finalmente is null)
-            throw new ErroDeSintaxe("try sem except nem finally", linha);
+            throw new ErroDeSintaxe(Idioma.T("try sem except nem finally"), linha);
         return new CmdTente(corpo, casos, senao, finalmente, linha);
     }
 
@@ -879,6 +879,6 @@ public class ParserPython(List<Token> toks)
             return new Variavel(t.Texto, t.Linha);
         }
 
-        throw new ErroDeSintaxe($"nao entendi '{Mostrar(t)}' aqui", t.Linha);
+        throw new ErroDeSintaxe(Idioma.T("nao entendi '{0}' aqui", Mostrar(t)), t.Linha);
     }
 }

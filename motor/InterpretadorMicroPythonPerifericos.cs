@@ -39,7 +39,7 @@ public partial class Interpretador
             if (scl < 0 && args.Count > 0 && args[0].Referencia is Objeto) scl = NumeroDePino(args[0], linha);
             if (sda < 0 && args.Count > 1 && args[1].Referencia is Objeto) sda = NumeroDePino(args[1], linha);
             if (scl < 0 || sda < 0)
-                throw new ErroDeExecucao($"TypeError: o {classe} por software precisa de scl=Pin(...) e sda=Pin(...)", linha);
+                throw new ErroDeExecucao(Idioma.T("TypeError: o {0} por software precisa de scl=Pin(...) e sda=Pin(...)", classe), linha);
             bus = maq.I2cPorSoftware(sda, scl);
         }
         else
@@ -53,8 +53,8 @@ public partial class Interpretador
             // A Pico so liga o i2c0 nos GPIO 0, 4, 8... (SDA) e 1, 5, 9... (SCL); o i2c1, nos 2, 6... e 3, 7...
             if (Chip == "RP2040")
             {
-                if (sda % 4 != (id == 0 ? 0 : 2)) throw new ErroDeExecucao($"ValueError: bad SDA pin -- o I2C({id}) da Pico nao sai no GP{sda}", linha);
-                if (scl % 4 != (id == 0 ? 1 : 3)) throw new ErroDeExecucao($"ValueError: bad SCL pin -- o I2C({id}) da Pico nao sai no GP{scl}", linha);
+                if (sda % 4 != (id == 0 ? 0 : 2)) throw new ErroDeExecucao(Idioma.T("ValueError: bad SDA pin -- o I2C({0}) da Pico nao sai no GP{1}", id, sda), linha);
+                if (scl % 4 != (id == 0 ? 1 : 3)) throw new ErroDeExecucao(Idioma.T("ValueError: bad SCL pin -- o I2C({0}) da Pico nao sai no GP{1}", id, scl), linha);
             }
             bus = id == 0 ? maq.I2c : maq.I2c1;
         }
@@ -80,8 +80,8 @@ public partial class Interpretador
         if (bus.Achar(endereco) is { } quem) return quem;
         string erro = Chip == "RP2040" ? "[Errno 5] EIO" : "[Errno 19] ENODEV";
         string onde = bus.ForaDoFio(endereco) is { PinoSda: >= 0 } fora
-            ? $" -- o {fora.Nome} esta nos pinos SDA {fora.PinoSda} / SCL {fora.PinoScl}, e este I2C usa SDA {bus.Sda} / SCL {bus.Scl}"
-            : $" -- ninguem respondeu no endereco 0x{endereco:X2} (a peca esta ligada nos pinos deste I2C?)";
+            ? Idioma.T(" -- o {0} esta nos pinos SDA {1} / SCL {2}, e este I2C usa SDA {3} / SCL {4}", fora.Nome, fora.PinoSda, fora.PinoScl, bus.Sda, bus.Scl)
+            : Idioma.T(" -- ninguem respondeu no endereco 0x{0:X2} (a peca esta ligada nos pinos deste I2C?)", endereco);
         throw new ErroDeExecucao($"OSError: {erro}{onde}", linha);
     }
 
@@ -158,8 +158,7 @@ public partial class Interpretador
                 return Valor.Vazio;
         }
 
-        throw new ErroDeExecucao($"I2C.{metodo}() ainda nao e suportado pelo simulador. O I2C tem scan, writeto, readfrom, "
-                                 + "writeto_mem, readfrom_mem, init e deinit.", linha);
+        throw new ErroDeExecucao(Idioma.T("I2C.{0}() ainda nao e suportado pelo simulador. O I2C tem scan, writeto, readfrom, writeto_mem, readfrom_mem, init e deinit.", metodo), linha);
     }
 
     // ---------------- SSD1306 (o driver ssd1306.py, em cima do framebuf) ----------------
@@ -180,7 +179,7 @@ public partial class Interpretador
         if (!spi)
         {
             var bus = args.Count > 2 && args[2].Referencia is Objeto { Rede: BarramentoI2c b } ? b
-                : throw new ErroDeExecucao("SSD1306_I2C(largura, altura, i2c): o terceiro argumento e o I2C da tela", linha);
+                : throw new ErroDeExecucao(Idioma.T("SSD1306_I2C(largura, altura, i2c): o terceiro argumento e o I2C da tela"), linha);
             endereco = nomeados.TryGetValue("addr", out var ad) ? (int)ad.Num : args.Count > 3 ? (int)args[3].Num : 0x3C;
             numero = bus.Numero;
             RegistrarNoI2c(objeto, endereco, numero);
@@ -263,8 +262,7 @@ public partial class Interpretador
                 return Valor.Vazio;
         }
 
-        throw new ErroDeExecucao($"SSD1306.{metodo}() ainda nao e suportado pelo simulador. A tela tem fill, pixel, hline, vline, "
-                                 + "line, rect, fill_rect, ellipse, text, scroll, show, contrast, invert, poweroff e poweron.", linha);
+        throw new ErroDeExecucao(Idioma.T("SSD1306.{0}() ainda nao e suportado pelo simulador. A tela tem fill, pixel, hline, vline, line, rect, fill_rect, ellipse, text, scroll, show, contrast, invert, poweroff e poweron.", metodo), linha);
     }
 
     /// <summary>O text() do framebuf: 8 colunas por letra, bit 0 em cima; fora de 32..127 vira o 127.</summary>
@@ -408,7 +406,6 @@ public partial class Interpretador
             case "sendbreak": return Valor.Vazio;
         }
 
-        throw new ErroDeExecucao($"UART.{metodo}() ainda nao e suportado pelo simulador. A UART tem write, read, readline, any, "
-                                 + "init, deinit, flush e txdone.", linha);
+        throw new ErroDeExecucao(Idioma.T("UART.{0}() ainda nao e suportado pelo simulador. A UART tem write, read, readline, any, init, deinit, flush e txdone.", metodo), linha);
     }
 }

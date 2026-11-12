@@ -78,8 +78,7 @@ public partial class Interpretador
         }
 
         throw new ErroDeExecucao(
-            $"bot.{metodo}() ainda nao e suportado pelo simulador. "
-            + "Por enquanto valem sendMessage() e getUpdates().", c.Linha);
+            Idioma.T("bot.{0}() ainda nao e suportado pelo simulador. Por enquanto valem sendMessage() e getUpdates().", metodo), c.Linha);
     }
 
     bool EnviarNoTelegram(EstadoTelegram estado, string chatId, string texto,
@@ -90,7 +89,7 @@ public partial class Interpretador
         if (!Maq.Rede.WifiConectado(Maq))
         {
             Maq.Rede.Anotar(Maq, "telegram",
-                "bot.sendMessage() antes de o WiFi conectar: nao foi enviado");
+                Idioma.T("bot.sendMessage() antes de o WiFi conectar: nao foi enviado"));
             return false;
         }
 
@@ -110,8 +109,8 @@ public partial class Interpretador
 
         Maq.Rede.Anotar(Maq, "telegram",
             resposta.Codigo == 401
-                ? "o Telegram recusou o token (401). Confira o BOT_TOKEN do sketch."
-                : $"o Telegram respondeu {resposta.Codigo}");
+                ? Idioma.T("o Telegram recusou o token (401). Confira o BOT_TOKEN do sketch.")
+                : Idioma.T("o Telegram respondeu {0}", resposta.Codigo));
         return false;
     }
 
@@ -132,8 +131,8 @@ public partial class Interpretador
         {
             Maq.Rede.Anotar(Maq, "telegram",
                 resposta.Codigo == 401
-                    ? "o Telegram recusou o token (401) no getUpdates()"
-                    : $"getUpdates() respondeu {resposta.Codigo}");
+                    ? Idioma.T("o Telegram recusou o token (401) no getUpdates()")
+                    : Idioma.T("getUpdates() respondeu {0}", resposta.Codigo));
             return 0;
         }
 
@@ -264,6 +263,6 @@ public partial class Interpretador
         }
 
         throw new ErroDeExecucao(
-            $"preferences.{metodo}() ainda nao e suportado pelo simulador", c.Linha);
+            Idioma.T("preferences.{0}() ainda nao e suportado pelo simulador", metodo), c.Linha);
     }
 }

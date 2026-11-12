@@ -85,16 +85,15 @@ public partial class Interpretador
         var alvo = ObjetoDoArgumento(c.Args.Count > 0 ? c.Args[0] : null, amb);
         if (alvo is null)
             throw new ErroDeExecucao(
-                "getLocalTime() espera o endereco de um 'struct tm', "
-                + "como em getLocalTime(&agora).", c.Linha);
+                Idioma.T("getLocalTime() espera o endereco de um 'struct tm', como em getLocalTime(&agora)."), c.Linha);
 
         // Sem WiFi nao ha NTP -- e o erro numero um deste sketch.
         bool temRede = Maq.Rede is not null && Maq.Rede.NaRede(Maq);
         if (!temRede || !relogioPedido)
         {
             Maq.Rede?.Anotar(Maq, "ntp", !relogioPedido
-                ? "getLocalTime() antes de configTime(): o relogio nunca foi acertado"
-                : "getLocalTime() sem WiFi conectado: a hora nao pode ser buscada");
+                ? Idioma.T("getLocalTime() antes de configTime(): o relogio nunca foi acertado")
+                : Idioma.T("getLocalTime() sem WiFi conectado: a hora nao pode ser buscada"));
             return true;
         }
 

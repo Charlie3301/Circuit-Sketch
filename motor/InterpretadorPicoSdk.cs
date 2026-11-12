@@ -177,9 +177,7 @@ public partial class Interpretador
             {
                 int pino = (int)A(0);
                 if (!pinosEmPwm.Contains(pino) && avisosDePwm.Add(pino))
-                    maq.Avisar($"pwm_set_gpio_level no GP{pino}, mas o pino nao foi passado para o "
-                               + $"PWM: falta gpio_set_function({pino}, GPIO_FUNC_PWM). Na placa, o "
-                               + "sinal nao sai no pino.");
+                    maq.Avisar(Idioma.T("pwm_set_gpio_level no GP{0}, mas o pino nao foi passado para o PWM: falta gpio_set_function({1}, GPIO_FUNC_PWM). Na placa, o sinal nao sai no pino.", pino, pino));
                 MudarNivel((pino >> 1) & 7, pino & 1, A(1));
                 return true;
             }
@@ -211,8 +209,7 @@ public partial class Interpretador
         if (!avisouDoSensorDesligado)
         {
             avisouDoSensorDesligado = true;
-            maq.Avisar("adc_read() no canal 4 com o sensor de temperatura desligado: chame "
-                       + "adc_set_temp_sensor_enabled(true) antes. Na placa a leitura fica em zero.");
+            maq.Avisar(Idioma.T("adc_read() no canal 4 com o sensor de temperatura desligado: chame adc_set_temp_sensor_enabled(true) antes. Na placa a leitura fica em zero."));
         }
         return 0;
     }

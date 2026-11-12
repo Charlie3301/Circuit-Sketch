@@ -32,7 +32,7 @@ public partial class Interpretador
         Valor[] Vetor(int i)
         {
             if (i < N && VetorDoArgumento(c.Args[i], amb, out var vetor)) return vetor;
-            throw new ErroDeExecucao($"tft.{metodo}(): o argumento {i + 1} tem que ser um vetor (a imagem).", c.Linha);
+            throw new ErroDeExecucao(Idioma.T("tft.{0}(): o argumento {1} tem que ser um vetor (a imagem).", metodo, i + 1), c.Linha);
         }
 
         switch (metodo)
@@ -121,8 +121,7 @@ public partial class Interpretador
             case "setFont":
                 if (N == 0 || Arg(0).Num == 0 && !Arg(0).EhTexto && Arg(0).Referencia is null) return Valor.Vazio;
                 throw new ErroDeExecucao(
-                    "tft.setFont(): as fontes da Adafruit_GFX (FreeSans, FreeMono...) ainda nao estao no "
-                    + "simulador. Sem setFont, o texto sai na fonte 5x7 da biblioteca -- use setTextSize para aumentar.",
+                    Idioma.T("tft.setFont(): as fontes da Adafruit_GFX (FreeSans, FreeMono...) ainda nao estao no simulador. Sem setFont, o texto sai na fonte 5x7 da biblioteca -- use setTextSize para aumentar."),
                     c.Linha);
 
             case "print":
@@ -263,6 +262,6 @@ public partial class Interpretador
             }
         }
 
-        throw new ErroDeExecucao($"'{obj.Classe}.{metodo}()' ainda nao e suportado", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("'{0}.{1}()' ainda nao e suportado", obj.Classe, metodo), c.Linha);
     }
 }

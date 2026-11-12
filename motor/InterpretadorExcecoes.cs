@@ -84,11 +84,12 @@ public partial class Interpretador
     static string TipoDoErro(ErroDeExecucao e)
     {
         if (e is ExcecaoDoSketch x) return x.Tipo;
-        string m = e.Message.ToLowerInvariant();
+        // As regras olham o portugues: em outro idioma, a mensagem volta para ele antes.
+        string m = Idioma.Desfazer(e.Texto).ToLowerInvariant();
         if (m.Contains("oserror")) return "OSError";   // o I2C e a UART do Python ja dizem
         if (m.Contains("divisao por zero") || m.Contains("dividir por zero") || m.Contains("modulo por zero")) return "ZeroDivisionError";
         if (m.Contains("indice") && (m.Contains("fora") || m.Contains("range"))) return "IndexError";
-        if (m.Contains("chave") && (m.Contains("nao existe") || m.Contains("nao tem"))) return "KeyError";
+        if (m.Contains("chave") && (m.Contains("nao existe") || m.Contains("nao tem") || m.Contains("nao esta no dicionario"))) return "KeyError";
         if (m.Contains("nao foi declarada") || m.Contains("nao foi definid")) return "NameError";
         if (m.Contains("nao tem o campo") || m.Contains("nao tem o metodo") || m.Contains("nao tem atributo")) return "AttributeError";
         if (m.Contains("memoria") || m.Contains("heap")) return "MemoryError";
@@ -113,14 +114,7 @@ public partial class Interpretador
         => e is ExcecaoDoSketch { Objeto: { } o }
             ? Valor.DeReferencia(o)
             : Valor.DeReferencia(NovaExcecao(TipoDoErro(e),
-                [Valor.DeTexto(e is ExcecaoDoSketch x ? x.Mensagem : SemOnde(e.Message))]));
-
-    /// <summary>"linha 7: indice 5 fora do vetor" -> "indice 5 fora do vetor".</summary>
-    static string SemOnde(string mensagem)
-    {
-        int dois = mensagem.IndexOf(": ", StringComparison.Ordinal);
-        return dois > 0 && dois < 40 ? mensagem[(dois + 2)..] : mensagem;
-    }
+                [Valor.DeTexto(e is ExcecaoDoSketch x ? x.Mensagem : e.Texto)]));
 
     void ExecTente(CmdTente t, Ambiente amb)
     {
@@ -269,13 +263,13 @@ public partial class Interpretador
     {
         if (!amb.Buscar("self", out var self) || self.Referencia is not Objeto obj
             || !amb.Buscar("__classe__", out var classe) || !classes.TryGetValue(classe.Texto ?? "", out var daqui))
-            throw new ErroDeExecucao("super() so funciona dentro de um metodo de classe", c.Linha);
+            throw new ErroDeExecucao(Idioma.T("super() so funciona dentro de um metodo de classe"), c.Linha);
         var deCima = daqui.Bases.FirstOrDefault();
         if (deCima is null)
         {
             // A de cima e embutida (Exception, object): o __init__ dela nao faz nada aqui.
             if (metodo == "__init__") return Valor.Vazio;
-            throw new ErroDeExecucao($"a classe {daqui.Nome} nao tem classe de cima com {metodo}()", c.Linha);
+            throw new ErroDeExecucao(Idioma.T("a classe {0} nao tem classe de cima com {1}()", daqui.Nome, metodo), c.Linha);
         }
         Funcao f = metodo == "__init__"
             ? (deCima.Construtores.Count > 0 ? Escolher(deCima.Construtores, c.Args, amb, c.Linha, deCima.Nome) : null)
@@ -283,7 +277,7 @@ public partial class Interpretador
         if (f is null)
         {
             if (metodo == "__init__") return Valor.Vazio;
-            throw new ErroDeExecucao($"a classe {deCima.Nome} nao tem o metodo {metodo}()", c.Linha);
+            throw new ErroDeExecucao(Idioma.T("a classe {0} nao tem o metodo {1}()", deCima.Nome, metodo), c.Linha);
         }
         return ChamarUsuario(f, c.Args, amb, EscopoComSelf(obj, deCima.Nome), c.Linha);
     }

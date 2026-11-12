@@ -209,20 +209,18 @@ public sealed partial class Rede
             if (!ExigeRedeDeVerdade) return;
 
             estado.Falha = 1;
-            Anotar(placa, "wifi", $"nao achou a rede \"{estado.Ssid}\"");
+            Anotar(placa, "wifi", Idioma.T("nao achou a rede \"{0}\"", estado.Ssid));
             Avisar(placa,
-                $"WiFi.begin(\"{estado.Ssid}\"): nao ha rede com esse nome no circuito. "
-                + "Confira o SSID do ponto de acesso, ou tire a peca do circuito para voltar "
-                + "a conectar em qualquer nome.");
+                Idioma.T("WiFi.begin(\"{0}\"): nao ha rede com esse nome no circuito. Confira o SSID do ponto de acesso, ou tire a peca do circuito para voltar a conectar em qualquer nome.", estado.Ssid));
             return;
         }
 
         if (!ponto.Aberta && (senha ?? "") != ponto.Senha)
         {
             estado.Falha = 4;
-            Anotar(placa, "wifi", $"senha errada em \"{estado.Ssid}\"");
+            Anotar(placa, "wifi", Idioma.T("senha errada em \"{0}\"", estado.Ssid));
             Avisar(placa,
-                $"WiFi.begin(\"{estado.Ssid}\"): a senha nao confere com a do ponto de acesso.");
+                Idioma.T("WiFi.begin(\"{0}\"): a senha nao confere com a do ponto de acesso.", estado.Ssid));
         }
     }
 
@@ -245,7 +243,7 @@ public sealed partial class Rede
         estado.ModoAp = true;
         estado.ConectaEm = placa.Ms;
         estado.Anunciado = true;
-        Anotar(placa, "wifi", $"abriu a rede \"{estado.Ssid}\" (ponto de acesso) · IP {estado.Ip}");
+        Anotar(placa, "wifi", Idioma.T("abriu a rede \"{0}\" (ponto de acesso) · IP {1}", estado.Ssid, estado.Ip));
     }
 
     /// <summary>Quantas placas estao conectadas agora na rede deste nome (as luzes do roteador).</summary>
@@ -264,7 +262,7 @@ public sealed partial class Rede
         if (!estado.Anunciado)
         {
             estado.Anunciado = true;
-            Anotar(placa, "wifi", $"conectou em \"{estado.Ssid}\" · IP {estado.Ip}");
+            Anotar(placa, "wifi", Idioma.T("conectou em \"{0}\" · IP {1}", estado.Ssid, estado.Ip));
         }
         return true;
     }
@@ -278,7 +276,7 @@ public sealed partial class Rede
         var estado = Wifi(placa);
         if (estado.Cabo) return;
         estado.Cabo = true;
-        Anotar(placa, "eth", $"cabo de rede ligado · IP {estado.Ip}");
+        Anotar(placa, "eth", Idioma.T("cabo de rede ligado · IP {0}", estado.Ip));
     }
 
     public void DesligarCabo(Maquina placa)
@@ -286,7 +284,7 @@ public sealed partial class Rede
         var estado = Wifi(placa);
         if (!estado.Cabo) return;
         estado.Cabo = false;
-        Anotar(placa, "eth", "cabo de rede desligado");
+        Anotar(placa, "eth", Idioma.T("cabo de rede desligado"));
     }
 
     public bool CaboConectado(Maquina placa) => Wifi(placa).Cabo;
@@ -297,7 +295,7 @@ public sealed partial class Rede
     public void DesligarWifi(Maquina placa)
     {
         var estado = Wifi(placa);
-        if (estado.Ligado && estado.Anunciado) Anotar(placa, "wifi", "desconectou do WiFi");
+        if (estado.Ligado && estado.Anunciado) Anotar(placa, "wifi", Idioma.T("desconectou do WiFi"));
         estado.Ligado = false;
     }
 
@@ -389,12 +387,11 @@ public sealed partial class Rede
         servidor.AbrirPonte();
 
         Anotar(dona, "servidor", servidor.UrlLocal is null
-            ? $"servidor na porta {porta}; as portas 8080 a 8099 do computador estão ocupadas, "
-              + "então só as placas da bancada o alcançam"
-            : $"servidor na porta {porta} · abra no navegador: {servidor.UrlLocal}");
+            ? Idioma.T("servidor na porta {0}; as portas 8080 a 8099 do computador estão ocupadas, então só as placas da bancada o alcançam", porta)
+            : Idioma.T("servidor na porta {0} · abra no navegador: {1}", porta, servidor.UrlLocal));
 
         if (!Wifi(dona).Ligado)
-            Anotar(dona, "aviso", "o servidor abriu, mas a placa ainda não chamou WiFi.begin()");
+            Anotar(dona, "aviso", Idioma.T("o servidor abriu, mas a placa ainda não chamou WiFi.begin()"));
         return servidor;
     }
 
@@ -454,8 +451,7 @@ public sealed partial class Rede
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return null;
         if (!EhLocal(uri.Host) && !UsarInternet)
         {
-            Anotar(origem, "http", $"GET {url} → sem internet: a rede do simulador está sem saída "
-                                   + "(menu ⋮ > Rede usa a internet do computador)");
+            Anotar(origem, "http", Idioma.T("GET {0} → sem internet: a rede do simulador está sem saída (menu ⋮ > Rede usa a internet do computador)", url));
             return null;
         }
         using var cancelar = new CancellationTokenSource(tempoMs);
@@ -477,12 +473,12 @@ public sealed partial class Rede
             while (!tarefa.Wait(40))
                 if (origem.Parar) { cancelar.Cancel(); throw new ExecucaoInterrompida(); }
             var dados = tarefa.Result;
-            Anotar(origem, "http", dados is null ? $"GET {url} → recusado" : $"GET {url} → {dados.Length} bytes");
+            Anotar(origem, "http", dados is null ? $"GET {url} → recusado" : Idioma.T("GET {0} → {1} bytes", url, dados.Length));
             return dados;
         }
         catch (AggregateException)
         {
-            Anotar(origem, "http", $"GET {url} → não veio");
+            Anotar(origem, "http", Idioma.T("GET {0} → não veio", url));
             return null;
         }
     }
@@ -493,14 +489,13 @@ public sealed partial class Rede
         metodo = (metodo ?? "GET").ToUpperInvariant();
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || (uri.Scheme != "http" && uri.Scheme != "https"))
         {
-            Anotar(origem, "http", $"{metodo} {url}: endereço inválido (precisa começar com http:// ou https://)");
+            Anotar(origem, "http", Idioma.T("{0} {1}: endereço inválido (precisa começar com http:// ou https://)", metodo, url));
             return RespostaHttp.Erro(ErroConexaoRecusada);
         }
 
         if (!NaRede(origem))
         {
-            Anotar(origem, "aviso", $"{metodo} {url}: a placa não está no WiFi. "
-                                    + "Chame WiFi.begin() e espere WL_CONNECTED antes.");
+            Anotar(origem, "aviso", Idioma.T("{0} {1}: a placa não está no WiFi. Chame WiFi.begin() e espere WL_CONNECTED antes.", metodo, url));
             return RespostaHttp.Erro(ErroConexaoRecusada);
         }
 
@@ -514,7 +509,7 @@ public sealed partial class Rede
             if (origem.Parar) throw new ExecucaoInterrompida();
             if (bytes is null)
             {
-                Anotar(origem, "http", $"{metodo} {url} → {alvo.Dona.Nome} não respondeu a tempo");
+                Anotar(origem, "http", Idioma.T("{0} {1} → {2} não respondeu a tempo", metodo, url, alvo.Dona.Nome));
                 return RespostaHttp.Erro(ErroTempoDeLeitura);
             }
             var resposta = PedidoHttp.LerResposta(bytes);
@@ -524,15 +519,14 @@ public sealed partial class Rede
 
         if (EhIpDaBancada(uri.Host))
         {
-            Anotar(origem, "http", $"{metodo} {url} → recusado: nenhuma placa ouve na porta {uri.Port}");
+            Anotar(origem, "http", Idioma.T("{0} {1} → recusado: nenhuma placa ouve na porta {2}", metodo, url, uri.Port));
             return RespostaHttp.Erro(ErroConexaoRecusada);
         }
 
         // 2 e 3. o computador ou a internet
         if (!EhLocal(uri.Host) && !UsarInternet)
         {
-            Anotar(origem, "http", $"{metodo} {url} → sem internet: a rede do simulador está sem saída "
-                                   + "(menu ⋮ > Rede usa a internet do computador)");
+            Anotar(origem, "http", Idioma.T("{0} {1} → sem internet: a rede do simulador está sem saída (menu ⋮ > Rede usa a internet do computador)", metodo, url));
             return RespostaHttp.Erro(ErroConexaoRecusada);
         }
 
@@ -572,17 +566,17 @@ public sealed partial class Rede
                 if (origem.Parar) { cancelar.Cancel(); throw new ExecucaoInterrompida(); }
 
             var resposta = tarefa.Result;
-            Anotar(origem, "http", $"{metodo} {url} → {resposta.Codigo} ({resposta.Corpo.Length} caracteres)");
+            Anotar(origem, "http", Idioma.T("{0} {1} → {2} ({3} caracteres)", metodo, url, resposta.Codigo, resposta.Corpo.Length));
             return resposta;
         }
         catch (AggregateException ae) when (ae.InnerException is OperationCanceledException)
         {
-            Anotar(origem, "http", $"{metodo} {url} → tempo esgotado ({tempoMs} ms)");
+            Anotar(origem, "http", Idioma.T("{0} {1} → tempo esgotado ({2} ms)", metodo, url, tempoMs));
             return RespostaHttp.Erro(ErroTempoDeLeitura);
         }
         catch (AggregateException ae)
         {
-            Anotar(origem, "http", $"{metodo} {url} → não conectou: {Explicar(ae.InnerException)}");
+            Anotar(origem, "http", Idioma.T("{0} {1} → não conectou: {2}", metodo, url, Explicar(ae.InnerException)));
             return RespostaHttp.Erro(ErroConexaoRecusada);
         }
     }
@@ -592,10 +586,10 @@ public sealed partial class Rede
         while (ex?.InnerException is not null && ex is HttpRequestException) ex = ex.InnerException;
         return ex switch
         {
-            null => "erro desconhecido",
-            SocketException { SocketErrorCode: SocketError.HostNotFound } => "endereço não encontrado (sem internet?)",
-            SocketException { SocketErrorCode: SocketError.ConnectionRefused } => "conexão recusada",
-            TimeoutException => "tempo esgotado",
+            null => Idioma.T("erro desconhecido"),
+            SocketException { SocketErrorCode: SocketError.HostNotFound } => Idioma.T("endereço não encontrado (sem internet?)"),
+            SocketException { SocketErrorCode: SocketError.ConnectionRefused } => Idioma.T("conexão recusada"),
+            TimeoutException => Idioma.T("tempo esgotado"),
             _ => ex.Message,
         };
     }
@@ -610,7 +604,7 @@ public sealed partial class Rede
     {
         if (!NaRede(origem))
         {
-            Anotar(origem, "aviso", $"connect({host}, {porta}): a placa não está no WiFi");
+            Anotar(origem, "aviso", Idioma.T("connect({0}, {1}): a placa não está no WiFi", host, porta));
             return null;
         }
 
@@ -619,11 +613,11 @@ public sealed partial class Rede
         if (servidor is not null)
         {
             conexao = ConexaoTcp.ParaPlaca(origem, servidor, host, porta);
-            Anotar(origem, "tcp", $"conectou em {servidor.Dona.Nome} ({host}:{porta})");
+            Anotar(origem, "tcp", Idioma.T("conectou em {0} ({1}:{2})", servidor.Dona.Nome, host, porta));
         }
         else if (EhIpDaBancada(host))
         {
-            Anotar(origem, "tcp", $"{host}:{porta} recusou: nenhuma placa ouve nessa porta");
+            Anotar(origem, "tcp", Idioma.T("{0}:{1} recusou: nenhuma placa ouve nessa porta", host, porta));
             return null;
         }
         else if (host == EnderecoDoBrokerInterno && PortaDoBroker > 0 && !segura)
@@ -633,13 +627,13 @@ public sealed partial class Rede
             catch (ExecucaoInterrompida) { throw; }
             catch (Exception ex)
             {
-                Anotar(origem, "tcp", $"o broker interno não conectou: {Explicar(ex)}");
+                Anotar(origem, "tcp", Idioma.T("o broker interno não conectou: {0}", Explicar(ex)));
                 return null;
             }
         }
         else if (!EhLocal(host) && !UsarInternet)
         {
-            Anotar(origem, "tcp", $"{host}:{porta}: sem internet (menu ⋮ > Rede usa a internet do computador)");
+            Anotar(origem, "tcp", Idioma.T("{0}:{1}: sem internet (menu ⋮ > Rede usa a internet do computador)", host, porta));
             return null;
         }
         else
@@ -647,7 +641,7 @@ public sealed partial class Rede
             try
             {
                 conexao = ConexaoTcp.Real(origem, host, porta, segura, insegura, 5000);
-                Anotar(origem, "tcp", $"conectou em {host}:{porta}");
+                Anotar(origem, "tcp", Idioma.T("conectou em {0}:{1}", host, porta));
             }
             catch (ExecucaoInterrompida) { throw; }
             catch (Exception ex)
@@ -659,14 +653,14 @@ public sealed partial class Rede
                     try
                     {
                         conexao = ConexaoTcp.Real(origem, "127.0.0.1", PortaDoBroker, false, false, 5000);
-                        Anotar(origem, "mqtt", $"{host}:{porta} não respondeu ({Explicar(ex)}) -- o broker interno do simulador atende no lugar dele");
+                        Anotar(origem, "mqtt", Idioma.T("{0}:{1} não respondeu ({2}) -- o broker interno do simulador atende no lugar dele", host, porta, Explicar(ex)));
                     }
                     catch (ExecucaoInterrompida) { throw; }
                     catch (Exception) { conexao = null; }
                 }
                 if (conexao is null)
                 {
-                    Anotar(origem, "tcp", $"{host}:{porta} não conectou: {Explicar(ex)}");
+                    Anotar(origem, "tcp", Idioma.T("{0}:{1} não conectou: {2}", host, porta, Explicar(ex)));
                     return null;
                 }
             }
@@ -724,13 +718,13 @@ public sealed partial class Rede
         if (!NaRede(placa))
         {
             cliente.Estado = -2;
-            Anotar(placa, "aviso", "MQTT connect(): a placa não está no WiFi");
+            Anotar(placa, "aviso", Idioma.T("MQTT connect(): a placa não está no WiFi"));
             return false;
         }
         if (string.IsNullOrWhiteSpace(cliente.Host))
         {
             cliente.Estado = -2;
-            Anotar(placa, "aviso", "MQTT connect() sem client.setServer(broker, porta) antes");
+            Anotar(placa, "aviso", Idioma.T("MQTT connect() sem client.setServer(broker, porta) antes"));
             return false;
         }
 
@@ -771,10 +765,7 @@ public sealed partial class Rede
                         // Caiu logo depois de conectar, sem o sketch pedir:
                         // quase sempre e outro cliente com o mesmo id.
                         bool logo = Environment.TickCount64 - cliente.ConectouEm < 20_000;
-                        Anotar(placa, "mqtt", $"a conexão com {host} caiu"
-                            + (logo ? $" logo depois de conectar. Outro cliente entrou com o mesmo id "
-                                      + $"(\"{cliente.Id}\")? Num broker público cada placa precisa de um id "
-                                      + "diferente, como \"ESP32-\" + WiFi.macAddress()." : ""));
+                        Anotar(placa, "mqtt", Idioma.T("a conexão com {0} caiu{1}", host, (logo ? Idioma.T(" logo depois de conectar. Outro cliente entrou com o mesmo id (\"{0}\")? Num broker público cada placa precisa de um id diferente, como \"ESP32-\" + WiFi.macAddress().", cliente.Id) : "")));
                     };
                     cliente.Tcp = tcp;
                     cliente.Interno = false;
@@ -785,8 +776,7 @@ public sealed partial class Rede
                         semResposta.Remove(chave);
                         if (!clientesMqtt.Contains(cliente)) clientesMqtt.Add(cliente);
                     }
-                    Anotar(placa, "mqtt", $"conectou em {host}:{cliente.Porta}{(cliente.Tls ? " (TLS)" : "")} "
-                                          + $"como \"{cliente.Id}\"");
+                    Anotar(placa, "mqtt", Idioma.T("conectou em {0}:{1}{2} como \"{3}\"", host, cliente.Porta, (cliente.Tls ? " (TLS)" : ""), cliente.Id));
                     return true;
                 }
                 catch (ExecucaoInterrompida) { throw; }
@@ -796,8 +786,7 @@ public sealed partial class Rede
                     // conectar, com o codigo no state(). Cair no broker
                     // interno aqui esconderia a senha errada.
                     cliente.Estado = recusa.Codigo;
-                    Anotar(placa, "mqtt", $"{host} recusou a conexão: {recusa.Message} "
-                                          + $"(client.state() = {recusa.Codigo})");
+                    Anotar(placa, "mqtt", Idioma.T("{0} recusou a conexão: {1} (client.state() = {2})", host, recusa.Message, recusa.Codigo));
                     return false;
                 }
                 catch (Exception ex)
@@ -814,31 +803,29 @@ public sealed partial class Rede
                     if (EhLocal(host))
                     {
                         cliente.Estado = ex is TimeoutException || causa is TimeoutException ? -4 : -2;
-                        Anotar(placa, "mqtt", $"{host}:{cliente.Porta} não conectou: {Explicar(causa)}");
+                        Anotar(placa, "mqtt", Idioma.T("{0}:{1} não conectou: {2}", host, cliente.Porta, Explicar(causa)));
                         return false;
                     }
 
                     string dica = cliente.Porta == 8883 && !cliente.Tls
-                        ? " A porta 8883 é a do MQTT com TLS: o PubSubClient precisa de um WiFiClientSecure."
+                        ? Idioma.T(" A porta 8883 é a do MQTT com TLS: o PubSubClient precisa de um WiFiClientSecure.")
                         : cliente.Porta == 1883 && cliente.Tls
-                            ? " A porta 1883 é a do MQTT sem TLS: com WiFiClientSecure, o broker costuma usar a 8883."
-                            : ex is BrokerSemResposta ? "" : " (a conexão abriu, mas o broker não respondeu o CONNECT)";
+                            ? Idioma.T(" A porta 1883 é a do MQTT sem TLS: com WiFiClientSecure, o broker costuma usar a 8883.")
+                            : ex is BrokerSemResposta ? "" : Idioma.T(" (a conexão abriu, mas o broker não respondeu o CONNECT)");
 
                     lock (trava) semResposta[chave] = Environment.TickCount64;
-                    Anotar(placa, "mqtt", $"{host} não respondeu ({Explicar(causa)}).{dica} Usando o broker "
-                                          + "interno do CircuitSketch: as placas da bancada e o painel Rede conversam por ele");
+                    Anotar(placa, "mqtt", Idioma.T("{0} não respondeu ({1}).{2} Usando o broker interno do CircuitSketch: as placas da bancada e o painel Rede conversam por ele", host, Explicar(causa), dica));
                 }
             }
             else
             {
                 long volta = (EsperaParaTentarDeNovoMs - (agora - falhou) + 999) / 1000;
-                Anotar(placa, "mqtt", $"{host} não respondeu há pouco; usando o broker interno direto "
-                                      + $"(tenta {host} de novo em {volta} s)");
+                Anotar(placa, "mqtt", Idioma.T("{0} não respondeu há pouco; usando o broker interno direto (tenta {1} de novo em {2} s)", host, host, volta));
             }
         }
         else if (semSaida)
         {
-            Anotar(placa, "mqtt", $"sem internet: \"{host}\" virou o broker interno do CircuitSketch");
+            Anotar(placa, "mqtt", Idioma.T("sem internet: \"{0}\" virou o broker interno do CircuitSketch", host));
         }
 
         // O broker interno tambem derruba o id repetido -- e o que qualquer
@@ -850,7 +837,7 @@ public sealed partial class Rede
         cliente.Estado = 0;
         cliente.ConectouEm = Environment.TickCount64;
         lock (trava) if (!clientesMqtt.Contains(cliente)) clientesMqtt.Add(cliente);
-        if (daBancada) Anotar(placa, "mqtt", $"conectou no broker interno como \"{cliente.Id}\"");
+        if (daBancada) Anotar(placa, "mqtt", Idioma.T("conectou no broker interno como \"{0}\"", cliente.Id));
         return true;
     }
 
@@ -872,8 +859,7 @@ public sealed partial class Rede
 
         foreach (var velho in repetidos)
         {
-            string texto = $"duas placas com o mesmo client id (\"{cliente.Id}\"): o broker derruba uma quando a "
-                           + "outra conecta. Dê um id diferente para cada uma, como \"ESP32-\" + WiFi.macAddress().";
+            string texto = Idioma.T("duas placas com o mesmo client id (\"{0}\"): o broker derruba uma quando a outra conecta. Dê um id diferente para cada uma, como \"ESP32-\" + WiFi.macAddress().", cliente.Id);
             Anotar(cliente.Dona, "aviso", texto);
 
             if (!externo)
@@ -881,8 +867,7 @@ public sealed partial class Rede
                 Broker.RemoverDono(velho);
                 velho.EsvaziarChegadas();
                 velho.Estado = -3;
-                Anotar(velho.Dona, "mqtt", $"o broker derrubou a conexão: outra placa entrou com o mesmo id "
-                                           + $"(\"{velho.Id}\")");
+                Anotar(velho.Dona, "mqtt", Idioma.T("o broker derrubou a conexão: outra placa entrou com o mesmo id (\"{0}\")", velho.Id));
             }
         }
     }
@@ -908,7 +893,7 @@ public sealed partial class Rede
     public bool AssinarMqtt(ClienteMqtt cliente, string filtro)
     {
         if (!cliente.Conectado) return false;
-        Anotar(cliente.Dona, "mqtt", $"assinou {filtro}");
+        Anotar(cliente.Dona, "mqtt", Idioma.T("assinou {0}", filtro));
 
         if (cliente.Interno)
         {
@@ -948,14 +933,14 @@ public sealed partial class Rede
         if (estava && !educado && cliente.Testamento is { } testamento && cliente.Interno)
         {
             Broker.Publicar(testamento.Topico, testamento.Carga, testamento.Retida);
-            Anotar(cliente.Dona, "mqtt", $"o broker publicou o testamento: {testamento.Topico}: {Curto(testamento.Carga)}");
+            Anotar(cliente.Dona, "mqtt", Idioma.T("o broker publicou o testamento: {0}: {1}", testamento.Topico, Curto(testamento.Carga)));
         }
 
         cliente.Tcp?.Fechar(educado);
         cliente.Tcp = null;
         cliente.Estado = -1;
         cliente.EsvaziarChegadas();
-        if (estava && !calado) Anotar(cliente.Dona, "mqtt", "desconectou do broker");
+        if (estava && !calado) Anotar(cliente.Dona, "mqtt", Idioma.T("desconectou do broker"));
     }
 
     // ---- o painel da janela ----
@@ -971,7 +956,7 @@ public sealed partial class Rede
     {
         if (string.IsNullOrWhiteSpace(topico)) return;
         byte[] carga = Encoding.UTF8.GetBytes(texto ?? "");
-        Anotar(null, "mqtt", $"painel → {topico}: {Curto(texto)}");
+        Anotar(null, "mqtt", Idioma.T("painel → {0}: {1}", topico, Curto(texto)));
         Broker.Publicar(topico, carga, false);
 
         // Um por broker: o painel entra com o TLS e o usuario da placa que
@@ -1009,7 +994,7 @@ public sealed partial class Rede
                     }
                     catch (Exception ex)
                     {
-                        Anotar(null, "mqtt", $"painel não publicou em {chave}: {Explicar(ex)}");
+                        Anotar(null, "mqtt", Idioma.T("painel não publicou em {0}: {1}", chave, Explicar(ex)));
                     }
                 }
         });
@@ -1043,7 +1028,7 @@ public sealed partial class Rede
 
         if (mestre)
         {
-            Anotar(placa, "bt", $"Bluetooth ligado como mestre \"{dispositivo.Nome}\"");
+            Anotar(placa, "bt", Idioma.T("Bluetooth ligado como mestre \"{0}\"", dispositivo.Nome));
             return dispositivo;
         }
 
@@ -1054,18 +1039,16 @@ public sealed partial class Rede
         var porta = PortaBluetooth.Abrir(dispositivo, PortaBluetooth.PrimeiraPorta);
 
         Anotar(placa, "bt", porta is null
-            ? $"Bluetooth visível como \"{dispositivo.Nome}\" — conecte pelo painel Bluetooth"
-            : $"Bluetooth visível como \"{dispositivo.Nome}\" — painel Bluetooth, "
-              + $"ou 127.0.0.1:{porta.Porta} de qualquer programa do computador");
+            ? Idioma.T("Bluetooth visível como \"{0}\" — conecte pelo painel Bluetooth", dispositivo.Nome)
+            : Idioma.T("Bluetooth visível como \"{0}\" — painel Bluetooth, ou 127.0.0.1:{1} de qualquer programa do computador", dispositivo.Nome, porta.Porta));
 
         // E no radio de verdade do computador, para o celular do aluno.
         if (UsarBluetoothDoPc)
         {
             dispositivo.PeloRadio = ServicoBluetoothDoPc.Abrir(dispositivo);
             Anotar(placa, "bt", dispositivo.PeloRadio is { } radio
-                ? $"celular de verdade: pareie este computador no celular e, no app de terminal "
-                  + $"Bluetooth, conecte no computador (serviço \"{radio.Nome}\")"
-                : $"celular de verdade: não dá agora — {ServicoBluetoothDoPc.Motivo}");
+                ? Idioma.T("celular de verdade: pareie este computador no celular e, no app de terminal Bluetooth, conecte no computador (serviço \"{0}\")", radio.Nome)
+                : Idioma.T("celular de verdade: não dá agora — {0}", ServicoBluetoothDoPc.Motivo));
         }
 
         return dispositivo;
@@ -1107,7 +1090,7 @@ public sealed partial class Rede
         lock (trava) alvo = bluetooth.FirstOrDefault(d => d != mestre && !d.Mestre && d.Nome == nome);
         if (alvo is null)
         {
-            Anotar(mestre.Dona, "bt", $"não encontrou \"{nome}\" (a outra placa chamou SerialBT.begin(\"{nome}\")?)");
+            Anotar(mestre.Dona, "bt", Idioma.T("não encontrou \"{0}\" (a outra placa chamou SerialBT.begin(\"{1}\")?)", nome, nome));
             return false;
         }
         return ConectarBluetooth(mestre, alvo);
@@ -1123,7 +1106,7 @@ public sealed partial class Rede
         alvo.Par = mestre;
         mestre.Avisar(DispositivoBt.EventoAbriu, alvo.Nome);
         alvo.Avisar(DispositivoBt.EventoClienteAbriu, mestre.Nome);
-        Anotar(mestre.Dona, "bt", $"conectou em \"{nome}\" ({alvo.Dona.Nome})");
+        Anotar(mestre.Dona, "bt", Idioma.T("conectou em \"{0}\" ({1})", nome, alvo.Dona.Nome));
         return true;
     }
 
@@ -1143,7 +1126,7 @@ public sealed partial class Rede
         if (comCelular is not null && comCelular != alvo) comCelular.Avisar(DispositivoBt.EventoFechou, "celular");
         comCelular = alvo;
         alvo.Avisar(DispositivoBt.EventoClienteAbriu, "celular");
-        Anotar(alvo.Dona, "bt", $"celular conectou em \"{nome}\"");
+        Anotar(alvo.Dona, "bt", Idioma.T("celular conectou em \"{0}\"", nome));
         return true;
     }
 
@@ -1151,7 +1134,7 @@ public sealed partial class Rede
     {
         if (comCelular is null) return;
         comCelular.Avisar(DispositivoBt.EventoFechou, "celular");
-        Anotar(comCelular.Dona, "bt", "celular desconectou");
+        Anotar(comCelular.Dona, "bt", Idioma.T("celular desconectou"));
         comCelular = null;
     }
 
@@ -1162,7 +1145,7 @@ public sealed partial class Rede
         if (alvo is null) return false;
         alvo.Entrada.Adicionar(texto);
         alvo.Avisar(DispositivoBt.EventoDados, "celular");
-        Anotar(alvo.Dona, "bt", $"celular → {Curto(texto.TrimEnd('\n', '\r'))}");
+        Anotar(alvo.Dona, "bt", Idioma.T("celular → {0}", Curto(texto.TrimEnd('\n', '\r'))));
         return true;
     }
 
@@ -1508,7 +1491,7 @@ public sealed class ServidorWeb
         if (TcpDeVerdade)
         {
             lock (fila) conexoesDaPonte.Enqueue(cliente);
-            rede.Anotar(Dona, "servidor", "o navegador conectou");
+            rede.Anotar(Dona, "servidor", Idioma.T("o navegador conectou"));
             return;
         }
         using (cliente)
@@ -1524,8 +1507,7 @@ public sealed class ServidorWeb
 
                 byte[] resposta = Entregar(pedido, 15000, null)
                     ?? PedidoHttp.MontarResposta(504, "text/html; charset=utf-8",
-                        "<h3>A placa não respondeu</h3><p>O <code>loop()</code> está chamando "
-                        + "<code>server.handleClient()</code>? Sem isso o pedido nunca é atendido.</p>");
+                        Idioma.T("<h3>A placa não respondeu</h3><p>O <code>loop()</code> está chamando <code>server.handleClient()</code>? Sem isso o pedido nunca é atendido.</p>"));
                 fluxo.Write(resposta);
             }
             catch { }
@@ -1536,10 +1518,10 @@ public sealed class ServidorWeb
     public byte[] Entregar(PedidoHttp pedido, int tempoMs, Func<bool> desistir)
     {
         if (fechado)
-            return PedidoHttp.MontarResposta(503, "text/plain; charset=utf-8", "o servidor foi fechado");
+            return PedidoHttp.MontarResposta(503, "text/plain; charset=utf-8", Idioma.T("o servidor foi fechado"));
 
         lock (fila) fila.Enqueue(pedido);
-        rede.Anotar(Dona, "servidor", $"{pedido.Origem} pediu {pedido.Metodo} {pedido.CaminhoCompleto}");
+        rede.Anotar(Dona, "servidor", Idioma.T("{0} pediu {1} {2}", pedido.Origem, pedido.Metodo, pedido.CaminhoCompleto));
         return pedido.Esperar(tempoMs, () => fechado || desistir?.Invoke() == true);
     }
 
@@ -1566,7 +1548,7 @@ public sealed class ServidorWeb
         lock (fila)
             while (fila.Count > 0)
                 fila.Dequeue().Responder(PedidoHttp.MontarResposta(503, "text/plain; charset=utf-8",
-                    "o servidor foi fechado (a placa parou ou reiniciou)"));
+                    Idioma.T("o servidor foi fechado (a placa parou ou reiniciou)")));
     }
 }
 
@@ -1638,7 +1620,7 @@ public sealed class ConexaoTcp
                 ? new SslStream(fluxo, false, (_, _, _, _) => true)
                 : new SslStream(fluxo, false);
             ConexaoMqtt.Esperar(ssl.AuthenticateAsClientAsync(host), tempoMs, () => origem.Parar, tcp,
-                                "negociar a conexão segura");
+                                Idioma.T("negociar a conexão segura"));
             fluxo = ssl;
         }
         byte[] certificado = (fluxo as SslStream)?.RemoteCertificate?.GetRawCertData();
@@ -1741,7 +1723,7 @@ public sealed class ConexaoTcp
                 pedidoRecebido.Responder(escrito.Length > 0
                     ? escrito
                     : PedidoHttp.MontarResposta(500, "text/plain; charset=utf-8",
-                        "a placa fechou a conexão sem responder nada"));
+                        Idioma.T("a placa fechou a conexão sem responder nada")));
                 break;
             }
             case Tipo.Real:
@@ -1849,7 +1831,7 @@ public sealed class DispositivoBt
 
         string destino = Par is not null ? Par.Nome
                        : rede.TemCelular(this) ? "celular"
-                       : PeloRadio is { TemAlguem: true } ? "celular (Bluetooth do computador)"
+                       : PeloRadio is { TemAlguem: true } ? Idioma.T("celular (Bluetooth do computador)")
                        : $"127.0.0.1:{PeloComputador.Porta}";
         lock (pendente)
         {

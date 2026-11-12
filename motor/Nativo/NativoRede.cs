@@ -98,14 +98,14 @@ public sealed unsafe partial class ModuloNativo
         }
         if (s.Ponte is null)
         {
-            Maquina.Rede.Anotar(Maquina, "servidor", "servidor HTTP: as portas 8080 a 8099 do computador estao ocupadas");
+            Maquina.Rede.Anotar(Maquina, "servidor", Idioma.T("servidor HTTP: as portas 8080 a 8099 do computador estao ocupadas"));
             return -1;
         }
         lock (servidores) servidores.Add(s);
         long id = Guardar(s);
-        Maquina.Rede.Anotar(Maquina, "servidor", $"servidor na porta {s.Porta} (httpd) · abra no navegador: {s.Url}");
+        Maquina.Rede.Anotar(Maquina, "servidor", Idioma.T("servidor na porta {0} (httpd) · abra no navegador: {1}", s.Porta, s.Url));
         if (!Maquina.Rede.Wifi(Maquina).Ligado)
-            Maquina.Rede.Anotar(Maquina, "aviso", "o servidor abriu, mas a placa ainda nao ligou o WiFi");
+            Maquina.Rede.Anotar(Maquina, "aviso", Idioma.T("o servidor abriu, mas a placa ainda nao ligou o WiFi"));
         new Thread(() => Aceitar(s)) { IsBackground = true, Name = "httpd nativo " + s.Url }.Start();
         return id;
     }
@@ -141,7 +141,7 @@ public sealed unsafe partial class ModuloNativo
                     s.Fila.Enqueue(p);
                     Monitor.PulseAll(s);
                 }
-                Maquina.Rede.Anotar(Maquina, "servidor", $"navegador pediu {p.Metodo} {p.Caminho}{(p.Consulta is null ? "" : "?" + p.Consulta)}");
+                Maquina.Rede.Anotar(Maquina, "servidor", Idioma.T("navegador pediu {0} {1}{2}", p.Metodo, p.Caminho, (p.Consulta is null ? "" : "?" + p.Consulta)));
                 while (!p.Fim.Wait(100))
                     if (s.Fechado || encerrando) return;
                 if (p.Caiu || p.Fechar || !p.Terminado) break;

@@ -85,7 +85,7 @@ public partial class Interpretador
             case "setSegments":
             {
                 if (N < 1 || !VetorDoArgumento(c.Args[0], amb, out var segmentos))
-                    throw new ErroDeExecucao("display.setSegments(dados): os dados tem que ser um vetor de bytes", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("display.setSegments(dados): os dados tem que ser um vetor de bytes"), c.Linha);
                 int tamanho = (int)A(1, 4), posicao = (int)A(2, 0);
                 for (int k = 0; k < tamanho && k < segmentos.Length; k++) m.Definir(posicao + k, (byte)(long)segmentos[k].Num);
                 return Valor.Vazio;
@@ -105,7 +105,7 @@ public partial class Interpretador
             case "encodeDigit":
                 return Valor.DeInt(SegmentosDoDigito[A(0) & 15]);
             default:
-                throw new ErroDeExecucao($"TM1637Display.{metodo}() ainda nao e suportado", c.Linha);
+                throw new ErroDeExecucao(Idioma.T("TM1637Display.{0}() ainda nao e suportado", metodo), c.Linha);
         }
     }
 
@@ -159,7 +159,7 @@ public partial class Interpretador
                 break;
             }
             default:
-                throw new ErroDeExecucao($"LedControl.{metodo}() ainda nao e suportado", c.Linha);
+                throw new ErroDeExecucao(Idioma.T("LedControl.{0}() ainda nao e suportado", metodo), c.Linha);
         }
         m.Mudou();
         return Valor.Vazio;

@@ -199,9 +199,7 @@ public partial class Interpretador
             Escrever("", true);
             Escrever("--------------- CUT HERE FOR EXCEPTION DECODER ---------------", true);
         }
-        maq.Avisar($"o ESP8266 ficou {maq.UsSemCeder / 1e6:0.0} s sem ceder o processador e o watchdog "
-                   + (duro ? "de hardware" : "de software (~3,2 s)") + " reiniciou a placa -- como na bancada. "
-                   + "Um laco longo precisa de um delay() ou yield() no meio (o WiFi do ESP8266 depende disso).");
+        maq.Avisar(Idioma.T("o ESP8266 ficou {0:0.0} s sem ceder o processador e o watchdog {1} reiniciou a placa -- como na bancada. Um laco longo precisa de um delay() ou yield() no meio (o WiFi do ESP8266 depende disso).", maq.UsSemCeder / 1e6, (duro ? Idioma.T("de hardware") : Idioma.T("de software (~3,2 s)"))));
         throw Reiniciar(duro ? ReinicioDaPlaca.PeloWatchdogDeHardware : ReinicioDaPlaca.PeloWatchdog, 0, 0);
     }
 
@@ -219,15 +217,13 @@ public partial class Interpretador
         Escrever($"abort() was called at PC 0x420178e7 on core {nucleo}", true);
         Escrever("", true);
         Escrever("Rebooting...", true);
-        maq.Avisar("o loop() ficou mais de 5 s sem voltar com o watchdog do loop ligado (enableLoopWDT), "
-                   + "e a placa reiniciou -- como na bancada.");
+        maq.Avisar(Idioma.T("o loop() ficou mais de 5 s sem voltar com o watchdog do loop ligado (enableLoopWDT), e a placa reiniciou -- como na bancada."));
         throw Reiniciar(ReinicioDaPlaca.PeloWatchdog, 0, 0);
     }
 
     void DispararWatchdogDeHardware()
     {
-        maq.Avisar($"o watchdog armado pelo sketch ({prazoDoWatchdogUs / 1000:0} ms) nao foi alimentado a tempo "
-                   + "e reiniciou a placa, como na bancada.");
+        maq.Avisar(Idioma.T("o watchdog armado pelo sketch ({0:0} ms) nao foi alimentado a tempo e reiniciou a placa, como na bancada.", prazoDoWatchdogUs / 1000));
         prazoDoWatchdogUs = 0;
         throw Reiniciar(ReinicioDaPlaca.PeloWatchdogDeHardware, 0, 0);
     }
@@ -246,7 +242,7 @@ public partial class Interpretador
             // avr/wdt.h: WDTO_15MS (0) ate WDTO_8S (9).
             case "wdt_enable":
                 if (!maq.Perfil.De8Bits)
-                    throw new ErroDeExecucao("wdt_enable() e do avr/wdt.h: so existe nas placas AVR.", linha);
+                    throw new ErroDeExecucao(Idioma.T("wdt_enable() e do avr/wdt.h: so existe nas placas AVR."), linha);
                 prazoDoWatchdogUs = PrazoDoWdtDoAvr((int)A(0)) * 1000.0;
                 watchdogAlimentadoEmUs = maq.AgoraUs();
                 return true;

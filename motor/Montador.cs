@@ -222,7 +222,7 @@ public static class Montador
                 foreach (ushort palavra in palavras)
                 {
                     if (onde >= flash.Length)
-                        throw new ErroDeSintaxe("o programa nao cabe na flash", numero);
+                        throw new ErroDeSintaxe(Idioma.T("o programa nao cabe na flash"), numero);
 
                     flash[onde] = palavra;
                     deQuemVeio[onde] = numero;
@@ -586,14 +586,14 @@ public static class Montador
             case "break": return [0x9598];
 
             default:
-                throw new ErroDeSintaxe($"não conheço a instrução '{nome}'", linha);
+                throw new ErroDeSintaxe(Idioma.T("não conheço a instrução '{0}'", nome), linha);
         }
     }
 
     static string Arg(string[] args, int i, string nome, int linha)
         => i < args.Length
             ? args[i]
-            : throw new ErroDeSintaxe($"falta um argumento em '{nome}'", linha);
+            : throw new ErroDeSintaxe(Idioma.T("falta um argumento em '{0}'", nome), linha);
 
     static ushort DoisRegistradores(int baseDoOpcode, int d, int r)
         => (ushort)(baseDoOpcode | ((r & 0x10) << 5) | (d << 4) | (r & 0x0F));
@@ -605,7 +605,7 @@ public static class Montador
     {
         if (d < 16)
             throw new ErroDeSintaxe(
-                $"esta instrução só aceita r16 a r31, e veio r{d}", linha);
+                Idioma.T("esta instrução só aceita r16 a r31, e veio r{0}", d), linha);
 
         return (ushort)(baseDoOpcode | (int)(((k >> 4) & 0x0F) << 8)
                         | ((d - 16) << 4) | (int)(k & 0x0F));
@@ -615,7 +615,7 @@ public static class Montador
     {
         if (d is not (24 or 26 or 28 or 30))
             throw new ErroDeSintaxe(
-                $"adiw e sbiw só aceitam r24, r26, r28 e r30 -- veio r{d}", linha);
+                Idioma.T("adiw e sbiw só aceitam r24, r26, r28 e r30 -- veio r{0}", d), linha);
 
         int par = (d - 24) / 2;
         return (ushort)(baseDoOpcode | (int)(((k >> 4) & 3) << 6)
@@ -637,7 +637,7 @@ public static class Montador
             // gravar um endereço truncado que acerta outro registrador.
             if (endereco > 0x3F)
                 throw new ErroDeSintaxe(
-                    $"'{nome}' está na E/S estendida: use lds ou sts, e não in ou out", linha);
+                    Idioma.T("'{0}' está na E/S estendida: use lds ou sts, e não in ou out", nome), linha);
 
             return endereco;
         }
@@ -652,7 +652,7 @@ public static class Montador
 
         if (endereco > 0x1F)
             throw new ErroDeSintaxe(
-                "sbi, cbi, sbic e sbis só alcançam os 32 primeiros registradores de E/S",
+                Idioma.T("sbi, cbi, sbic e sbis só alcançam os 32 primeiros registradores de E/S"),
                 linha);
 
         string bit = Apelido(Arg(args, 1, "sbi/cbi", linha), simbolos);
@@ -681,7 +681,7 @@ public static class Montador
         "Z" => (ushort)(0x8000 | (d << 4)),
         "Z+" => (ushort)(0x9001 | (d << 4)),
         "-Z" => (ushort)(0x9002 | (d << 4)),
-        _ => throw new ErroDeSintaxe($"'{ponteiro}' não é um ponteiro de carga", linha),
+        _ => throw new ErroDeSintaxe(Idioma.T("'{0}' não é um ponteiro de carga", ponteiro), linha),
     };
 
     static ushort Guardar(string ponteiro, int r, int linha) => ponteiro.ToUpperInvariant() switch
@@ -695,14 +695,14 @@ public static class Montador
         "Z" => (ushort)(0x8200 | (r << 4)),
         "Z+" => (ushort)(0x9201 | (r << 4)),
         "-Z" => (ushort)(0x9202 | (r << 4)),
-        _ => throw new ErroDeSintaxe($"'{ponteiro}' não é um ponteiro de escrita", linha),
+        _ => throw new ErroDeSintaxe(Idioma.T("'{0}' não é um ponteiro de escrita", ponteiro), linha),
     };
 
     /// <summary>"ldd r16, Y+3" e "std Z+5, r16".</summary>
     static ushort ComDeslocamento(int registrador, string alvo, bool escrita, int linha)
     {
         int mais = alvo.IndexOf('+');
-        if (mais < 0) throw new ErroDeSintaxe($"'{alvo}' precisa de um deslocamento", linha);
+        if (mais < 0) throw new ErroDeSintaxe(Idioma.T("'{0}' precisa de um deslocamento", alvo), linha);
 
         char qual = char.ToUpperInvariant(alvo[0]);
         long q = Numero(alvo[(mais + 1)..].Trim(), linha);
@@ -740,7 +740,7 @@ public static class Montador
             "XL" => 26, "XH" => 27,
             "YL" => 28, "YH" => 29,
             "ZL" => 30, "ZH" => 31,
-            _ => throw new ErroDeSintaxe($"'{nome}' não é um registrador", linha),
+            _ => throw new ErroDeSintaxe(Idioma.T("'{0}' não é um registrador", nome), linha),
         };
     }
 
@@ -872,11 +872,11 @@ public static class Montador
             else if (limpo.StartsWith('0') && limpo.Length > 1 && limpo.All(char.IsDigit))
                 valor = Convert.ToInt64(limpo, 8);
             else if (!long.TryParse(limpo, out valor))
-                throw new ErroDeSintaxe($"não entendi o valor '{texto}'", linha);
+                throw new ErroDeSintaxe(Idioma.T("não entendi o valor '{0}'", texto), linha);
         }
         catch (Exception e) when (e is FormatException or ArgumentException or OverflowException)
         {
-            throw new ErroDeSintaxe($"não entendi o valor '{texto}'", linha);
+            throw new ErroDeSintaxe(Idioma.T("não entendi o valor '{0}'", texto), linha);
         }
 
         return negativo ? -valor : valor;

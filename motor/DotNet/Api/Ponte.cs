@@ -16,12 +16,26 @@ namespace CircuitSketch
     /// <summary>A placa parou (o Parar, o reset): a thread do programa sai por aqui.</summary>
     public sealed class ParadaDaPlaca : Exception
     {
-        public ParadaDaPlaca() : base("a placa parou") { }
+        public ParadaDaPlaca() : base(Idioma.T("a placa parou")) { }
+    }
+
+    /// <summary>
+    /// As mensagens da API no idioma da tela: a API e um assembly a parte, sem
+    /// o Idioma do motor, entao a traducao chega pela Ponte (ligada pelo
+    /// SketchDotNet). Sem ela, a frase sai como esta.
+    /// </summary>
+    internal static class Idioma
+    {
+        public static string T(string texto) => Ponte.Traduzir?.Invoke(texto, null) ?? texto;
+
+        public static string T(string formato, params object[] valores) =>
+            Ponte.Traduzir?.Invoke(formato, valores) ?? string.Format(CultureInfo.InvariantCulture, formato, valores);
     }
 
     public static class Ponte
     {
         // ---- ligados pelo simulador (SketchDotNet), por reflexao ----
+        public static Func<string, object[], string> Traduzir;
         public static Func<string, string, object[], bool[], object> Chamar;
         public static Action Ponto;
         public static Func<string, object> Constante;
@@ -304,11 +318,11 @@ namespace CircuitSketch
         }
         public static void Assert(bool condicao)
         {
-            if (!condicao) throw new InvalidOperationException("Debug.Assert falhou");
+            if (!condicao) throw new InvalidOperationException(Idioma.T("Debug.Assert falhou"));
         }
         public static void Assert(bool condicao, string mensagem)
         {
-            if (!condicao) throw new InvalidOperationException("Debug.Assert falhou: " + mensagem);
+            if (!condicao) throw new InvalidOperationException(Idioma.T("Debug.Assert falhou: {0}", mensagem));
         }
         public static void Flush() { }
     }

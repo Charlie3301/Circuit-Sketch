@@ -193,9 +193,11 @@ public static class CompiladorNativo
     {
         var falta = Regex.Match(erro.Message, @"'([^']+)' file not found");
         return !falta.Success ? erro
-            : new ErroDeSintaxe($"{falta.Groups[1].Value} nao esta instalada e nao vem com a placa (na IDE do Arduino: \"No such file or directory\"). "
-                                + "Instale a biblioteca que traz esse arquivo, ou tire o #include.", erro.Linha);
+            : new ErroDeSintaxe(Idioma.T("{0} nao esta instalada e nao vem com a placa (na IDE do Arduino: \"No such file or directory\"). Instale a biblioteca que traz esse arquivo, ou tire o #include.", falta.Groups[1].Value), erro.Linha);
     }
+
+    /// <summary>Um texto dentro do printf("...") de um codigo C gerado: sem aspas, barras nem %.</summary>
+    static string TextoEmC(string texto) => texto.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("%", "%%");
 
     static readonly Regex InclusaoComAspas = new(@"^\s*#\s*include\s*""([^""]+)""", RegexOptions.Compiled | RegexOptions.Multiline);
 
@@ -294,7 +296,7 @@ public static class CompiladorNativo
                 try
                 {
                     Compilar(new Projeto { Sketch = "void setup() {}\nvoid loop() {}\n", Placa = placa },
-                             primeiraVez => avisar?.Invoke("preparando o compilador de C++ (so na primeira vez; pode levar alguns minutos)…"));
+                             primeiraVez => avisar?.Invoke(Idioma.T("preparando o compilador de C++ (so na primeira vez; pode levar alguns minutos)…")));
                 }
                 catch { }
             }
@@ -325,7 +327,7 @@ public static class CompiladorNativo
                 try
                 {
                     var comAsInstaladas = CompilarSemTrava(projeto, avisar, instaladasVencem: true);
-                    avisar?.Invoke("o que o simulador imita nao tinha o que o sketch pede: usando as bibliotecas instaladas.");
+                    avisar?.Invoke(Idioma.T("o que o simulador imita nao tinha o que o sketch pede: usando as bibliotecas instaladas."));
                     return comAsInstaladas;
                 }
                 catch (ErroDeSintaxe comAsInstaladas)
@@ -349,8 +351,8 @@ public static class CompiladorNativo
 
     static SketchCompilado CompilarSemTrava(Projeto projeto, Action<string> avisar, bool instaladasVencem)
     {
-        string pasta = AcharPasta() ?? throw new ErroDeExecucao("o compilador de C++ (a pasta \"nativo\") nao foi encontrado.", 0);
-        string zig = Zig ?? throw new ErroDeExecucao("o compilador de C++ (nativo/zig/zig.exe) nao foi encontrado.", 0);
+        string pasta = AcharPasta() ?? throw new ErroDeExecucao(Idioma.T("o compilador de C++ (a pasta \"nativo\") nao foi encontrado."), 0);
+        string zig = Zig ?? throw new ErroDeExecucao(Idioma.T("o compilador de C++ (nativo/zig/zig.exe) nao foi encontrado."), 0);
         string placa = projeto.Placa ?? "esp32-devkit-v1";
 
         // ---- o core da placa ----
@@ -377,18 +379,18 @@ public static class CompiladorNativo
         string pronto = Path.Combine(pastaDoCore, "pronto");
         if (!File.Exists(pronto))
         {
-            avisar?.Invoke("compilando o core do Arduino desta placa (so na primeira vez)…");
+            avisar?.Invoke(Idioma.T("compilando o core do Arduino desta placa (so na primeira vez)…"));
             Directory.CreateDirectory(pastaDoCore);
             File.WriteAllText(Path.Combine(pastaDoCore, "cs_placa.h"), cabecalho);
             var erros = CompilarVarios(zig, fontesDoCore.Select(f => (f, ObjetoDoCore(f), !f.EndsWith(".c", StringComparison.OrdinalIgnoreCase))),
                                        [pastaDoCore, inc, src, .. idf], definicoes: definicoes);
-            if (erros.Count > 0) throw new ErroDeExecucao("o core nativo do Arduino nao compilou: " + string.Join("\n", erros.Take(8)), 0);
+            if (erros.Count > 0) throw new ErroDeExecucao(Idioma.T("o core nativo do Arduino nao compilou: {0}", string.Join("\n", erros.Take(8))), 0);
             var (codigoDoAr, saidaDoAr) = Rodar(zig, ["ar", "rcs", "core.a", .. fontesDoCore.Where(f => !FicaForaDoCoreA(f) && !EhFraco(f)).Select(f => Path.GetFileName(ObjetoDoCore(f)))], pastaDoCore);
-            if (codigoDoAr != 0) throw new ErroDeExecucao("o core nativo nao virou biblioteca: " + saidaDoAr, 0);
+            if (codigoDoAr != 0) throw new ErroDeExecucao(Idioma.T("o core nativo nao virou biblioteca: {0}", saidaDoAr), 0);
             if (fontesDoCore.Any(EhFraco))
             {
                 var (codigoDosFracos, saidaDosFracos) = Rodar(zig, ["ar", "rcs", "fracos.a", .. fontesDoCore.Where(EhFraco).Select(f => Path.GetFileName(ObjetoDoCore(f)))], pastaDoCore);
-                if (codigoDosFracos != 0) throw new ErroDeExecucao("o core nativo nao virou biblioteca: " + saidaDosFracos, 0);
+                if (codigoDosFracos != 0) throw new ErroDeExecucao(Idioma.T("o core nativo nao virou biblioteca: {0}", saidaDosFracos), 0);
             }
             File.WriteAllText(pronto, "");
         }
@@ -618,7 +620,7 @@ public static class CompiladorNativo
         string arquivo = Path.Combine(destino, "libmbedtls.a");
         if (File.Exists(arquivo)) return arquivo;
 
-        avisar?.Invoke("compilando o mbedTLS desta placa (so na primeira vez)…");
+        avisar?.Invoke(Idioma.T("compilando o mbedTLS desta placa (so na primeira vez)…"));
         Directory.CreateDirectory(destino);
         // So o chip (o sdkconfig.h escolhe a configuracao pelo CONFIG_IDF_TARGET): o
         // resto do cs_placa.h (o INPUT, o OUTPUT...) bate com o windows.h que o
@@ -628,9 +630,9 @@ public static class CompiladorNativo
         var objetos = fontes.Select(f => Path.Combine(destino, Path.GetFileNameWithoutExtension(f) + ".o")).ToList();
         var erros = CompilarVarios(zig, fontes.Select((f, i) => (f, objetos[i], false)), [destino, inc, library, .. idf],
                                    definicoes: [ConfiguracaoDoMbedtls]);
-        if (erros.Count > 0) throw new ErroDeExecucao("o mbedTLS nao compilou: " + string.Join("\n", erros.Take(8)), 0);
+        if (erros.Count > 0) throw new ErroDeExecucao(Idioma.T("o mbedTLS nao compilou: {0}", string.Join("\n", erros.Take(8))), 0);
         var (codigo, saida) = Rodar(zig, ["ar", "rcs", arquivo, .. objetos], destino);
-        if (codigo != 0) throw new ErroDeExecucao("o mbedTLS nao virou biblioteca: " + saida, 0);
+        if (codigo != 0) throw new ErroDeExecucao(Idioma.T("o mbedTLS nao virou biblioteca: {0}", saida), 0);
         return arquivo;
     }
 
@@ -796,7 +798,7 @@ public static class CompiladorNativo
         string arquivo = Path.Combine(destino, "lib.a");
         if (File.Exists(arquivo)) return arquivo;
 
-        avisar?.Invoke($"compilando a biblioteca {lib.Nome} (so na primeira vez)…");
+        avisar?.Invoke(Idioma.T("compilando a biblioteca {0} (so na primeira vez)…", lib.Nome));
         string trabalho = destino + ".tmp-" + Guid.NewGuid().ToString("N")[..8];
         Directory.CreateDirectory(trabalho);
         try
@@ -813,7 +815,7 @@ public static class CompiladorNativo
                                        inclusoes, depurar: true, depois: [trabalho], definicoes: definicoes);
             if (erros.Count > 0) throw ErroDoCompilador(erros, abas);
             var (codigo, saida) = Rodar(zig, ["ar", "rcs", "lib.a", .. objetos], trabalho);
-            if (codigo != 0) throw new ErroDeExecucao($"a biblioteca {lib.Nome} nao virou .a: " + saida, 0);
+            if (codigo != 0) throw new ErroDeExecucao(Idioma.T("a biblioteca {0} nao virou .a: {1}", lib.Nome, saida), 0);
             if (Directory.Exists(destino)) Directory.Delete(destino, true);
             Directory.Move(trabalho, destino);
         }
@@ -845,7 +847,7 @@ public static class CompiladorNativo
         string arquivo = Path.Combine(destino, "lib" + pilha.Pasta + ".a");
         if (File.Exists(arquivo)) return arquivo;
 
-        avisar?.Invoke($"compilando a pilha {pilha.Pasta} desta placa (so na primeira vez, pode levar alguns minutos)…");
+        avisar?.Invoke(Idioma.T("compilando a pilha {0} desta placa (so na primeira vez, pode levar alguns minutos)…", pilha.Pasta));
         Directory.CreateDirectory(destino);
         File.WriteAllText(Path.Combine(destino, "cs_placa.h"), cabecalho);
         // Os objetos pelo nome relativo: sao centenas, e a linha de comando do Windows tem limite.
@@ -853,9 +855,9 @@ public static class CompiladorNativo
         var erros = CompilarVarios(zig, fontes.Select((f, i) => (f, Path.Combine(destino, objetos[i]), !f.EndsWith(".c", StringComparison.OrdinalIgnoreCase))),
                                    [destino, inc, .. pilha.Inclusoes.Select(i => Path.Combine(raiz, i)), .. idf],
                                    definicoes: [.. definicoes, .. pilha.Publicas, .. pilha.Privadas]);
-        if (erros.Count > 0) throw new ErroDeExecucao($"a pilha {pilha.Pasta} nao compilou: " + string.Join("\n", erros.Take(8)), 0);
+        if (erros.Count > 0) throw new ErroDeExecucao(Idioma.T("a pilha {0} nao compilou: {1}", pilha.Pasta, string.Join("\n", erros.Take(8))), 0);
         var (codigo, saida) = Rodar(zig, ["ar", "rcs", Path.GetFileName(arquivo), .. objetos], destino);
-        if (codigo != 0) throw new ErroDeExecucao($"a pilha {pilha.Pasta} nao virou biblioteca: " + saida, 0);
+        if (codigo != 0) throw new ErroDeExecucao(Idioma.T("a pilha {0} nao virou biblioteca: {1}", pilha.Pasta, saida), 0);
         return arquivo;
     }
 
@@ -1538,10 +1540,10 @@ public static class CompiladorNativo
             erros.Add((arq, int.Parse(m.Groups["lin"].Value), m.Groups["msg"].Value));
         }
         if (erros.Count == 0)
-            return new ErroDeSintaxe("o compilador de C++ recusou o programa: " + string.Join(" ", linhas.Take(6)), 0);
+            return new ErroDeSintaxe(Idioma.T("o compilador de C++ recusou o programa: {0}", string.Join(" ", linhas.Take(6))), 0);
 
         var (arquivo, linha, texto) = erros[0];
-        string mais = erros.Count > 1 ? $" (e mais {erros.Count - 1} erro{(erros.Count > 2 ? "s" : "")})" : "";
+        string mais = erros.Count > 1 ? Idioma.T(" (e mais {0} erro{1})", erros.Count - 1, (erros.Count > 2 ? "s" : "")) : "";
         if (arquivo.Equals("sketch.ino", StringComparison.OrdinalIgnoreCase))
             return new ErroDeSintaxe(texto + mais, linha);
         int codigo = Origens.Codificar(Origens.Registrar("nativo:" + arquivo, arquivo), linha);
@@ -1582,7 +1584,7 @@ public static class CompiladorNativo
                     corpos.Append(dado
                         ? $"__attribute__((weak, aligned(64))) unsigned char cs_ausente{vistos.Count}[16384] __asm__(\"{nome}\");\n"
                         : $"void cs_ausente{vistos.Count}(void) __asm__(\"{nome}\") __attribute__((weak));\n" +
-                          $"void cs_ausente{vistos.Count}(void) {{ printf(\"\\n{nome}: a biblioteca chamou esta funcao, mas ela nao existe\\n\"); abort(); }}\n");
+                          $"void cs_ausente{vistos.Count}(void) {{ printf(\"\\n{nome}: {TextoEmC(Idioma.T("a biblioteca chamou esta funcao, mas ela nao existe"))}\\n\"); abort(); }}\n");
                 continue;
             }
             var partes = nome.Split("::").Select(p => p.Length + Regex.Escape(p)).ToList();
@@ -1595,7 +1597,7 @@ public static class CompiladorNativo
                 foreach (Match m in padrao.Matches(bytes))
                     if (vistos.Add(m.Value))
                         corpos.Append($"void cs_ausente{vistos.Count}(void) __asm__(\"{m.Value}\") __attribute__((weak));\n" +
-                                      $"void cs_ausente{vistos.Count}(void) {{ printf(\"\\n{legivel.Replace("\\", "").Replace("\"", "")}: a biblioteca chamou esta funcao, mas ela nao existe\\n\"); abort(); }}\n");
+                                      $"void cs_ausente{vistos.Count}(void) {{ printf(\"\\n{legivel.Replace("\\", "").Replace("\"", "")}: {TextoEmC(Idioma.T("a biblioteca chamou esta funcao, mas ela nao existe"))}\\n\"); abort(); }}\n");
         }
         if (vistos.Count == 0) return null;
         string fonte = Path.Combine(trabalho, $"cs_ausentes{rodada}.c"), objetoNovo = Path.ChangeExtension(fonte, ".o");
@@ -1611,10 +1613,10 @@ public static class CompiladorNativo
         {
             string nomes = string.Join(", ", faltando.Take(6).Select(n => Regex.Replace(n, @"\(.*\)$", "()")));
             if (faltando.Any(f => f.StartsWith("setup") || f.StartsWith("loop")))
-                return new ErroDeSintaxe($"o sketch precisa de setup() e de loop() (faltou: {nomes}).", 0);
-            return new ErroDeSintaxe($"funcao declarada e nunca definida: {nomes}.", 0);
+                return new ErroDeSintaxe(Idioma.T("o sketch precisa de setup() e de loop() (faltou: {0}).", nomes), 0);
+            return new ErroDeSintaxe(Idioma.T("funcao declarada e nunca definida: {0}.", nomes), 0);
         }
-        return new ErroDeSintaxe("o ligador recusou o programa: " + saida.Trim().Split('\n').FirstOrDefault(), 0);
+        return new ErroDeSintaxe(Idioma.T("o ligador recusou o programa: {0}", saida.Trim().Split('\n').FirstOrDefault()), 0);
     }
 }
 

@@ -77,8 +77,7 @@ public partial class Interpretador
         long n = (long)Math.Max(0, pedido);
         if (psram && Ram.Layout.Psram <= 0) return Valor.DeInt(0);
         if (n > MaiorBlocoGuardado && Ram.CustoDoBloco(n) <= (psram ? Ram.PsramLivre : Ram.HeapLivre))
-            throw new ErroDeExecucao($"malloc({n}): um bloco tao grande cabe na placa, mas o simulador nao consegue guardar "
-                                     + "mais que 4 milhoes de bytes num bloco so.", linha);
+            throw new ErroDeExecucao(Idioma.T("malloc({0}): um bloco tao grande cabe na placa, mas o simulador nao consegue guardar mais que 4 milhoes de bytes num bloco so.", n), linha);
         // Um bloco so tem que caber inteiro numa regiao: na ESP32 classica a
         // maior tem ~110 KB, e o malloc(150000) da NULL com 300 KB livres.
         if (n > MaiorBlocoLivre(psram)) return Valor.DeInt(0);
@@ -113,12 +112,10 @@ public partial class Interpretador
                 Escrever($"Backtrace: 0x40082b31:0x3ffb1f90 (core {nucleo})", true);
                 Escrever("", true);
                 Escrever("Rebooting...", true);
-                maq.Avisar($"{Origens.Onde(linha)}: free() de um bloco que {(bloco?.Solto == true ? "ja tinha sido solto" : "nao veio do malloc")}: "
-                           + "na ESP32 isso para a placa com o assert da heap, como na bancada.");
+                maq.Avisar(Idioma.T("{0}: free() de um bloco que {1}: na ESP32 isso para a placa com o assert da heap, como na bancada.", Origens.Onde(linha), (bloco?.Solto == true ? Idioma.T("ja tinha sido solto") : Idioma.T("nao veio do malloc"))));
                 throw Reiniciar(ReinicioDaPlaca.PeloPanico, 0, 0);
             }
-            maq.Avisar($"{Origens.Onde(linha)}: free() de um bloco que {(bloco?.Solto == true ? "ja tinha sido solto" : "nao veio do malloc")}: "
-                       + $"no {maq.Perfil?.Processador} isso corrompe a heap sem avisar -- e o erro aparece depois, em outro lugar.");
+            maq.Avisar(Idioma.T("{0}: free() de um bloco que {1}: no {2} isso corrompe a heap sem avisar -- e o erro aparece depois, em outro lugar.", Origens.Onde(linha), (bloco?.Solto == true ? Idioma.T("ja tinha sido solto") : Idioma.T("nao veio do malloc")), maq.Perfil?.Processador));
             return;
         }
         bloco.Solto = true;
@@ -204,8 +201,7 @@ public partial class Interpretador
             Escrever("", true);
             Escrever("Rebooting...", true);
         }
-        maq.Avisar($"{Origens.Onde(linha)}: new de {bytes} bytes nao coube na heap ({Ram.HeapLivre} livres): "
-                   + "o new lanca std::bad_alloc, ninguem pega, e a placa para no abort() -- como na bancada.");
+        maq.Avisar(Idioma.T("{0}: new de {1} bytes nao coube na heap ({2} livres): o new lanca std::bad_alloc, ninguem pega, e a placa para no abort() -- como na bancada.", Origens.Onde(linha), bytes, Ram.HeapLivre));
         throw Reiniciar(ReinicioDaPlaca.PeloPanico, 0, 0);
     }
 
@@ -292,12 +288,9 @@ public partial class Interpretador
         if (!avisouDoTexto)
         {
             avisouDoTexto = true;
-            maq.Avisar($"{Origens.Onde(linha)}: a String precisou de {bloco} bytes "
-                       + (grandeDemais ? "-- mais que o maximo de uma String na ESP32 (65535 bytes sem a PSRAM)"
-                                       : $"e a heap so tinha {Ram.HeapLivre} livres")
-                       + ". Na placa nao ha erro nenhum: "
-                       + (invalida ? "a String fica vazia, e o texto some do que o sketch imprime."
-                                   : "a String fica como estava -- o += e o concat() simplesmente nao acrescentam nada."));
+            maq.Avisar(Idioma.T("{0}: a String precisou de {1} bytes {2}. Na placa nao ha erro nenhum: {3}", Origens.Onde(linha), bloco, (grandeDemais ? Idioma.T("-- mais que o maximo de uma String na ESP32 (65535 bytes sem a PSRAM)")
+                                       : Idioma.T("e a heap so tinha {0} livres", Ram.HeapLivre)), (invalida ? Idioma.T("a String fica vazia, e o texto some do que o sketch imprime.")
+                                   : Idioma.T("a String fica como estava -- o += e o concat() simplesmente nao acrescentam nada."))));
         }
 
         if (invalida)
@@ -347,10 +340,8 @@ public partial class Interpretador
         }
         if (!Ram.Alocar(bytes, false, out long custo))
         {
-            string nome = radio switch { "wifi" => "o WiFi", "ble" => "o BLE", _ => "o Bluetooth" };
-            maq.Avisar($"{Origens.Onde(linha)}: {nome} precisa de ~{bytes / 1024} KB da heap para ligar, e so havia "
-                       + $"{Ram.HeapLivre} bytes livres. Na placa o driver nao sobe e o radio fica desligado -- "
-                       + "sobra de heap e o que o sketch deixa depois das globais e dos malloc.");
+            string nome = radio switch { "wifi" => Idioma.T("o WiFi"), "ble" => Idioma.T("o BLE"), _ => Idioma.T("o Bluetooth") };
+            maq.Avisar(Idioma.T("{0}: {1} precisa de ~{2} KB da heap para ligar, e so havia {3} bytes livres. Na placa o driver nao sobe e o radio fica desligado -- sobra de heap e o que o sketch deixa depois das globais e dos malloc.", Origens.Onde(linha), nome, bytes / 1024, Ram.HeapLivre));
             return false;
         }
         radiosNaHeap[radio] = custo;
@@ -461,8 +452,7 @@ public partial class Interpretador
             Escrever("Debug exception reason: Stack canary watchpoint triggered (loopTask) ", true);
             Escrever("", true);
             Escrever("Rebooting...", true);
-            maq.Avisar($"{onde} passou dos {layout.PilhaDoLoop} bytes da pilha do loopTask (cada chamada, com as locais, "
-                       + $"ocupa {quadro} bytes): a ESP32 para com o Guru Meditation do 'Stack canary', como na bancada.");
+            maq.Avisar(Idioma.T("{0} passou dos {1} bytes da pilha do loopTask (cada chamada, com as locais, ocupa {2} bytes): a ESP32 para com o Guru Meditation do 'Stack canary', como na bancada.", onde, layout.PilhaDoLoop, quadro));
             throw Reiniciar(ReinicioDaPlaca.PeloPanico, 0, 0);
         }
         if (EhEsp8266)
@@ -477,15 +467,12 @@ public partial class Interpretador
             Escrever("", true);
             Escrever("ctx: cont", true);
             Escrever("<<<stack<<<", true);
-            maq.Avisar($"{onde} passou dos {layout.PilhaDoLoop} bytes da pilha do loop do ESP8266 (o 'cont'): a placa "
-                       + "atropela a memoria do lado e reinicia com uma excecao, como na bancada.");
+            maq.Avisar(Idioma.T("{0} passou dos {1} bytes da pilha do loop do ESP8266 (o 'cont'): a placa atropela a memoria do lado e reinicia com uma excecao, como na bancada.", onde, layout.PilhaDoLoop));
             throw Reiniciar(ReinicioDaPlaca.PeloPanico, 0, 0);
         }
         maq.Avisar(layout.Compartilhada
-            ? $"{onde}: a pilha encostou na heap e nas globais ({layout.RamTotal} bytes de RAM no total, "
-              + $"{Ram.Estatica} de globais, {Ram.HeapUsada} de heap). Na placa isso corrompe variaveis sem aviso "
-              + "e costuma terminar com a placa reiniciando sozinha -- aqui ela reinicia na hora."
-            : $"{onde} passou dos {layout.PilhaDoLoop} bytes da pilha: a placa atropela a memoria e para.");
+            ? Idioma.T("{0}: a pilha encostou na heap e nas globais ({1} bytes de RAM no total, {2} de globais, {3} de heap). Na placa isso corrompe variaveis sem aviso e costuma terminar com a placa reiniciando sozinha -- aqui ela reinicia na hora.", onde, layout.RamTotal, Ram.Estatica, Ram.HeapUsada)
+            : Idioma.T("{0} passou dos {1} bytes da pilha: a placa atropela a memoria e para.", onde, layout.PilhaDoLoop));
         throw Reiniciar(ReinicioDaPlaca.PelaMemoria, 0, 0);
     }
 
@@ -671,8 +658,7 @@ public partial class Interpretador
     Valor ChamarRp2040(string metodo, Chamada c, Ambiente amb)
     {
         if (maq.Perfil?.Id is not ("pi-pico" or "pi-pico-w"))
-            throw new ErroDeExecucao("o objeto 'rp2040' e do core da Raspberry Pi Pico (arduino-pico): "
-                                     + $"na {maq.Perfil?.Nome} ele nao existe.", c.Linha);
+            throw new ErroDeExecucao(Idioma.T("o objeto 'rp2040' e do core da Raspberry Pi Pico (arduino-pico): na {0} ele nao existe.", maq.Perfil?.Nome), c.Linha);
         var args = c.Args.Select(a => Avaliar(a, amb)).ToList();
         if (WatchdogDoRp2040(metodo, args)) return Valor.Vazio;
         return metodo switch
@@ -685,7 +671,7 @@ public partial class Interpretador
             "getCycleCount64" => DoTipo((long)(maq.AgoraUs() * (maq.Perfil?.Megahertz ?? 133)), TipoC.ULongLong),
             "reboot" or "restart" => throw Reiniciar(ReinicioDaPlaca.PeloSoftware, 0, 0),
             "getBootselButton" => DoTipo(maq.BootselApertado ? 1 : 0, TipoC.Bool),
-            _ => throw new ErroDeExecucao($"rp2040.{metodo}() ainda nao e suportado pelo simulador.", c.Linha),
+            _ => throw new ErroDeExecucao(Idioma.T("rp2040.{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha),
         };
     }
 

@@ -451,7 +451,7 @@ public sealed unsafe partial class ModuloNativo
         else
         {
             linhas.Add($"Guru Meditation Error: Core  0 panic'ed ({motivo}). Exception was unhandled.");
-            if (!string.IsNullOrEmpty(detalhe)) linhas.Add("(simulador) " + detalhe);
+            if (!string.IsNullOrEmpty(detalhe)) linhas.Add(Idioma.T("(simulador) {0}", detalhe));
         }
         linhas.Add("");
         linhas.Add("Rebooting...");

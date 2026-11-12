@@ -57,13 +57,11 @@ public partial class Interpretador
     {
         string id = Maq.Perfil?.Id ?? "";
         if (id == "nano-rp2040-connect")
-            throw new ErroDeExecucao($"{oque}: o BLEDevice.h e a biblioteca BLE da ESP32. Na Nano RP2040 Connect o "
-                                     + "BLE e pela ArduinoBLE: #include <ArduinoBLE.h>.", linha);
+            throw new ErroDeExecucao(Idioma.T("{0}: o BLEDevice.h e a biblioteca BLE da ESP32. Na Nano RP2040 Connect o BLE e pela ArduinoBLE: #include <ArduinoBLE.h>.", oque), linha);
         if (!id.StartsWith("esp32", StringComparison.Ordinal))
-            throw new ErroDeExecucao($"{oque}: o BLEDevice.h e da ESP32 -- a {Maq.Perfil?.Nome ?? id} nao tem Bluetooth.", linha);
+            throw new ErroDeExecucao(Idioma.T("{0}: o BLEDevice.h e da ESP32 -- a {1} nao tem Bluetooth.", oque, Maq.Perfil?.Nome ?? id), linha);
         if (ModuloNativo.Chip(id) == "esp32s2")
-            throw new ErroDeExecucao($"{oque}: a ESP32-S2 nao tem Bluetooth nenhum (nem o classico, nem o BLE). "
-                                     + "Na placa, o BLEDevice.h nem compila para ela.", linha);
+            throw new ErroDeExecucao(Idioma.T("{0}: a ESP32-S2 nao tem Bluetooth nenhum (nem o classico, nem o BLE). Na placa, o BLEDevice.h nem compila para ela.", oque), linha);
     }
 
     /// <summary>Os bits das propriedades, os da pilha do chip (BLECharacteristic.h do core 3.3.11).</summary>
@@ -166,8 +164,7 @@ public partial class Interpretador
             // A pilha do Bluetooth pega a parte dela da heap. Sem lugar, o
             // esp_bluedroid_init falha e nada do BLE funciona depois.
             if (!LigarRadio("ble", c.Linha))
-                throw new ErroDeExecucao("BLEDevice::init(): nao ha heap para a pilha do Bluetooth. Na placa o init falha "
-                                         + "(ESP_ERR_NO_MEM) e o proximo passo do BLE trava a placa.", c.Linha);
+                throw new ErroDeExecucao(Idioma.T("BLEDevice::init(): nao ha heap para a pilha do Bluetooth. Na placa o init falha (ESP_ERR_NO_MEM) e o proximo passo do BLE trava a placa."), c.Linha);
             radioBle = Maq.Rede.IniciarBle(Maq, args.Count > 0 ? args[0].Mostrar() : "");
             servidorBle = null;
             anuncioBle = null;
@@ -177,8 +174,7 @@ public partial class Interpretador
         if (metodo is "getInitialized") return Valor.DeBool(radioBle is not null);
 
         if (radioBle is null)
-            throw new ErroDeExecucao($"BLEDevice::{metodo}() antes do BLEDevice::init(\"nome\"): na placa, a pilha do "
-                                     + "Bluetooth ainda nem ligou.", c.Linha);
+            throw new ErroDeExecucao(Idioma.T("BLEDevice::{0}() antes do BLEDevice::init(\"nome\"): na placa, a pilha do Bluetooth ainda nem ligou.", metodo), c.Linha);
 
         switch (metodo)
         {
@@ -224,7 +220,7 @@ public partial class Interpretador
                 return Valor.DeReferencia(NovoClienteBle());
         }
 
-        throw new ErroDeExecucao($"BLEDevice::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("BLEDevice::{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     // =====================================================================
@@ -528,7 +524,7 @@ public partial class Interpretador
                 break;
         }
 
-        throw new ErroDeExecucao($"{obj.Classe}::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("{0}::{1}() ainda nao e suportado pelo simulador.", obj.Classe, metodo), c.Linha);
     }
 
     /// <summary>
@@ -667,9 +663,7 @@ public partial class Interpretador
                     if (!avisouDaPilhaBle)
                     {
                         avisouDaPilhaBle = true;
-                        Maq.Avisar($"BLE: {info.Nome}::{metodo}({string.Join(", ", f.Params.Select(x => x.Tipo))}) e da outra pilha. "
-                                   + $"Na {Maq.Perfil?.Nome} o BLE e o {(nimble ? "NimBLE" : "Bluedroid")}, e o segundo "
-                                   + $"parametro e {tipoDoParam}* -- na placa, esse metodo nao e chamado.");
+                        Maq.Avisar(Idioma.T("BLE: {0}::{1}({2}) e da outra pilha. Na {3} o BLE e o {4}, e o segundo parametro e {5}* -- na placa, esse metodo nao e chamado.", info.Nome, metodo, string.Join(", ", f.Params.Select(x => x.Tipo)), Maq.Perfil?.Nome, (nimble ? "NimBLE" : "Bluedroid"), tipoDoParam));
                     }
                     continue;
                 }

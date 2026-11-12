@@ -108,11 +108,8 @@ sealed class Unidades(Projeto projeto, Linguagem linguagem)
                 || !tokens[fim - 2].E("(") || !tokens[fim - 1].E(")"))
                 continue;
             throw new ErroDeSintaxe(
-                "conversion from 'String' to non-scalar type 'std::string' {aka 'std::__cxx11::basic_string<char>'} "
-                + $"requested -- o {metodo.Texto}() devolve o String do Arduino" + (DaBle(metodo.Texto)
-                    ? " (no core 2.x da ESP32 a biblioteca BLE devolvia std::string; no 3.x, String)" : "")
-                + $". Declare \"String {tokens[i + 1].Texto} = ...\", ou converta: "
-                + $"\"std::string {tokens[i + 1].Texto} = algo->{metodo.Texto}().c_str();\".", tokens[i].Linha);
+                Idioma.T("conversion from 'String' to non-scalar type 'std::string' {{aka 'std::__cxx11::basic_string<char>'}} requested -- o {0}() devolve o String do Arduino{1}. Declare \"String {2} = ...\", ou converta: \"std::string {3} = algo->{4}().c_str();\".", metodo.Texto, (DaBle(metodo.Texto)
+                    ? Idioma.T(" (no core 2.x da ESP32 a biblioteca BLE devolvia std::string; no 3.x, String)") : ""), tokens[i + 1].Texto, tokens[i + 1].Texto, metodo.Texto), tokens[i].Linha);
         }
 
         static bool DaBle(string m) => m is "getValue" or "readValue" or "getName" or "getManufacturerData" or "getServiceData";

@@ -58,8 +58,8 @@ public static class Origens
     /// <summary>"linha 12" no sketch, "Botao.cpp, linha 12" nos outros.</summary>
     public static string Onde(int linha)
         => DoSketch(linha)
-            ? $"linha {linha}"
-            : $"{Nome(Arquivo(linha)) ?? "outro arquivo"}, linha {Linha(linha)}";
+            ? Idioma.T("linha {0}", linha)
+            : Idioma.T("{0}, linha {1}", Nome(Arquivo(linha)) ?? Idioma.T("outro arquivo"), Linha(linha));
 }
 
 /// <summary>Um arquivo que o #include achou.</summary>

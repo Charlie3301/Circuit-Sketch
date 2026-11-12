@@ -42,7 +42,7 @@ public sealed class SketchDotNet : ISketchCompilado
     }
 
     /// <summary>O contexto do programa: a API e o programa, carregados dos bytes.</summary>
-    sealed class Contexto(byte[] api) : AssemblyLoadContext("programa C# da placa", isCollectible: true)
+    sealed class Contexto(byte[] api) : AssemblyLoadContext(Idioma.T("programa C# da placa"), isCollectible: true)
     {
         Assembly carregada;
 
@@ -60,6 +60,7 @@ public sealed class SketchDotNet : ISketchCompilado
         ponte = api.GetType("CircuitSketch.Ponte", throwOnError: true);
         despachar = ponte.GetMethod("Despachar");
 
+        Ligar("Traduzir", (Func<string, object[], string>)((formato, valores) => valores is null ? Idioma.T(formato) : Idioma.T(formato, valores)));
         Ligar("Chamar", (Func<string, string, object[], bool[], object>)Chamar);
         Ligar("Ponto", (Action)Ponto);
         Ligar("Constante", (Func<string, object>)Constante);
@@ -95,7 +96,7 @@ public sealed class SketchDotNet : ISketchCompilado
         // O monitor: o Console.WriteLine e o Debug.WriteLine saem nele.
         Chamar("Serial", "begin", [115200L], null);
 
-        var entrada = programa.EntryPoint ?? throw new ErroDeExecucao("o programa C# nao tem Main.", 0);
+        var entrada = programa.EntryPoint ?? throw new ErroDeExecucao(Idioma.T("o programa C# nao tem Main."), 0);
         object[] args = entrada.GetParameters().Length > 0 ? [Array.Empty<string>()] : null;
         try
         {
@@ -145,8 +146,8 @@ public sealed class SketchDotNet : ISketchCompilado
                 linha = quadro.GetFileLineNumber();
                 break;
             }
-        string tipo = e is InsufficientExecutionStackException ? "a pilha acabou (recursao sem fim?)" : $"{e.GetType().Name}: {e.Message}";
-        throw new ErroDeExecucao($"o programa parou com uma excecao sem catch -- {tipo}", linha);
+        string tipo = e is InsufficientExecutionStackException ? Idioma.T("a pilha acabou (recursao sem fim?)") : $"{e.GetType().Name}: {e.Message}";
+        throw new ErroDeExecucao(Idioma.T("o programa parou com uma excecao sem catch -- {0}", tipo), linha);
     }
 
     void ConferirThreads()
@@ -154,7 +155,7 @@ public sealed class SketchDotNet : ISketchCompilado
         var e = daThread;
         if (e is null) return;
         daThread = null;
-        if (e is ErroDeExecucao erro) throw new ErroDeExecucao("numa thread do programa: " + erro.Message, 0);
+        if (e is ErroDeExecucao erro) throw new ErroDeExecucao(Idioma.T("numa thread do programa: {0}", erro.Message), 0);
         Relancar(e);
     }
 

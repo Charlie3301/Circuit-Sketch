@@ -44,11 +44,11 @@ public sealed class ReinicioDaPlaca(int razao, int causa, ulong pinos,
     /// <summary>O que o monitor serial mostraria da placa reiniciando.</summary>
     public string Resumo => Razao switch
     {
-        PeloSonoProfundo => $"acordou do sono profundo ({Interpretador.NomeDaCausa(Causa)})",
-        PeloPanico => "reiniciou depois de um panico (Guru Meditation)",
-        PeloWatchdog or PeloWatchdogDeHardware => "reiniciou pelo watchdog",
-        PelaMemoria => "reiniciou: a memoria acabou (a pilha encostou na heap)",
-        _ => "reiniciou pelo software",
+        PeloSonoProfundo => Idioma.T("acordou do sono profundo ({0})", Interpretador.NomeDaCausa(Causa)),
+        PeloPanico => Idioma.T("reiniciou depois de um panico (Guru Meditation)"),
+        PeloWatchdog or PeloWatchdogDeHardware => Idioma.T("reiniciou pelo watchdog"),
+        PelaMemoria => Idioma.T("reiniciou: a memoria acabou (a pilha encostou na heap)"),
+        _ => Idioma.T("reiniciou pelo software"),
     };
 }
 
@@ -195,18 +195,18 @@ public partial class Interpretador
     /// <summary>Nome da causa, para o aviso e o monitor.</summary>
     public static string NomeDaCausa(int causa) => causa switch
     {
-        2 => "EXT0, pelo pino",
-        3 => "EXT1, pelos pinos",
-        4 => "pelo timer",
-        7 => "pelo GPIO",
-        _ => "sem causa de despertar",
+        2 => Idioma.T("EXT0, pelo pino"),
+        3 => Idioma.T("EXT1, pelos pinos"),
+        4 => Idioma.T("pelo timer"),
+        7 => Idioma.T("pelo GPIO"),
+        _ => Idioma.T("sem causa de despertar"),
     };
 
     bool ChamarSono(string nome, Chamada c, Ambiente amb, out Valor resultado)
     {
         resultado = Valor.DeInt(0);   // ESP_OK
         if (!EhDaFamiliaEsp32)
-            throw new ErroDeExecucao($"{nome}() e do ESP-IDF da ESP32: esta placa nao tem.", c.Linha);
+            throw new ErroDeExecucao(Idioma.T("{0}() e do ESP-IDF da ESP32: esta placa nao tem.", nome), c.Linha);
 
         double A(int i) => i < c.Args.Count ? Avaliar(c.Args[i], amb).Num : 0;
         string chip = ChipDoSono;
@@ -223,16 +223,14 @@ public partial class Interpretador
                 // pino: ESP32, S2 e S3. Na C3 a funcao nem compila.
                 if (chip is not ("ESP32" or "ESP32-S2" or "ESP32-S3"))
                     throw new ErroDeExecucao(
-                        $"esp_sleep_enable_ext0_wakeup() nao existe na {chip}: "
-                        + (chip == "ESP32-C3"
-                            ? "use esp_deep_sleep_enable_gpio_wakeup(mascara, ESP_GPIO_WAKEUP_GPIO_HIGH)."
-                            : "use esp_sleep_enable_ext1_wakeup(mascara, modo)."), c.Linha);
+                        Idioma.T("esp_sleep_enable_ext0_wakeup() nao existe na {0}: {1}", chip, (chip == "ESP32-C3"
+                            ? Idioma.T("use esp_deep_sleep_enable_gpio_wakeup(mascara, ESP_GPIO_WAKEUP_GPIO_HIGH).")
+                            : Idioma.T("use esp_sleep_enable_ext1_wakeup(mascara, modo)."))), c.Linha);
 
                 int gpio = (int)A(0);
                 if (!EhPinoRtc(gpio))
                 {
-                    maq.Avisar($"esp_sleep_enable_ext0_wakeup({gpio}): o GPIO {gpio} nao e do RTC na {chip}, "
-                               + "e a placa nao acordaria por ele (a funcao devolve ESP_ERR_INVALID_ARG).");
+                    maq.Avisar(Idioma.T("esp_sleep_enable_ext0_wakeup({0}): o GPIO {1} nao e do RTC na {2}, e a placa nao acordaria por ele (a funcao devolve ESP_ERR_INVALID_ARG).", gpio, gpio, chip));
                     resultado = Valor.DeInt(0x102);
                     return true;
                 }
@@ -246,16 +244,15 @@ public partial class Interpretador
             {
                 if (chip == "ESP32-C3")
                     throw new ErroDeExecucao(
-                        "esp_sleep_enable_ext1_wakeup() nao existe na ESP32-C3: use "
-                        + "esp_deep_sleep_enable_gpio_wakeup(mascara, ESP_GPIO_WAKEUP_GPIO_HIGH).", c.Linha);
+                        Idioma.T("esp_sleep_enable_ext1_wakeup() nao existe na ESP32-C3: use esp_deep_sleep_enable_gpio_wakeup(mascara, ESP_GPIO_WAKEUP_GPIO_HIGH)."), c.Linha);
 
                 ulong mascara = (ulong)A(0);
                 var foraDoRtc = PinosDaMascara(mascara).Where(g => !EhPinoRtc(g)).ToList();
                 if (foraDoRtc.Count > 0)
                 {
-                    maq.Avisar($"esp_sleep_enable_ext1_wakeup: GPIO {string.Join(", ", foraDoRtc)} nao "
-                               + $"{(foraDoRtc.Count == 1 ? "e" : "sao")} do RTC na {chip} "
-                               + "(a funcao devolve ESP_ERR_INVALID_ARG).");
+                    maq.Avisar(foraDoRtc.Count == 1
+                        ? Idioma.T("esp_sleep_enable_ext1_wakeup: o GPIO {0} nao e do RTC na {1} (a funcao devolve ESP_ERR_INVALID_ARG).", foraDoRtc[0], chip)
+                        : Idioma.T("esp_sleep_enable_ext1_wakeup: os GPIO {0} nao sao do RTC na {1} (a funcao devolve ESP_ERR_INVALID_ARG).", string.Join(", ", foraDoRtc), chip));
                     resultado = Valor.DeInt(0x102);
                     return true;
                 }
@@ -268,13 +265,11 @@ public partial class Interpretador
             {
                 if (chip is not ("ESP32-C3" or "ESP32-C6" or "ESP32-H2"))
                     throw new ErroDeExecucao(
-                        $"esp_deep_sleep_enable_gpio_wakeup() e das ESP32-C3, C6 e H2: na {chip} use "
-                        + "esp_sleep_enable_ext0_wakeup() ou esp_sleep_enable_ext1_wakeup().", c.Linha);
+                        Idioma.T("esp_deep_sleep_enable_gpio_wakeup() e das ESP32-C3, C6 e H2: na {0} use esp_sleep_enable_ext0_wakeup() ou esp_sleep_enable_ext1_wakeup().", chip), c.Linha);
                 ulong mascara = (ulong)A(0);
                 if (PinosDaMascara(mascara).Any(g => !EhPinoRtc(g)))
                 {
-                    maq.Avisar($"esp_deep_sleep_enable_gpio_wakeup: na {chip} so os pinos do RTC acordam a placa "
-                               + "(a funcao devolve ESP_ERR_INVALID_ARG).");
+                    maq.Avisar(Idioma.T("esp_deep_sleep_enable_gpio_wakeup: na {0} so os pinos do RTC acordam a placa (a funcao devolve ESP_ERR_INVALID_ARG).", chip));
                     resultado = Valor.DeInt(0x102);
                     return true;
                 }
@@ -357,7 +352,7 @@ public partial class Interpretador
 
         if (nome.StartsWith("rtc_gpio_", StringComparison.Ordinal)) return true;
 
-        throw new ErroDeExecucao($"{nome}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("{0}() ainda nao e suportado pelo simulador.", nome), c.Linha);
     }
 
     static IEnumerable<int> PinosDaMascara(ulong mascara)
@@ -439,10 +434,9 @@ public partial class Interpretador
     {
         string espera = DescreverDespertar();
         if (espera is null)
-            maq.Avisar("esp_deep_sleep_start() sem nenhuma fonte de despertar: a placa dorme para sempre, "
-                       + "e so o botao RESET a acorda.");
+            maq.Avisar(Idioma.T("esp_deep_sleep_start() sem nenhuma fonte de despertar: a placa dorme para sempre, e so o botao RESET a acorda."));
 
-        maq.Dormir(pinosSegurados, espera ?? "para sempre (so o RESET acorda)");
+        maq.Dormir(pinosSegurados, espera ?? Idioma.T("para sempre (so o RESET acorda)"));
 
         double inicio = maq.AgoraUs();
         var (causa, pinos) = EsperarDespertar(inicio, profundo: true);
@@ -457,7 +451,7 @@ public partial class Interpretador
     void DormirLeve()
     {
         if (DescreverDespertar() is null && !(gpioNoSonoLeve && gpioDoSonoLeve.Count > 0))
-            maq.Avisar("esp_light_sleep_start() sem nenhuma fonte de despertar: a placa nao acorda mais.");
+            maq.Avisar(Idioma.T("esp_light_sleep_start() sem nenhuma fonte de despertar: a placa nao acorda mais."));
 
         var (causa, pinos) = EsperarDespertar(maq.AgoraUs(), profundo: false);
         causaDoSonoLeve = causa;
@@ -474,13 +468,12 @@ public partial class Interpretador
     {
         bool comFio = maq.D0NoReset?.Invoke() ?? true;
         if (us > 0 && !comFio)
-            maq.Avisar("ESP.deepSleep(): o ESP8266 so acorda sozinho com o D0 (GPIO16) ligado no RST. "
-                       + "Sem esse fio a placa dorme ate alguem apertar o RESET.");
+            maq.Avisar(Idioma.T("ESP.deepSleep(): o ESP8266 so acorda sozinho com o D0 (GPIO16) ligado no RST. Sem esse fio a placa dorme ate alguem apertar o RESET."));
 
         bool acorda = us > 0 && comFio;
         maq.Dormir(pinosSegurados, acorda
-            ? $"acorda em {us / 1_000_000.0:0.###} s, pelo D0 ligado no RST"
-            : "para sempre (so o RESET acorda)");
+            ? Idioma.T("acorda em {0:0.###} s, pelo D0 ligado no RST", us / 1_000_000.0)
+            : Idioma.T("para sempre (so o RESET acorda)"));
 
         despertarDoTimerUs = acorda ? us : -1;
         ext0Pino = -1;
@@ -495,15 +488,15 @@ public partial class Interpretador
         var partes = new List<string>();
         if (despertarDoTimerUs >= 0)
             partes.Add(despertarDoTimerUs >= 1_000_000 && despertarDoTimerUs % 1_000_000 == 0
-                ? $"o timer, em {despertarDoTimerUs / 1_000_000} s"
-                : $"o timer, em {despertarDoTimerUs / 1000.0:0.###} ms");
-        if (ext0Pino >= 0) partes.Add($"o GPIO {ext0Pino} em {(ext0Nivel == 1 ? "HIGH" : "LOW")}");
+                ? Idioma.T("o timer, em {0} s", despertarDoTimerUs / 1_000_000)
+                : Idioma.T("o timer, em {0:0.###} ms", despertarDoTimerUs / 1000.0));
+        if (ext0Pino >= 0) partes.Add(Idioma.T("o GPIO {0} em {1}", ext0Pino, (ext0Nivel == 1 ? "HIGH" : "LOW")));
         if (ext1Mascara != 0)
-            partes.Add($"os GPIO {string.Join(", ", PinosDaMascara(ext1Mascara))} "
-                       + (ext1Modo == 1 ? "(qualquer um em HIGH)" : ChipDoSono == "ESP32" ? "(todos em LOW)" : "(qualquer um em LOW)"));
+            partes.Add(Idioma.T("os GPIO {0} ", string.Join(", ", PinosDaMascara(ext1Mascara)))
+                       + (ext1Modo == 1 ? Idioma.T("(qualquer um em HIGH)") : ChipDoSono == "ESP32" ? Idioma.T("(todos em LOW)") : Idioma.T("(qualquer um em LOW)")));
         if (gpioMascara != 0)
-            partes.Add($"os GPIO {string.Join(", ", PinosDaMascara(gpioMascara))} em {(gpioModo == 1 ? "HIGH" : "LOW")}");
-        return partes.Count == 0 ? null : "acorda com " + string.Join(" ou ", partes);
+            partes.Add(Idioma.T("os GPIO {0} em {1}", string.Join(", ", PinosDaMascara(gpioMascara)), (gpioModo == 1 ? "HIGH" : "LOW")));
+        return partes.Count == 0 ? null : Idioma.T("acorda com {0}", string.Join(Idioma.T(" ou "), partes));
     }
 
     /// <summary>

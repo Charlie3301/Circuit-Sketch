@@ -117,10 +117,10 @@ public static class Cabecalhos
     /// O avr/wdt.h da avr-libc: os prazos do watchdog. So existe no AVR -- nas
     /// outras placas o #include nem acha o arquivo, e aqui tambem nao passa.
     /// </summary>
-    const string WdtDoAvr = """
+    static readonly string WdtDoAvr = $$"""
         #pragma once
         #ifndef __AVR__
-        #error "avr/wdt.h so existe nas placas AVR (Uno, Nano, Mega, ATtiny): nesta placa o compilador da 'No such file or directory'."
+        #error "{{Idioma.T("avr/wdt.h so existe nas placas AVR (Uno, Nano, Mega, ATtiny): nesta placa o compilador da 'No such file or directory'.")}}"
         #endif
         #define WDTO_15MS 0
         #define WDTO_30MS 1

@@ -71,8 +71,7 @@ public partial class Interpretador
                     // AttributeError, e aqui tambem.
                     case "read":
                         if (EhRp2040)
-                            throw new ErroDeExecucao("ADC.read() nao existe na Pico: o MicroPython do "
-                                + "RP2040 so tem read_u16(), que vai de 0 a 65535.", linha);
+                            throw new ErroDeExecucao(Idioma.T("ADC.read() nao existe na Pico: o MicroPython do RP2040 so tem read_u16(), que vai de 0 a 65535."), linha);
                         return Valor.DeInt(LeituraDoAdcPy(o));
 
                     // read_u16 devolve 16 bits, qualquer que seja o conversor:
@@ -187,7 +186,7 @@ public partial class Interpretador
         }
 
         throw new ErroDeExecucao(
-            $"{o.Classe}.{metodo}() ainda nao e suportado pelo simulador", linha);
+            Idioma.T("{0}.{1}() ainda nao e suportado pelo simulador", o.Classe, metodo), linha);
     }
 
     /// <summary>
@@ -197,8 +196,7 @@ public partial class Interpretador
     {
         if (v.Referencia is not ListaPy cor || cor.Itens.Count < 3)
             throw new ErroDeExecucao(
-                "a cor de um LED da fita e uma tupla de tres numeros, "
-                + "como (148, 0, 211)", linha);
+                Idioma.T("a cor de um LED da fita e uma tupla de tres numeros, como (148, 0, 211)"), linha);
 
         return Fita.Montar((int)cor.Itens[0].Num, (int)cor.Itens[1].Num, (int)cor.Itens[2].Num);
     }
@@ -208,12 +206,12 @@ public partial class Interpretador
     {
         if (o.Fita is null)
             throw new ErroDeExecucao(
-                $"nao da para escrever por indice num {o.Classe}", linha);
+                Idioma.T("nao da para escrever por indice num {0}", o.Classe), linha);
 
         if (i < 0) i += o.Fita.Quantidade;
         if (i < 0 || i >= o.Fita.Quantidade)
             throw new ErroDeExecucao(
-                $"a fita tem {o.Fita.Quantidade} LEDs: o indice {i} esta fora", linha);
+                Idioma.T("a fita tem {0} LEDs: o indice {1} esta fora", o.Fita.Quantidade, i), linha);
 
         o.Fita.Definir(i, CorDePython(v, linha));
     }
@@ -276,7 +274,7 @@ public partial class Interpretador
             }
         }
 
-        throw new ErroDeExecucao($"WLAN.{metodo}() ainda nao e suportado", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("WLAN.{0}() ainda nao e suportado", metodo), c.Linha);
     }
 
     // =====================================================================
@@ -294,7 +292,7 @@ public partial class Interpretador
                 o.Campos["callback"] = c.Args.Count > 0 && c.Args[0] is Variavel f
                     ? Valor.DeTexto(f.Nome)
                     : throw new ErroDeExecucao(
-                        "set_callback() espera o nome de uma funcao", c.Linha);
+                        Idioma.T("set_callback() espera o nome de uma funcao"), c.Linha);
                 return Valor.Vazio;
 
             case "connect":
@@ -310,10 +308,8 @@ public partial class Interpretador
                     throw new ErroDeExecucao(
                         cliente.Estado > 0
                             // O MQTTException(5) do umqtt: o broker respondeu que nao.
-                            ? $"MQTTException({cliente.Estado}): o broker '{cliente.Host}' recusou a conexao "
-                              + (cliente.Estado is 4 or 5 ? "(usuario ou senha)." : "(veja o painel Rede).")
-                            : $"nao consegui conectar no broker MQTT '{cliente.Host}'. "
-                              + "Confira o endereco e se o WiFi ja conectou.", c.Linha);
+                            ? Idioma.T("MQTTException({0}): o broker '{1}' recusou a conexao {2}", cliente.Estado, cliente.Host, (cliente.Estado is 4 or 5 ? Idioma.T("(usuario ou senha).") : Idioma.T("(veja o painel Rede).")))
+                            : Idioma.T("nao consegui conectar no broker MQTT '{0}'. Confira o endereco e se o WiFi ja conectou.", cliente.Host), c.Linha);
                 return Valor.Vazio;
             }
 
@@ -321,7 +317,7 @@ public partial class Interpretador
                 if (!rede.PublicarMqtt(cliente, S(0), TextoArduino.ParaBytes(S(1)),
                                        args.Count > 2 && args[2].Verdadeiro))
                     throw new ErroDeExecucao(
-                        "publish() falhou: o cliente MQTT nao esta conectado", c.Linha);
+                        Idioma.T("publish() falhou: o cliente MQTT nao esta conectado"), c.Linha);
                 return Valor.Vazio;
 
             case "subscribe":
@@ -375,7 +371,7 @@ public partial class Interpretador
                 return Valor.Vazio;
         }
 
-        throw new ErroDeExecucao($"client.{metodo}() ainda nao e suportado", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("client.{0}() ainda nao e suportado", metodo), c.Linha);
     }
 
     // =====================================================================
@@ -411,7 +407,7 @@ public partial class Interpretador
                         System.Globalization.CultureInfo.InvariantCulture, out long n)
                         ? n
                         : throw new ErroDeExecucao(
-                            $"int('{primeiro.Texto}') nao da: isso nao e um numero", linha))
+                            Idioma.T("int('{0}') nao da: isso nao e um numero", primeiro.Texto), linha))
                     : Valor.DeInt(Math.Truncate(primeiro.Num));
                 return true;
 
@@ -437,7 +433,7 @@ public partial class Interpretador
             {
                 var itens = args.Count == 1 ? [.. Percorrer(primeiro, linha)] : args;
                 if (itens.Count == 0)
-                    throw new ErroDeExecucao($"{nome}() precisa de pelo menos um valor", linha);
+                    throw new ErroDeExecucao(Idioma.T("{0}() precisa de pelo menos um valor", nome), linha);
                 r = nome == "min"
                     ? itens.Aggregate((a, b) => a.Num <= b.Num ? a : b)
                     : itens.Aggregate((a, b) => a.Num >= b.Num ? a : b);
@@ -588,9 +584,7 @@ public partial class Interpretador
             if (jaDigitado.Length > 0) return jaDigitado;
 
             throw new ErroDeExecucao(
-                "input() esta esperando alguem digitar no monitor serial, "
-                + "e aqui nao ha monitor. Rode o sketch pela janela do "
-                + "simulador e digite a resposta no painel Serial.", linha);
+                Idioma.T("input() esta esperando alguem digitar no monitor serial, e aqui nao ha monitor. Rode o sketch pela janela do simulador e digite a resposta no painel Serial."), linha);
         }
 
         while (true)
@@ -634,7 +628,7 @@ public partial class Interpretador
         Objeto { Fita: not null } o => o.Fita.Quantidade,
         _ => v.EhTexto
             ? v.Texto.Length
-            : throw new ErroDeExecucao("len() so vale para lista, texto e dicionario", linha)
+            : throw new ErroDeExecucao(Idioma.T("len() so vale para lista, texto e dicionario"), linha)
     };
 
     bool Contem(Valor onde, Valor oque, int linha)
@@ -654,20 +648,20 @@ public partial class Interpretador
     static Valor Intervalo(List<Valor> args, int linha)
     {
         if (args.Count == 0)
-            throw new ErroDeExecucao("range() precisa de pelo menos um numero", linha);
+            throw new ErroDeExecucao(Idioma.T("range() precisa de pelo menos um numero"), linha);
 
         long inicio = args.Count > 1 ? (long)args[0].Num : 0;
         long fim = args.Count > 1 ? (long)args[1].Num : (long)args[0].Num;
         long passo = args.Count > 2 ? (long)args[2].Num : 1;
 
-        if (passo == 0) throw new ErroDeExecucao("o passo de range() nao pode ser zero", linha);
+        if (passo == 0) throw new ErroDeExecucao(Idioma.T("o passo de range() nao pode ser zero"), linha);
 
         var itens = new List<Valor>();
         for (long i = inicio; passo > 0 ? i < fim : i > fim; i += passo)
         {
             if (itens.Count > 100_000)
                 throw new ErroDeExecucao(
-                    "este range() tem mais de 100 mil itens: confira os limites", linha);
+                    Idioma.T("este range() tem mais de 100 mil itens: confira os limites"), linha);
             itens.Add(Valor.DeInt(i));
         }
 
@@ -721,7 +715,7 @@ public partial class Interpretador
 
             int fecha = molde.IndexOf('}', i);
             if (fecha < 0)
-                throw new ErroDeExecucao("faltou fechar uma chave no texto f'...'", c.Linha);
+                throw new ErroDeExecucao(Idioma.T("faltou fechar uma chave no texto f'...'"), c.Linha);
 
             string dentro = molde[(i + 1)..fecha];
             i = fecha;
@@ -752,7 +746,7 @@ public partial class Interpretador
         }
         catch (ErroDeSintaxe e)
         {
-            throw new ErroDeExecucao($"dentro do f'...': {e.Message}", linha);
+            throw new ErroDeExecucao(Idioma.T("dentro do f'...': {0}", e.Message), linha);
         }
     }
 
@@ -804,12 +798,12 @@ public partial class Interpretador
             case "join":
             {
                 if (args.Count == 0 || args[0].Referencia is not ListaPy lista)
-                    throw new ErroDeExecucao("join() precisa de uma lista", linha);
+                    throw new ErroDeExecucao(Idioma.T("join() precisa de uma lista"), linha);
                 return Valor.DeTexto(string.Join(s, lista.Itens.Select(v => v.Mostrar())));
             }
         }
 
-        throw new ErroDeExecucao($"o texto nao tem o metodo '{metodo}()'", linha);
+        throw new ErroDeExecucao(Idioma.T("o texto nao tem o metodo '{0}()'", metodo), linha);
     }
 
     /// <summary>
@@ -827,7 +821,7 @@ public partial class Interpretador
             if (i + 1 < molde.Length && molde[i + 1] == '{') { saida.Append('{'); i++; continue; }
 
             int fecha = molde.IndexOf('}', i);
-            if (fecha < 0) throw new ErroDeExecucao("faltou fechar uma chave no format()", linha);
+            if (fecha < 0) throw new ErroDeExecucao(Idioma.T("faltou fechar uma chave no format()"), linha);
 
             string dentro = molde[(i + 1)..fecha];
             i = fecha;
@@ -869,9 +863,9 @@ public partial class Interpretador
             case "pop":
             {
                 if (l.Itens.Count == 0)
-                    throw new ErroDeExecucao("pop() numa lista vazia", linha);
+                    throw new ErroDeExecucao(Idioma.T("pop() numa lista vazia"), linha);
                 int i = args.Count > 0 ? l.Posicao((int)primeiro.Num) : l.Itens.Count - 1;
-                if (i < 0) throw new ErroDeExecucao("indice fora da lista", linha);
+                if (i < 0) throw new ErroDeExecucao(Idioma.T("indice fora da lista"), linha);
                 var saiu = l.Itens[i];
                 l.Itens.RemoveAt(i);
                 return saiu;
@@ -898,7 +892,7 @@ public partial class Interpretador
                 return Valor.Vazio;
         }
 
-        throw new ErroDeExecucao($"a lista nao tem o metodo '{metodo}()'", linha);
+        throw new ErroDeExecucao(Idioma.T("a lista nao tem o metodo '{0}()'", metodo), linha);
     }
 
     Valor ChamarNoDicionario(DicionarioPy d, string metodo, List<Valor> args, int linha)
@@ -942,6 +936,6 @@ public partial class Interpretador
                 return Valor.Vazio;
         }
 
-        throw new ErroDeExecucao($"o dicionario nao tem o metodo '{metodo}()'", linha);
+        throw new ErroDeExecucao(Idioma.T("o dicionario nao tem o metodo '{0}()'", metodo), linha);
     }
 }

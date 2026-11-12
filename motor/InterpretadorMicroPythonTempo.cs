@@ -39,7 +39,7 @@ public partial class Interpretador
     {
         if (v.Referencia is Rotina r) return r;
         if (v.EhTexto && funcoes.TryGetValue(v.Texto, out var f)) return new Rotina { Funcao = f, Captura = Global };
-        throw new ErroDeExecucao($"{ondeUsou}: o callback tem que ser uma funcao do sketch (def) ou uma lambda", linha);
+        throw new ErroDeExecucao(Idioma.T("{0}: o callback tem que ser uma funcao do sketch (def) ou uma lambda", ondeUsou), linha);
     }
 
     // =====================================================================
@@ -63,7 +63,7 @@ public partial class Interpretador
             : nomeados.TryGetValue("freq", out var fr) && fr.Num > 0 ? 1000.0 / fr.Num
             : -1;
         if (periodo <= 0)
-            throw new ErroDeExecucao("Timer.init(): falta o period (em ms) ou a freq (em Hz)", linha);
+            throw new ErroDeExecucao(Idioma.T("Timer.init(): falta o period (em ms) ou a freq (em Hz)"), linha);
         bool periodico = !nomeados.TryGetValue("mode", out var modo) || modo.Num != 0;   // ONE_SHOT = 0
         timersPy.Add(new TimerPy
         {
@@ -87,7 +87,7 @@ public partial class Interpretador
                 return Valor.DeInt(t is null ? 0 : (long)Math.Max(0, t.Proximo - maq.Ms));
             }
         }
-        throw new ErroDeExecucao($"Timer.{metodo}() ainda nao e suportado pelo simulador. O Timer tem init, deinit e value.", linha);
+        throw new ErroDeExecucao(Idioma.T("Timer.{0}() ainda nao e suportado pelo simulador. O Timer tem init, deinit e value.", metodo), linha);
     }
 
     /// <summary>Os Timers vencidos: cada um chama o callback dele (com o Timer de argumento).</summary>
@@ -185,7 +185,7 @@ public partial class Interpretador
                     }
                     catch (ArgumentOutOfRangeException)
                     {
-                        throw new ErroDeExecucao("RTC.datetime(): data invalida (ano, mes, dia, dia_da_semana, hora, minuto, segundo, subsegundo)", linha);
+                        throw new ErroDeExecucao(Idioma.T("RTC.datetime(): data invalida (ano, mes, dia, dia_da_semana, hora, minuto, segundo, subsegundo)"), linha);
                     }
                     rtcMsDoAcerto = maq.Ms;
                     return Valor.Vazio;
@@ -199,7 +199,7 @@ public partial class Interpretador
             }
             case "memory": return Valor.DeTexto("");
         }
-        throw new ErroDeExecucao($"RTC.{metodo}() ainda nao e suportado pelo simulador. O RTC tem datetime e init.", linha);
+        throw new ErroDeExecucao(Idioma.T("RTC.{0}() ainda nao e suportado pelo simulador. O RTC tem datetime e init.", metodo), linha);
     }
 
     // =====================================================================
@@ -272,7 +272,7 @@ public partial class Interpretador
             case "readinto":
             {
                 if (args.Count == 0 || args[0].Referencia is not ListaPy alvo)
-                    throw new ErroDeExecucao("SPI.readinto() precisa de um bytearray: buf = bytearray(4)", linha);
+                    throw new ErroDeExecucao(Idioma.T("SPI.readinto() precisa de um bytearray: buf = bytearray(4)"), linha);
                 int enche = Enchimento();
                 for (int i = 0; i < alvo.Itens.Count; i++) alvo.Itens[i] = Valor.DeInt(Troca(enche));
                 return Valor.Vazio;
@@ -283,7 +283,7 @@ public partial class Interpretador
             {
                 var saida = args.Count > 0 ? BytesPy(args[0]) : [];
                 if (args.Count < 2 || args[1].Referencia is not ListaPy entrada)
-                    throw new ErroDeExecucao("SPI.write_readinto() precisa do bytearray de entrada", linha);
+                    throw new ErroDeExecucao(Idioma.T("SPI.write_readinto() precisa do bytearray de entrada"), linha);
                 for (int i = 0; i < saida.Length; i++)
                 {
                     int lido = Troca(saida[i]);
@@ -292,6 +292,6 @@ public partial class Interpretador
                 return Valor.Vazio;
             }
         }
-        throw new ErroDeExecucao($"{o.Classe}.{metodo}() ainda nao e suportado pelo simulador. O SPI tem init, deinit, write, read, readinto e write_readinto.", linha);
+        throw new ErroDeExecucao(Idioma.T("{0}.{1}() ainda nao e suportado pelo simulador. O SPI tem init, deinit, write, read, readinto e write_readinto.", o.Classe, metodo), linha);
     }
 }

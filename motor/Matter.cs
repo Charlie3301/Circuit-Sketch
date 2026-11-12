@@ -20,20 +20,20 @@ public sealed class MatterDaPlaca(Maquina dona)
     public void Comissionar()
     {
         Comissionada = true;
-        dona.Rede?.Anotar(dona, "matter", "comissionada (a bancada faz o papel do aplicativo)");
+        dona.Rede?.Anotar(dona, "matter", Idioma.T("comissionada (a bancada faz o papel do aplicativo)"));
     }
 
     public void Descomissionar()
     {
         Comissionada = false;
         lock (trava) escritas.Clear();
-        dona.Rede?.Anotar(dona, "matter", "saiu do fabric");
+        dona.Rede?.Anotar(dona, "matter", Idioma.T("saiu do fabric"));
     }
 
     public void Relatar(int endpoint, long cluster, long atributo, string valor)
     {
         lock (trava) relatados[$"{endpoint}/{cluster}/{atributo}"] = valor;
-        dona.Rede?.Anotar(dona, "matter", $"endpoint {endpoint} cluster 0x{cluster:X4} atributo 0x{atributo:X4} = {valor}");
+        dona.Rede?.Anotar(dona, "matter", Idioma.T("endpoint {0} cluster 0x{1:X4} atributo 0x{2:X4} = {3}", endpoint, cluster, atributo, valor));
     }
 
     /// <summary>O ultimo valor que a placa reportou desse atributo, ou null.</summary>

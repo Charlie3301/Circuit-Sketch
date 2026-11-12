@@ -98,8 +98,7 @@ public sealed unsafe partial class ModuloNativo
     public static ModuloNativo Carregar(Maquina maquina, Programa programa, int razaoDoReinicio = 1)
     {
         string pasta = Pasta ?? AcharPasta()
-            ?? throw new ErroDeExecucao("o modo nativo (os arquivos .c) precisa da pasta \"nativo\" do simulador, "
-                                        + "e ela nao foi encontrada.", 0);
+            ?? throw new ErroDeExecucao(Idioma.T("o modo nativo (os arquivos .c) precisa da pasta \"nativo\" do simulador, e ela nao foi encontrada."), 0);
         if (!Tcc.Carregar(pasta, out string erro)) throw new ErroDeExecucao(erro, 0);
 
         var modulo = new ModuloNativo(maquina, razaoDoReinicio) { tabelaDeParticoes = programa.TabelaDeParticoes };
@@ -161,7 +160,7 @@ public sealed unsafe partial class ModuloNativo
         try
         {
             estado = Tcc.Novo();
-            if (estado == IntPtr.Zero) throw new ErroDeExecucao("o compilador de C nao abriu.", 0);
+            if (estado == IntPtr.Zero) throw new ErroDeExecucao(Idioma.T("o compilador de C nao abriu."), 0);
             Tcc.Nasceu();
             Tcc.FuncaoDeErro(estado, GCHandle.ToIntPtr(alcaDasMensagens), &ErroDoTcc);
 
@@ -240,7 +239,7 @@ public sealed unsafe partial class ModuloNativo
             if (tamanho <= 0) throw ErroDeCompilacao(mensagens);
             tamanhoDoCodigo = (nuint)tamanho;
             codigo = Win32.VirtualAlloc(IntPtr.Zero, tamanhoDoCodigo, Win32.MEM_COMMIT | Win32.MEM_RESERVE, Win32.PAGE_READWRITE);
-            if (codigo == IntPtr.Zero) throw new ErroDeExecucao("sem memoria para o codigo nativo.", 0);
+            if (codigo == IntPtr.Zero) throw new ErroDeExecucao(Idioma.T("sem memoria para o codigo nativo."), 0);
             if (Tcc.Relocar(estado, (void*)codigo) < 0) throw ErroDeCompilacao(mensagens);
 
             lock (mensagens)
@@ -298,10 +297,10 @@ public sealed unsafe partial class ModuloNativo
         lock (mensagens) linhas = [.. mensagens.Select(Limpar)];
         var erros = linhas.Where(l => !l.Contains("warning:", StringComparison.Ordinal)).ToList();
         if (erros.Count == 0) erros = linhas;
-        string texto = erros.Count == 0 ? "o compilador de C recusou o programa (sem mensagem)."
+        string texto = erros.Count == 0 ? Idioma.T("o compilador de C recusou o programa (sem mensagem).")
                      : string.Join(Environment.NewLine, erros.Take(12));
-        if (erros.Count > 12) texto += Environment.NewLine + $"... e mais {erros.Count - 12}";
-        return new ErroDeSintaxe("compilando o C: " + texto, 0);
+        if (erros.Count > 12) texto += Idioma.T("{0}... e mais {1}", Environment.NewLine, erros.Count - 12);
+        return new ErroDeSintaxe(Idioma.T("compilando o C: {0}", texto), 0);
     }
 
     // As pastas como o compilador as escreve nas mensagens, e o que mostrar
@@ -382,7 +381,7 @@ public sealed unsafe partial class ModuloNativo
         IntPtr Exigir(string nome)
         {
             IntPtr p = Simbolo(nome);
-            if (p == IntPtr.Zero) throw new ErroDeExecucao($"o runtime nativo esta incompleto (falta {nome}).", 0);
+            if (p == IntPtr.Zero) throw new ErroDeExecucao(Idioma.T("o runtime nativo esta incompleto (falta {0}).", nome), 0);
             return p;
         }
 
@@ -396,8 +395,7 @@ public sealed unsafe partial class ModuloNativo
 
         var funcoes = HostNativo.Tabela();
         if (campos != funcoes.Length)
-            throw new ErroDeExecucao($"o runtime nativo e o simulador nao combinam ({campos} funcoes no C, "
-                                     + $"{funcoes.Length} no simulador).", 0);
+            throw new ErroDeExecucao(Idioma.T("o runtime nativo e o simulador nao combinam ({0} funcoes no C, {1} no simulador).", campos, funcoes.Length), 0);
         tabela = Marshal.AllocHGlobal(funcoes.Length * IntPtr.Size);
         for (int i = 0; i < funcoes.Length; i++) ((IntPtr*)tabela)[i] = funcoes[i];
 
@@ -422,7 +420,7 @@ public sealed unsafe partial class ModuloNativo
             regiaoPsram = Win32.VirtualAlloc(IntPtr.Zero, tamanhoPsram, Win32.MEM_COMMIT | Win32.MEM_RESERVE, Win32.PAGE_READWRITE);
         }
         if (regiaoInterna == IntPtr.Zero || (psram > 0 && regiaoPsram == IntPtr.Zero))
-            throw new ErroDeExecucao("sem memoria para a RAM da placa.", 0);
+            throw new ErroDeExecucao(Idioma.T("sem memoria para a RAM da placa."), 0);
 
         // O tratador de falhas e o do proprio runtime (C): so olha o codigo
         // deste modulo, e nao chama o .NET.
@@ -666,7 +664,7 @@ public sealed unsafe partial class ModuloNativo
         if (presas)
         {
             // Soltar a memoria com codigo rodando nela derrubaria o programa.
-            Maquina.Avisar("modo nativo: uma tarefa do C nao parou; a memoria dela fica presa ate fechar o simulador.");
+            Maquina.Avisar(Idioma.T("modo nativo: uma tarefa do C nao parou; a memoria dela fica presa ate fechar o simulador."));
             return;
         }
         Liberar();
@@ -765,7 +763,7 @@ public sealed unsafe partial class ModuloNativo
     /// <summary>Erro do lado C# dentro de uma chamada do C: vira aviso, e a placa para.</summary>
     internal void Falha(Exception e)
     {
-        Maquina.Avisar("modo nativo: erro interno do simulador (" + e.GetType().Name + ": " + e.Message + ")");
+        Maquina.Avisar(Idioma.T("modo nativo: erro interno do simulador ({0}: {1})", e.GetType().Name, e.Message));
         Maquina.Parar = true;
     }
 }

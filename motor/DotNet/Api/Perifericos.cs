@@ -120,7 +120,7 @@ namespace System.Device.Pwm
             get => ciclo;
             set
             {
-                if (value < 0 || value > 1) throw new ArgumentOutOfRangeException(nameof(DutyCycle), "o ciclo vai de 0 a 1");
+                if (value < 0 || value > 1) throw new ArgumentOutOfRangeException(nameof(DutyCycle), Idioma.T("o ciclo vai de 0 a 1"));
                 ciclo = value;
                 if (ligado) Aplicar(false);
             }
@@ -179,7 +179,7 @@ namespace System.Device.Adc
             {
                 if (canal >= 0 && canal < 8) return Adc1[canal];
                 if (canal >= 10 && canal < 20) return Adc2[canal - 10];
-                throw new ArgumentOutOfRangeException(nameof(canal), $"a ESP32 nao tem o canal {canal} do ADC");
+                throw new ArgumentOutOfRangeException(nameof(canal), Idioma.T("a ESP32 nao tem o canal {0} do ADC", canal));
             }
             return Ponte.Numero("A" + canal, canal);
         }
@@ -437,7 +437,7 @@ namespace System.IO.Ports
                 "COM1" => "Serial",
                 "COM2" => "Serial1",
                 "COM3" => "Serial2",
-                _ => throw new ArgumentException($"a porta {portName} nao existe (COM1, COM2 ou COM3)"),
+                _ => throw new ArgumentException(Idioma.T("a porta {0} nao existe (COM1, COM2 ou COM3)", portName)),
             };
         }
 
@@ -488,7 +488,7 @@ namespace System.IO.Ports
 
         void Exigir()
         {
-            if (!IsOpen) throw new InvalidOperationException($"a porta {PortName} esta fechada (falta o Open())");
+            if (!IsOpen) throw new InvalidOperationException(Idioma.T("a porta {0} esta fechada (falta o Open())", PortName));
         }
 
         public void Write(string text)
@@ -512,7 +512,7 @@ namespace System.IO.Ports
                 long c = Ponte.I(serial, "read");
                 if (c >= 0) return (int)c;
                 if (ReadTimeout >= 0 && relogio.ElapsedMilliseconds >= ReadTimeout)
-                    throw new TimeoutException($"nada chegou na {PortName} em {ReadTimeout} ms");
+                    throw new TimeoutException(Idioma.T("nada chegou na {0} em {1} ms", PortName, ReadTimeout));
                 Ponte.Dormir(1);
             }
         }

@@ -166,8 +166,7 @@ public partial class Interpretador
     {
         if (Maq.Perfil.TemWifi || Maq.Rede.CaboConectado(Maq)) return;
         throw new ErroDeExecucao(
-            $"{oque}: a {Maq.Perfil.Nome} nao tem WiFi. As placas com rede neste simulador sao a "
-            + "ESP32 DevKit V1 e a Nano RP2040 Connect.", linha);
+            Idioma.T("{0}: a {1} nao tem WiFi. As placas com rede neste simulador sao a ESP32 DevKit V1 e a Nano RP2040 Connect.", oque, Maq.Perfil.Nome), linha);
     }
 
     // =====================================================================
@@ -437,7 +436,7 @@ public partial class Interpretador
                 return Valor.DeBool(true);
         }
 
-        throw new ErroDeExecucao($"WiFi.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("WiFi.{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     /// <summary>Deixa o tempo da placa passar ate o WiFi ficar pronto.</summary>
@@ -550,10 +549,10 @@ public partial class Interpretador
         }
 
         throw new ErroDeExecucao(esp8266 && metodo is "getEfuseMac" or "getChipModel" or "getChipCores"
-                ? $"ESP.{metodo}() e da ESP32: no ESP8266 use ESP.getChipId()."
+                ? Idioma.T("ESP.{0}() e da ESP32: no ESP8266 use ESP.getChipId().", metodo)
                 : !esp8266 && metodo == "getChipId"
-                    ? "ESP.getChipId() e do ESP8266: na ESP32 use ESP.getEfuseMac()."
-                    : $"ESP.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+                    ? Idioma.T("ESP.getChipId() e do ESP8266: na ESP32 use ESP.getEfuseMac().")
+                    : Idioma.T("ESP.{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     // =====================================================================
@@ -569,7 +568,7 @@ public partial class Interpretador
         "PubSubClient" => ChamarMqtt(obj, metodo, c, amb),
         "BluetoothSerial" => ChamarBluetooth(obj, metodo, c, amb),
         "IPAddress" => ChamarIp(obj, metodo, c, amb),
-        _ => throw new ErroDeExecucao($"{obj.Classe}.{metodo}() ainda nao e suportado.", c.Linha),
+        _ => throw new ErroDeExecucao(Idioma.T("{0}.{1}() ainda nao e suportado.", obj.Classe, metodo), c.Linha),
     };
 
     Valor ChamarIp(Objeto obj, string metodo, Chamada c, Ambiente amb)
@@ -587,7 +586,7 @@ public partial class Interpretador
                 return Valor.DeBool(vale);
             }
         }
-        throw new ErroDeExecucao($"IPAddress.{metodo}() ainda nao e suportado.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("IPAddress.{0}() ainda nao e suportado.", metodo), c.Linha);
     }
 
     // =====================================================================
@@ -605,7 +604,7 @@ public partial class Interpretador
             ExigirWifi(c.Linha, $"http.{metodo}()");
             if (string.IsNullOrEmpty(http.Url))
                 throw new ErroDeExecucao(
-                    $"http.{metodo}() sem http.begin(url) antes.", c.Linha);
+                    Idioma.T("http.{0}() sem http.begin(url) antes.", metodo), c.Linha);
 
             http.Resposta = Maq.Rede.Requisitar(Maq, metodoHttp, http.Url, http.Cabecalhos,
                 corpo, http.TempoMs, http.Inseguro);
@@ -663,7 +662,7 @@ public partial class Interpretador
                 {
                     Rede.ErroConexaoRecusada => "connection refused",
                     Rede.ErroTempoDeLeitura => "read timeout",
-                    _ => "erro " + (int)args[0].Num,
+                    _ => Idioma.T("erro {0}", (int)args[0].Num),
                 });
 
             case "setConnectTimeout":
@@ -676,10 +675,10 @@ public partial class Interpretador
             case "getStream":
             case "getStreamPtr":
                 throw new ErroDeExecucao(
-                    "http.getStream() ainda nao e suportado. Use http.getString().", c.Linha);
+                    Idioma.T("http.getStream() ainda nao e suportado. Use http.getString()."), c.Linha);
         }
 
-        throw new ErroDeExecucao($"http.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("http.{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     /// <summary>Quais argumentos sao objetos (e quais sao valores comuns).</summary>
@@ -705,7 +704,7 @@ public partial class Interpretador
             case "on":
             {
                 if (c.Args.Count < 2)
-                    throw new ErroDeExecucao("server.on() espera o caminho e a funcao que atende.", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("server.on() espera o caminho e a funcao que atende."), c.Linha);
 
                 string caminho = Avaliar(c.Args[0], amb).Mostrar();
                 int metodoHttp = 127;
@@ -807,13 +806,13 @@ public partial class Interpretador
             case "requestAuthentication":
                 s.Codigo = 401;
                 s.Tipo = "text/plain; charset=utf-8";
-                s.Corpo.Clear().Append("precisa de usuario e senha");
+                s.Corpo.Clear().Append(Idioma.T("precisa de usuario e senha"));
                 s.CabecalhosDaResposta.Add(new("WWW-Authenticate", "Basic realm=\"CircuitSketch\""));
                 s.Respondeu = true;
                 return Valor.Vazio;
         }
 
-        throw new ErroDeExecucao($"server.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("server.{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     /// <summary>
@@ -858,7 +857,7 @@ public partial class Interpretador
             else
             {
                 s.Codigo = 404;
-                s.Corpo.Append($"Nao achei {pedido.Caminho}. O sketch registrou esta rota com server.on()?");
+                s.Corpo.Append(Idioma.T("Nao achei {0}. O sketch registrou esta rota com server.on()?", pedido.Caminho));
                 s.Respondeu = true;
             }
         }
@@ -867,7 +866,7 @@ public partial class Interpretador
             pedido.Responder(s.Respondeu
                 ? PedidoHttp.MontarResposta(s.Codigo, s.Tipo, s.Corpo.ToString(), s.CabecalhosDaResposta)
                 : PedidoHttp.MontarResposta(500, "text/plain; charset=utf-8",
-                    $"a rota {pedido.Caminho} rodou mas nao chamou server.send()"));
+                    Idioma.T("a rota {0} rodou mas nao chamou server.send()", pedido.Caminho)));
             s.Atual = null;
         }
     }
@@ -967,7 +966,7 @@ public partial class Interpretador
                 return Valor.Vazio;
         }
 
-        throw new ErroDeExecucao($"server.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("server.{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     // =====================================================================
@@ -1056,7 +1055,7 @@ public partial class Interpretador
             }
         }
 
-        throw new ErroDeExecucao($"client.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("client.{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     // =====================================================================
@@ -1077,9 +1076,7 @@ public partial class Interpretador
         if (!estado.AvisouTamanho)
         {
             estado.AvisouTamanho = true;
-            Maq.Rede?.Anotar(Maq, "aviso", $"publish(\"{topico}\") devolveu false: a mensagem ocupa {pacote} bytes e o "
-                                       + $"buffer do PubSubClient tem {estado.Buffer}. Na placa acontece o mesmo; "
-                                       + "client.setBufferSize(1024) no setup() resolve.");
+            Maq.Rede?.Anotar(Maq, "aviso", Idioma.T("publish(\"{0}\") devolveu false: a mensagem ocupa {1} bytes e o buffer do PubSubClient tem {2}. Na placa acontece o mesmo; client.setBufferSize(1024) no setup() resolve.", topico, pacote, estado.Buffer));
         }
         _ = linha;
         return false;
@@ -1226,8 +1223,7 @@ public partial class Interpretador
             case "subscribe":
                 if (9 + TextoArduino.ParaBytes(S(0)).Length > estado.Buffer)
                 {
-                    rede.Anotar(Maq, "aviso", $"subscribe(\"{S(0)}\") devolveu false: o tópico não cabe no buffer "
-                                          + $"de {estado.Buffer} bytes do PubSubClient");
+                    rede.Anotar(Maq, "aviso", Idioma.T("subscribe(\"{0}\") devolveu false: o tópico não cabe no buffer de {1} bytes do PubSubClient", S(0), estado.Buffer));
                     return Valor.DeBool(false);
                 }
                 return Valor.DeBool(rede.AssinarMqtt(cliente, S(0)));
@@ -1251,9 +1247,7 @@ public partial class Interpretador
                     int pacote = 5 + 2 + TextoArduino.ParaBytes(mensagem.Topico).Length + mensagem.Carga.Length;
                     if (pacote > estado.Buffer)
                     {
-                        rede.Anotar(Maq, "aviso", $"chegou uma mensagem de {pacote} bytes em {mensagem.Topico}, e o "
-                                              + $"buffer do PubSubClient tem {estado.Buffer}: ela foi jogada fora, como "
-                                              + "na placa. client.setBufferSize(1024) no setup() resolve.");
+                        rede.Anotar(Maq, "aviso", Idioma.T("chegou uma mensagem de {0} bytes em {1}, e o buffer do PubSubClient tem {2}: ela foi jogada fora, como na placa. client.setBufferSize(1024) no setup() resolve.", pacote, mensagem.Topico, estado.Buffer));
                         continue;
                     }
 
@@ -1268,7 +1262,7 @@ public partial class Interpretador
             }
         }
 
-        throw new ErroDeExecucao($"client.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("client.{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     // =====================================================================
@@ -1279,10 +1273,9 @@ public partial class Interpretador
     {
         if (!Maq.Perfil.TemBluetoothClassico)
             throw new ErroDeExecucao(
-                $"SerialBT.{metodo}(): a {Maq.Perfil.Nome} nao tem Bluetooth classico. "
-                + (Maq.Perfil.Id == "nano-rp2040-connect"
-                    ? "A Nano RP2040 Connect so tem Bluetooth LE, que o simulador ainda nao cobre."
-                    : "O BluetoothSerial e da ESP32."), c.Linha);
+                Idioma.T("SerialBT.{0}(): a {1} nao tem Bluetooth classico. {2}", metodo, Maq.Perfil.Nome, (Maq.Perfil.Id == "nano-rp2040-connect"
+                    ? Idioma.T("A Nano RP2040 Connect so tem Bluetooth LE, que o simulador ainda nao cobre.")
+                    : Idioma.T("O BluetoothSerial e da ESP32."))), c.Linha);
 
         var estado = (EstadoBt)obj.Rede;
 
@@ -1377,6 +1370,6 @@ public partial class Interpretador
             case "readString": case "readStringUntil": return Valor.DeTexto("");
         }
 
-        throw new ErroDeExecucao($"SerialBT.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("SerialBT.{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 }

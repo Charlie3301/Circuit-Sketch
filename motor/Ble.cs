@@ -296,8 +296,8 @@ public static class Ble
     public static string NomeDoUuid(string uuid) => Normalizar(uuid) switch
     {
         ServicoUart => "Nordic UART",
-        UartRx => "UART RX (o celular escreve)",
-        UartTx => "UART TX (a placa notifica)",
+        UartRx => Idioma.T("UART RX (o celular escreve)"),
+        UartTx => Idioma.T("UART TX (a placa notifica)"),
         _ => Curto(uuid) switch
         {
             0x1800 => "Generic Access",
@@ -365,7 +365,7 @@ public sealed partial class Rede
         bool pilha = nimble ?? ModuloNativo.Chip(placa.Perfil?.Id ?? "") != "esp32";
         var radio = new RadioBle(placa, string.IsNullOrWhiteSpace(nome) ? "ESP32" : nome, endereco, pilha);
         lock (trava) radiosBle.Add(radio);
-        Anotar(placa, "ble", $"BLE ligado como \"{radio.Nome}\" ({endereco})");
+        Anotar(placa, "ble", Idioma.T("BLE ligado como \"{0}\" ({1})", radio.Nome, endereco));
         return radio;
     }
 
@@ -422,7 +422,7 @@ public sealed partial class Rede
         lock (cliente.ComoCliente) cliente.ComoCliente.Add(conexao);
         servidor.Anunciando = false;
         servidor.Avisar(new EventoBle(TipoDeEventoBle.Conectou, Conexao: conexao));
-        Anotar(servidor.Dona, "ble", $"\"{cliente.Nome}\" ({cliente.Endereco}) conectou em \"{servidor.Nome}\"");
+        Anotar(servidor.Dona, "ble", Idioma.T("\"{0}\" ({1}) conectou em \"{2}\"", cliente.Nome, cliente.Endereco, servidor.Nome));
         return conexao;
     }
 
@@ -447,7 +447,7 @@ public sealed partial class Rede
         }
         if (servidorNoAr || avisarAQuemSaiu) conexao.Servidor.Avisar(new EventoBle(TipoDeEventoBle.Desconectou, Conexao: conexao));
         if (clienteNoAr || avisarAQuemSaiu) conexao.Cliente.Avisar(new EventoBle(TipoDeEventoBle.Caiu, Conexao: conexao));
-        Anotar(conexao.Servidor.Dona, "ble", $"\"{conexao.Cliente.Nome}\" desconectou de \"{conexao.Servidor.Nome}\"");
+        Anotar(conexao.Servidor.Dona, "ble", Idioma.T("\"{0}\" desconectou de \"{1}\"", conexao.Cliente.Nome, conexao.Servidor.Nome));
     }
 
     /// <summary>O cliente le uma caracteristica do servidor. Nulo: ela nao deixa ler (ou a conexao caiu).</summary>
@@ -515,9 +515,9 @@ public sealed partial class Rede
     {
         if (radio.Anunciando == ligar) return;
         radio.Anunciando = ligar;
-        Anotar(radio.Dona, "ble", ligar ? $"anunciando \"{radio.Nome}\"" + (radio.UuidsAnunciados.Count > 0
-                                              ? $" (serviço {string.Join(", ", radio.UuidsAnunciados)})" : "")
-                                        : "parou de anunciar");
+        Anotar(radio.Dona, "ble", ligar ? Idioma.T("anunciando \"{0}\"", radio.Nome) + (radio.UuidsAnunciados.Count > 0
+                                              ? Idioma.T(" (serviço {0})", string.Join(", ", radio.UuidsAnunciados)) : "")
+                                        : Idioma.T("parou de anunciar"));
     }
 
     public bool ConectarBleDoCelular(RadioBle radio)
@@ -530,7 +530,7 @@ public sealed partial class Rede
         radio.CelularConectado = true;
         BleDoCelular = radio;
         radio.Avisar(new EventoBle(TipoDeEventoBle.Conectou));
-        Anotar(radio.Dona, "ble", $"celular conectou em \"{radio.Nome}\"");
+        Anotar(radio.Dona, "ble", Idioma.T("celular conectou em \"{0}\"", radio.Nome));
         return true;
     }
 
@@ -544,7 +544,7 @@ public sealed partial class Rede
         foreach (var c in radio.Visiveis()) c.Assinada = false;
         if (radio.ReanunciarAoDesconectar) radio.Anunciando = true;
         radio.Avisar(new EventoBle(TipoDeEventoBle.Desconectou));
-        Anotar(radio.Dona, "ble", pelaPlaca ? "a placa desconectou o celular" : "celular desconectou");
+        Anotar(radio.Dona, "ble", pelaPlaca ? Idioma.T("a placa desconectou o celular") : Idioma.T("celular desconectou"));
         if (pelaPlaca) BleDoCelularCaiu?.Invoke(radio);
     }
 
@@ -562,7 +562,7 @@ public sealed partial class Rede
         if (c is null || !(c.Escreve || c.EscreveSemResposta) || BleDoCelular != c.Servico.Radio) return false;
         c.Valor = dados;
         c.Servico.Radio.Avisar(new EventoBle(TipoDeEventoBle.Escreveu, c, Dados: dados));
-        Anotar(c.Servico.Radio.Dona, "ble", $"celular → {Ble.NomeDoUuid(c.Uuid) ?? c.Uuid}: {Ble.Mostrar(dados)}");
+        Anotar(c.Servico.Radio.Dona, "ble", Idioma.T("celular → {0}: {1}", Ble.NomeDoUuid(c.Uuid) ?? c.Uuid, Ble.Mostrar(dados)));
         return true;
     }
 

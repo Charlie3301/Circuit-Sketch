@@ -88,7 +88,7 @@ public partial class Interpretador
         if (!PosicaoNoVetor(ix, amb, out var vetor, out int posicao, out var faltam, out string nome)) return false;
         int tamanho = Produto(faltam);
         if (posicao < 0 || posicao + tamanho > vetor.Length)
-            throw new ErroDeExecucao($"indice fora do vetor '{nome}' (ele tem {vetor.Length} itens ao todo)", ix.Linha);
+            throw new ErroDeExecucao(Idioma.T("indice fora do vetor '{0}' (ele tem {1} itens ao todo)", nome, vetor.Length), ix.Linha);
 
         if (faltam.Length == 0) valor = vetor[posicao];
         else if (faltam.Length == 1 && vetor.Length > 0 && vetor[0].Caractere)
@@ -192,7 +192,7 @@ public partial class Interpretador
             void Exigir(int quantos)
             {
                 if (pos + quantos > inicio + tamanho)
-                    throw new ErroDeExecucao($"itens demais na inicializacao de '{d.Nome}' (excess elements in array initializer)", d.Linha);
+                    throw new ErroDeExecucao(Idioma.T("itens demais na inicializacao de '{0}' (excess elements in array initializer)", d.Nome), d.Linha);
             }
 
             foreach (var item in lista)
@@ -225,8 +225,7 @@ public partial class Interpretador
                     if (pos % linha != 0) pos += linha - pos % linha;
                     var bytes = TextoArduino.ParaBytes(valor.Texto);
                     if (bytes.Length >= linha)
-                        throw new ErroDeExecucao($"o texto \"{valor.Texto}\" tem {bytes.Length} letras e nao cabe numa linha de "
-                                                 + $"{linha} (sobra lugar para o '\\0' so ate {linha - 1})", d.Linha);
+                        throw new ErroDeExecucao(Idioma.T("o texto \"{0}\" tem {1} letras e nao cabe numa linha de {2} (sobra lugar para o '\\0' so ate {3})", valor.Texto, bytes.Length, linha, linha - 1), d.Linha);
                     Exigir(linha);
                     bool deCaractere = EhCaractere(d.Tipo);
                     for (int k = 0; k < bytes.Length; k++)

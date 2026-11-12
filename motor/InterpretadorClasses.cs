@@ -70,8 +70,7 @@ public partial class Interpretador
                 // O mesmo .h incluido por dois arquivos: e a mesma classe.
                 if (ja.Decl.Linha == decl.Linha) continue;
                 throw new ErroDeExecucao(
-                    $"a classe {decl.Nome} foi declarada duas vezes "
-                    + $"(a outra esta em {Origens.Onde(ja.Decl.Linha)})", decl.Linha);
+                    Idioma.T("a classe {0} foi declarada duas vezes (a outra esta em {1})", decl.Nome, Origens.Onde(ja.Decl.Linha)), decl.Linha);
             }
 
             var info = new ClasseInfo { Nome = decl.Nome, Decl = decl };
@@ -101,7 +100,7 @@ public partial class Interpretador
     {
         if (info.Estaticos is not null) return info.Estaticos;
         if (fundo > 32)
-            throw new ErroDeExecucao($"a classe {info.Nome} herda dela mesma", info.Decl.Linha);
+            throw new ErroDeExecucao(Idioma.T("a classe {0} herda dela mesma", info.Nome), info.Decl.Linha);
 
         var pai = info.Bases.Count > 0 ? CriarEstaticos(info.Bases[0], fundo + 1) : global;
         info.Estaticos = new Ambiente(pai) { Classe = info.Nome };
@@ -185,8 +184,7 @@ public partial class Interpretador
             // O mesmo cabecalho lido duas vezes: nada a fazer.
             if (velha.Linha == nova.Linha) return;
             throw new ErroDeExecucao(
-                $"{NomeParaMostrar(nova)}() foi escrita duas vezes (a outra esta em {Origens.Onde(velha.Linha)}). "
-                + "O compilador recusa isso.", nova.Linha);
+                Idioma.T("{0}() foi escrita duas vezes (a outra esta em {1}). O compilador recusa isso.", NomeParaMostrar(nova), Origens.Onde(velha.Linha)), nova.Linha);
         }
 
         var comCorpo = velha.Corpo is not null ? velha : nova;
@@ -264,8 +262,7 @@ public partial class Interpretador
 
         if (!info.Metodos.TryGetValue(metodo, out var lista))
             throw new ErroDeExecucao(
-                $"'{dono}::{metodo}' foi escrito fora da classe, mas a classe {dono} nao declara "
-                + $"{metodo}() dentro dela. Declare o metodo na classe (no .h).", f.Linha);
+                Idioma.T("'{0}::{1}' foi escrito fora da classe, mas a classe {2} nao declara {3}() dentro dela. Declare o metodo na classe (no .h).", dono, metodo, dono, metodo), f.Linha);
 
         Juntar(lista, nova);
         return true;
@@ -310,7 +307,7 @@ public partial class Interpretador
     void Inicializar(Objeto obj, ClasseInfo info, List<Expr> args, Ambiente amb, int linha, int fundo)
     {
         if (fundo > 32)
-            throw new ErroDeExecucao($"o construtor de {info.Nome} chama a si mesmo sem parar", linha);
+            throw new ErroDeExecucao(Idioma.T("o construtor de {0} chama a si mesmo sem parar", info.Nome), linha);
 
         Funcao ctor = null;
         if (info.Construtores.Count > 0)
@@ -481,7 +478,7 @@ public partial class Interpretador
 
         if (v.Referencia is not Objeto fonte || fonte.Escopo is null)
             throw new ErroDeExecucao(
-                $"'{nome}' e um objeto {info.Nome}, e so recebe outro {info.Nome}", 0);
+                Idioma.T("'{0}' e um objeto {1}, e so recebe outro {2}", nome, info.Nome, info.Nome), 0);
 
         fonte.Escopo.CopiarConteudo(alvo.Escopo, Copiar);
         return true;
@@ -546,7 +543,7 @@ public partial class Interpretador
         {
             long n = (long)Avaliar(nv.Tamanho, amb).Num;
             if (n < 0 || n > 1_000_000)
-                throw new ErroDeExecucao($"new {nv.Tipo}[{n}]: tamanho impossivel", nv.Linha);
+                throw new ErroDeExecucao(Idioma.T("new {0}[{1}]: tamanho impossivel", nv.Tipo, n), nv.Linha);
 
             // O vetor ocupa a heap da placa: "new int[2000]" num Uno nao cabe.
             long custoDoVetor = ReservarParaNovo(n * Math.Max(1, TamanhoNaPilha(nv.Tipo)), nv.Linha);
@@ -703,7 +700,7 @@ public partial class Interpretador
         {
             if (!f.Estatico)
                 throw new ErroDeExecucao(
-                    $"{NomeParaMostrar(f)}() nao e static: precisa de um objeto para rodar", linha);
+                    Idioma.T("{0}() nao e static: precisa de um objeto para rodar", NomeParaMostrar(f)), linha);
             escopo = classes.TryGetValue(f.Classe ?? "", out var info) ? info.Estaticos : global;
         }
         else escopo = EscopoComSelf(obj, f.Classe);   // no Python, com o "self" (no C++, o proprio objeto)
@@ -725,8 +722,7 @@ public partial class Interpretador
         }
         if (f.Corpo is null)
             throw new ErroDeExecucao(
-                $"{NomeParaMostrar(f)}() foi declarada, mas nao tem corpo em lugar nenhum "
-                + "(na placa, o compilador da \"undefined reference\").", linha);
+                Idioma.T("{0}() foi declarada, mas nao tem corpo em lugar nenhum (na placa, o compilador da \"undefined reference\").", NomeParaMostrar(f)), linha);
 
         // Sem parametros e sem nada declarado no corpo, a funcao le e escreve
         // so o que mora fora dela: roda direto no escopo de onde ela mora, sem
@@ -762,8 +758,7 @@ public partial class Interpretador
 
     void EstourarPilha(int linha)
         => throw new ErroDeExecucao(
-            $"a pilha estourou: {chamadasAbertas} chamadas de funcao uma dentro da outra "
-            + "(recursao sem fim?). Na placa, isso reinicia o chip.", linha);
+            Idioma.T("a pilha estourou: {0} chamadas de funcao uma dentro da outra (recursao sem fim?). Na placa, isso reinicia o chip.", chamadasAbertas), linha);
 
     /// <summary>
     /// O "return 2.5" de uma funcao int devolve 2, como no C++. So nas
@@ -919,7 +914,7 @@ public partial class Interpretador
             {
                 int i = (int)Avaliar(ix.Idx, amb).Num;
                 if (i < 0 || i >= vetor.Length)
-                    throw new ErroDeExecucao($"indice {i} fora do vetor '{av.Nome}' (0..{vetor.Length - 1})", ix.Linha);
+                    throw new ErroDeExecucao(Idioma.T("indice {0} fora do vetor '{1}' (0..{2})", i, av.Nome, vetor.Length - 1), ix.Linha);
                 return new Apelido(
                     () => vetor[i],
                     novo => vetor[i] = vetor[i].Caractere ? Valor.ComoCaractere(novo) : novo);
@@ -947,16 +942,15 @@ public partial class Interpretador
         var comCorpo = candidatas.Where(f => f.Corpo is not null).ToList();
         if (comCorpo.Count == 0)
             throw new ErroDeExecucao(
-                $"{nome}() foi declarada, mas nao tem corpo em lugar nenhum "
-                + "(na placa, o compilador da \"undefined reference\").", linha);
+                Idioma.T("{0}() foi declarada, mas nao tem corpo em lugar nenhum (na placa, o compilador da \"undefined reference\").", nome), linha);
 
         var cabem = comCorpo.Where(f => Cabe(f, args.Count)).ToList();
 
         if (cabem.Count == 0)
         {
-            var formas = comCorpo.Select(f => $"{nome.Split("::")[^1]}({string.Join(", ", f.Params.Select(p => p.Tipo + " " + p.Nome))})");
+            var formas = comCorpo.Select(f => Idioma.T("{0}({1})", nome.Split("::")[^1], string.Join(", ", f.Params.Select(p => p.Tipo + " " + p.Nome))));
             throw new ErroDeExecucao(
-                $"{nome}() nao recebe {args.Count} argumento(s). O que existe: {string.Join("; ", formas)}", linha);
+                Idioma.T("{0}() nao recebe {1} argumento(s). O que existe: {2}", nome, args.Count, string.Join("; ", formas)), linha);
         }
 
         if (cabem.Count == 1) return cabem[0];
@@ -1076,7 +1070,7 @@ public partial class Interpretador
                 if (classes.TryGetValue(dono, out var info))
                 {
                     var f = ProcurarMetodo(info, qual, c.Args, amb, c.Linha)
-                            ?? throw new ErroDeExecucao($"a classe {dono} nao tem o metodo {qual}()", c.Linha);
+                            ?? throw new ErroDeExecucao(Idioma.T("a classe {0} nao tem o metodo {1}()", dono, qual), c.Linha);
                     resultado = ChamarMetodo(f.Estatico ? null : amb.ObjetoAtual(), f, c.Args, amb, c.Linha);
                     return true;
                 }
@@ -1153,15 +1147,14 @@ public partial class Interpretador
 
         var tem = Hierarquia(info).SelectMany(k => k.Metodos.Keys).Distinct().OrderBy(n => n).ToList();
         throw new ErroDeExecucao(
-            $"a classe {info.Nome} nao tem o metodo {metodo}()"
-            + (tem.Count > 0 ? ". Tem: " + string.Join(", ", tem.Select(n => n + "()")) : ""), c.Linha);
+            Idioma.T("a classe {0} nao tem o metodo {1}(){2}", info.Nome, metodo, (tem.Count > 0 ? Idioma.T(". Tem: {0}", string.Join(", ", tem.Select(n => n + "()"))) : "")), c.Linha);
     }
 
     Valor ImprimirPeloWrite(Objeto obj, ClasseInfo info, string metodo, Chamada c, Ambiente amb)
     {
         var escrever = AcharLista(info, "write")?.FirstOrDefault(f => f.Corpo is not null && f.Params.Count == 1)
             ?? throw new ErroDeExecucao(
-                $"a classe {info.Nome} deriva do Print, mas nao escreveu o write(uint8_t) que o print() usa",
+                Idioma.T("a classe {0} deriva do Print, mas nao escreveu o write(uint8_t) que o print() usa", info.Nome),
                 c.Linha);
 
         var args = c.Args.Select(a => Avaliar(a, amb)).ToList();
@@ -1291,7 +1284,7 @@ public partial class Interpretador
             else if (sequencia.EhTexto) texto = sequencia.Texto;
             else
                 throw new ErroDeExecucao(
-                    "o for (x : lista) percorre um vetor ou uma String, e isto nao e nenhum dos dois",
+                    Idioma.T("o for (x : lista) percorre um vetor ou uma String, e isto nao e nenhum dos dois"),
                     pc.Linha);
         }
 
@@ -1367,8 +1360,7 @@ public partial class Interpretador
 
         var tem = dono.Campos.Keys.OrderBy(k => k).ToList();
         throw new ErroDeExecucao(
-            $"o objeto {dono.Classe} nao tem o campo '{m.Nome}'"
-            + (tem.Count > 0 ? ". Tem: " + string.Join(", ", tem) : ""), m.Linha);
+            Idioma.T("o objeto {0} nao tem o campo '{1}'{2}", dono.Classe, m.Nome, (tem.Count > 0 ? Idioma.T(". Tem: {0}", string.Join(", ", tem)) : "")), m.Linha);
     }
 
     bool GuardarMembroDeClasse(Membro m, Valor v, Ambiente amb)
@@ -1393,7 +1385,7 @@ public partial class Interpretador
 
         if (classes.TryGetValue(dono.Classe, out var info) && info.Estaticos.Atribuir(m.Nome, v)) return true;
 
-        throw new ErroDeExecucao($"o objeto {dono.Classe} nao tem o campo '{m.Nome}'", m.Linha);
+        throw new ErroDeExecucao(Idioma.T("o objeto {0} nao tem o campo '{1}'", dono.Classe, m.Nome), m.Linha);
     }
 
     /// <summary>O vetor de dentro de um objeto: "this->buffer", "fila.itens".</summary>

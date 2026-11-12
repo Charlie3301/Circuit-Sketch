@@ -195,8 +195,7 @@ public partial class Interpretador
         string tipo = TipoDeclaradoDe(sem, amb);
         if (tipo == "String" || valor.EhTexto && tipo is null)
         {
-            Avisar("EEPROM: put() de uma String grava o OBJETO String (o endereco do texto, que muda a cada boot), e nao as "
-                   + "letras. Guarde num char[] -- ou use writeString()/readString() na ESP32.");
+            Avisar(Idioma.T("EEPROM: put() de uma String grava o OBJETO String (o endereco do texto, que muda a cada boot), e nao as letras. Guarde num char[] -- ou use writeString()/readString() na ESP32."));
             Completar(saida, BytesDoTipo("String"));
             return [.. saida];
         }
@@ -257,10 +256,9 @@ public partial class Interpretador
     Valor ChamarEeprom(string metodo, Chamada c, Ambiente amb)
     {
         if (maq.Perfil?.Id == "nano-rp2040-connect")
-            throw new ErroDeExecucao("EEPROM.h: No such file or directory -- o core mbed da Nano RP2040 Connect nao tem EEPROM. "
-                                     + "Guarde na flash (KVStore ou LittleFS).", c.Linha);
+            throw new ErroDeExecucao(Idioma.T("EEPROM.h: No such file or directory -- o core mbed da Nano RP2040 Connect nao tem EEPROM. Guarde na flash (KVStore ou LittleFS)."), c.Linha);
         if (EepromDoChip == 0 && !EepromNaFlash)
-            throw new ErroDeExecucao($"a {maq.Perfil?.Nome} nao tem EEPROM no simulador.", c.Linha);
+            throw new ErroDeExecucao(Idioma.T("a {0} nao tem EEPROM no simulador.", maq.Perfil?.Nome), c.Linha);
 
         int A(int i) => i < c.Args.Count ? (int)Avaliar(c.Args[i], amb).Num : 0;
         var memoria = MemoriaDaEeprom;
@@ -272,8 +270,7 @@ public partial class Interpretador
                 if (!EepromNaFlash)
                 {
                     if (c.Args.Count == 0) return Valor.DeInt(0);   // o iterador do AVR
-                    throw new ErroDeExecucao("no matching function for call to 'EEPROMClass::begin(int)' -- no "
-                                             + $"{maq.Perfil?.Nome} a EEPROM e de verdade: nao tem begin(tamanho) nem commit().", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("no matching function for call to 'EEPROMClass::begin(int)' -- no {0} a EEPROM e de verdade: nao tem begin(tamanho) nem commit().", maq.Perfil?.Nome), c.Linha);
                 }
                 int pedido = A(0);
                 if (pedido <= 0) return Valor.DeBool(false);
@@ -335,7 +332,7 @@ public partial class Interpretador
             case "commit":
             {
                 if (!EepromNaFlash)
-                    throw new ErroDeExecucao($"'class EEPROMClass' has no member named 'commit' -- no {maq.Perfil?.Nome} a EEPROM grava na hora.", c.Linha);
+                    throw new ErroDeExecucao(Idioma.T("'class EEPROMClass' has no member named 'commit' -- no {0} a EEPROM grava na hora.", maq.Perfil?.Nome), c.Linha);
                 return Valor.DeBool(GravarEepromNaFlash());
             }
 
@@ -383,8 +380,7 @@ public partial class Interpretador
             return Valor.DeInt(saida.Count);
         }
 
-        throw new ErroDeExecucao($"EEPROM.{metodo}() ainda nao e suportado pelo simulador. A EEPROM tem read, write, update, "
-                                 + "get, put, length" + (EepromNaFlash ? ", begin, commit e end." : " e o EEPROM[i]."), c.Linha);
+        throw new ErroDeExecucao(Idioma.T("EEPROM.{0}() ainda nao e suportado pelo simulador. A EEPROM tem read, write, update, get, put, length{1}", metodo, (EepromNaFlash ? Idioma.T(", begin, commit e end.") : Idioma.T(" e o EEPROM[i]."))), c.Linha);
     }
 
     static string TipoDoMetodoDaEeprom(string sufixo) => sufixo switch
@@ -421,8 +417,7 @@ public partial class Interpretador
         var memoria = MemoriaDaEeprom;
         if (memoria is null)
         {
-            Avisar("EEPROM: escrita antes do EEPROM.begin(tamanho) -- na " + maq.Perfil?.Nome + " a EEPROM e emulada na flash "
-                   + "e, sem o begin(), o write() nao faz nada.");
+            Avisar(Idioma.T("EEPROM: escrita antes do EEPROM.begin(tamanho) -- na {0} a EEPROM e emulada na flash e, sem o begin(), o write() nao faz nada.", maq.Perfil?.Nome));
             return;
         }
         for (int k = 0; k < bytes.Length; k++)
@@ -444,8 +439,7 @@ public partial class Interpretador
             memoria[e] = bytes[k];
             eepromOcupadaAteUs = maq.AgoraUs() + 3400;
             if (maq.ContarEscritaNaEeprom(e) == 100_000)
-                Avisar($"EEPROM: a celula {e} ja foi escrita 100 mil vezes -- e o que o datasheet garante. Na placa ela "
-                       + "comeca a falhar; escreva so quando o valor muda (update/put), e nunca a cada volta do loop().");
+                Avisar(Idioma.T("EEPROM: a celula {0} ja foi escrita 100 mil vezes -- e o que o datasheet garante. Na placa ela comeca a falhar; escreva so quando o valor muda (update/put), e nunca a cada volta do loop().", e));
         }
         _ = linha;
     }
@@ -460,7 +454,7 @@ public partial class Interpretador
         // Apagar e gravar o setor: a NVS da ESP32 e rapida; a ESP8266 e a Pico apagam 4 KB inteiros.
         maq.EsperarNoChip(EhFamiliaEsp32 ? 8_000 : 45_000);
         if (maq.ContarCommitDaEeprom() == 10_000)
-            Avisar("EEPROM: 10 mil commit() -- o setor da flash aguenta isso, nao muito mais. Grave so quando o valor muda.");
+            Avisar(Idioma.T("EEPROM: 10 mil commit() -- o setor da flash aguenta isso, nao muito mais. Grave so quando o valor muda."));
         return true;
     }
 

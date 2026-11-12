@@ -41,7 +41,7 @@ public sealed unsafe partial class ModuloNativo
         foreach (int p in new[] { mosi, miso, sclk })
             if (p >= Maquina.Perfil.NumPinos)
             {
-                Maquina.Avisar($"SPI: o GPIO {p} nao existe no {Maquina.Perfil.Nome}.");
+                Maquina.Avisar(Idioma.T("SPI: o GPIO {0} nao existe no {1}.", p, Maquina.Perfil.Nome));
                 return 0x102;
             }
         lock (barramentos) barramentos[host] = new BarramentoSpi { Mosi = mosi, Miso = miso, Sclk = sclk };
@@ -69,10 +69,7 @@ public sealed unsafe partial class ModuloNativo
             bool sckOk = aparelho.Sck < 0 || aparelho.Sck == bus.Sclk;
             if (!mosiOk || !sckOk)
             {
-                Maquina.Avisar($"SPI: o {Nome(aparelho.Tipo)} no CS {cs} nao esta no barramento que o codigo iniciou "
-                               + $"(o codigo usa MOSI {bus.Mosi} e SCK {bus.Sclk}; o fio do aparelho vai no "
-                               + $"{(mosiOk ? "" : "MOSI " + aparelho.Mosi + " ")}{(sckOk ? "" : "SCK " + aparelho.Sck)}). "
-                               + "Nada chega nele.");
+                Maquina.Avisar(Idioma.T("SPI: o {0} no CS {1} nao esta no barramento que o codigo iniciou (o codigo usa MOSI {2} e SCK {3}; o fio do aparelho vai no {4}{5}). Nada chega nele.", Nome(aparelho.Tipo), cs, bus.Mosi, bus.Sclk, (mosiOk ? "" : "MOSI " + aparelho.Mosi + " "), (sckOk ? "" : "SCK " + aparelho.Sck)));
                 aparelho = null;
             }
         }
@@ -87,11 +84,11 @@ public sealed unsafe partial class ModuloNativo
 
     static string Nome(string tipo) => tipo switch
     {
-        "ili9341" => "display ILI9341",
-        "st7789" => "display ST7789",
-        "st7735" => "display ST7735",
-        "ssd1306" => "display OLED",
-        "sd" => "modulo microSD",
+        "ili9341" => Idioma.T("display {0}", "ILI9341"),
+        "st7789" => Idioma.T("display {0}", "ST7789"),
+        "st7735" => Idioma.T("display {0}", "ST7735"),
+        "ssd1306" => Idioma.T("display {0}", "OLED"),
+        "sd" => Idioma.T("modulo microSD"),
         "74hc595" => "74HC595",
         _ => tipo,
     };

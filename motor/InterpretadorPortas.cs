@@ -56,8 +56,7 @@ public partial class Interpretador
     {
         if (portasGlobais.TryGetValue(nome, out var p)) return p;
         if (PinosDaPorta(nome) is not { } pinos)
-            throw new ErroDeExecucao($"'{nome}' was not declared in this scope -- a {maq.Perfil?.Nome} nao tem essa porta. "
-                                     + (EhAvr ? "No Uno a unica UART e o Serial (pinos 0 e 1); para outra, use a SoftwareSerial." : ""),
+            throw new ErroDeExecucao(Idioma.T("'{0}' was not declared in this scope -- a {1} nao tem essa porta. {2}", nome, maq.Perfil?.Nome, (EhAvr ? Idioma.T("No Uno a unica UART e o Serial (pinos 0 e 1); para outra, use a SoftwareSerial.") : "")),
                                      linha);
         var (buffer, fifo) = TamanhosDaUart();
         p = new PortaSerial(maq, nome, pinos.Rx, pinos.Tx, buffer, fifo, nome == "Serial" ? maq.EntradaSerial : null);
@@ -234,7 +233,7 @@ public partial class Interpretador
                 return Valor.DeBool(p.Entrada.Procurar(alvo));
             }
         }
-        throw new ErroDeExecucao($"{p.Nome}.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("{0}.{1}() ainda nao e suportado pelo simulador.", p.Nome, metodo), c.Linha);
     }
 
     /// <summary>O parseInt() so termina quando o numero acaba (chegou algo que nao e digito).</summary>

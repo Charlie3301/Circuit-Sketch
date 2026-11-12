@@ -40,7 +40,7 @@ public class Parser(List<Token> toks)
     Token Exigir(string s)
     {
         if (!Checar(s))
-            throw new ErroDeSintaxe($"esperava '{s}' mas encontrei '{Atual.Texto}'", Atual.Linha);
+            throw new ErroDeSintaxe(Idioma.T("esperava '{0}' mas encontrei '{1}'", s, Atual.Texto), Atual.Linha);
         return Avancar();
     }
 
@@ -222,7 +222,7 @@ public class Parser(List<Token> toks)
         string tipo = TentarTipo(local: false);
         if (tipo is null)
             throw new ErroDeSintaxe(
-                $"esperava uma declaracao ou funcao, encontrei '{Atual.Texto}'", Atual.Linha);
+                Idioma.T("esperava uma declaracao ou funcao, encontrei '{0}'", Atual.Texto), Atual.Linha);
 
         bool externo = ultimoExterno, referencia = ultimoReferencia;
         string nome = LerPonteiroDeFuncao();
@@ -339,7 +339,7 @@ public class Parser(List<Token> toks)
                 if (fundo == 0) return k;
             }
         }
-        throw new ErroDeSintaxe($"'{toks[abre].Texto}' sem o par que o fecha", toks[abre].Linha);
+        throw new ErroDeSintaxe(Idioma.T("'{0}' sem o par que o fecha", toks[abre].Texto), toks[abre].Linha);
     }
 
     /// <summary>O "&gt;" que fecha o "&lt;" de um template. "&gt;&gt;" fecha dois.</summary>
@@ -659,8 +659,7 @@ public class Parser(List<Token> toks)
         {
             if (aposCorpo.Count == 0)
                 throw new ErroDeSintaxe(
-                    "esta struct nao tem nome, entao nao da para declarar uma variavel dela. "
-                    + "Escreva \"struct Nome { ... };\" ou \"typedef struct { ... } Nome;\".", linha);
+                    Idioma.T("esta struct nao tem nome, entao nao da para declarar uma variavel dela. Escreva \"struct Nome { ... };\" ou \"typedef struct { ... } Nome;\"."), linha);
 
             // "struct { int x; } ponto;": a struct sem nome ganha um.
             nome = "__anonima" + Origens.Linha(linha) + "_" + Origens.Arquivo(linha);
@@ -805,14 +804,14 @@ public class Parser(List<Token> toks)
         }
 
         string tipo = TentarTipo(local: false, membro: true)
-            ?? throw new ErroDeSintaxe($"nao entendi '{Atual.Texto}' dentro da classe {classe}", Atual.Linha);
+            ?? throw new ErroDeSintaxe(Idioma.T("nao entendi '{0}' dentro da classe {1}", Atual.Texto, classe), Atual.Linha);
         bool referencia = ultimoReferencia;
 
         string nome = LerPonteiroDeFuncao();
         if (nome is not null) tipo = "funcao*";
         else if (Checar("operator")) { p++; nome = "operator" + LerOperador(); }
         else if (Atual.Tipo == T.Id) nome = SemEspaco(Avancar().Texto);
-        else throw new ErroDeSintaxe($"esperava o nome do membro, encontrei '{Atual.Texto}'", Atual.Linha);
+        else throw new ErroDeSintaxe(Idioma.T("esperava o nome do membro, encontrei '{0}'", Atual.Texto), Atual.Linha);
 
         if (Checar("("))
         {
@@ -984,9 +983,7 @@ public class Parser(List<Token> toks)
                     : anterior is not null
                         ? new Binaria("+", anterior, new Literal(1, "1", true, false, linhaMembro), linhaMembro)
                         : throw new ErroDeSintaxe(
-                            $"'{membro}' vem depois de um valor que so da para saber rodando, "
-                            + "entao o simulador nao sabe em que numero continuar. "
-                            + "Escreva o valor dele.", linhaMembro);
+                            Idioma.T("'{0}' vem depois de um valor que so da para saber rodando, entao o simulador nao sabe em que numero continuar. Escreva o valor dele.", membro), linhaMembro);
 
                 membros.Add(new CmdDecl("int", membro, valor, false, null, null, linhaMembro));
                 if (sabeOProximo) proximo++;
@@ -1090,7 +1087,7 @@ public class Parser(List<Token> toks)
             p++;
         }
         if (partes.Count == 0)
-            throw new ErroDeSintaxe("tipo esperado", Atual.Linha);
+            throw new ErroDeSintaxe(Idioma.T("tipo esperado"), Atual.Linha);
 
         string tipo = string.Join(" ", partes);
         if (partes.Count == 1 && !ponteiro && !ultimoReferencia && vetoresApelidados.TryGetValue(partes[0], out var tamanho))
@@ -1125,7 +1122,7 @@ public class Parser(List<Token> toks)
 
         if (EhInicioDeDeclaracao()) return LerTipo();
 
-        if (Atual.Tipo != T.Id) throw new ErroDeSintaxe("tipo esperado", Atual.Linha);
+        if (Atual.Tipo != T.Id) throw new ErroDeSintaxe(Idioma.T("tipo esperado"), Atual.Linha);
 
         string nome = Resolver(SemEspaco(Avancar().Texto));
         if (Checar("<"))
@@ -1259,7 +1256,7 @@ public class Parser(List<Token> toks)
 
         var t = Avancar();
         if (t.Tipo != T.Id)
-            throw new ErroDeSintaxe($"esperava um nome, encontrei '{t.Texto}'", t.Linha);
+            throw new ErroDeSintaxe(Idioma.T("esperava um nome, encontrei '{0}'", t.Texto), t.Linha);
 
         string nome = SemEspaco(t.Texto);
 
@@ -1478,7 +1475,7 @@ public class Parser(List<Token> toks)
             var args = new List<Expr>();
             string fecha = Aceitar("(") ? ")" : Aceitar("{") ? "}" : null;
             if (fecha is null)
-                throw new ErroDeSintaxe($"esperava '(' depois de '{nome}' na lista de inicializacao", Atual.Linha);
+                throw new ErroDeSintaxe(Idioma.T("esperava '(' depois de '{0}' na lista de inicializacao", nome), Atual.Linha);
             if (!Checar(fecha))
                 do { args.Add(AnalisarExpr()); } while (Aceitar(","));
             Exigir(fecha);
@@ -1732,7 +1729,7 @@ public class Parser(List<Token> toks)
             p++;
             var corpo = AnalisarCmd();
             if (!Aceitar("while"))
-                throw new ErroDeSintaxe("esperava 'while' depois do 'do'", Atual.Linha);
+                throw new ErroDeSintaxe(Idioma.T("esperava 'while' depois do 'do'"), Atual.Linha);
             Exigir("("); var cond = AnalisarExpr(); Exigir(")"); Exigir(";");
             return new CmdFacaEnquanto(corpo, cond, linha);
         }
@@ -1749,7 +1746,7 @@ public class Parser(List<Token> toks)
                 if (Aceitar("case")) { valor = AnalisarExpr(); Exigir(":"); }
                 else if (Aceitar("default")) Exigir(":");
                 else throw new ErroDeSintaxe(
-                    $"dentro de switch esperava 'case' ou 'default', encontrei '{Atual.Texto}'",
+                    Idioma.T("dentro de switch esperava 'case' ou 'default', encontrei '{0}'", Atual.Texto),
                     Atual.Linha);
 
                 // O corpo vai ate o proximo case/default: sem break, cai nele.
@@ -2138,6 +2135,6 @@ public class Parser(List<Token> toks)
 
         if (t.Tipo == T.Id) { p++; return new Variavel(SemEspaco(t.Texto), t.Linha); }
 
-        throw new ErroDeSintaxe($"expressao inesperada perto de '{t.Texto}'", t.Linha);
+        throw new ErroDeSintaxe(Idioma.T("expressao inesperada perto de '{0}'", t.Texto), t.Linha);
     }
 }

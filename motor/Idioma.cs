@@ -72,6 +72,7 @@ public static class Idioma
 
         textos = catalogo?.Textos ?? [];
         Atual = catalogo?.Codigo ?? Original;
+        lock (voltas) { voltas.Clear(); moldes = null; }
         try { cultura = CultureInfo.GetCultureInfo(catalogo?.Cultura ?? Original); }
         catch (CultureNotFoundException) { cultura = CultureInfo.InvariantCulture; }
 
@@ -119,6 +120,124 @@ public static class Idioma
 
     /// <summary>A frase com valores dentro ({0}, {1:0.0}), na cultura do idioma.</summary>
     public static string T(string formato, params object[] valores) => string.Format(cultura, T(formato), valores);
+
+    /// <summary>
+    /// O caminho de volta: uma frase ja traduzida (com os valores dentro) de
+    /// novo no portugues do codigo. Para quem decide pelo texto de uma
+    /// mensagem -- o tipo da excecao do Python sai das palavras do erro -- e
+    /// assim continua decidindo igual em qualquer idioma. Frase que nao veio
+    /// do catalogo volta como esta.
+    /// </summary>
+    public static string Desfazer(string texto) => Desfazer(texto, 0);
+
+    static string Desfazer(string texto, int fundo)
+    {
+        if (textos.Count == 0 || string.IsNullOrEmpty(texto) || fundo > 3) return texto;
+        lock (voltas)
+        {
+            if (voltas.TryGetValue(texto, out string pronto)) return pronto;
+            moldes ??= Moldes();
+        }
+        string resultado = texto;
+        if (exatas.TryGetValue(texto, out string original)) resultado = original;
+        else
+        {
+            foreach (var molde in moldes)
+            {
+                var valores = new string[molde.Valores];
+                if (!Casar(molde, texto, valores)) continue;
+                var desfeitos = valores.Select(v => (object)Desfazer(v ?? "", fundo + 1)).ToArray();
+                try { resultado = string.Format(CultureInfo.InvariantCulture, molde.Original, desfeitos); }
+                catch (FormatException) { continue; }
+                break;
+            }
+        }
+        lock (voltas)
+        {
+            if (voltas.Count > 4096) voltas.Clear();
+            voltas[texto] = resultado;
+        }
+        return resultado;
+    }
+
+    /// <summary>
+    /// A traducao em pedacos: o texto fixo entre as marcas (Pedacos tem um a
+    /// mais que Marcas) e o numero de cada marca, na ordem em que aparecem.
+    /// </summary>
+    sealed record Molde(string[] Pedacos, int[] Marcas, int Valores, string Original, int Fixo);
+
+    static readonly Dictionary<string, string> voltas = new(StringComparer.Ordinal);
+    static Dictionary<string, string> exatas = new(StringComparer.Ordinal);
+    static List<Molde> moldes;
+
+    /// <summary>
+    /// O texto bate com o molde? Comeca com o primeiro pedaco, acaba com o
+    /// ultimo, e cada pedaco do meio e achado da esquerda para a direita --
+    /// o valor de cada marca e o que fica entre eles. Sem expressao regular:
+    /// e linear no tamanho do texto, por mais marcas que a frase tenha.
+    /// </summary>
+    static bool Casar(Molde molde, string texto, string[] valores)
+    {
+        var pedacos = molde.Pedacos;
+        if (!texto.StartsWith(pedacos[0], StringComparison.Ordinal) || !texto.EndsWith(pedacos[^1], StringComparison.Ordinal))
+            return false;
+        int pos = pedacos[0].Length, limite = texto.Length - pedacos[^1].Length;
+        if (limite < pos) return false;
+        for (int i = 0; i < molde.Marcas.Length; i++)
+        {
+            bool ultima = i == molde.Marcas.Length - 1;
+            int ate = ultima ? limite : texto.IndexOf(pedacos[i + 1], pos, limite - pos, StringComparison.Ordinal);
+            if (ate < pos) return false;
+            string valor = texto[pos..ate];
+            int n = molde.Marcas[i];
+            if (valores[n] is null) valores[n] = valor;
+            else if (valores[n] != valor) return false;
+            pos = ultima ? ate : ate + pedacos[i + 1].Length;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Cada traducao com {0} vira um molde. Os de mais texto fixo vem primeiro
+    /// (o mais especifico ganha), e o que e quase so marca ("{0}: {1}") fica
+    /// de fora -- casaria com qualquer coisa.
+    /// </summary>
+    static List<Molde> Moldes()
+    {
+        var marca = new System.Text.RegularExpressions.Regex(@"\{\{|\}\}|\{(\d+)(?:,[^}:]*)?(?::[^}]*)?\}");
+        var lista = new List<Molde>();
+        var unicas = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var (original, traducao) in textos)
+        {
+            if (string.IsNullOrEmpty(traducao)) continue;
+            if (!traducao.Contains('{'))
+            {
+                unicas.TryAdd(traducao, original);
+                continue;
+            }
+            var pedacos = new List<string>();
+            var marcas = new List<int>();
+            var atual = new System.Text.StringBuilder();
+            int fim = 0;
+            foreach (System.Text.RegularExpressions.Match m in marca.Matches(traducao))
+            {
+                atual.Append(traducao, fim, m.Index - fim);
+                fim = m.Index + m.Length;
+                if (!m.Groups[1].Success) { atual.Append(m.Value[0]); continue; }
+                pedacos.Add(atual.ToString());
+                atual.Clear();
+                marcas.Add(int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture));
+            }
+            atual.Append(traducao, fim, traducao.Length - fim);
+            pedacos.Add(atual.ToString());
+            int fixo = pedacos.Sum(p => p.Trim().Length);
+            // Duas marcas coladas ("{2}{2}") nao tem fronteira entre elas: fica de fora.
+            if (marcas.Count == 0 || fixo < 4 || pedacos.Skip(1).SkipLast(1).Any(p => p.Length == 0)) continue;
+            lista.Add(new Molde([.. pedacos], [.. marcas], marcas.Max() + 1, original, fixo));
+        }
+        exatas = unicas;
+        return [.. lista.OrderByDescending(m => m.Fixo)];
+    }
 
     static Catalogo Ler(string recurso)
     {

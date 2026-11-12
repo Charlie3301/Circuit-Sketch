@@ -114,8 +114,7 @@ public partial class Interpretador
             "Wire" => maq.I2c,
             "Wire1" when TemWire1 => maq.I2c1,
             _ => throw new ErroDeExecucao(
-                $"'{nome}' was not declared in this scope -- a {maq.Perfil?.Nome} tem um barramento I2C so (o Wire)."
-                + (EhAvr ? " Para um segundo no Uno, so por software (a biblioteca SoftwareWire)." : ""), linha),
+                Idioma.T("'{0}' was not declared in this scope -- a {1} tem um barramento I2C so (o Wire).{2}", nome, maq.Perfil?.Nome, (EhAvr ? Idioma.T(" Para um segundo no Uno, so por software (a biblioteca SoftwareWire).") : "")), linha),
         };
         if (!b.BufferDefinido) b.TamanhoDoBuffer = BufferDaWire;
         return b;
@@ -138,8 +137,7 @@ public partial class Interpretador
         }
         int numero = args.Count > 0 ? (int)args[0].Num : 0;
         if (!EhFamiliaEsp32)
-            throw new ErroDeExecucao($"TwoWire({numero}): na {maq.Perfil?.Nome} o barramento vem pronto -- use o Wire"
-                                     + (TemWire1 ? " e o Wire1." : "."), linha);
+            throw new ErroDeExecucao(Idioma.T("TwoWire({0}): na {1} o barramento vem pronto -- use o Wire{2}", numero, maq.Perfil?.Nome, (TemWire1 ? Idioma.T(" e o Wire1.") : ".")), linha);
         obj.Rede = numero switch
         {
             0 => BarramentoI2cDe("Wire", linha),
@@ -156,8 +154,7 @@ public partial class Interpretador
         string nome = obj.Campos.TryGetValue("_nome", out var n) ? n.Texto : "TwoWire";
         if (obj.Rede is BarramentoI2c b) return ChamarI2c(b, nome, metodo, c, amb);
         foreach (var arg in c.Args) Avaliar(arg, amb);
-        Avisar($"I2C: {nome} -- a {maq.Perfil?.Nome} nao tem o controlador {(int)obj.Campos.GetValueOrDefault("_numero", Valor.DeInt(0)).Num}; "
-               + "o begin() falha e nada e transmitido.");
+        Avisar(Idioma.T("I2C: {0} -- a {1} nao tem o controlador {2}; o begin() falha e nada e transmitido.", nome, maq.Perfil?.Nome, (int)obj.Campos.GetValueOrDefault("_numero", Valor.DeInt(0)).Num));
         return metodo switch { "begin" => Valor.DeBool(false), "endTransmission" => Valor.DeInt(4), _ => Valor.DeInt(0) };
     }
 
@@ -174,8 +171,7 @@ public partial class Interpretador
         else if (PinosDoWire1 is { } fabrica && maq.I2c1 == b) b.Begin(fabrica.Sda, fabrica.Scl);
         else
         {
-            Avisar($"I2C: {nome}.begin() sem pinos -- na {maq.Perfil?.Nome} o segundo barramento nao tem pinos de fabrica "
-                   + $"(\"no Default SDA Pin for Second Peripheral\"). Use {nome}.begin(SDA, SCL).");
+            Avisar(Idioma.T("I2C: {0}.begin() sem pinos -- na {1} o segundo barramento nao tem pinos de fabrica (\"no Default SDA Pin for Second Peripheral\"). Use {2}.begin(SDA, SCL).", nome, maq.Perfil?.Nome, nome));
             return false;
         }
         return true;
@@ -201,9 +197,7 @@ public partial class Interpretador
         // que nunca seria chamado.
         if (metodo is "onReceive" or "onRequest")
             throw new ErroDeExecucao(
-                $"{nome}.{metodo}(): a placa como ESCRAVA de I2C ainda nao e simulada. "
-                + "O simulador roda a placa como mestre -- beginTransmission, write, "
-                + "endTransmission e requestFrom funcionam.", c.Linha);
+                Idioma.T("{0}.{1}(): a placa como ESCRAVA de I2C ainda nao e simulada. O simulador roda a placa como mestre -- beginTransmission, write, endTransmission e requestFrom funcionam.", nome, metodo), c.Linha);
 
         if (!barramento.BufferDefinido) barramento.TamanhoDoBuffer = BufferDaWire;
         var args = c.Args.Select(a => Avaliar(a, amb)).ToList();
@@ -218,8 +212,7 @@ public partial class Interpretador
                 if (args.Count >= 2 && !(EhFamiliaEsp32 && args.Count == 4))
                 {
                     if (!WireComPinos)
-                        throw new ErroDeExecucao($"no matching function for call to 'TwoWire::begin(int, int)' -- na {maq.Perfil?.Nome} "
-                            + "o I2C tem pinos fixos" + (Chip == "RP2040" ? $" (troque com {nome}.setSDA() e {nome}.setSCL() antes do begin())." : $" (SDA {maq.Perfil?.SdaPadrao}, SCL {maq.Perfil?.SclPadrao})."),
+                        throw new ErroDeExecucao(Idioma.T("no matching function for call to 'TwoWire::begin(int, int)' -- na {0} o I2C tem pinos fixos{1}", maq.Perfil?.Nome, (Chip == "RP2040" ? Idioma.T(" (troque com {0}.setSDA() e {1}.setSCL() antes do begin()).", nome, nome) : $" (SDA {maq.Perfil?.SdaPadrao}, SCL {maq.Perfil?.SclPadrao}).")),
                             c.Linha);
                     if (barramento.Ligado && EhFamiliaEsp32) return Valor.DeBool(true);   // "Bus already started in Master Mode."
                     barramento.Begin(A(0), A(1));
@@ -241,11 +234,10 @@ public partial class Interpretador
             // setPins (ESP32) e setSDA/setSCL (Pico, STM32): os pinos do proximo
             // begin(). Com o barramento rodando, a ESP32 recusa e a Pico para.
             case "setPins":
-                if (!EhFamiliaEsp32) throw new ErroDeExecucao($"'class TwoWire' has no member named 'setPins' -- e da ESP32"
-                                                              + (Chip == "RP2040" ? $"; na Pico use {nome}.setSDA() e {nome}.setSCL()." : "."), c.Linha);
+                if (!EhFamiliaEsp32) throw new ErroDeExecucao(Idioma.T("'class TwoWire' has no member named 'setPins' -- e da ESP32{0}", (Chip == "RP2040" ? Idioma.T("; na Pico use {0}.setSDA() e {1}.setSCL().", nome, nome) : ".")), c.Linha);
                 if (barramento.Ligado)
                 {
-                    Avisar($"I2C: {nome}.setPins() com o barramento ligado -- o core recusa (\"bus already initialized. change pins only when not.\").");
+                    Avisar(Idioma.T("I2C: {0}.setPins() com o barramento ligado -- o core recusa (\"bus already initialized. change pins only when not.\").", nome));
                     return Valor.DeBool(false);
                 }
                 barramento.Pinos(A(0), A(1));
@@ -254,7 +246,7 @@ public partial class Interpretador
             case "setSDA":
             case "setSCL":
             {
-                if (EhFamiliaEsp32) throw new ErroDeExecucao($"'class TwoWire' has no member named '{metodo}' -- na ESP32 e {nome}.setPins(sda, scl).", c.Linha);
+                if (EhFamiliaEsp32) throw new ErroDeExecucao(Idioma.T("'class TwoWire' has no member named '{0}' -- na ESP32 e {1}.setPins(sda, scl).", metodo, nome), c.Linha);
                 int pino = A(0);
                 bool sda = metodo == "setSDA";
                 if (Chip == "RP2040")
@@ -265,8 +257,7 @@ public partial class Interpretador
                     if (barramento.Ligado)
                         throw new ErroDeExecucao($"FATAL: Attempting to set {nome}.{(sda ? "SDA" : "SCL")} while running", c.Linha);
                     if (pino % 4 != resto || pino > 29)
-                        throw new ErroDeExecucao($"FATAL: Attempting to set {nome}.{(sda ? "SDA" : "SCL")} to illegal pin {pino} -- "
-                            + $"o {(barramento.Numero == 1 ? "i2c1" : "i2c0")} so sai nos GPIO {resto}, {resto + 4}, {resto + 8}...", c.Linha);
+                        throw new ErroDeExecucao(Idioma.T("FATAL: Attempting to set {0}.{1} to illegal pin {2} -- o {3} so sai nos GPIO {4}, {5}, {6}...", nome, (sda ? "SDA" : "SCL"), pino, (barramento.Numero == 1 ? "i2c1" : "i2c0"), resto, resto + 4, resto + 8), c.Linha);
                 }
                 if (sda) barramento.Pinos(pino, -1); else barramento.Pinos(-1, pino);
                 return Valor.DeBool(true);
@@ -328,9 +319,7 @@ public partial class Interpretador
             case "peek": return Valor.DeInt(barramento.Espiar());
         }
 
-        throw new ErroDeExecucao($"{nome}.{metodo}() ainda nao e suportado pelo simulador. "
-            + "O barramento tem begin, setClock, setPins, beginTransmission, write, endTransmission, "
-            + "requestFrom, available, read e peek.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("{0}.{1}() ainda nao e suportado pelo simulador. O barramento tem begin, setClock, setPins, beginTransmission, write, endTransmission, requestFrom, available, read e peek.", nome, metodo), c.Linha);
     }
 
     /// <summary>
@@ -341,8 +330,7 @@ public partial class Interpretador
     void ExigirBarramentoLigado(BarramentoI2c barramento, string nome)
     {
         if (barramento.Ligado) return;
-        Avisar($"I2C: o sketch usou o {nome} sem chamar {nome}.begin() no setup(). "
-               + "Na placa de verdade nada e transmitido.");
+        Avisar(Idioma.T("I2C: o sketch usou o {0} sem chamar {1}.begin() no setup(). Na placa de verdade nada e transmitido.", nome, nome));
     }
 
     /// <summary>
@@ -353,7 +341,6 @@ public partial class Interpretador
     void AvisarForaDoFio(BarramentoI2c barramento, string nome, int endereco)
     {
         if (endereco < 0 || barramento.ForaDoFio(endereco) is not { } peca || peca.PinoSda < 0) return;
-        Avisar($"I2C: o {peca.Nome} (0x{endereco:X2}) esta ligado nos pinos SDA {peca.PinoSda} / SCL {peca.PinoScl}, "
-               + $"mas o {nome} usa SDA {barramento.Sda} / SCL {barramento.Scl}. Na placa ele nao responde.");
+        Avisar(Idioma.T("I2C: o {0} (0x{1:X2}) esta ligado nos pinos SDA {2} / SCL {3}, mas o {4} usa SDA {5} / SCL {6}. Na placa ele nao responde.", peca.Nome, endereco, peca.PinoSda, peca.PinoScl, nome, barramento.Sda, barramento.Scl));
     }
 }

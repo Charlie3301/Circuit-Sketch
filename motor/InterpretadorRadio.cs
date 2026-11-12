@@ -74,17 +74,14 @@ public partial class Interpretador
                 if (!Maq.RadioPresente)
                 {
                     AvisarNaPlaca(
-                        "radio.begin() devolveu false: nao ha modulo NRF24L01 ligado nesta placa. "
-                        + "Ponha a peca no circuito e ligue o CE, o CSN, o SCK, o MOSI, o MISO "
-                        + "e a alimentacao dela.");
+                        Idioma.T("radio.begin() devolveu false: nao ha modulo NRF24L01 ligado nesta placa. Ponha a peca no circuito e ligue o CE, o CSN, o SCK, o MOSI, o MISO e a alimentacao dela."));
                     radio.Ligado = false;
                     return Valor.DeBool(false);
                 }
 
                 radio.Ligado = true;
                 AvisarNaPlaca(
-                    "radio nRF24 simulado: o alcance e a bancada inteira, e so recebe quem "
-                    + "estiver no mesmo canal e com o mesmo endereco de tubo.");
+                    Idioma.T("radio nRF24 simulado: o alcance e a bancada inteira, e so recebe quem estiver no mesmo canal e com o mesmo endereco de tubo."));
                 return Valor.DeBool(true);
             }
 
@@ -166,7 +163,7 @@ public partial class Interpretador
                 return Valor.DeBool(false);
         }
 
-        throw new ErroDeExecucao($"radio.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("radio.{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     string EnderecoDoTubo(Chamada c, Ambiente amb, int i)
@@ -220,8 +217,7 @@ public partial class Interpretador
         }
 
         throw new ErroDeExecucao(
-            "radio.read() espera uma variavel para guardar o que chegou, "
-            + "como em radio.read(&texto, sizeof(texto)).", e.Linha);
+            Idioma.T("radio.read() espera uma variavel para guardar o que chegou, como em radio.read(&texto, sizeof(texto))."), e.Linha);
     }
 
     static readonly string Separador = ((char)31).ToString();
@@ -260,8 +256,7 @@ public partial class Interpretador
                 ExigirWifi(c.Linha, "esp_now_init()");
                 EspNow.Ligado = true;
                 AvisarNaPlaca(
-                    "ESP-Now simulado: as mensagens chegam nas outras placas da bancada que "
-                    + "tambem chamaram esp_now_init().");
+                    Idioma.T("ESP-Now simulado: as mensagens chegam nas outras placas da bancada que tambem chamaram esp_now_init()."));
                 resultado = Valor.DeInt(0);
                 return true;
 
@@ -297,8 +292,7 @@ public partial class Interpretador
                 // retorno ("!= ESP_OK") tem que ver o que veria la.
                 if (!EspNow.Ligado)
                 {
-                    AvisarNaPlaca("esp_now_add_peer() antes de esp_now_init(): na placa o par nao "
-                                  + "entra (ESP_ERR_ESPNOW_NOT_INIT). Chame esp_now_init() primeiro.");
+                    AvisarNaPlaca(Idioma.T("esp_now_add_peer() antes de esp_now_init(): na placa o par nao entra (ESP_ERR_ESPNOW_NOT_INIT). Chame esp_now_init() primeiro."));
                     resultado = Valor.DeInt(0x3065);
                     return true;
                 }
@@ -326,7 +320,7 @@ public partial class Interpretador
             {
                 if (!EspNow.Ligado)
                     throw new ErroDeExecucao(
-                        "esp_now_send() antes de esp_now_init(). Chame esp_now_init() no setup().",
+                        Idioma.T("esp_now_send() antes de esp_now_init(). Chame esp_now_init() no setup()."),
                         c.Linha);
 
                 var carga = CargaDoArgumento(c, 1, amb);
@@ -338,8 +332,7 @@ public partial class Interpretador
 
                 if (destinos.Count == 0)
                 {
-                    AvisarNaPlaca("esp_now_send(NULL, ...) sem nenhum par: nada saiu "
-                                  + "(ESP_ERR_ESPNOW_NOT_FOUND).");
+                    AvisarNaPlaca(Idioma.T("esp_now_send(NULL, ...) sem nenhum par: nada saiu (ESP_ERR_ESPNOW_NOT_FOUND)."));
                     resultado = Valor.DeInt(0x3069);
                     return true;
                 }
@@ -353,10 +346,7 @@ public partial class Interpretador
                     // bancada.
                     if (!EspNow.Pares.Contains(destino))
                     {
-                        AvisarNaPlaca($"esp_now_send() para {destino}, que nao foi adicionado com "
-                                      + "esp_now_add_peer(): na placa de verdade o envio falha "
-                                      + "(ESP_ERR_ESPNOW_NOT_FOUND) e nada sai. Para mandar para "
-                                      + "todas, adicione FF:FF:FF:FF:FF:FF como par.");
+                        AvisarNaPlaca(Idioma.T("esp_now_send() para {0}, que nao foi adicionado com esp_now_add_peer(): na placa de verdade o envio falha (ESP_ERR_ESPNOW_NOT_FOUND) e nada sai. Para mandar para todas, adicione FF:FF:FF:FF:FF:FF como par.", destino));
                         resultado = Valor.DeInt(0x3069);
                         return true;
                     }
@@ -402,7 +392,7 @@ public partial class Interpretador
             return v.Nome;
 
         throw new ErroDeExecucao(
-            $"{ondeUsou} espera o nome de uma funcao deste sketch.", c.Linha);
+            Idioma.T("{0} espera o nome de uma funcao deste sketch.", ondeUsou), c.Linha);
     }
 
     string MacDoArgumento(Chamada c, int i, Ambiente amb)
@@ -608,9 +598,7 @@ public partial class Interpretador
                 if (tipo is not null && tipo.Contains('|'))
                 {
                     if (tipo.EndsWith("|[]", StringComparison.Ordinal))
-                        maq.Avisar($"sizeof({v.Nome}) num parametro da funcao da o tamanho do PONTEIRO "
-                                   + $"({BytesDoPonteiro} bytes), e nao o do vetor: dentro da funcao o vetor "
-                                   + "vira endereco. Passe a quantidade de itens junto, como parametro.");
+                        maq.Avisar(Idioma.T("sizeof({0}) num parametro da funcao da o tamanho do PONTEIRO ({1} bytes), e nao o do vetor: dentro da funcao o vetor vira endereco. Passe a quantidade de itens junto, como parametro.", v.Nome, BytesDoPonteiro));
                     return Valor.DeInt(BytesDoPonteiro);
                 }
                 return Valor.DeInt(vetor.Length * BytesDoItem(tipo, vetor));

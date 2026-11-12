@@ -152,8 +152,7 @@ public partial class Interpretador
                 return true;
             }
             throw new ErroDeExecucao(
-                $"o vetor '{v.Nome}' foi usado inteiro onde se espera um valor. "
-                + $"Use um elemento, como {v.Nome}[0], ou passe o vetor para uma funcao sua.", v.Linha);
+                Idioma.T("o vetor '{0}' foi usado inteiro onde se espera um valor. Use um elemento, como {1}[0], ou passe o vetor para uma funcao sua.", v.Nome, v.Nome), v.Linha);
         }
 
         if (amb.BuscarObjeto(v.Nome, out var objeto))
@@ -694,8 +693,7 @@ public partial class Interpretador
         }
 
         throw new ErroDeExecucao(
-            $"{funcao}() precisa de um vetor de char como destino, "
-            + $"como em: char msg[50]; {funcao}(msg, ...);", e.Linha);
+            Idioma.T("{0}() precisa de um vetor de char como destino, como em: char msg[50]; {1}(msg, ...);", funcao, funcao), e.Linha);
     }
 
     /// <summary>
@@ -750,12 +748,11 @@ public partial class Interpretador
 
             case Variavel v:
                 throw new ErroDeExecucao(
-                    $"{ondeUsou} aponta para '{v.Nome}()', que nao existe neste sketch.", e.Linha);
+                    Idioma.T("{0} aponta para '{1}()', que nao existe neste sketch.", ondeUsou, v.Nome), e.Linha);
 
             default:
                 throw new ErroDeExecucao(
-                    $"{ondeUsou} espera o nome de uma funcao do sketch, "
-                    + "ou uma funcao anonima: []() { ... }", e.Linha);
+                    Idioma.T("{0} espera o nome de uma funcao do sketch, ou uma funcao anonima: []() {{ ... }}", ondeUsou), e.Linha);
         }
     }
 

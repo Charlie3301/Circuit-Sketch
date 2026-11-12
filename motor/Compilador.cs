@@ -229,8 +229,7 @@ public static class Compilador
                 // do interpretador, e o motivo verdadeiro e este. Quem usa o que so ele
                 // tem (o registrador do AVR) ja esperava por isso.
                 if (CompiladorNativo.PorQueNao(projeto) is null)
-                    AvisoDoCompilador?.Invoke($"o compilador de C++ recusou ({Origens.Onde(erroDoClang.Linha)}: {erroDoClang.Message}); "
-                                              + "rodando no interpretador, que nao tem tudo do C++.");
+                    AvisoDoCompilador?.Invoke(Idioma.T("o compilador de C++ recusou ({0}: {1}); rodando no interpretador, que nao tem tudo do C++.", Origens.Onde(erroDoClang.Linha), erroDoClang.Message));
                 return interpretado;
             }
         }

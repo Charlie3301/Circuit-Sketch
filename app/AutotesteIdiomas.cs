@@ -83,38 +83,43 @@ public static partial class Autoteste
     /// </summary>
     static void Idiomas_SobraDePortugues()
     {
-        saida.AppendLine("idiomas: o que sobra em portugues com a tela em ingles");
-
         // As tabelas fixas (cores, atalhos, temas...) guardam a lingua de
         // quando nasceram, e depois dos outros blocos ja nasceram em
-        // portugues. Entao a varredura roda num processo so dela, que comeca
-        // em ingles (--idioma en), e aqui so se traz o resultado.
-        if (Idioma.Atual != "en")
+        // portugues. Entao a varredura roda num processo so dela para cada
+        // idioma completo, que ja comeca nele (--idioma en, --idioma es...),
+        // e aqui so se traz o resultado.
+        if (Idioma.Atual == Idioma.Original)
         {
-            string relatorio = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"circuitsketch-idiomas-{Environment.ProcessId}.txt");
-            bool terminou = false;
-            int codigo = -1;
-            try
+            foreach (var (outro, _) in Idioma.Disponiveis(soCompletos: true).Where(d => d.Codigo != Idioma.Original))
             {
-                System.IO.File.Delete(relatorio);
-                using var filho = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Environment.ProcessPath!,
-                    ["--teste", "--idioma", "en", "--so", "Idiomas_SobraDePortugues", "--saida", relatorio]) { UseShellExecute = false });
-                terminou = filho!.WaitForExit(600_000);
-                if (!terminou) filho.Kill(true);
-                else codigo = filho.ExitCode;
-                string[] linhas = System.IO.File.Exists(relatorio) ? System.IO.File.ReadAllLines(relatorio) : [];
-                foreach (string linha in linhas.Where(l => l.Contains("sobra: ", StringComparison.Ordinal) || l.Contains("FALHA", StringComparison.Ordinal)))
-                    saida.AppendLine(linha);
+                saida.AppendLine($"idiomas: o que sobra em portugues com a tela em {outro}");
+                string relatorio = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"circuitsketch-idiomas-{outro}-{Environment.ProcessId}.txt");
+                bool terminou = false;
+                int codigo = -1;
+                try
+                {
+                    System.IO.File.Delete(relatorio);
+                    using var filho = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Environment.ProcessPath!,
+                        ["--teste", "--idioma", outro, "--so", "Idiomas_SobraDePortugues", "--saida", relatorio]) { UseShellExecute = false });
+                    terminou = filho!.WaitForExit(600_000);
+                    if (!terminou) filho.Kill(true);
+                    else codigo = filho.ExitCode;
+                    string[] linhas = System.IO.File.Exists(relatorio) ? System.IO.File.ReadAllLines(relatorio) : [];
+                    foreach (string linha in linhas.Where(l => l.Contains("sobra: ", StringComparison.Ordinal) || l.Contains("FALHA", StringComparison.Ordinal)))
+                        saida.AppendLine(linha);
+                }
+                finally { try { System.IO.File.Delete(relatorio); } catch (System.IO.IOException) { } }
+                Conferir($"idiomas: a varredura em {outro} (num processo so dela) nao achou portugues sobrando",
+                    terminou && codigo == 0, terminou ? $"saiu com {codigo}" : "nao terminou em 10 minutos");
             }
-            finally { try { System.IO.File.Delete(relatorio); } catch (System.IO.IOException) { } }
-            Conferir("idiomas: a varredura em ingles (num processo so dela) nao achou portugues sobrando",
-                terminou && codigo == 0, terminou ? $"saiu com {codigo}" : "nao terminou em 10 minutos");
             return;
         }
 
+        string lingua = Idioma.Atual;
+        saida.AppendLine($"idiomas: o que sobra em portugues com a tela em {lingua}");
         var achados = new SortedDictionary<string, string>(StringComparer.Ordinal);
         var janelas = new List<System.Windows.Window>();
-        Idioma.Usar("en");
+        Idioma.Usar(lingua);
         try
         {
             var janela = new MainWindow
@@ -190,6 +195,8 @@ public static partial class Autoteste
             Janela("celular", () => janela.TesteAbrirCelular());
             string analisador = circuito.Pecas.FirstOrDefault(p => p.Tipo == "logic-analyzer")?.Id;
             if (analisador is not null) Janela("analisador", () => janela.TesteAbrirAnalisador(analisador));
+
+            MotorTraduzido(lingua);
         }
         finally
         {
@@ -203,8 +210,108 @@ public static partial class Autoteste
 
         foreach (var (texto, onde) in achados)
             saida.AppendLine($"        sobra: \"{(texto.Length > 140 ? texto[..140] + "..." : texto)}\"  ({onde})");
-        Conferir("idiomas: com a tela em ingles, nenhum texto com cara de portugues", achados.Count == 0,
+        Conferir($"idiomas: com a tela em {lingua}, nenhum texto com cara de portugues", achados.Count == 0,
             $"{achados.Count} texto(s), na lista acima");
+    }
+
+    /// <summary>
+    /// O motor no idioma da varredura (roda no processo dela, que ja nasceu
+    /// nele): os erros do interpretador saem traduzidos, o tipo da excecao do
+    /// Python -- que sai das palavras do erro -- continua o mesmo, e o caminho
+    /// de volta (Idioma.Desfazer) acha o portugues de cada frase do catalogo.
+    /// </summary>
+    static void MotorTraduzido(string lingua)
+    {
+        // Cada except so pega se o tipo bater; o que nao bate cai no "outro".
+        string python = """
+            for n in range(5):
+                try:
+                    if n == 0:
+                        x = 1 / 0
+                    elif n == 1:
+                        v = [1, 2, 3]
+                        print(v[7])
+                    elif n == 2:
+                        d = {"a": 1}
+                        print(d["b"])
+                    elif n == 3:
+                        int("abc")
+                    else:
+                        print(nao_existe)
+                except ZeroDivisionError as e:
+                    print("ZeroDivisionError:", e)
+                except IndexError as e:
+                    print("IndexError:", e)
+                except KeyError as e:
+                    print("KeyError:", e)
+                except ValueError as e:
+                    print("ValueError:", e)
+                except NameError as e:
+                    print("NameError:", e)
+                except Exception as e:
+                    print("outro:", e)
+            """;
+        string serial;
+        try { serial = RodarPython(python).Serial; }
+        catch (Exception e) { serial = "(nao rodou: " + e.Message + ")"; }
+        Conferir($"idiomas: em {lingua} o except do Python pega cada erro do simulador pelo tipo (divisao, indice, chave, valor, nome)",
+            serial.Contains("ZeroDivisionError: " + Idioma.T("divisao por zero")) && serial.Contains("IndexError: ") && serial.Contains("KeyError: ")
+            && serial.Contains("ValueError: ") && serial.Contains("NameError: ") && !serial.Contains("outro:"), serial);
+        Conferir($"idiomas: em {lingua} a mensagem das excecoes do Python sai traduzida",
+            serial.Split('|').All(l => !PareceComPortugues(l)), serial);
+
+        // Os erros do C++ do interpretador (de sintaxe e de execucao), com o "line N:" da frente.
+        static string Erro(string corpo)
+        {
+            try
+            {
+                var maq = new Maquina { Perfil = PerfilPlaca.Esp32 };
+                var interp = new Interpretador(new Parser(Lexer.Tokenizar(
+                    "int v[3];\nvoid setup() {\n" + corpo + "\n}\nvoid loop() {}\n")).AnalisarPrograma(), maq);
+                interp.Preparar();
+                interp.Setup();
+                return string.Join(" ", maq.Avisos);
+            }
+            catch (Exception e) { return e.Message; }
+        }
+        var erros = new[]
+        {
+            Erro("float f = 1.5 % 2.0;"), Erro("v[7] = 1;"), Erro("x = 3;"), Erro("int a = 1 @ 2;"),
+            Erro("ArduinoOTA.begin();"), Erro("Serial.voar();"), Erro("int m[2][2] = {{1, 2, 3}};"),
+        };
+        var emPortugues = erros.Where(PareceComPortugues).ToList();
+        string linha = Idioma.T("linha {0}", "");
+        Conferir($"idiomas: em {lingua} os erros do C++ do interpretador saem traduzidos",
+            emPortugues.Count == 0 && erros.All(e => !string.IsNullOrEmpty(e)) && erros.Any(e => e.StartsWith(linha, StringComparison.Ordinal)),
+            string.Join(" | ", emPortugues.Count > 0 ? emPortugues : erros));
+
+        // O caminho de volta, frase por frase: a traducao montada com valores
+        // volta para o portugues montado com os mesmos valores. Frases que
+        // duas chaves traduzem igual nao tem volta unica e ficam de fora.
+        var assembly = typeof(Idioma).Assembly;
+        using var doc = JsonDocument.Parse(assembly.GetManifestResourceStream($"idiomas/{lingua}.json")!);
+        var pares = doc.RootElement.GetProperty("textos").EnumerateObject()
+            .Select(p => (Pt: p.Name, En: p.Value.GetString())).Where(p => !string.IsNullOrEmpty(p.En)).ToList();
+        var repetidas = pares.GroupBy(p => p.En).Where(g => g.Count() > 1).Select(g => g.Key).ToHashSet();
+        var marca = new Regex(@"\{(\d+)(?:[,:][^}]*)?\}");
+        var semVolta = new List<string>();
+        int conferidas = 0;
+        foreach (var (pt, en) in pares)
+        {
+            // Duas marcas coladas ("{2}{2}") nao tem fronteira: o Desfazer nao tenta.
+            if (repetidas.Contains(en) || !marca.IsMatch(pt) || Regex.IsMatch(en, @"\}\{\d")) continue;
+            int quantos = marca.Matches(pt).Max(m => int.Parse(m.Groups[1].Value)) + 1;
+            var valores = Enumerable.Range(0, quantos).Select(i => (object)$"V{i}x").ToArray();
+            string montada, esperada;
+            try { montada = string.Format(en, valores); esperada = string.Format(pt, valores); }
+            catch (FormatException) { semVolta.Add("(formato) " + pt); continue; }
+            // A que e quase so marca ("{0}: {1}") casaria com qualquer coisa: o Desfazer nem tenta.
+            if (marca.Replace(en, "").Replace("{{", "{").Replace("}}", "}").Trim().Length < 4) continue;
+            conferidas++;
+            if (Idioma.Desfazer(montada) != esperada) semVolta.Add($"{montada} -> {Idioma.Desfazer(montada)}");
+        }
+        Conferir($"idiomas: Idioma.Desfazer devolve o portugues das {conferidas} frases com valores do catalogo {lingua}",
+            conferidas > 500 && semVolta.Count == 0, string.Join(" | ", semVolta.Take(6)));
     }
 
     static readonly HashSet<string> SoDoPortugues = new(StringComparer.OrdinalIgnoreCase)
@@ -215,35 +322,54 @@ public static partial class Autoteste
         "peça", "peças", "fio", "fios", "placa", "pino", "pinos", "ligado", "ligada", "desligado", "abrir", "fechar",
     };
 
+    /// <summary>
+    /// Palavras curtas que o portugues divide com o espanhol ("de", "que",
+    /// "para", "placa"...): numa tela em espanhol elas sao do espanhol.
+    /// </summary>
+    static readonly HashSet<string> TambemDoEspanhol = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "de", "da", "das", "dos", "e", "o", "nos", "para", "que", "esta", "este", "como", "porque", "cada", "placa", "abrir", "pelo",
+    };
+
     static readonly Regex AcentoDoPortugues = new("[ãõáàâéêíóôúüçÃÕÁÀÂÉÊÍÓÔÚÇ]");
+    // O espanhol tambem tem á, é, í, ó, ú e ü: so o til do a e do o, o circunflexo, a crase e o ç sao do portugues.
+    static readonly Regex AcentoSoDoPortugues = new("[ãõàâêôçÃÕÀÂÊÔÇ]");
     static readonly Regex Palavra = new(@"\p{L}{3,}");
 
     /// <summary>
     /// As palavras do portugues da tela: as que aparecem nas frases originais
-    /// do catalogo ingles e em nenhuma traducao. E o que pega "Desfazer" ou
-    /// "Solto", sem acento e sem palavra de ligacao.
+    /// do catalogo do idioma atual e em nenhuma traducao dele. E o que pega
+    /// "Desfazer" ou "Solto", sem acento e sem palavra de ligacao.
     /// </summary>
-    static readonly Lazy<HashSet<string>> VocabularioDoPortugues = new(() =>
+    static readonly Dictionary<string, HashSet<string>> VocabularioDoPortugues = [];
+
+    static HashSet<string> Vocabulario(string lingua)
     {
-        var assembly = typeof(Idioma).Assembly;
-        string recurso = assembly.GetManifestResourceNames().First(r => r.StartsWith("idiomas/", StringComparison.Ordinal) && r.EndsWith("en.json", StringComparison.Ordinal));
-        using var doc = JsonDocument.Parse(assembly.GetManifestResourceStream(recurso)!);
-        var originais = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var traduzidas = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var p in doc.RootElement.GetProperty("textos").EnumerateObject())
+        lock (VocabularioDoPortugues)
         {
-            foreach (Match m in Palavra.Matches(p.Name)) originais.Add(m.Value);
-            foreach (Match m in Palavra.Matches(p.Value.GetString() ?? "")) traduzidas.Add(m.Value);
+            if (VocabularioDoPortugues.TryGetValue(lingua, out var pronto)) return pronto;
+            var assembly = typeof(Idioma).Assembly;
+            using var doc = JsonDocument.Parse(assembly.GetManifestResourceStream($"idiomas/{lingua}.json")!);
+            var originais = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var traduzidas = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var p in doc.RootElement.GetProperty("textos").EnumerateObject())
+            {
+                foreach (Match m in Palavra.Matches(p.Name)) originais.Add(m.Value);
+                foreach (Match m in Palavra.Matches(p.Value.GetString() ?? "")) traduzidas.Add(m.Value);
+            }
+            originais.ExceptWith(traduzidas);
+            return VocabularioDoPortugues[lingua] = originais;
         }
-        originais.ExceptWith(traduzidas);
-        return originais;
-    });
+    }
 
     /// <summary>Um texto que parece portugues: tem acento, ou uma palavra que so o portugues usa.</summary>
     static bool PareceComPortugues(string texto)
     {
         if (string.IsNullOrWhiteSpace(texto)) return false;
-        if (AcentoDoPortugues.IsMatch(texto)) return true;
+        string lingua = Idioma.Atual == Idioma.Original ? "en" : Idioma.Atual;
+        bool espanhol = lingua.StartsWith("es", StringComparison.Ordinal);
+        if ((espanhol ? AcentoSoDoPortugues : AcentoDoPortugues).IsMatch(texto)) return true;
+        var vocabulario = Vocabulario(lingua);
         foreach (string pedaco in texto.Split((char[])null, StringSplitOptions.RemoveEmptyEntries))
         {
             // Em maiusculas e sigla (COM, OS), nao palavra. Com numero, ponto ou
@@ -251,9 +377,9 @@ public static partial class Autoteste
             // Adafruit_BMP280.h): fica como e em qualquer lingua.
             string palavra = pedaco.Trim('.', ',', ':', ';', '(', ')', '"', '\'', '!', '?', '…', '·', '—', '-');
             if (palavra == palavra.ToUpperInvariant() || palavra.Any(c => char.IsDigit(c) || c is '.' or '_')) continue;
-            if (SoDoPortugues.Contains(palavra)) return true;
+            if (SoDoPortugues.Contains(palavra) && !(espanhol && TambemDoEspanhol.Contains(palavra))) return true;
             foreach (Match m in Palavra.Matches(palavra))
-                if (VocabularioDoPortugues.Value.Contains(m.Value)) return true;
+                if (vocabulario.Contains(m.Value)) return true;
         }
         return false;
     }

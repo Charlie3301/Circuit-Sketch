@@ -43,7 +43,7 @@ public class ParserPascal(List<Token> tokens, DialetoPascal dialeto)
     Token Exigir(string texto)
     {
         if (!Eh(texto))
-            throw new ErroDeSintaxe($"esperava '{texto}' e veio '{Atual.Texto}'", Linha);
+            throw new ErroDeSintaxe(Idioma.T("esperava '{0}' e veio '{1}'", texto, Atual.Texto), Linha);
 
         return Comer();
     }
@@ -133,7 +133,7 @@ public class ParserPascal(List<Token> tokens, DialetoPascal dialeto)
             if (Aceitar(";")) continue;
 
             throw new ErroDeSintaxe(
-                $"não esperava '{Atual.Texto}' aqui, fora de um procedimento", Linha);
+                Idioma.T("não esperava '{0}' aqui, fora de um procedimento", Atual.Texto), Linha);
         }
 
         funcoes.AddRange(aninhadas);
@@ -972,7 +972,7 @@ public class ParserPascal(List<Token> tokens, DialetoPascal dialeto)
             return Sufixos(new Variavel(t.Texto, linha));
         }
 
-        throw new ErroDeSintaxe($"não esperava '{t.Texto}' numa expressão", linha);
+        throw new ErroDeSintaxe(Idioma.T("não esperava '{0}' numa expressão", t.Texto), linha);
     }
 
     /// <summary>

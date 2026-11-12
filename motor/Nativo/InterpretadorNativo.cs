@@ -70,7 +70,7 @@ public partial class Interpretador
                 }
                 else if (v.EhTexto)
                 {
-                    throw new ErroDeExecucao($"{nome}(): o argumento {i + 1} e um texto, mas o C espera {tipo}.", linha);
+                    throw new ErroDeExecucao(Idioma.T("{0}(): o argumento {1} e um texto, mas o C espera {2}.", nome, i + 1, tipo), linha);
                 }
                 else slots[i] = unchecked((ulong)(long)v.Num);
             }

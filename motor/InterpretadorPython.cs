@@ -53,8 +53,7 @@ public partial class Interpretador
     {
         if (!ModulosPy.Existe(c.Modulo))
             throw new ErroDeExecucao(
-                $"o modulo '{c.Modulo}' ainda nao existe no simulador. "
-                + "Os que existem sao: " + string.Join(", ", ModulosPy.Conhecidos), c.Linha);
+                Idioma.T("o modulo '{0}' ainda nao existe no simulador. Os que existem sao: {1}", c.Modulo, string.Join(", ", ModulosPy.Conhecidos)), c.Linha);
 
         if (c.Nomes.Count == 0)
         {
@@ -93,8 +92,7 @@ public partial class Interpretador
                 var partes = item.Referencia as ListaPy;
                 if (partes is null || partes.Itens.Count != c.Nomes.Count)
                     throw new ErroDeExecucao(
-                        $"este for espera {c.Nomes.Count} valores por volta, "
-                        + "mas a sequencia nao os entrega em grupos desse tamanho", c.Linha);
+                        Idioma.T("este for espera {0} valores por volta, mas a sequencia nao os entrega em grupos desse tamanho", c.Nomes.Count), c.Linha);
 
                 for (int i = 0; i < c.Nomes.Count; i++)
                     DeclararOuAtribuir(c.Nomes[i], partes.Itens[i], amb);
@@ -145,8 +143,7 @@ public partial class Interpretador
         }
 
         throw new ErroDeExecucao(
-            "este valor nao e uma sequencia: so lista, tupla, dicionario, "
-            + "texto e range() podem ser percorridos", linha);
+            Idioma.T("este valor nao e uma sequencia: so lista, tupla, dicionario, texto e range() podem ser percorridos"), linha);
     }
 
     // =====================================================================
@@ -169,7 +166,7 @@ public partial class Interpretador
 
         int total = alvo.Referencia is ListaPy l ? l.Itens.Count
                   : alvo.EhTexto ? alvo.Texto.Length
-                  : throw new ErroDeExecucao("so lista e texto podem ser fatiados", f.Linha);
+                  : throw new ErroDeExecucao(Idioma.T("so lista e texto podem ser fatiados"), f.Linha);
 
         int inicio = f.Inicio is null ? 0 : Limitar((int)Avaliar(f.Inicio, amb).Num, total);
         int fim = f.Fim is null ? total : Limitar((int)Avaliar(f.Fim, amb).Num, total);
@@ -205,7 +202,7 @@ public partial class Interpretador
                 int i = lista.Posicao((int)Avaliar(ix.Idx, amb).Num);
                 if (i < 0)
                     throw new ErroDeExecucao(
-                        $"indice fora da lista, que tem {lista.Itens.Count} itens", ix.Linha);
+                        Idioma.T("indice fora da lista, que tem {0} itens", lista.Itens.Count), ix.Linha);
                 v = lista.Itens[i];
                 return true;
             }
@@ -215,9 +212,8 @@ public partial class Interpretador
                 string chave = Avaliar(ix.Idx, amb).Mostrar();
                 if (!dic.Itens.TryGetValue(chave, out v))
                     throw new ErroDeExecucao(
-                        $"a chave '{chave}' nao esta no dicionario"
-                        + (dic.Ordem.Count == 0 ? ", que esta vazio"
-                           : ". Tem: " + string.Join(", ", dic.Ordem)), ix.Linha);
+                        Idioma.T("a chave '{0}' nao esta no dicionario{1}", chave, (dic.Ordem.Count == 0 ? Idioma.T(", que esta vazio")
+                           : Idioma.T(". Tem: {0}", string.Join(", ", dic.Ordem)))), ix.Linha);
                 return true;
             }
         }
@@ -229,7 +225,7 @@ public partial class Interpretador
             if (i < 0) i += s.Length;
             if (i < 0 || i >= s.Length)
                 throw new ErroDeExecucao(
-                    $"indice fora do texto, que tem {s.Length} letras", ix.Linha);
+                    Idioma.T("indice fora do texto, que tem {0} letras", s.Length), ix.Linha);
             v = Valor.DeTexto(s[i].ToString());
             return true;
         }
@@ -255,7 +251,7 @@ public partial class Interpretador
                     int i = lista.Posicao((int)Avaliar(ix.Idx, amb).Num);
                     if (i < 0)
                         throw new ErroDeExecucao(
-                            $"indice fora da lista, que tem {lista.Itens.Count} itens", ix.Linha);
+                            Idioma.T("indice fora da lista, que tem {0} itens", lista.Itens.Count), ix.Linha);
                     lista.Itens[i] = v;
                     return true;
                 }
@@ -396,13 +392,13 @@ public partial class Interpretador
             // A divisao do Python SEMPRE da real -- 7/2 e 3.5, e nao 3.
             // E a pegadinha numero um de quem vem do C.
             case "/":
-                if (y.Num == 0) throw new ErroDeExecucao("divisao por zero", linha);
+                if (y.Num == 0) throw new ErroDeExecucao(Idioma.T("divisao por zero"), linha);
                 r = Valor.DeReal(x.Num / y.Num);
                 return true;
 
             // "//": a inteira, arredondando para baixo (inclusive negativo).
             case "//":
-                if (y.Num == 0) throw new ErroDeExecucao("divisao por zero", linha);
+                if (y.Num == 0) throw new ErroDeExecucao(Idioma.T("divisao por zero"), linha);
                 r = x.Inteiro && y.Inteiro
                     ? Valor.DeInt(Math.Floor(x.Num / y.Num))
                     : Valor.DeReal(Math.Floor(x.Num / y.Num));
@@ -411,7 +407,7 @@ public partial class Interpretador
             // O resto do Python acompanha o sinal do DIVISOR: -1 % 3 e 2.
             case "%":
             {
-                if (y.Num == 0) throw new ErroDeExecucao("resto por zero", linha);
+                if (y.Num == 0) throw new ErroDeExecucao(Idioma.T("resto por zero"), linha);
                 double resto = x.Num - Math.Floor(x.Num / y.Num) * y.Num;
                 r = x.Inteiro && y.Inteiro ? Valor.DeInt(resto) : Valor.DeReal(resto);
                 return true;
@@ -441,7 +437,7 @@ public partial class Interpretador
             int j = i + 1;
             while (j < molde.Length && !char.IsLetter(molde[j])) j++;
             if (j >= molde.Length)
-                throw new ErroDeExecucao("faltou a letra depois do '%'", linha);
+                throw new ErroDeExecucao(Idioma.T("faltou a letra depois do '%'"), linha);
 
             string largura = molde[(i + 1)..j];
             char tipo = molde[j];
@@ -469,7 +465,7 @@ public partial class Interpretador
             'b' => Convert.ToString((long)v.Num, 2),
             'c' => ((char)(int)v.Num).ToString(),
             'e' => v.Num.ToString("e6", System.Globalization.CultureInfo.InvariantCulture),
-            _ => throw new ErroDeExecucao($"'%{tipo}' nao e um formato conhecido", linha)
+            _ => throw new ErroDeExecucao(Idioma.T("'%{0}' nao e um formato conhecido", tipo), linha)
         };
 
         string so = largura.Split('.')[0];

@@ -25,7 +25,7 @@ public partial class Interpretador
         bool CaminhoRecusado(string caminho)
         {
             if (caminho.StartsWith('/')) return false;
-            maq.Avisar($"{nome}.{metodo}(\"{caminho}\"): o caminho na flash comeca com \"/\" -- escreva \"/{caminho}\".");
+            maq.Avisar(Idioma.T("{0}.{1}(\"{2}\"): o caminho na flash comeca com \"/\" -- escreva \"/{3}\".", nome, metodo, caminho, caminho));
             return true;
         }
 
@@ -38,8 +38,7 @@ public partial class Interpretador
                 {
                     if (!formatarSeFalhar)
                     {
-                        maq.Avisar($"{nome}.begin() devolveu false: a particao da flash nunca foi formatada (a placa nova). "
-                                   + $"Use {nome}.begin(true), que formata, ou mande os arquivos da pasta data para a flash.");
+                        maq.Avisar(Idioma.T("{0}.begin() devolveu false: a particao da flash nunca foi formatada (a placa nova). Use {1}.begin(true), que formata, ou mande os arquivos da pasta data para a flash.", nome, nome));
                         return Valor.DeBool(false);
                     }
                     flash.Limpar();
@@ -84,7 +83,7 @@ public partial class Interpretador
                 return Valor.DeBool(arquivo is not null);
             }
         }
-        throw new ErroDeExecucao($"{nome}.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("{0}.{1}() ainda nao e suportado pelo simulador.", nome, metodo), c.Linha);
     }
 
     /// <summary>O modo do open(): "r", "w" (do zero) ou "a" (no fim), como a ESP32 entende.</summary>

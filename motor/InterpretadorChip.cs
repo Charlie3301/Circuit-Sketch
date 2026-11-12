@@ -46,13 +46,11 @@ public partial class Interpretador
             {
                 if (c.Args.Count < 3 || SemEndereco(c.Args[2]) is not Variavel alvo)
                     throw new ErroDeExecucao(
-                        "aoMudarPino() espera o nome de uma funcao no 3o argumento, "
-                        + "como em aoMudarPino(\"CLK\", RISING, contar).", c.Linha);
+                        Idioma.T("aoMudarPino() espera o nome de uma funcao no 3o argumento, como em aoMudarPino(\"CLK\", RISING, contar)."), c.Linha);
 
                 if (!funcoes.ContainsKey(alvo.Nome))
                     throw new ErroDeExecucao(
-                        $"aoMudarPino() aponta para '{alvo.Nome}()', que nao existe "
-                        + "neste chip.", c.Linha);
+                        Idioma.T("aoMudarPino() aponta para '{0}()', que nao existe neste chip.", alvo.Nome), c.Linha);
 
                 maq.Vigiar(PinoDoChip(c, amb, 0), alvo.Nome, (int)Numero(c, amb, 1));
                 return true;
@@ -70,8 +68,7 @@ public partial class Interpretador
 
         if (indice < 0)
             throw new ErroDeExecucao(
-                $"este chip nao tem o pino \"{nome}\". "
-                + "Os pinos sao os que estao no .chip.json.", c.Linha);
+                Idioma.T("este chip nao tem o pino \"{0}\". Os pinos sao os que estao no .chip.json.", nome), c.Linha);
 
         return indice;
     }

@@ -524,7 +524,7 @@ public sealed class Avr
 
     void Desconhecido(ushort op)
         => throw new ErroDeExecucao(
-            $"opcode {op:X4} nao reconhecido", programa.LinhaDe(Pc - 1));
+            Idioma.T("opcode {0:X4} nao reconhecido", op), programa.LinhaDe(Pc - 1));
 
     // ---- 0000 ----
     void Grupo0(ushort op, int d, int r)

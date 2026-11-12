@@ -1295,7 +1295,7 @@ public class Maquina
     string nome;
 
     /// <summary>Como a placa aparece no painel Rede.</summary>
-    public string Nome { get => nome ?? Perfil?.Nome ?? "placa"; set => nome = value; }
+    public string Nome { get => nome ?? Perfil?.Nome ?? Idioma.T("placa"); set => nome = value; }
 
     Rede rede;
 
@@ -1917,25 +1917,25 @@ public class Maquina
         if (!Valido(p)) return;
         if (Perfil.SoAnalogico(p))
         {
-            if (modo != 0) Avisar($"o pino {p} da {Perfil.Nome} e so analogico: nao tem saida nem pull-up (use analogRead).");
+            if (modo != 0) Avisar(Idioma.T("o pino {0} da {1} e so analogico: nao tem saida nem pull-up (use analogRead).", p, Perfil.Nome));
             Modo[p] = 0;
             return;
         }
         if (modo == 1 && AvisoSoEntrada(p))
-            Avisar($"GPIO {p} e somente entrada na {Perfil.Nome}: nao pode ser OUTPUT.");
+            Avisar(Idioma.T("GPIO {0} e somente entrada na {1}: nao pode ser OUTPUT.", p, Perfil.Nome));
         if (modo == 2 && AvisoSoEntrada(p))
-            Avisar($"GPIO {p} nao tem pull-up interno na {Perfil.Nome}.");
+            Avisar(Idioma.T("GPIO {0} nao tem pull-up interno na {1}.", p, Perfil.Nome));
         if (AvisoFlash(p))
-            Avisar($"GPIO {p} e usado pela flash interna: evite.");
+            Avisar(Idioma.T("GPIO {0} e usado pela flash interna: evite.", p));
         Modo[p] = modo;
     }
 
     public void DigitalWrite(int p, int v)
     {
         if (!Valido(p)) return;
-        if (Perfil.SoAnalogico(p)) { Avisar($"digitalWrite no pino {p} da {Perfil.Nome}, que e so analogico: nada acontece."); return; }
+        if (Perfil.SoAnalogico(p)) { Avisar(Idioma.T("digitalWrite no pino {0} da {1}, que e so analogico: nada acontece.", p, Perfil.Nome)); return; }
         if (AvisoSoEntrada(p))
-        { Avisar($"digitalWrite em GPIO {p}, que e somente entrada."); return; }
+        { Avisar(Idioma.T("digitalWrite em GPIO {0}, que e somente entrada.", p)); return; }
         v = v != 0 ? 1 : 0;
         double quando = Gastar(Perfil.CustoDoPinoUs);
 
@@ -2121,7 +2121,7 @@ public class Maquina
     bool Valido(int p)
     {
         if (p >= 0 && p < Perfil.NumPinos) return true;
-        Avisar($"pino {p} nao existe no {Perfil.Nome} (vai de 0 a {Perfil.NumPinos - 1}).");
+        Avisar(Idioma.T("pino {0} nao existe no {1} (vai de 0 a {2}).", p, Perfil.Nome, Perfil.NumPinos - 1));
         return false;
     }
 

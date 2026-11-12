@@ -88,18 +88,14 @@ public static class Lexer
     static string Recusa(char c) => c switch
     {
         '\u2013' or '\u2014' =>
-            "aqui tem um traco longo (–), e nao o sinal de menos (-). "
-            + "Isso costuma vir de codigo colado de uma pagina ou do Word.",
+            Idioma.T("aqui tem um traco longo (–), e nao o sinal de menos (-). Isso costuma vir de codigo colado de uma pagina ou do Word."),
         '\u201C' or '\u201D' =>
-            "aqui tem aspas curvas (\u201C \u201D), e nao as aspas retas que o C usa. "
-            + "Isso costuma vir de codigo colado de uma pagina ou do Word.",
+            Idioma.T("aqui tem aspas curvas (\u201C \u201D), e nao as aspas retas que o C usa. Isso costuma vir de codigo colado de uma pagina ou do Word."),
         '\u2018' or '\u2019' =>
-            "aqui tem apostrofo curvo (\u2018 \u2019), e nao o reto que o C usa. "
-            + "Isso costuma vir de codigo colado de uma pagina ou do Word.",
+            Idioma.T("aqui tem apostrofo curvo (\u2018 \u2019), e nao o reto que o C usa. Isso costuma vir de codigo colado de uma pagina ou do Word."),
         '\u00A0' =>
-            "aqui tem um espaco 'duro' invisivel, que veio junto do texto colado. "
-            + "Apague o espaco e digite outro.",
-        _ => $"caractere inesperado '{c}'",
+            Idioma.T("aqui tem um espaco 'duro' invisivel, que veio junto do texto colado. Apague o espaco e digite outro."),
+        _ => Idioma.T("caractere inesperado '{0}'", c),
     };
 
     /// <summary>O sketch sozinho, sem placa: so as diretivas que ele mesmo escreve.</summary>
@@ -333,8 +329,7 @@ public static class Lexer
                     {
                         if (txt.Any(d => d is '8' or '9'))
                             throw new ErroDeSintaxe(
-                                $"'{txt}' comeca com zero, e numero com zero na frente e octal no C "
-                                + "(so vai de 0 a 7). Tire o zero da frente.", Onde());
+                                Idioma.T("'{0}' comeca com zero, e numero com zero na frente e octal no C (so vai de 0 a 7). Tire o zero da frente.", txt), Onde());
                         val = Convert.ToInt64(txt, 8);
                     }
                     else val = double.Parse(txt, System.Globalization.CultureInfo.InvariantCulture);
@@ -360,7 +355,7 @@ public static class Lexer
                     string marca = src[(i + 2)..abre];
                     string fecha = ")" + marca + Aspas;
                     int fim = src.IndexOf(fecha, abre + 1, StringComparison.Ordinal);
-                    if (fim < 0) throw new ErroDeSintaxe("string crua sem fechamento", Onde());
+                    if (fim < 0) throw new ErroDeSintaxe(Idioma.T("string crua sem fechamento"), Onde());
 
                     string conteudo = src[(abre + 1)..fim];
                     toks.Add(new Token(T.Str, conteudo, 0, false, Onde()));
@@ -517,13 +512,13 @@ public static class Lexer
 
             if (t.Tipo == T.Op && !EhOperador(t.Texto))
                 throw new ErroDeSintaxe(
-                    t.Texto == StringAberta ? "string sem fechamento" : Recusa(t.Texto[0]), t.Linha);
+                    t.Texto == StringAberta ? Idioma.T("string sem fechamento") : Recusa(t.Texto[0]), t.Linha);
 
             saida.Add(t);
         }
 
         if (pilha.Count > 0)
-            throw new ErroDeSintaxe("este #if (ou #ifdef) nao tem o #endif que o fecha", pilha[^1].Linha);
+            throw new ErroDeSintaxe(Idioma.T("este #if (ou #ifdef) nao tem o #endif que o fecha"), pilha[^1].Linha);
     }
 
     static (string Nome, string Resto) Partir(string texto)
@@ -564,7 +559,7 @@ public static class Lexer
             {
                 var topo = Topo(pilha, "#" + nome, d.Linha);
                 if (topo.TeveElse)
-                    throw new ErroDeSintaxe($"#{nome} depois do #else", d.Linha);
+                    throw new ErroDeSintaxe(Idioma.T("#{0} depois do #else", nome), d.Linha);
 
                 if (!topo.PaiAtivo || topo.JaTomado) { topo.Ativo = false; return; }
 
@@ -582,7 +577,7 @@ public static class Lexer
             case "else":
             {
                 var topo = Topo(pilha, "#else", d.Linha);
-                if (topo.TeveElse) throw new ErroDeSintaxe("dois #else no mesmo #if", d.Linha);
+                if (topo.TeveElse) throw new ErroDeSintaxe(Idioma.T("dois #else no mesmo #if"), d.Linha);
                 topo.TeveElse = true;
                 topo.Ativo = topo.PaiAtivo && !topo.JaTomado;
                 topo.JaTomado = true;
@@ -641,7 +636,7 @@ public static class Lexer
     static Condicao Topo(List<Condicao> pilha, string diretiva, int linha)
     {
         if (pilha.Count == 0)
-            throw new ErroDeSintaxe($"{diretiva} sem o #if (ou #ifdef) que ele fecha", linha);
+            throw new ErroDeSintaxe(Idioma.T("{0} sem o #if (ou #ifdef) que ele fecha", diretiva), linha);
         return pilha[^1];
     }
 
@@ -649,7 +644,7 @@ public static class Lexer
     static void Definir(string texto, int linha, Preprocessador pp)
     {
         var (nome, _) = Partir(texto);
-        if (nome.Length == 0) throw new ErroDeSintaxe("#define sem nome", linha);
+        if (nome.Length == 0) throw new ErroDeSintaxe(Idioma.T("#define sem nome"), linha);
 
         string depois = texto[nome.Length..];
 
@@ -658,7 +653,7 @@ public static class Lexer
         if (depois.StartsWith('('))
         {
             int fecha = depois.IndexOf(')');
-            if (fecha < 0) throw new ErroDeSintaxe($"#define {nome}( sem o ')'", linha);
+            if (fecha < 0) throw new ErroDeSintaxe(Idioma.T("#define {0}( sem o ')'", nome), linha);
 
             var parametros = new List<string>();
             bool variadica = false;
@@ -702,14 +697,14 @@ public static class Lexer
         if (alvo.StartsWith('<'))
         {
             int fecha = alvo.IndexOf('>');
-            if (fecha < 0) throw new ErroDeSintaxe("#include <... sem o '>'", linha);
+            if (fecha < 0) throw new ErroDeSintaxe(Idioma.T("#include <... sem o '>'"), linha);
             nome = alvo[1..fecha].Trim();
             comAspas = false;
         }
         else if (alvo.StartsWith('"'))
         {
             int fecha = alvo.IndexOf('"', 1);
-            if (fecha < 0) throw new ErroDeSintaxe("#include \"... sem as aspas do fim", linha);
+            if (fecha < 0) throw new ErroDeSintaxe(Idioma.T("#include \"... sem as aspas do fim"), linha);
             nome = alvo[1..fecha].Trim();
             comAspas = true;
         }
@@ -720,8 +715,7 @@ public static class Lexer
 
         if (pp.Fundo > 40)
             throw new ErroDeSintaxe(
-                $"#include \"{nome}\" entrou em arquivos demais, um dentro do outro. "
-                + "Um arquivo inclui o outro de volta sem #pragma once ou #ifndef?", linha);
+                Idioma.T("#include \"{0}\" entrou em arquivos demais, um dentro do outro. Um arquivo inclui o outro de volta sem #pragma once ou #ifndef?", nome), linha);
 
         pp.Fundo++;
         try
@@ -829,7 +823,7 @@ public static class Lexer
             args[^1].Add(x);
         }
 
-        throw new ErroDeSintaxe("a chamada da macro nao fecha o parentese", linha);
+        throw new ErroDeSintaxe(Idioma.T("a chamada da macro nao fecha o parentese"), linha);
     }
 
     static List<Token> Substituir(Macro macro, List<List<Token>> args, Preprocessador pp,
@@ -843,10 +837,10 @@ public static class Lexer
 
         if (args.Count < fixos && !(fixos == 1 && args.Count == 0))
             throw new ErroDeSintaxe(
-                $"a macro {macro.Nome}() pede {fixos} argumento(s), e veio {args.Count}", linha);
+                Idioma.T("a macro {0}() pede {1} argumento(s), e veio {2}", macro.Nome, fixos, args.Count), linha);
         if (!macro.Variadica && args.Count > fixos && fixos > 0)
             throw new ErroDeSintaxe(
-                $"a macro {macro.Nome}() pede {fixos} argumento(s), e veio {args.Count}", linha);
+                Idioma.T("a macro {0}() pede {1} argumento(s), e veio {2}", macro.Nome, fixos, args.Count), linha);
 
         for (int k = 0; k < fixos; k++)
             valores[macro.Parametros[k]] = k < args.Count ? args[k] : [];
@@ -994,7 +988,7 @@ public static class Lexer
         ts = Reexpandir(ts, pp, [], 0);
         ts = TrocarDefined(ts, pp, linha);
 
-        if (ts.Count == 0) throw new ErroDeSintaxe("#if sem condicao", linha);
+        if (ts.Count == 0) throw new ErroDeSintaxe(Idioma.T("#if sem condicao"), linha);
 
         // O que sobrou de nome depois das macros vale zero -- e a regra
         // do C, e e o que faz "#if VERSAO > 2" funcionar sem VERSAO.
@@ -1005,7 +999,7 @@ public static class Lexer
         int p = 0;
         long valor = new ContaDoIf(ts, linha).Ler(ref p);
         if (p < ts.Count)
-            throw new ErroDeSintaxe($"sobrou '{ts[p].Texto}' na condicao do #if", linha);
+            throw new ErroDeSintaxe(Idioma.T("sobrou '{0}' na condicao do #if", ts[p].Texto), linha);
         return valor != 0;
     }
 
@@ -1021,12 +1015,12 @@ public static class Lexer
                 if (k + 1 < ts.Count && ts[k + 1].E("("))
                 {
                     if (k + 3 >= ts.Count || !ts[k + 3].E(")"))
-                        throw new ErroDeSintaxe("defined( sem o ')'", linha);
+                        throw new ErroDeSintaxe(Idioma.T("defined( sem o ')'"), linha);
                     nome = ts[k + 2].Texto;
                     k += 3;
                 }
                 else if (k + 1 < ts.Count) nome = ts[++k].Texto;
-                else throw new ErroDeSintaxe("defined sem nome", linha);
+                else throw new ErroDeSintaxe(Idioma.T("defined sem nome"), linha);
 
                 saida.Add(new Token(T.Num, "defined", pp.Macros.ContainsKey(nome) ? 1 : 0, true, linha));
                 continue;
@@ -1067,7 +1061,7 @@ public static class Lexer
             {
                 p++;
                 long sim = Ler(ref p);
-                if (p >= ts.Count || !ts[p].E(":")) throw new ErroDeSintaxe("'?' sem ':' no #if", linha);
+                if (p >= ts.Count || !ts[p].E(":")) throw new ErroDeSintaxe(Idioma.T("'?' sem ':' no #if"), linha);
                 p++;
                 long nao = Ler(ref p);
                 return c != 0 ? sim : nao;
@@ -1101,8 +1095,8 @@ public static class Lexer
                     "+" => esq + dir,
                     "-" => esq - dir,
                     "*" => esq * dir,
-                    "/" => dir == 0 ? throw new ErroDeSintaxe("divisao por zero no #if", linha) : esq / dir,
-                    "%" => dir == 0 ? throw new ErroDeSintaxe("resto por zero no #if", linha) : esq % dir,
+                    "/" => dir == 0 ? throw new ErroDeSintaxe(Idioma.T("divisao por zero no #if"), linha) : esq / dir,
+                    "%" => dir == 0 ? throw new ErroDeSintaxe(Idioma.T("resto por zero no #if"), linha) : esq % dir,
                     _ => esq,
                 };
             }
@@ -1111,7 +1105,7 @@ public static class Lexer
 
         long Unario(ref int p)
         {
-            if (p >= ts.Count) throw new ErroDeSintaxe("a condicao do #if acabou no meio", linha);
+            if (p >= ts.Count) throw new ErroDeSintaxe(Idioma.T("a condicao do #if acabou no meio"), linha);
             var t = ts[p];
 
             if (t.Tipo == T.Op)
@@ -1126,7 +1120,7 @@ public static class Lexer
                     {
                         p++;
                         long v = Ler(ref p);
-                        if (p >= ts.Count || !ts[p].E(")")) throw new ErroDeSintaxe("'(' sem ')' no #if", linha);
+                        if (p >= ts.Count || !ts[p].E(")")) throw new ErroDeSintaxe(Idioma.T("'(' sem ')' no #if"), linha);
                         p++;
                         return v;
                     }
@@ -1135,7 +1129,7 @@ public static class Lexer
 
             if (t.Tipo is T.Num or T.Char) { p++; return (long)t.Valor; }
 
-            throw new ErroDeSintaxe($"'{t.Texto}' nao cabe numa condicao de #if", linha);
+            throw new ErroDeSintaxe(Idioma.T("'{0}' nao cabe numa condicao de #if", t.Texto), linha);
         }
     }
 }

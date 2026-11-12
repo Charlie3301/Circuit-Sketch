@@ -99,9 +99,7 @@ public partial class Interpretador
         // "BLEScanResults resultados = pBLEScan->start(5);" e do core 2.x:
         // no 3.x o start() devolve um ponteiro, e a linha nem compila.
         if (d.Classe == "BLEScanResults" && d.Inicial is Chamada { Alvo: Membro { Nome: "start" } })
-            throw new ErroDeExecucao("conversion from 'BLEScanResults*' to non-scalar type 'BLEScanResults' requested -- "
-                                     + "no core 3.x da ESP32 o start() devolve um ponteiro: escreva "
-                                     + "\"BLEScanResults *resultados = pBLEScan->start(...);\" e use resultados->getCount().", d.Linha);
+            throw new ErroDeExecucao(Idioma.T("conversion from 'BLEScanResults*' to non-scalar type 'BLEScanResults' requested -- no core 3.x da ESP32 o start() devolve um ponteiro: escreva \"BLEScanResults *resultados = pBLEScan->start(...);\" e use resultados->getCount()."), d.Linha);
     }
 
     Objeto NovoAnuncio(RadioBle radio)
@@ -200,7 +198,7 @@ public partial class Interpretador
             case "BLERemoteService": return ChamarServicoRemotoBle(obj, metodo, c, amb);
             case "BLERemoteCharacteristic": return ChamarCaracteristicaRemotaBle(obj, metodo, c, amb);
         }
-        throw new ErroDeExecucao($"{obj.Classe}::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("{0}::{1}() ainda nao e suportado pelo simulador.", obj.Classe, metodo), c.Linha);
     }
 
     Valor ChamarScanBle(EstadoScanBle scan, string metodo, Chamada c, Ambiente amb)
@@ -256,7 +254,7 @@ public partial class Interpretador
             case "clearDuplicateCache": case "dump":
                 return Valor.Vazio;
         }
-        throw new ErroDeExecucao($"BLEScan::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("BLEScan::{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     Valor ChamarResultadosBle(EstadoScanBle scan, string metodo, Chamada c, Ambiente amb)
@@ -278,7 +276,7 @@ public partial class Interpretador
                     if (o.Rede is AnuncioVisto v) Escrever(TextoDoAnuncio(v), true);
                 return Valor.Vazio;
         }
-        throw new ErroDeExecucao($"BLEScanResults::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("BLEScanResults::{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     /// <summary>O toString() do BLEAdvertisedDevice, na ordem do BLEAdvertisedDevice.cpp.</summary>
@@ -331,7 +329,7 @@ public partial class Interpretador
             case "getAddressType": return Valor.DeInt(0);
             case "toString": return Valor.DeTexto(TextoDoAnuncio(v));
         }
-        throw new ErroDeExecucao($"BLEAdvertisedDevice::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("BLEAdvertisedDevice::{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     static string EnderecoDoValor(Valor v) => v.Referencia is Objeto { Classe: "BLEAddress" } a ? a.Texto ?? "" : v.Mostrar();
@@ -419,7 +417,7 @@ public partial class Interpretador
             case "toString":
                 return Valor.DeTexto($"peer address: {conexao?.Servidor.Endereco ?? "00:00:00:00:00:00"}");
         }
-        throw new ErroDeExecucao($"BLEClient::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("BLEClient::{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     static CaracteristicaBle AcharCaracteristicaRemota(ConexaoBle conexao, string servico, string caracteristica)
@@ -462,7 +460,7 @@ public partial class Interpretador
             case "getHandle": return Valor.DeInt(40);
             case "toString": return Valor.DeTexto($"Service: uuid: {estado.Servico?.Uuid}");
         }
-        throw new ErroDeExecucao($"BLERemoteService::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("BLERemoteService::{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     /// <summary>O mesmo objeto para a mesma caracteristica da mesma conexao: o callback de notificacao fica nele.</summary>
@@ -591,7 +589,7 @@ public partial class Interpretador
                 return Valor.DeTexto($"Characteristic: uuid: {car?.Uuid}, handle: {42 + (car?.Servico.Caracteristicas.IndexOf(car) ?? 0) * 2}");
             case "setAuth": return Valor.Vazio;
         }
-        throw new ErroDeExecucao($"BLERemoteCharacteristic::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("BLERemoteCharacteristic::{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     byte[] LerRemota(EstadoRemotoBle estado)

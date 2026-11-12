@@ -101,7 +101,7 @@ public partial class Interpretador
                 return Valor.DeBool((crc & 0xFF) == invertido[0] && crc >> 8 == invertido[1]);
             }
         }
-        throw new ErroDeExecucao($"OneWire::{metodo}() ainda nao e suportado", chamada?.Linha ?? 0);
+        throw new ErroDeExecucao(Idioma.T("OneWire::{0}() ainda nao e suportado", metodo), chamada?.Linha ?? 0);
     }
 
     /// <summary>O search() da OneWire: a proxima ROM do fio, pelo algoritmo da nota de aplicacao 187 da Maxim.</summary>
@@ -199,7 +199,7 @@ public partial class Interpretador
             case "check_crc16":
                 return ContasDoUmFio(metodo, args, chamada, amb);
         }
-        throw new ErroDeExecucao($"OneWire.{metodo}() ainda nao e suportado", 0);
+        throw new ErroDeExecucao(Idioma.T("OneWire.{0}() ainda nao e suportado", metodo), 0);
     }
 
     // =====================================================================
@@ -332,6 +332,6 @@ public partial class Interpretador
             case "toFahrenheit": return Valor.DeReal(args.Count > 0 ? args[0].Num * 1.8 + 32 : 32);
             case "toCelsius": return Valor.DeReal(args.Count > 0 ? (args[0].Num - 32) / 1.8 : 0);
         }
-        throw new ErroDeExecucao($"DallasTemperature.{metodo}() ainda nao e suportado", 0);
+        throw new ErroDeExecucao(Idioma.T("DallasTemperature.{0}() ainda nao e suportado", metodo), 0);
     }
 }

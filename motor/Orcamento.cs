@@ -32,21 +32,16 @@ public readonly record struct Orcamento(PerfilPlaca Placa, int Ram, int Flash)
 
     /// <summary>As duas linhas que a IDE imprime depois de compilar.</summary>
     public string EmTexto()
-        => $"programa: {Flash:N0} bytes ({UsoDoFlash:P0}) de {Placa.FlashBytes:N0} de flash"
-           + Environment.NewLine
-           + $"variáveis: {Ram:N0} bytes ({UsoDaRam:P0}) de {Placa.RamBytes:N0} de RAM"
-           + $" — restam {Math.Max(0, Placa.RamBytes - Ram):N0}";
+        => Idioma.T("programa: {0:N0} bytes ({1:P0}) de {2:N0} de flash{3}variáveis: {4:N0} bytes ({5:P0}) de {6:N0} de RAM — restam {7:N0}", Flash, UsoDoFlash, Placa.FlashBytes, Environment.NewLine, Ram, UsoDaRam, Placa.RamBytes, Math.Max(0, Placa.RamBytes - Ram));
 
     /// <summary>O motivo de não caber, ou null.</summary>
     public string PorQueNaoCabe()
     {
         if (RamEstourou)
-            return $"as variáveis do sketch ocupam {Ram:N0} bytes e a {Placa.Nome} "
-                   + $"só tem {Placa.RamBytes:N0} de RAM.";
+            return Idioma.T("as variáveis do sketch ocupam {0:N0} bytes e a {1} só tem {2:N0} de RAM.", Ram, Placa.Nome, Placa.RamBytes);
 
         if (FlashEstourou)
-            return $"o programa ocupa {Flash:N0} bytes e só cabem {Placa.FlashBytes:N0} "
-                   + $"na flash da {Placa.Nome}.";
+            return Idioma.T("o programa ocupa {0:N0} bytes e só cabem {1:N0} na flash da {2}.", Flash, Placa.FlashBytes, Placa.Nome);
 
         return null;
     }

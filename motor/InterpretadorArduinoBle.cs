@@ -125,11 +125,10 @@ public partial class Interpretador
         if (id.StartsWith("esp32", StringComparison.Ordinal))
         {
             if (ModuloNativo.Chip(id) == "esp32s2")
-                throw new ErroDeExecucao($"{oque}: a ESP32-S2 nao tem Bluetooth -- a ArduinoBLE nem inicia nela.", linha);
+                throw new ErroDeExecucao(Idioma.T("{0}: a ESP32-S2 nao tem Bluetooth -- a ArduinoBLE nem inicia nela.", oque), linha);
             return;
         }
-        throw new ErroDeExecucao($"{oque}: a ArduinoBLE precisa de um radio BLE, e a {Maq.Perfil?.Nome ?? id} nao tem. "
-                                 + "No simulador ela roda na Nano RP2040 Connect e nas ESP32.", linha);
+        throw new ErroDeExecucao(Idioma.T("{0}: a ArduinoBLE precisa de um radio BLE, e a {1} nao tem. No simulador ela roda na Nano RP2040 Connect e nas ESP32.", oque, Maq.Perfil?.Nome ?? id), linha);
     }
 
     // =====================================================================
@@ -388,7 +387,7 @@ public partial class Interpretador
                 return Valor.DeBool(true);
             case "paired": case "pairable": return Valor.DeBool(false);
         }
-        throw new ErroDeExecucao($"BLE.{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("BLE.{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     /// <summary>
@@ -539,9 +538,9 @@ public partial class Interpretador
                 "uuid" => Valor.DeTexto(desc.Uuid),
                 "value" => Valor.DeTexto(desc.Texto ?? ""),
                 "valueLength" or "valueSize" => Valor.DeInt(TextoArduino.ParaBytes(desc.Texto ?? "").Length),
-                _ => throw new ErroDeExecucao($"BLEDescriptor::{metodo}() ainda nao e suportado pelo simulador.", c.Linha),
+                _ => throw new ErroDeExecucao(Idioma.T("BLEDescriptor::{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha),
             },
-            _ => throw new ErroDeExecucao($"{obj.Classe}::{metodo}() ainda nao e suportado pelo simulador.", c.Linha),
+            _ => throw new ErroDeExecucao(Idioma.T("{0}::{1}() ainda nao e suportado pelo simulador.", obj.Classe, metodo), c.Linha),
         };
     }
 
@@ -619,7 +618,7 @@ public partial class Interpretador
                 return Valor.DeReferencia(RemotaArduino(d.Conexao, car));
             }
         }
-        throw new ErroDeExecucao($"BLEDevice::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("BLEDevice::{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     /// <summary>A mesma caracteristica remota para a mesma conexao: o valor e o evento dela ficam no objeto.</summary>
@@ -669,7 +668,7 @@ public partial class Interpretador
             }
             case "clear": return Valor.Vazio;
         }
-        throw new ErroDeExecucao($"BLEService::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("BLEService::{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 
     Valor ChamarCaracteristicaArduino(Objeto obj, CaracteristicaArduino car, string metodo, Chamada c, Ambiente amb)
@@ -834,7 +833,7 @@ public partial class Interpretador
             case "descriptorCount": return Valor.DeInt(0);
             case "hasDescriptor": return Valor.DeBool(false);
         }
-        throw new ErroDeExecucao($"{obj.Classe}::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("{0}::{1}() ainda nao e suportado pelo simulador.", obj.Classe, metodo), c.Linha);
     }
 
     /// <summary>O valor de agora: o da caracteristica local, ou o ultimo que chegou da remota.</summary>

@@ -18,7 +18,7 @@ public sealed partial class Rede
     public void AnunciarMdns(Maquina placa, string nome)
     {
         lock (trava) nomesMdns[placa] = (nome ?? "").Trim().ToLowerInvariant();
-        Anotar(placa, "mdns", $"responde por {nome}.local");
+        Anotar(placa, "mdns", Idioma.T("responde por {0}.local", nome));
     }
 
     public void PararMdns(Maquina placa)
@@ -43,7 +43,7 @@ public sealed partial class Rede
             lista.RemoveAll(s => s.Servico == servico && s.Protocolo == protocolo);
             lista.Add((servico, protocolo, porta));
         }
-        Anotar(placa, "mdns", $"anuncia _{servico}._{protocolo} na porta {porta}");
+        Anotar(placa, "mdns", Idioma.T("anuncia _{0}._{1} na porta {2}", servico, protocolo, porta));
     }
 
     /// <summary>MDNS.queryService: as placas da bancada (na rede) que anunciam o servico -- nome, IP e porta.</summary>
@@ -102,10 +102,10 @@ public sealed partial class Rede
             if (porta == 123) return Gateway;
             if (paraOBroker)
             {
-                Anotar(origem, "mqtt", $"{host}: sem internet -- o broker interno do simulador atende no lugar dele");
+                Anotar(origem, "mqtt", Idioma.T("{0}: sem internet -- o broker interno do simulador atende no lugar dele", host));
                 return EnderecoDoBrokerInterno;
             }
-            Anotar(origem, "dns", $"{host}: sem internet (menu ⋮ > Rede usa a internet do computador)");
+            Anotar(origem, "dns", Idioma.T("{0}: sem internet (menu ⋮ > Rede usa a internet do computador)", host));
             return null;
         }
         try
@@ -116,10 +116,10 @@ public sealed partial class Rede
         {
             if (paraOBroker)
             {
-                Anotar(origem, "mqtt", $"{host}: o nome nao resolveu -- o broker interno do simulador atende no lugar dele");
+                Anotar(origem, "mqtt", Idioma.T("{0}: o nome nao resolveu -- o broker interno do simulador atende no lugar dele", host));
                 return EnderecoDoBrokerInterno;
             }
-            Anotar(origem, "dns", $"{host}: o nome nao existe");
+            Anotar(origem, "dns", Idioma.T("{0}: o nome nao existe", host));
             return null;
         }
     }

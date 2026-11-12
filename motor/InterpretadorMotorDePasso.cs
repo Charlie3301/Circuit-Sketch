@@ -74,6 +74,6 @@ public partial class Interpretador
 
             case "version": return Valor.DeInt(5);
         }
-        throw new ErroDeExecucao($"Stepper::{metodo}() ainda nao e suportado pelo simulador.", c.Linha);
+        throw new ErroDeExecucao(Idioma.T("Stepper::{0}() ainda nao e suportado pelo simulador.", metodo), c.Linha);
     }
 }

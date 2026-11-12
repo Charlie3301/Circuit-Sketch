@@ -170,7 +170,7 @@ namespace Iot.Device.Hcsr04
             return us > 0;
         }
 
-        public UnitsNet.Length Distance => TryGetDistance(out var d) ? d : throw new InvalidOperationException("o eco nao voltou");
+        public UnitsNet.Length Distance => TryGetDistance(out var d) ? d : throw new InvalidOperationException(Idioma.T("o eco nao voltou"));
 
         public void Dispose() { }
     }

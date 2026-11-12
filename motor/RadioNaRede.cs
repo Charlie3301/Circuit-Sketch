@@ -39,14 +39,14 @@ public sealed partial class Rede
             lock (trava)
             {
                 alvo.Caixa.Enqueue(carga);
-                alvo.UltimoRemetente = quem.Dona?.Nome ?? "placa";
+                alvo.UltimoRemetente = quem.Dona?.Nome ?? Idioma.T("placa");
                 while (alvo.Caixa.Count > 32) alvo.Caixa.Dequeue();
             }
 
         Anotar(quem.Dona, "radio",
             alvos.Count > 0
-                ? $"nRF24 enviou \"{Curto(carga, 40)}\" em {quem.Escrita} · {alvos.Count} ouvindo"
-                : $"nRF24 enviou \"{Curto(carga, 40)}\" em {quem.Escrita} · ninguem ouvindo");
+                ? Idioma.T("nRF24 enviou \"{0}\" em {1} · {2} ouvindo", Curto(carga, 40), quem.Escrita, alvos.Count)
+                : Idioma.T("nRF24 enviou \"{0}\" em {1} · ninguem ouvindo", Curto(carga, 40), quem.Escrita));
 
         return alvos.Count > 0;
     }
@@ -98,8 +98,8 @@ public sealed partial class Rede
 
         Anotar(quem.Dona, "esp-now",
             alvos.Count > 0
-                ? $"enviou para {destino} · {alvos.Count} placa(s)"
-                : $"enviou para {destino} · nenhuma placa recebeu");
+                ? Idioma.T("enviou para {0} · {1} placa(s)", destino, alvos.Count)
+                : Idioma.T("enviou para {0} · nenhuma placa recebeu", destino));
 
         return alvos.Count;
     }

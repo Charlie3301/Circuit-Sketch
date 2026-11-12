@@ -117,7 +117,7 @@ public partial class Interpretador
         if (ModulosPy.NomesDe(modulo).Contains(caminho.Split('.')[0]))
             return Valor.DeReferencia(new MembroDeModuloPy(modulo, caminho));
 
-        throw new ErroDeExecucao($"'{modulo}.{caminho}' nao existe no simulador", linha);
+        throw new ErroDeExecucao(Idioma.T("'{0}.{1}' nao existe no simulador", modulo, caminho), linha);
     }
 
     // =====================================================================
@@ -259,7 +259,7 @@ public partial class Interpretador
             case "esp": return Valor.Vazio;
             case "rp2":
                 if (maq.Perfil?.Id is not ("pi-pico" or "pi-pico-w"))
-                    throw new ErroDeExecucao($"o modulo rp2 e o do RP2040 (Raspberry Pi Pico): na {maq.Perfil?.Nome} ele nao existe.", linha);
+                    throw new ErroDeExecucao(Idioma.T("o modulo rp2 e o do RP2040 (Raspberry Pi Pico): na {0} ele nao existe.", maq.Perfil?.Nome), linha);
                 return Valor.DeInt(maq.BootselApertado ? 1 : 0);
 
             case "sys":
@@ -277,11 +277,10 @@ public partial class Interpretador
 
             case "urequests":
                 throw new ErroDeExecucao(
-                    "urequests ainda nao e suportado. Para falar HTTP a partir do "
-                    + "sketch, use o MQTT ou o servidor web.", linha);
+                    Idioma.T("urequests ainda nao e suportado. Para falar HTTP a partir do sketch, use o MQTT ou o servidor web."), linha);
         }
 
-        throw new ErroDeExecucao($"'{modulo}.{nome}()' ainda nao e suportado", linha);
+        throw new ErroDeExecucao(Idioma.T("'{0}.{1}()' ainda nao e suportado", modulo, nome), linha);
     }
 
     // =====================================================================
@@ -314,7 +313,7 @@ public partial class Interpretador
                 return Valor.Vazio;
         }
 
-        throw new ErroDeExecucao($"machine.{nome}() ainda nao e suportado", linha);
+        throw new ErroDeExecucao(Idioma.T("machine.{0}() ainda nao e suportado", nome), linha);
     }
 
     /// <summary>
@@ -327,7 +326,7 @@ public partial class Interpretador
     Valor NovoPino(List<Valor> args, Dictionary<string, Valor> nomeados, int linha)
     {
         if (args.Count == 0)
-            throw new ErroDeExecucao("Pin() precisa do numero do pino", linha);
+            throw new ErroDeExecucao(Idioma.T("Pin() precisa do numero do pino"), linha);
 
         int pino = NumeroDePino(args[0], linha);
         var objeto = new Objeto("Pin") { Pino = pino };
@@ -363,7 +362,7 @@ public partial class Interpretador
     {
         if (v.Referencia is Objeto o && o.Pino >= 0) return o.Pino;
         if (v.Referencia is not null)
-            throw new ErroDeExecucao("esperava o numero de um pino aqui", linha);
+            throw new ErroDeExecucao(Idioma.T("esperava o numero de um pino aqui"), linha);
 
         // Pin("LED") e o LED da placa -- na Pico W e o unico jeito de
         // chegar nele, porque ele fica no radio e nao num GPIO. "GP15"
@@ -374,7 +373,7 @@ public partial class Interpretador
             if (nome.Equals("LED", StringComparison.OrdinalIgnoreCase)) return Maq.Perfil.LedInterno;
             int daPlaca = Maq.Perfil.Numero(nome);
             if (daPlaca >= 0) return daPlaca;
-            throw new ErroDeExecucao($"o pino \"{nome}\" nao existe nesta placa", linha);
+            throw new ErroDeExecucao(Idioma.T("o pino \"{0}\" nao existe nesta placa", nome), linha);
         }
         return (int)v.Num;
     }
@@ -389,7 +388,7 @@ public partial class Interpretador
     /// </summary>
     Valor NovoAdc(List<Valor> args, int linha)
     {
-        if (args.Count == 0) throw new ErroDeExecucao("ADC() precisa do pino ou do canal", linha);
+        if (args.Count == 0) throw new ErroDeExecucao(Idioma.T("ADC() precisa do pino ou do canal"), linha);
 
         var objeto = new Objeto("ADC");
         bool numeroCru = args[0].Referencia is null && !args[0].EhTexto;
@@ -474,7 +473,7 @@ public partial class Interpretador
     {
         if (args.Count < 2)
             throw new ErroDeExecucao(
-                "NeoPixel() precisa do pino e de quantos LEDs tem a fita", linha);
+                Idioma.T("NeoPixel() precisa do pino e de quantos LEDs tem a fita"), linha);
 
         int pino = NumeroDePino(args[0], linha);
         var objeto = new Objeto("NeoPixel")
@@ -549,7 +548,7 @@ public partial class Interpretador
             }
         }
 
-        throw new ErroDeExecucao($"time.{nome}() ainda nao e suportado", linha);
+        throw new ErroDeExecucao(Idioma.T("time.{0}() ainda nao e suportado", nome), linha);
     }
 
     void Dormir(long ms)
@@ -570,7 +569,7 @@ public partial class Interpretador
     Valor DoRede(string nome, List<Valor> args, int linha)
     {
         if (nome != "WLAN")
-            throw new ErroDeExecucao($"network.{nome}() ainda nao e suportado", linha);
+            throw new ErroDeExecucao(Idioma.T("network.{0}() ainda nao e suportado", nome), linha);
 
         var objeto = new Objeto("WLAN");
         objeto.Campos["modo"] = args.Count > 0 ? args[0] : Valor.DeInt(0);
@@ -582,12 +581,12 @@ public partial class Interpretador
     // =====================================================================
     Valor DoJson(string nome, List<Valor> args, int linha)
     {
-        if (args.Count == 0) throw new ErroDeExecucao($"json.{nome}() precisa de um argumento", linha);
+        if (args.Count == 0) throw new ErroDeExecucao(Idioma.T("json.{0}() precisa de um argumento", nome), linha);
 
         if (nome == "dumps") return Valor.DeTexto(ParaJson(args[0]));
         if (nome == "loads") return DeJson(args[0].Mostrar(), linha);
 
-        throw new ErroDeExecucao($"json.{nome}() ainda nao e suportado", linha);
+        throw new ErroDeExecucao(Idioma.T("json.{0}() ainda nao e suportado", nome), linha);
     }
 
     static string ParaJson(Valor v) => v.Referencia switch
@@ -680,7 +679,7 @@ public partial class Interpretador
                             System.Globalization.CultureInfo.InvariantCulture, out double n))
             return bruto.Contains('.') ? Valor.DeReal(n) : Valor.DeInt(n);
 
-        throw new ErroDeExecucao($"'{bruto}' nao e um valor de JSON", linha);
+        throw new ErroDeExecucao(Idioma.T("'{0}' nao e um valor de JSON", bruto), linha);
     }
 
     Valor DoMatematica(string nome, List<Valor> args, int linha)
@@ -707,7 +706,7 @@ public partial class Interpretador
             "fmod" => Valor.DeReal(Math.IEEERemainder(A(0), A(1))),
             "radians" => Valor.DeReal(A(0) * Math.PI / 180),
             "degrees" => Valor.DeReal(A(0) * 180 / Math.PI),
-            _ => throw new ErroDeExecucao($"math.{nome}() ainda nao e suportado", linha)
+            _ => throw new ErroDeExecucao(Idioma.T("math.{0}() ainda nao e suportado", nome), linha)
         };
     }
 
@@ -740,9 +739,9 @@ public partial class Interpretador
             case "choice":
                 if (args.Count > 0 && args[0].Referencia is ListaPy l && l.Itens.Count > 0)
                     return l.Itens[sorteio.Next(l.Itens.Count)];
-                throw new ErroDeExecucao("random.choice() precisa de uma lista com itens", linha);
+                throw new ErroDeExecucao(Idioma.T("random.choice() precisa de uma lista com itens"), linha);
         }
 
-        throw new ErroDeExecucao($"random.{nome}() ainda nao e suportado", linha);
+        throw new ErroDeExecucao(Idioma.T("random.{0}() ainda nao e suportado", nome), linha);
     }
 }

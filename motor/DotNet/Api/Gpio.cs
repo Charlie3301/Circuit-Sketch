@@ -142,7 +142,7 @@ namespace System.Device.Gpio
 
         public GpioPin OpenPin(int pinNumber, PinMode mode)
         {
-            if (abertos.ContainsKey(pinNumber)) throw new InvalidOperationException($"o pino {pinNumber} ja esta aberto");
+            if (abertos.ContainsKey(pinNumber)) throw new InvalidOperationException(Idioma.T("o pino {0} ja esta aberto", pinNumber));
             var p = new GpioPin(this, pinNumber, mode);
             abertos[pinNumber] = p;
             Ponte.C(null, "pinMode", pinNumber, ModoDoArduino(mode));

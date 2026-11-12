@@ -112,7 +112,7 @@ public partial class Interpretador
                 case ">=": return Valor.DeC(a >= b ? 1 : 0, TipoC.Bool);
                 case "%": case "&": case "|": case "^":
                     throw OperandosInvalidos(op, tx, ty, linha);
-                default: throw new ErroDeExecucao($"operador '{op}' nao suportado", linha);
+                default: throw new ErroDeExecucao(Idioma.T("operador '{0}' nao suportado", op), linha);
             }
         }
 
@@ -143,7 +143,7 @@ public partial class Interpretador
             case ">": return Valor.DeC((u64 ? (ulong)la > (ulong)lb : la > lb) ? 1 : 0, TipoC.Bool);
             case "<=": return Valor.DeC((u64 ? (ulong)la <= (ulong)lb : la <= lb) ? 1 : 0, TipoC.Bool);
             case ">=": return Valor.DeC((u64 ? (ulong)la >= (ulong)lb : la >= lb) ? 1 : 0, TipoC.Bool);
-            default: throw new ErroDeExecucao($"operador '{op}' nao suportado", linha);
+            default: throw new ErroDeExecucao(Idioma.T("operador '{0}' nao suportado", op), linha);
         }
         return Inteiro(res, tc);
     }
@@ -165,10 +165,8 @@ public partial class Interpretador
     }
 
     ErroDeExecucao OperandosInvalidos(string op, TipoC a, TipoC b, int linha)
-        => new($"invalid operands of types '{ModeloC.NomeNoCompilador(a)}' and "
-               + $"'{ModeloC.NomeNoCompilador(b)}' to binary 'operator{op}': o compilador recusa "
-               + (op == "%" ? "o '%' com real -- ele e so para inteiros (para real existe o fmod())."
-                            : $"o '{op}' com real -- ele e so para inteiros."), linha);
+        => new(Idioma.T("invalid operands of types '{0}' and '{1}' to binary 'operator{2}': o compilador recusa {3}", ModeloC.NomeNoCompilador(a), ModeloC.NomeNoCompilador(b), op, (op == "%" ? Idioma.T("o '%' com real -- ele e so para inteiros (para real existe o fmod()).")
+                            : Idioma.T("o '{0}' com real -- ele e so para inteiros.", op))), linha);
 
     /// <summary>
     /// "-x", "~x" e "+x": o operando e promovido (um byte vira int) e o
@@ -182,8 +180,7 @@ public partial class Interpretador
         if (TiposC.EhReal(t))
         {
             if (op == "~")
-                throw new ErroDeExecucao($"wrong type argument to bit-complement: o '~' do C e so para inteiros, "
-                                         + $"e este valor e {m.NomeNoCompilador(t)}.", linha);
+                throw new ErroDeExecucao(Idioma.T("wrong type argument to bit-complement: o '~' do C e so para inteiros, e este valor e {0}.", m.NomeNoCompilador(t)), linha);
             return Valor.DeC(m.Converter(op == "-" ? -x.Num : x.Num, t), t);
         }
         var p = m.Promover(t);
@@ -281,8 +278,7 @@ public partial class Interpretador
             Escrever("", true);
             Escrever("Rebooting...", true);
         }
-        maq.Avisar($"{Origens.Onde(linha)}: divisao inteira por zero. No {maq.Perfil?.Processador} isso e uma "
-                   + "excecao do processador, e a placa reinicia -- o mesmo acontece na bancada.");
+        maq.Avisar(Idioma.T("{0}: divisao inteira por zero. No {1} isso e uma excecao do processador, e a placa reinicia -- o mesmo acontece na bancada.", Origens.Onde(linha), maq.Perfil?.Processador));
         throw Reiniciar(ReinicioDaPlaca.PeloPanico, 0, 0);
     }
 
@@ -327,9 +323,7 @@ public partial class Interpretador
                 TipoC ta = T(0), tb = T(1);
                 if (m.MinMaxDoStd && args[0].Tipo != TipoC.Nenhum && args[1].Tipo != TipoC.Nenhum && ta != tb)
                     throw new ErroDeExecucao(
-                        $"no matching function for call to '{nome}({m.NomeNoCompilador(ta)}, {m.NomeNoCompilador(tb)})': "
-                        + $"no core da {maq.Perfil.Processador} o {nome}() e o std::{nome}, que exige os dois do MESMO "
-                        + $"tipo -- nao compila. Converta um deles, como em {nome}((long)a, b).", linha);
+                        Idioma.T("no matching function for call to '{0}({1}, {2})': no core da {3} o {4}() e o std::{5}, que exige os dois do MESMO tipo -- nao compila. Converta um deles, como em {6}((long)a, b).", nome, m.NomeNoCompilador(ta), m.NomeNoCompilador(tb), maq.Perfil.Processador, nome, nome, nome), linha);
                 var tc = m.Comum(ta, tb);
                 double a = m.Converter(A(0), tc), b = m.Converter(A(1), tc);
                 return Valor.DeC(nome == "min" ? Math.Min(a, b) : Math.Max(a, b), tc);

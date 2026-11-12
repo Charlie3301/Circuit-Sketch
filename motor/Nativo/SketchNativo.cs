@@ -145,7 +145,7 @@ public sealed unsafe class SketchNativo : ISketchCompilado
         modulo = NativeLibrary.Load(copia);
 
         IntPtr Exigir(string nome) => NativeLibrary.TryGetExport(modulo, nome, out IntPtr p) ? p
-            : throw new ErroDeExecucao($"o sketch compilado nao tem '{nome}' (o core nativo e de outra versao).", 0);
+            : throw new ErroDeExecucao(Idioma.T("o sketch compilado nao tem '{0}' (o core nativo e de outra versao).", nome), 0);
 
         var iniciar = (delegate* unmanaged<Ponte*, int>)Exigir("cs_iniciar");
         entrar = (delegate* unmanaged<int, int, int, Val*, int>)Exigir("cs_entrar");
@@ -174,7 +174,7 @@ public sealed unsafe class SketchNativo : ISketchCompilado
         ponte->Ctx = GCHandle.ToIntPtr(alca);
         ponte->Chamar = (IntPtr)(delegate* unmanaged<IntPtr, byte*, byte*, int, Val*, Val*, int>)&Chamar;
         ponte->Micros = (IntPtr)(delegate* unmanaged<IntPtr, long>)&Micros;
-        if (iniciar(ponte) != 0) throw new ErroDeExecucao("o sketch compilado e de outra versao da ponte.", 0);
+        if (iniciar(ponte) != 0) throw new ErroDeExecucao(Idioma.T("o sketch compilado e de outra versao da ponte."), 0);
         ulong f;
         inicio = medir(&f);
         fim = f;
@@ -358,8 +358,8 @@ public sealed unsafe class SketchNativo : ISketchCompilado
         uint codigo = descreverFalha(buf, 300);
         string texto = Marshal.PtrToStringUTF8((IntPtr)buf) ?? "falha";
         if (codigo == 0xC00000FD) refazerGuarda();
-        string onde = qual switch { 0 => "no setup()", 1 => "no loop()", 2 => "na rotina de interrupcao", 4 => "na interrupcao do timer", _ => "nas globais" };
-        throw new ErroDeExecucao($"o programa travou {onde}: {texto}.", 0);
+        string onde = qual switch { 0 => Idioma.T("no setup()"), 1 => Idioma.T("no loop()"), 2 => Idioma.T("na rotina de interrupcao"), 4 => Idioma.T("na interrupcao do timer"), _ => Idioma.T("nas globais") };
+        throw new ErroDeExecucao(Idioma.T("o programa travou {0}: {1}.", onde, texto), 0);
     }
 
     byte* Secao(string nome, out uint tamanho)
@@ -657,7 +657,7 @@ public sealed unsafe class SketchNativo : ISketchCompilado
         // memoria fica, para nao soltar o codigo debaixo dela.
         if (Volatile.Read(ref estado) != 0)
         {
-            maq.Avisar("modo nativo: o sketch nao parou; a memoria dele fica presa ate fechar o simulador.");
+            maq.Avisar(Idioma.T("modo nativo: o sketch nao parou; a memoria dele fica presa ate fechar o simulador."));
             return;
         }
         depuracao?.Desligar();
