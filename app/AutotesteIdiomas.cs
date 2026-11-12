@@ -280,9 +280,10 @@ public static partial class Autoteste
             Erro("ArduinoOTA.begin();"), Erro("Serial.voar();"), Erro("int m[2][2] = {{1, 2, 3}};"),
         };
         var emPortugues = erros.Where(PareceComPortugues).ToList();
-        string linha = Idioma.T("linha {0}", "");
+        // "linha 3" vira "line 3", mas tambem "第 3 行": o numero pode ficar no meio.
+        var linha = new Regex("^" + Regex.Escape(Idioma.T("linha {0}", "\u0001")).Replace("\u0001", @"\d+"));
         Conferir($"idiomas: em {lingua} os erros do C++ do interpretador saem traduzidos",
-            emPortugues.Count == 0 && erros.All(e => !string.IsNullOrEmpty(e)) && erros.Any(e => e.StartsWith(linha, StringComparison.Ordinal)),
+            emPortugues.Count == 0 && erros.All(e => !string.IsNullOrEmpty(e)) && erros.Any(e => linha.IsMatch(e)),
             string.Join(" | ", emPortugues.Count > 0 ? emPortugues : erros));
 
         // O caminho de volta, frase por frase: a traducao montada com valores
@@ -306,7 +307,7 @@ public static partial class Autoteste
             try { montada = string.Format(en, valores); esperada = string.Format(pt, valores); }
             catch (FormatException) { semVolta.Add("(formato) " + pt); continue; }
             // A que e quase so marca ("{0}: {1}") casaria com qualquer coisa: o Desfazer nem tenta.
-            if (marca.Replace(en, "").Replace("{{", "{").Replace("}}", "}").Trim().Length < 4) continue;
+            if (marca.Replace(en, "\u0001").Replace("{{", "{").Replace("}}", "}").Split('\u0001').Sum(Idioma.PesoDoFixo) < 4) continue;
             conferidas++;
             if (Idioma.Desfazer(montada) != esperada) semVolta.Add($"{montada} -> {Idioma.Desfazer(montada)}");
         }

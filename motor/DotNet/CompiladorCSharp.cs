@@ -138,7 +138,7 @@ public static class CompiladorCSharp
                      .ThenBy(e => e.Location.GetLineSpan().StartLinePosition.Line).First();
         var span = d.Location.GetLineSpan();
         int linha = span.StartLinePosition.Line + 1;
-        string mais = erros.Count > 1 ? Idioma.T(" (e mais {0} erro{1})", erros.Count - 1, (erros.Count > 2 ? "s" : "")) : "";
+        string mais = erros.Count switch { <= 1 => "", 2 => Idioma.T(" (e mais 1 erro)"), _ => Idioma.T(" (e mais {0} erros)", erros.Count - 1) };
         string texto = $"{d.Id}: {d.GetMessage(System.Globalization.CultureInfo.InvariantCulture)}{mais}";
         string arquivo = span.Path ?? "Program.cs";
         if (arquivo == "Program.cs" || !d.Location.IsInSource) return new ErroDeSintaxe(texto, d.Location.IsInSource ? linha : 0);

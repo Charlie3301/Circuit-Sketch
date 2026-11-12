@@ -264,7 +264,9 @@ public partial record PerfilPlaca(
         => Pares(("SDA", 18), ("SCL", 19), ("SS", 10), ("MOSI", 11), ("MISO", 12), ("SCK", 13));
 
     /// <summary>A ficha da placa numa linha, para o console.</summary>
-    public string Ficha => Idioma.T("{0} · {1} núcleo{2} · {3:0.#} MHz · {4:0.#} KB de RAM", Processador, Nucleos, (Nucleos == 1 ? "" : "s"), Megahertz, RamBytes / 1024.0);
+    public string Ficha => Nucleos == 1
+        ? Idioma.T("{0} · 1 núcleo · {1:0.#} MHz · {2:0.#} KB de RAM", Processador, Megahertz, RamBytes / 1024.0)
+        : Idioma.T("{0} · {1} núcleos · {2:0.#} MHz · {3:0.#} KB de RAM", Processador, Nucleos, Megahertz, RamBytes / 1024.0);
 
     // ---------------- ajudantes de nome ----------------
     /// <summary>Tira o sufixo de pad repetido: "13.2" e o mesmo que "13".</summary>

@@ -1543,7 +1543,7 @@ public static class CompiladorNativo
             return new ErroDeSintaxe(Idioma.T("o compilador de C++ recusou o programa: {0}", string.Join(" ", linhas.Take(6))), 0);
 
         var (arquivo, linha, texto) = erros[0];
-        string mais = erros.Count > 1 ? Idioma.T(" (e mais {0} erro{1})", erros.Count - 1, (erros.Count > 2 ? "s" : "")) : "";
+        string mais = erros.Count switch { <= 1 => "", 2 => Idioma.T(" (e mais 1 erro)"), _ => Idioma.T(" (e mais {0} erros)", erros.Count - 1) };
         if (arquivo.Equals("sketch.ino", StringComparison.OrdinalIgnoreCase))
             return new ErroDeSintaxe(texto + mais, linha);
         int codigo = Origens.Codificar(Origens.Registrar("nativo:" + arquivo, arquivo), linha);

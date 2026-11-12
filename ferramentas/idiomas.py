@@ -118,6 +118,8 @@ def marcas(texto):
 
 
 def main():
+    # O nome do idioma vai escrito nele mesmo (简体中文): o console do Windows nao e utf-8.
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
     args = sys.argv[1:]
     if args[:1] == ['--novo']:
         if len(args) != 4:

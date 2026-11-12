@@ -194,6 +194,18 @@ public partial class App : Application
         Idioma.Usar(!Armazem.Isolado ? Preferencias.Texto(Preferencias.Idioma, Idioma.Original)
                     : iIdioma >= 0 && iIdioma + 1 < e.Args.Length ? e.Args[iIdioma + 1] : Idioma.Original);
 
+        // O chines (e o japones e o coreano) tem os mesmos ideogramas com
+        // desenhos diferentes: o WPF escolhe a fonte de cada um pela lingua da
+        // tela, e sem dizer qual ele desenha o chines com a fonte japonesa.
+        // Nas outras linguas a tela fica como estava (a lingua tambem muda a
+        // virgula dos numeros nos bindings).
+        if (Idioma.Cultura.TwoLetterISOLanguageName is "zh" or "ja" or "ko")
+        {
+            var lingua = System.Windows.Markup.XmlLanguage.GetLanguage(Idioma.Cultura.IetfLanguageTag);
+            // Basta no FrameworkElement: o texto de dentro (Run, Paragraph) herda a lingua dele.
+            FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(lingua));
+        }
+
         DispatcherUnhandledException += (_, ev) =>
         {
             Registrar("DispatcherUnhandledException", ev.Exception);

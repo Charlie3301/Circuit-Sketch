@@ -96,14 +96,18 @@ public static class Idioma
         return catalogo.Textos.Values.Count(t => !string.IsNullOrEmpty(t)) / (double)catalogo.Textos.Count;
     }
 
-    /// <summary>O idioma do Windows, se houver catalogo para ele (senao, o original).</summary>
+    /// <summary>
+    /// O idioma do Windows, se houver catalogo para ele (senao, o original).
+    /// Sobe pela cultura mae: o Windows em zh-TW cai no zh-Hant, o zh-CN no
+    /// zh-Hans, o es-MX no es.
+    /// </summary>
     public static string DoSistema()
     {
-        var sistema = CultureInfo.InstalledUICulture;
         var codigos = Disponiveis().Select(d => d.Codigo).ToList();
-        return codigos.FirstOrDefault(c => c.Equals(sistema.Name, StringComparison.OrdinalIgnoreCase))
-               ?? codigos.FirstOrDefault(c => c.Equals(sistema.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
-               ?? Original;
+        for (var c = CultureInfo.InstalledUICulture; !string.IsNullOrEmpty(c.Name); c = c.Parent)
+            if (codigos.FirstOrDefault(d => d.Equals(c.Name, StringComparison.OrdinalIgnoreCase)) is { } achado)
+                return achado;
+        return Original;
     }
 
     /// <summary>A frase no idioma em uso (o portugues, se ainda nao foi traduzida).</summary>
@@ -142,15 +146,28 @@ public static class Idioma
         if (exatas.TryGetValue(texto, out string original)) resultado = original;
         else
         {
+            string reserva = null;
             foreach (var molde in moldes)
             {
                 var valores = new string[molde.Valores];
                 if (!Casar(molde, texto, valores)) continue;
                 var desfeitos = valores.Select(v => (object)Desfazer(v ?? "", fundo + 1)).ToArray();
-                try { resultado = string.Format(CultureInfo.InvariantCulture, molde.Original, desfeitos); }
+                string montado;
+                try { montado = string.Format(CultureInfo.InvariantCulture, molde.Original, desfeitos); }
                 catch (FormatException) { continue; }
+                // Valor com espaco na ponta e sinal de molde que engoliu o espaco
+                // de outra frase ("GPIO {0}" casando com "GPIO 2, 4 "): fica de
+                // reserva enquanto um molde mais justo ainda pode aparecer.
+                if (valores.Any(v => v is { Length: > 0 } && (char.IsWhiteSpace(v[0]) || char.IsWhiteSpace(v[^1]))))
+                {
+                    reserva ??= montado;
+                    continue;
+                }
+                resultado = montado;
+                reserva = null;
                 break;
             }
+            if (reserva is not null) resultado = reserva;
         }
         lock (voltas)
         {
@@ -198,6 +215,14 @@ public static class Idioma
     }
 
     /// <summary>
+    /// Quanto texto fixo um pedaco do molde tem. Um ideograma (chines,
+    /// japones, coreano) diz o que uma palavra curta diz: "第 {0} 行" e tao
+    /// especifico quanto "linha {0}", entao cada um conta como dois.
+    /// </summary>
+    public static int PesoDoFixo(string pedaco) => pedaco.Trim().Sum(c => c is >= '⺀' and <= '鿿' or >= '가' and <= '힯'
+                                                                              or >= '豈' and <= '﫿' or >= '＀' and <= '￯' ? 2 : 1);
+
+    /// <summary>
     /// Cada traducao com {0} vira um molde. Os de mais texto fixo vem primeiro
     /// (o mais especifico ganha), e o que e quase so marca ("{0}: {1}") fica
     /// de fora -- casaria com qualquer coisa.
@@ -230,7 +255,7 @@ public static class Idioma
             }
             atual.Append(traducao, fim, traducao.Length - fim);
             pedacos.Add(atual.ToString());
-            int fixo = pedacos.Sum(p => p.Trim().Length);
+            int fixo = pedacos.Sum(PesoDoFixo);
             // Duas marcas coladas ("{2}{2}") nao tem fronteira entre elas: fica de fora.
             if (marcas.Count == 0 || fixo < 4 || pedacos.Skip(1).SkipLast(1).Any(p => p.Length == 0)) continue;
             lista.Add(new Molde([.. pedacos], [.. marcas], marcas.Max() + 1, original, fixo));
