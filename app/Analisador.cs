@@ -185,7 +185,7 @@ public static class Analisador
 
         double inicio = onda[i].Us;
         double fim = i + 1 < onda.Count ? onda[i + 1].Us : ate;
-        var texto = new StringBuilder(onda[i].Nivel == 1 ? "ALTO " : "BAIXO ");
+        var texto = new StringBuilder(onda[i].Nivel == 1 ? Idioma.T("ALTO") : Idioma.T("BAIXO")).Append(' ');
         texto.Append(Tempo(fim - inicio));
 
         // Periodo: da subida anterior a seguinte, quando as duas estao na janela.

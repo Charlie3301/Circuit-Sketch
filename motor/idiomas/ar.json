@@ -288,6 +288,7 @@
   "Alimentação": "التغذية",
   "Alterações não salvas": "تغييرات غير محفوظة",
   "Alto": "مرتفع",
+  "ALTO": "مرتفع",
   "Alto-falante": "مكبّر صوت",
   "alto-falante direto no pino {0}: os 8 Ω pediriam uns {1:0} mA e a porta segura a corrente em {2:0} mA, no limite dela. O som sai fraco e a porta trabalha fora da faixa. Use um amplificador (o MAX98357A, pelo I2S, ou um transistor), ou pelo menos um resistor de 100 Ω em série.": "مكبّر الصوت مباشرة على الطرف {0}: الـ ‎8 Ω ستطلب نحو ‎{1:0} mA والطرف يحدّ التيار عند ‎{2:0} mA، عند حدّه. يخرج الصوت ضعيفًا ويعمل الطرف خارج نطاقه. استخدم مضخّمًا (MAX98357A، عبر I2S، أو ترانزستور)، أو على الأقل مقاومة ‎100 Ω على التوالي.",
   "alto-falante ligado direto no {0}: os 8 Ω puxam {1:0} mA, {2:0.#} W numa bobina de 0,5 W, e ela queima. O alto-falante vai na saída de um amplificador (o MAX98357A, pelo I2S)": "مكبّر الصوت موصول مباشرة بـ {0}: الـ ‎8 Ω تسحب ‎{1:0} mA، أي ‎{2:0.#} W في ملف ‎0.5 W، فيحترق. مكبّر الصوت يوصَل بمخرج مضخّم (MAX98357A، عبر I2S)",
@@ -385,6 +386,7 @@
   "Baixe pelo índice da Arduino (o botão abaixo), ou instale a pasta ou o .zip, como na Arduino IDE: o simulador passa a rodar o código C++ dela.": "نزّلها من فهرس Arduino ‏(الزر أدناه)، أو ثبّت المجلد أو ملف ‎.zip، كما في Arduino IDE: سيشغّل المحاكي كود C++ الخاص بها.",
   "Baixe pelo índice oficial da Arduino (o mesmo da Arduino IDE; a internet só é usada para isso), ou, se a biblioteca já está na Arduino IDE deste computador, copie daqui mesmo.": "نزّلها من فهرس Arduino الرسمي (نفسه في Arduino IDE؛ ولا يُستخدم الإنترنت إلا لذلك)، أو إن كانت المكتبة موجودة في Arduino IDE على هذا الحاسوب، انسخها من هنا مباشرة.",
   "Baixo": "منخفض",
+  "BAIXO": "منخفض",
   "Balança com HX711 e OLED": "ميزان بـ HX711 وOLED",
   "Barra de LEDs": "شريط LED",
   "Base": "الأساس",
@@ -505,7 +507,6 @@
   "chip \"{0}\" criado: edite {1} para os pinos e {2} para o comportamento.": "أُنشئت الشريحة \"{0}\": عدّل {1} للأطراف و{2} للسلوك.",
   "Chips": "الشرائح",
   "Chumbo 12 V": "رصاص ‎12 V",
-  "Cima": "أعلى",
   "Cinza": "رمادي",
   "Circuito": "الدائرة",
   "circuito importado: {0}": "استُورد الدائرة: {0}",
@@ -671,7 +672,6 @@
   "Direcional ↑": "الاتجاه ↑",
   "Direcional →": "الاتجاه →",
   "Direcional ↓": "الاتجاه ↓",
-  "Direita": "يمين",
   "Disco": "قرص",
   "Disco de telefone": "قرص هاتف دوّار",
   "Disparo na subida": "قدح عند الصعود",
@@ -803,7 +803,6 @@
   "esperava um nome, encontrei '{0}'": "كان متوقّعًا اسم، ووجدت '{0}'",
   "esperava uma declaracao ou funcao, encontrei '{0}'": "كان متوقّعًا تعريف أو دالة، ووجدت '{0}'",
   "Espessura": "السماكة",
-  "Esquerda": "يسار",
   "Esquerdo: ponta vermelha · direito ou Shift+clique: preta · arraste no vazio para andar · Esc tira as pontas": "الأيسر: المجس الأحمر · الأيمن أو Shift+نقر: الأسود · اسحب في الفراغ للتحرك · Esc يزيل المجسّات",
   "Essa pasta não tem nenhum arquivo .h, então não parece uma biblioteca do Arduino. Escolha a pasta que tem os .h (ou a src/ dentro dela).": "هذا المجلد لا يحتوي على أي ملف ‎.h، لذا لا يبدو مكتبة Arduino. اختر المجلد الذي يحتوي على ملفات ‎.h ‏(أو مجلد src/ داخله).",
   "esse nome não dá para usar em arquivo.": "لا يمكن استخدام هذا الاسم في ملف.",
@@ -1537,6 +1536,10 @@
   "pacote MQTT grande demais": "حزمة MQTT كبيرة جدًا",
   "painel não publicou em {0}: {1}": "اللوحة لم تنشر على {0}: {1}",
   "painel → {0}: {1}": "اللوحة → {0}: {1}",
+  "Para a direita": "يمين",
+  "Para a esquerda": "يسار",
+  "Para baixo": "أسفل",
+  "Para cima": "أعلى",
   "para compilar e mandar para a placa de verdade, instale a Arduino IDE 2 (arduino.cc/en/software) — o simulador usa o compilador que vem dentro dela": "للترجمة والإرسال إلى اللوحة الحقيقية، ثبّت Arduino IDE 2 ‏(arduino.cc/en/software) — المحاكي يستخدم المترجم المضمّن فيها",
   "para gravar num Uno:  avrdude -c arduino -p m328p -P COM3 -U flash:w:{0}:i": "للنسخ على Uno:  avrdude -c arduino -p m328p -P COM3 -U flash:w:{0}:i",
   "Para quem continua sempre de onde parou. Se o arquivo tiver sido apagado ou movido, volta a tela de abertura.": "لمن يتابع دائمًا من حيث توقّف. إن حُذف الملف أو نُقل، تعود شاشة الافتتاح.",
@@ -2224,5 +2227,10 @@
   "🔋 ligada": "🔋 تعمل",
   "🔋 {0:0.0} V no {1}": "🔋 ‎{0:0.0} V على {1}",
   "🔥 {0:0} °C · proteção térmica": "🔥 ‎{0:0} °C · حماية حرارية"
+ },
+ "_obsoletos": {
+  "Cima": "أعلى",
+  "Direita": "يمين",
+  "Esquerda": "يسار"
  }
 }

@@ -288,6 +288,7 @@
   "Alimentação": "Alimentation",
   "Alterações não salvas": "Modifications non enregistrées",
   "Alto": "Fort",
+  "ALTO": "HAUT",
   "Alto-falante": "Haut-parleur",
   "alto-falante direto no pino {0}: os 8 Ω pediriam uns {1:0} mA e a porta segura a corrente em {2:0} mA, no limite dela. O som sai fraco e a porta trabalha fora da faixa. Use um amplificador (o MAX98357A, pelo I2S, ou um transistor), ou pelo menos um resistor de 100 Ω em série.": "haut-parleur directement sur la broche {0} : les 8 Ω demanderaient environ {1:0} mA et la broche limite le courant à {2:0} mA, à sa limite. Le son sort faible et la broche travaille hors de sa plage. Utilisez un amplificateur (le MAX98357A, par I2S, ou un transistor), ou au moins une résistance de 100 Ω en série.",
   "alto-falante ligado direto no {0}: os 8 Ω puxam {1:0} mA, {2:0.#} W numa bobina de 0,5 W, e ela queima. O alto-falante vai na saída de um amplificador (o MAX98357A, pelo I2S)": "haut-parleur relié directement au {0} : les 8 Ω tirent {1:0} mA, {2:0.#} W dans une bobine de 0,5 W, et elle grille. Le haut-parleur va sur la sortie d'un amplificateur (le MAX98357A, par I2S)",
@@ -385,6 +386,7 @@
   "Baixe pelo índice da Arduino (o botão abaixo), ou instale a pasta ou o .zip, como na Arduino IDE: o simulador passa a rodar o código C++ dela.": "Téléchargez-les depuis l'index d'Arduino (le bouton ci-dessous), ou installez le dossier ou le .zip, comme dans l'Arduino IDE : le simulateur exécute ensuite leur code C++.",
   "Baixe pelo índice oficial da Arduino (o mesmo da Arduino IDE; a internet só é usada para isso), ou, se a biblioteca já está na Arduino IDE deste computador, copie daqui mesmo.": "Téléchargez-la depuis l'index officiel d'Arduino (le même que l'Arduino IDE ; internet ne sert qu'à cela), ou, si la bibliothèque est déjà dans l'Arduino IDE de cet ordinateur, copiez-la d'ici.",
   "Baixo": "Bas",
+  "BAIXO": "BAS",
   "Balança com HX711 e OLED": "Balance avec HX711 et OLED",
   "Barra de LEDs": "Barre de LED",
   "Base": "Base",
@@ -505,7 +507,6 @@
   "chip \"{0}\" criado: edite {1} para os pinos e {2} para o comportamento.": "puce \"{0}\" créée : modifiez {1} pour les broches et {2} pour le comportement.",
   "Chips": "Puces",
   "Chumbo 12 V": "Plomb 12 V",
-  "Cima": "Haut",
   "Cinza": "Gris",
   "Circuito": "Circuit",
   "circuito importado: {0}": "circuit importé : {0}",
@@ -671,7 +672,6 @@
   "Direcional ↑": "Croix ↑",
   "Direcional →": "Croix →",
   "Direcional ↓": "Croix ↓",
-  "Direita": "Droite",
   "Disco": "Disque",
   "Disco de telefone": "Cadran de téléphone",
   "Disparo na subida": "Déclenchement sur front montant",
@@ -803,7 +803,6 @@
   "esperava um nome, encontrei '{0}'": "un nom était attendu, '{0}' trouvé",
   "esperava uma declaracao ou funcao, encontrei '{0}'": "une déclaration ou une fonction était attendue, '{0}' trouvé",
   "Espessura": "Épaisseur",
-  "Esquerda": "Gauche",
   "Esquerdo: ponta vermelha · direito ou Shift+clique: preta · arraste no vazio para andar · Esc tira as pontas": "Gauche : pointe rouge · droit ou Shift+clic : noire · faites glisser dans le vide pour vous déplacer · Échap retire les pointes",
   "Essa pasta não tem nenhum arquivo .h, então não parece uma biblioteca do Arduino. Escolha a pasta que tem os .h (ou a src/ dentro dela).": "Ce dossier ne contient aucun fichier .h, il ne ressemble donc pas à une bibliothèque Arduino. Choisissez le dossier qui contient les .h (ou le src/ qu'il contient).",
   "esse nome não dá para usar em arquivo.": "ce nom ne peut pas servir de nom de fichier.",
@@ -1537,6 +1536,10 @@
   "pacote MQTT grande demais": "paquet MQTT trop gros",
   "painel não publicou em {0}: {1}": "le panneau n'a pas publié sur {0} : {1}",
   "painel → {0}: {1}": "panneau → {0} : {1}",
+  "Para a direita": "Droite",
+  "Para a esquerda": "Gauche",
+  "Para baixo": "Bas",
+  "Para cima": "Haut",
   "para compilar e mandar para a placa de verdade, instale a Arduino IDE 2 (arduino.cc/en/software) — o simulador usa o compilador que vem dentro dela": "pour compiler et envoyer à la vraie carte, installez l'Arduino IDE 2 (arduino.cc/en/software) — le simulateur utilise le compilateur qu'elle contient",
   "para gravar num Uno:  avrdude -c arduino -p m328p -P COM3 -U flash:w:{0}:i": "pour graver sur un Uno :  avrdude -c arduino -p m328p -P COM3 -U flash:w:{0}:i",
   "Para quem continua sempre de onde parou. Se o arquivo tiver sido apagado ou movido, volta a tela de abertura.": "Pour qui reprend toujours là où il s'est arrêté. Si le fichier a été supprimé ou déplacé, l'écran d'accueil revient.",
@@ -2224,5 +2227,10 @@
   "🔋 ligada": "🔋 allumée",
   "🔋 {0:0.0} V no {1}": "🔋 {0:0.0} V sur {1}",
   "🔥 {0:0} °C · proteção térmica": "🔥 {0:0} °C · protection thermique"
+ },
+ "_obsoletos": {
+  "Cima": "Haut",
+  "Direita": "Droite",
+  "Esquerda": "Gauche"
  }
 }

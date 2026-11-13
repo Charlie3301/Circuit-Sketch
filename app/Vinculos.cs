@@ -169,8 +169,8 @@ public static class Vinculos
 
         "analog-joystick" =>
         [
-            (Cima, Idioma.T("Cima")), (Baixo, Idioma.T("Baixo")), (Esquerda, Idioma.T("Esquerda")),
-            (Direita, Idioma.T("Direita")), (Apertar, Idioma.T("Apertar o manche")),
+            (Cima, Idioma.T("Para cima")), (Baixo, Idioma.T("Para baixo")), (Esquerda, Idioma.T("Para a esquerda")),
+            (Direita, Idioma.T("Para a direita")), (Apertar, Idioma.T("Apertar o manche")),
         ],
 
         "slide-switch" or "tilt-switch" or "pir-motion-sensor" => [(Alternar, Idioma.T("Ligar/desligar"))],

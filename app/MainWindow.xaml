@@ -670,7 +670,7 @@
                             <Button DockPanel.Dock="Right" x:Name="btBaudSerial" Content="{local:T '9600 baud'}" Width="92"
                                     Margin="6,0,0,0" Style="{StaticResource BotaoPequeno}" Click="AbrirListaDeBaud"
                                     ToolTip="{local:T 'O baud do monitor serial da placa do editor (o do Serial.begin do sketch)'}"/>
-                            <Button DockPanel.Dock="Right" Content="{local:T 'Enviar'}" Width="64" Margin="6,0,0,0"
+                            <Button DockPanel.Dock="Right" Content="{local:T 'Enviar'}" MinWidth="64" Margin="6,0,0,0"
                                     Style="{StaticResource BotaoPequeno}" Click="EnviarPeloSerial"/>
                             <TextBox x:Name="txtEntradaSerial" FlowDirection="LeftToRight" Style="{StaticResource CampoEscuro}"
                                      ToolTip="{local:T 'Texto para o sketch (Serial.available / Serial.read)'}"
@@ -745,7 +745,7 @@
                                        TextWrapping="Wrap" Foreground="{DynamicResource Aviso}"/>
                         </Border>
                         <DockPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
-                            <Button DockPanel.Dock="Right" Content="{local:T 'Enviar'}" Width="64" Margin="6,0,0,0"
+                            <Button DockPanel.Dock="Right" Content="{local:T 'Enviar'}" MinWidth="64" Margin="6,0,0,0"
                                     Style="{StaticResource BotaoPequeno}" Click="EnviarPeloBluetooth"/>
                             <TextBox x:Name="txtEntradaBt" Style="{StaticResource CampoEscuro}"
                                      ToolTip="{local:T 'Texto para a placa conectada'}" KeyDown="TeclaNoBluetooth"/>

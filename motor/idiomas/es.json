@@ -288,6 +288,7 @@
   "Alimentação": "Alimentación",
   "Alterações não salvas": "Cambios sin guardar",
   "Alto": "Alto",
+  "ALTO": "ALTO",
   "Alto-falante": "Altavoz",
   "alto-falante direto no pino {0}: os 8 Ω pediriam uns {1:0} mA e a porta segura a corrente em {2:0} mA, no limite dela. O som sai fraco e a porta trabalha fora da faixa. Use um amplificador (o MAX98357A, pelo I2S, ou um transistor), ou pelo menos um resistor de 100 Ω em série.": "altavoz directo en el pin {0}: los 8 Ω pedirían unos {1:0} mA y el pin limita la corriente en {2:0} mA, en su límite. El sonido sale débil y el pin trabaja fuera de rango. Usa un amplificador (el MAX98357A, por I2S, o un transistor), o al menos una resistencia de 100 Ω en serie.",
   "alto-falante ligado direto no {0}: os 8 Ω puxam {1:0} mA, {2:0.#} W numa bobina de 0,5 W, e ela queima. O alto-falante vai na saída de um amplificador (o MAX98357A, pelo I2S)": "altavoz conectado directo al {0}: los 8 Ω consumen {1:0} mA, {2:0.#} W en una bobina de 0,5 W, y se quema. El altavoz va en la salida de un amplificador (el MAX98357A, por I2S)",
@@ -385,6 +386,7 @@
   "Baixe pelo índice da Arduino (o botão abaixo), ou instale a pasta ou o .zip, como na Arduino IDE: o simulador passa a rodar o código C++ dela.": "Descárgala del índice de Arduino (el botón de abajo), o instala la carpeta o el .zip, como en el Arduino IDE: el simulador pasa a ejecutar su código C++.",
   "Baixe pelo índice oficial da Arduino (o mesmo da Arduino IDE; a internet só é usada para isso), ou, se a biblioteca já está na Arduino IDE deste computador, copie daqui mesmo.": "Descárgala del índice oficial de Arduino (el mismo del Arduino IDE; internet solo se usa para eso), o, si la biblioteca ya está en el Arduino IDE de esta computadora, cópiala desde aquí mismo.",
   "Baixo": "Bajo",
+  "BAIXO": "BAJO",
   "Balança com HX711 e OLED": "Báscula con HX711 y OLED",
   "Barra de LEDs": "Barra de LEDs",
   "Base": "Base",
@@ -505,7 +507,6 @@
   "chip \"{0}\" criado: edite {1} para os pinos e {2} para o comportamento.": "chip \"{0}\" creado: edita {1} para los pines y {2} para el comportamiento.",
   "Chips": "Chips",
   "Chumbo 12 V": "Plomo 12 V",
-  "Cima": "Arriba",
   "Cinza": "Gris",
   "Circuito": "Circuito",
   "circuito importado: {0}": "circuito importado: {0}",
@@ -671,7 +672,6 @@
   "Direcional ↑": "Cruceta ↑",
   "Direcional →": "Cruceta →",
   "Direcional ↓": "Cruceta ↓",
-  "Direita": "Derecha",
   "Disco": "Disco",
   "Disco de telefone": "Disco de teléfono",
   "Disparo na subida": "Disparo en flanco de subida",
@@ -803,7 +803,6 @@
   "esperava um nome, encontrei '{0}'": "esperaba un nombre, encontré '{0}'",
   "esperava uma declaracao ou funcao, encontrei '{0}'": "esperaba una declaración o función, encontré '{0}'",
   "Espessura": "Grosor",
-  "Esquerda": "Izquierda",
   "Esquerdo: ponta vermelha · direito ou Shift+clique: preta · arraste no vazio para andar · Esc tira as pontas": "Izquierdo: punta roja · derecho o Shift+clic: negra · arrastra en el vacío para moverte · Esc quita las puntas",
   "Essa pasta não tem nenhum arquivo .h, então não parece uma biblioteca do Arduino. Escolha a pasta que tem os .h (ou a src/ dentro dela).": "Esa carpeta no tiene ningún archivo .h, así que no parece una biblioteca de Arduino. Elige la carpeta que tiene los .h (o la src/ dentro de ella).",
   "esse nome não dá para usar em arquivo.": "ese nombre no se puede usar en un archivo.",
@@ -1537,6 +1536,10 @@
   "pacote MQTT grande demais": "paquete MQTT demasiado grande",
   "painel não publicou em {0}: {1}": "el panel no publicó en {0}: {1}",
   "painel → {0}: {1}": "panel → {0}: {1}",
+  "Para a direita": "Derecha",
+  "Para a esquerda": "Izquierda",
+  "Para baixo": "Abajo",
+  "Para cima": "Arriba",
   "para compilar e mandar para a placa de verdade, instale a Arduino IDE 2 (arduino.cc/en/software) — o simulador usa o compilador que vem dentro dela": "para compilar y enviar a la placa de verdad, instala el Arduino IDE 2 (arduino.cc/en/software) — el simulador usa el compilador que viene dentro",
   "para gravar num Uno:  avrdude -c arduino -p m328p -P COM3 -U flash:w:{0}:i": "para grabarlo en un Uno:  avrdude -c arduino -p m328p -P COM3 -U flash:w:{0}:i",
   "Para quem continua sempre de onde parou. Se o arquivo tiver sido apagado ou movido, volta a tela de abertura.": "Para quien siempre sigue donde lo dejó. Si el archivo fue borrado o movido, vuelve la pantalla de inicio.",
@@ -2224,5 +2227,10 @@
   "🔋 ligada": "🔋 encendida",
   "🔋 {0:0.0} V no {1}": "🔋 {0:0.0} V en el {1}",
   "🔥 {0:0} °C · proteção térmica": "🔥 {0:0} °C · protección térmica"
+ },
+ "_obsoletos": {
+  "Cima": "Arriba",
+  "Direita": "Derecha",
+  "Esquerda": "Izquierda"
  }
 }

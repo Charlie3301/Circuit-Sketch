@@ -288,6 +288,7 @@
   "Alimentação": "Matning",
   "Alterações não salvas": "Osparade ändringar",
   "Alto": "Hög",
+  "ALTO": "HÖG",
   "Alto-falante": "Högtalare",
   "alto-falante direto no pino {0}: os 8 Ω pediriam uns {1:0} mA e a porta segura a corrente em {2:0} mA, no limite dela. O som sai fraco e a porta trabalha fora da faixa. Use um amplificador (o MAX98357A, pelo I2S, ou um transistor), ou pelo menos um resistor de 100 Ω em série.": "högtalare direkt på stift {0}: de 8 Ω skulle kräva cirka {1:0} mA och porten begränsar strömmen till {2:0} mA, vid sin gräns. Ljudet blir svagt och porten arbetar utanför sitt område. Använd en förstärkare (MAX98357A, via I2S, eller en transistor), eller åtminstone ett motstånd på 100 Ω i serie.",
   "alto-falante ligado direto no {0}: os 8 Ω puxam {1:0} mA, {2:0.#} W numa bobina de 0,5 W, e ela queima. O alto-falante vai na saída de um amplificador (o MAX98357A, pelo I2S)": "högtalare kopplad direkt till {0}: de 8 Ω drar {1:0} mA, {2:0.#} W i en spole på 0,5 W, och den brinner. Högtalaren ska till utgången på en förstärkare (MAX98357A, via I2S)",
@@ -385,6 +386,7 @@
   "Baixe pelo índice da Arduino (o botão abaixo), ou instale a pasta ou o .zip, como na Arduino IDE: o simulador passa a rodar o código C++ dela.": "Ladda ner via Arduinos index (knappen nedan), eller installera mappen eller .zip-filen, som i Arduino IDE: simulatorn kör då dess C++-kod.",
   "Baixe pelo índice oficial da Arduino (o mesmo da Arduino IDE; a internet só é usada para isso), ou, se a biblioteca já está na Arduino IDE deste computador, copie daqui mesmo.": "Ladda ner via Arduinos officiella index (samma som Arduino IDE; internet används bara till det), eller, om biblioteket redan finns i Arduino IDE på den här datorn, kopiera det härifrån.",
   "Baixo": "Låg",
+  "BAIXO": "LÅG",
   "Balança com HX711 e OLED": "Våg med HX711 och OLED",
   "Barra de LEDs": "LED-stapel",
   "Base": "Grund",
@@ -505,7 +507,6 @@
   "chip \"{0}\" criado: edite {1} para os pinos e {2} para o comportamento.": "chippet \"{0}\" skapat: redigera {1} för stiften och {2} för beteendet.",
   "Chips": "Chip",
   "Chumbo 12 V": "Bly 12 V",
-  "Cima": "Upp",
   "Cinza": "Grå",
   "Circuito": "Krets",
   "circuito importado: {0}": "krets importerad: {0}",
@@ -671,7 +672,6 @@
   "Direcional ↑": "Styrkors ↑",
   "Direcional →": "Styrkors →",
   "Direcional ↓": "Styrkors ↓",
-  "Direita": "Höger",
   "Disco": "Skiva",
   "Disco de telefone": "Fingerskiva",
   "Disparo na subida": "Trigger på stigande flank",
@@ -803,7 +803,6 @@
   "esperava um nome, encontrei '{0}'": "förväntade ett namn, hittade '{0}'",
   "esperava uma declaracao ou funcao, encontrei '{0}'": "förväntade en deklaration eller funktion, hittade '{0}'",
   "Espessura": "Tjocklek",
-  "Esquerda": "Vänster",
   "Esquerdo: ponta vermelha · direito ou Shift+clique: preta · arraste no vazio para andar · Esc tira as pontas": "Vänster: röd mätspets · höger eller Shift+klick: svart · dra i tomrummet för att flytta · Esc tar bort mätspetsarna",
   "Essa pasta não tem nenhum arquivo .h, então não parece uma biblioteca do Arduino. Escolha a pasta que tem os .h (ou a src/ dentro dela).": "Den här mappen har ingen .h-fil, så den ser inte ut som ett Arduino-bibliotek. Välj mappen som har .h-filerna (eller src/ inuti den).",
   "esse nome não dá para usar em arquivo.": "det namnet går inte att använda i en fil.",
@@ -1537,6 +1536,10 @@
   "pacote MQTT grande demais": "MQTT-paketet är för stort",
   "painel não publicou em {0}: {1}": "panelen publicerade inte på {0}: {1}",
   "painel → {0}: {1}": "panel → {0}: {1}",
+  "Para a direita": "Höger",
+  "Para a esquerda": "Vänster",
+  "Para baixo": "Ned",
+  "Para cima": "Upp",
   "para compilar e mandar para a placa de verdade, instale a Arduino IDE 2 (arduino.cc/en/software) — o simulador usa o compilador que vem dentro dela": "för att kompilera och skicka till det riktiga kortet, installera Arduino IDE 2 (arduino.cc/en/software) — simulatorn använder kompilatorn som följer med den",
   "para gravar num Uno:  avrdude -c arduino -p m328p -P COM3 -U flash:w:{0}:i": "för att bränna på en Uno:  avrdude -c arduino -p m328p -P COM3 -U flash:w:{0}:i",
   "Para quem continua sempre de onde parou. Se o arquivo tiver sido apagado ou movido, volta a tela de abertura.": "För den som alltid fortsätter där den slutade. Om filen har raderats eller flyttats kommer startskärmen tillbaka.",
@@ -2224,5 +2227,10 @@
   "🔋 ligada": "🔋 på",
   "🔋 {0:0.0} V no {1}": "🔋 {0:0.0} V på {1}",
   "🔥 {0:0} °C · proteção térmica": "🔥 {0:0} °C · värmeskydd"
+ },
+ "_obsoletos": {
+  "Cima": "Upp",
+  "Direita": "Höger",
+  "Esquerda": "Vänster"
  }
 }

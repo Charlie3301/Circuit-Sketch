@@ -288,6 +288,7 @@
   "Alimentação": "电源",
   "Alterações não salvas": "未保存的更改",
   "Alto": "高",
+  "ALTO": "高电平",
   "Alto-falante": "扬声器",
   "alto-falante direto no pino {0}: os 8 Ω pediriam uns {1:0} mA e a porta segura a corrente em {2:0} mA, no limite dela. O som sai fraco e a porta trabalha fora da faixa. Use um amplificador (o MAX98357A, pelo I2S, ou um transistor), ou pelo menos um resistor de 100 Ω em série.": "扬声器直接接到引脚 {0}：8 Ω 需要约 {1:0} mA，而引脚把电流限制在 {2:0} mA，已到极限。声音很弱，引脚也工作在额定范围之外。请使用功放（MAX98357A 通过 I2S，或一个三极管），至少也要串联一个 100 Ω 电阻。",
   "alto-falante ligado direto no {0}: os 8 Ω puxam {1:0} mA, {2:0.#} W numa bobina de 0,5 W, e ela queima. O alto-falante vai na saída de um amplificador (o MAX98357A, pelo I2S)": "扬声器直接接到了 {0}：8 Ω 会吸取 {1:0} mA，在 0.5 W 的线圈上产生 {2:0.#} W，线圈会烧毁。扬声器应接在功放的输出端（MAX98357A，通过 I2S）",
@@ -385,6 +386,7 @@
   "Baixe pelo índice da Arduino (o botão abaixo), ou instale a pasta ou o .zip, como na Arduino IDE: o simulador passa a rodar o código C++ dela.": "从 Arduino 索引下载（下面的按钮），或者像在 Arduino IDE 中一样安装文件夹或 .zip：仿真器就会运行它的 C++ 代码。",
   "Baixe pelo índice oficial da Arduino (o mesmo da Arduino IDE; a internet só é usada para isso), ou, se a biblioteca já está na Arduino IDE deste computador, copie daqui mesmo.": "从 Arduino 官方索引下载（与 Arduino IDE 相同；只有这里会用到互联网），或者，如果这台电脑的 Arduino IDE 中已经有这个库，直接从那里复制。",
   "Baixo": "低",
+  "BAIXO": "低电平",
   "Balança com HX711 e OLED": "HX711 和 OLED 电子秤",
   "Barra de LEDs": "LED 光柱",
   "Base": "基础",
@@ -505,7 +507,6 @@
   "chip \"{0}\" criado: edite {1} para os pinos e {2} para o comportamento.": "已创建芯片“{0}”：编辑 {1} 设置引脚，编辑 {2} 设置行为。",
   "Chips": "芯片",
   "Chumbo 12 V": "铅酸 12 V",
-  "Cima": "上",
   "Cinza": "灰色",
   "Circuito": "电路",
   "circuito importado: {0}": "已导入电路：{0}",
@@ -671,7 +672,6 @@
   "Direcional ↑": "方向键 ↑",
   "Direcional →": "方向键 →",
   "Direcional ↓": "方向键 ↓",
-  "Direita": "右",
   "Disco": "圆盘",
   "Disco de telefone": "电话拨号盘",
   "Disparo na subida": "上升沿触发",
@@ -803,7 +803,6 @@
   "esperava um nome, encontrei '{0}'": "应为名称，但遇到了 '{0}'",
   "esperava uma declaracao ou funcao, encontrei '{0}'": "应为声明或函数，但遇到了 '{0}'",
   "Espessura": "粗细",
-  "Esquerda": "左",
   "Esquerdo: ponta vermelha · direito ou Shift+clique: preta · arraste no vazio para andar · Esc tira as pontas": "左键：红表笔 · 右键或 Shift+点击：黑表笔 · 在空白处拖动可移动 · Esc 移除表笔",
   "Essa pasta não tem nenhum arquivo .h, então não parece uma biblioteca do Arduino. Escolha a pasta que tem os .h (ou a src/ dentro dela).": "这个文件夹里没有任何 .h 文件，看起来不像 Arduino 库。请选择包含 .h 文件的文件夹（或其中的 src/）。",
   "esse nome não dá para usar em arquivo.": "这个名称不能用作文件名。",
@@ -1537,6 +1536,10 @@
   "pacote MQTT grande demais": "MQTT 数据包太大",
   "painel não publicou em {0}: {1}": "面板未能发布到 {0}：{1}",
   "painel → {0}: {1}": "面板 → {0}：{1}",
+  "Para a direita": "右",
+  "Para a esquerda": "左",
+  "Para baixo": "下",
+  "Para cima": "上",
   "para compilar e mandar para a placa de verdade, instale a Arduino IDE 2 (arduino.cc/en/software) — o simulador usa o compilador que vem dentro dela": "要编译并上传到真实开发板，请安装 Arduino IDE 2（arduino.cc/en/software）——仿真器使用其中自带的编译器",
   "para gravar num Uno:  avrdude -c arduino -p m328p -P COM3 -U flash:w:{0}:i": "烧录到 Uno：  avrdude -c arduino -p m328p -P COM3 -U flash:w:{0}:i",
   "Para quem continua sempre de onde parou. Se o arquivo tiver sido apagado ou movido, volta a tela de abertura.": "适合总是从上次停下的地方继续的人。如果文件已被删除或移动，会回到启动画面。",
@@ -2224,5 +2227,10 @@
   "🔋 ligada": "🔋 已通电",
   "🔋 {0:0.0} V no {1}": "🔋 {1} 上 {0:0.0} V",
   "🔥 {0:0} °C · proteção térmica": "🔥 {0:0} °C · 热保护"
+ },
+ "_obsoletos": {
+  "Cima": "上",
+  "Direita": "右",
+  "Esquerda": "左"
  }
 }
