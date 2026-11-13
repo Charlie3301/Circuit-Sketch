@@ -332,9 +332,20 @@ public static partial class Autoteste
         "de", "da", "das", "dos", "e", "o", "nos", "para", "que", "esta", "este", "como", "porque", "cada", "placa", "abrir", "pelo",
     };
 
+    /// <summary>
+    /// Palavras curtas que o portugues divide com o italiano ("da", "e", "o",
+    /// "sua", "quando"): numa tela em italiano elas sao do italiano.
+    /// </summary>
+    static readonly HashSet<string> TambemDoItaliano = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "da", "e", "o", "sua", "quando",
+    };
+
     static readonly Regex AcentoDoPortugues = new("[ãõáàâéêíóôúüçÃÕÁÀÂÉÊÍÓÔÚÇ]");
     // O espanhol tambem tem á, é, í, ó, ú e ü: so o til do a e do o, o circunflexo, a crase e o ç sao do portugues.
     static readonly Regex AcentoSoDoPortugues = new("[ãõàâêôçÃÕÀÂÊÔÇ]");
+    // O italiano tem à ("già") e é ("perché"); o resto continua sendo do portugues.
+    static readonly Regex AcentoNaoItaliano = new("[ãõáâêíóôúüçÃÕÁÂÊÍÓÔÚÇ]");
     static readonly Regex Palavra = new(@"\p{L}{3,}");
 
     /// <summary>
@@ -369,7 +380,8 @@ public static partial class Autoteste
         if (string.IsNullOrWhiteSpace(texto)) return false;
         string lingua = Idioma.Atual == Idioma.Original ? "en" : Idioma.Atual;
         bool espanhol = lingua.StartsWith("es", StringComparison.Ordinal);
-        if ((espanhol ? AcentoSoDoPortugues : AcentoDoPortugues).IsMatch(texto)) return true;
+        bool italiano = lingua.StartsWith("it", StringComparison.Ordinal);
+        if ((espanhol ? AcentoSoDoPortugues : italiano ? AcentoNaoItaliano : AcentoDoPortugues).IsMatch(texto)) return true;
         var vocabulario = Vocabulario(lingua);
         foreach (string pedaco in texto.Split((char[])null, StringSplitOptions.RemoveEmptyEntries))
         {
@@ -378,7 +390,8 @@ public static partial class Autoteste
             // Adafruit_BMP280.h): fica como e em qualquer lingua.
             string palavra = pedaco.Trim('.', ',', ':', ';', '(', ')', '"', '\'', '!', '?', '…', '·', '—', '-');
             if (palavra == palavra.ToUpperInvariant() || palavra.Any(c => char.IsDigit(c) || c is '.' or '_')) continue;
-            if (SoDoPortugues.Contains(palavra) && !(espanhol && TambemDoEspanhol.Contains(palavra))) return true;
+            if (SoDoPortugues.Contains(palavra) && !(espanhol && TambemDoEspanhol.Contains(palavra))
+                && !(italiano && TambemDoItaliano.Contains(palavra))) return true;
             foreach (Match m in Palavra.Matches(palavra))
                 if (vocabulario.Contains(m.Value)) return true;
         }
