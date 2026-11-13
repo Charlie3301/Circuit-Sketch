@@ -342,6 +342,13 @@ public static partial class Autoteste
     };
 
     /// <summary>
+    /// "de" e o artigo e o pronome do plural do sueco ("de senaste projekten"):
+    /// numa tela em sueco ele e do sueco.
+    /// </summary>
+    static readonly HashSet<string> TambemDoSueco = new(StringComparer.OrdinalIgnoreCase)
+    { "de", };
+
+    /// <summary>
     /// Palavras curtas que o portugues divide com o frances ("de", "que", "ou",
     /// "mais", "à"): numa tela em frances elas sao do frances.
     /// </summary>
@@ -393,6 +400,7 @@ public static partial class Autoteste
         bool espanhol = lingua.StartsWith("es", StringComparison.Ordinal);
         bool italiano = lingua.StartsWith("it", StringComparison.Ordinal);
         bool frances = lingua.StartsWith("fr", StringComparison.Ordinal);
+        bool sueco = lingua.StartsWith("sv", StringComparison.Ordinal);
         if ((espanhol ? AcentoSoDoPortugues : italiano ? AcentoNaoItaliano : frances ? AcentoNaoFrances : AcentoDoPortugues).IsMatch(texto)) return true;
         var vocabulario = Vocabulario(lingua);
         foreach (string pedaco in texto.Split((char[])null, StringSplitOptions.RemoveEmptyEntries))
@@ -404,7 +412,8 @@ public static partial class Autoteste
             if (palavra == palavra.ToUpperInvariant() || palavra.Any(c => char.IsDigit(c) || c is '.' or '_')) continue;
             if (SoDoPortugues.Contains(palavra) && !(espanhol && TambemDoEspanhol.Contains(palavra))
                 && !(italiano && TambemDoItaliano.Contains(palavra))
-                && !(frances && TambemDoFrances.Contains(palavra))) return true;
+                && !(frances && TambemDoFrances.Contains(palavra))
+                && !(sueco && TambemDoSueco.Contains(palavra))) return true;
             foreach (Match m in Palavra.Matches(palavra))
                 if (vocabulario.Contains(m.Value)) return true;
         }
