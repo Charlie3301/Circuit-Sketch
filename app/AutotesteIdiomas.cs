@@ -356,6 +356,14 @@ public static partial class Autoteste
     { "de", };
 
     /// <summary>
+    /// Palavras que o portugues divide com o alemao: "das" e o artigo neutro,
+    /// "um" e "em volta de", "da" e "ali", "uns" e "nos" (pronome). Numa tela
+    /// em alemao elas sao do alemao.
+    /// </summary>
+    static readonly HashSet<string> TambemDoAlemao = new(StringComparer.OrdinalIgnoreCase)
+    { "das", "um", "da", "uns", };
+
+    /// <summary>
     /// Palavras curtas que o portugues divide com o frances ("de", "que", "ou",
     /// "mais", "à"): numa tela em frances elas sao do frances.
     /// </summary>
@@ -373,6 +381,8 @@ public static partial class Autoteste
     static readonly Regex AcentoNaoFrances = new("[ãõáíóúÃÕÁÍÓÚ]");
     // O noruegues tem o é ("relé", "én"); o resto continua sendo do portugues.
     static readonly Regex AcentoNaoNoruegues = new("[ãõáàâêíóôúüçÃÕÁÀÂÊÍÓÔÚÇ]");
+    // O alemao tem o ü ("für", "Rückgängig"); o resto continua sendo do portugues.
+    static readonly Regex AcentoNaoAlemao = new("[ãõáàâéêíóôúçÃÕÁÀÂÉÊÍÓÔÚÇ]");
     static readonly Regex Palavra = new(@"\p{L}{3,}");
 
     /// <summary>
@@ -411,8 +421,9 @@ public static partial class Autoteste
         bool frances = lingua.StartsWith("fr", StringComparison.Ordinal);
         bool sueco = lingua.StartsWith("sv", StringComparison.Ordinal);
         bool noruegues = lingua.StartsWith("nb", StringComparison.Ordinal);
+        bool alemao = lingua.StartsWith("de", StringComparison.Ordinal);
         if ((espanhol ? AcentoSoDoPortugues : italiano ? AcentoNaoItaliano : frances ? AcentoNaoFrances
-            : noruegues ? AcentoNaoNoruegues : AcentoDoPortugues).IsMatch(texto)) return true;
+            : noruegues ? AcentoNaoNoruegues : alemao ? AcentoNaoAlemao : AcentoDoPortugues).IsMatch(texto)) return true;
         var vocabulario = Vocabulario(lingua);
         foreach (string pedaco in texto.Split((char[])null, StringSplitOptions.RemoveEmptyEntries))
         {
@@ -425,7 +436,8 @@ public static partial class Autoteste
                 && !(italiano && TambemDoItaliano.Contains(palavra))
                 && !(frances && TambemDoFrances.Contains(palavra))
                 && !(sueco && TambemDoSueco.Contains(palavra))
-                && !(noruegues && TambemDoNoruegues.Contains(palavra))) return true;
+                && !(noruegues && TambemDoNoruegues.Contains(palavra))
+                && !(alemao && TambemDoAlemao.Contains(palavra))) return true;
             foreach (Match m in Palavra.Matches(palavra))
                 if (vocabulario.Contains(m.Value)) return true;
         }
