@@ -100,7 +100,7 @@ public static class Idioma
     }
 
     /// <summary>
-    /// A cultura com algarismos de 0 a 9, ponto decimal e o "-" simples quando
+    /// A cultura com o "-" simples, e com algarismos de 0 a 9 e ponto decimal quando
     /// a lingua tem algarismos proprios (o arabe tem ٠١٢...، o "٫" decimal e
     /// um "-" com marca de direcao). Numero de placa, de pino e de medida
     /// fica igual ao do codigo e do que a placa imprime; e o WPF, que troca
@@ -109,18 +109,25 @@ public static class Idioma
     /// </summary>
     static CultureInfo ComAlgarismosOcidentais(CultureInfo c)
     {
-        if (c.NumberFormat.NativeDigits is [ "0", .. ] &&
-            c.NumberFormat.DigitSubstitution == DigitShapes.None) return c;
+        bool algarismos = !(c.NumberFormat.NativeDigits is [ "0", .. ] &&
+                            c.NumberFormat.DigitSubstitution == DigitShapes.None);
+        // O hebraico tem 0-9, mas o "-" vem com uma marca invisivel de
+        // direcao na frente: "-3" digitado nao bateria com o formatado.
+        bool sinais = c.NumberFormat.NegativeSign != "-" || c.NumberFormat.PositiveSign != "+";
+        if (!algarismos && !sinais) return c;
         var nova = (CultureInfo)c.Clone();
         var n = nova.NumberFormat;
-        n.NativeDigits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-        n.DigitSubstitution = DigitShapes.None;
-        n.NumberDecimalSeparator = n.CurrencyDecimalSeparator = n.PercentDecimalSeparator = ".";
-        n.NumberGroupSeparator = n.CurrencyGroupSeparator = n.PercentGroupSeparator = ",";
         n.NegativeSign = "-";
         n.PositiveSign = "+";
-        n.PercentSymbol = "%";
-        n.PerMilleSymbol = "‰";
+        if (algarismos)
+        {
+            n.NativeDigits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+            n.DigitSubstitution = DigitShapes.None;
+            n.NumberDecimalSeparator = n.CurrencyDecimalSeparator = n.PercentDecimalSeparator = ".";
+            n.NumberGroupSeparator = n.CurrencyGroupSeparator = n.PercentGroupSeparator = ",";
+            n.PercentSymbol = "%";
+            n.PerMilleSymbol = "‰";
+        }
         return CultureInfo.ReadOnly(nova);
     }
 
