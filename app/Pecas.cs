@@ -245,6 +245,21 @@ public static class Pecas
         catch { return null; }
     }
 
+    /// <summary>A viewport de um SVG qualquer, em px de 96 dpi (a base importada, Frames.cs).</summary>
+    internal static (double larg, double alt)? ViewportDoSvg(string svg)
+        => string.IsNullOrEmpty(svg) ? null : ViewportDe(svg);
+
+    /// <summary>
+    /// O desenho de um SVG importado como base (Frames.cs), no mesmo
+    /// enquadramento das pecas, e o tamanho dele. Nulo quando nao se le.
+    /// </summary>
+    internal static (DrawingGroup desenho, double larg, double alt)? LerParaFrame(string svg)
+    {
+        if (ViewportDoSvg(svg) is not { } v) return null;
+        var lido = Ler(svg);
+        return lido is null ? null : (Enquadrar(lido, svg, null), v.larg, v.alt);
+    }
+
     /// <summary>O ajuste medido desta peca, ou nada.</summary>
     static Vector AjusteDe(string nome)
     {

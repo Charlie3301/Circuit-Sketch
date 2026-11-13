@@ -1998,6 +1998,34 @@ public partial class MainWindow : Window
             virar.Click += (_, _) => { editor.VirarPcbSelecionada(); AtualizarBarraObjeto(); };
             opcoesObjeto.Children.Add(virar);
         }
+        else if (Frames.EhFrame(peca.Tipo))
+        {
+            // O material do frame: o acrilico de cada cor, a madeira, o carbono.
+            string escolhido = Frames.MaterialDe(peca).Id;
+            foreach (var material in Frames.MateriaisDe(peca.Tipo))
+            {
+                bool marcada = escolhido == material.Id;
+                Brush tinta = material.Acabamento switch
+                {
+                    Frames.Acabamento.Original => new LinearGradientBrush(Colors.White, Color.FromRgb(0xB0, 0xB4, 0xBA), 45),
+                    Frames.Acabamento.Carbono => new LinearGradientBrush(Color.FromRgb(0x44, 0x46, 0x4C), material.Cor, 45),
+                    _ => new SolidColorBrush(Color.FromArgb((byte)(Math.Max(material.Opacidade, 0.45) * 255), material.Cor.R, material.Cor.G, material.Cor.B)),
+                };
+                var quadro = new System.Windows.Shapes.Rectangle
+                {
+                    Width = 20, Height = 20, RadiusX = 3, RadiusY = 3, Margin = new Thickness(0, 0, 4, 0),
+                    Fill = tinta,
+                    Stroke = marcada ? Brushes.White : new SolidColorBrush(Color.FromRgb(0x5A, 0x5A, 0x5E)),
+                    StrokeThickness = marcada ? 2.5 : 1, Cursor = Cursors.Hand, ToolTip = Frames.NomeDoMaterial(material.Id), Tag = material.Id,
+                };
+                quadro.MouseLeftButtonDown += (s2, _) =>
+                {
+                    editor.DefinirMaterialDoFrame((string)((System.Windows.Shapes.Rectangle)s2).Tag);
+                    AtualizarBarraObjeto();
+                };
+                opcoesObjeto.Children.Add(quadro);
+            }
+        }
         else if (Catalogo.EhProtoboard(peca.Tipo))
         {
             // As mini de 170 vem coloridas; deixa escolher a cor.
@@ -2596,6 +2624,44 @@ public partial class MainWindow : Window
     {
         MontarExportarDosPlugins();
         return [.. menuOpcoes.Items.OfType<MenuItem>().Where(m => m.Tag is "exportar-plugin").Select(m => (string)m.Header)];
+    }
+
+    /// <summary>
+    /// Uma base feita pela pessoa (Frames.cs): o SVG de corte da placa do robo
+    /// dela. O tamanho vem do arquivo (o width/height em mm); a largura pode
+    /// ser trocada antes de entrar, para o SVG feito sem unidade.
+    /// </summary>
+    void ImportarBaseSvg(object s = null, RoutedEventArgs e = null)
+    {
+        var dlg = new Microsoft.Win32.OpenFileDialog { Filter = Idioma.T("Desenho de corte (*.svg)") + "|*.svg" };
+        if (dlg.ShowDialog() != true) return;
+
+        string svg;
+        try { svg = File.ReadAllText(dlg.FileName); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { Erro(Idioma.T("não deu para ler o arquivo: {0}", ex.Message)); return; }
+
+        if (Frames.TamanhoDoSvg(svg) is not { } tamanho) { Erro(Idioma.T("este SVG não diz o tamanho dele (falta o viewBox)")); return; }
+        string resposta = Dialogos.Perguntar(this,
+            Idioma.T("Largura da base em mm (o arquivo diz {0:0.#} × {1:0.#} mm)", tamanho.larg, tamanho.alt),
+            tamanho.larg.ToString("0.##", System.Globalization.CultureInfo.CurrentCulture));
+        if (resposta is null) return;
+        if (!double.TryParse(resposta.Replace(',', '.'), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double largura)
+            || largura < 5 || largura > 2000)
+        {
+            Erro(Idioma.T("a largura tem que ser um número entre 5 e 2000 mm"));
+            return;
+        }
+
+        var peca = ImportarBase(System.IO.Path.GetFileNameWithoutExtension(dlg.FileName), svg, largura / tamanho.larg);
+        if (peca is null) { Erro(Idioma.T("não deu para ler o desenho deste SVG")); return; }
+        Aviso(Idioma.T("adicionado: {0}", Catalogo.Obter(peca.Tipo)?.Nome));
+    }
+
+    /// <summary>A base importada no circuito (sem dialogo): e o que o autoteste chama.</summary>
+    internal PecaNoCircuito ImportarBase(string nome, string svg, double escala)
+    {
+        var b = new BaseImportada { Nome = nome, Svg = svg, Escala = escala, Id = Frames.IdDa(svg, escala) };
+        return editor.AdicionarBase(b);
     }
 
     void ImportarDoWokwi(object s = null, RoutedEventArgs e = null)
@@ -6932,6 +6998,8 @@ public partial class MainWindow : Window
             ? ""
             : peca.Tipo == "resistor"
                 ? Idioma.T("Resistor {0:0} Ω · R gira · Del exclui", peca.Ohms)
+            : Frames.Obter(peca.Tipo) is { } frame
+                ? Idioma.T("{0} · {1:0} × {2:0} mm · arrastar leva o que está em cima · R gira · Del exclui", def.Nome, frame.LarguraMm, frame.AlturaMm)
                 : Idioma.T("{0} · {1} pinos · R gira · Del exclui", def.Nome, def.Pinos.Count);
     }
 

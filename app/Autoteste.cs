@@ -155,6 +155,7 @@ public static partial class Autoteste
         Bloco("Barra_NomeDoCircuito", Barra_NomeDoCircuito);
         Bloco("Queima_NivelDeTensao", Queima_NivelDeTensao);
         Bloco("Avisos_SelosNoCircuito", Avisos_SelosNoCircuito);
+        Bloco("Frames_ChassisEBases", Frames_ChassisEBases);
         Bloco("Sensores_Redesenhados", Sensores_Redesenhados);
         Bloco("Esp8266_Redesenhadas", Esp8266_Redesenhadas);
         Bloco("Pcb_Base", Pcb_Base);

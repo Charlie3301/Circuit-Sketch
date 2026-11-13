@@ -34,7 +34,7 @@ public partial class EditorCircuito
         for (int i = Atual.Pecas.Count - 1; i >= 0; i--)
         {
             var peca = Atual.Pecas[i];
-            if (Catalogo.EhProtoboard(peca.Tipo) || EstaDoOutroLado(peca)) continue;
+            if (Catalogo.EhProtoboard(peca.Tipo) || Frames.EhFrame(peca.Tipo) || EstaDoOutroLado(peca)) continue;
             var def = Catalogo.Obter(peca.Tipo);
             if (def is null) continue;
             bool perna = def.Pinos.Any(pino =>
@@ -53,6 +53,14 @@ public partial class EditorCircuito
             if (!Catalogo.EhProtoboard(peca.Tipo)) continue;
             var def = Catalogo.Obter(peca.Tipo);
             if (def is not null && NoCorpo(peca, def, p)) Por(peca.Id, -1);
+        }
+
+        // E os frames debaixo de tudo (pela chapa: o furo nao e do frame).
+        for (int i = Atual.Pecas.Count - 1; i >= 0; i--)
+        {
+            var peca = Atual.Pecas[i];
+            if (!Frames.EhFrame(peca.Tipo) || Catalogo.Obter(peca.Tipo) is not { } def) continue;
+            if (Frames.NaPlaca(peca.Tipo, Geometria.PontoLocal(peca, def, p))) Por(peca.Id, -1);
         }
 
         // E os fios que passam ali (o de cima primeiro).

@@ -315,6 +315,9 @@ public class Circuito
     /// </summary>
     public List<string> AvisosFechados { get; set; }
 
+    /// <summary>As bases importadas de SVG (Frames.cs) que este circuito usa. Nulo quando nao ha nenhuma.</summary>
+    public List<BaseImportada> Bases { get; set; }
+
     /// <summary>
     /// Um id legivel para uma peca nova, no jeito do Wokwi: "led1", "r2",
     /// "esp1" -- o diagram.json se le pelos ids, e "a3f9c2d1" nao diz nada.
@@ -337,7 +340,25 @@ public class Circuito
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    public string ParaJson() => JsonSerializer.Serialize(this, Formato);
+    public string ParaJson()
+    {
+        CompletarBases();
+        return JsonSerializer.Serialize(this, Formato);
+    }
+
+    /// <summary>
+    /// Toda base importada que esta no circuito vai com ele, mesmo a que
+    /// chegou colada de outro projeto; a que ja nao esta em nenhuma peca sai.
+    /// </summary>
+    public void CompletarBases()
+    {
+        var usadas = Pecas.Where(p => Frames.EhImportado(p.Tipo)).Select(p => p.Tipo).Distinct().ToList();
+        if (usadas.Count == 0) { Bases = null; return; }
+        var lista = (Bases ?? []).Where(b => usadas.Contains(b.Id)).ToList();
+        foreach (string tipo in usadas)
+            if (!lista.Any(b => b.Id == tipo) && Frames.Obter(tipo)?.Base is { } b) lista.Add(b);
+        Bases = lista;
+    }
 
     public static Circuito DeJson(string json)
         => TentarDeJson(json, out var c, out _) ? c : new Circuito();
@@ -376,6 +397,8 @@ public class Circuito
         circuito.Pecas ??= [];
         circuito.Fios ??= [];
         circuito.AtualizarPinosAntigos();
+        // As bases importadas entram no catalogo antes da conferencia: sao pecas deste circuito.
+        Frames.RegistrarDo(circuito);
 
         // Peca sem tipo conhecido nao pode entrar: ela nao teria desenho
         // nem pinos, e o resto do programa quebraria longe daqui.

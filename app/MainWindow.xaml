@@ -293,6 +293,9 @@
                         <!-- CIRCUITO EM JSON -->
                         <MenuItem Header="{local:T 'Importar circuito (diagram.json)...'}"
                                   Uid="importar" Click="ImportarDoWokwi"/>
+                        <MenuItem Header="{local:T 'Importar base de SVG (frame)...'}"
+                                  ToolTip="{local:T 'O desenho de corte da placa do seu robô: o contorno e os furos viram uma base onde as peças ficam'}"
+                                  Click="ImportarBaseSvg"/>
                         <MenuItem x:Name="miExportar" Header="{local:T 'Exportar circuito (diagram.json)...'}"
                                   Click="ExportarParaWokwi"/>
                         <MenuItem x:Name="miExportarHex"

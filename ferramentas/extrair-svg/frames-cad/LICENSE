@@ -1,0 +1,36 @@
+Os arquivos de corte de onde saem os frames da Alpha 25
+(ferramentas/extrair-svg/pecas-frames-a25.py -> app/assets/frames.json).
+Cada um continua com a licenca do projeto de origem.
+
+2wd-dasaki-placa.json
+    O contorno da placa de cima do "2WD smart car arduino robot chassis",
+    de dasaki -- https://www.thingiverse.com/thing:4738179 (2wd_robot.zip,
+    2wd_robot.stl; face no plano z 48,4, tirada com contorno-stl.py).
+    Licenca: GNU General Public License v2.0.
+
+4wd-sb43201-placa.json
+    O contorno da placa de cima do "Arduino Robot Car Chassis 4WD", de
+    sb43201 -- https://www.thingiverse.com/thing:2151514
+    (waston_mod_chassis_top.stl; face no plano z 3,0).
+    Licenca: Creative Commons Atribuicao (CC BY).
+
+BradenAcrylicDrawing15.svg
+    O SVG de corte do carrinho 4WD de Braden Boucher (Bridgewater State
+    University) -- https://github.com/BradenBoucher/rc-car (cad/). O carrinho
+    usa o painel C, o da direita: a placa de 203,2 x 304,8 mm.
+    Licenca: MIT.
+
+S2_v0.1_main_plate_3mm.dxf, S2_v0.1_5_inch_arms_4mm_4x.dxf,
+S2_v0.1_6_inch_arms_4mm_4x.dxf
+    Source Two v0.1, frame de drone aberto da Team BlackSheep, desenho de
+    Philipp Seidel -- https://github.com/ps915/source_two
+    Licenca: GNU General Public License v3.0.
+
+MeArmV3.dxf
+    MeArm V3, de Benjamin Gray / MeArm -- https://github.com/mearm/mearm
+    Licenca: Creative Commons Atribuicao-CompartilhaIgual 3.0 (CC BY-SA 3.0).
+
+DE-Arm-4mm.dxf
+    DE-Arm, Dyson School of Design Engineering, Imperial College London
+    (derivado do MeArm) -- https://github.com/IDE-GID-Cyberphysical-Systems/de-arm
+    (physical-build-resources/). Licenca: GNU General Public License v3.0.

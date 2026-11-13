@@ -133,6 +133,8 @@ public static class Catalogo
         porId[IdPcbPadrao] = MontarPcb(IdPcbPadrao);
         // Os suportes de pilhas da lista; os de outro tamanho nascem quando pedidos.
         foreach (string suporte in Baterias.SuportesNaPaleta) porId[suporte] = Baterias.DefDoSuporte(suporte);
+        // Os frames (Frames.cs): o carrinho, o drone, o braco robotico.
+        foreach (string frame in Frames.DeFabrica) porId[frame] = Frames.DefDe(Frames.Obter(frame));
     }
 
     /// <summary>Os suportes de pilhas fora da lista (o 6x AA, o 1x 18650...): pedidos pela barra.</summary>

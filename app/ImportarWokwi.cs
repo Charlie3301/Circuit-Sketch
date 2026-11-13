@@ -90,6 +90,9 @@ public static class ImportarWokwi
         circuito.Autor = Texto(raiz, "author");
         // Os avisos fechados nao estao no diagram.json: a aba os mantem do circuito de agora.
         circuito.AvisosFechados = atual?.AvisosFechados is { Count: > 0 } fechados ? [.. fechados] : null;
+        // Nem as bases importadas (o SVG fica no .sktch): vem do circuito de agora, ja no catalogo.
+        circuito.Bases = atual?.Bases is { Count: > 0 } bases ? [.. bases] : null;
+        Frames.RegistrarDo(circuito);
 
         // O resto do topo ("serialMonitor", "dependencies"...) vai junto como veio.
         foreach (var campo in raiz.EnumerateObject())

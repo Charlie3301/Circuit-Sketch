@@ -418,7 +418,14 @@ public class JanelaPecas : Window
         nomeDaPeca.SetResourceReference(TextBlock.ForegroundProperty, Tema.Texto);
         textos.Children.Add(nomeDaPeca);
 
-        var pinos = new TextBlock { Text = Idioma.T("{0} pinos", peca.Pinos.Count), FontSize = 10 };
+        // O frame nao tem pino: o que diz dele e o tamanho da chapa.
+        var pinos = new TextBlock
+        {
+            Text = Frames.Obter(peca.Id) is { } frame
+                ? Idioma.T("{0:0} × {1:0} mm", frame.LarguraMm, frame.AlturaMm)
+                : Idioma.T("{0} pinos", peca.Pinos.Count),
+            FontSize = 10,
+        };
         pinos.SetResourceReference(TextBlock.ForegroundProperty, Tema.TextoFraco);
         textos.Children.Add(pinos);
         linha.Children.Add(textos);
@@ -441,6 +448,7 @@ public class JanelaPecas : Window
     {
         if (miniaturas.TryGetValue(id, out var pronta)) return pronta;
         ImageSource feita = null;
+        if (Frames.Obter(id) is { } frame) return miniaturas[id] = MiniaturaDoFrame(frame);
         var arte = Pecas.Talvez(id) ?? Pecas.Talvez($"{id}-corpo");
         if (arte is not null && arte.Width > 0 && arte.Height > 0)
         {
@@ -458,6 +466,30 @@ public class JanelaPecas : Window
         }
         miniaturas[id] = feita;
         return feita;
+    }
+
+    /// <summary>O frame nao tem SVG: a miniatura e o contorno dele, na cor do material de fabrica.</summary>
+    static ImageSource MiniaturaDoFrame(Frames.Frame frame)
+    {
+        const double Largura = 38, Altura = 28;
+        double escala = Math.Min(Largura / frame.LarguraMm, Altura / frame.AlturaMm);
+        var material = Frames.Materiais.FirstOrDefault(m => m.Id == frame.Material) ?? Frames.Materiais[0];
+        var cor = material.Cor;
+        // O transparente sumiria no fundo da lista: a miniatura e a chapa mais cheia.
+        var tinta = new SolidColorBrush(Color.FromArgb((byte)(Math.Max(material.Opacidade, 0.7) * 255), cor.R, cor.G, cor.B));
+        var borda = new Pen(new SolidColorBrush(Color.FromRgb((byte)(cor.R * 0.6), (byte)(cor.G * 0.6), (byte)(cor.B * 0.6))), 0.6 / escala);
+        var desenho = new DrawingVisual();
+        using (var ctx = desenho.RenderOpen())
+        {
+            ctx.PushTransform(new TranslateTransform((Largura - frame.LarguraMm * escala) / 2, (Altura - frame.AlturaMm * escala) / 2));
+            ctx.PushTransform(new ScaleTransform(escala, escala));
+            ctx.DrawGeometry(tinta, borda, frame.Contorno);
+        }
+        var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(
+            (int)(Largura * 2), (int)(Altura * 2), 192, 192, PixelFormats.Pbgra32);
+        bitmap.Render(desenho);
+        bitmap.Freeze();
+        return bitmap;
     }
 
     static void PorMiniatura(Border moldura, ImageSource arte, string id)
@@ -487,7 +519,7 @@ public class JanelaPecas : Window
     /// <summary>A categoria como aparece no cabecalho. A do catalogo e chave (sem acento); esta e a da tela.</summary>
     static string NomeDaCategoria(string categoria) => categoria switch
     {
-        "Base" => Idioma.T("Base"), "Placas" => Idioma.T("Placas"), "Saida" => Idioma.T("Saída"),
+        "Base" => Idioma.T("Base"), "Frames" => Idioma.T("Frames e chassis"), "Placas" => Idioma.T("Placas"), "Saida" => Idioma.T("Saída"),
         "Entrada" => Idioma.T("Entrada"), "Sensores" => Idioma.T("Sensores"), "Atuadores" => Idioma.T("Atuadores"),
         "Motores" => Idioma.T("Motores"), "Modulos" => Idioma.T("Módulos"), "Rede" => Idioma.T("Rede"),
         "Alimentacao" => Idioma.T("Alimentação"), "Logica" => Idioma.T("Lógica"), "Passivos" => Idioma.T("Passivos"),
@@ -498,10 +530,10 @@ public class JanelaPecas : Window
 
     static int OrdemCategoria(string c) => c switch
     {
-        "Base" => 0, "Placas" => 1, "Saida" => 2, "Entrada" => 3,
-        "Sensores" => 4, "Atuadores" => 5, "Motores" => 6, "Modulos" => 7, "Rede" => 8,
-        "Alimentacao" => 9, "Logica" => 10, "Passivos" => 11,
-        "Chips" => 12, "Anotacao" => 13, _ => 14
+        "Base" => 0, "Frames" => 1, "Placas" => 2, "Saida" => 3, "Entrada" => 4,
+        "Sensores" => 5, "Atuadores" => 6, "Motores" => 7, "Modulos" => 8, "Rede" => 9,
+        "Alimentacao" => 10, "Logica" => 11, "Passivos" => 12,
+        "Chips" => 13, "Anotacao" => 14, _ => 15
     };
 
     /// <summary>

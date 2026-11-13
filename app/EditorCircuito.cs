@@ -1519,7 +1519,8 @@ public partial class EditorCircuito : Border
     /// mesmo para a foto de conferencia de uma peca sozinha (--desenho).
     /// </summary>
     internal FrameworkElement DesenhoDa(PecaNoCircuito peca, PecaDef def)
-        => Catalogo.EhPcb(peca.Tipo) ? DesenharPcb(peca, def)
+        => Frames.EhFrame(peca.Tipo) ? DesenharFrame(peca, def)
+            : Catalogo.EhPcb(peca.Tipo) ? DesenharPcb(peca, def)
             : Catalogo.EhProtoboard(peca.Tipo)
             ? DesenharProtoboard(peca, def)
             : Baterias.EhSuporte(peca.Tipo)
@@ -2321,7 +2322,7 @@ public partial class EditorCircuito : Border
     /// Protoboard no fundo, pecas por cima. E o que permite encaixar
     /// componentes sobre a placa sem brigar pelo clique.
     /// </summary>
-    static int ZDe(string tipo) => Catalogo.EhProtoboard(tipo) ? 10 : EhAcessorio(tipo) ? 120 : 100;
+    static int ZDe(string tipo) => Frames.EhFrame(tipo) ? 5 : Catalogo.EhProtoboard(tipo) ? 10 : EhAcessorio(tipo) ? 120 : 100;
 
     /// <summary>Os desenhos que vivem em cima de cada peca (tela, luzes, a parte que gira).</summary>
     readonly Dictionary<string, List<UIElement>> camadasDaPeca = [];
@@ -2476,6 +2477,30 @@ public partial class EditorCircuito : Border
         Redesenhar();
         Selecionar(peca.Id, false);
         Mudou?.Invoke();
+    }
+
+    /// <summary>O material do frame selecionado (Frames.Materiais).</summary>
+    public void DefinirMaterialDoFrame(string material)
+    {
+        var peca = Selecionada;
+        if (peca is null || !Frames.EhFrame(peca.Tipo) || !Frames.MateriaisDe(peca.Tipo).Any(m => m.Id == material)) return;
+        peca.Cor = material;
+        Redesenhar();
+        Selecionar(peca.Id, false);
+        Mudou?.Invoke();
+    }
+
+    /// <summary>
+    /// Uma base importada de SVG (Frames.cs) no circuito: no catalogo, na
+    /// lista do circuito (o SVG vai no .sktch) e na tela. Nulo quando o SVG
+    /// nao se le.
+    /// </summary>
+    public PecaNoCircuito AdicionarBase(BaseImportada b)
+    {
+        if (!Frames.Registrar(b)) return null;
+        Atual.Bases ??= [];
+        if (!Atual.Bases.Any(x => x.Id == b.Id)) Atual.Bases.Add(b);
+        return Adicionar(b.Id);
     }
 
     /// <summary>A cor da mascara de solda da PCB selecionada.</summary>
@@ -3985,7 +4010,8 @@ public partial class EditorCircuito : Border
     {
         // As pecas do outro lado de uma PCB virada nao recebem clique: o
         // clique e do furo e da trilha do lado que se ve.
-        var naoPlacas = Atual.Pecas.Where(x => !Catalogo.EhProtoboard(x.Tipo) && !EstaDoOutroLado(x)).ToList();
+        // Os frames tambem nao: sao a base, e o clique neles vem por ultimo (o 8).
+        var naoPlacas = Atual.Pecas.Where(x => !Catalogo.EhProtoboard(x.Tipo) && !Frames.EhFrame(x.Tipo) && !EstaDoOutroLado(x)).ToList();
 
         // 1) botao fisico
         foreach (var peca in naoPlacas)
@@ -4123,6 +4149,16 @@ public partial class EditorCircuito : Border
             var def = Catalogo.Obter(placas[i].Tipo);
             if (def is not null && NoCorpo(placas[i], def, p))
                 return new Acerto(Camada.CorpoPlaca, placas[i], null, p, -1, null);
+        }
+
+        // 8) o frame (a placa de acrilico, o frame do drone): pela chapa de
+        // verdade -- o clique no furo ou fora do contorno nao e do frame.
+        for (int i = Atual.Pecas.Count - 1; i >= 0; i--)
+        {
+            var frame = Atual.Pecas[i];
+            if (!Frames.EhFrame(frame.Tipo) || Catalogo.Obter(frame.Tipo) is not { } def) continue;
+            if (Frames.NaPlaca(frame.Tipo, Geometria.PontoLocal(frame, def, p)))
+                return new Acerto(Camada.CorpoPlaca, frame, null, p, -1, null);
         }
 
         return new Acerto(Camada.Nada, null, null, p, -1, null);
@@ -4380,10 +4416,40 @@ public partial class EditorCircuito : Border
                 if (!selecionadas.Contains(outra.Id))
                     carona.Add((outra.Id, outra.X - peca.X, outra.Y - peca.Y));
 
+        // E o que estiver em cima de um frame arrastado (o carrinho inteiro vai junto).
+        if (Frames.EhFrame(peca.Tipo))
+            foreach (var outra in EmCimaDoFrame(peca))
+                if (!selecionadas.Contains(outra.Id) && carona.All(c => c.id != outra.Id))
+                    carona.Add((outra.Id, outra.X - peca.X, outra.Y - peca.Y));
+
         CaptureMouse();
     }
 
     readonly List<(string id, double dx, double dy)> carona = [];
+
+    /// <summary>
+    /// O que esta em cima de um frame: as pecas com o centro dentro do contorno
+    /// dele (um furo no meio da chapa ainda e em cima) -- e o que esta espetado
+    /// numa protoboard que esta em cima. Outro frame nao: dois frames sao duas
+    /// bases, e o de baixo nao carrega o outro.
+    /// </summary>
+    internal List<PecaNoCircuito> EmCimaDoFrame(PecaNoCircuito frame)
+    {
+        var lista = new List<PecaNoCircuito>();
+        if (Catalogo.Obter(frame.Tipo) is not { } defFrame) return lista;
+        foreach (var outra in Atual.Pecas)
+        {
+            if (outra.Id == frame.Id || Frames.EhFrame(outra.Tipo) || Catalogo.Obter(outra.Tipo) is not { } def) continue;
+            var (largura, altura) = Geometria.Tamanho(outra, def);
+            var centro = new Point(outra.X + largura / 2, outra.Y + altura / 2);
+            if (!Frames.DentroDoContorno(frame.Tipo, Geometria.PontoLocal(frame, defFrame, centro))) continue;
+            if (!lista.Contains(outra)) lista.Add(outra);
+            if (Catalogo.EhProtoboard(outra.Tipo))
+                foreach (var espetada in EspetadasEm(outra))
+                    if (espetada.Id != frame.Id && !lista.Contains(espetada)) lista.Add(espetada);
+        }
+        return lista;
+    }
 
     /// <summary>Para o teste: o pan do botao do meio, que mexe so no deslocamento.</summary>
     internal void PanearParaTeste(double dx, double dy)
@@ -4406,7 +4472,8 @@ public partial class EditorCircuito : Border
         double dx = x - peca.X, dy = y - peca.Y;
         if (Math.Abs(dx) < 1e-9 && Math.Abs(dy) < 1e-9) return;
 
-        List<PecaNoCircuito> juntas = Catalogo.EhProtoboard(peca.Tipo) ? [.. EspetadasEm(peca).Where(o => o.Id != peca.Id)] : [];
+        List<PecaNoCircuito> juntas = Catalogo.EhProtoboard(peca.Tipo) ? [.. EspetadasEm(peca).Where(o => o.Id != peca.Id)]
+            : Frames.EhFrame(peca.Tipo) ? EmCimaDoFrame(peca) : [];
         peca.X = x; peca.Y = y;
         Reposicionar(peca);
         foreach (var outra in juntas)

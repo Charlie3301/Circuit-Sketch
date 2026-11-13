@@ -198,6 +198,7 @@
   <ItemGroup>
     <EmbeddedResource Include="assets\*.svg" />
     <EmbeddedResource Include="assets\pecas.json" />
+    <EmbeddedResource Include="assets\frames.json" />
     <EmbeddedResource Include="assets\changelog.txt" />
     <EmbeddedResource Include="assets\demos\*.sktch" />
     <!-- Tons de teste (nao e musica) em ALAC, Opus e WavPack, para o autoteste do player. -->
