@@ -17,8 +17,8 @@ function Show-GravacaoEsptool {
     $comprimido = [int]($Programa * 0.56)
     $inicio = 0x10000
 
-    Write-Host "CircuitSketch - alvo simulado (nenhuma placa e usada)"
-    Write-Host ("Placa: {0}" -f $Placa)
+    Write-Host "CircuitSketch - simulated target (no real board is used)"
+    Write-Host ("Board: {0}" -f $Placa)
     Write-Host ("Sketch: {0}" -f $Sketch)
     Write-Host ""
     Write-Host "Configuring flash size..."
@@ -68,8 +68,8 @@ function Show-BarraAvrdude {
 function Show-GravacaoAvrdude {
     param([int]$Programa, [string]$Sketch, [string]$Placa, [string]$Assinatura)
 
-    Write-Host "CircuitSketch - alvo simulado (nenhuma placa e usada)"
-    Write-Host ("Placa: {0}" -f $Placa)
+    Write-Host "CircuitSketch - simulated target (no real board is used)"
+    Write-Host ("Board: {0}" -f $Placa)
     Write-Host ("Sketch: {0}" -f $Sketch)
     Write-Host ""
     Write-Host "avrdude: AVR device initialized and ready to accept instructions"

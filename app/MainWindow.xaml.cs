@@ -308,6 +308,7 @@ public partial class MainWindow : Window
         EscreverAtalhosNasDicas();
         PreviewKeyDown += Atalhos;
         Closing += AoFechar;
+        ComecarVigiaDaUsb();
 
         // O salvamento automatico olha a cada meio minuto se esta na hora.
         salvador = new DispatcherTimer { Interval = TimeSpan.FromSeconds(30) };
@@ -6074,6 +6075,28 @@ public partial class MainWindow : Window
         AtualizarSerial();
     }
 
+    /// <summary>
+    /// O que a pessoa digitou no monitor serial da Arduino IDE (pelo plugin):
+    /// vai para a placa do editor, como o campo "Enviar" daqui, e aparece no
+    /// monitor com o mesmo "&gt;" na frente.
+    /// </summary>
+    void ReceberDoMonitorDaIde()
+    {
+        if (bancada.Quantas == 0) return;
+        var bytes = MonitorIde.LerEntrada();
+        if (bytes is null || bytes.Length == 0) return;
+
+        var maquina = bancada.De(placaDoEditor);
+        if (maquina is null) return;
+        if (BaudErrado(placaDoEditor, maquina, out _, out _)) bytes = Embaralhar(bytes);
+        maquina.EntradaSerial.Adicionar(bytes);
+
+        string texto = System.Text.Encoding.UTF8.GetString(bytes).TrimEnd('\r', '\n');
+        if (texto.Length > 0) maquina.EscreverSerial($"[{maquina.Ms,7}ms] > {texto}");
+    }
+
+    internal void TesteReceberDoMonitorDaIde() => ReceberDoMonitorDaIde();
+
     void TeclaNaEntradaSerial(object s, KeyEventArgs e)
     {
         if (e.Key != Key.Enter) return;
@@ -6661,6 +6684,8 @@ public partial class MainWindow : Window
     /// </summary>
     void AtualizarSerial()
     {
+        ReceberDoMonitorDaIde();
+
         var novasDoQuadro = new List<string>();
         bool mudou = false;
         bool varias = bancada.Quantas > 1;
@@ -6715,7 +6740,8 @@ public partial class MainWindow : Window
         RedesenharSerial();
         MostrarBaudDoMonitor();
 
-        MonitorIde.Escrever(novasDoQuadro);
+        // Sem o "[   1200ms] " daqui: o monitor da IDE tem a marca de tempo dele.
+        MonitorIde.Escrever(novasDoQuadro.Select(l => TempoDaLinha.Replace(l, "", 1)));
     }
 
     /// <summary>A marca de tempo que abre cada linha do monitor: "[   1200ms] ".</summary>

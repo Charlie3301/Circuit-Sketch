@@ -10,11 +10,17 @@
 #  protocolo, este aqui despeja o arquivo no socket, e fechar e
 #  matar. De quebra da para rodar este sozinho para ver se o
 #  problema esta no cano ou no protocolo.
+#
+#  Os dois sentidos: o que o sketch imprime (serial.txt) vai para o
+#  socket, e o que a pessoa digita no monitor da IDE chega pelo socket
+#  e e acrescentado em entrada.txt -- o CircuitSketch le de la e
+#  entrega ao Serial.read do sketch.
 # ============================================================
 
 param(
     [Parameter(Mandatory = $true)][string]$Endereco,   # 127.0.0.1:1234
-    [Parameter(Mandatory = $true)][string]$Arquivo
+    [Parameter(Mandatory = $true)][string]$Arquivo,
+    [string]$Entrada = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -38,8 +44,27 @@ $cliente = New-Object System.Net.Sockets.TcpClient
 $cliente.Connect($partes[0], [int]$partes[1])
 Anotar "conectou"
 
-$escritor = New-Object System.IO.StreamWriter($cliente.GetStream())
+$fluxo = $cliente.GetStream()
+$escritor = New-Object System.IO.StreamWriter($fluxo)
 $escritor.AutoFlush = $true
+$recebido = New-Object byte[] 4096
+
+# O que chegou do monitor da IDE (a pessoa digitou e apertou Enter):
+# vai inteiro, com o fim de linha que ela escolheu, para o fim do
+# entrada.txt. ReadWrite no compartilhamento pelo mesmo motivo da
+# leitura do serial.txt: o CircuitSketch le este arquivo enquanto isso.
+function Receber {
+    if (-not $Entrada) { return }
+    while ($fluxo.DataAvailable) {
+        $n = $fluxo.Read($recebido, 0, $recebido.Length)
+        if ($n -le 0) { return }
+        $pasta = Split-Path -Parent $Entrada
+        if (-not (Test-Path -LiteralPath $pasta)) { New-Item -ItemType Directory -Force -Path $pasta | Out-Null }
+        $destino = [System.IO.File]::Open($Entrada, 'Append', 'Write', 'ReadWrite')
+        try { $destino.Write($recebido, 0, $n) } finally { $destino.Dispose() }
+        Anotar "recebeu $n bytes da IDE"
+    }
+}
 
 # Comeca do inicio de proposito: quem abre o monitor no meio da
 # execucao quer ver o que ja saiu, e nao uma tela em branco.
@@ -48,6 +73,7 @@ $posicao = 0
 try {
     while ($cliente.Connected) {
         Start-Sleep -Milliseconds 120
+        Receber
 
         if (-not (Test-Path -LiteralPath $Arquivo)) { continue }
         $tamanho = (Get-Item -LiteralPath $Arquivo).Length
@@ -56,7 +82,7 @@ try {
         # comeco em vez de ficar esperando passar do fim.
         if ($tamanho -lt $posicao) {
             $posicao = 0
-            $escritor.Write("`r`n--- placa reiniciada ---`r`n")
+            $escritor.Write("`r`n--- board restarted ---`r`n")
         }
         if ($tamanho -eq $posicao) { continue }
 

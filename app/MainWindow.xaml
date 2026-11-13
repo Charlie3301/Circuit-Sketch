@@ -200,6 +200,34 @@
                                Foreground="{DynamicResource TextoFraco}" HorizontalAlignment="Right"
                                TextTrimming="CharacterEllipsis" MaxWidth="260"/>
                 </StackPanel>
+                <!-- A placa de verdade que recebe o codigo: a porta USB e o que
+                     esta ligado nela, como o "Select Board" da Arduino IDE. -->
+                <Button x:Name="btPlacaUsb" Margin="0,0,8,0" Height="28" MaxWidth="250" VerticalAlignment="Center"
+                        Cursor="Hand" Click="AbrirMenuDasPortas"
+                        ToolTip="{local:T 'A placa de verdade ligada na USB, que recebe o código da seta'}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="f" Background="{DynamicResource Painel}" BorderBrush="{DynamicResource Borda}"
+                                    BorderThickness="1" CornerRadius="14" Padding="10,0">
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="f" Property="Background" Value="{DynamicResource Borda}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Left" Text="USB" FontSize="9" FontWeight="Bold" Margin="0,0,6,0"
+                                   VerticalAlignment="Center" Foreground="{DynamicResource TextoFraco}"/>
+                        <TextBlock DockPanel.Dock="Right" Text="&#x25BE;" FontSize="11" Margin="6,0,0,0"
+                                   VerticalAlignment="Center" Foreground="{DynamicResource TextoFraco}"/>
+                        <TextBlock x:Name="txtPlacaUsb" FontSize="11" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource Texto}" TextTrimming="CharacterEllipsis"
+                                   Text="{local:T 'nenhuma placa na USB'}"/>
+                    </DockPanel>
+                </Button>
                 <Button x:Name="btVerificar" Style="{StaticResource Redondo}" Background="#00878F"
                         Content="&#x2713;" FontSize="17" Click="Verificar"
                         ToolTip="{local:T 'Verificar o código: o simulador e o compilador do Arduino (Ctrl+R)'}"/>
@@ -779,9 +807,12 @@
                                     Margin="6,0,0,0" Style="{StaticResource BotaoPequeno}" Click="MandarParaPlaca"/>
                             <Button DockPanel.Dock="Right" x:Name="btVerificarNaAba" Content="{local:T 'Verificar'}"
                                     Margin="6,0,0,0" Style="{StaticResource BotaoPequeno}" Click="Verificar"/>
+                            <Button DockPanel.Dock="Right" x:Name="btMonitorPlaca" Content="{local:T 'Monitor serial'}"
+                                    Margin="6,0,0,0" Style="{StaticResource BotaoPequeno}" Click="AlternarMonitorDaPlaca"
+                                    ToolTip="{local:T 'O monitor serial da placa de verdade, na porta escolhida'}"/>
                             <Button DockPanel.Dock="Left" x:Name="btPortaPlaca" Width="150"
                                     Content="{local:T 'Escolher a porta'}" Style="{StaticResource BotaoPequeno}"
-                                    Click="EscolherPortaDaPlaca"
+                                    Click="AbrirMenuDasPortas"
                                     ToolTip="{local:T 'As placas ligadas na USB deste computador'}"/>
                             <TextBlock x:Name="txtPortaEscolhida" Margin="10,0,0,0" FontSize="11"
                                        VerticalAlignment="Center" Foreground="{DynamicResource TextoFraco}"
@@ -789,6 +820,13 @@
                         </DockPanel>
                         <TextBlock x:Name="txtPlacaEstado" DockPanel.Dock="Top" Margin="0,0,0,6" FontSize="11"
                                    TextWrapping="Wrap" Foreground="{DynamicResource TextoFraco}"/>
+                        <!-- O que se manda para a placa de verdade, com o monitor dela aberto. -->
+                        <DockPanel x:Name="painelEntradaPlaca" DockPanel.Dock="Bottom" Margin="0,6,0,0" Visibility="Collapsed">
+                            <Button DockPanel.Dock="Right" Content="{local:T 'Enviar'}" Margin="6,0,0,0"
+                                    Style="{StaticResource BotaoPequeno}" Click="EnviarParaAPlaca"/>
+                            <TextBox x:Name="txtEntradaPlaca" Style="{StaticResource CampoEscuro}" KeyDown="TeclaNaEntradaPlaca"
+                                     ToolTip="{local:T 'Texto para a placa de verdade (vai com o fim de linha do monitor do simulador)'}"/>
+                        </DockPanel>
                         <ScrollViewer x:Name="rolagemPlaca" VerticalScrollBarVisibility="Auto">
                             <TextBlock x:Name="txtPlaca" FlowDirection="LeftToRight" VerticalAlignment="Top" FontFamily="Consolas" FontSize="11"
                                        Foreground="{DynamicResource Texto}" TextWrapping="Wrap"

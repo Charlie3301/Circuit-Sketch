@@ -54,9 +54,9 @@ Anotar "subiu | politica=$(Get-ExecutionPolicy) | pasta=$PWD"
 
 $porta = @{
     address       = 'circuitsketch'
-    label         = 'CircuitSketch (simulador)'
+    label         = 'CircuitSketch (simulator)'
     protocol      = 'circuitsketch'
-    protocolLabel = 'Simulador'
+    protocolLabel = 'Simulator'
     hardwareId    = ''
     properties    = @{ vid = '0x0000'; pid = '0x0000' }
 }

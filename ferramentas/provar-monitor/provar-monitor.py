@@ -1,5 +1,5 @@
-"""
-Prova do monitor serial: simulador -> Arduino IDE.
+r"""
+Prova do monitor serial: simulador <-> Arduino IDE.
 
 Faz o papel da IDE. Abre o monitor.ps1, fala o protocolo do pluggable
 monitor (HELLO / DESCRIBE / OPEN / CLOSE / QUIT), poe um socket TCP de
@@ -24,10 +24,13 @@ import time
 
 BAT = r'C:\Users\seraf\OneDrive\Desktop\SimuladorESP32\plataforma\tools\monitor.bat'
 ARQ = os.path.join(os.environ['APPDATA'], 'CircuitSketch', 'serial.txt')
+ENTRADA = os.path.join(os.environ['APPDATA'], 'CircuitSketch', 'entrada.txt')
 
 os.makedirs(os.path.dirname(ARQ), exist_ok=True)
 with open(ARQ, 'w', encoding='utf-8') as f:
     f.write('estado 0\nestado 1\n')
+with open(ENTRADA, 'w', encoding='utf-8') as f:
+    pass
 
 servidor = socket.socket()
 servidor.bind(('127.0.0.1', 0))
@@ -42,11 +45,16 @@ def aceitar():
         conexao, _ = servidor.accept()
         conexao.settimeout(8)
         fim = time.time() + 8
+        mandou = False
         while time.time() < fim:
             dados = conexao.recv(4096)
             if not dados:
                 break
             recebido.append(dados.decode('utf-8', 'replace'))
+            # O caminho de volta: a pessoa digita no monitor da IDE.
+            if not mandou:
+                conexao.sendall('liga led\n'.encode('utf-8'))
+                mandou = True
         conexao.close()
     except Exception:
         # Fechar o monitor derruba a conexao; e o esperado.
@@ -132,7 +140,10 @@ conferir('o que ja estava no arquivo chega',
          'estado 0' in texto and 'estado 1' in texto, repr(texto[:200]))
 conferir('linha escrita com o monitor aberto chega', 'estado 2' in texto, repr(texto))
 conferir('arquivo zerado e visto como reinicio',
-         'placa reiniciada' in texto and 'depois do reinicio' in texto, repr(texto))
+         'board restarted' in texto and 'depois do reinicio' in texto, repr(texto))
+with open(ENTRADA, encoding='utf-8') as f:
+    digitado = f.read()
+conferir('o que se digita no monitor da IDE chega em entrada.txt', digitado == 'liga led\n', repr(digitado))
 conferir('CLOSE aceita', r4.get('eventType') == 'close' and not r4.get('error'), str(r4))
 conferir('QUIT aceita', r5.get('eventType') == 'quit', str(r5))
 

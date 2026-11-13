@@ -14,7 +14,7 @@ namespace Simulador.App;
 /// que a pessoa ja instalou nela. Nada novo para instalar: sem a IDE, os
 /// botoes dizem isso e o que fazer.
 /// </summary>
-public static class PlacaDeVerdade
+public static partial class PlacaDeVerdade
 {
     /// <summary>Uma porta USB com (talvez) uma placa reconhecida.</summary>
     public sealed record Porta(string Endereco, string Rotulo, string Placa, string Fqbn);
@@ -25,7 +25,16 @@ public static class PlacaDeVerdade
     static string cli;
     static bool procurou;
 
-    /// <summary>O arduino-cli da Arduino IDE 2, ou null.</summary>
+    /// <summary>
+    /// Onde fica o arduino-cli que o próprio CircuitSketch baixa (de
+    /// downloads.arduino.cc) quando a Arduino IDE 2 não está instalada.
+    /// </summary>
+    public static string CliBaixado => Path.Combine(Armazem.Pasta, "arduino-cli", "arduino-cli.exe");
+
+    /// <summary>Procura o arduino-cli de novo (depois de baixar, ou para o teste).</summary>
+    public static void EsquecerCli() { procurou = false; cli = null; }
+
+    /// <summary>O arduino-cli da Arduino IDE 2, o do PATH ou o que o CircuitSketch baixou; ou null.</summary>
     public static string Cli
     {
         get
@@ -54,7 +63,7 @@ public static class PlacaDeVerdade
                 }
                 catch (ArgumentException) { }
 
-            return null;
+            return File.Exists(CliBaixado) ? cli = CliBaixado : null;
         }
     }
 
@@ -78,7 +87,9 @@ public static class PlacaDeVerdade
         "arduino-uno" => "arduino:avr:uno",
         "arduino-nano" => "arduino:avr:nano",
         "arduino-mega" => "arduino:avr:mega",
-        "esp32-devkit-v1" => "esp32:esp32:esp32",
+        // A DOIT DevKit V1, e nao a "ESP32 Dev Module" generica: so a variante
+        // dela define LED_BUILTIN (GPIO 2), que o sketch em branco usa.
+        "esp32-devkit-v1" => "esp32:esp32:esp32doit-devkit-v1",
         "esp32-s2-devkit" => "esp32:esp32:esp32s2",
         "esp32-s3-devkit" => "esp32:esp32:esp32s3",
         "esp32-c3-devkit" => "esp32:esp32:esp32c3",
@@ -120,11 +131,120 @@ public static class PlacaDeVerdade
     //  consultas
     // =================================================================
 
-    /// <summary>As portas seriais com o que o arduino-cli reconheceu nelas.</summary>
+    /// <summary>
+    /// As portas seriais: as do Windows na hora (com o nome pelo VID/PID) e,
+    /// com o arduino-cli, a placa que ele reconheceu em cada uma.
+    /// </summary>
     public static List<Porta> Portas()
     {
-        var saida = Rodar(["board", "list", "--format", "json"], 30_000, out _);
-        return saida is null ? [] : LerPortas(saida);
+        var doWindows = PortasDoWindows();
+        if (Cli is null) return doWindows;
+
+        var saida = RodarJson(["board", "list"], 30_000);
+        if (saida is null) return doWindows;
+
+        // O arduino-cli sabe a placa (com o FQBN); o Windows sabe as portas
+        // que ele as vezes ainda nao listou. Fica a uniao, pela ordem do COM.
+        var juntas = LerPortas(saida).ToDictionary(p => p.Endereco, StringComparer.OrdinalIgnoreCase);
+        foreach (var p in doWindows)
+            if (!juntas.TryGetValue(p.Endereco, out var doCli))
+                juntas[p.Endereco] = p;
+            else if (doCli.Placa is null && p.Placa is not null)
+                juntas[p.Endereco] = doCli with { Placa = p.Placa };
+        return [.. juntas.Values.OrderBy(p => NumeroDoCom(p.Endereco)).ThenBy(p => p.Endereco)];
+    }
+
+    static int NumeroDoCom(string endereco)
+        => endereco?.StartsWith("COM", StringComparison.OrdinalIgnoreCase) == true
+           && int.TryParse(endereco[3..], out int n) ? n : int.MaxValue;
+
+    /// <summary>
+    /// As portas COM que existem agora, como o Windows as lista
+    /// (HARDWARE\DEVICEMAP\SERIALCOMM): muda quando uma placa é ligada ou
+    /// tirada, e ler é instantâneo -- serve para vigiar a USB.
+    /// </summary>
+    public static string AssinaturaDasPortas()
+    {
+        try
+        {
+            using var chave = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"HARDWARE\DEVICEMAP\SERIALCOMM");
+            if (chave is null) return "";
+            // As COM do Bluetooth (\Device\BthModem0) nao sao placa na USB.
+            return string.Join(",", chave.GetValueNames()
+                                         .Where(n => !n.Contains("BthModem", StringComparison.OrdinalIgnoreCase))
+                                         .Select(n => chave.GetValue(n) as string)
+                                         .Where(v => !string.IsNullOrEmpty(v)).OrderBy(v => v));
+        }
+        catch (Exception e) when (e is System.Security.SecurityException or UnauthorizedAccessException or IOException)
+        {
+            return "";
+        }
+    }
+
+    /// <summary>
+    /// As portas COM com o VID/PID de quem está do outro lado, pelo registro
+    /// (Enum\USB e Enum\FTDIBUS). Funciona sem a Arduino IDE: a lista de
+    /// placas aparece mesmo antes de haver um compilador.
+    /// </summary>
+    public static List<Porta> PortasDoWindows()
+    {
+        var existentes = AssinaturaDasPortas().Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                             .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var vidPid = new Dictionary<string, (string Vid, string Pid)>(StringComparer.OrdinalIgnoreCase);
+
+        try
+        {
+            foreach (string barramento in new[] { "USB", "FTDIBUS" })
+            {
+                using var raiz = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Enum\" + barramento);
+                if (raiz is null) continue;
+                foreach (string aparelho in raiz.GetSubKeyNames())
+                {
+                    var m = System.Text.RegularExpressions.Regex.Match(aparelho, @"VID_([0-9A-F]{4}).PID_([0-9A-F]{4})",
+                                                                        System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    if (!m.Success) continue;
+                    using var chaveDoAparelho = raiz.OpenSubKey(aparelho);
+                    if (chaveDoAparelho is null) continue;
+                    foreach (string instancia in chaveDoAparelho.GetSubKeyNames())
+                    {
+                        using var parametros = chaveDoAparelho.OpenSubKey(instancia + @"\Device Parameters");
+                        if (parametros?.GetValue("PortName") is string com && existentes.Contains(com))
+                            vidPid[com] = ("0x" + m.Groups[1].Value.ToUpperInvariant(), "0x" + m.Groups[2].Value.ToUpperInvariant());
+                    }
+                }
+            }
+        }
+        catch (Exception e) when (e is System.Security.SecurityException or UnauthorizedAccessException or IOException) { }
+
+        return [.. existentes.OrderBy(NumeroDoCom).ThenBy(c => c)
+                             .Select(com => vidPid.TryGetValue(com, out var v)
+                                 ? new Porta(com, "Serial Port (USB)", NomePeloUsb(v.Vid, v.Pid), null)
+                                 : new Porta(com, "Serial Port", null, null))];
+    }
+
+    /// <summary>A placa (ou o conversor USB-serial) pelo VID/PID.</summary>
+    public static string NomePeloUsb(string vid, string pid) => (vid?.ToUpperInvariant(), pid?.ToUpperInvariant()) switch
+    {
+        ("0X2341", "0X0043" or "0X0001" or "0X0243") => "Arduino Uno",
+        ("0X2341", "0X0010" or "0X0042" or "0X0242") => "Arduino Mega 2560",
+        ("0X2341", "0X005E" or "0X805E") => "Arduino Nano RP2040 Connect",
+        ("0X2E8A", _) => "Raspberry Pi Pico",
+        _ => ConversorDe(vid, pid),
+    };
+
+    /// <summary>
+    /// Roda pedindo JSON: "--json" nos arduino-cli 1.x; os da IDE 2.0 (0.x)
+    /// so conhecem "--format json".
+    /// </summary>
+    static string RodarJson(List<string> args, int prazoMs)
+    {
+        foreach (var jeito in new[] { new[] { "--json" }, new[] { "--format", "json" } })
+        {
+            string saida = Rodar([.. args, .. jeito], prazoMs, out _);
+            if (saida?.TrimStart() is { } s && (s.StartsWith('{') || s.StartsWith('[')))
+                return saida;
+        }
+        return null;
     }
 
     /// <summary>O JSON do "board list" -- separado para o teste ler um exemplo.</summary>
@@ -161,7 +281,7 @@ public static class PlacaDeVerdade
                 // por um conversor USB-serial generico (CP2102, CH340).
                 if (placa is null && porta.TryGetProperty("properties", out var props)
                     && props.TryGetProperty("vid", out var vid))
-                    placa = ConversorDe(vid.GetString(), props.TryGetProperty("pid", out var pid) ? pid.GetString() : "");
+                    placa = NomePeloUsb(vid.GetString(), props.TryGetProperty("pid", out var pid) ? pid.GetString() : "");
 
                 portas.Add(new Porta(endereco, rotulo, placa, fqbn));
             }
@@ -185,7 +305,7 @@ public static class PlacaDeVerdade
     public static HashSet<string> Nucleos()
     {
         var instalados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var saida = Rodar(["core", "list", "--format", "json"], 60_000, out _);
+        var saida = RodarJson(["core", "list"], 60_000);
         if (saida is null) return instalados;
 
         try
@@ -369,6 +489,8 @@ public static class PlacaDeVerdade
             StandardErrorEncoding = Encoding.UTF8,
         };
         foreach (string a in args) inicio.ArgumentList.Add(a);
+        // Sem as cores do terminal: na aba PLACA elas viravam "[92m" no meio do texto.
+        inicio.ArgumentList.Add("--no-color");
         if (ConfigDaIde is { } config)
         {
             inicio.ArgumentList.Add("--config-file");
@@ -376,6 +498,14 @@ public static class PlacaDeVerdade
         }
         return inicio;
     }
+
+    /// <summary>
+    /// Tira os códigos de cor do terminal ("\x1b[92m"): o gcc e as
+    /// ferramentas das placas os escrevem mesmo com o --no-color.
+    /// </summary>
+    public static string SemCores(string texto)
+        => texto is null || texto.IndexOf('\u001b') < 0 ? texto
+           : System.Text.RegularExpressions.Regex.Replace(texto, @"\u001b\[[0-9;?]*[ -/]*[@-~]", "");
 
     /// <summary>Roda e devolve tudo o que ele escreveu, ou null se nao deu.</summary>
     static string Rodar(IEnumerable<string> args, int prazoMs, out string erro)
@@ -410,8 +540,8 @@ public static class PlacaDeVerdade
         try
         {
             using var processo = new Process { StartInfo = Inicio(args), EnableRaisingEvents = true };
-            processo.OutputDataReceived += (_, e) => { if (e.Data is not null) linha?.Invoke(e.Data); };
-            processo.ErrorDataReceived += (_, e) => { if (e.Data is not null) linha?.Invoke(e.Data); };
+            processo.OutputDataReceived += (_, e) => { if (e.Data is not null) linha?.Invoke(SemCores(e.Data)); };
+            processo.ErrorDataReceived += (_, e) => { if (e.Data is not null) linha?.Invoke(SemCores(e.Data)); };
             processo.Start();
             processo.BeginOutputReadLine();
             processo.BeginErrorReadLine();

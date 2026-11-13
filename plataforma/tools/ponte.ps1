@@ -52,7 +52,7 @@ $anotacao = if ($Build) { Join-Path $Build 'circuitsketch-sketch.txt' } else { $
 
 if ($Modo -eq 'compilar') {
     if (-not (Test-Path -LiteralPath $Sketch)) {
-        [Console]::Error.WriteLine("ERRO: pasta do sketch nao encontrada: $Sketch")
+        [Console]::Error.WriteLine("ERROR: sketch folder not found: $Sketch")
         exit 1
     }
     # Deixa o rastro para o passo de gravar, que nao recebe o caminho.
@@ -63,8 +63,8 @@ else {
         $Sketch = (Get-Content -LiteralPath $anotacao -Raw).Trim()
     }
     if (-not $Sketch -or -not (Test-Path -LiteralPath $Sketch)) {
-        [Console]::Error.WriteLine("ERRO: nao achei o sketch desta compilacao.")
-        [Console]::Error.WriteLine("Compile uma vez antes de gravar.")
+        [Console]::Error.WriteLine("ERROR: the sketch of this build was not found.")
+        [Console]::Error.WriteLine("Verify (compile) once before uploading.")
         exit 1
     }
 
@@ -99,13 +99,13 @@ if (-not $exe -or -not (Test-Path -LiteralPath $exe)) {
 }
 
 if ($exe -and (Test-Path -LiteralPath $exe)) {
-    if ($Modo -eq 'gravar') { Write-Host "Abrindo o CircuitSketch..." }
+    if ($Modo -eq 'gravar') { Write-Host "Opening CircuitSketch..." }
     $argumentos = @($Sketch)
     if ($Peca) { $argumentos += @('--placa', $Peca) }
     Start-Process -FilePath $exe -ArgumentList $argumentos -WindowStyle Normal
     exit 0
 }
 
-[Console]::Error.WriteLine("AVISO: o CircuitSketch nao foi encontrado.")
-[Console]::Error.WriteLine("Rode instalar.ps1 para registrar o caminho do executavel.")
+[Console]::Error.WriteLine("WARNING: CircuitSketch was not found.")
+[Console]::Error.WriteLine("Run 'Instalar plugin.bat' (in the CircuitSketch folder) again to register where CircuitSketch.exe is.")
 exit 0

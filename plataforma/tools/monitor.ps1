@@ -22,15 +22,16 @@
 #  no meio da execucao, e da para conferir o que esta acontecendo
 #  abrindo o arquivo no Bloco de Notas.
 #
-#  So o sentido simulador -> IDE existe. O caminho de volta pediria
-#  Serial.read, que o motor ainda nao tem, e um monitor que aceita
-#  texto e joga fora seria pior do que um que nao aceita.
+#  Os dois sentidos: o que a pessoa digita no monitor da IDE vai para
+#  %APPDATA%\CircuitSketch\entrada.txt, e o CircuitSketch entrega ao
+#  Serial.read do sketch que esta rodando.
 # ============================================================
 
 $ErrorActionPreference = 'Stop'
 $OutputEncoding = [System.Text.UTF8Encoding]::new($false)
 
 $arquivo = Join-Path $env:APPDATA 'CircuitSketch\serial.txt'
+$entrada = Join-Path $env:APPDATA 'CircuitSketch\entrada.txt'
 $cano    = Join-Path $PSScriptRoot 'monitor-cano.ps1'
 $filho   = $null
 
@@ -69,7 +70,7 @@ while ($true) {
                     protocol = 'circuitsketch'
                     configuration_parameters = @{
                         baudrate = @{
-                            label    = 'Velocidade'
+                            label    = 'Baudrate'
                             type     = 'enum'
                             values   = @('9600', '19200', '38400', '57600', '115200')
                             selected = '115200'
@@ -102,7 +103,8 @@ while ($true) {
                 $filho = Start-Process -PassThru -NoNewWindow -FilePath 'powershell' `
                     -ArgumentList @(
                         '-NoProfile', '-ExecutionPolicy', 'Bypass', '-NonInteractive',
-                        '-File', $cano, '-Endereco', $partes[1], '-Arquivo', $arquivo)
+                        '-File', $cano, '-Endereco', $partes[1], '-Arquivo', $arquivo,
+                        '-Entrada', $entrada)
 
                 Responder @{ eventType = 'open'; message = 'OK' }
             }

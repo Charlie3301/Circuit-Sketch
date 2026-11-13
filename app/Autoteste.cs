@@ -103,6 +103,7 @@ public static partial class Autoteste
         Bloco("Placa_CodigoDeCadaUma", Placa_CodigoDeCadaUma);
         Bloco("Queima_LigacaoErrada", Queima_LigacaoErrada);
         Bloco("Monitor_ParaAIde", Monitor_ParaAIde);
+        Bloco("Monitor_DaIde", Monitor_DaIde);
         Bloco("Motor_Enum", Motor_Enum);
         Bloco("Fios_Sobrepostos", Fios_Sobrepostos);
         Bloco("Motor_Interrupcoes", Motor_Interrupcoes);
@@ -201,6 +202,7 @@ public static partial class Autoteste
         Bloco("Ble_PlacaComPlaca", Ble_PlacaComPlaca);
         Bloco("Ble_ArduinoBle", Ble_ArduinoBle);
         Bloco("Placa_DeVerdade", Placa_DeVerdade);
+        Bloco("Placa_Usb", Placa_Usb);
         Bloco("Motor_TamanhosEVetores", Motor_TamanhosEVetores);
         Bloco("Motor_SonoProfundo", Motor_SonoProfundo);
         Bloco("Tela_TftEmPixels", Tela_TftEmPixels);
