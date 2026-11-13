@@ -85,6 +85,8 @@ public static class Preferencias
 
     // ---------------- as chaves que existem ----------------
     public const string Grade = "grade";
+    /// <summary>O desenho do fundo com a grade ligada: "pontilhado", "grade" ou "quadriculado".</summary>
+    public const string EstiloDoFundo = "estilo-do-fundo";
     /// <summary>O "author" dos diagram.json (vazio: o usuario do Windows).</summary>
     public const string Autor = "autor-dos-projetos";
 
@@ -156,6 +158,15 @@ public static class Preferencias
     // ---- aparência e circuito ----
     public const string EscalaDaInterface = "escala-da-interface";
     public const string EspessuraDoFio = "espessura-do-fio";
+
+    // O broker MQTT do computador (a janela do MQTT).
+    public const string MqttPorta = "mqtt-porta";
+    public const string MqttNaRede = "mqtt-na-rede";
+    public const string MqttSoNoComputador = "mqtt-so-no-computador";
+
+    // Os controles do celular: o que cada botao manda (JSON numa linha).
+    public const string CelularControleRc = "celular-controle-rc";
+    public const string CelularControleVideogame = "celular-controle-videogame";
 
     /// <summary>
     /// Um número guardado. Fora da faixa, ou escrito errado no arquivo,

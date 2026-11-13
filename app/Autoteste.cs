@@ -251,6 +251,9 @@ public static partial class Autoteste
         Bloco("Esc_Brushless", Esc_Brushless);
         Bloco("Receptor_Radio", Receptor_Radio);
         Bloco("Acessorios_RodasHelices", Acessorios_RodasHelices);
+        Bloco("Editor_SobreposicoesNoArraste", Editor_SobreposicoesNoArraste);
+        Bloco("Editor_OpcoesNaVertical", Editor_OpcoesNaVertical);
+        Bloco("Atalhos_Configuraveis", Atalhos_Configuraveis);
         Bloco("PlayerDap_Pecas", PlayerDap_Pecas);
         Bloco("PlayerDap_Formatos", PlayerDap_Formatos);
         Bloco("PlayerDap_Ape", PlayerDap_Ape);
@@ -287,6 +290,7 @@ public static partial class Autoteste
         Bloco("Rede_WifiEHttp", Rede_WifiEHttp);
         Bloco("Rede_ServidorCru", Rede_ServidorCru);
         Bloco("Rede_Mqtt", Rede_Mqtt);
+        Bloco("Rede_BrokerDoComputador", Rede_BrokerDoComputador);
         Bloco("Rede_Bluetooth", Rede_Bluetooth);
         Bloco("Painel_RedeEBluetooth", Painel_RedeEBluetooth);
         Bloco("Editor_SelecaoEGrade", Editor_SelecaoEGrade);

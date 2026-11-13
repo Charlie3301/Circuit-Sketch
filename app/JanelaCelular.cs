@@ -18,16 +18,16 @@ namespace Simulador.App;
 /// As cores sao as de um celular (o tema escuro do Android), e nao as do
 /// programa: e um aparelho, como as pecas do circuito.
 /// </summary>
-public sealed class JanelaCelular : Window
+public sealed partial class JanelaCelular : Window
 {
-    static SolidColorBrush Cor(byte r, byte g, byte b)
+    internal static SolidColorBrush Cor(byte r, byte g, byte b)
     {
         var p = new SolidColorBrush(Color.FromRgb(r, g, b));
         p.Freeze();
         return p;
     }
 
-    static readonly SolidColorBrush Fundo = Cor(0x12, 0x14, 0x18), Superficie = Cor(0x1D, 0x21, 0x27),
+    internal static readonly SolidColorBrush Fundo = Cor(0x12, 0x14, 0x18), Superficie = Cor(0x1D, 0x21, 0x27),
         Superficie2 = Cor(0x27, 0x2C, 0x34), TextoForte = Cor(0xEC, 0xEF, 0xF4), TextoFraco = Cor(0x9A, 0xA3, 0xB0),
         Destaque = Cor(0x82, 0xB1, 0xFF), Verde = Cor(0x7E, 0xE0, 0x9E), Vermelho = Cor(0xFF, 0x8A, 0x80),
         Amarelo = Cor(0xFF, 0xD5, 0x80), Borda = Cor(0x33, 0x39, 0x42);
@@ -35,7 +35,7 @@ public sealed class JanelaCelular : Window
     readonly Rede rede;
     readonly DispatcherTimer tique;
     readonly TextBlock horaDaBarra = new() { Foreground = TextoForte, FontSize = 13, VerticalAlignment = VerticalAlignment.Center };
-    readonly Border paginaDispositivos = new(), paginaTerminal = new(), paginaBle = new();
+    readonly Border paginaDispositivos = new(), paginaTerminal = new(), paginaBle = new(), paginaRc = new(), paginaVideogame = new();
     readonly List<(Button Botao, Border Pagina)> abas = [];
 
     public JanelaCelular(Window dono, Rede rede)
@@ -70,7 +70,8 @@ public sealed class JanelaCelular : Window
             Text = Idioma.T("o celular da aula"), FontSize = 12, Foreground = TextoFraco, Margin = new Thickness(22, 0, 12, 20),
         });
         foreach (var (texto, pagina) in new[] { (Idioma.T("Dispositivos"), paginaDispositivos), (Idioma.T("Terminal (clássico)"), paginaTerminal),
-                                                ("BLE", paginaBle) })
+                                                ("BLE", paginaBle), (Idioma.T("Controle RC"), paginaRc),
+                                                (Idioma.T("Controle de videogame"), paginaVideogame) })
         {
             var botao = BotaoDoMenu(texto);
             botao.Click += (_, _) => Mostrar(pagina);
@@ -80,7 +81,7 @@ public sealed class JanelaCelular : Window
         corpo.Children.Add(menu);
 
         var conteudo = new Grid { Margin = new Thickness(28, 20, 28, 20) };
-        foreach (var p in new[] { paginaDispositivos, paginaTerminal, paginaBle })
+        foreach (var p in new[] { paginaDispositivos, paginaTerminal, paginaBle, paginaRc, paginaVideogame })
             conteudo.Children.Add(p);
         Grid.SetColumn(conteudo, 1);
         corpo.Children.Add(conteudo);
@@ -90,7 +91,14 @@ public sealed class JanelaCelular : Window
         MontarDispositivos();
         MontarTerminal();
         MontarBle();
+        MontarControleRc();
+        MontarControleVideogame();
         Mostrar(paginaDispositivos);
+
+        // As setas (ou W A S D) guiam o carrinho com o Controle RC aberto.
+        PreviewKeyDown += (_, ev) => { if (TeclaDoRc(ev.Key, true)) ev.Handled = true; };
+        PreviewKeyUp += (_, ev) => { if (TeclaDoRc(ev.Key, false)) ev.Handled = true; };
+        Deactivated += (_, _) => SoltarTeclasDoRc();
 
         rede.ChegouNoCelular += AoChegarClassico;
         rede.NotificouOCelular += AoNotificar;
@@ -173,7 +181,7 @@ public sealed class JanelaCelular : Window
         }
     }
 
-    static Button Botao(string texto, bool principal = false)
+    internal static Button Botao(string texto, bool principal = false)
     {
         var modelo = new ControlTemplate(typeof(Button));
         var borda = new FrameworkElementFactory(typeof(Border));
@@ -198,14 +206,14 @@ public sealed class JanelaCelular : Window
         };
     }
 
-    static void TrocarTexto(ContentControl botao, string texto)
+    internal static void TrocarTexto(ContentControl botao, string texto)
     {
         if (botao.Content is TextBlock t) t.Text = texto;
         else botao.Content = texto;
     }
 
     /// <summary>Uma chave de ligar e desligar: a pilula acende quando ligada.</summary>
-    static ToggleButton Chave(string texto, bool ligada = false)
+    internal static ToggleButton Chave(string texto, bool ligada = false)
     {
         var modelo = new ControlTemplate(typeof(ToggleButton));
         var borda = new FrameworkElementFactory(typeof(Border));
@@ -240,10 +248,10 @@ public sealed class JanelaCelular : Window
     }
 
     /// <summary>Um botao que troca de opcao a cada toque (o fim de linha, texto ou hexa).</summary>
-    static Button Ciclo(string[] opcoes, Action<int> mudou)
+    internal static Button Ciclo(string[] opcoes, Action<int> mudou, int inicial = 0)
     {
-        int atual = 0;
-        var botao = Botao(opcoes[0]);
+        int atual = Math.Clamp(inicial, 0, opcoes.Length - 1);
+        var botao = Botao(opcoes[atual]);
         botao.Click += (_, _) =>
         {
             atual = (atual + 1) % opcoes.Length;
@@ -253,26 +261,26 @@ public sealed class JanelaCelular : Window
         return botao;
     }
 
-    static TextBox Campo(string dica = null) => new()
+    internal static TextBox Campo(string dica = null) => new()
     {
         Background = Superficie2, Foreground = TextoForte, CaretBrush = TextoForte, BorderBrush = Borda,
         BorderThickness = new Thickness(1), Padding = new Thickness(10, 7, 10, 7), FontSize = 14,
         VerticalContentAlignment = VerticalAlignment.Center, ToolTip = dica,
     };
 
-    static TextBlock Titulo(string texto) => new()
+    internal static TextBlock Titulo(string texto) => new()
     {
         Text = texto, FontSize = 24, FontWeight = FontWeights.SemiBold, Foreground = TextoForte,
         Margin = new Thickness(0, 0, 0, 4),
     };
 
-    static TextBlock Subtitulo(string texto) => new()
+    internal static TextBlock Subtitulo(string texto) => new()
     {
         Text = texto, FontSize = 13, Foreground = TextoFraco, TextWrapping = TextWrapping.Wrap,
         Margin = new Thickness(0, 0, 0, 16),
     };
 
-    static Border Cartao(UIElement dentro) => new()
+    internal static Border Cartao(UIElement dentro) => new()
     {
         Background = Superficie, CornerRadius = new CornerRadius(14), Padding = new Thickness(16, 12, 16, 12),
         Margin = new Thickness(0, 0, 0, 10), Child = dentro, BorderBrush = Borda, BorderThickness = new Thickness(1),
@@ -285,6 +293,7 @@ public sealed class JanelaCelular : Window
         AtualizarTerminal();
         AtualizarBle();
         EsvaziarPedacoClassico();
+        AtualizarControles();
     }
 
     // =====================================================================
@@ -889,11 +898,15 @@ public sealed class JanelaCelular : Window
         });
     }
 
-    /// <summary>Para o teste: mostra uma das paginas ("dispositivos", "terminal", "ble", "servicos").</summary>
+    /// <summary>Para o teste: mostra uma das paginas ("dispositivos", "terminal", "ble", "servicos", "rc", "videogame").</summary>
     internal void MostrarPagina(string qual)
     {
         Atualizar();
-        Mostrar(qual switch { "terminal" => paginaTerminal, "ble" or "servicos" => paginaBle, _ => paginaDispositivos });
+        Mostrar(qual switch
+        {
+            "terminal" => paginaTerminal, "ble" or "servicos" => paginaBle, "rc" => paginaRc, "videogame" => paginaVideogame,
+            _ => paginaDispositivos,
+        });
         if (qual == "servicos") bleModoUart.IsChecked = false;
     }
 

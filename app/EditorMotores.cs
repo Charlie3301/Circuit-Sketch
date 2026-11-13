@@ -632,7 +632,7 @@ public partial class EditorCircuito
         foreach (string id in motoresSemEscova.Keys.Where(id => !vivas.Contains(id)).ToList()) motoresSemEscova.Remove(id);
         foreach (string id in rotulosDeGiro.Keys.Where(id => !vivas.Contains(id)).ToList())
         {
-            mundo.Children.Remove(rotulosDeGiro[id]);
+            TirarDaTela(rotulosDeGiro[id]);
             rotulosDeGiro.Remove(id);
         }
         return conta;
@@ -688,7 +688,11 @@ public partial class EditorCircuito
         if (rotulo.Visibility != visivel) rotulo.Visibility = visivel;
         if (!girando) return;
         if (rotulo.Text != texto) rotulo.Text = texto;
+        PosicionarRotuloAcima(peca, def, rotulo);
+    }
 
+    void PosicionarRotuloAcima(PecaNoCircuito peca, PecaDef def, TextBlock rotulo)
+    {
         rotulo.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         var caixa = CaixaNoMundo(peca, def);
         Canvas.SetLeft(rotulo, caixa.X + caixa.Width / 2 - rotulo.DesiredSize.Width / 2);
@@ -697,7 +701,7 @@ public partial class EditorCircuito
 
     void ApagarRotulosDeGiro()
     {
-        foreach (var r in rotulosDeGiro.Values) mundo.Children.Remove(r);
+        foreach (var r in rotulosDeGiro.Values) TirarDaTela(r);
         rotulosDeGiro.Clear();
     }
 

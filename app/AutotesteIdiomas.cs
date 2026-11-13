@@ -193,6 +193,8 @@ public static partial class Autoteste
             Janela("cartao", () => new JanelaCartao(janela, new Dictionary<string, string> { ["leia.txt"] = "x" }, false));
             Janela("pendrive", () => new JanelaCartao(janela, new Dictionary<string, string> { ["leia.txt"] = "x" }, true, titulo: Idioma.N("Pendrive USB")));
             Janela("celular", () => janela.TesteAbrirCelular());
+            Janela("mqtt", () => new JanelaMqtt(janela, janela.RedeParaTeste) { ShowActivated = false });
+            Janela("ajuda", () => janela.JanelaDaAjuda());
             string analisador = circuito.Pecas.FirstOrDefault(p => p.Tipo == "logic-analyzer")?.Id;
             if (analisador is not null) Janela("analisador", () => janela.TesteAbrirAnalisador(analisador));
 

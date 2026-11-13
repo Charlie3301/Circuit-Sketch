@@ -226,7 +226,7 @@
             <Button x:Name="btAoVivo" Style="{StaticResource Redondo}" Background="#117A65"
                     Content="x=" FontSize="12" FontWeight="Bold" Click="AlternarAoVivo" IsEnabled="False"
                     ToolTip="{local:T 'Variáveis ao vivo: ver as variáveis do sketch mudando enquanto ele roda, sem pausar'}"/>
-            <Button Style="{StaticResource Redondo}" Background="#1668C1" Content="+"
+            <Button x:Name="btAdicionar" Style="{StaticResource Redondo}" Background="#1668C1" Content="+"
                     FontSize="21" ToolTip="{local:T 'Adicionar componente (A)'}"
                     Click="AdicionarPeca"/>
 
@@ -243,13 +243,13 @@
                              itens saiam claro sobre claro. Tudo plano, tudo
                              legivel, e salvar fica a um clique. -->
                         <!-- PROJETO -->
-                        <MenuItem Header="{local:T 'Novo projeto'}" InputGestureText="Ctrl+N"
+                        <MenuItem Header="{local:T 'Novo projeto'}" Uid="novo"
                                   Click="NovoCircuito"/>
-                        <MenuItem Header="{local:T 'Abrir projeto...'}" InputGestureText="Ctrl+O"
+                        <MenuItem Header="{local:T 'Abrir projeto...'}" Uid="abrir"
                                   Click="AbrirCircuito"/>
-                        <MenuItem Header="{local:T 'Salvar projeto'}" InputGestureText="Ctrl+S"
+                        <MenuItem Header="{local:T 'Salvar projeto'}" Uid="salvar"
                                   Click="SalvarCircuito"/>
-                        <MenuItem Header="{local:T 'Salvar projeto como...'}" InputGestureText="Ctrl+Shift+S"
+                        <MenuItem Header="{local:T 'Salvar projeto como...'}" Uid="salvar-como"
                                   Click="SalvarComo"/>
                         <MenuItem x:Name="miRecentes" Header="{local:T 'Projetos recentes'}"/>
                         <MenuItem x:Name="miDemos" Header="{local:T 'Exemplos prontos'}"/>
@@ -264,7 +264,7 @@
 
                         <!-- CIRCUITO EM JSON -->
                         <MenuItem Header="{local:T 'Importar circuito (diagram.json)...'}"
-                                  InputGestureText="Ctrl+I" Click="ImportarDoWokwi"/>
+                                  Uid="importar" Click="ImportarDoWokwi"/>
                         <MenuItem x:Name="miExportar" Header="{local:T 'Exportar circuito (diagram.json)...'}"
                                   Click="ExportarParaWokwi"/>
                         <MenuItem x:Name="miExportarHex"
@@ -274,15 +274,15 @@
                         <Separator Background="{DynamicResource Borda}"/>
 
                         <!-- EDITAR -->
-                        <MenuItem Header="{local:T 'Desfazer'}" InputGestureText="Ctrl+Z" Click="Desfazer"/>
-                        <MenuItem Header="{local:T 'Refazer'}" InputGestureText="Ctrl+Y" Click="Refazer"/>
+                        <MenuItem Header="{local:T 'Desfazer'}" Uid="desfazer" Click="Desfazer"/>
+                        <MenuItem Header="{local:T 'Refazer'}" Uid="refazer" Click="Refazer"/>
                         <Separator Background="{DynamicResource Borda}"/>
 
                         <!-- VISUALIZAR -->
-                        <MenuItem Header="{local:T 'Ajustar à tela'}" InputGestureText="F" Click="Ajustar"/>
-                        <MenuItem Header="{local:T 'Mostrar a grade'}" InputGestureText="G"
+                        <MenuItem Header="{local:T 'Ajustar à tela'}" Uid="ajustar" Click="Ajustar"/>
+                        <MenuItem Header="{local:T 'Mostrar a grade'}" Uid="grade"
                                   Click="AlternarGrade"/>
-                        <MenuItem Header="{local:T 'Tela cheia'}" InputGestureText="Alt+Enter"
+                        <MenuItem Header="{local:T 'Tela cheia'}" Uid="tela-cheia"
                                   Click="TelaCheia"/>
                         <Separator Background="{DynamicResource Borda}"/>
 
@@ -298,13 +298,19 @@
                                   Tag="degrau" Click="EstiloDeTodosOsFios"/>
                         <Separator Background="{DynamicResource Borda}"/>
 
-                        <!-- PROGRAMA -->
+                        <!-- CONEXOES: o celular do Bluetooth e o broker MQTT do computador -->
+                        <MenuItem Header="{local:T 'Bluetooth (celular)...'}" Uid="celular" Click="AbrirCelular"/>
+                        <MenuItem Header="{local:T 'MQTT (broker do computador)...'}" Uid="mqtt" Click="AbrirMqtt"/>
                         <MenuItem x:Name="miInternet" Header="{local:T 'Usar a internet do computador'}"
                                   IsCheckable="True" IsChecked="True" Click="AlternarInternet"/>
+                        <Separator Background="{DynamicResource Borda}"/>
+
+                        <!-- PROGRAMA -->
                         <MenuItem Header="{local:T 'Novo chip...'}" Click="NovoChip"/>
-                        <MenuItem Header="{local:T 'Gerenciador de bibliotecas...'}" InputGestureText="Ctrl+Shift+I" Click="AbrirBibliotecas"/>
-                        <MenuItem Header="{local:T 'Configurações...'}" Click="AbrirConfiguracoes"/>
-                        <MenuItem Header="{local:T 'Ajuda e atalhos'}" InputGestureText="?" Click="Ajuda"/>
+                        <MenuItem Header="{local:T 'Gerenciador de bibliotecas...'}" Uid="bibliotecas" Click="AbrirBibliotecas"/>
+                        <MenuItem Header="{local:T 'Configurações...'}" Uid="configuracoes" Click="AbrirConfiguracoes"/>
+                        <MenuItem Header="{local:T 'Atalhos do teclado...'}" Uid="atalhos" Click="AbrirAtalhos"/>
+                        <MenuItem Header="{local:T 'Ajuda e atalhos'}" Uid="ajuda" Click="Ajuda"/>
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
@@ -348,30 +354,39 @@
                  comeco delas. -->
             <Border x:Name="barraObjeto" Visibility="Collapsed"
                     HorizontalAlignment="Left" VerticalAlignment="Top"
+                    MinWidth="230" MaxWidth="340"
                     Margin="12" Padding="8,6" CornerRadius="6"
                     Background="{DynamicResource Painel}" BorderBrush="{DynamicResource Borda}" BorderThickness="1">
                 <Border.Effect>
                     <DropShadowEffect Color="Black" BlurRadius="14"
                                       ShadowDepth="3" Opacity="0.45"/>
                 </Border.Effect>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock x:Name="txtObjeto" VerticalAlignment="Center"
-                               Foreground="{DynamicResource TextoForte}" FontWeight="SemiBold" FontSize="12"
-                               Margin="4,0,10,0"/>
-                    <StackPanel x:Name="opcoesObjeto" Orientation="Horizontal"
-                                VerticalAlignment="Center"/>
-                    <Border Width="1" Background="{DynamicResource Borda}" Margin="8,2,8,2"/>
-                    <Button x:Name="btGirar" Content="&#x21BB;" Click="Girar"
-                            ToolTip="{local:T 'Girar 90° (R)'}" Style="{StaticResource FerramentaObj}"/>
-                    <Button x:Name="btEspelhar" Content="&#x21C6;" Click="Espelhar"
-                            ToolTip="{local:T 'Espelhar (M)'}" Style="{StaticResource FerramentaObj}"/>
-                    <Button x:Name="btApagar" Content="&#x1F5D1;" Click="Excluir"
-                            ToolTip="{local:T 'Excluir (Del)'}" Style="{StaticResource FerramentaObj}"/>
-                    <Button Content="?" Click="Ajuda" ToolTip="{local:T 'Ajuda'}"
-                            Style="{StaticResource FerramentaObj}"/>
-                    <Button Content="&#x2715;" Click="LimparSelecao" ToolTip="{local:T 'Fechar'}"
-                            Style="{StaticResource FerramentaObj}"/>
-                </StackPanel>
+                <!-- Em pe: o nome e as ferramentas em cima, e as opcoes uma
+                     embaixo da outra (Nome, X, Y, depois as da peca). Deitada,
+                     a peca com muita opcao passava da largura da tela. -->
+                <DockPanel>
+                    <DockPanel DockPanel.Dock="Top" LastChildFill="True">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top" Margin="8,0,0,0">
+                            <Button x:Name="btGirar" Content="&#x21BB;" Click="Girar"
+                                    ToolTip="{local:T 'Girar 90° (R)'}" Style="{StaticResource FerramentaObj}"/>
+                            <Button x:Name="btEspelhar" Content="&#x21C6;" Click="Espelhar"
+                                    ToolTip="{local:T 'Espelhar (M)'}" Style="{StaticResource FerramentaObj}"/>
+                            <Button x:Name="btApagar" Content="&#x1F5D1;" Click="Excluir"
+                                    ToolTip="{local:T 'Excluir (Del)'}" Style="{StaticResource FerramentaObj}"/>
+                            <Button Content="?" Click="Ajuda" ToolTip="{local:T 'Ajuda'}"
+                                    Style="{StaticResource FerramentaObj}"/>
+                            <Button Content="&#x2715;" Click="LimparSelecao" ToolTip="{local:T 'Fechar'}"
+                                    Style="{StaticResource FerramentaObj}"/>
+                        </StackPanel>
+                        <TextBlock x:Name="txtObjeto" VerticalAlignment="Center" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource TextoForte}" FontWeight="SemiBold" FontSize="12"
+                                   Margin="4,0,0,0"/>
+                    </DockPanel>
+                    <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource Borda}" Margin="0,6,0,8"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="4,0,4,2">
+                        <local:ColunaDeOpcoes x:Name="opcoesObjeto"/>
+                    </ScrollViewer>
+                </DockPanel>
             </Border>
 
             <!-- DESCRICAO: o nome, o autor e o texto do projeto, em cartoes

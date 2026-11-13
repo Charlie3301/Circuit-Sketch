@@ -17,6 +17,15 @@ public sealed record MensagemMqtt(string Topico, byte[] Carga, bool Retida = fal
 /// some sem dizer tchau -- desligou, resetou, perdeu o WiFi. E o jeito
 /// classico de um painel mostrar "offline".
 /// </summary>
+/// <summary>Um tópico que passou pelo broker, como a janela do MQTT mostra.</summary>
+public sealed record TopicoMqtt(string Topico, byte[] Ultima, bool Retida, DateTime Quando, int Vezes)
+{
+    public string Texto => Encoding.UTF8.GetString(Ultima);
+}
+
+/// <summary>Uma mensagem de uma placa da simulação num broker de fora (o HiveMQ da aula), para a janela do MQTT.</summary>
+public sealed record TrafegoMqtt(string Placa, string Broker, bool Saindo, MensagemMqtt Mensagem);
+
 public sealed record TestamentoMqtt(string Topico, byte[] Carga, bool Retida, int Qos);
 
 /// <summary>
@@ -109,6 +118,34 @@ public sealed class BrokerMqtt
     readonly object trava = new();
     readonly List<(object Dono, string Filtro, Action<MensagemMqtt> Entregar)> assinaturas = [];
     readonly Dictionary<string, MensagemMqtt> retidas = [];
+    readonly Dictionary<string, (byte[] Ultima, DateTime Quando, int Vezes)> topicos = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// Toda publicação que passa pelo broker, com quem mandou (o id do
+    /// cliente, a placa, o painel). É o que a janela do MQTT mostra ao vivo.
+    /// Chamado fora da trava, na thread de quem publicou.
+    /// </summary>
+    public event Action<MensagemMqtt, string> Publicou;
+
+    /// <summary>Os tópicos que já passaram pelo broker: a última mensagem, quando, quantas vezes e se há retida.</summary>
+    public IReadOnlyList<TopicoMqtt> Topicos()
+    {
+        lock (trava)
+            return [.. topicos.OrderBy(t => t.Key, StringComparer.Ordinal)
+                              .Select(t => new TopicoMqtt(t.Key, t.Value.Ultima, retidas.ContainsKey(t.Key), t.Value.Quando, t.Value.Vezes))];
+    }
+
+    /// <summary>Quem assina o quê agora (o dono é o cliente: a placa ou a conexão TCP).</summary>
+    public IReadOnlyList<(object Dono, string Filtro)> Assinaturas()
+    {
+        lock (trava) return [.. assinaturas.Select(a => (a.Dono, a.Filtro))];
+    }
+
+    /// <summary>Esquece os tópicos vistos (as retidas ficam): o "limpar" da janela.</summary>
+    public void EsquecerTopicos()
+    {
+        lock (trava) topicos.Clear();
+    }
 
     public void Assinar(object dono, string filtro, Action<MensagemMqtt> entregar)
     {
@@ -148,12 +185,14 @@ public sealed class BrokerMqtt
         get { lock (trava) return retidas.Count; }
     }
 
-    public void Publicar(string topico, byte[] carga, bool retida)
+    public void Publicar(string topico, byte[] carga, bool retida, string origem = null)
     {
         var mensagem = new MensagemMqtt(topico, carga ?? [], retida);
         List<Action<MensagemMqtt>> alvos;
         lock (trava)
         {
+            topicos.TryGetValue(topico, out var antes);
+            topicos[topico] = (mensagem.Carga, DateTime.Now, antes.Vezes + 1);
             if (retida)
             {
                 // Retida vazia apaga a retida do tópico, como no MQTT.
@@ -171,6 +210,9 @@ public sealed class BrokerMqtt
             try { entregar(aoVivo); }
             catch { /* um assinante com defeito não derruba os outros */ }
         }
+
+        try { Publicou?.Invoke(mensagem, origem); }
+        catch { /* a janela que mostra não derruba o broker */ }
     }
 
     /// <summary>O tópico casa com o filtro? <c>+</c> vale um nível, <c>#</c> vale o resto.</summary>
@@ -637,40 +679,88 @@ sealed class ConexaoMqtt
 }
 
 /// <summary>
-/// O broker interno aberto em <c>localhost</c>, para um app MQTT do
-/// próprio computador (MQTT Explorer, mosquitto_sub) enxergar e mandar
-/// mensagens para as placas da bancada.
+/// Um cliente conectado por TCP no broker do computador: um app de MQTT, o
+/// celular, uma placa de verdade, ou a própria placa da simulação que
+/// conectou em localhost.
+/// </summary>
+public sealed class ClienteDoServidor
+{
+    public string Id { get; internal set; } = "";
+    public string Endereco { get; init; } = "";
+    public string Usuario { get; internal set; }
+    public DateTime Desde { get; init; } = DateTime.Now;
+    public bool TemTestamento { get; internal set; }
+
+    int enviadas, recebidas;
+    public int Enviadas => enviadas;
+    public int Recebidas => recebidas;
+    internal void ContarEnviada() => Interlocked.Increment(ref enviadas);
+    internal void ContarRecebida() => Interlocked.Increment(ref recebidas);
+
+    readonly List<string> filtros = [];
+    public IReadOnlyList<string> Filtros { get { lock (filtros) return [.. filtros]; } }
+    internal void Assinou(string filtro) { lock (filtros) if (!filtros.Contains(filtro)) filtros.Add(filtro); }
+    internal void Cancelou(string filtro) { lock (filtros) filtros.Remove(filtro); }
+
+    internal TcpClient Tcp;
+}
+
+/// <summary>
+/// O broker do computador: o broker interno aberto numa porta TCP, para um
+/// app de MQTT do próprio computador (MQTT Explorer, mosquitto_sub) -- e,
+/// com <see cref="NaRede"/>, o celular ou uma placa de verdade na mesma
+/// rede -- enxergar e mandar mensagens para as placas da simulação.
 ///
-/// Só em <c>localhost</c>: abrir para a rede do laboratório faria o
-/// Windows perguntar sobre o firewall, e cada aluno veria a bancada dos
-/// outros.
+/// Sem pedir, só em <c>localhost</c>: abrir para a rede faz o Windows
+/// perguntar sobre o firewall, e no laboratório cada aluno veria a bancada
+/// dos outros. A janela do MQTT abre para a rede quando a pessoa marca.
 /// </summary>
 public sealed class ServidorMqtt
 {
     readonly BrokerMqtt broker;
     readonly TcpListener ouvinte;
-    readonly List<TcpClient> conexoes = [];
+    readonly List<ClienteDoServidor> clientes = [];
     volatile bool fechado;
 
     public int Porta { get; }
 
-    ServidorMqtt(BrokerMqtt broker, TcpListener ouvinte)
+    /// <summary>Aceita conexões da rede (todas as placas de rede), e não só de localhost.</summary>
+    public bool NaRede { get; }
+
+    /// <summary>Alguém entrou, saiu ou mudou de assinatura.</summary>
+    public event Action Mudou;
+
+    public IReadOnlyList<ClienteDoServidor> Clientes()
+    {
+        lock (clientes) return [.. clientes];
+    }
+
+    ServidorMqtt(BrokerMqtt broker, TcpListener ouvinte, bool naRede)
     {
         this.broker = broker;
         this.ouvinte = ouvinte;
+        NaRede = naRede;
         Porta = ((IPEndPoint)ouvinte.LocalEndpoint).Port;
     }
 
     /// <summary>Abre na porta pedida (0 = qualquer livre), ou null se ela estiver ocupada.</summary>
-    public static ServidorMqtt Abrir(BrokerMqtt broker, int porta)
+    public static ServidorMqtt Abrir(BrokerMqtt broker, int porta, bool naRede = false)
     {
-        var ouvinte = new TcpListener(IPAddress.Loopback, porta);
+        var ouvinte = new TcpListener(naRede ? IPAddress.Any : IPAddress.Loopback, porta);
+        // Sem isto o Windows deixa um segundo programa abrir a mesma porta
+        // em outro endereço, e o app de MQTT cai num broker ou no outro.
+        ouvinte.ExclusiveAddressUse = true;
         try { ouvinte.Start(); }
         catch (SocketException) { return null; }
 
-        var servidor = new ServidorMqtt(broker, ouvinte);
+        var servidor = new ServidorMqtt(broker, ouvinte, naRede);
         new Thread(servidor.Aceitar) { IsBackground = true, Name = "broker mqtt" }.Start();
         return servidor;
+    }
+
+    void Avisar()
+    {
+        try { Mudou?.Invoke(); } catch { }
     }
 
     void Aceitar()
@@ -680,15 +770,16 @@ public sealed class ServidorMqtt
             TcpClient tcp;
             try { tcp = ouvinte.AcceptTcpClient(); }
             catch { return; }
-            lock (conexoes) conexoes.Add(tcp);
             new Thread(() => Atender(tcp)) { IsBackground = true, Name = "cliente mqtt" }.Start();
         }
     }
 
     void Atender(TcpClient tcp)
     {
-        var dono = new object();
+        var cliente = new ClienteDoServidor { Endereco = tcp.Client.RemoteEndPoint?.ToString() ?? "", Tcp = tcp };
         var escrita = new object();
+        TestamentoMqtt testamento = null;
+        bool educado = false, conectou = false;
         try
         {
             var fluxo = tcp.GetStream();
@@ -706,14 +797,33 @@ public sealed class ServidorMqtt
                 switch (cabecalho & 0xF0)
                 {
                     case 0x10:
+                    {
+                        (cliente.Id, cliente.Usuario, testamento) = LerConnect(corpo);
+                        if (string.IsNullOrEmpty(cliente.Id)) cliente.Id = "auto-" + Random.Shared.Next(100000, 999999);
+                        cliente.TemTestamento = testamento is not null;
+
+                        // O mesmo id de novo: o broker de verdade derruba a conexão velha.
+                        List<ClienteDoServidor> velhos;
+                        lock (clientes)
+                        {
+                            velhos = [.. clientes.Where(c => c.Id == cliente.Id)];
+                            clientes.Add(cliente);
+                        }
+                        foreach (var velho in velhos)
+                            try { velho.Tcp?.Close(); } catch { }
+
+                        conectou = true;
                         Enviar(PacoteMqtt.Connack, [0, 0]);
+                        Avisar();
                         break;
+                    }
 
                     case 0x30:
                     {
                         var (mensagem, qos, id) = PacoteMqtt.LerPublish(cabecalho, corpo);
                         if (qos == 1) Enviar(PacoteMqtt.Puback, [(byte)(id >> 8), (byte)id]);
-                        broker.Publicar(mensagem.Topico, mensagem.Carga, mensagem.Retida);
+                        cliente.ContarEnviada();
+                        broker.Publicar(mensagem.Topico, mensagem.Carga, mensagem.Retida, cliente.Id);
                         break;
                     }
 
@@ -735,15 +845,20 @@ public sealed class ServidorMqtt
                         Enviar(PacoteMqtt.Suback, [.. resposta]);
 
                         foreach (string filtro in filtros)
-                            broker.Assinar(dono, filtro, m =>
+                        {
+                            cliente.Assinou(filtro);
+                            broker.Assinar(cliente, filtro, m =>
                             {
                                 try
                                 {
                                     Enviar((byte)(PacoteMqtt.Publish | (m.Retida ? 1 : 0)),
                                            PacoteMqtt.CorpoPublish(m.Topico, m.Carga));
+                                    cliente.ContarRecebida();
                                 }
                                 catch { }
                             });
+                        }
+                        Avisar();
                         break;
                     }
 
@@ -751,8 +866,14 @@ public sealed class ServidorMqtt
                     {
                         int i = 0;
                         ushort id = PacoteMqtt.LerCurto(corpo, ref i);
-                        while (i < corpo.Length) broker.Cancelar(dono, PacoteMqtt.LerTexto(corpo, ref i));
+                        while (i < corpo.Length)
+                        {
+                            string filtro = PacoteMqtt.LerTexto(corpo, ref i);
+                            broker.Cancelar(cliente, filtro);
+                            cliente.Cancelou(filtro);
+                        }
                         Enviar(PacoteMqtt.Unsuback, [(byte)(id >> 8), (byte)id]);
+                        Avisar();
                         break;
                     }
 
@@ -761,6 +882,7 @@ public sealed class ServidorMqtt
                         break;
 
                     case 0xE0:
+                        educado = true;
                         return;
                 }
             }
@@ -768,9 +890,45 @@ public sealed class ServidorMqtt
         catch { }
         finally
         {
-            broker.RemoverDono(dono);
-            lock (conexoes) conexoes.Remove(tcp);
+            broker.RemoverDono(cliente);
+            lock (clientes) clientes.Remove(cliente);
             try { tcp.Close(); } catch { }
+
+            // Sumiu sem o DISCONNECT (caiu, foi fechado à força): o broker
+            // publica o testamento dele, como o mosquitto faz.
+            if (conectou && !educado && !fechado && testamento is not null)
+                broker.Publicar(testamento.Topico, testamento.Carga, testamento.Retida, cliente.Id);
+            if (conectou) Avisar();
+        }
+    }
+
+    /// <summary>O id, o usuário e o testamento do CONNECT (MQTT 3.1.1).</summary>
+    static (string Id, string Usuario, TestamentoMqtt Testamento) LerConnect(byte[] corpo)
+    {
+        try
+        {
+            int i = 0;
+            PacoteMqtt.LerTexto(corpo, ref i);      // "MQTT"
+            i++;                                     // o nível do protocolo
+            byte marcas = corpo[i++];
+            PacoteMqtt.LerCurto(corpo, ref i);       // o keep alive
+            string id = PacoteMqtt.LerTexto(corpo, ref i);
+
+            TestamentoMqtt testamento = null;
+            if ((marcas & 0x04) != 0)
+            {
+                string topico = PacoteMqtt.LerTexto(corpo, ref i);
+                int tamanho = PacoteMqtt.LerCurto(corpo, ref i);
+                var carga = corpo[i..(i + tamanho)];
+                i += tamanho;
+                testamento = new TestamentoMqtt(topico, carga, (marcas & 0x20) != 0, (marcas >> 3) & 3);
+            }
+            string usuario = (marcas & 0x80) != 0 ? PacoteMqtt.LerTexto(corpo, ref i) : null;
+            return (id, usuario, testamento);
+        }
+        catch (Exception)
+        {
+            return ("", null, null);
         }
     }
 
@@ -778,8 +936,8 @@ public sealed class ServidorMqtt
     {
         fechado = true;
         try { ouvinte.Stop(); } catch { }
-        lock (conexoes)
-            foreach (var c in conexoes)
-                try { c.Close(); } catch { }
+        lock (clientes)
+            foreach (var c in clientes)
+                try { c.Tcp?.Close(); } catch { }
     }
 }

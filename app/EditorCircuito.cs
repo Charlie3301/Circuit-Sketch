@@ -150,6 +150,15 @@ public partial class EditorCircuito : Border
         foreach (var (camada, cache) in camadasDosFios) AjustarCamada(camada, cache);
     }
 
+    /// <summary>
+    /// Um desenho por cima da peca sai da tela, esteja no mundo ou na mao (durante o arraste ele
+    /// vai junto com a peca): tirar so do mundo deixava o da mao para tras, como um fantasma.
+    /// </summary>
+    static void TirarDaTela(UIElement elemento)
+    {
+        if (elemento is not null && VisualTreeHelper.GetParent(elemento) is Panel pai) pai.Children.Remove(elemento);
+    }
+
     /// <summary>O elemento sai da camada em que estiver.</summary>
     static void TirarDaCamada(FrameworkElement elemento) => (elemento.Parent as Panel)?.Children.Remove(elemento);
 
@@ -160,6 +169,17 @@ public partial class EditorCircuito : Border
         {
             TirarDaCamada(visual);
             camadaDaMao.Children.Add(visual);
+
+            // O que vive em cima da peca (o LED aceso, o brilho, a tela, o braco) vai junto, por
+            // cima dela: ficando no mundo, abaixo da camada da mao, o LED aceso parecia apagado
+            // durante o arraste e a tela sumia embaixo do corpo da peca.
+            if (camadasDaPeca.TryGetValue(idDaPeca, out var lista))
+                foreach (var elemento in lista)
+                    if (elemento is FrameworkElement f && f.Parent == mundo)
+                    {
+                        mundo.Children.Remove(f);
+                        camadaDaMao.Children.Add(f);
+                    }
         }
     }
 
@@ -171,6 +191,13 @@ public partial class EditorCircuito : Border
             {
                 camadaDaMao.Children.Remove(visual);
                 (ArteMuda(peca.Tipo) ? mundo : camadaFixa).Children.Add(visual);
+                if (camadasDaPeca.TryGetValue(peca.Id, out var lista))
+                    foreach (var elemento in lista)
+                        if (elemento is FrameworkElement f && f.Parent == camadaDaMao)
+                        {
+                            camadaDaMao.Children.Remove(f);
+                            mundo.Children.Add(f);
+                        }
             }
         RedesenharFios();
         PedirCacheDaFixa();
@@ -228,7 +255,7 @@ public partial class EditorCircuito : Border
 
     public void ApagarQueimaduras()
     {
-        foreach (var marca in estouros.Values) mundo.Children.Remove(marca);
+        foreach (var marca in estouros.Values) TirarDaTela(marca);
         estouros.Clear();
         queimadasPelaAlimentacao.Clear();
         MostrarAvisos([]);
@@ -1169,6 +1196,11 @@ public partial class EditorCircuito : Border
         grupo.Children.Add(escala);
         grupo.Children.Add(deslocamento);
         mundo.RenderTransform = grupo;
+
+        // O fundo preso ao circuito: arrastar a tela com o botao do meio (ou o direito) mudava
+        // o deslocamento sem passar por AplicarGrade, e os pontos ficavam parados enquanto as
+        // pecas andavam por cima deles.
+        deslocamento.Changed += (_, _) => AplicarGrade();
         camadaFixa.RenderTransform = grupo;
         camadaFixa.CacheMode = cacheDaFixa;
         foreach (var (camada, cache) in camadasDosFios)
@@ -1337,12 +1369,19 @@ public partial class EditorCircuito : Border
             return;
         }
 
+        string estilo = EstiloDoFundo is FundoGrade or FundoQuadriculado ? EstiloDoFundo : FundoPontilhado;
+
+        // O quadriculado e o papel milimetrado: linha fina a cada furo e uma
+        // mais forte a cada dez (uma polegada). O ladrilho cobre as dez.
+        int furos = estilo == FundoQuadriculado ? 10 : 1;
+        double lado = passo * furos;
+
         double raio = Math.Clamp(0.7 * escala.ScaleX, 0.5, 1.8);
-        var viewport = new Rect(Resto(deslocamento.X - passo / 2, passo),
-                                Resto(deslocamento.Y - passo / 2, passo),
-                                passo, passo);
+        var viewport = new Rect(Resto(deslocamento.X - passo / 2, lado),
+                                Resto(deslocamento.Y - passo / 2, lado),
+                                lado, lado);
         // Arrastar a tela so anda o ladrilho: um pincel novo teria de ser desenhado de novo a cada quadro.
-        var chave = (passo, raio, CorDoFundo, CorDaGrade);
+        var chave = (passo, raio, CorDoFundo, CorDaGrade, estilo);
         if (ReferenceEquals(Background, pincelDaGrade) && chave == chaveDaGrade)
         {
             pincelDaGrade.Viewport = viewport;
@@ -1351,10 +1390,26 @@ public partial class EditorCircuito : Border
         var desenho = new DrawingGroup();
         desenho.Children.Add(new GeometryDrawing(
             new SolidColorBrush(CorDoFundo), null,
-            new RectangleGeometry(new Rect(0, 0, passo, passo))));
-        desenho.Children.Add(new GeometryDrawing(
-            new SolidColorBrush(CorDaGrade), null,
-            new EllipseGeometry(new Point(passo / 2, passo / 2), raio, raio)));
+            new RectangleGeometry(new Rect(0, 0, lado, lado))));
+        if (estilo == FundoPontilhado)
+            desenho.Children.Add(new GeometryDrawing(
+                new SolidColorBrush(CorDaGrade), null,
+                new EllipseGeometry(new Point(passo / 2, passo / 2), raio, raio)));
+        else
+        {
+            // As linhas passam pelos furos (o meio do ladrilho de um passo), como os pontos.
+            var cor = CorDaGrade;
+            var fina = new Pen(new SolidColorBrush(Color.FromArgb((byte)(estilo == FundoGrade ? 0x8C : 0x55), cor.R, cor.G, cor.B)), 1);
+            var forte = new Pen(new SolidColorBrush(Color.FromArgb(0xC0, cor.R, cor.G, cor.B)), 1.4);
+            fina.Freeze(); forte.Freeze();
+            for (int i = 0; i < furos; i++)
+            {
+                double meio = passo / 2 + i * passo;
+                var caneta = furos > 1 && i == 0 ? forte : fina;
+                desenho.Children.Add(new GeometryDrawing(null, caneta, new LineGeometry(new Point(meio, 0), new Point(meio, lado))));
+                desenho.Children.Add(new GeometryDrawing(null, caneta, new LineGeometry(new Point(0, meio), new Point(lado, meio))));
+            }
+        }
 
         // O ponto do ladrilho cai no MESMO lugar que um furo da
         // protoboard cairia: o ladrilho comeca meio passo antes do
@@ -1372,7 +1427,12 @@ public partial class EditorCircuito : Border
     }
 
     DrawingBrush pincelDaGrade;
-    (double, double, Color, Color) chaveDaGrade;
+    (double, double, Color, Color, string) chaveDaGrade;
+
+    public const string FundoPontilhado = "pontilhado", FundoGrade = "grade", FundoQuadriculado = "quadriculado", FundoLimpo = "limpo";
+
+    /// <summary>O desenho do fundo quando a grade esta ligada (desligada, o fundo e limpo).</summary>
+    public string EstiloDoFundo { get; set; } = FundoPontilhado;
 
     /// <summary>Resto sempre positivo: o pan negativo tambem precisa ladrilhar.</summary>
     static double Resto(double a, double b) => ((a % b) + b) % b;
@@ -1393,23 +1453,23 @@ public partial class EditorCircuito : Border
     {
         camadasDaPeca.Clear();
         foreach (var v in visuais.Values) TirarDaCamada(v);
-        foreach (var v in parteMovel.Values) mundo.Children.Remove(v);
-        foreach (var (tela, _) in chavesDip.Values) mundo.Children.Remove(tela);
+        foreach (var v in parteMovel.Values) TirarDaTela(v);
+        foreach (var (tela, _) in chavesDip.Values) TirarDaTela(tela);
         chavesDip.Clear();
 
         foreach (var tracos in tracosDoAnalisador.Values)
-            foreach (var traco in tracos) mundo.Children.Remove(traco);
+            foreach (var traco in tracos) TirarDaTela(traco);
         tracosDoAnalisador.Clear();
         ondasDoAnalisador.Clear();
-        foreach (var v in brilhos.Values) mundo.Children.Remove(v);
-        foreach (var v in ledsAcesos.Values) mundo.Children.Remove(v);
+        foreach (var v in brilhos.Values) TirarDaTela(v);
+        foreach (var v in ledsAcesos.Values) TirarDaTela(v);
         ledsAcesos.Clear();
         semTextura.Clear();
         foreach (var tela in telasLcd.Values) RemoverTelaLcd(tela);
-        foreach (var b in bracosServo.Values) mundo.Children.Remove(b);
+        foreach (var b in bracosServo.Values) TirarDaTela(b);
         foreach (var luzes in ledsDePlaca.Values)
-            foreach (var l in luzes) mundo.Children.Remove(l);
-        foreach (var marca in estouros.Values) mundo.Children.Remove(marca);
+            foreach (var l in luzes) TirarDaTela(l);
+        foreach (var marca in estouros.Values) TirarDaTela(marca);
         estouros.Clear();
 
         // Tela do TFT, luz do rele e ponteiro do motor de passo saem
@@ -1422,21 +1482,21 @@ public partial class EditorCircuito : Border
         // e foi essa diferenca que escondeu o erro.
         foreach (var (imagem, letras) in telasTft.Values)
         {
-            mundo.Children.Remove(imagem);
-            mundo.Children.Remove(letras);
+            TirarDaTela(imagem);
+            TirarDaTela(letras);
         }
         telasTft.Clear();
         versaoDaTft.Clear();
 
-        foreach (var luz in luzesDeRele.Values) mundo.Children.Remove(luz);
+        foreach (var luz in luzesDeRele.Values) TirarDaTela(luz);
         luzesDeRele.Clear();
 
         foreach (var par in ponteirosDePasso.Values)
-            foreach (var ponteiro in par) mundo.Children.Remove(ponteiro);
+            foreach (var ponteiro in par) TirarDaTela(ponteiro);
         ponteirosDePasso.Clear();
         eixosDePasso.Clear();
 
-        foreach (var r in rotulosDePeca.Values) mundo.Children.Remove(r);
+        foreach (var r in rotulosDePeca.Values) TirarDaTela(r);
         rotulosDePeca.Clear();
         ApagarRotulosDeGiro();
         ApagarLuzesDeModulo();
@@ -2280,7 +2340,7 @@ public partial class EditorCircuito : Border
     {
         Panel.SetZIndex(elemento, ZDe(peca.Tipo));
         if (!camadasDaPeca.TryGetValue(peca.Id, out var lista)) camadasDaPeca[peca.Id] = lista = [];
-        lista.RemoveAll(e => !mundo.Children.Contains(e));
+        lista.RemoveAll(e => VisualTreeHelper.GetParent(e) != mundo && VisualTreeHelper.GetParent(e) != camadaDaMao);
         UIElement ultimo = lista.Count > 0 ? lista[^1] : visuais.GetValueOrDefault(peca.Id);
         int i = ultimo is null ? -1 : mundo.Children.IndexOf(ultimo);
         if (i < 0) mundo.Children.Add(elemento);
@@ -3544,7 +3604,7 @@ public partial class EditorCircuito : Border
 
     void RedesenharAlcas()
     {
-        foreach (var alca in alcasDobra) mundo.Children.Remove(alca);
+        foreach (var alca in alcasDobra) TirarDaTela(alca);
         alcasDobra.Clear();
 
         // So o fio sozinho ganha alcas: com varios selecionados a tela
@@ -4325,6 +4385,42 @@ public partial class EditorCircuito : Border
 
     readonly List<(string id, double dx, double dy)> carona = [];
 
+    /// <summary>Para o teste: o pan do botao do meio, que mexe so no deslocamento.</summary>
+    internal void PanearParaTeste(double dx, double dy)
+    {
+        deslocamento.X += dx;
+        deslocamento.Y += dy;
+    }
+
+    /// <summary>Para o teste: onde a tela poe o furo (0, 0) do circuito.</summary>
+    internal Point OrigemNaTelaParaTeste => new(deslocamento.X, deslocamento.Y);
+
+    /// <summary>
+    /// Poe a peca num ponto exato do circuito (o canto de cima, a esquerda, em pixels do mundo),
+    /// sem grade nem encaixe: e o "mover para" do campo X/Y. Quem esta espetado numa
+    /// protoboard vai junto, como no arraste.
+    /// </summary>
+    public void MoverPara(PecaNoCircuito peca, double x, double y)
+    {
+        if (peca is null || double.IsNaN(x) || double.IsNaN(y) || double.IsInfinity(x) || double.IsInfinity(y)) return;
+        double dx = x - peca.X, dy = y - peca.Y;
+        if (Math.Abs(dx) < 1e-9 && Math.Abs(dy) < 1e-9) return;
+
+        List<PecaNoCircuito> juntas = Catalogo.EhProtoboard(peca.Tipo) ? [.. EspetadasEm(peca).Where(o => o.Id != peca.Id)] : [];
+        peca.X = x; peca.Y = y;
+        Reposicionar(peca);
+        foreach (var outra in juntas)
+        {
+            outra.X += dx; outra.Y += dy;
+            Reposicionar(outra);
+        }
+        RedesenharFios();
+        AtualizarRealce();
+        PedirCacheDaFixa();
+        Arrastou?.Invoke();
+        Mudou?.Invoke();
+    }
+
     /// <summary>Pecas com pelo menos uma perna dentro de um furo desta placa.</summary>
     IEnumerable<PecaNoCircuito> EspetadasEm(PecaNoCircuito placa)
     {
@@ -4360,6 +4456,10 @@ public partial class EditorCircuito : Border
         {
             origemFio = (idPeca, pino);
             fioEmCurso.Stroke = Pincel(CorDoFio);
+            // Comeca do pino, e nao da curva do fio anterior: ela ficava na tela,
+            // parada no lugar antigo, ate o mouse se mexer (o fio "fantasma").
+            var ponta = PosicaoPino(idPeca, pino);
+            fioEmCurso.Data = ponta is null ? null : Curva(EstiloPadrao, ponta.Value, ponta.Value);
             fioEmCurso.Visibility = Visibility.Visible;
             return;
         }
@@ -4393,7 +4493,12 @@ public partial class EditorCircuito : Border
     {
         origemFio = null;
         fioEmCurso.Visibility = Visibility.Collapsed;
+        fioEmCurso.Data = null;
     }
+
+    /// <summary>Para o teste: o fio em construcao, visivel, e por onde passa.</summary>
+    internal (bool Visivel, Rect Caixa) FioEmCursoParaTeste
+        => (fioEmCurso.Visibility == Visibility.Visible, fioEmCurso.Data?.Bounds ?? Rect.Empty);
 
     public bool LigandoFio => origemFio is not null;
 
@@ -4481,6 +4586,7 @@ public partial class EditorCircuito : Border
             var a = PosicaoPino(origemFio.Value.peca, origemFio.Value.pino);
             if (a is not null)
                 fioEmCurso.Data = Curva(EstiloPadrao, a.Value, ehPino ? acerto.Posicao : p);
+            else CancelarFio();   // a peca de onde ele saia foi apagada
         }
 
         if (lacando && esquerdoApertado)
@@ -4664,7 +4770,7 @@ public partial class EditorCircuito : Border
         if (peca.Tipo == "texto")
         {
             AjustarCaixaDoTexto(peca);
-            if (rotulosDePeca.Remove(peca.Id, out var doTexto)) mundo.Children.Remove(doTexto);
+            if (rotulosDePeca.Remove(peca.Id, out var doTexto)) TirarDaTela(doTexto);
             return;
         }
 
@@ -4674,7 +4780,7 @@ public partial class EditorCircuito : Border
 
         if (string.IsNullOrWhiteSpace(texto))
         {
-            if (rotulosDePeca.Remove(peca.Id, out var antigo)) mundo.Children.Remove(antigo);
+            if (rotulosDePeca.Remove(peca.Id, out var antigo)) TirarDaTela(antigo);
             return;
         }
 
@@ -4747,12 +4853,21 @@ public partial class EditorCircuito : Border
         return RotuloParaTeste(peca.Id) is null;
     }
 
-    void Reposicionar(PecaNoCircuito peca)
+    /// <param name="girou">A peca girou ou espelhou, alem de andar.</param>
+    void Reposicionar(PecaNoCircuito peca, bool girou = false)
     {
         var def = Catalogo.Obter(peca.Tipo);
         if (def is not null) AtualizarRotulo(peca, def);
+        double dx = 0, dy = 0;
         if (visuais.TryGetValue(peca.Id, out var v))
-        { Canvas.SetLeft(v, peca.X); Canvas.SetTop(v, peca.Y); }
+        {
+            // Quanto a peca andou desde o ultimo desenho: o desenho ainda esta onde ela estava.
+            double x0 = Canvas.GetLeft(v), y0 = Canvas.GetTop(v);
+            if (!double.IsNaN(x0)) dx = peca.X - x0;
+            if (!double.IsNaN(y0)) dy = peca.Y - y0;
+            Canvas.SetLeft(v, peca.X); Canvas.SetTop(v, peca.Y);
+        }
+        if (def is not null) PosicionarSobreposicoes(peca, def, dx, dy, girou);
         if (def is not null) PosicionarMovel(peca, def);
         if (def is not null && peca.Tipo == "dip-switch-8") PosicionarChavesDip(peca, def);
         if (def is not null)
@@ -4771,6 +4886,90 @@ public partial class EditorCircuito : Border
         // Os aneis de BOOT/EN sao desenhados a parte: sem isto ficavam
         // para tras quando a placa era arrastada.
         if (BotoesPorPlaca.ContainsKey(peca.Tipo)) DesenharBotoesDaPlaca();
+    }
+
+    /// <summary>
+    /// O que o quadro da simulacao desenha por cima da peca e so poe no lugar quando muda: a luz
+    /// do rele, os ponteiros do biaxial, as ondas do analisador, o rpm e os segmentos e pixels
+    /// acesos. Sem isto, arrastar ou girar a peca com a simulacao parada (ou entre dois quadros)
+    /// deixava esses pedacos no lugar antigo: o "fantasma" da peca arrastada.
+    /// </summary>
+    void PosicionarSobreposicoes(PecaNoCircuito peca, PecaDef def, double dx, double dy, bool girou)
+    {
+        if (luzesDeRele.ContainsKey(peca.Id)) PosicionarLuzDoRele(peca, def);
+        if (ponteirosDePasso.ContainsKey(peca.Id) && eixosDePasso.TryGetValue(peca.Id, out var eixos) && eixos.Length >= 2)
+            MostrarBiaxial(peca, eixos);
+        if (desenhoDoAnalisador.TryGetValue(peca.Id, out var ondas)) DesenharOndas(peca, def, ondas);
+        if (rotulosDeGiro.TryGetValue(peca.Id, out var rotulo)) PosicionarRotuloAcima(peca, def, rotulo);
+
+        if (!luzesDeLed.TryGetValue(peca.Id, out var luzes)) return;
+        if (girou)
+        {
+            // Girada, cada luz muda de forma: o proximo quadro as faz de novo no lugar certo.
+            foreach (var luz in luzes) TirarDaTela(luz);
+            luzesDeLed.Remove(peca.Id);
+        }
+        else if (dx != 0 || dy != 0)
+            foreach (var luz in luzes) DeslocarLuz(luz, dx, dy);
+    }
+
+    /// <summary>A luz anda junto com a peca, sem o quadro da simulacao.</summary>
+    static void DeslocarLuz(Shape luz, double dx, double dy)
+    {
+        if (luz is Path caminho)
+        {
+            // Os segmentos guardam os cantos para nao refazer a geometria a cada quadro.
+            if (caminho.Tag is Point[] cantos)
+            {
+                var novos = cantos.Select(c => new Point(c.X + dx, c.Y + dy)).ToArray();
+                caminho.Tag = novos;
+                var figura = new PathFigure { IsClosed = true, IsFilled = true, StartPoint = novos[0] };
+                for (int k = 1; k < novos.Length; k++) figura.Segments.Add(new LineSegment(novos[k], false));
+                caminho.Data = new PathGeometry([figura]);
+            }
+            else if (caminho.Data is { } forma)
+            {
+                var nova = forma.CloneCurrentValue();
+                var antes = nova.Transform as TranslateTransform;
+                nova.Transform = new TranslateTransform((antes?.X ?? 0) + dx, (antes?.Y ?? 0) + dy);
+                caminho.Data = nova;
+            }
+            return;
+        }
+        double x = Canvas.GetLeft(luz), y = Canvas.GetTop(luz);
+        if (!double.IsNaN(x)) Canvas.SetLeft(luz, x + dx);
+        if (!double.IsNaN(y)) Canvas.SetTop(luz, y + dy);
+    }
+
+    /// <summary>Para o teste: quantos desenhos por cima da peca estao na camada da mao (e quantos ha).</summary>
+    internal (int NaMao, int Total) SobreposicoesNaMaoParaTeste(string idDaPeca)
+        => camadasDaPeca.TryGetValue(idDaPeca, out var lista)
+            ? (lista.Count(e => VisualTreeHelper.GetParent(e) == camadaDaMao), lista.Count)
+            : (0, 0);
+
+    /// <summary>Para o teste: um ponto de cada desenho por cima da peca, no mundo, sem passar pelo layout.</summary>
+    internal List<(string Tipo, Point Ponto)> SobreposicoesParaTeste(string idDaPeca)
+    {
+        var lista = new List<UIElement>();
+        if (camadasDaPeca.TryGetValue(idDaPeca, out var camada)) lista.AddRange(camada.Where(mundo.Children.Contains));
+        if (rotulosDeGiro.TryGetValue(idDaPeca, out var giro) && giro.Visibility == Visibility.Visible) lista.Add(giro);
+        if (rotulosDePeca.TryGetValue(idDaPeca, out var nome)) lista.Add(nome);
+        var pontos = new List<(string, Point)>();
+        foreach (var e in lista)
+        {
+            double x = Canvas.GetLeft(e), y = Canvas.GetTop(e);
+            if (double.IsNaN(x)) x = 0;
+            if (double.IsNaN(y)) y = 0;
+            Point? p = e switch
+            {
+                Line l => new Point(x + l.X1, y + l.Y1),
+                Path { Data: { } g } when !g.Bounds.IsEmpty => new Point(x + g.Bounds.X, y + g.Bounds.Y),
+                Path => null,
+                _ => new Point(x, y),
+            };
+            if (p is { } ponto) pontos.Add((e.GetType().Name, ponto));
+        }
+        return pontos;
     }
 
     /// <summary>Nome legivel: no LED, dizer qual perna e + e qual e menos.</summary>
@@ -5199,9 +5398,9 @@ public partial class EditorCircuito : Border
                 if (Animar) AnimarGiro(v, antes, peca.Rotacao);
             }
 
-            PosicionarBrilho(peca, def);
-            PosicionarEstouro(peca, def);
-            PosicionarTft(peca, def);
+            // Tudo o que vive em cima da peca gira junto (o botao do
+            // potenciometro, as luzes, a tela), e nao so o brilho e a tela.
+            Reposicionar(peca, girou: true);
         }
         RedesenharFios();
         AtualizarRealce();
@@ -5220,9 +5419,7 @@ public partial class EditorCircuito : Border
 
             peca.Espelhada = !peca.Espelhada;
             if (visuais.TryGetValue(peca.Id, out var v)) Posicionar(v, peca);
-            PosicionarBrilho(peca, def);
-            PosicionarEstouro(peca, def);
-            PosicionarTft(peca, def);
+            Reposicionar(peca, girou: true);
         }
         RedesenharFios();
         AtualizarRealce();
@@ -6431,10 +6628,7 @@ public partial class EditorCircuito : Border
             };
             PorNaCamadaDa(peca, luz);
             luzesDeRele[peca.Id] = luz;
-
-            var centro = Geometria.PosicaoLocal(peca, def, def.Largura / 2, def.Altura * 0.22);
-            Canvas.SetLeft(luz, centro.X - 3.5);
-            Canvas.SetTop(luz, centro.Y - 3.5);
+            PosicionarLuzDoRele(peca, def);
         }
 
         var cor = ligado
@@ -6442,6 +6636,14 @@ public partial class EditorCircuito : Border
             : Color.FromRgb(0x2A, 0x3A, 0x2E);
         if (luz.Fill is not SolidColorBrush b || b.Color != cor)
             luz.Fill = new SolidColorBrush(cor);
+    }
+
+    void PosicionarLuzDoRele(PecaNoCircuito peca, PecaDef def)
+    {
+        if (!luzesDeRele.TryGetValue(peca.Id, out var luz)) return;
+        var centro = Geometria.PosicaoLocal(peca, def, def.Largura / 2, def.Altura * 0.22);
+        Canvas.SetLeft(luz, centro.X - 3.5);
+        Canvas.SetTop(luz, centro.Y - 3.5);
     }
 
     /// <summary>

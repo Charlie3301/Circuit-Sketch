@@ -631,6 +631,20 @@ public sealed partial class Rede
                 return null;
             }
         }
+        else if (MqttSoNoComputador && porta == 1883 && !segura && PortaDoBroker > 0 && !EhLocal(host))
+        {
+            try
+            {
+                conexao = ConexaoTcp.Real(origem, "127.0.0.1", PortaDoBroker, false, false, 5000);
+                Anotar(origem, "mqtt", Idioma.T("\"{0}\" foi para o broker do computador (menu ⋮ > MQTT)", host));
+            }
+            catch (ExecucaoInterrompida) { throw; }
+            catch (Exception ex)
+            {
+                Anotar(origem, "tcp", Idioma.T("o broker interno não conectou: {0}", Explicar(ex)));
+                return null;
+            }
+        }
         else if (!EhLocal(host) && !UsarInternet)
         {
             Anotar(origem, "tcp", Idioma.T("{0}:{1}: sem internet (menu ⋮ > Rede usa a internet do computador)", host, porta));
@@ -688,12 +702,54 @@ public sealed partial class Rede
     /// mosquitto instalado, por exemplo), ele continua funcionando dentro
     /// do programa, só não fica visível para outros apps.
     /// </summary>
-    public bool AbrirBrokerLocal(int porta)
+    public bool AbrirBrokerLocal(int porta, bool naRede = false)
     {
         if (servidorMqtt is not null) return true;
-        servidorMqtt = ServidorMqtt.Abrir(Broker, porta);
+        servidorMqtt = ServidorMqtt.Abrir(Broker, porta, naRede);
         return servidorMqtt is not null;
     }
+
+    /// <summary>O broker do computador aberto agora (null se a porta estava ocupada).</summary>
+    public ServidorMqtt ServidorDoBroker => servidorMqtt;
+
+    /// <summary>
+    /// Fecha e abre de novo o broker do computador, em outra porta ou aberto
+    /// para a rede. As placas no broker interno nao percebem: o broker e o
+    /// mesmo, so a porta de fora muda.
+    /// </summary>
+    public bool ReabrirBroker(int porta, bool naRede)
+    {
+        servidorMqtt?.Fechar();
+        servidorMqtt = ServidorMqtt.Abrir(Broker, porta, naRede);
+        return servidorMqtt is not null;
+    }
+
+    /// <summary>
+    /// Toda placa da simulacao vai para o broker do computador, qualquer que
+    /// seja o endereco do sketch (o broker.hivemq.com da aula, o IP do
+    /// mosquitto da escola). E o jeito de ver tudo na janela do MQTT sem
+    /// mudar o codigo que vai para a placa de verdade.
+    /// </summary>
+    public bool MqttSoNoComputador { get; set; }
+
+    /// <summary>As mensagens das placas num broker de fora: a janela do MQTT mostra junto com as do computador.</summary>
+    public event Action<TrafegoMqtt> MqttDeFora;
+
+    void AvisarDeFora(ClienteMqtt cliente, bool saindo, MensagemMqtt mensagem)
+    {
+        try { MqttDeFora?.Invoke(new TrafegoMqtt(cliente.Dona?.Nome ?? "", $"{cliente.Host}:{cliente.Porta}", saindo, mensagem)); }
+        catch { }
+    }
+
+    /// <summary>Os clientes MQTT das placas da simulacao, conectados ou nao.</summary>
+    public IReadOnlyList<ClienteMqtt> ClientesMqtt()
+    {
+        lock (trava) return [.. clientesMqtt];
+    }
+
+    /// <summary>Quem publica: a placa e o id dela, como a janela do MQTT mostra.</summary>
+    static string Origem(ClienteMqtt cliente)
+        => string.IsNullOrEmpty(cliente.Id) ? cliente.Dona?.Nome ?? "" : $"{cliente.Dona?.Nome} · {cliente.Id}";
 
     /// <summary>
     /// Brokers que nao responderam, e quando. Na rede da escola que bloqueia
@@ -731,7 +787,7 @@ public sealed partial class Rede
         string host = cliente.Host;
         string chave = $"{host}:{cliente.Porta}";
         bool daBancada = host.Equals("circuitsketch", StringComparison.OrdinalIgnoreCase) || EhIpDaBancada(host);
-        bool semSaida = !UsarInternet && !EhLocal(host);
+        bool semSaida = (!UsarInternet && !EhLocal(host)) || (MqttSoNoComputador && !daBancada);
 
         if (!daBancada && !semSaida)
         {
@@ -755,6 +811,7 @@ public sealed partial class Rede
                         {
                             cliente.Chegou(m);
                             Anotar(placa, "mqtt", $"← {m.Topico}: {Curto(m.Carga)}");
+                            AvisarDeFora(cliente, false, m);
                         }, () => placa.Parar, cliente.Testamento, cliente.Tls, !cliente.SemConferirCertificado);
 
                     tcp.Caiu += () =>
@@ -823,6 +880,10 @@ public sealed partial class Rede
                 Anotar(placa, "mqtt", Idioma.T("{0} não respondeu há pouco; usando o broker interno direto (tenta {1} de novo em {2} s)", host, host, volta));
             }
         }
+        else if (semSaida && MqttSoNoComputador)
+        {
+            Anotar(placa, "mqtt", Idioma.T("\"{0}\" foi para o broker do computador (menu ⋮ > MQTT)", host));
+        }
         else if (semSaida)
         {
             Anotar(placa, "mqtt", Idioma.T("sem internet: \"{0}\" virou o broker interno do CircuitSketch", host));
@@ -879,9 +940,10 @@ public sealed partial class Rede
 
         if (cliente.Interno)
         {
-            Broker.Publicar(topico, carga, retida);
+            Broker.Publicar(topico, carga, retida, Origem(cliente));
             return true;
         }
+        AvisarDeFora(cliente, true, new MensagemMqtt(topico, carga ?? [], retida));
         try { cliente.Tcp.Publicar(topico, carga, retida); return true; }
         catch
         {
@@ -932,7 +994,7 @@ public sealed partial class Rede
 
         if (estava && !educado && cliente.Testamento is { } testamento && cliente.Interno)
         {
-            Broker.Publicar(testamento.Topico, testamento.Carga, testamento.Retida);
+            Broker.Publicar(testamento.Topico, testamento.Carga, testamento.Retida, Origem(cliente));
             Anotar(cliente.Dona, "mqtt", Idioma.T("o broker publicou o testamento: {0}: {1}", testamento.Topico, Curto(testamento.Carga)));
         }
 
@@ -952,12 +1014,12 @@ public sealed partial class Rede
     /// verdade que alguma placa está usando agora -- o painel faz o papel
     /// do celular com o app de MQTT.
     /// </summary>
-    public void PublicarDoPainel(string topico, string texto)
+    public void PublicarDoPainel(string topico, string texto, bool retida = false, string origem = null)
     {
         if (string.IsNullOrWhiteSpace(topico)) return;
         byte[] carga = Encoding.UTF8.GetBytes(texto ?? "");
         Anotar(null, "mqtt", Idioma.T("painel → {0}: {1}", topico, Curto(texto)));
-        Broker.Publicar(topico, carga, false);
+        Broker.Publicar(topico, carga, retida, origem ?? Idioma.T("painel"));
 
         // Um por broker: o painel entra com o TLS e o usuario da placa que
         // ja conectou nele -- o HiveMQ Cloud nao aceita ninguem sem senha.
@@ -990,7 +1052,7 @@ public sealed partial class Rede
                                 modelo.Tls, !modelo.SemConferirCertificado);
                             lock (trava) paineisMqtt[chave] = conexao;
                         }
-                        conexao.Publicar(topico, carga, false);
+                        conexao.Publicar(topico, carga, retida);
                     }
                     catch (Exception ex)
                     {

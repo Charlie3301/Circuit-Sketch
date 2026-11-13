@@ -26,7 +26,7 @@ public partial class EditorCircuito
     void ApagarLuzesDeLed()
     {
         foreach (var luzes in luzesDeLed.Values)
-            foreach (var l in luzes) mundo.Children.Remove(l);
+            foreach (var l in luzes) TirarDaTela(l);
         luzesDeLed.Clear();
     }
 
@@ -34,7 +34,7 @@ public partial class EditorCircuito
     {
         if (luzesDeLed.TryGetValue(peca.Id, out var luzes) && luzes.Count == quantas) return luzes;
         if (luzes is not null)
-            foreach (var l in luzes) mundo.Children.Remove(l);
+            foreach (var l in luzes) TirarDaTela(l);
         luzes = [];
         for (int i = 0; i < quantas; i++)
         {

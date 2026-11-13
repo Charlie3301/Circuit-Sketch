@@ -94,12 +94,28 @@ public partial class EditorCircuito
         Canvas.SetTop(tela.Pontos, peca.Y);
         Canvas.SetLeft(tela.Sombra, peca.X + g.VidroX);
         Canvas.SetTop(tela.Sombra, peca.Y + g.VidroY);
+
+        // Girada (ou espelhada), a tela vai junto com o desenho, em volta do mesmo centro:
+        // antes ficava deitada no lugar antigo, por cima da peca em pe.
+        if (Catalogo.Obter(peca.Tipo) is not { } def) return;
+        var (largura, altura) = Geometria.Tamanho(peca, def);
+        tela.Pontos.RenderTransform = GiroDaPeca(peca, largura / 2, altura / 2);
+        tela.Sombra.RenderTransform = GiroDaPeca(peca, largura / 2 - g.VidroX, altura / 2 - g.VidroY);
+    }
+
+    static Transform GiroDaPeca(PecaNoCircuito peca, double cx, double cy)
+    {
+        if (peca.Rotacao == 0 && !peca.Espelhada) return null;
+        var grupo = new TransformGroup();
+        if (peca.Espelhada) grupo.Children.Add(new ScaleTransform(-1, 1, cx, cy));
+        if (peca.Rotacao != 0) grupo.Children.Add(new RotateTransform(peca.Rotacao, cx, cy));
+        return grupo;
     }
 
     void RemoverTelaLcd(TelaLcd tela)
     {
-        mundo.Children.Remove(tela.Pontos);
-        mundo.Children.Remove(tela.Sombra);
+        TirarDaTela(tela.Pontos);
+        TirarDaTela(tela.Sombra);
     }
 
     /// <summary>

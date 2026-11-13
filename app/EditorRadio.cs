@@ -160,7 +160,7 @@ public partial class EditorCircuito
     {
         foreach (var d in desenhosDeRadio.Values)
             foreach (UIElement e in new UIElement[] { d.Hastes[0], d.Hastes[1], d.Manches[0], d.Manches[1], d.Chaves[0], d.Chaves[1], d.Luz, d.Tela })
-                mundo.Children.Remove(e);
+                TirarDaTela(e);
         desenhosDeRadio.Clear();
     }
 

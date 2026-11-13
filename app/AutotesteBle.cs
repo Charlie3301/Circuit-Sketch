@@ -321,6 +321,53 @@ public static partial class Autoteste
                 Conferir("celular: texto com acento aparece como texto, e nao so em hexa",
                     grau.StartsWith("\"25") && grau.EndsWith("C\"  0x3235C2B043"), grau);
 
+                // Os controles do celular: o mesmo UART leva o que cada botao manda.
+                if (celular is not null)
+                {
+                    int antes = celular.EnviadosPelosControles.Count;
+                    celular.MostrarPagina("rc");
+                    celular.RcApertar("F");
+                    celular.RcSoltar("F");
+                    celular.RcExtra(0);
+                    bool farolAceso = celular.RcExtraAceso(0);
+                    celular.RcExtra(0);
+                    celular.RcExtra(2);
+                    celular.RcExtraSoltar(2);
+                    celular.RcVelocidade(5);
+                    celular.RcTeclado(System.Windows.Input.Key.Up, true);
+                    celular.RcTeclado(System.Windows.Input.Key.Left, true);
+                    celular.RcTeclado(System.Windows.Input.Key.Up, false);
+                    celular.RcTeclado(System.Windows.Input.Key.Left, false);
+                    string rcMandou = string.Join(" ", celular.EnviadosPelosControles.Skip(antes));
+                    Conferir("celular rc: seta, parar ao soltar, farol liga e desliga, buzina, velocidade e as setas do teclado (com diagonal)",
+                        rcMandou == "F S W w V v 5 F G L S" && farolAceso && !celular.RcExtraAceso(0), rcMandou);
+                    Conferir("celular rc: a placa recebe pelo UART",
+                        EsperarPor(() => LinhasDoSerial(maq).Contains("comando: s"), 3000), string.Join(" | ", LinhasDoSerial(maq).TakeLast(6)));
+
+                    celular.MostrarPagina("videogame");
+                    antes = celular.EnviadosPelosControles.Count;
+                    celular.VideogameDefinir("A", "verde", "apagar");
+                    celular.VideogameApertar("A");
+                    bool verde = EsperarPor(() => maq.Digital[6] == 1 && maq.Digital[5] == 0, 3000);
+                    celular.VideogameSoltar("A");
+                    bool apagou = EsperarPor(() => maq.Digital[6] == 0 && maq.Digital[5] == 0, 3000);
+                    Conferir("celular videogame: o A configurado manda \"verde\" e, ao soltar, \"apagar\" (a lampada obedece)",
+                        verde && apagou, $"R={maq.Digital[5]} G={maq.Digital[6]} / {string.Join(" | ", LinhasDoSerial(maq).TakeLast(4))}");
+
+                    celular.VideogameFormato("J{lx},{ly},{rt}");
+                    celular.VideogameManches(0.5, -1, 0, 0);
+                    celular.VideogameManches(0.5, -1, 0, 0);
+                    celular.AplicarControle(new EstadoDoControle(true, EstadoDoControle.B, 0, 1, 0, 0, 0, 0));
+                    bool acesos = celular.VideogameAceso("B") && celular.VideogameAceso("RT");
+                    celular.AplicarControle(new EstadoDoControle(true, 0, 0, 0, 0, 0, 0, 0));
+                    string vgMandou = string.Join(" ", celular.EnviadosPelosControles.Skip(antes));
+                    Conferir("celular videogame: manches no formato escolhido (so quando mudam) e o controle do computador aperta os botoes",
+                        vgMandou == "verde apagar J50,-100,0 B RT" && acesos && !celular.VideogameAceso("B"), vgMandou);
+                    FotografarJanela(celular, Path.Combine(Path.GetTempPath(), "circuitsketch-teste-videogame.png"));
+                    celular.MostrarPagina("rc");
+                    FotografarJanela(celular, Path.Combine(Path.GetTempPath(), "circuitsketch-teste-rc.png"));
+                }
+
                 FotografarJanela(celular, Path.Combine(Path.GetTempPath(), "circuitsketch-teste-celular.png"));
                 celular?.Close();
             }

@@ -395,11 +395,27 @@ public class JanelaConfiguracoes : Window
     void MontarCircuito(StackPanel painel)
     {
         var grupo = Grupo(painel, Idioma.T("Fundo"));
-        Caixa(grupo, Idioma.T("Mostrar a grade do fundo"), ajustes.LerGrade(), ligado =>
+        // Limpo e a grade desligada (o G liga e desliga); os outros sao o desenho dela.
+        (string Valor, string Nome)[] fundos =
+        [
+            (EditorCircuito.FundoPontilhado, Idioma.T("Pontilhado")),
+            (EditorCircuito.FundoGrade, Idioma.T("Grade")),
+            (EditorCircuito.FundoQuadriculado, Idioma.T("Quadriculado")),
+            (EditorCircuito.FundoLimpo, Idioma.T("Limpo")),
+        ];
+        string fundoAtual = !ajustes.LerGrade() ? EditorCircuito.FundoLimpo
+            : Preferencias.Texto(Preferencias.EstiloDoFundo, EditorCircuito.FundoPontilhado);
+        var nomeDoFundo = Valor(fundos.FirstOrDefault(f => f.Valor == fundoAtual).Nome ?? fundos[0].Nome);
+        Escolha(grupo, Idioma.T("Fundo do circuito"), nomeDoFundo, fundos.Select(f => (f.Nome, (Action)(() =>
         {
-            ajustes.DefinirGrade(ligado);
+            bool ligado = f.Valor != EditorCircuito.FundoLimpo;
+            if (ligado) Preferencias.Definir(Preferencias.EstiloDoFundo, f.Valor);
             Preferencias.Definir(Preferencias.Grade, ligado);
-        });
+            nomeDoFundo.Text = f.Nome;
+            ajustes.Aplicar?.Invoke();
+            ajustes.DefinirGrade(ligado);
+        }))));
+        Nota(grupo, Idioma.T("Os pontos e as linhas caem nos furos da protoboard (0,1\"). A tecla G liga e desliga."));
 
         var fios = Grupo(painel, Idioma.T("Fios"));
 

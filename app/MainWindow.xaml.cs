@@ -50,6 +50,45 @@ public partial class MainWindow : Window
         celular.Show();
     }
 
+    JanelaMqtt janelaMqtt;
+
+    /// <summary>
+    /// Abre o broker do computador como a pessoa deixou na janela do MQTT
+    /// (porta, aberto para a rede, todas as placas aqui). Nos testes fica
+    /// no padrao: so localhost, e as placas no broker que o sketch pedir.
+    /// </summary>
+    void AbrirBrokerDoComputador()
+    {
+        bool teste = Autoteste.Rodando || Passeio.Ativo;
+        int porta = teste ? 1883 : Preferencias.Numero(Preferencias.MqttPorta, 1883, 1, 65535);
+        bool naRede = !teste && Preferencias.Ligado(Preferencias.MqttNaRede, false);
+        redeSimulada.MqttSoNoComputador = !teste && Preferencias.Ligado(Preferencias.MqttSoNoComputador, false);
+        redeSimulada.AbrirBrokerLocal(porta, naRede);
+    }
+
+    /// <summary>A janela do broker MQTT do computador (menu ⋮ > MQTT): uma so, como a do celular.</summary>
+    void AbrirMqtt(object s = null, RoutedEventArgs e = null)
+    {
+        if (janelaMqtt is { IsLoaded: true })
+        {
+            if (janelaMqtt.WindowState == WindowState.Minimized) janelaMqtt.WindowState = WindowState.Normal;
+            janelaMqtt.Activate();
+            return;
+        }
+        AbrirBrokerDoComputador();
+        janelaMqtt = new JanelaMqtt(this, redeSimulada);
+        janelaMqtt.Closed += (_, _) => janelaMqtt = null;
+        janelaMqtt.Show();
+    }
+
+    internal JanelaMqtt TesteAbrirMqtt()
+    {
+        AbrirMqtt();
+        return janelaMqtt;
+    }
+
+    internal Rede RedeParaTeste => redeSimulada;
+
     internal JanelaCelular TesteAbrirCelular()
     {
         AbrirCelular();
@@ -204,6 +243,7 @@ public partial class MainWindow : Window
 
         // Durante o arraste so refaz a rede -- sem empilhar desfazer.
         editor.Arrastou += ReconstruirRede;
+        editor.Arrastou += MostrarPosicao;
         editor.Arrastou += RefletirDiagrama;
         editor.GiroMudou += GiroMudouNoEditor;
         editor.SelecaoMudou += AtualizarBarraObjeto;
@@ -265,6 +305,7 @@ public partial class MainWindow : Window
         relogioTela.Start();
 
         menuOpcoes.Opened += MontarMenusDinamicos;
+        EscreverAtalhosNasDicas();
         PreviewKeyDown += Atalhos;
         Closing += AoFechar;
 
@@ -1220,6 +1261,7 @@ public partial class MainWindow : Window
     // ================= comandos da barra =================
     void AbrirMenu(object s, RoutedEventArgs e)
     {
+        EscreverAtalhosNoMenu();
         btMenu.ContextMenu.PlacementTarget = btMenu;
         btMenu.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
         btMenu.ContextMenu.IsOpen = true;
@@ -1269,6 +1311,7 @@ public partial class MainWindow : Window
     void MontarMenusDinamicos(object s = null, RoutedEventArgs e = null)
     {
         MontarExportarDosPlugins();
+        EscreverAtalhosNoMenu();
         miRecentes.Items.Clear();
         var lista = Recentes.Ler();
 
@@ -1582,6 +1625,111 @@ public partial class MainWindow : Window
     internal JanelaAnalisador TesteAbrirAnalisador(string idDaPeca)
         => AbrirAnalisador(editor.Atual.Pecas.First(p => p.Id == idDaPeca));
 
+    /// <summary>Pixels do circuito por milimetro (96 por polegada, como a protoboard de 0,1").</summary>
+    const double PixelsPorMm = 96 / 25.4;
+
+    TextBox campoX, campoY;
+    PecaNoCircuito pecaDaPosicao;
+
+    /// <summary>
+    /// Onde a peca esta, em milimetros a partir da origem do circuito (o canto de cima, a
+    /// esquerda, da peca), e o "mover para": digitar um numero e Enter poe a peca ali, exata,
+    /// sem a grade.
+    /// </summary>
+    void MontarPosicao(PecaNoCircuito peca)
+    {
+        pecaDaPosicao = peca;
+        TextBox Campo(string eixo)
+        {
+            var campo = new TextBox
+            {
+                Width = 58,
+                Margin = new Thickness(0, 0, 8, 0),
+                Style = (Style)FindResource("CampoEscuro"),
+                ToolTip = Idioma.T("Posição {0} da peça, em milímetros. Digite e aperte Enter para mover a peça para lá.", eixo),
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalContentAlignment = HorizontalAlignment.Right,
+            };
+            System.Windows.Automation.AutomationProperties.SetName(campo, Idioma.T("Posição {0} (mm)", eixo));
+            campo.PreviewKeyDown += (_, ev) =>
+            {
+                // O foco volta ao circuito (e nao a ninguem): com Keyboard.ClearFocus a janela
+                // perdia o foco, e o primeiro clique no outro campo nao entrava nele.
+                if (ev.Key == Key.Enter) { AplicarPosicao(); editor.Focus(); ev.Handled = true; }
+                else if (ev.Key == Key.Escape) { MostrarPosicao(); editor.Focus(); ev.Handled = true; }
+            };
+            campo.LostFocus += (_, _) => { if (campo == campoX || campo == campoY) AplicarPosicao(); };
+            // Entrou no campo, o numero vem todo selecionado: digitar troca o valor. Sem isto,
+            // clicar e digitar "80" dava "8002,87", e a peca ia parar a 8 metros dali.
+            campo.GotKeyboardFocus += (_, _) => campo.SelectAll();
+            campo.PreviewMouseLeftButtonDown += (_, ev) =>
+            {
+                if (campo.IsKeyboardFocusWithin) return;
+                campo.Focus();
+                ev.Handled = true;
+            };
+            opcoesObjeto.Children.Add(new TextBlock
+            {
+                Text = eixo,
+                Foreground = Cinza,
+                FontSize = 11,
+                Margin = new Thickness(0, 0, 4, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+            });
+            opcoesObjeto.Children.Add(campo);
+            opcoesObjeto.Children.Add(new TextBlock
+            {
+                Text = "mm",
+                Foreground = Cinza,
+                FontSize = 11,
+                VerticalAlignment = VerticalAlignment.Center,
+            });
+            return campo;
+        }
+        campoX = Campo("X");
+        campoY = Campo("Y");
+        // O que e de toda peca (nome e lugar) separado do que e desta.
+        opcoesObjeto.Children.Add(new Border { Width = 1, Background = new SolidColorBrush(Color.FromRgb(0x4A, 0x4A, 0x4E)) });
+        MostrarPosicao();
+    }
+
+    /// <summary>Os campos seguem a peca enquanto ela anda (menos o que esta sendo digitado).</summary>
+    void MostrarPosicao()
+    {
+        if (pecaDaPosicao is null || campoX is null) return;
+        var cultura = System.Globalization.CultureInfo.CurrentCulture;
+        if (!campoX.IsKeyboardFocused) campoX.Text = (pecaDaPosicao.X / PixelsPorMm).ToString("0.##", cultura);
+        if (!campoY.IsKeyboardFocused) campoY.Text = (pecaDaPosicao.Y / PixelsPorMm).ToString("0.##", cultura);
+    }
+
+    void AplicarPosicao()
+    {
+        if (pecaDaPosicao is not { } peca || campoX is null) return;
+        double? Ler(TextBox campo)
+        {
+            string texto = campo.Text.Trim().Replace(',', '.');
+            return double.TryParse(texto, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double mm)
+                   && Math.Abs(mm) < 100000 ? mm * PixelsPorMm : null;
+        }
+        double x = Ler(campoX) ?? peca.X, y = Ler(campoY) ?? peca.Y;
+        // O que o campo mostra tem duas casas: sem mudar o numero, a peca nao anda.
+        if (Math.Abs(x / PixelsPorMm - Math.Round(peca.X / PixelsPorMm, 2)) < 0.004) x = peca.X;
+        if (Math.Abs(y / PixelsPorMm - Math.Round(peca.Y / PixelsPorMm, 2)) < 0.004) y = peca.Y;
+        editor.MoverPara(peca, x, y);
+        MostrarPosicao();
+    }
+
+    internal ColunaDeOpcoes TesteOpcoesDoObjeto => opcoesObjeto;
+
+    /// <summary>Para o teste: digita X e Y (em mm) nos campos da peca selecionada e aperta Enter.</summary>
+    internal (string X, string Y) TesteDigitarPosicao(string x, string y)
+    {
+        if (campoX is null) return (null, null);
+        campoX.Text = x; campoY.Text = y;
+        AplicarPosicao();
+        return (campoX.Text, campoY.Text);
+    }
+
     void AtualizarBarraObjeto()
     {
         int quantas = editor.QuantidadeSelecionada;
@@ -1589,6 +1737,8 @@ public partial class MainWindow : Window
         // Fio selecionado tem a sua propria tab.
         if (editor.FioAtual is not null) { MontarBarraDoFio(); return; }
 
+        campoX = campoY = null;
+        pecaDaPosicao = null;
         if (quantas == 0)
         {
             barraObjeto.Visibility = Visibility.Collapsed;
@@ -1647,7 +1797,7 @@ public partial class MainWindow : Window
         {
             if (ev.Key != Key.Enter || Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)) return;
             editor.DefinirNome(peca, campoNome.Text);
-            Keyboard.ClearFocus();
+            editor.Focus();
             ev.Handled = true;
         };
 
@@ -1660,6 +1810,7 @@ public partial class MainWindow : Window
             VerticalAlignment = VerticalAlignment.Center,
         });
         opcoesObjeto.Children.Add(campoNome);
+        MontarPosicao(peca);
 
         if (PerfilPlaca.EhPlaca(peca.Tipo)) MontarBarraDaPlaca(peca);
 
@@ -2526,7 +2677,10 @@ public partial class MainWindow : Window
     /// toda aula.
     /// </summary>
     void AbrirConfiguracoes(object s = null, RoutedEventArgs e = null)
-        => CriarConfiguracoes().ShowDialog();
+    {
+        CriarConfiguracoes().ShowDialog();
+        EscreverAtalhosNasDicas();   // os atalhos podem ter mudado la dentro
+    }
 
     /// <summary>
     /// A janela de configurações montada e ainda não mostrada.
@@ -3151,6 +3305,7 @@ public partial class MainWindow : Window
         AplicarTema();
         editor.CorDoFio = Preferencias.Texto(Preferencias.CorDoFio, "#00A651");
         editor.MostrarGrade = Preferencias.Ligado(Preferencias.Grade, true);
+        editor.EstiloDoFundo = Preferencias.Texto(Preferencias.EstiloDoFundo, EditorCircuito.FundoPontilhado);
         editor.AplicarGrade();
 
         string estilo = Preferencias.Texto(Preferencias.EstiloDoFio, Fio.EstiloSolto);
@@ -3654,125 +3809,111 @@ public partial class MainWindow : Window
         }
     }
 
-    void Ajuda(object s = null, RoutedEventArgs e = null)
+    void Ajuda(object s = null, RoutedEventArgs e = null) => JanelaDaAjuda().ShowDialog();
+
+    /// <summary>
+    /// A ajuda numa janela com rolagem (a caixa de mensagem passava da altura
+    /// da tela) e traduzida. Os atalhos sao os de agora, da tabela: trocados
+    /// em Configurações, a ajuda acompanha.
+    /// </summary>
+    internal Window JanelaDaAjuda() => JanelaAbertura.JanelaDeTexto(this, Idioma.T("Ajuda e atalhos"), TextoDaAjuda());
+
+    internal static string TextoDaAjuda()
     {
-        MessageBox.Show(this,
-            """
-            CIRCUITO
-              Arrastar peça .............. segurar e mover
-              Selecionar várias .......... arrastar no vazio (laço)
-              Somar à seleção ............ Ctrl ou Shift + clique
-              Ligar fio .................. clicar num pino, depois no outro
-              Selecionar fio ............. clicar em cima dele (Del apaga)
-              Vários fios de uma vez ..... arrastar no vazio por cima deles
-              Traçado do fio ............. tab do fio: solto, reto ou degrau
-              Moldar o fio ............... selecione e arraste as bolinhas
-              Novo canto ................. arraste a bolinha vazada do meio
-              Tirar um canto ............. clique duplo em cima dele
-              Cancelar fio ............... clicar no vazio
-              Mover a tela ............... botão do meio ou direito
-              Zoom ....................... roda do mouse
-              Sem encaixe na grade ....... segurar Alt ao arrastar
-              Apertar um botão ........... segurar o mouse sobre ele
-              Reiniciar a placa .......... clicar no RESET dela (EN na ESP32);
-                                           segurando, ela fica parada
-              BOOT da ESP32 .............. segurar leva o GPIO 0 a LOW
-
-            ABA COMPONENTES
-              Clique direito numa ligação  trocar o pino da placa, a cor e
-                                           o traçado do fio, ou apagá-lo
-
-            CÓDIGO
-              Linguagens ................. Arduino (C/C++), C, MicroPython,
-                                           C#, Rust, Ada, SPARK, Cowgol,
-                                           Millipascal e Assembly: o programa
-                                           reconhece pelo próprio código
-              Assembly ................... AVR de verdade, só no Uno e no
-                                           Nano (ATmega328P), no ritmo dos
-                                           16 MHz do chip
-              Gravar na placa ............ menu ⋮ > Exportar programa
-                                           gravável (.hex)
-
-            PAINEL DE BAIXO
-              CONSOLE .................... avisos e erros do simulador
-              MONITOR SERIAL ............. o que o sketch imprime; o campo
-                                           de baixo manda texto para ele
-              REDE ....................... WiFi, HTTP e MQTT: o que cada placa
-                                           fez, o link do servidor para abrir
-                                           no navegador e o envio de MQTT
-              BLUETOOTH .................. faz o papel do celular: conecta na
-                                           placa e troca mensagens
-              ↗ ao lado de cada aba ...... solta só aquela aba numa janela;
-                                           arraste de volta para encaixar
-
-            ATALHOS (os de fábrica; troque em Configurações)
-              A .......... adicionar componente
-              R .......... girar a peça 90°
-              M .......... espelhar a peça
-              setas ...... mover o cenário
-              Esc ........ cancelar a ligação em curso
-              F5 ......... rodar / parar
-              F6 ......... pausar / continuar (depurador)
-              F9 ......... ponto de parada na linha do cursor
-              F10 ........ andar uma linha
-              F .......... ajustar à tela
-              + / - ...... aproximar / afastar
-              G .......... alternar grade
-              Del ........ excluir seleção
-              Ctrl+S ..... salvar o projeto (.sktch: circuito + código)
-              Ctrl+O ..... abrir projeto
-              Ctrl+Z ..... desfazer
-              Ctrl+Y ..... refazer
-              Ctrl+C ..... copiar peça
-              Ctrl+V ..... colar peça
-              Ctrl+I ..... importar circuito (diagram.json)
-              Ctrl+M ..... monitor serial
-              Alt+Enter .. tela cheia
-              ? .......... esta ajuda
-            """,
-            Idioma.T("Ajuda e atalhos"), MessageBoxButton.OK, MessageBoxImage.Information);
+        var texto = new System.Text.StringBuilder();
+        texto.AppendLine(Idioma.T("CIRCUITO"));
+        texto.AppendLine(Idioma.T("  Arrastar peça .............. segurar e mover\n  Selecionar várias .......... arrastar no vazio (laço)\n  Somar à seleção ............ Ctrl ou Shift + clique\n  Ligar fio .................. clicar num pino, depois no outro\n  Selecionar fio ............. clicar em cima dele (Del apaga)\n  Vários fios de uma vez ..... arrastar no vazio por cima deles\n  Traçado do fio ............. tab do fio: solto, reto ou degrau\n  Moldar o fio ............... selecione e arraste as bolinhas\n  Novo canto ................. arraste a bolinha vazada do meio\n  Tirar um canto ............. clique duplo em cima dele\n  Cancelar fio ............... clicar no vazio ou Esc\n  Mover a tela ............... botão do meio ou direito\n  Zoom ....................... roda do mouse\n  Sem encaixe na grade ....... segurar Alt ao arrastar\n  Lugar exato ................ campos X e Y da tab da peça (mm)\n  Apertar um botão ........... segurar o mouse sobre ele\n  Reiniciar a placa .......... clicar no RESET dela (EN na ESP32);\n                               segurando, ela fica parada\n  BOOT da ESP32 .............. segurar leva o GPIO 0 a LOW"));
+        texto.AppendLine();
+        texto.AppendLine(Idioma.T("ABA COMPONENTES"));
+        texto.AppendLine(Idioma.T("  Clique direito numa ligação  trocar o pino da placa, a cor e\n                               o traçado do fio, ou apagá-lo"));
+        texto.AppendLine();
+        texto.AppendLine(Idioma.T("CÓDIGO"));
+        texto.AppendLine(Idioma.T("  Linguagens ................. Arduino (C/C++), C, MicroPython,\n                               C#, Rust, Ada, SPARK, Cowgol,\n                               Millipascal e Assembly: o programa\n                               reconhece pelo próprio código\n  Assembly ................... AVR de verdade, só no Uno e no\n                               Nano (ATmega328P), no ritmo dos\n                               16 MHz do chip\n  Gravar na placa ............ menu ⋮ > Exportar programa\n                               gravável (.hex)"));
+        texto.AppendLine();
+        texto.AppendLine(Idioma.T("PAINEL DE BAIXO"));
+        texto.AppendLine(Idioma.T("  CONSOLE .................... avisos e erros do simulador\n  MONITOR SERIAL ............. o que o sketch imprime; o campo\n                               de baixo manda texto para ele\n  REDE ....................... WiFi, HTTP e MQTT: o que cada placa\n                               fez, o link do servidor para abrir\n                               no navegador e o envio de MQTT\n  BLUETOOTH .................. faz o papel do celular: conecta na\n                               placa e troca mensagens\n  ↗ ao lado de cada aba ...... solta só aquela aba numa janela;\n                               arraste de volta para encaixar"));
+        texto.AppendLine();
+        texto.AppendLine(Idioma.T("CONEXÕES (menu ⋮)"));
+        texto.AppendLine(Idioma.T("  Bluetooth (celular) ........ o celular: dispositivos, terminal,\n                               BLE, controle de carrinho RC e\n                               controle de videogame\n  MQTT ....................... o broker do computador: as placas,\n                               os tópicos, as mensagens e o envio"));
+        texto.AppendLine();
+        texto.AppendLine(Idioma.T("ATALHOS (troque em ⋮ > Atalhos do teclado)"));
+        foreach (string categoria in AtalhosDoPrograma.Categorias)
+        {
+            texto.AppendLine("  " + categoria);
+            foreach (var acao in AtalhosDoPrograma.Todas.Where(a => a.Categoria == categoria))
+            {
+                var (tecla, _) = AtalhosDoPrograma.Atalho(acao.Id);
+                if (tecla == Key.None) continue;
+                string rotulo = AtalhosDoPrograma.Rotulo(acao.Id) + " ";
+                texto.AppendLine("    " + rotulo.PadRight(14, '.') + " " + acao.Nome);
+            }
+        }
+        texto.AppendLine("    " + "Esc ".PadRight(14, '.') + " " + Idioma.T("cancelar a ligação em curso"));
+        return texto.ToString();
     }
 
     // ================= atalhos =================
+
+    /// <summary>
+    /// O atalho ao lado de cada item do menu ⋮ e nas dicas dos botoes: o que
+    /// esta configurado agora, e nao o de fabrica escrito na mao.
+    /// </summary>
+    void EscreverAtalhosNoMenu()
+    {
+        foreach (var item in menuOpcoes.Items.OfType<MenuItem>())
+        {
+            if (string.IsNullOrEmpty(item.Uid) || AtalhosDoPrograma.Acao(item.Uid) is null) continue;
+            var (tecla, _) = AtalhosDoPrograma.Atalho(item.Uid);
+            item.InputGestureText = tecla == Key.None ? "" : AtalhosDoPrograma.Rotulo(item.Uid);
+        }
+    }
+
+    /// <summary>As dicas dos botoes que dizem o atalho: refeitas quando os atalhos mudam.</summary>
+    void EscreverAtalhosNasDicas()
+    {
+        foreach (var (botao, id) in new (Button, string)[]
+                 {
+                     (btVerificar, "verificar"), (btMandar, "mandar"), (btRodar, "rodar"), (btParar, "rodar"),
+                     (btPasso, "passo"), (btAdicionar, "adicionar"), (btGirar, "girar"),
+                     (btEspelhar, "espelhar"), (btApagar, "excluir"),
+                 })
+            if (botao.ToolTip is string dica) botao.ToolTip = AtalhosDoPrograma.ComAtalho(dica, id);
+        if (btPausar.ToolTip is string pausa) btPausar.ToolTip = AtalhosDoPrograma.ComAtalho(pausa, "pausar");
+    }
+
+    void AbrirAtalhos(object s = null, RoutedEventArgs e = null)
+    {
+        new JanelaAtalhos(this).ShowDialog();
+        EscreverAtalhosNoMenu();
+        EscreverAtalhosNasDicas();
+    }
+
     void Atalhos(object s, KeyEventArgs e)
     {
         bool noTexto = txtCodigo.IsKeyboardFocusWithin || EscrevendoEmCampo();
         var tecla = e.Key == Key.System ? e.SystemKey : e.Key;
         var mods = Keyboard.Modifiers;
 
-        if (mods.HasFlag(ModifierKeys.Alt) && tecla is Key.Enter or Key.System)
+        // O Esc nao se troca: e o "desiste" de toda janela.
+        if (tecla == Key.Escape)
         {
-            TelaCheia();
+            if (modoDaTela == "circuito" && !noTexto && (editor.PontaVermelha is not null || editor.PontaPreta is not null))
+            {
+                editor.TirarPontas();
+                Aviso(Idioma.T("multímetro: pontas tiradas."));
+            }
+            else if (editor.LigandoFio) { editor.CancelarFio(); Aviso(Idioma.T("ligação cancelada")); }
+            else editor.Focus();
             e.Handled = true;
             return;
-        }
-
-        switch (tecla)
-        {
-            case Key.Escape:
-                if (modoDaTela == "circuito" && !noTexto && (editor.PontaVermelha is not null || editor.PontaPreta is not null))
-                {
-                    editor.TirarPontas();
-                    Aviso(Idioma.T("multímetro: pontas tiradas."));
-                }
-                else if (editor.LigandoFio) { editor.CancelarFio(); Aviso(Idioma.T("ligação cancelada")); }
-                else editor.Focus();
-                e.Handled = true;
-                return;
-
-            case Key.Left when !noTexto: editor.Deslocar(60, 0); e.Handled = true; return;
-            case Key.Right when !noTexto: editor.Deslocar(-60, 0); e.Handled = true; return;
-            case Key.Up when !noTexto: editor.Deslocar(0, 60); e.Handled = true; return;
-            case Key.Down when !noTexto: editor.Deslocar(0, -60); e.Handled = true; return;
-
-            case Key.Add or Key.OemPlus when !noTexto: Aproximar(); e.Handled = true; return;
-            case Key.Subtract or Key.OemMinus when !noTexto: Afastar(); e.Handled = true; return;
         }
 
         string acao = AtalhosDoPrograma.Id(tecla, mods);
         if (acao is null) return;
 
-        bool comModificador = mods != ModifierKeys.None;
+        // Shift sozinho nao conta como modificador nas teclas de uma tecla so:
+        // o "?" do teclado americano e o Shift+/, e as setas com Shift continuam setas.
+        bool comModificador = (mods & (ModifierKeys.Control | ModifierKeys.Alt)) != 0;
         if (noTexto && !comModificador && acao is not ("pausar" or "pausa-na-linha" or "passo"))
             return;
 
@@ -3818,6 +3959,23 @@ public partial class MainWindow : Window
             case "espelhar": editor.Espelhar(); break;
             case "excluir": Excluir(); break;
             case "ajuda": Ajuda(); break;
+
+            case "aproximar": Aproximar(); break;
+            case "afastar": Afastar(); break;
+            case "mover-esquerda": editor.Deslocar(60, 0); break;
+            case "mover-direita": editor.Deslocar(-60, 0); break;
+            case "mover-cima": editor.Deslocar(0, 60); break;
+            case "mover-baixo": editor.Deslocar(0, -60); break;
+            case "tela-cheia": TelaCheia(); break;
+            case "modo-simulacao": MostrarModo("simulacao"); break;
+            case "modo-multimetro": MostrarModo("circuito"); break;
+            case "modo-componentes": MostrarModo("componentes"); break;
+            case "modo-descricao": MostrarModo("descricao"); break;
+
+            case "celular": AbrirCelular(); break;
+            case "mqtt": AbrirMqtt(); break;
+            case "configuracoes": AbrirConfiguracoes(); break;
+            case "atalhos": AbrirAtalhos(); break;
 
             default: return;
         }
@@ -4919,9 +5077,10 @@ public partial class MainWindow : Window
             m.Nome = NomeCurtoDaPlaca(id).Trim('[', ']');
         }
 
-        // Broker MQTT em localhost: um app de MQTT do proprio computador
-        // conecta nele e conversa com as placas da bancada.
-        redeSimulada.AbrirBrokerLocal(1883);
+        // O broker MQTT do computador: um app de MQTT do proprio computador
+        // (ou o celular, se aberto para a rede) conecta nele e conversa com
+        // as placas da bancada. Porta e rede vem das Configuracoes do MQTT.
+        AbrirBrokerDoComputador();
         ReconstruirRede();
 
         var placas = editor.Atual.Placas().ToList();
@@ -5663,7 +5822,7 @@ public partial class MainWindow : Window
         if (!rodando && aoVivo && painelVariaveis.Visibility == Visibility.Visible && placaPausada is null)
             painelVariaveis.Visibility = Visibility.Collapsed;
         btPausar.Content = pausado ? "▶" : "❚❚";
-        btPausar.ToolTip = pausado ? Idioma.T("Continuar (F6)") : Idioma.T("Pausar (F6)");
+        btPausar.ToolTip = AtalhosDoPrograma.ComAtalho(pausado ? Idioma.T("Continuar (F6)") : Idioma.T("Pausar (F6)"), "pausar");
         btPasso.IsEnabled = pausado;
     }
 

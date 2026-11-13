@@ -122,7 +122,7 @@ public partial class EditorCircuito
     void ApagarLuzesDeModulo()
     {
         foreach (var luzes in luzesDeModulo.Values)
-            foreach (var l in luzes) mundo.Children.Remove(l);
+            foreach (var l in luzes) TirarDaTela(l);
         luzesDeModulo.Clear();
     }
 
