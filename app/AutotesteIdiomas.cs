@@ -341,11 +341,22 @@ public static partial class Autoteste
         "da", "e", "o", "sua", "quando",
     };
 
+    /// <summary>
+    /// Palavras curtas que o portugues divide com o frances ("de", "que", "ou",
+    /// "mais", "à"): numa tela em frances elas sao do frances.
+    /// </summary>
+    static readonly HashSet<string> TambemDoFrances = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "de", "que", "ou", "mais", "à",
+    };
+
     static readonly Regex AcentoDoPortugues = new("[ãõáàâéêíóôúüçÃÕÁÀÂÉÊÍÓÔÚÇ]");
     // O espanhol tambem tem á, é, í, ó, ú e ü: so o til do a e do o, o circunflexo, a crase e o ç sao do portugues.
     static readonly Regex AcentoSoDoPortugues = new("[ãõàâêôçÃÕÀÂÊÔÇ]");
     // O italiano tem à ("già") e é ("perché"); o resto continua sendo do portugues.
     static readonly Regex AcentoNaoItaliano = new("[ãõáâêíóôúüçÃÕÁÂÊÍÓÔÚÇ]");
+    // O frances tem à, â, é, ê, ô, ç e ü ("déjà", "être", "reçu"); o til e o agudo do a, i, o e u sao do portugues.
+    static readonly Regex AcentoNaoFrances = new("[ãõáíóúÃÕÁÍÓÚ]");
     static readonly Regex Palavra = new(@"\p{L}{3,}");
 
     /// <summary>
@@ -381,7 +392,8 @@ public static partial class Autoteste
         string lingua = Idioma.Atual == Idioma.Original ? "en" : Idioma.Atual;
         bool espanhol = lingua.StartsWith("es", StringComparison.Ordinal);
         bool italiano = lingua.StartsWith("it", StringComparison.Ordinal);
-        if ((espanhol ? AcentoSoDoPortugues : italiano ? AcentoNaoItaliano : AcentoDoPortugues).IsMatch(texto)) return true;
+        bool frances = lingua.StartsWith("fr", StringComparison.Ordinal);
+        if ((espanhol ? AcentoSoDoPortugues : italiano ? AcentoNaoItaliano : frances ? AcentoNaoFrances : AcentoDoPortugues).IsMatch(texto)) return true;
         var vocabulario = Vocabulario(lingua);
         foreach (string pedaco in texto.Split((char[])null, StringSplitOptions.RemoveEmptyEntries))
         {
@@ -391,7 +403,8 @@ public static partial class Autoteste
             string palavra = pedaco.Trim('.', ',', ':', ';', '(', ')', '"', '\'', '!', '?', '…', '·', '—', '-');
             if (palavra == palavra.ToUpperInvariant() || palavra.Any(c => char.IsDigit(c) || c is '.' or '_')) continue;
             if (SoDoPortugues.Contains(palavra) && !(espanhol && TambemDoEspanhol.Contains(palavra))
-                && !(italiano && TambemDoItaliano.Contains(palavra))) return true;
+                && !(italiano && TambemDoItaliano.Contains(palavra))
+                && !(frances && TambemDoFrances.Contains(palavra))) return true;
             foreach (Match m in Palavra.Matches(palavra))
                 if (vocabulario.Contains(m.Value)) return true;
         }
