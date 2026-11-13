@@ -1,58 +1,58 @@
-// ESP32-DOOM no CircuitSketch: o DOOM de verdade -- o motor PrBoom 2.5.0,
-// do projeto ESP32-DOOM -- numa ESP32-S3 com PSRAM, display ILI9341, cartao
-// microSD, amplificador I2S MAX98357A e alto-falante.
+// ESP32-DOOM in CircuitSketch: the real DOOM -- the PrBoom 2.5.0 engine,
+// from the ESP32-DOOM project -- on an ESP32-S3 with PSRAM, an ILI9341
+// display, a microSD card, a MAX98357A I2S amplifier and a speaker.
 //
-// O jogo e a biblioteca ESP32-DOOM, escrita em C (GPL, com o codigo junto):
-// no simulador ela roda no modo nativo, compilada de verdade, como na placa.
+// The game is the ESP32-DOOM library, written in C (GPL, source included):
+// in the simulator it runs in native mode, really compiled, as on the board.
 //
-// ANTES DE RODAR: o cartao precisa do DOOM1.WAD (o shareware serve). Pare a
-// simulacao, clique duas vezes no cartao do circuito e use "Carregar do
-// computador". O WAD nao vem junto: e da id Software.
+// BEFORE RUNNING: the card needs DOOM1.WAD (the shareware one works). Stop
+// the simulation, double-click the card in the circuit and use "Load from
+// the computer". The WAD is not included: it belongs to id Software.
 //
-// NA PLACA DE VERDADE (Arduino IDE, core esp32 3.x):
-//   - copie a pasta bibliotecas/ESP32-DOOM do CircuitSketch para
-//     Documentos/Arduino/libraries;
-//   - Placa: "ESP32S3 Dev Module" (um N8R8: 8 MB de flash e 8 de PSRAM);
-//   - Ferramentas > PSRAM: "OPI PSRAM";
-//   - Ferramentas > Partition Scheme: "Huge APP (3MB No OTA/1MB SPIFFS)";
-//   - o DOOM1.WAD na raiz de um cartao microSD formatado em FAT32.
+// ON THE REAL BOARD (Arduino IDE, esp32 core 3.x):
+//   - copy CircuitSketch's bibliotecas/ESP32-DOOM folder to
+//     Documents/Arduino/libraries;
+//   - Board: "ESP32S3 Dev Module" (an N8R8: 8 MB of flash and 8 of PSRAM);
+//   - Tools > PSRAM: "OPI PSRAM";
+//   - Tools > Partition Scheme: "Huge APP (3MB No OTA/1MB SPIFFS)";
+//   - DOOM1.WAD in the root of a microSD card formatted as FAT32.
 //
-// Controles: os botoes do circuito (ou o teclado, ou um controle de video
-// game). O "atirar" tambem e o OK dos menus; a chave liga o correr.
+// Controls: the circuit's buttons (or the keyboard, or a game controller).
+// "Fire" is also OK in the menus; the switch turns running on.
 
 #include <WiFi.h>
 #include <doom_esp32.h>
 
-// A tela tambem vai para o navegador, se a placa entrar numa rede. Na placa
-// de verdade, ponha aqui a sua; no simulador, qualquer nome conecta.
-const char *REDE = "CircuitSketch-WiFi";
-const char *SENHA = "";
+// The screen also goes to the browser if the board joins a network. On the
+// real board, put yours here; in the simulator, any name connects.
+const char *NETWORK = "CircuitSketch-WiFi";
+const char *PASSWORD = "";
 
 void setup() {
   Serial.begin(115200);
 
-  // Os pinos do circuito -- os mesmos da BASE ZERO.
-  doom_barramento(11, 13, 12);           // MOSI, MISO, SCK (o display e o cartao dividem)
-  doom_tela(10, 9, 8, 7);                // CS, DC, RST, luz de fundo
-  doom_cartao(14);                       // CS do cartao
-  doom_botoes(4, 5, 6, 15, 16, 17, 18);  // cima, baixo, esquerda, direita, menu, atirar, usar
+  // The circuit's pins -- the same as BASE ZERO.
+  doom_barramento(11, 13, 12);           // MOSI, MISO, SCK (the display and the card share them)
+  doom_tela(10, 9, 8, 7);                // CS, DC, RST, backlight
+  doom_cartao(14);                       // card CS
+  doom_botoes(4, 5, 6, 15, 16, 17, 18);  // up, down, left, right, menu, fire, use
   doom_chave_correr(1);
-  doom_som(40, 41, 42);                  // BCLK, LRC, DIN do MAX98357A
+  doom_som(40, 41, 42);                  // MAX98357A BCLK, LRC, DIN
 
-  WiFi.begin(REDE, SENHA);
+  WiFi.begin(NETWORK, PASSWORD);
   for (int i = 0; i < 50 && WiFi.status() != WL_CONNECTED; i++) delay(100);
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.print("A tela no navegador: http://");
+    Serial.print("The screen in the browser: http://");
     Serial.println(WiFi.localIP());
     doom_web(80);
   } else {
-    Serial.println("Sem rede: o jogo fica so no display.");
+    Serial.println("No network: the game stays on the display only.");
   }
 
   doom_iniciar();
 }
 
 void loop() {
-  // O jogo roda nas tarefas do FreeRTOS que o doom_iniciar() criou.
+  // The game runs in the FreeRTOS tasks that doom_iniciar() created.
   delay(1000);
 }

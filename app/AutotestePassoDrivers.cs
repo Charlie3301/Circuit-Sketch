@@ -171,7 +171,7 @@ public static partial class Autoteste
             int[] gpios = [19, 18, 5, 17];
             string[] pinos = ["D19", "D18", "D5", "TX2"];
             for (int k = 0; k < 4; k++) b.Ligar(b.Placa, pinos[k], b.Driver, $"IN{k + 1}");
-            string[] fios = ["laranja", "amarelo", "rosa", "azul", "vermelho"], conector = ["A", "B", "C", "D", "COM"];
+            string[] fios = ["orange", "yellow", "pink", "blue", "red"], conector = ["A", "B", "C", "D", "COM"];
             for (int k = 0; k < 5; k++) b.Ligar(b.Motor, fios[k], b.Driver, conector[k]);
             foreach (int g in gpios) b.Saida(g);
             b.Quadro();

@@ -64,17 +64,17 @@ def gravar(recurso, codigo, pecas, fios, codigos_por_placa=None):
 # =====================================================================
 
 BLUETOOTH = r'''
-// Controle por Bluetooth, na ESP32.
+// Bluetooth control, on the ESP32.
 //
-// Na aba BLUETOOTH, clique em Conectar e mande um comando:
-//   vermelho, verde, azul, branco, apagar  -> cor do LED RGB
-//   bip                                    -> toca o buzzer
-//   temp                                   -> responde temperatura e umidade
-//   ajuda                                  -> lista os comandos
+// In the BLUETOOTH tab, click Connect and send a command:
+//   red, green, blue, white, off  -> RGB LED color
+//   beep                          -> sounds the buzzer
+//   temp                          -> answers temperature and humidity
+//   help                          -> lists the commands
 //
-// Um celular de verdade tambem serve: com o sketch rodando, a placa abre
-// uma porta em 127.0.0.1 (o painel diz qual). Um terminal TCP qualquer
-// faz o papel do app "Serial Bluetooth Terminal", byte a byte.
+// A real phone works too: with the sketch running, the board opens a port
+// on 127.0.0.1 (the panel says which). Any TCP terminal plays the part of
+// the "Serial Bluetooth Terminal" app, byte by byte.
 
 #include <BluetoothSerial.h>
 #include <DHT.h>
@@ -85,84 +85,84 @@ BluetoothSerial SerialBT;
 DHT dht(4, DHT22);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-const int PINO_R = 25;
-const int PINO_G = 26;
-const int PINO_B = 27;
+const int PIN_R = 25;
+const int PIN_G = 26;
+const int PIN_B = 27;
 const int BUZZER = 14;
 
-unsigned long ultimoAviso = 0;
+unsigned long lastReport = 0;
 
-void cor(int r, int g, int b) {
-  analogWrite(PINO_R, r);
-  analogWrite(PINO_G, g);
-  analogWrite(PINO_B, b);
+void color(int r, int g, int b) {
+  analogWrite(PIN_R, r);
+  analogWrite(PIN_G, g);
+  analogWrite(PIN_B, b);
 }
 
-void mostrar(String linha1, String linha2) {
+void show(String line1, String line2) {
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print(linha1);
+  lcd.print(line1);
   lcd.setCursor(0, 1);
-  lcd.print(linha2);
+  lcd.print(line2);
 }
 
 void setup() {
   Serial.begin(115200);
-  SerialBT.begin("ESP32-Sala");   // o nome que aparece no celular
+  SerialBT.begin("ESP32-Room");   // the name the phone shows
   dht.begin();
   lcd.init();
   lcd.backlight();
   pinMode(BUZZER, OUTPUT);
-  cor(0, 0, 0);
-  mostrar("Bluetooth pronto", "ESP32-Sala");
-  Serial.println("Esperando o celular: aba BLUETOOTH > Conectar");
+  color(0, 0, 0);
+  show("Bluetooth ready", "ESP32-Room");
+  Serial.println("Waiting for the phone: BLUETOOTH tab > Connect");
 }
 
 void loop() {
   if (SerialBT.available()) {
-    String comando = SerialBT.readStringUntil('\n');
-    comando.trim();
-    comando.toLowerCase();
-    Serial.println("recebi: " + comando);
+    String command = SerialBT.readStringUntil('\n');
+    command.trim();
+    command.toLowerCase();
+    Serial.println("got: " + command);
 
-    if (comando == "vermelho") {
-      cor(255, 0, 0);
-      SerialBT.println("LED vermelho");
-    } else if (comando == "verde") {
-      cor(0, 255, 0);
-      SerialBT.println("LED verde");
-    } else if (comando == "azul") {
-      cor(0, 0, 255);
-      SerialBT.println("LED azul");
-    } else if (comando == "branco") {
-      cor(255, 255, 255);
-      SerialBT.println("LED branco");
-    } else if (comando == "apagar") {
-      cor(0, 0, 0);
-      SerialBT.println("LED apagado");
-    } else if (comando == "bip") {
+    if (command == "red") {
+      color(255, 0, 0);
+      SerialBT.println("LED red");
+    } else if (command == "green") {
+      color(0, 255, 0);
+      SerialBT.println("LED green");
+    } else if (command == "blue") {
+      color(0, 0, 255);
+      SerialBT.println("LED blue");
+    } else if (command == "white") {
+      color(255, 255, 255);
+      SerialBT.println("LED white");
+    } else if (command == "off") {
+      color(0, 0, 0);
+      SerialBT.println("LED off");
+    } else if (command == "beep") {
       tone(BUZZER, 880, 200);
-      SerialBT.println("bip!");
-    } else if (comando == "temp") {
-      SerialBT.print("temperatura: ");
+      SerialBT.println("beep!");
+    } else if (command == "temp") {
+      SerialBT.print("temperature: ");
       SerialBT.print(dht.readTemperature(), 1);
       SerialBT.println(" C");
-      SerialBT.print("umidade: ");
+      SerialBT.print("humidity: ");
       SerialBT.print(dht.readHumidity(), 0);
       SerialBT.println(" %");
-    } else if (comando == "ajuda") {
-      SerialBT.println("comandos: vermelho, verde, azul, branco, apagar, bip, temp");
+    } else if (command == "help") {
+      SerialBT.println("commands: red, green, blue, white, off, beep, temp");
     } else {
-      SerialBT.println("nao conheco '" + comando + "'. Mande: ajuda");
+      SerialBT.println("unknown '" + command + "'. Send: help");
     }
 
-    mostrar("Ultimo comando:", comando);
+    show("Last command:", command);
   }
 
-  // A cada 5 s a placa manda a temperatura sozinha, como um sensor
-  // faria -- mas so se tiver alguem conectado para ouvir.
-  if (millis() - ultimoAviso > 5000) {
-    ultimoAviso = millis();
+  // Every 5 s the board sends the temperature on its own, like a sensor
+  // would -- but only if someone is connected to listen.
+  if (millis() - lastReport > 5000) {
+    lastReport = millis();
     if (SerialBT.hasClient()) {
       SerialBT.print("[auto] ");
       SerialBT.print(dht.readTemperature(), 1);
@@ -207,106 +207,104 @@ gravar('esp32-bluetooth', BLUETOOTH,
 #  ESP-NOW, duas placas
 # =====================================================================
 
-COMUM_ESPNOW = r'''
-// Endereco de difusao: todas as placas com ESP-NOW ouvem. Na bancada de
-// verdade, pode trocar pelo MAC da outra placa (o monitor serial mostra).
-uint8_t paraTodos[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-
-// A MESMA struct nas duas placas: o que sai de uma e copiado byte a byte
-// para dentro da outra.
-typedef struct {
-  float temperatura;
-  float umidade;
-  int potenciometro;   // 0 a 4095
-  bool botao;
-} Leitura;
-
-typedef struct {
-  bool ledLigado;
-} Comando;
-
-Leitura leitura;
-Comando comando;
-esp_now_peer_info_t par;
-'''
-
 SENSOR = r'''
-// ESP-NOW: a placa SENSOR.
+// ESP-NOW: the SENSOR board.
 //
-// Le o DHT22, o potenciometro e o botao e manda tudo para a placa PAINEL
-// a cada meio segundo -- sem roteador e sem WiFi conectado: o ESP-NOW
-// fala direto de placa para placa. O caminho de volta tambem existe: o
-// botao do painel acende e apaga o LED daqui.
+// Reads the DHT22, the potentiometer and the button and sends it all to the
+// PANEL board every half second -- no router and no WiFi connection:
+// ESP-NOW talks straight from board to board. The way back exists too: the
+// panel's button turns this board's LED on and off.
 //
-// (Na versao 2.x do pacote da ESP32, o aoReceber recebe
-// "const uint8_t *mac" no lugar do esp_now_recv_info_t.)
+// (In version 2.x of the ESP32 package, onReceive gets
+// "const uint8_t *mac" instead of esp_now_recv_info_t.)
 
 #include <esp_now.h>
 #include <WiFi.h>
 #include <DHT.h>
 
-const int PINO_DHT = 4;
-const int PINO_POT = 34;
-const int PINO_BOTAO = 13;
-const int PINO_LED = 27;
+const int DHT_PIN = 4;
+const int POT_PIN = 34;
+const int BUTTON_PIN = 13;
+const int LED_PIN = 27;
 
-DHT dht(PINO_DHT, DHT22);
-''' + COMUM_ESPNOW + r'''
-void aoEnviar(const uint8_t *mac, esp_now_send_status_t estado) {
-  if (estado != ESP_NOW_SEND_SUCCESS) Serial.println("o painel nao ouviu");
+DHT dht(DHT_PIN, DHT22);
+
+// Broadcast address: every board with ESP-NOW listens. On the real bench,
+// you can swap it for the other board's MAC (the serial monitor shows it).
+uint8_t toEveryone[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+// The SAME struct on both boards: what leaves one is copied byte by byte
+// into the other.
+typedef struct {
+  float temperature;
+  float humidity;
+  int potentiometer;   // 0 to 4095
+  bool button;
+} Reading;
+
+typedef struct {
+  bool ledOn;
+} Command;
+
+Reading reading;
+Command command;
+esp_now_peer_info_t peer;
+
+void onSend(const uint8_t *mac, esp_now_send_status_t status) {
+  if (status != ESP_NOW_SEND_SUCCESS) Serial.println("the panel did not hear");
 }
 
-void aoReceber(const esp_now_recv_info_t *info, const uint8_t *dados, int tamanho) {
-  memcpy(&comando, dados, sizeof(comando));
-  digitalWrite(PINO_LED, comando.ledLigado ? HIGH : LOW);
-  Serial.println(comando.ledLigado ? "o painel acendeu o LED" : "o painel apagou o LED");
+void onReceive(const esp_now_recv_info_t *info, const uint8_t *data, int length) {
+  memcpy(&command, data, sizeof(command));
+  digitalWrite(LED_PIN, command.ledOn ? HIGH : LOW);
+  Serial.println(command.ledOn ? "the panel turned the LED on" : "the panel turned the LED off");
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(PINO_BOTAO, INPUT_PULLUP);
-  pinMode(PINO_LED, OUTPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
   dht.begin();
 
   WiFi.mode(WIFI_STA);
-  Serial.print("MAC do sensor: ");
+  Serial.print("sensor MAC: ");
   Serial.println(WiFi.macAddress());
 
   if (esp_now_init() != ESP_OK) {
-    Serial.println("ESP-NOW nao iniciou");
+    Serial.println("ESP-NOW did not start");
     return;
   }
-  esp_now_register_send_cb(aoEnviar);
-  esp_now_register_recv_cb(aoReceber);
+  esp_now_register_send_cb(onSend);
+  esp_now_register_recv_cb(onReceive);
 
-  memcpy(par.peer_addr, paraTodos, 6);
-  par.channel = 0;
-  par.encrypt = false;
-  if (esp_now_add_peer(&par) != ESP_OK) {
-    Serial.println("nao consegui adicionar o par");
+  memcpy(peer.peer_addr, toEveryone, 6);
+  peer.channel = 0;
+  peer.encrypt = false;
+  if (esp_now_add_peer(&peer) != ESP_OK) {
+    Serial.println("could not add the peer");
     return;
   }
-  Serial.println("sensor pronto");
+  Serial.println("sensor ready");
 }
 
 void loop() {
-  leitura.temperatura = dht.readTemperature();
-  leitura.umidade = dht.readHumidity();
-  leitura.potenciometro = analogRead(PINO_POT);
-  leitura.botao = digitalRead(PINO_BOTAO) == LOW;
+  reading.temperature = dht.readTemperature();
+  reading.humidity = dht.readHumidity();
+  reading.potentiometer = analogRead(POT_PIN);
+  reading.button = digitalRead(BUTTON_PIN) == LOW;
 
-  esp_now_send(paraTodos, (uint8_t *) &leitura, sizeof(leitura));
+  esp_now_send(toEveryone, (uint8_t *) &reading, sizeof(reading));
   delay(500);
 }
 '''
 
 PAINEL = r'''
-// ESP-NOW: a placa PAINEL.
+// ESP-NOW: the PANEL board.
 //
-// Recebe as leituras da placa SENSOR e mostra: temperatura e umidade no
-// LCD; o potenciometro de la vira o angulo do servo daqui; o botao de la
-// acende o LED daqui. O botao DAQUI faz o caminho de volta: acende e
-// apaga o LED da placa sensor.
+// Receives the readings from the SENSOR board and shows them: temperature
+// and humidity on the LCD; the potentiometer over there becomes this
+// servo's angle; the button over there lights the LED here. The button
+// HERE goes the other way: it turns the sensor board's LED on and off.
 
 #include <esp_now.h>
 #include <WiFi.h>
@@ -314,87 +312,109 @@ PAINEL = r'''
 #include <LiquidCrystal_I2C.h>
 #include <ESP32Servo.h>
 
-const int PINO_SERVO = 18;
-const int PINO_LED = 19;
-const int PINO_BOTAO = 23;
+const int SERVO_PIN = 18;
+const int LED_PIN = 19;
+const int BUTTON_PIN = 23;
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-Servo ponteiro;
-''' + COMUM_ESPNOW + r'''
-// O callback so copia e marca: quem mexe no LCD e no servo e o loop.
-// Desenhar dentro do callback seria fazer o radio esperar o display.
-volatile bool chegou = false;
-unsigned long ultimaLeitura = 0;
-int botaoAntes = HIGH;
+Servo pointer;
 
-void aoReceber(const esp_now_recv_info_t *info, const uint8_t *dados, int tamanho) {
-  memcpy(&leitura, dados, sizeof(leitura));
-  chegou = true;
+// Broadcast address: every board with ESP-NOW listens. On the real bench,
+// you can swap it for the other board's MAC (the serial monitor shows it).
+uint8_t toEveryone[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+// The SAME struct on both boards: what leaves one is copied byte by byte
+// into the other.
+typedef struct {
+  float temperature;
+  float humidity;
+  int potentiometer;   // 0 to 4095
+  bool button;
+} Reading;
+
+typedef struct {
+  bool ledOn;
+} Command;
+
+Reading reading;
+Command command;
+esp_now_peer_info_t peer;
+
+// The callback only copies and flags: the loop is what touches the LCD and
+// the servo. Drawing inside the callback would make the radio wait on the
+// display.
+volatile bool arrived = false;
+unsigned long lastReading = 0;
+int lastButton = HIGH;
+
+void onReceive(const esp_now_recv_info_t *info, const uint8_t *data, int length) {
+  memcpy(&reading, data, sizeof(reading));
+  arrived = true;
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(PINO_LED, OUTPUT);
-  pinMode(PINO_BOTAO, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   lcd.init();
   lcd.backlight();
-  lcd.print("Esperando o");
+  lcd.print("Waiting for the");
   lcd.setCursor(0, 1);
   lcd.print("sensor...");
-  ponteiro.attach(PINO_SERVO);
+  pointer.attach(SERVO_PIN);
 
   WiFi.mode(WIFI_STA);
-  Serial.print("MAC do painel: ");
+  Serial.print("panel MAC: ");
   Serial.println(WiFi.macAddress());
 
   if (esp_now_init() != ESP_OK) {
-    Serial.println("ESP-NOW nao iniciou");
+    Serial.println("ESP-NOW did not start");
     return;
   }
-  esp_now_register_recv_cb(aoReceber);
+  esp_now_register_recv_cb(onReceive);
 
-  memcpy(par.peer_addr, paraTodos, 6);
-  par.channel = 0;
-  par.encrypt = false;
-  esp_now_add_peer(&par);
-  Serial.println("painel pronto");
+  memcpy(peer.peer_addr, toEveryone, 6);
+  peer.channel = 0;
+  peer.encrypt = false;
+  esp_now_add_peer(&peer);
+  Serial.println("panel ready");
 }
 
 void loop() {
-  if (chegou) {
-    chegou = false;
-    ultimaLeitura = millis();
+  if (arrived) {
+    arrived = false;
+    lastReading = millis();
 
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Temp: ");
-    lcd.print(leitura.temperatura, 1);
+    lcd.print(reading.temperature, 1);
     lcd.print(" C");
     lcd.setCursor(0, 1);
-    lcd.print("Umid: ");
-    lcd.print(leitura.umidade, 0);
+    lcd.print("Hum:  ");
+    lcd.print(reading.humidity, 0);
     lcd.print(" %");
 
-    ponteiro.write(map(leitura.potenciometro, 0, 4095, 0, 180));
-    digitalWrite(PINO_LED, leitura.botao ? HIGH : LOW);
+    pointer.write(map(reading.potentiometer, 0, 4095, 0, 180));
+    digitalWrite(LED_PIN, reading.button ? HIGH : LOW);
   }
 
-  // Tres segundos sem noticia do sensor: avisa.
-  if (ultimaLeitura > 0 && millis() - ultimaLeitura > 3000) {
+  // Three seconds with no news from the sensor: warn.
+  if (lastReading > 0 && millis() - lastReading > 3000) {
     lcd.clear();
-    lcd.print("Sensor sumiu!");
-    ultimaLeitura = 0;
+    lcd.print("Sensor is gone!");
+    lastReading = 0;
   }
 
-  // Cada aperto do botao daqui inverte o LED da placa sensor.
-  int botao = digitalRead(PINO_BOTAO);
-  if (botaoAntes == HIGH && botao == LOW) {
-    comando.ledLigado = !comando.ledLigado;
-    esp_now_send(paraTodos, (uint8_t *) &comando, sizeof(comando));
-    Serial.println(comando.ledLigado ? "mandei: acender" : "mandei: apagar");
+  // Each press of the button here flips the sensor board's LED.
+  int button = digitalRead(BUTTON_PIN);
+  if (lastButton == HIGH && button == LOW) {
+    command.ledOn = !command.ledOn;
+    esp_now_send(toEveryone, (uint8_t *) &command, sizeof(command));
+    Serial.println(command.ledOn ? "sent: turn on" : "sent: turn off");
   }
-  botaoAntes = botao;
+  lastButton = button;
   delay(20);
 }
 '''
@@ -453,75 +473,75 @@ gravar('esp32-espnow', SENSOR,
 # =====================================================================
 
 ANALISADOR = r'''
-// Analisador logico: cinco sinais de verdade, lado a lado.
+// Logic analyzer: five real signals, side by side.
 //
-// Selecione o analisador no circuito e clique em "Abrir o analisador":
-//   D0  pino 5   PWM de 25% a 976 Hz (Timer0) - o LED fraco
-//   D1  pino 6   PWM de 75% a 976 Hz - o LED forte
-//   D2  pino 8   tone() de 1 kHz, em rajadas de 60 ms
-//   D3  pino 9   o pulso do servo, 50 Hz: gire o potenciometro e a
-//                largura muda de 0,5 a 2,4 ms
-//   D4  pino 11  DADO do shiftOut
-//   D5  pino 12  RELOGIO do shiftOut
-//   D6  pino 13  TRAVA (latch)
-//   D7  pino 1   a serial saindo pelo TX, a 9600 baud - com a letra
-//                escrita em cima de cada byte
+// Select the analyzer in the circuit and click "Open the analyzer":
+//   D0  pin 5    25% PWM at 976 Hz (Timer0) - the dim LED
+//   D1  pin 6    75% PWM at 976 Hz - the bright LED
+//   D2  pin 8    1 kHz tone(), in 60 ms bursts
+//   D3  pin 9    the servo pulse, 50 Hz: turn the potentiometer and the
+//                width changes from 0.5 to 2.4 ms
+//   D4  pin 11   shiftOut DATA
+//   D5  pin 12   shiftOut CLOCK
+//   D6  pin 13   LATCH
+//   D7  pin 1    the serial port going out on TX, at 9600 baud - with the
+//                character written over each byte
 //
-// Pare a captura (Espaco), aproxime com a roda do mouse e passe o mouse
-// num canal: o analisador mede a largura, o periodo e a frequencia. O
-// "Salvar .vcd" leva a captura para o PulseView.
+// Stop the capture (Space), zoom with the mouse wheel and hover over a
+// channel: the analyzer measures the width, period and frequency.
+// "Save .vcd" takes the capture to PulseView.
 //
-// Na placa de verdade os pinos foram escolhidos para nao brigarem: o
-// Servo usa o Timer1 (e desliga o PWM dos pinos 9 e 10), e o tone() usa
-// o Timer2 (e desliga o PWM dos pinos 3 e 11). Por isso o PWM esta no 5
-// e no 6, que sao do Timer0.
+// On the real board the pins were chosen so they don't clash: Servo uses
+// Timer1 (and disables PWM on pins 9 and 10), and tone() uses Timer2 (and
+// disables PWM on pins 3 and 11). That is why the PWM is on 5 and 6, which
+// belong to Timer0.
 
 #include <Servo.h>
 
-const int LED_FRACO = 5;
-const int LED_FORTE = 6;
+const int DIM_LED = 5;
+const int BRIGHT_LED = 6;
 const int BUZZER = 8;
 const int SERVO = 9;
-const int DADO = 11;
-const int RELOGIO = 12;
-const int TRAVA = 13;
+const int DATA = 11;
+const int CLOCK = 12;
+const int LATCH = 13;
 const int POT = A0;
 
-Servo ponteiro;
-byte contador = 0;
-unsigned long ultimoBip = 0;
+Servo pointer;
+byte counter = 0;
+unsigned long lastBeep = 0;
 
 void setup() {
   Serial.begin(9600);
-  pinMode(DADO, OUTPUT);
-  pinMode(RELOGIO, OUTPUT);
-  pinMode(TRAVA, OUTPUT);
+  pinMode(DATA, OUTPUT);
+  pinMode(CLOCK, OUTPUT);
+  pinMode(LATCH, OUTPUT);
 
-  analogWrite(LED_FRACO, 64);    // 25% do tempo alto
-  analogWrite(LED_FORTE, 192);   // 75%
-  ponteiro.attach(SERVO);
+  analogWrite(DIM_LED, 64);      // high 25% of the time
+  analogWrite(BRIGHT_LED, 192);  // 75%
+  pointer.attach(SERVO);
 }
 
 void loop() {
-  // O servo segue o potenciometro.
-  int angulo = map(analogRead(POT), 0, 1023, 0, 180);
-  ponteiro.write(angulo);
+  // The servo follows the potentiometer.
+  int angle = map(analogRead(POT), 0, 1023, 0, 180);
+  pointer.write(angle);
 
-  // Um byte pelo shiftOut, com a trava em volta: e o que um 74HC595
-  // receberia para acender oito LEDs.
-  digitalWrite(TRAVA, LOW);
-  shiftOut(DADO, RELOGIO, MSBFIRST, contador);
-  digitalWrite(TRAVA, HIGH);
+  // One byte through shiftOut, wrapped by the latch: what a 74HC595 would
+  // receive to light eight LEDs.
+  digitalWrite(LATCH, LOW);
+  shiftOut(DATA, CLOCK, MSBFIRST, counter);
+  digitalWrite(LATCH, HIGH);
 
-  // A cada meio segundo, um bip e uma linha na serial.
-  if (millis() - ultimoBip >= 500) {
-    ultimoBip = millis();
+  // Every half second, a beep and a line on the serial port.
+  if (millis() - lastBeep >= 500) {
+    lastBeep = millis();
     tone(BUZZER, 1000, 60);
     Serial.print("n=");
-    Serial.println(contador);
+    Serial.println(counter);
   }
 
-  contador++;
+  counter++;
   delay(20);
 }
 '''
@@ -529,7 +549,7 @@ void loop() {
 gravar('uno-analisador', ANALISADOR,
        pecas=[
            {'Id': 'placa', 'Tipo': 'arduino-uno', 'X': 300, 'Y': 220},
-           {'Id': 'la', 'Tipo': 'logic-analyzer', 'X': 330, 'Y': 20, 'Nome': 'analisador',
+           {'Id': 'la', 'Tipo': 'logic-analyzer', 'X': 330, 'Y': 20, 'Nome': 'analyzer',
             'JanelaUs': 50000},
            {'Id': 'led1', 'Tipo': 'led', 'X': 150, 'Y': 70, 'Cor': 'amarelo'},
            {'Id': 'r1', 'Tipo': 'resistor', 'X': 125, 'Y': 150, 'Ohms': 220},

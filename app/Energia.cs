@@ -856,9 +856,9 @@ public sealed partial class Energia
             // cada fio de fase. Quem fecha a bobina e o ULN2003, puxando a fase
             // para o GND: ~80 mA por fase ligada, com 5 V.
             case "motor-28byj48":
-                foreach (string fase in new[] { "laranja", "amarelo", "rosa", "azul" })
+                foreach (string fase in new[] { "orange", "yellow", "pink", "blue" })
                 {
-                    var r = Entre("vermelho", fase, 50, 0, 0.06, 0.2);
+                    var r = Entre("red", fase, 50, 0, 0.06, 0.2);
                     if (r is not null) yield return r with { Rotulo = fase };
                 }
                 yield break;

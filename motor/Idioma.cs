@@ -26,6 +26,13 @@ public static class Idioma
     /// <summary>O idioma em que o codigo esta escrito.</summary>
     public const string Original = "pt-BR";
 
+    /// <summary>
+    /// O idioma de quem ainda nao escolheu nenhum: o ingles (o CircuitSketch e
+    /// distribuido para o mundo). O codigo continua em portugues -- as frases
+    /// dele sao as chaves dos catalogos --, mas a tela abre em ingles.
+    /// </summary>
+    public const string Principal = "en";
+
     static Dictionary<string, string> textos = [];
     static CultureInfo cultura = CultureInfo.GetCultureInfo(Original);
 

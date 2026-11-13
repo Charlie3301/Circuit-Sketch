@@ -12286,41 +12286,41 @@
   "altura": 189,
   "pinos": [
    {
-    "nome": "azul",
+    "nome": "blue",
     "x": 64.25,
     "y": 177.45,
     "sinais": [],
-    "descricao": "Fio azul: fase D (o IN4 do ULN2003)"
+    "descricao": "Blue wire: phase D (IN4 of the ULN2003)"
    },
    {
-    "nome": "rosa",
+    "nome": "pink",
     "x": 73.7,
     "y": 177.45,
     "sinais": [],
-    "descricao": "Fio rosa: fase C (o IN3)"
+    "descricao": "Pink wire: phase C (IN3)"
    },
    {
-    "nome": "amarelo",
+    "nome": "yellow",
     "x": 83.15,
     "y": 177.45,
     "sinais": [],
-    "descricao": "Fio amarelo: fase B (o IN2)"
+    "descricao": "Yellow wire: phase B (IN2)"
    },
    {
-    "nome": "laranja",
+    "nome": "orange",
     "x": 92.6,
     "y": 177.45,
     "sinais": [],
-    "descricao": "Fio laranja: fase A (o IN1)"
+    "descricao": "Orange wire: phase A (IN1)"
    },
    {
-    "nome": "vermelho",
+    "nome": "red",
     "x": 102.05,
     "y": 177.45,
     "sinais": [
      "power"
     ],
-    "descricao": "Fio vermelho: o comum das bobinas, no + (5 V)"
+    "descricao": "Red wire: common of the coils, to + (5 V)"
    }
   ],
   "variantes": [],

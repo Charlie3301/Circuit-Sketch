@@ -12,7 +12,7 @@
   <path d="M1.500 1.200 H48.000" stroke="#ffffff" stroke-opacity="0.25" stroke-width="0.4"/>
   <path d="M1.700 0.900 V26.600" stroke="#0a0f1c" stroke-width="0.5"/>
   <text x="16.000" y="12.750" fill="#ffffff" font-size="11.0px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">9V</text>
-  <text x="16.000" y="21.350" fill="#c8d2e4" font-size="2.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">ALCALINA</text>
+  <text x="16.000" y="21.350" fill="#c8d2e4" font-size="2.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">ALKALINE</text>
   <text x="32.000" y="8.250" fill="#c8d2e4" font-size="2.4px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">6LR61</text>
   <text x="32.000" y="11.550" fill="#8e9bb4" font-size="2.0px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">1604A</text>
   <text x="43.800" y="7.750" fill="#1d2433" font-size="3.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">+</text>

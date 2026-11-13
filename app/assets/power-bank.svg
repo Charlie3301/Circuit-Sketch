@@ -11,7 +11,7 @@
   <path d="M7.400 1.400 H91.400" stroke="#7d828b" stroke-width="0.4"/>
   <text x="36.400" y="27.400" fill="#e9ebee" font-size="11.0px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="bold" font-style="normal">10000</text>
   <text x="36.400" y="36.800" fill="#a9aeb6" font-size="3.6px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">mAh  ·  37Wh</text>
-  <text x="36.400" y="42.900" fill="#8a9099" font-size="2.4px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">SAÍDA 5V 2.1A    ENTRADA 5V 2A</text>
+  <text x="36.400" y="42.900" fill="#8a9099" font-size="2.4px" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-weight="normal" font-style="normal">OUTPUT 5V 2.1A    INPUT 5V 2A</text>
   <circle cx="84.900" cy="22.400" r="0.9" fill="#3aa0ff"/>
   <circle cx="84.900" cy="22.400" r="1.6" fill="#3aa0ff" fill-opacity="0.18"/>
   <circle cx="84.900" cy="26.000" r="0.9" fill="#3aa0ff"/>

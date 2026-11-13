@@ -394,7 +394,7 @@ public static class Passeio
             var redeDoPasseio = janela.TesteRedeSimulada;
             if (redeDoPasseio.AnunciosBle().FirstOrDefault() is { } radio) redeDoPasseio.ConectarBleDoCelular(radio);
             celularDoPasseio?.MostrarPagina("ble");
-            celularDoPasseio?.Digitar("vermelho", pelaUart: true);
+            celularDoPasseio?.Digitar("red", pelaUart: true);
         }));
         passos.Add((1500, $"{23 + passos.Count - 22:00} celular BLE servicos",
                     () => celularDoPasseio?.MostrarPagina("servicos")));
@@ -410,7 +410,7 @@ public static class Passeio
                 depois.Stop();
                 if (redeDoPasseio.DispositivosVisiveis().FirstOrDefault() is { } nome) redeDoPasseio.ConectarCelular(nome);
                 celularDoPasseio?.MostrarPagina("terminal");
-                celularDoPasseio?.Digitar("ajuda", pelaUart: false);
+                celularDoPasseio?.Digitar("help", pelaUart: false);
             };
             depois.Start();
         }));
@@ -454,7 +454,7 @@ public static class Passeio
                      ("atalhos", () => new JanelaAtalhos(janela)),
                      ("bibliotecas", () => new JanelaBibliotecas(janela, janela.TesteCodigo)),
                      ("cartao com arquivo do computador", () => new JanelaCartao(janela,
-                         new(StringComparer.OrdinalIgnoreCase) { ["LEIAME.TXT"] = "Este cartao ainda nao tem o jogo." },
+                         new(StringComparer.OrdinalIgnoreCase) { ["README.TXT"] = "This card does not have the game yet." },
                          false,
                          new(StringComparer.OrdinalIgnoreCase)
                          {

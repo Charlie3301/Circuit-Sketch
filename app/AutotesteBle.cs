@@ -257,8 +257,8 @@ public static partial class Autoteste
                 var placa = janela.TesteEditorCircuito.Atual.Pecas.First(p => p.Tipo == "esp32-c3-devkit");
                 var maq = janela.TesteMaquinaDa(placa.Id);
                 var rede = maq.Rede;
-                bool anunciou = EsperarPor(() => rede.AnunciosBle().Any(r => r.Nome == "ESP32-C3 Lampada"), 6000);
-                Conferir("demo ble: a C3 anuncia a \"ESP32-C3 Lampada\"", anunciou,
+                bool anunciou = EsperarPor(() => rede.AnunciosBle().Any(r => r.Nome == "ESP32-C3 Lamp"), 6000);
+                Conferir("demo ble: a C3 anuncia a \"ESP32-C3 Lamp\"", anunciou,
                     string.Join(", ", rede.AnunciosBle().Select(r => r.Nome)));
 
                 var celular = janela.TesteAbrirCelular();
@@ -270,21 +270,21 @@ public static partial class Autoteste
                 rede.NotificouOCelular += (_, car, dados) => { lock (notificacoes) notificacoes.Add((car.Uuid, dados)); };
                 var radio = rede.AnunciosBle().First();
                 rede.ConectarBleDoCelular(radio);
-                EsperarPor(() => LinhasDoSerial(maq).Contains("celular conectou"), 3000);
+                EsperarPor(() => LinhasDoSerial(maq).Contains("phone connected"), 3000);
 
                 var tx = radio.Visiveis().First(c => c.Uuid == Ble.UartTx);
                 var rx = radio.Visiveis().First(c => c.Uuid == Ble.UartRx);
                 var temp = radio.Visiveis().First(c => Ble.Curto(c.Uuid) == 0x2A6E);
                 rede.AssinarDoCelular(tx, true);
                 rede.AssinarDoCelular(temp, true);
-                rede.EscreverDoCelular(rx, System.Text.Encoding.UTF8.GetBytes("Vermelho\n"));
+                rede.EscreverDoCelular(rx, System.Text.Encoding.UTF8.GetBytes("Red\n"));
                 bool respondeu = EsperarPor(() =>
                 {
                     lock (notificacoes)
                         return notificacoes.Any(n => n.Uuid == Ble.UartTx
-                                                     && System.Text.Encoding.UTF8.GetString(n.Dados) == "LED vermelho\n");
+                                                     && System.Text.Encoding.UTF8.GetString(n.Dados) == "LED red\n");
                 }, 4000);
-                Conferir("demo ble: \"Vermelho\" pelo UART acende o vermelho e a placa responde por notificacao",
+                Conferir("demo ble: \"Red\" pelo UART acende o vermelho e a placa responde por notificacao",
                     respondeu && maq.Digital[5] == 1 && maq.Digital[6] == 0,
                     $"R={maq.Digital[5]} G={maq.Digital[6]} B={maq.Digital[7]} / {string.Join(" | ", LinhasDoSerial(maq))}");
 
@@ -342,16 +342,16 @@ public static partial class Autoteste
                     Conferir("celular rc: seta, parar ao soltar, farol liga e desliga, buzina, velocidade e as setas do teclado (com diagonal)",
                         rcMandou == "F S W w V v 5 F G L S" && farolAceso && !celular.RcExtraAceso(0), rcMandou);
                     Conferir("celular rc: a placa recebe pelo UART",
-                        EsperarPor(() => LinhasDoSerial(maq).Contains("comando: s"), 3000), string.Join(" | ", LinhasDoSerial(maq).TakeLast(6)));
+                        EsperarPor(() => LinhasDoSerial(maq).Contains("command: s"), 3000), string.Join(" | ", LinhasDoSerial(maq).TakeLast(6)));
 
                     celular.MostrarPagina("videogame");
                     antes = celular.EnviadosPelosControles.Count;
-                    celular.VideogameDefinir("A", "verde", "apagar");
+                    celular.VideogameDefinir("A", "green", "off");
                     celular.VideogameApertar("A");
                     bool verde = EsperarPor(() => maq.Digital[6] == 1 && maq.Digital[5] == 0, 3000);
                     celular.VideogameSoltar("A");
                     bool apagou = EsperarPor(() => maq.Digital[6] == 0 && maq.Digital[5] == 0, 3000);
-                    Conferir("celular videogame: o A configurado manda \"verde\" e, ao soltar, \"apagar\" (a lampada obedece)",
+                    Conferir("celular videogame: o A configurado manda \"green\" e, ao soltar, \"off\" (a lampada obedece)",
                         verde && apagou, $"R={maq.Digital[5]} G={maq.Digital[6]} / {string.Join(" | ", LinhasDoSerial(maq).TakeLast(4))}");
 
                     celular.VideogameFormato("J{lx},{ly},{rt}");
@@ -362,7 +362,7 @@ public static partial class Autoteste
                     celular.AplicarControle(new EstadoDoControle(true, 0, 0, 0, 0, 0, 0, 0));
                     string vgMandou = string.Join(" ", celular.EnviadosPelosControles.Skip(antes));
                     Conferir("celular videogame: manches no formato escolhido (so quando mudam) e o controle do computador aperta os botoes",
-                        vgMandou == "verde apagar J50,-100,0 B RT" && acesos && !celular.VideogameAceso("B"), vgMandou);
+                        vgMandou == "green off J50,-100,0 B RT" && acesos && !celular.VideogameAceso("B"), vgMandou);
                     FotografarJanela(celular, Path.Combine(Path.GetTempPath(), "circuitsketch-teste-videogame.png"));
                     celular.MostrarPagina("rc");
                     FotografarJanela(celular, Path.Combine(Path.GetTempPath(), "circuitsketch-teste-rc.png"));

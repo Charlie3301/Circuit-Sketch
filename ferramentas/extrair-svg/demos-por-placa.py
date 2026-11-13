@@ -69,14 +69,14 @@ c.ligar('oled', 'SCL', 'placa', '9', ROXO)
 c.botao('botao', '4', 'GND', 300, 200)
 
 gravar('esp32s2-relogio-ntp', r'''
-// Relogio pela internet, na ESP32-S2.
+// Internet clock on the ESP32-S2.
 //
-// A placa entra no WiFi, pergunta a hora a um servidor NTP e mostra no
-// display OLED. O botao troca entre a hora e a data. Sem pilha e sem
-// ajuste: quem acerta o relogio e a internet.
+// The board joins the WiFi, asks an NTP server for the time and shows it on
+// the OLED display. The button switches between the time and the date. No
+// battery and no setting: the internet keeps the clock right.
 //
-// No simulador a hora chega pelo mesmo caminho da placa -- configTime e
-// getLocalTime --, e vem do relogio deste computador.
+// In the simulator the time arrives the same way it does on the board --
+// configTime and getLocalTime -- and comes from this computer's clock.
 
 #include <WiFi.h>
 #include <time.h>
@@ -84,27 +84,27 @@ gravar('esp32s2-relogio-ntp', r'''
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-const int BOTAO = 4;
+const int BUTTON = 4;
 
-Adafruit_SSD1306 tela(128, 64, &Wire, -1);
+Adafruit_SSD1306 display(128, 64, &Wire, -1);
 
-// Horario de Brasilia: UTC-3, sem horario de verao.
-const long FUSO = -3 * 3600;
+// Brasilia time: UTC-3, no daylight saving.
+const long TIME_ZONE = -3 * 3600;
 
-bool mostrarData = false;
-int botaoAntes = HIGH;
+bool showDate = false;
+int lastButton = HIGH;
 
 void setup() {
   Serial.begin(115200);
-  pinMode(BOTAO, INPUT_PULLUP);
+  pinMode(BUTTON, INPUT_PULLUP);
 
-  Wire.begin();   // SDA no GPIO 8 e SCL no 9: os de fabrica da S2
-  tela.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-  tela.clearDisplay();
-  tela.setTextColor(SSD1306_WHITE);
-  tela.setCursor(0, 0);
-  tela.print("Conectando...");
-  tela.display();
+  Wire.begin();   // SDA on GPIO 8 and SCL on 9: the S2 defaults
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  display.clearDisplay();
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.print("Connecting...");
+  display.display();
 
   WiFi.begin("Wokwi-GUEST", "");
   while (WiFi.status() != WL_CONNECTED) {
@@ -112,51 +112,51 @@ void setup() {
     Serial.print(".");
   }
   Serial.println();
-  Serial.print("conectado, IP ");
+  Serial.print("connected, IP ");
   Serial.println(WiFi.localIP());
 
-  configTime(FUSO, 0, "pool.ntp.org", "time.google.com");
+  configTime(TIME_ZONE, 0, "pool.ntp.org", "time.google.com");
 }
 
 void loop() {
-  int botao = digitalRead(BOTAO);
-  if (botaoAntes == HIGH && botao == LOW) mostrarData = !mostrarData;
-  botaoAntes = botao;
+  int button = digitalRead(BUTTON);
+  if (lastButton == HIGH && button == LOW) showDate = !showDate;
+  lastButton = button;
 
-  struct tm agora;
-  if (!getLocalTime(&agora)) {
-    Serial.println("esperando a hora do NTP...");
+  struct tm now;
+  if (!getLocalTime(&now)) {
+    Serial.println("waiting for the NTP time...");
     delay(500);
     return;
   }
 
-  char linha[20];
-  if (mostrarData) strftime(linha, sizeof(linha), "%d/%m/%Y", &agora);
-  else strftime(linha, sizeof(linha), "%H:%M:%S", &agora);
+  char line[20];
+  if (showDate) strftime(line, sizeof(line), "%d/%m/%Y", &now);
+  else strftime(line, sizeof(line), "%H:%M:%S", &now);
 
-  tela.clearDisplay();
-  tela.setTextSize(1);
-  tela.setCursor(0, 0);
-  tela.print("Relogio NTP - S2");
-  tela.setTextSize(2);
-  tela.setCursor(0, 24);
-  tela.print(linha);
-  tela.setTextSize(1);
-  tela.setCursor(0, 56);
-  tela.print(mostrarData ? "botao: ver a hora" : "botao: ver a data");
-  tela.display();
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.print("NTP clock - S2");
+  display.setTextSize(2);
+  display.setCursor(0, 24);
+  display.print(line);
+  display.setTextSize(1);
+  display.setCursor(0, 56);
+  display.print(showDate ? "button: show time" : "button: show date");
+  display.display();
 
   delay(200);
 }
 ''', c, '''
-Relogio pela internet (NTP) no OLED, na ESP32-S2.
+Internet clock (NTP) on the OLED, on the ESP32-S2.
 
-O que esta demo mostra:
-- WiFi, NTP e o relogio do sistema (configTime e getLocalTime), do jeito
-  que a ESP32 faz na bancada;
-- o display OLED no I2C de fabrica da S2 (SDA no 8, SCL no 9).
+What this demo shows:
+- WiFi, NTP and the system clock (configTime and getLocalTime), the way
+  the ESP32 does it on the bench;
+- the OLED display on the S2's default I2C (SDA on 8, SCL on 9).
 
-Aperte F5 e o botao para trocar entre a hora e a data.
+Press F5, then the button to switch between the time and the date.
 ''')
 demo('esp32s2-relogio-ntp', 'Relógio pela internet (NTP) no OLED', 'ESP32-S2 DevKit')
 
@@ -173,90 +173,90 @@ c.ligar('anel', 'DIN', 'placa', '5', VERDE)
 c.botao('botao', '4', 'GND', 300, 230)
 
 gravar('esp32s3-anel-neopixel', r'''
-// Anel de 16 NeoPixels na ESP32-S3, com tres efeitos.
+// Ring of 16 NeoPixels on the ESP32-S3, with three effects.
 //
-// O botao troca o efeito: arco-iris, cometa e respiracao. As cores saem
-// das contas da propria biblioteca -- ColorHSV, gamma32 e sine8 --, entao
-// o que aparece aqui e o que o anel de verdade mostra.
+// The button changes the effect: rainbow, comet and breathing. The colors
+// come from the library's own math -- ColorHSV, gamma32 and sine8 -- so
+// what you see here is what the real ring shows.
 //
-// Na bancada: o anel puxa ate 1 A no branco. Alimente pelo 5V (nunca por
-// um pino), com um capacitor de 1000 uF no VCC e 330 ohms no DIN.
+// On the bench: the ring draws up to 1 A on white. Power it from 5V (never
+// from a pin), with a 1000 uF capacitor on VCC and 330 ohms on DIN.
 
 #include <Adafruit_NeoPixel.h>
 
-const int PINO_ANEL = 5;
-const int BOTAO = 4;
-const int QUANTOS = 16;
+const int RING_PIN = 5;
+const int BUTTON = 4;
+const int COUNT = 16;
 
-Adafruit_NeoPixel anel(QUANTOS, PINO_ANEL, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel ring(COUNT, RING_PIN, NEO_GRB + NEO_KHZ800);
 
-int efeito = 0;          // 0 arco-iris, 1 cometa, 2 respiracao
-int botaoAntes = HIGH;
-long matiz = 0;
-int passo = 0;
+int effect = 0;          // 0 rainbow, 1 comet, 2 breathing
+int lastButton = HIGH;
+long hue = 0;
+int step = 0;
 
-void arcoIris() {
-  for (int i = 0; i < QUANTOS; i++) {
-    long h = matiz + (i * 65536L / QUANTOS);
-    anel.setPixelColor(i, anel.gamma32(anel.ColorHSV(h)));
+void rainbow() {
+  for (int i = 0; i < COUNT; i++) {
+    long h = hue + (i * 65536L / COUNT);
+    ring.setPixelColor(i, ring.gamma32(ring.ColorHSV(h)));
   }
-  matiz += 512;
+  hue += 512;
 }
 
-void cometa() {
-  // Um ponto claro com um rastro que vai apagando.
-  for (int i = 0; i < QUANTOS; i++) {
-    int distancia = (passo - i + QUANTOS) % QUANTOS;
-    int brilho = distancia < 6 ? 255 >> distancia : 0;
-    anel.setPixelColor(i, anel.Color(0, brilho / 2, brilho));
+void comet() {
+  // A bright dot with a trail that fades away.
+  for (int i = 0; i < COUNT; i++) {
+    int distance = (step - i + COUNT) % COUNT;
+    int brightness = distance < 6 ? 255 >> distance : 0;
+    ring.setPixelColor(i, ring.Color(0, brightness / 2, brightness));
   }
-  passo = (passo + 1) % QUANTOS;
+  step = (step + 1) % COUNT;
 }
 
-void respiracao() {
-  int brilho = anel.sine8(passo * 4);
-  anel.fill(anel.Color(brilho, brilho / 4, 0));
-  passo++;
+void breathing() {
+  int brightness = ring.sine8(step * 4);
+  ring.fill(ring.Color(brightness, brightness / 4, 0));
+  step++;
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(BOTAO, INPUT_PULLUP);
-  anel.begin();
-  anel.setBrightness(80);
-  Serial.println("Aperte o botao para trocar o efeito");
+  pinMode(BUTTON, INPUT_PULLUP);
+  ring.begin();
+  ring.setBrightness(80);
+  Serial.println("Press the button to change the effect");
 }
 
 void loop() {
-  int botao = digitalRead(BOTAO);
-  if (botaoAntes == HIGH && botao == LOW) {
-    efeito = (efeito + 1) % 3;
-    passo = 0;
-    anel.clear();
-    Serial.print("efeito: ");
-    if (efeito == 0) Serial.println("arco-iris");
-    else if (efeito == 1) Serial.println("cometa");
-    else Serial.println("respiracao");
+  int button = digitalRead(BUTTON);
+  if (lastButton == HIGH && button == LOW) {
+    effect = (effect + 1) % 3;
+    step = 0;
+    ring.clear();
+    Serial.print("effect: ");
+    if (effect == 0) Serial.println("rainbow");
+    else if (effect == 1) Serial.println("comet");
+    else Serial.println("breathing");
   }
-  botaoAntes = botao;
+  lastButton = button;
 
-  if (efeito == 0) arcoIris();
-  else if (efeito == 1) cometa();
-  else respiracao();
+  if (effect == 0) rainbow();
+  else if (effect == 1) comet();
+  else breathing();
 
-  anel.show();
+  ring.show();
   delay(30);
 }
 ''', c, '''
-Anel NeoPixel com tres efeitos, na ESP32-S3.
+NeoPixel ring with three effects, on the ESP32-S3.
 
-O que esta demo mostra:
-- LEDs enderecaveis com a Adafruit_NeoPixel: o arco-iris do ColorHSV com
-  gamma32, um cometa e uma respiracao com sine8;
-- o show() mandando a fita inteira de uma vez -- sem ele nada acende,
-  aqui e na bancada.
+What this demo shows:
+- addressable LEDs with Adafruit_NeoPixel: the ColorHSV rainbow with
+  gamma32, a comet and a breathing effect with sine8;
+- show() sending the whole strip at once -- without it nothing lights up,
+  here and on the bench.
 
-Aperte F5 e o botao para trocar o efeito.
+Press F5, then the button to change the effect.
 ''')
 demo('esp32s3-anel-neopixel', 'Anel NeoPixel com três efeitos', 'ESP32-S3 DevKit')
 
@@ -283,94 +283,95 @@ c.ligar('lcd', 'SDA', 'placa', '8', AZUL)
 c.ligar('lcd', 'SCL', 'placa', '9', ROXO)
 
 gravar('esp32c3-estufa', r'''
-// Estufa automatica na ESP32-C3.
+// Automatic greenhouse on the ESP32-C3.
 //
-// O DHT22 mede a temperatura e a umidade. Com calor, a janela (o servo)
-// abre e o ventilador (LED azul) liga; com frio, o aquecedor (LED
-// vermelho) liga e a janela fecha. O LCD mostra tudo.
+// The DHT22 measures temperature and humidity. When it is hot, the window
+// (the servo) opens and the fan (blue LED) turns on; when it is cold, the
+// heater (red LED) turns on and the window closes. The LCD shows it all.
 
 #include <DHT.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <ESP32Servo.h>
 
-const int PINO_DHT = 4;
-const int PINO_JANELA = 5;
-const int VENTILADOR = 6;
-const int AQUECEDOR = 7;
+const int DHT_PIN = 4;
+const int WINDOW_PIN = 5;
+const int FAN = 6;
+const int HEATER = 7;
 
-const float QUENTE = 28.0;
-const float FRIO = 18.0;
+const float HOT = 28.0;
+const float COLD = 18.0;
 
-DHT dht(PINO_DHT, DHT22);
+DHT dht(DHT_PIN, DHT22);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-Servo janela;
+Servo window;
 
 void setup() {
   Serial.begin(115200);
-  pinMode(VENTILADOR, OUTPUT);
-  pinMode(AQUECEDOR, OUTPUT);
+  pinMode(FAN, OUTPUT);
+  pinMode(HEATER, OUTPUT);
   dht.begin();
-  lcd.init();          // o I2C de fabrica da C3: SDA no 8, SCL no 9
+  lcd.init();          // the C3's default I2C: SDA on 8, SCL on 9
   lcd.backlight();
-  janela.attach(PINO_JANELA);
-  janela.write(0);
+  window.attach(WINDOW_PIN);
+  window.write(0);
 }
 
 void loop() {
-  float temperatura = dht.readTemperature();
-  float umidade = dht.readHumidity();
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
 
-  if (isnan(temperatura) || isnan(umidade)) {
-    Serial.println("o DHT22 nao respondeu");
+  if (isnan(temperature) || isnan(humidity)) {
+    Serial.println("the DHT22 did not answer");
     delay(2000);
     return;
   }
 
-  String estado;
-  if (temperatura > QUENTE) {
-    janela.write(90);
-    digitalWrite(VENTILADOR, HIGH);
-    digitalWrite(AQUECEDOR, LOW);
-    estado = "Ventilando";
-  } else if (temperatura < FRIO) {
-    janela.write(0);
-    digitalWrite(VENTILADOR, LOW);
-    digitalWrite(AQUECEDOR, HIGH);
-    estado = "Aquecendo";
+  String state;
+  if (temperature > HOT) {
+    window.write(90);
+    digitalWrite(FAN, HIGH);
+    digitalWrite(HEATER, LOW);
+    state = "Venting";
+  } else if (temperature < COLD) {
+    window.write(0);
+    digitalWrite(FAN, LOW);
+    digitalWrite(HEATER, HIGH);
+    state = "Heating";
   } else {
-    janela.write(0);
-    digitalWrite(VENTILADOR, LOW);
-    digitalWrite(AQUECEDOR, LOW);
-    estado = "Tudo certo";
+    window.write(0);
+    digitalWrite(FAN, LOW);
+    digitalWrite(HEATER, LOW);
+    state = "All good";
   }
 
   lcd.setCursor(0, 0);
-  lcd.print(temperatura, 1);
+  lcd.print(temperature, 1);
   lcd.print("C  ");
-  lcd.print(umidade, 0);
+  lcd.print(humidity, 0);
   lcd.print("%    ");
   lcd.setCursor(0, 1);
-  lcd.print(estado);
+  lcd.print(state);
   lcd.print("        ");
 
-  Serial.print(temperatura, 1);
+  Serial.print(temperature, 1);
   Serial.print(" C, ");
-  Serial.print(umidade, 0);
+  Serial.print(humidity, 0);
   Serial.print(" % -> ");
-  Serial.println(estado);
+  Serial.println(state);
 
-  delay(2000);   // o DHT22 le no maximo uma vez a cada 2 s
+  delay(2000);   // the DHT22 reads at most once every 2 s
 }
 ''', c, '''
-Estufa automatica, na ESP32-C3.
+Automatic greenhouse, on the ESP32-C3.
 
-O que esta demo mostra:
-- o DHT22 (temperatura e umidade), um servo e um LCD I2C na mesma placa;
-- decisao por faixa: acima de 28 C ventila, abaixo de 18 C aquece.
+What this demo shows:
+- the DHT22 (temperature and humidity), a servo and an I2C LCD on the
+  same board;
+- deciding by range: above 28 C it vents, below 18 C it heats.
 
-A estufa comeca quente (31 C). Clique no DHT22 e baixe a temperatura para
-ver a janela fechar e o aquecedor ligar.
+The greenhouse starts hot (31 C). Click the DHT22 and lower the
+temperature to watch the window close and the heater turn on.
 ''')
 demo('esp32c3-estufa', 'Estufa: DHT22, janela com servo e LCD', 'ESP32-C3 DevKit')
 
@@ -390,85 +391,85 @@ c.led('armado', '5', 'GND', 'verde', 480, 190, VERDE)
 c.botao('botao', '6', 'GND', 320, 300)
 
 gravar('esp32c6-alarme', r'''
-// Alarme com sensor de presenca, na ESP32-C6.
+// Alarm with a motion sensor, on the ESP32-C6.
 //
-// O botao arma e desarma. Armado (LED verde aceso), qualquer movimento no
-// sensor PIR dispara a sirene e pisca o LED vermelho, ate alguem
-// desarmar. Depois de armar ha 5 s para sair -- como nos alarmes de
-// verdade.
+// The button arms and disarms it. Armed (green LED on), any movement on the
+// PIR sensor sets off the siren and blinks the red LED until someone
+// disarms it. After arming there are 5 s to leave -- just like real
+// alarms.
 
 const int PIR = 2;
-const int SIRENE = 3;
-const int LED_ALARME = 4;
-const int LED_ARMADO = 5;
-const int BOTAO = 6;
+const int SIREN = 3;
+const int ALARM_LED = 4;
+const int ARMED_LED = 5;
+const int BUTTON = 6;
 
-const unsigned long TEMPO_PARA_SAIR = 5000;
+const unsigned long EXIT_DELAY = 5000;
 
-enum Estado { DESARMADO, SAINDO, ARMADO, DISPARADO };
-Estado estado = DESARMADO;
-unsigned long desde = 0;
-int botaoAntes = HIGH;
+enum State { DISARMED, LEAVING, ARMED, TRIGGERED };
+State state = DISARMED;
+unsigned long since = 0;
+int lastButton = HIGH;
 
-void mudarPara(Estado novo) {
-  estado = novo;
-  desde = millis();
-  noTone(SIRENE);
-  digitalWrite(LED_ALARME, LOW);
-  digitalWrite(LED_ARMADO, novo == ARMADO || novo == SAINDO);
+void changeTo(State next) {
+  state = next;
+  since = millis();
+  noTone(SIREN);
+  digitalWrite(ALARM_LED, LOW);
+  digitalWrite(ARMED_LED, next == ARMED || next == LEAVING);
 
-  if (novo == DESARMADO) Serial.println("desarmado");
-  if (novo == SAINDO) Serial.println("armando: 5 s para sair...");
-  if (novo == ARMADO) Serial.println("ARMADO");
-  if (novo == DISPARADO) Serial.println("*** INVASAO! ***");
+  if (next == DISARMED) Serial.println("disarmed");
+  if (next == LEAVING) Serial.println("arming: 5 s to leave...");
+  if (next == ARMED) Serial.println("ARMED");
+  if (next == TRIGGERED) Serial.println("*** INTRUDER! ***");
 }
 
 void setup() {
   Serial.begin(115200);
   pinMode(PIR, INPUT);
-  pinMode(LED_ALARME, OUTPUT);
-  pinMode(LED_ARMADO, OUTPUT);
-  pinMode(BOTAO, INPUT_PULLUP);
-  mudarPara(DESARMADO);
+  pinMode(ALARM_LED, OUTPUT);
+  pinMode(ARMED_LED, OUTPUT);
+  pinMode(BUTTON, INPUT_PULLUP);
+  changeTo(DISARMED);
 }
 
 void loop() {
-  int botao = digitalRead(BOTAO);
-  if (botaoAntes == HIGH && botao == LOW) {
-    if (estado == DESARMADO) mudarPara(SAINDO);
-    else mudarPara(DESARMADO);
+  int button = digitalRead(BUTTON);
+  if (lastButton == HIGH && button == LOW) {
+    if (state == DISARMED) changeTo(LEAVING);
+    else changeTo(DISARMED);
   }
-  botaoAntes = botao;
+  lastButton = button;
 
-  if (estado == SAINDO) {
-    // Pisca o verde enquanto da tempo de sair.
-    digitalWrite(LED_ARMADO, (millis() / 250) % 2);
-    if (millis() - desde > TEMPO_PARA_SAIR) mudarPara(ARMADO);
-  }
-
-  if (estado == ARMADO && digitalRead(PIR) == HIGH) {
-    mudarPara(DISPARADO);
+  if (state == LEAVING) {
+    // Blinks the green LED while there is time to leave.
+    digitalWrite(ARMED_LED, (millis() / 250) % 2);
+    if (millis() - since > EXIT_DELAY) changeTo(ARMED);
   }
 
-  if (estado == DISPARADO) {
-    // Sirene de duas notas e o LED vermelho piscando junto.
-    bool alto = (millis() / 300) % 2;
-    tone(SIRENE, alto ? 1200 : 800);
-    digitalWrite(LED_ALARME, alto);
+  if (state == ARMED && digitalRead(PIR) == HIGH) {
+    changeTo(TRIGGERED);
+  }
+
+  if (state == TRIGGERED) {
+    // Two-tone siren with the red LED blinking along.
+    bool high = (millis() / 300) % 2;
+    tone(SIREN, high ? 1200 : 800);
+    digitalWrite(ALARM_LED, high);
   }
 
   delay(20);
 }
 ''', c, '''
-Alarme com sensor de presenca, na ESP32-C6.
+Alarm with a motion sensor, on the ESP32-C6.
 
-O que esta demo mostra:
-- uma maquina de estados (enum): desarmado, saindo, armado, disparado;
-- o sensor PIR, uma sirene de duas notas com tone() e o tempo medido com
-  millis(), sem travar o loop.
+What this demo shows:
+- a state machine (enum): disarmed, leaving, armed, triggered;
+- the PIR sensor, a two-tone siren with tone() and time measured with
+  millis(), without blocking the loop.
 
-Aperte F5, arme no botao, espere 5 s e clique no sensor PIR para simular
-alguem passando. O botao desarma.
+Press F5, arm it with the button, wait 5 s and click the PIR sensor to
+simulate someone walking by. The button disarms it.
 ''')
 demo('esp32c6-alarme', 'Alarme com sensor de presença', 'ESP32-C6 DevKit')
 
@@ -479,9 +480,7 @@ demo('esp32c6-alarme', 'Alarme com sensor de presença', 'ESP32-C6 DevKit')
 
 c = Circuito('placa', 'esp32-h2-devkit')
 c.peca('sonar', 'hc-sr04', 300, 20, Giro=giro_distancia(35))
-c.ligar('sonar', 'VCC', 'placa', '3V3', VERMELHO)
 c.ligar('sonar', 'TRIG', 'placa', '4', AMARELO)
-c.ligar('sonar', 'ECHO', 'placa', '5', VERDE)
 c.ligar('sonar', 'GND', 'placa', 'GND', PRETO)
 c.peca('rgb', 'rgb-led', 420, 190)
 c.peca('r_r', 'resistor', 330, 280, Ohms=220)
@@ -495,42 +494,51 @@ c.ligar('placa', '12', 'r_b', '1', AZUL)
 c.ligar('r_b', '2', 'rgb', 'B', AZUL)
 c.ligar('rgb', 'COM', 'placa', 'GND.2', PRETO)
 c.buzzer('buzzer', '22', 'GND.2', 520, 190)
+# o HC-SR04 comum e de 5 V: o ECHO passa por um divisor de 1 k e 2 k (3,3 V no pino 5)
+c.peca('r_echo1', 'resistor', 470, 70, Ohms=1000)
+c.peca('r_echo2', 'resistor', 470, 110, Ohms=2000)
+c.ligar('sonar', 'VCC', 'placa', '5V', VERMELHO)
+c.ligar('sonar', 'ECHO', 'r_echo1', '1', VERDE)
+c.ligar('r_echo1', '2', 'placa', '5', VERDE)
+c.ligar('r_echo1', '2', 'r_echo2', '1', VERDE)
+c.ligar('r_echo2', '2', 'placa', 'GND.3', PRETO)
 
 gravar('esp32h2-estacionamento', r'''
-// Sensor de estacionamento, na ESP32-H2.
+// Parking sensor, on the ESP32-H2.
 //
-// O ultrassom mede a distancia ate o carro de tras. Longe, o LED fica
-// verde; perto, amarelo e com bipes cada vez mais rapidos; encostando,
-// vermelho e o bipe vira continuo -- o mesmo de qualquer carro.
+// The ultrasonic sensor measures the distance to the car behind. Far away,
+// the LED is green; closer, yellow with beeps that get faster and faster;
+// almost touching, red and the beep becomes continuous -- like any car.
 //
-// Na bancada: o HC-SR04 comum e de 5 V, e o ECHO dele poe 5 V no pino --
-// demais para a H2, que e de 3,3 V. Use o HC-SR04P, que funciona em 3,3 V,
-// ou um divisor de 1 k e 2 k no ECHO.
+// The common HC-SR04 runs on 5 V: VCC goes to the board's 5V, and ECHO --
+// which puts 5 V on the pin, too much for the H2, a 3.3 V chip -- goes
+// through a 1 k and 2 k divider (3.3 V on pin 5). Another way: the
+// HC-SR04P, which works on 3.3 V.
 
 const int TRIG = 4;
 const int ECHO = 5;
-const int VERMELHO = 10;
-const int VERDE = 11;
-const int AZUL = 12;
+const int RED = 10;
+const int GREEN = 11;
+const int BLUE = 12;
 const int BUZZER = 22;
 
-unsigned long ultimoBip = 0;
+unsigned long lastBeep = 0;
 
-float medirCm() {
+float measureCm() {
   digitalWrite(TRIG, LOW);
   delayMicroseconds(2);
   digitalWrite(TRIG, HIGH);
   delayMicroseconds(10);
   digitalWrite(TRIG, LOW);
-  unsigned long idaEVolta = pulseIn(ECHO, HIGH, 30000);
-  if (idaEVolta == 0) return 400;   // nada na frente
-  return idaEVolta / 58.0;          // 58 us por centimetro, ida e volta
+  unsigned long roundTrip = pulseIn(ECHO, HIGH, 30000);
+  if (roundTrip == 0) return 400;   // nothing in front
+  return roundTrip / 58.0;          // 58 us per centimeter, there and back
 }
 
-void cor(int r, int g, int b) {
-  analogWrite(VERMELHO, r);
-  analogWrite(VERDE, g);
-  analogWrite(AZUL, b);
+void color(int r, int g, int b) {
+  analogWrite(RED, r);
+  analogWrite(GREEN, g);
+  analogWrite(BLUE, b);
 }
 
 void setup() {
@@ -540,37 +548,38 @@ void setup() {
 }
 
 void loop() {
-  float cm = medirCm();
+  float cm = measureCm();
 
-  // O intervalo entre os bipes encolhe com a distancia.
-  unsigned long intervalo;
-  if (cm > 100) { cor(0, 255, 0); intervalo = 0; }
-  else if (cm > 50) { cor(0, 255, 0); intervalo = 800; }
-  else if (cm > 20) { cor(255, 160, 0); intervalo = 300; }
-  else { cor(255, 0, 0); intervalo = 1; }
+  // The gap between beeps shrinks with the distance.
+  unsigned long interval;
+  if (cm > 100) { color(0, 255, 0); interval = 0; }
+  else if (cm > 50) { color(0, 255, 0); interval = 800; }
+  else if (cm > 20) { color(255, 160, 0); interval = 300; }
+  else { color(255, 0, 0); interval = 1; }
 
-  if (intervalo == 0) {
+  if (interval == 0) {
     noTone(BUZZER);
-  } else if (intervalo == 1) {
-    tone(BUZZER, 2000);                    // encostando: continuo
-  } else if (millis() - ultimoBip > intervalo) {
-    ultimoBip = millis();
+  } else if (interval == 1) {
+    tone(BUZZER, 2000);                    // almost touching: continuous
+  } else if (millis() - lastBeep > interval) {
+    lastBeep = millis();
     tone(BUZZER, 2000, 80);
   }
 
-  Serial.print("distancia: ");
+  Serial.print("distance: ");
   Serial.print(cm, 0);
   Serial.println(" cm");
   delay(60);
 }
 ''', c, '''
-Sensor de estacionamento, na ESP32-H2.
+Parking sensor, on the ESP32-H2.
 
-O que esta demo mostra:
-- o ultrassom HC-SR04 com pulseIn: o eco vira distancia (58 us por cm);
-- um LED RGB com PWM e bipes cada vez mais rapidos com tone().
+What this demo shows:
+- the HC-SR04 ultrasonic sensor with pulseIn: the echo becomes distance
+  (58 us per cm);
+- an RGB LED with PWM and beeps that get faster with tone().
 
-Aperte F5 e clique no HC-SR04 para aproximar ou afastar o "carro".
+Press F5 and click the HC-SR04 to move the "car" closer or farther.
 ''')
 demo('esp32h2-estacionamento', 'Sensor de estacionamento (ultrassom)', 'ESP32-H2 DevKit')
 
@@ -584,64 +593,65 @@ c.led('led', 'D5', 'GND.3', 'verde', 320, 60, VERDE)
 c.botao('botao', 'D6', 'GND.3', 300, 180)
 
 gravar('nodemcu-servidor', r'''
-// Servidor web na NodeMCU (ESP8266).
+// Web server on the NodeMCU (ESP8266).
 //
-// A pagina mostra se o botao esta apertado e liga e desliga o LED. Ela se
-// atualiza sozinha a cada 2 s: aperte o botao e veja a pagina mudar.
+// The page shows whether the button is pressed and turns the LED on and
+// off. It refreshes itself every 2 s: press the button and watch the page
+// change.
 //
-// Repare nos nomes: D5 e D6 sao os da serigrafia da NodeMCU, e o core do
-// ESP8266 os traduz para os GPIO 14 e 12.
+// Note the names: D5 and D6 are the ones printed on the NodeMCU, and the
+// ESP8266 core translates them to GPIO 14 and 12.
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 
 const int LED = D5;
-const int BOTAO = D6;
+const int BUTTON = D6;
 
-ESP8266WebServer servidor(80);
-bool ledLigado = false;
+ESP8266WebServer server(80);
+bool ledOn = false;
 
-String pagina() {
+String page() {
   String html = "<!DOCTYPE html><html><head><meta charset='utf-8'>";
   html += "<meta http-equiv='refresh' content='2'>";
   html += "<title>NodeMCU</title></head><body style='font-family:sans-serif'>";
-  html += "<h2>NodeMCU na rede</h2>";
-  html += "<p>Botao: <b>";
-  html += digitalRead(BOTAO) == LOW ? "APERTADO" : "solto";
+  html += "<h2>NodeMCU on the network</h2>";
+  html += "<p>Button: <b>";
+  html += digitalRead(BUTTON) == LOW ? "PRESSED" : "released";
   html += "</b></p><p>LED: <b>";
-  html += ledLigado ? "aceso" : "apagado";
+  html += ledOn ? "on" : "off";
   html += "</b></p>";
-  html += "<p><a href='/ligar'>Ligar</a> | <a href='/desligar'>Desligar</a></p>";
-  html += "<p>Ligada ha ";
+  html += "<p><a href='/on'>Turn on</a> | <a href='/off'>Turn off</a></p>";
+  html += "<p>Up for ";
   html += millis() / 1000;
   html += " s</p></body></html>";
   return html;
 }
 
-void responder() {
-  servidor.send(200, "text/html", pagina());
+void respond() {
+  server.send(200, "text/html", page());
 }
 
-void ligar() {
-  ledLigado = true;
+void turnOn() {
+  ledOn = true;
   digitalWrite(LED, HIGH);
-  responder();
+  respond();
 }
 
-void desligar() {
-  ledLigado = false;
+void turnOff() {
+  ledOn = false;
   digitalWrite(LED, LOW);
-  responder();
+  respond();
 }
 
 void setup() {
   Serial.begin(115200);
   pinMode(LED, OUTPUT);
-  pinMode(BOTAO, INPUT_PULLUP);
+  pinMode(BUTTON, INPUT_PULLUP);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin("Wokwi-GUEST", "");
-  Serial.print("conectando");
+  Serial.print("connecting");
   while (WiFi.status() != WL_CONNECTED) {
     delay(300);
     Serial.print(".");
@@ -650,27 +660,27 @@ void setup() {
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
 
-  servidor.on("/", responder);
-  servidor.on("/ligar", ligar);
-  servidor.on("/desligar", desligar);
-  servidor.begin();
-  Serial.println("servidor no ar: abra o endereco do painel REDE");
+  server.on("/", respond);
+  server.on("/on", turnOn);
+  server.on("/off", turnOff);
+  server.begin();
+  Serial.println("server is up: open the address in the NETWORK panel");
 }
 
 void loop() {
-  servidor.handleClient();
+  server.handleClient();
   delay(2);
 }
 ''', c, '''
-Servidor web na NodeMCU (ESP8266).
+Web server on the NodeMCU (ESP8266).
 
-O que esta demo mostra:
-- uma pagina servida pela propria placa, com links que acendem o LED e o
-  estado do botao atualizado a cada 2 s;
-- os nomes D5 e D6 da serigrafia, que o core do ESP8266 traduz para os
-  GPIO de verdade.
+What this demo shows:
+- a page served by the board itself, with links that light the LED and
+  the button state refreshed every 2 s;
+- the D5 and D6 names printed on the board, which the ESP8266 core
+  translates to the real GPIO.
 
-Aperte F5 e abra no navegador o endereco que aparece no painel REDE.
+Press F5 and open the address shown in the NETWORK panel in a browser.
 ''')
 demo('nodemcu-servidor', 'Servidor web: LED e botão na página', 'NodeMCU (ESP8266)')
 
@@ -684,64 +694,64 @@ c.led_ativo_baixo('tomada', 'GPIO2', 'VCC', 'amarelo', 330, 60, AMARELO)
 c.botao('botao', 'GPIO0', 'GND', 300, 190)
 
 gravar('esp01-tomada-mqtt', r'''
-// Tomada inteligente por MQTT, num ESP-01.
+// Smart plug over MQTT, on an ESP-01.
 //
-// O "rele" da tomada e o LED (no ESP-01 de verdade seria um modulo de rele
-// no mesmo pino). Pelo MQTT:
-//   casa/tomada          liga, desliga ou alterna
-//   casa/tomada/estado   a placa responde "ligada" ou "desligada"
-// O botao faz o mesmo na mao, e tambem avisa pelo MQTT.
+// The plug's "relay" is the LED (on a real ESP-01 it would be a relay
+// module on the same pin). Over MQTT:
+//   home/plug          on, off or toggle
+//   home/plug/state    the board answers "on" or "off"
+// The button does the same by hand, and also reports over MQTT.
 //
-// Por que o LED acende com LOW: no ESP-01 o GPIO0 e o GPIO2 precisam estar
-// em HIGH quando a placa liga, senao ela nao da partida. Com o LED entre o
-// 3,3 V e o pino, ele segura o GPIO2 em cima no boot -- e acende quando o
-// pino vai para LOW.
+// Why the LED lights with LOW: on the ESP-01, GPIO0 and GPIO2 must be HIGH
+// when the board powers up, or it won't boot. With the LED between 3.3 V
+// and the pin, it holds GPIO2 high at boot -- and lights when the pin goes
+// LOW.
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-const int TOMADA = 2;   // GPIO2
-const int BOTAO = 0;    // GPIO0: o mesmo botao de gravar
+const int PLUG = 2;     // GPIO2
+const int BUTTON = 0;   // GPIO0: the same button used for flashing
 
-WiFiClient rede;
-PubSubClient mqtt(rede);
+WiFiClient net;
+PubSubClient mqtt(net);
 
-bool ligada = false;
-int botaoAntes = HIGH;
+bool isOn = false;
+int lastButton = HIGH;
 
-void aplicar(bool nova) {
-  ligada = nova;
-  digitalWrite(TOMADA, ligada ? LOW : HIGH);   // acende com LOW
-  mqtt.publish("casa/tomada/estado", ligada ? "ligada" : "desligada", true);
-  Serial.println(ligada ? "tomada LIGADA" : "tomada desligada");
+void apply(bool value) {
+  isOn = value;
+  digitalWrite(PLUG, isOn ? LOW : HIGH);   // lights with LOW
+  mqtt.publish("home/plug/state", isOn ? "on" : "off", true);
+  Serial.println(isOn ? "plug ON" : "plug off");
 }
 
-void chegou(char* topico, byte* dados, unsigned int tamanho) {
-  String comando;
-  for (unsigned int i = 0; i < tamanho; i++) comando += (char)dados[i];
-  comando.trim();
-  comando.toLowerCase();
+void received(char* topic, byte* payload, unsigned int length) {
+  String command;
+  for (unsigned int i = 0; i < length; i++) command += (char)payload[i];
+  command.trim();
+  command.toLowerCase();
 
-  if (comando == "liga") aplicar(true);
-  else if (comando == "desliga") aplicar(false);
-  else if (comando == "alterna") aplicar(!ligada);
-  else Serial.println("comando desconhecido: " + comando);
+  if (command == "on") apply(true);
+  else if (command == "off") apply(false);
+  else if (command == "toggle") apply(!isOn);
+  else Serial.println("unknown command: " + command);
 }
 
-void conectar() {
-  // O ID do cliente tem que ser unico no broker: com o mesmo ID, cada
-  // tomada que conecta derruba a outra. O MAC da placa resolve.
-  String id = "tomada-" + WiFi.macAddress();
+void reconnect() {
+  // The client ID must be unique on the broker: with the same ID, each
+  // plug that connects kicks the other one off. The board's MAC solves it.
+  String id = "plug-" + WiFi.macAddress();
   id.replace(":", "");
 
   while (!mqtt.connected()) {
     Serial.print("broker... ");
     if (mqtt.connect(id.c_str())) {
       Serial.println("ok");
-      mqtt.subscribe("casa/tomada");
-      aplicar(ligada);
+      mqtt.subscribe("home/plug");
+      apply(isOn);
     } else {
-      Serial.println("falhou, tento de novo em 2 s");
+      Serial.println("failed, trying again in 2 s");
       delay(2000);
     }
   }
@@ -749,9 +759,9 @@ void conectar() {
 
 void setup() {
   Serial.begin(115200);
-  pinMode(TOMADA, OUTPUT);
-  digitalWrite(TOMADA, HIGH);   // comeca desligada
-  pinMode(BOTAO, INPUT_PULLUP);
+  pinMode(PLUG, OUTPUT);
+  digitalWrite(PLUG, HIGH);   // starts off
+  pinMode(BUTTON, INPUT_PULLUP);
 
   WiFi.begin("Wokwi-GUEST", "");
   while (WiFi.status() != WL_CONNECTED) delay(250);
@@ -759,29 +769,29 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   mqtt.setServer("broker.hivemq.com", 1883);
-  mqtt.setCallback(chegou);
+  mqtt.setCallback(received);
 }
 
 void loop() {
-  if (!mqtt.connected()) conectar();
+  if (!mqtt.connected()) reconnect();
   mqtt.loop();
 
-  int botao = digitalRead(BOTAO);
-  if (botaoAntes == HIGH && botao == LOW) aplicar(!ligada);
-  botaoAntes = botao;
+  int button = digitalRead(BUTTON);
+  if (lastButton == HIGH && button == LOW) apply(!isOn);
+  lastButton = button;
   delay(20);
 }
 ''', c, '''
-Tomada inteligente por MQTT, num ESP-01.
+Smart plug over MQTT, on an ESP-01.
 
-O que esta demo mostra:
-- MQTT com a PubSubClient: assinar um topico, obedecer e responder o
-  estado numa mensagem retida;
-- o LED que acende com LOW, o jeito certo no ESP-01 (o GPIO2 precisa
-  estar em HIGH na partida).
+What this demo shows:
+- MQTT with PubSubClient: subscribing to a topic, obeying it and
+  reporting the state in a retained message;
+- the LED that lights with LOW, the right way on the ESP-01 (GPIO2 must
+  be HIGH at boot).
 
-Aperte F5 e, no painel REDE, publique "liga", "desliga" ou "alterna" em
-casa/tomada. O botao tambem liga e desliga.
+Press F5 and, in the NETWORK panel, publish "on", "off" or "toggle" to
+home/plug. The button also turns it on and off.
 ''')
 demo('esp01-tomada-mqtt', 'Tomada inteligente por MQTT', 'ESP-01')
 
@@ -795,67 +805,68 @@ c.botao('botao', 'GPIO0', 'GND', 300, 60)
 c.buzzer('buzzer', 'GPIO2', 'GND', 320, 170)
 
 gravar('esp02-campainha', r'''
-// Campainha musical, num ESP-02.
+// Musical doorbell, on an ESP-02.
 //
-// Aperte o botao e ela toca "ding-dong" -- ou, a cada quinta visita, o
-// comeco da Ode a Alegria, de Beethoven. O monitor serial conta as visitas.
+// Press the button and it plays "ding-dong" -- or, on every fifth visit,
+// the opening of Beethoven's Ode to Joy. The serial monitor counts the
+// visits.
 //
-// O buzzer e passivo: e o tone() que faz cada nota, na frequencia dela.
+// The buzzer is passive: tone() makes each note, at its own frequency.
 
-const int BOTAO = 0;    // GPIO0
+const int BUTTON = 0;   // GPIO0
 const int BUZZER = 2;   // GPIO2
 
-// Ode a Alegria: notas (Hz) e duracoes (ms).
-const int NOTAS[] = {330, 330, 349, 392, 392, 349, 330, 294,
+// Ode to Joy: notes (Hz) and durations (ms).
+const int NOTES[] = {330, 330, 349, 392, 392, 349, 330, 294,
                      262, 262, 294, 330, 330, 294, 294};
-const int TEMPOS[] = {300, 300, 300, 300, 300, 300, 300, 300,
-                      300, 300, 300, 300, 450, 150, 600};
-const int QUANTAS = 15;
+const int DURATIONS[] = {300, 300, 300, 300, 300, 300, 300, 300,
+                         300, 300, 300, 300, 450, 150, 600};
+const int NOTE_COUNT = 15;
 
-int visitas = 0;
+int visits = 0;
 
 void dingDong() {
-  tone(BUZZER, 659, 300);   // mi
+  tone(BUZZER, 659, 300);   // E
   delay(350);
-  tone(BUZZER, 523, 500);   // do
+  tone(BUZZER, 523, 500);   // C
   delay(600);
 }
 
-void odeAAlegria() {
-  for (int i = 0; i < QUANTAS; i++) {
-    tone(BUZZER, NOTAS[i], TEMPOS[i] * 9 / 10);
-    delay(TEMPOS[i]);
+void odeToJoy() {
+  for (int i = 0; i < NOTE_COUNT; i++) {
+    tone(BUZZER, NOTES[i], DURATIONS[i] * 9 / 10);
+    delay(DURATIONS[i]);
   }
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(BOTAO, INPUT_PULLUP);
-  Serial.println("Campainha pronta: aperte o botao");
+  pinMode(BUTTON, INPUT_PULLUP);
+  Serial.println("Doorbell ready: press the button");
 }
 
 void loop() {
-  if (digitalRead(BOTAO) == LOW) {
-    visitas++;
-    Serial.print("Visita numero ");
-    Serial.println(visitas);
+  if (digitalRead(BUTTON) == LOW) {
+    visits++;
+    Serial.print("Visit number ");
+    Serial.println(visits);
 
-    if (visitas % 5 == 0) odeAAlegria();
+    if (visits % 5 == 0) odeToJoy();
     else dingDong();
 
-    // Segurar o botao nao toca de novo: espera soltar.
-    while (digitalRead(BOTAO) == LOW) delay(10);
+    // Holding the button does not ring again: wait for release.
+    while (digitalRead(BUTTON) == LOW) delay(10);
   }
   delay(20);
 }
 ''', c, '''
-Campainha musical, num ESP-02.
+Musical doorbell, on an ESP-02.
 
-O que esta demo mostra:
-- melodia com tone() e vetores de notas e duracoes;
-- o "espera soltar", que impede o botao segurado de tocar sem parar.
+What this demo shows:
+- a melody with tone() and arrays of notes and durations;
+- "wait for release", which keeps a held button from ringing nonstop.
 
-Aperte F5 e o botao. A cada quinta visita a musica muda.
+Press F5, then the button. Every fifth visit the tune changes.
 ''')
 demo('esp02-campainha', 'Campainha musical', 'ESP-02')
 
@@ -875,64 +886,65 @@ c.led('quente', 'GPIO16', 'GND', 'vermelho', 510, 150, VERMELHO)
 c.led('seco', 'GPIO15', 'GND', 'amarelo', 600, 150, AMARELO)
 
 gravar('esp03-termo-higrometro', r'''
-// Termo-higrometro com DHT11, num ESP-03.
+// Thermo-hygrometer with a DHT11, on an ESP-03.
 //
-// Tres LEDs dizem como esta a sala: azul (frio, abaixo de 20 C), verde
-// (confortavel) e vermelho (quente, acima de 27 C). O amarelo acende com o
-// ar seco, abaixo de 40 % de umidade.
+// Three LEDs tell how the room is: blue (cold, below 20 C), green
+// (comfortable) and red (hot, above 27 C). The yellow one lights when the
+// air is dry, below 40 % humidity.
 //
-// O ESP-03 nao traz o GPIO4 nem o GPIO5 para fora: os LEDs vao nos que
-// ele tem. O do GPIO15 ainda ajuda na partida, que pede esse pino em LOW.
+// The ESP-03 does not break out GPIO4 or GPIO5: the LEDs go on the pins it
+// has. The one on GPIO15 even helps at boot, which needs that pin LOW.
 
 #include <DHT.h>
 
-const int PINO_DHT = 14;
-const int FRIO = 12;
-const int CONFORTO = 13;
-const int QUENTE = 16;
-const int SECO = 15;
+const int DHT_PIN = 14;
+const int COLD = 12;
+const int COMFORT = 13;
+const int HOT = 16;
+const int DRY = 15;
 
-DHT dht(PINO_DHT, DHT11);
+DHT dht(DHT_PIN, DHT11);
 
 void setup() {
   Serial.begin(115200);
-  pinMode(FRIO, OUTPUT);
-  pinMode(CONFORTO, OUTPUT);
-  pinMode(QUENTE, OUTPUT);
-  pinMode(SECO, OUTPUT);
+  pinMode(COLD, OUTPUT);
+  pinMode(COMFORT, OUTPUT);
+  pinMode(HOT, OUTPUT);
+  pinMode(DRY, OUTPUT);
   dht.begin();
 }
 
 void loop() {
-  delay(1000);   // o DHT11 le no maximo uma vez por segundo
+  delay(1000);   // the DHT11 reads at most once per second
 
   float t = dht.readTemperature();
-  float u = dht.readHumidity();
-  if (isnan(t) || isnan(u)) {
-    Serial.println("falha ao ler o DHT11");
+  float h = dht.readHumidity();
+  if (isnan(t) || isnan(h)) {
+    Serial.println("failed to read the DHT11");
     return;
   }
 
-  digitalWrite(FRIO, t < 20);
-  digitalWrite(CONFORTO, t >= 20 && t <= 27);
-  digitalWrite(QUENTE, t > 27);
-  digitalWrite(SECO, u < 40);
+  digitalWrite(COLD, t < 20);
+  digitalWrite(COMFORT, t >= 20 && t <= 27);
+  digitalWrite(HOT, t > 27);
+  digitalWrite(DRY, h < 40);
 
-  Serial.print("temperatura: ");
+  Serial.print("temperature: ");
   Serial.print(t, 0);
-  Serial.print(" C   umidade: ");
-  Serial.print(u, 0);
+  Serial.print(" C   humidity: ");
+  Serial.print(h, 0);
   Serial.println(" %");
 }
 ''', c, '''
-Termo-higrometro com DHT11, num ESP-03.
+Thermo-hygrometer with a DHT11, on an ESP-03.
 
-O que esta demo mostra:
-- temperatura e umidade do DHT11 decidindo quatro LEDs;
-- comparacao escrita direto no digitalWrite ("t < 20" ja e HIGH ou LOW).
+What this demo shows:
+- the DHT11's temperature and humidity deciding four LEDs;
+- a comparison written straight into digitalWrite ("t < 20" is already
+  HIGH or LOW).
 
-Aperte F5 e clique no DHT11 para mudar a temperatura e a umidade (o ar
-comeca seco, com o LED amarelo aceso).
+Press F5 and click the DHT11 to change the temperature and humidity (the
+air starts dry, with the yellow LED on).
 ''')
 demo('esp03-termo-higrometro', 'Termo-higrômetro com DHT11', 'ESP-03')
 
@@ -951,84 +963,86 @@ c.botao('botao', 'GPIO0', 'GND', 440, 250)
 c.buzzer('buzzer', 'GPIO16', 'GND', 560, 230)
 
 gravar('esp04-semaforo-pedestre', r'''
-// Semaforo com botao de pedestre, num ESP-04.
+// Traffic light with a pedestrian button, on an ESP-04.
 //
-// O carro fica no verde ate alguem apertar o botao. Ai o semaforo dos
-// carros passa pelo amarelo e fecha, o do pedestre abre com um bipe
-// ritmado (o sinal sonoro para quem nao enxerga) e, no fim, o vermelho do
-// pedestre pisca avisando que vai fechar.
+// Cars keep the green until someone presses the button. Then the cars'
+// light goes through yellow and turns red, the pedestrian light turns
+// green with a rhythmic beep (the audible signal for the visually
+// impaired) and, at the end, the pedestrian red blinks to warn it is about
+// to close.
 //
-// O ESP-04 traz sete GPIO para fora (0, 2, 12, 13, 14, 15 e 16) e esta
-// demo usa os sete.
+// The ESP-04 breaks out seven GPIO (0, 2, 12, 13, 14, 15 and 16) and this
+// demo uses all seven.
 
-const int CARRO_VERMELHO = 14;
-const int CARRO_AMARELO = 12;
-const int CARRO_VERDE = 13;
-const int PEDESTRE_VERMELHO = 15;
-const int PEDESTRE_VERDE = 2;
-const int BOTAO = 0;
+const int CAR_RED = 14;
+const int CAR_YELLOW = 12;
+const int CAR_GREEN = 13;
+const int WALK_RED = 15;
+const int WALK_GREEN = 2;
+const int BUTTON = 0;
 const int BUZZER = 16;
 
-void carros(int vermelho, int amarelo, int verde) {
-  digitalWrite(CARRO_VERMELHO, vermelho);
-  digitalWrite(CARRO_AMARELO, amarelo);
-  digitalWrite(CARRO_VERDE, verde);
+void cars(int red, int yellow, int green) {
+  digitalWrite(CAR_RED, red);
+  digitalWrite(CAR_YELLOW, yellow);
+  digitalWrite(CAR_GREEN, green);
 }
 
-void pedestres(int vermelho, int verde) {
-  digitalWrite(PEDESTRE_VERMELHO, vermelho);
-  digitalWrite(PEDESTRE_VERDE, verde);
+void pedestrians(int red, int green) {
+  digitalWrite(WALK_RED, red);
+  digitalWrite(WALK_GREEN, green);
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(CARRO_VERMELHO, OUTPUT);
-  pinMode(CARRO_AMARELO, OUTPUT);
-  pinMode(CARRO_VERDE, OUTPUT);
-  pinMode(PEDESTRE_VERMELHO, OUTPUT);
-  pinMode(PEDESTRE_VERDE, OUTPUT);
-  pinMode(BOTAO, INPUT_PULLUP);
+  pinMode(CAR_RED, OUTPUT);
+  pinMode(CAR_YELLOW, OUTPUT);
+  pinMode(CAR_GREEN, OUTPUT);
+  pinMode(WALK_RED, OUTPUT);
+  pinMode(WALK_GREEN, OUTPUT);
+  pinMode(BUTTON, INPUT_PULLUP);
 
-  carros(LOW, LOW, HIGH);
-  pedestres(HIGH, LOW);
-  Serial.println("Verde para os carros. Aperte o botao para atravessar.");
+  cars(LOW, LOW, HIGH);
+  pedestrians(HIGH, LOW);
+  Serial.println("Green for the cars. Press the button to cross.");
 }
 
 void loop() {
-  if (digitalRead(BOTAO) == LOW) {
-    Serial.println("pedido de travessia!");
-    delay(1000);                   // o carro nao para na hora
-    carros(LOW, HIGH, LOW);
+  if (digitalRead(BUTTON) == LOW) {
+    Serial.println("crossing requested!");
+    delay(1000);                   // cars don't stop right away
+    cars(LOW, HIGH, LOW);
     delay(2000);
-    carros(HIGH, LOW, LOW);
+    cars(HIGH, LOW, LOW);
     delay(1000);
 
-    pedestres(LOW, HIGH);
-    Serial.println("pedestre: pode atravessar");
-    for (int i = 0; i < 10; i++) { // 5 s com bipe
+    pedestrians(LOW, HIGH);
+    Serial.println("pedestrians: walk");
+    for (int i = 0; i < 10; i++) { // 5 s of beeping
       tone(BUZZER, 880, 100);
       delay(500);
     }
 
-    for (int i = 0; i < 6; i++) {  // o vermelho pisca: vai fechar
-      pedestres(i % 2 == 0, LOW);
+    for (int i = 0; i < 6; i++) {  // the red blinks: about to close
+      pedestrians(i % 2 == 0, LOW);
       delay(300);
     }
-    pedestres(HIGH, LOW);
+    pedestrians(HIGH, LOW);
     delay(1000);
-    carros(LOW, LOW, HIGH);
-    Serial.println("verde para os carros");
+    cars(LOW, LOW, HIGH);
+    Serial.println("green for the cars");
   }
   delay(20);
 }
 ''', c, '''
-Semaforo com botao de pedestre, num ESP-04.
+Traffic light with a pedestrian button, on an ESP-04.
 
-O que esta demo mostra:
-- dois semaforos coordenados (carros e pedestres) numa sequencia de tempos;
-- o bipe de acessibilidade e o vermelho piscando no fim da travessia.
+What this demo shows:
+- two coordinated traffic lights (cars and pedestrians) in a timed
+  sequence;
+- the accessibility beep and the red blinking at the end of the crossing.
 
-Aperte F5 e o botao para pedir a travessia.
+Press F5, then the button to request a crossing.
 ''')
 demo('esp04-semaforo-pedestre', 'Semáforo com botão de pedestre', 'ESP-04')
 
@@ -1043,48 +1057,48 @@ c.ligar('placa', 'TXD', 'la', 'D0', AZUL)
 c.ligar('la', 'GND', 'placa', 'GND', PRETO)
 
 gravar('esp05-calculadora', r'''
-// Calculadora pela serial, num ESP-05.
+// Serial calculator, on an ESP-05.
 //
-// O ESP-05 so tem os pinos da serial para fora -- RX e TX --, e e
-// justamente por eles que a conversa acontece. Digite uma conta no monitor
-// serial e aperte Enter:
+// The ESP-05 only breaks out the serial pins -- RX and TX -- and that is
+// exactly where the conversation happens. Type a calculation in the serial
+// monitor and press Enter:
 //
 //   12 + 30      7.5 * 4      100 / 8      2 ^ 10
 //
-// O analisador logico esta no TX: abra-o para ver cada letra da resposta
-// saindo a 115200 baud, com o caractere escrito em cima.
+// The logic analyzer is on TX: open it to see each character of the answer
+// going out at 115200 baud, with the character written on top.
 
 #include <math.h>
 
-void calcular(String conta) {
-  // O operador e o primeiro + - * / ^ depois do primeiro numero.
-  int onde = -1;
-  char operador = ' ';
-  for (unsigned int i = 1; i < conta.length(); i++) {
-    char c = conta.charAt(i);
+void calculate(String expr) {
+  // The operator is the first + - * / ^ after the first number.
+  int at = -1;
+  char op = ' ';
+  for (unsigned int i = 1; i < expr.length(); i++) {
+    char c = expr.charAt(i);
     if (c == '+' || c == '-' || c == '*' || c == '/' || c == '^') {
-      onde = i;
-      operador = c;
+      at = i;
+      op = c;
       break;
     }
   }
 
-  if (onde < 0) {
-    Serial.println("nao achei o operador. Use + - * / ou ^");
+  if (at < 0) {
+    Serial.println("no operator found. Use + - * / or ^");
     return;
   }
 
-  float a = conta.substring(0, onde).toFloat();
-  float b = conta.substring(onde + 1).toFloat();
+  float a = expr.substring(0, at).toFloat();
+  float b = expr.substring(at + 1).toFloat();
   float r = 0;
 
-  switch (operador) {
+  switch (op) {
     case '+': r = a + b; break;
     case '-': r = a - b; break;
     case '*': r = a * b; break;
     case '/':
       if (b == 0) {
-        Serial.println("divisao por zero!");
+        Serial.println("division by zero!");
         return;
       }
       r = a / b;
@@ -1092,36 +1106,36 @@ void calcular(String conta) {
     case '^': r = pow(a, b); break;
   }
 
-  Serial.print(conta);
+  Serial.print(expr);
   Serial.print(" = ");
-  if (r == (long)r) Serial.println((long)r);   // conta inteira: sem virgula
+  if (r == (long)r) Serial.println((long)r);   // whole result: no decimals
   else Serial.println(r, 4);
 }
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Calculadora: digite uma conta (ex.: 12 + 30)");
+  Serial.println("Calculator: type a calculation (e.g. 12 + 30)");
 }
 
 void loop() {
   if (Serial.available()) {
-    String conta = Serial.readStringUntil('\n');
-    conta.trim();
-    if (conta.length() > 0) calcular(conta);
+    String expr = Serial.readStringUntil('\n');
+    expr.trim();
+    if (expr.length() > 0) calculate(expr);
   }
   delay(10);
 }
 ''', c, '''
-Calculadora pela serial, num ESP-05.
+Serial calculator, on an ESP-05.
 
-O que esta demo mostra:
-- ler uma linha do monitor serial e separar os numeros do operador com
-  os metodos de String;
-- o analisador logico no pino TX: cada byte da resposta aparece como uma
-  letra sobre a forma de onda.
+What this demo shows:
+- reading a line from the serial monitor and splitting the numbers from
+  the operator with String methods;
+- the logic analyzer on the TX pin: each byte of the answer shows up as a
+  character over the waveform.
 
-Aperte F5, digite "12 + 30" no monitor serial e aperte Enter. Depois
-selecione o analisador e clique em "Abrir o analisador".
+Press F5, type "12 + 30" in the serial monitor and press Enter. Then
+select the analyzer and click "Open the analyzer".
 ''')
 demo('esp05-calculadora', 'Calculadora pela serial (com analisador no TX)', 'ESP-05')
 
@@ -1140,38 +1154,39 @@ c.botao('b_azul', 'GPIO0', 'GND', 500, 150, AZUL)
 c.buzzer('buzzer', 'GPIO15', 'GND', 420, 240)
 
 gravar('esp06-genius', r'''
-// Genius, num ESP-06.
+// Genius, on an ESP-06.
 //
-// A placa acende uma sequencia de cores, cada uma com a sua nota. Repita
-// apertando os botoes na mesma ordem. Acertou, a sequencia cresce; errou,
-// o jogo diz quantas voce acertou e recomeca.
+// The board lights a sequence of colors, each with its own note. Repeat it
+// by pressing the buttons in the same order. Get it right and the sequence
+// grows; get it wrong and the game tells how many rounds you got and
+// starts over.
 //
-// Aperte qualquer botao para comecar.
+// Press any button to start.
 
-const int LEDS[] = {16, 14, 12};       // vermelho, verde, azul
-const int BOTOES[] = {13, 2, 0};
-const int NOTAS[] = {262, 330, 392};   // do, mi, sol
+const int LEDS[] = {16, 14, 12};       // red, green, blue
+const int BUTTONS[] = {13, 2, 0};
+const int NOTES[] = {262, 330, 392};   // C, E, G
 const int BUZZER = 15;
-const int MAXIMO = 20;
+const int MAXIMUM = 20;
 
-int sequencia[MAXIMO];
-int tamanho = 0;
+int sequence[MAXIMUM];
+int length = 0;
 
-void mostrar(int cor, int ms) {
-  digitalWrite(LEDS[cor], HIGH);
-  tone(BUZZER, NOTAS[cor], ms);
+void show(int color, int ms) {
+  digitalWrite(LEDS[color], HIGH);
+  tone(BUZZER, NOTES[color], ms);
   delay(ms);
-  digitalWrite(LEDS[cor], LOW);
+  digitalWrite(LEDS[color], LOW);
   delay(150);
 }
 
-// Espera um botao e devolve qual foi (0, 1 ou 2).
-int esperarBotao() {
+// Waits for a button and returns which one it was (0, 1 or 2).
+int waitForButton() {
   while (true) {
     for (int i = 0; i < 3; i++) {
-      if (digitalRead(BOTOES[i]) == LOW) {
-        mostrar(i, 250);
-        while (digitalRead(BOTOES[i]) == LOW) delay(5);   // espera soltar
+      if (digitalRead(BUTTONS[i]) == LOW) {
+        show(i, 250);
+        while (digitalRead(BUTTONS[i]) == LOW) delay(5);   // wait for release
         return i;
       }
     }
@@ -1179,10 +1194,10 @@ int esperarBotao() {
   }
 }
 
-void perdeu() {
-  Serial.print("Errou! Voce acertou ");
-  Serial.print(tamanho - 1);
-  Serial.println(" rodada(s).");
+void lost() {
+  Serial.print("Wrong! You got ");
+  Serial.print(length - 1);
+  Serial.println(" round(s) right.");
   tone(BUZZER, 110, 800);
   for (int k = 0; k < 3; k++) {
     for (int i = 0; i < 3; i++) digitalWrite(LEDS[i], HIGH);
@@ -1190,37 +1205,37 @@ void perdeu() {
     for (int i = 0; i < 3; i++) digitalWrite(LEDS[i], LOW);
     delay(200);
   }
-  tamanho = 0;
+  length = 0;
 }
 
 void setup() {
   Serial.begin(115200);
   for (int i = 0; i < 3; i++) {
     pinMode(LEDS[i], OUTPUT);
-    pinMode(BOTOES[i], INPUT_PULLUP);
+    pinMode(BUTTONS[i], INPUT_PULLUP);
   }
-  Serial.println("Genius: aperte qualquer botao para comecar");
-  esperarBotao();
-  randomSeed(micros());   // a hora do primeiro aperto vira a semente
+  Serial.println("Genius: press any button to start");
+  waitForButton();
+  randomSeed(micros());   // the time of the first press becomes the seed
 }
 
 void loop() {
-  if (tamanho == MAXIMO) {
-    Serial.println("Voce venceu o Genius!");
-    tamanho = 0;
+  if (length == MAXIMUM) {
+    Serial.println("You beat Genius!");
+    length = 0;
   }
 
-  sequencia[tamanho] = random(3);
-  tamanho++;
-  Serial.print("Rodada ");
-  Serial.println(tamanho);
+  sequence[length] = random(3);
+  length++;
+  Serial.print("Round ");
+  Serial.println(length);
   delay(600);
 
-  for (int i = 0; i < tamanho; i++) mostrar(sequencia[i], 400);
+  for (int i = 0; i < length; i++) show(sequence[i], 400);
 
-  for (int i = 0; i < tamanho; i++) {
-    if (esperarBotao() != sequencia[i]) {
-      perdeu();
+  for (int i = 0; i < length; i++) {
+    if (waitForButton() != sequence[i]) {
+      lost();
       delay(1000);
       return;
     }
@@ -1228,15 +1243,15 @@ void loop() {
   delay(400);
 }
 ''', c, '''
-Jogo Genius, num ESP-06.
+Genius game, on an ESP-06.
 
-O que esta demo mostra:
-- vetores (a sequencia e as tabelas de pinos e notas) e funcoes que
-  devolvem valor;
-- random() com semente tirada do primeiro aperto -- cada partida sai
-  diferente, como na placa.
+What this demo shows:
+- arrays (the sequence and the pin and note tables) and functions that
+  return a value;
+- random() seeded from the first press -- each game comes out different,
+  like on the board.
 
-Aperte F5 e qualquer botao para comecar. Repita as cores.
+Press F5 and any button to start. Repeat the colors.
 ''')
 demo('esp06-genius', 'Jogo Genius', 'ESP-06')
 
@@ -1254,65 +1269,67 @@ for i, pino in enumerate(['GPIO16', 'GPIO14', 'GPIO12', 'GPIO13', 'GPIO5'], star
     c.ligar('barra', f'C{i}', 'placa', 'GND', PRETO)
 
 gravar('esp07-scanner-wifi', r'''
-// Scanner de redes WiFi, num ESP-07 -- o modulo com conector de antena.
+// WiFi network scanner, on an ESP-07 -- the module with an antenna
+// connector.
 //
-// A cada 5 s a placa procura as redes em volta e lista no monitor serial:
-// o nome, o sinal (RSSI, em dBm) e se e aberta ou com senha. A barra de
-// LEDs mostra a forca da MELHOR rede: quanto mais perto de 0 dBm, mais LEDs.
+// Every 5 s the board looks for the networks around it and lists them in
+// the serial monitor: the name, the signal (RSSI, in dBm) and whether it is
+// open or password-protected. The LED bar shows the strength of the BEST
+// network: the closer to 0 dBm, the more LEDs.
 //
-// No simulador as redes sao as que o WiFi deste computador enxerga.
+// In the simulator the networks are the ones this computer's WiFi sees.
 
 #include <ESP8266WiFi.h>
 
-const int BARRA[] = {16, 14, 12, 13, 5};
+const int BAR[] = {16, 14, 12, 13, 5};
 
-void mostrarSinal(int rssi) {
-  // De -90 dBm (quase nada) a -40 dBm (otimo): de 0 a 5 LEDs.
-  int acesos = constrain(map(rssi, -90, -40, 0, 5), 0, 5);
-  for (int i = 0; i < 5; i++) digitalWrite(BARRA[i], i < acesos);
+void showSignal(int rssi) {
+  // From -90 dBm (almost nothing) to -40 dBm (great): from 0 to 5 LEDs.
+  int lit = constrain(map(rssi, -90, -40, 0, 5), 0, 5);
+  for (int i = 0; i < 5; i++) digitalWrite(BAR[i], i < lit);
 }
 
 void setup() {
   Serial.begin(115200);
-  for (int i = 0; i < 5; i++) pinMode(BARRA[i], OUTPUT);
+  for (int i = 0; i < 5; i++) pinMode(BAR[i], OUTPUT);
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);
 }
 
 void loop() {
-  Serial.println("procurando redes...");
-  int quantas = WiFi.scanNetworks();
+  Serial.println("scanning for networks...");
+  int found = WiFi.scanNetworks();
 
-  if (quantas <= 0) {
-    Serial.println("nenhuma rede encontrada");
-    mostrarSinal(-100);
+  if (found <= 0) {
+    Serial.println("no networks found");
+    showSignal(-100);
   } else {
-    int melhor = -100;
-    for (int i = 0; i < quantas; i++) {
+    int best = -100;
+    for (int i = 0; i < found; i++) {
       Serial.print(i + 1);
       Serial.print(". ");
       Serial.print(WiFi.SSID(i));
       Serial.print("  ");
       Serial.print(WiFi.RSSI(i));
       Serial.print(" dBm  ");
-      Serial.println(WiFi.encryptionType(i) == ENC_TYPE_NONE ? "aberta" : "com senha");
-      if (WiFi.RSSI(i) > melhor) melhor = WiFi.RSSI(i);
+      Serial.println(WiFi.encryptionType(i) == ENC_TYPE_NONE ? "open" : "secured");
+      if (WiFi.RSSI(i) > best) best = WiFi.RSSI(i);
     }
-    mostrarSinal(melhor);
+    showSignal(best);
   }
 
   WiFi.scanDelete();
   delay(5000);
 }
 ''', c, '''
-Scanner de redes WiFi, num ESP-07.
+WiFi network scanner, on an ESP-07.
 
-O que esta demo mostra:
-- WiFi.scanNetworks() com nome, sinal e tipo de seguranca de cada rede;
-- map() e constrain() transformando dBm em LEDs acesos.
+What this demo shows:
+- WiFi.scanNetworks() with each network's name, signal and security type;
+- map() and constrain() turning dBm into lit LEDs.
 
-Aperte F5. As redes listadas sao as que o WiFi deste computador enxerga.
+Press F5. The networks listed are the ones this computer's WiFi sees.
 ''')
 demo('esp07-scanner-wifi', 'Scanner de redes WiFi com barra de sinal', 'ESP-07')
 
@@ -1328,79 +1345,79 @@ c.botao('botao', 'GPIO13', 'GND', 320, 150)
 c.buzzer('buzzer', 'GPIO16', 'GND', 460, 150)
 
 gravar('esp08-reflexo', r'''
-// Jogo de reflexo, num ESP-08.
+// Reflex game, on an ESP-08.
 //
-// O LED vermelho acende: prepare-se. Depois de um tempo sorteado, o verde
-// acende -- aperte o botao o mais rapido que conseguir. O monitor serial
-// mostra o seu tempo e o recorde. Apertou antes da hora? Queimou a
-// largada, e o buzzer reclama.
+// The red LED lights: get ready. After a random time, the green one
+// lights -- press the button as fast as you can. The serial monitor shows
+// your time and the record. Pressed too early? False start, and the buzzer
+// complains.
 
-const int PREPARA = 12;
-const int VAI = 14;
-const int BOTAO = 13;
-const int BUZZER = 16;   // o ESP-08 nao traz o GPIO4 nem o GPIO5
+const int READY = 12;
+const int GO = 14;
+const int BUTTON = 13;
+const int BUZZER = 16;   // the ESP-08 does not break out GPIO4 or GPIO5
 
-unsigned long recorde = 0;
+unsigned long record = 0;
 
-bool apertado() {
-  return digitalRead(BOTAO) == LOW;
+bool pressed() {
+  return digitalRead(BUTTON) == LOW;
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(PREPARA, OUTPUT);
-  pinMode(VAI, OUTPUT);
-  pinMode(BOTAO, INPUT_PULLUP);
-  Serial.println("Reflexo: aperte o botao quando o LED verde acender");
+  pinMode(READY, OUTPUT);
+  pinMode(GO, OUTPUT);
+  pinMode(BUTTON, INPUT_PULLUP);
+  Serial.println("Reflex: press the button when the green LED lights");
 }
 
 void loop() {
-  digitalWrite(PREPARA, HIGH);
+  digitalWrite(READY, HIGH);
   randomSeed(micros());
-  unsigned long espera = random(1500, 4000);
-  unsigned long inicio = millis();
+  unsigned long wait = random(1500, 4000);
+  unsigned long start = millis();
 
-  // A espera sorteada -- vigiando quem aperta antes.
-  while (millis() - inicio < espera) {
-    if (apertado()) {
-      digitalWrite(PREPARA, LOW);
-      Serial.println("Queimou a largada! Espere o verde.");
+  // The random wait -- watching for anyone pressing early.
+  while (millis() - start < wait) {
+    if (pressed()) {
+      digitalWrite(READY, LOW);
+      Serial.println("False start! Wait for the green.");
       tone(BUZZER, 150, 600);
-      while (apertado()) delay(5);
+      while (pressed()) delay(5);
       delay(1500);
       return;
     }
     delay(2);
   }
 
-  digitalWrite(PREPARA, LOW);
-  digitalWrite(VAI, HIGH);
-  unsigned long acendeu = millis();
-  while (!apertado()) delay(1);
-  unsigned long tempo = millis() - acendeu;
-  digitalWrite(VAI, LOW);
+  digitalWrite(READY, LOW);
+  digitalWrite(GO, HIGH);
+  unsigned long litAt = millis();
+  while (!pressed()) delay(1);
+  unsigned long elapsed = millis() - litAt;
+  digitalWrite(GO, LOW);
 
-  Serial.print("Seu tempo: ");
-  Serial.print(tempo);
+  Serial.print("Your time: ");
+  Serial.print(elapsed);
   Serial.print(" ms");
-  if (recorde == 0 || tempo < recorde) {
-    recorde = tempo;
-    Serial.print("  <- recorde!");
+  if (record == 0 || elapsed < record) {
+    record = elapsed;
+    Serial.print("  <- record!");
     tone(BUZZER, 1319, 150);
   }
   Serial.println();
 
-  while (apertado()) delay(5);   // espera soltar
+  while (pressed()) delay(5);   // wait for release
   delay(1500);
 }
 ''', c, '''
-Jogo de reflexo, num ESP-08.
+Reflex game, on an ESP-08.
 
-O que esta demo mostra:
-- tempo medido com millis() com precisao de milissegundo;
-- espera sorteada com random() e a vigia de quem aperta antes da hora.
+What this demo shows:
+- time measured with millis() to the millisecond;
+- a random wait with random() and the watch for early presses.
 
-Aperte F5 e o botao assim que o LED verde acender.
+Press F5, then the button as soon as the green LED lights.
 ''')
 demo('esp08-reflexo', 'Jogo de reflexo', 'ESP-08')
 
@@ -1424,72 +1441,72 @@ c.botao('botao', 'GPIO2', 'GND', 320, 300)
 c.buzzer('buzzer', 'GPIO15', 'GND', 470, 290)
 
 gravar('esp09-dado', r'''
-// Dado eletronico, num ESP-09.
+// Electronic die, on an ESP-09.
 //
-// Aperte o botao: o dado "rola" (os pontos mudam cada vez mais devagar e o
-// buzzer faz o tec-tec) e para num numero de 1 a 6, desenhado como no
-// dado de verdade.
+// Press the button: the die "rolls" (the dots change slower and slower and
+// the buzzer goes tick-tick) and stops on a number from 1 to 6, drawn like
+// on a real die.
 //
-// Sao sete LEDs e so quatro pinos: os pontos que acendem sempre juntos
-// dividem o pino. No 6, por exemplo, as duas colunas acendem inteiras.
+// That is seven LEDs and only four pins: the dots that always light
+// together share a pin. On 6, for example, both columns light up whole.
 //
-// O ESP-09 so traz seis GPIO para fora (0, 2, 12, 13, 14 e 15), e tres
-// deles mandam na partida: o GPIO0 e o GPIO2 tem que estar em HIGH, o
-// GPIO15 em LOW. Por isso o ponto do centro vai entre o 3,3 V e o GPIO0
-// (acende com LOW), o botao fica no GPIO2 e o buzzer no GPIO15.
+// The ESP-09 only breaks out six GPIO (0, 2, 12, 13, 14 and 15), and three
+// of them control boot: GPIO0 and GPIO2 must be HIGH, GPIO15 LOW. That is
+// why the center dot goes between 3.3 V and GPIO0 (it lights with LOW),
+// the button sits on GPIO2 and the buzzer on GPIO15.
 
-const int CENTRO = 0;       // o do meio, acende com LOW
-const int DIAGONAL1 = 14;   // canto de cima a esquerda e de baixo a direita
-const int DIAGONAL2 = 12;   // os outros dois cantos
-const int MEIO = 13;        // meio da esquerda e meio da direita
-const int BOTAO = 2;
+const int CENTER = 0;       // the middle one, lights with LOW
+const int DIAGONAL1 = 14;   // top-left and bottom-right corners
+const int DIAGONAL2 = 12;   // the other two corners
+const int MIDDLE = 13;      // middle-left and middle-right
+const int BUTTON = 2;
 const int BUZZER = 15;
 
-void mostrar(int n) {
-  digitalWrite(CENTRO, (n == 1 || n == 3 || n == 5) ? LOW : HIGH);
+void show(int n) {
+  digitalWrite(CENTER, (n == 1 || n == 3 || n == 5) ? LOW : HIGH);
   digitalWrite(DIAGONAL1, n >= 2);
   digitalWrite(DIAGONAL2, n >= 4);
-  digitalWrite(MEIO, n == 6);
+  digitalWrite(MIDDLE, n == 6);
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(CENTRO, OUTPUT);
+  pinMode(CENTER, OUTPUT);
   pinMode(DIAGONAL1, OUTPUT);
   pinMode(DIAGONAL2, OUTPUT);
-  pinMode(MEIO, OUTPUT);
-  pinMode(BOTAO, INPUT_PULLUP);
-  mostrar(6);
-  Serial.println("Dado eletronico: aperte o botao para rolar");
+  pinMode(MIDDLE, OUTPUT);
+  pinMode(BUTTON, INPUT_PULLUP);
+  show(6);
+  Serial.println("Electronic die: press the button to roll");
 }
 
 void loop() {
-  if (digitalRead(BOTAO) == LOW) {
+  if (digitalRead(BUTTON) == LOW) {
     randomSeed(micros());
-    // Rola desacelerando, como um dado de verdade parando.
-    for (int espera = 30; espera < 250; espera += 20) {
-      mostrar(random(1, 7));
+    // Rolls slowing down, like a real die coming to rest.
+    for (int wait = 30; wait < 250; wait += 20) {
+      show(random(1, 7));
       tone(BUZZER, 1800, 8);
-      delay(espera);
+      delay(wait);
     }
-    int resultado = random(1, 7);
-    mostrar(resultado);
+    int result = random(1, 7);
+    show(result);
     tone(BUZZER, 988, 120);
-    Serial.print("Saiu ");
-    Serial.println(resultado);
-    while (digitalRead(BOTAO) == LOW) delay(10);
+    Serial.print("Rolled ");
+    Serial.println(result);
+    while (digitalRead(BUTTON) == LOW) delay(10);
   }
   delay(20);
 }
 ''', c, '''
-Dado eletronico, num ESP-09.
+Electronic die, on an ESP-09.
 
-O que esta demo mostra:
-- sete LEDs em quatro pinos: os pontos que acendem juntos ficam em
-  paralelo, cada um com o seu resistor;
-- random(1, 7) com semente nova a cada jogada.
+What this demo shows:
+- seven LEDs on four pins: the dots that light together are in parallel,
+  each with its own resistor;
+- random(1, 7) with a new seed on every roll.
 
-Aperte F5 e o botao para rolar o dado.
+Press F5, then the button to roll the die.
 ''')
 demo('esp09-dado', 'Dado eletrônico', 'ESP-09')
 
@@ -1501,82 +1518,83 @@ demo('esp09-dado', 'Dado eletrônico', 'ESP-09')
 c = Circuito('placa', 'esp-10', 120, 120)
 
 gravar('esp10-ponte-serial-web', r'''
-// Ponte entre a serial e a web, num ESP-10.
+// Bridge between the serial port and the web, on an ESP-10.
 //
-// O ESP-10 e um modulo de cinco pinos: so a serial sai dele. O uso de
-// verdade e esse -- um "modem" de WiFi para outra placa. Aqui:
-//   - o que chega pela serial (digite no monitor) aparece na pagina;
-//   - o que se escreve na pagina sai pela serial.
+// The ESP-10 is a five-pin module: only the serial port comes out of it.
+// That is its real use -- a WiFi "modem" for another board. Here:
+//   - what arrives over serial (type in the monitor) shows up on the page;
+//   - what is written on the page goes out over serial.
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 
-ESP8266WebServer servidor(80);
+ESP8266WebServer server(80);
 
-String recebidas[5];     // as ultimas cinco linhas da serial
-int quantas = 0;
+String received[5];     // the last five serial lines
+int count = 0;
 
-void guardar(String linha) {
-  if (quantas < 5) {
-    recebidas[quantas] = linha;
-    quantas++;
+void store(String line) {
+  if (count < 5) {
+    received[count] = line;
+    count++;
   } else {
-    for (int i = 0; i < 4; i++) recebidas[i] = recebidas[i + 1];
-    recebidas[4] = linha;
+    for (int i = 0; i < 4; i++) received[i] = received[i + 1];
+    received[4] = line;
   }
 }
 
-void pagina() {
-  // O formulario manda o texto em /?msg=...
-  if (servidor.hasArg("msg") && servidor.arg("msg").length() > 0) {
-    Serial.println("[web] " + servidor.arg("msg"));
+void page() {
+  // The form sends the text in /?msg=...
+  if (server.hasArg("msg") && server.arg("msg").length() > 0) {
+    Serial.println("[web] " + server.arg("msg"));
   }
 
   String html = "<!DOCTYPE html><html><head><meta charset='utf-8'>";
-  html += "<title>Ponte serial</title></head><body style='font-family:sans-serif'>";
-  html += "<h2>Ponte serial e web (ESP-10)</h2>";
-  html += "<h3>Chegou pela serial:</h3><ul>";
-  for (int i = 0; i < quantas; i++) html += "<li>" + recebidas[i] + "</li>";
-  if (quantas == 0) html += "<li><i>nada ainda: digite no monitor serial</i></li>";
-  html += "</ul><form action='/'><input name='msg' placeholder='mandar pela serial'> ";
-  html += "<button>Enviar</button></form><p><a href='/'>atualizar</a></p></body></html>";
-  servidor.send(200, "text/html", html);
+  html += "<title>Serial bridge</title></head><body style='font-family:sans-serif'>";
+  html += "<h2>Serial and web bridge (ESP-10)</h2>";
+  html += "<h3>Arrived over serial:</h3><ul>";
+  for (int i = 0; i < count; i++) html += "<li>" + received[i] + "</li>";
+  if (count == 0) html += "<li><i>nothing yet: type in the serial monitor</i></li>";
+  html += "</ul><form action='/'><input name='msg' placeholder='send over serial'> ";
+  html += "<button>Send</button></form><p><a href='/'>refresh</a></p></body></html>";
+  server.send(200, "text/html", html);
 }
 
 void setup() {
   Serial.begin(115200);
   WiFi.begin("Wokwi-GUEST", "");
   while (WiFi.status() != WL_CONNECTED) delay(250);
-  Serial.print("pagina em http://");
+  Serial.print("page at http://");
   Serial.println(WiFi.localIP());
 
-  servidor.on("/", pagina);
-  servidor.begin();
+  server.on("/", page);
+  server.begin();
 }
 
 void loop() {
-  servidor.handleClient();
+  server.handleClient();
 
   if (Serial.available()) {
-    String linha = Serial.readStringUntil('\n');
-    linha.trim();
-    if (linha.length() > 0) {
-      guardar(linha);
-      Serial.println("ok, esta na pagina: " + linha);
+    String line = Serial.readStringUntil('\n');
+    line.trim();
+    if (line.length() > 0) {
+      store(line);
+      Serial.println("ok, it is on the page: " + line);
     }
   }
   delay(5);
 }
 ''', c, '''
-Ponte entre a serial e uma pagina web, num ESP-10.
+Bridge between the serial port and a web page, on an ESP-10.
 
-O que esta demo mostra:
-- um modulo de cinco pinos fazendo o que ele faz de verdade: levar a
-  serial de outra placa para a rede;
-- formulario HTML com hasArg() e arg(), e um vetor de String como fila.
+What this demo shows:
+- a five-pin module doing what it really does: carrying another board's
+  serial port to the network;
+- an HTML form with hasArg() and arg(), and an array of String as a
+  queue.
 
-Aperte F5, digite algo no monitor serial e abra a pagina (endereco no
-painel REDE). O que se escreve na pagina volta pela serial.
+Press F5, type something in the serial monitor and open the page (address
+in the NETWORK panel). What you write on the page comes back over serial.
 ''')
 demo('esp10-ponte-serial-web', 'Ponte entre a serial e uma página web', 'ESP-10')
 
@@ -1590,76 +1608,78 @@ c.led_ativo_baixo('luz', 'RXD', 'VCC', 'branco', 330, 50, BRANCO)
 c.botao('botao', 'GPIO0', 'GND', 300, 170)
 
 gravar('esp11-minuteria', r'''
-// Minuteria de escada, num ESP-11.
+// Stairway timer switch, on an ESP-11.
 //
-// Um toque no botao acende a luz por 10 s -- e ela da uma piscada antes de
-// apagar, avisando quem ainda esta na escada. Segurar o botao por 2 s
-// deixa a luz fixa (modo faxina); outro toque volta ao normal.
+// A tap on the button turns the light on for 10 s -- and it blinks once
+// before going off, warning whoever is still on the stairs. Holding the
+// button for 2 s keeps the light on (cleaning mode); another tap goes back
+// to normal.
 //
-// O ESP-11 so traz para fora o GPIO0 e os pinos da serial (o TX e o
-// GPIO1, o RX e o GPIO3). A lampada (o LED) vai no RX, entre o 3,3 V e
-// o pino, e acende com LOW -- e o sketch nao abre a Serial, que tomaria
-// o pino de volta.
+// The ESP-11 only breaks out GPIO0 and the serial pins (TX is GPIO1, RX is
+// GPIO3). The lamp (the LED) goes on RX, between 3.3 V and the pin, and
+// lights with LOW -- and the sketch does not open Serial, which would take
+// the pin back.
 
-const int BOTAO = 0;   // GPIO0
-const int LUZ = 3;     // RXD (GPIO3), acende com LOW
+const int BUTTON = 0;   // GPIO0
+const int LIGHT = 3;    // RXD (GPIO3), lights with LOW
 
-const unsigned long TEMPO_ACESA = 10000;
-const unsigned long TOQUE_LONGO = 2000;
+const unsigned long ON_TIME = 10000;
+const unsigned long LONG_PRESS = 2000;
 
-bool fixa = false;
-bool acesa = false;
-unsigned long acendeuEm = 0;
+bool locked = false;
+bool lit = false;
+unsigned long litAt = 0;
 
-void luz(bool ligar) {
-  acesa = ligar;
-  digitalWrite(LUZ, ligar ? LOW : HIGH);
+void light(bool on) {
+  lit = on;
+  digitalWrite(LIGHT, on ? LOW : HIGH);
 }
 
 void setup() {
-  pinMode(BOTAO, INPUT_PULLUP);
-  pinMode(LUZ, OUTPUT);
-  luz(false);
+  pinMode(BUTTON, INPUT_PULLUP);
+  pinMode(LIGHT, OUTPUT);
+  light(false);
 }
 
 void loop() {
-  if (digitalRead(BOTAO) == LOW) {
-    unsigned long apertou = millis();
-    while (digitalRead(BOTAO) == LOW && millis() - apertou < TOQUE_LONGO) delay(10);
+  if (digitalRead(BUTTON) == LOW) {
+    unsigned long pressedAt = millis();
+    while (digitalRead(BUTTON) == LOW && millis() - pressedAt < LONG_PRESS) delay(10);
 
-    if (millis() - apertou >= TOQUE_LONGO) {
-      fixa = true;
-      luz(true);
-      while (digitalRead(BOTAO) == LOW) delay(10);   // espera soltar
-    } else if (fixa) {
-      fixa = false;
-      luz(false);
+    if (millis() - pressedAt >= LONG_PRESS) {
+      locked = true;
+      light(true);
+      while (digitalRead(BUTTON) == LOW) delay(10);   // wait for release
+    } else if (locked) {
+      locked = false;
+      light(false);
     } else {
-      luz(true);
-      acendeuEm = millis();
+      light(true);
+      litAt = millis();
     }
   }
 
-  if (acesa && !fixa) {
-    unsigned long passou = millis() - acendeuEm;
-    if (passou > TEMPO_ACESA) {
-      luz(false);
-    } else if (passou > TEMPO_ACESA - 1000 && passou < TEMPO_ACESA - 700) {
-      digitalWrite(LUZ, HIGH);   // a piscada de aviso
+  if (lit && !locked) {
+    unsigned long elapsed = millis() - litAt;
+    if (elapsed > ON_TIME) {
+      light(false);
+    } else if (elapsed > ON_TIME - 1000 && elapsed < ON_TIME - 700) {
+      digitalWrite(LIGHT, HIGH);   // the warning blink
     } else {
-      digitalWrite(LUZ, LOW);
+      digitalWrite(LIGHT, LOW);
     }
   }
   delay(20);
 }
 ''', c, '''
-Minuteria de escada, num ESP-11.
+Stairway timer switch, on an ESP-11.
 
-O que esta demo mostra:
-- toque curto e toque longo no mesmo botao, medidos com millis();
-- um temporizador que nao trava o loop, com aviso antes de apagar.
+What this demo shows:
+- short press and long press on the same button, measured with millis();
+- a timer that does not block the loop, with a warning before going off.
 
-Aperte F5 e o botao (clique rapido: 10 s de luz; segure 2 s: luz fixa).
+Press F5, then the button (quick click: 10 s of light; hold 2 s: light
+stays on).
 ''')
 demo('esp11-minuteria', 'Minuteria de escada', 'ESP-11')
 
@@ -1682,16 +1702,16 @@ c.ligar('oled', 'SCL', 'placa', 'GPIO5', ROXO)
 c.botao('tara', 'GPIO13', 'GND', 480, 230)
 
 gravar('esp12-balanca', r'''
-// Balanca com HX711, num ESP-12.
+// Scale with an HX711, on an ESP-12.
 //
-// A celula de carga e o HX711 medem o peso, e o OLED mostra em gramas. O
-// botao e a TARA: ponha o prato vazio (ou um pote), aperte, e o zero passa
-// a ser ali.
+// The load cell and the HX711 measure the weight, and the OLED shows it in
+// grams. The button is the TARE: put the empty plate (or a bowl) on it,
+// press, and that becomes zero.
 //
-// O HX711 nao devolve gramas: devolve a contagem do conversor. E o
-// set_scale() -- o fator de calibracao da sua celula -- que transforma a
-// contagem em gramas. Na bancada, o fator se descobre pesando uma coisa de
-// peso conhecido.
+// The HX711 does not return grams: it returns the converter's count. It is
+// set_scale() -- your cell's calibration factor -- that turns the count
+// into grams. On the bench, you find the factor by weighing something of
+// known weight.
 
 #include <HX711.h>
 #include <Wire.h>
@@ -1700,63 +1720,64 @@ gravar('esp12-balanca', r'''
 
 const int DT = 12;
 const int SCK_HX = 14;
-const int TARA = 13;
+const int TARE = 13;
 
-// A celula de 5 kg da peca da ~420 contagens por grama.
-const float CALIBRACAO = 420.0;
+// The part's 5 kg cell gives ~420 counts per gram.
+const float CALIBRATION = 420.0;
 
-HX711 balanca;
-Adafruit_SSD1306 tela(128, 64, &Wire, -1);
+HX711 scale;
+Adafruit_SSD1306 display(128, 64, &Wire, -1);
 
 void setup() {
   Serial.begin(115200);
-  pinMode(TARA, INPUT_PULLUP);
+  pinMode(TARE, INPUT_PULLUP);
 
-  balanca.begin(DT, SCK_HX);
-  balanca.set_scale(CALIBRACAO);
-  balanca.tare();                 // o prato vazio e o zero
+  scale.begin(DT, SCK_HX);
+  scale.set_scale(CALIBRATION);
+  scale.tare();                   // the empty plate is zero
 
-  Wire.begin();                   // SDA no GPIO4, SCL no GPIO5
-  tela.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-  tela.setTextColor(SSD1306_WHITE);
+  Wire.begin();                   // SDA on GPIO4, SCL on GPIO5
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  display.setTextColor(SSD1306_WHITE);
 }
 
 void loop() {
-  if (digitalRead(TARA) == LOW) {
-    balanca.tare();
-    Serial.println("tara feita");
-    while (digitalRead(TARA) == LOW) delay(10);
+  if (digitalRead(TARE) == LOW) {
+    scale.tare();
+    Serial.println("tare done");
+    while (digitalRead(TARE) == LOW) delay(10);
   }
 
-  float gramas = balanca.get_units(5);
-  if (gramas > -1 && gramas < 1) gramas = 0;   // sem o tremido do zero
+  float grams = scale.get_units(5);
+  if (grams > -1 && grams < 1) grams = 0;   // no jitter around zero
 
-  tela.clearDisplay();
-  tela.setTextSize(1);
-  tela.setCursor(0, 0);
-  tela.print("Balanca - ESP-12");
-  tela.setTextSize(2);
-  tela.setCursor(0, 24);
-  tela.print(gramas, 0);
-  tela.print(" g");
-  tela.setTextSize(1);
-  tela.setCursor(0, 56);
-  tela.print("botao: tara");
-  tela.display();
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.print("Scale - ESP-12");
+  display.setTextSize(2);
+  display.setCursor(0, 24);
+  display.print(grams, 0);
+  display.print(" g");
+  display.setTextSize(1);
+  display.setCursor(0, 56);
+  display.print("button: tare");
+  display.display();
 
-  Serial.print(gramas, 0);
+  Serial.print(grams, 0);
   Serial.println(" g");
   delay(300);
 }
 ''', c, '''
-Balanca com HX711 e OLED, num ESP-12.
+Scale with an HX711 and an OLED, on an ESP-12.
 
-O que esta demo mostra:
-- a celula de carga do jeito da biblioteca: contagem crua, tara (o zero)
-  e calibracao (set_scale) para virar gramas;
-- o OLED no I2C de fabrica do ESP8266 (GPIO4 e GPIO5).
+What this demo shows:
+- the load cell the library's way: raw count, tare (zero) and calibration
+  (set_scale) to get grams;
+- the OLED on the ESP8266's default I2C (GPIO4 and GPIO5).
 
-Aperte F5 e clique no HX711 para por peso. O botao faz a tara.
+Press F5 and click the HX711 to put weight on it. The button does the
+tare.
 ''')
 demo('esp12-balanca', 'Balança com HX711 e OLED', 'ESP-12')
 
@@ -1779,71 +1800,71 @@ c.ligar('r_b', '2', 'rgb', 'B', AZUL)
 c.ligar('rgb', 'COM', 'placa', 'GND', PRETO)
 
 gravar('esp12e-rgb-navegador', r'''
-// Cor do LED RGB pelo navegador, num ESP-12E.
+// RGB LED color from the browser, on an ESP-12E.
 //
-// A pagina tem um seletor de cor: escolha e clique em Aplicar. A placa
-// recebe "#rrggbb", separa o vermelho, o verde e o azul e manda cada um
-// para o seu pino com PWM.
+// The page has a color picker: choose one and click Apply. The board gets
+// "#rrggbb", splits out the red, green and blue and sends each one to its
+// pin with PWM.
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 
-const int PINO_R = 14;
-const int PINO_G = 12;
-const int PINO_B = 13;
+const int PIN_R = 14;
+const int PIN_G = 12;
+const int PIN_B = 13;
 
-ESP8266WebServer servidor(80);
-String corAtual = "#000000";
+ESP8266WebServer server(80);
+String currentColor = "#000000";
 
-void aplicarCor(String hex) {
-  long valor = strtol(hex.substring(1).c_str(), NULL, 16);
-  int r = (valor >> 16) & 0xFF;
-  int g = (valor >> 8) & 0xFF;
-  int b = valor & 0xFF;
-  analogWrite(PINO_R, r);
-  analogWrite(PINO_G, g);
-  analogWrite(PINO_B, b);
-  corAtual = hex;
-  Serial.printf("cor %s -> R=%d G=%d B=%d\n", hex.c_str(), r, g, b);
+void applyColor(String hex) {
+  long value = strtol(hex.substring(1).c_str(), NULL, 16);
+  int r = (value >> 16) & 0xFF;
+  int g = (value >> 8) & 0xFF;
+  int b = value & 0xFF;
+  analogWrite(PIN_R, r);
+  analogWrite(PIN_G, g);
+  analogWrite(PIN_B, b);
+  currentColor = hex;
+  Serial.printf("color %s -> R=%d G=%d B=%d\n", hex.c_str(), r, g, b);
 }
 
-void pagina() {
-  if (servidor.hasArg("cor")) aplicarCor(servidor.arg("cor"));
+void page() {
+  if (server.hasArg("color")) applyColor(server.arg("color"));
 
   String html = "<!DOCTYPE html><html><head><meta charset='utf-8'>";
-  html += "<title>LED RGB</title></head><body style='font-family:sans-serif'>";
-  html += "<h2>LED RGB pelo navegador</h2>";
-  html += "<form action='/'><input type='color' name='cor' value='" + corAtual + "'> ";
-  html += "<button>Aplicar</button></form>";
-  html += "<p>Cor atual: " + corAtual + "</p></body></html>";
-  servidor.send(200, "text/html", html);
+  html += "<title>RGB LED</title></head><body style='font-family:sans-serif'>";
+  html += "<h2>RGB LED from the browser</h2>";
+  html += "<form action='/'><input type='color' name='color' value='" + currentColor + "'> ";
+  html += "<button>Apply</button></form>";
+  html += "<p>Current color: " + currentColor + "</p></body></html>";
+  server.send(200, "text/html", html);
 }
 
 void setup() {
   Serial.begin(115200);
-  analogWriteRange(255);    // o PWM de 0 a 255, como no Arduino
+  analogWriteRange(255);    // PWM from 0 to 255, like on the Arduino
   WiFi.begin("Wokwi-GUEST", "");
   while (WiFi.status() != WL_CONNECTED) delay(250);
-  Serial.print("abra http://");
+  Serial.print("open http://");
   Serial.println(WiFi.localIP());
 
-  servidor.on("/", pagina);
-  servidor.begin();
-  aplicarCor("#ff6a00");    // comeca laranja
+  server.on("/", page);
+  server.begin();
+  applyColor("#ff6a00");    // starts orange
 }
 
 void loop() {
-  servidor.handleClient();
+  server.handleClient();
   delay(2);
 }
 ''', c, '''
-Cor do LED RGB pelo navegador, num ESP-12E.
+RGB LED color from the browser, on an ESP-12E.
 
-O que esta demo mostra:
-- um seletor de cor HTML mandando "#rrggbb" para a placa;
-- strtol() e deslocamento de bits separando o vermelho, o verde e o azul.
+What this demo shows:
+- an HTML color picker sending "#rrggbb" to the board;
+- strtol() and bit shifts splitting out the red, green and blue.
 
-Aperte F5, abra o endereco do painel REDE e escolha uma cor.
+Press F5, open the address in the NETWORK panel and pick a color.
 ''')
 demo('esp12e-rgb-navegador', 'Cor do LED RGB pelo navegador', 'ESP-12E')
 
@@ -1853,89 +1874,93 @@ demo('esp12e-rgb-navegador', 'Cor do LED RGB pelo navegador', 'ESP-12E')
 # =====================================================================
 
 c = Circuito('placa', 'esp-12f', 80, 100)
+c.pecas[0]['Usb'] = True
 c.peca('matriz', 'neopixel-matrix', 320, 20)
+# os 64 LEDs puxam mais do que o regulador da placa: a matriz come do power bank
+c.peca('fonte', 'power-bank', 300, 330, Volts=5.0, MiliAmperes=2100, MiliAmperesHora=6500)
 c.ligar('matriz', 'GND', 'placa', 'GND', PRETO)
-c.ligar('matriz', 'VCC', 'placa', 'VCC', VERMELHO)
 c.ligar('matriz', 'DIN', 'placa', 'GPIO4', VERDE)
+c.ligar('matriz', 'VCC', 'fonte', '+', VERMELHO)
+c.ligar('fonte', '-', 'placa', 'GND', PRETO)
 
 gravar('esp12f-luminaria-mqtt', r'''
-// Luminaria NeoPixel pelo MQTT, num ESP-12F.
+// NeoPixel lamp over MQTT, on an ESP-12F.
 //
-// Tres topicos mandam na luminaria:
-//   casa/luminaria/cor      "#ff8800", ou vermelho, verde, azul, branco
-//   casa/luminaria/brilho   0 a 255
-//   casa/luminaria/efeito   fixo, arco-iris ou pulsar
-// e ela responde o estado em casa/luminaria/estado.
+// Three topics control the lamp:
+//   home/lamp/color        "#ff8800", or red, green, blue, white
+//   home/lamp/brightness   0 to 255
+//   home/lamp/effect       solid, rainbow or pulse
+// and it reports its state on home/lamp/state.
 //
-// Na bancada: 64 LEDs puxam ate 3,8 A no branco. Alimente a matriz com uma
-// fonte de 5 V propria, com o GND junto ao do modulo.
+// On the bench: 64 LEDs draw up to 3.8 A on white. Power the matrix from
+// its own 5 V supply, with its GND tied to the module's.
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <Adafruit_NeoPixel.h>
 
-const int PINO_MATRIZ = 4;
-const int QUANTOS = 64;
+const int MATRIX_PIN = 4;
+const int COUNT = 64;
 
-Adafruit_NeoPixel matriz(QUANTOS, PINO_MATRIZ, NEO_GRB + NEO_KHZ800);
-WiFiClient rede;
-PubSubClient mqtt(rede);
+Adafruit_NeoPixel matrix(COUNT, MATRIX_PIN, NEO_GRB + NEO_KHZ800);
+WiFiClient net;
+PubSubClient mqtt(net);
 
-uint32_t cor = 0xFF8800;
-String efeito = "fixo";
-long matiz = 0;
-int passo = 0;
+uint32_t color = 0xFF8800;
+String effect = "solid";
+long hue = 0;
+int step = 0;
 
-String hex6(uint32_t valor) {
-  String texto = String(valor, HEX);
-  while (texto.length() < 6) texto = "0" + texto;
-  texto.toUpperCase();
-  return texto;
+String hex6(uint32_t value) {
+  String text = String(value, HEX);
+  while (text.length() < 6) text = "0" + text;
+  text.toUpperCase();
+  return text;
 }
 
-uint32_t corPeloNome(String nome) {
-  if (nome == "vermelho") return 0xFF0000;
-  if (nome == "verde") return 0x00FF00;
-  if (nome == "azul") return 0x0000FF;
-  if (nome == "branco") return 0xFFFFFF;
-  if (nome.startsWith("#")) return strtol(nome.substring(1).c_str(), NULL, 16);
-  return cor;
+uint32_t colorByName(String name) {
+  if (name == "red") return 0xFF0000;
+  if (name == "green") return 0x00FF00;
+  if (name == "blue") return 0x0000FF;
+  if (name == "white") return 0xFFFFFF;
+  if (name.startsWith("#")) return strtol(name.substring(1).c_str(), NULL, 16);
+  return color;
 }
 
-void publicarEstado() {
-  String estado = "cor=#" + hex6(cor) + " brilho=" + String(matriz.getBrightness())
-                + " efeito=" + efeito;
-  mqtt.publish("casa/luminaria/estado", estado.c_str(), true);
-  Serial.println(estado);
+void publishState() {
+  String state = "color=#" + hex6(color) + " brightness=" + String(matrix.getBrightness())
+               + " effect=" + effect;
+  mqtt.publish("home/lamp/state", state.c_str(), true);
+  Serial.println(state);
 }
 
-void chegou(char* topico, byte* dados, unsigned int tamanho) {
-  String valor;
-  for (unsigned int i = 0; i < tamanho; i++) valor += (char)dados[i];
-  valor.trim();
-  String qual = String(topico);
+void received(char* topic, byte* payload, unsigned int length) {
+  String value;
+  for (unsigned int i = 0; i < length; i++) value += (char)payload[i];
+  value.trim();
+  String which = String(topic);
 
-  if (qual == "casa/luminaria/cor") cor = corPeloNome(valor);
-  else if (qual == "casa/luminaria/brilho") matriz.setBrightness(constrain(valor.toInt(), 0, 255));
-  else if (qual == "casa/luminaria/efeito") efeito = valor;
-  publicarEstado();
+  if (which == "home/lamp/color") color = colorByName(value);
+  else if (which == "home/lamp/brightness") matrix.setBrightness(constrain(value.toInt(), 0, 255));
+  else if (which == "home/lamp/effect") effect = value;
+  publishState();
 }
 
-void conectar() {
-  // ID unico no broker: o MAC da placa.
-  String id = "luminaria-" + WiFi.macAddress();
+void reconnect() {
+  // Unique ID on the broker: the board's MAC.
+  String id = "lamp-" + WiFi.macAddress();
   id.replace(":", "");
 
   while (!mqtt.connected()) {
     Serial.print("broker... ");
     if (mqtt.connect(id.c_str())) {
       Serial.println("ok");
-      mqtt.subscribe("casa/luminaria/cor");
-      mqtt.subscribe("casa/luminaria/brilho");
-      mqtt.subscribe("casa/luminaria/efeito");
-      publicarEstado();
+      mqtt.subscribe("home/lamp/color");
+      mqtt.subscribe("home/lamp/brightness");
+      mqtt.subscribe("home/lamp/effect");
+      publishState();
     } else {
-      Serial.println("falhou, tento de novo em 2 s");
+      Serial.println("failed, trying again in 2 s");
       delay(2000);
     }
   }
@@ -1943,45 +1968,45 @@ void conectar() {
 
 void setup() {
   Serial.begin(115200);
-  matriz.begin();
-  matriz.setBrightness(60);
+  matrix.begin();
+  matrix.setBrightness(60);
 
   WiFi.begin("Wokwi-GUEST", "");
   while (WiFi.status() != WL_CONNECTED) delay(250);
   mqtt.setServer("broker.hivemq.com", 1883);
-  mqtt.setCallback(chegou);
+  mqtt.setCallback(received);
 }
 
 void loop() {
-  if (!mqtt.connected()) conectar();
+  if (!mqtt.connected()) reconnect();
   mqtt.loop();
 
-  if (efeito == "arco-iris") {
-    for (int i = 0; i < QUANTOS; i++)
-      matriz.setPixelColor(i, matriz.gamma32(matriz.ColorHSV(matiz + i * 1024)));
-    matiz += 256;
-  } else if (efeito == "pulsar") {
-    int nivel = matriz.sine8(passo);
-    int r = ((cor >> 16) & 0xFF) * nivel / 255;
-    int g = ((cor >> 8) & 0xFF) * nivel / 255;
-    int b = (cor & 0xFF) * nivel / 255;
-    matriz.fill(matriz.Color(r, g, b));
-    passo += 4;
+  if (effect == "rainbow") {
+    for (int i = 0; i < COUNT; i++)
+      matrix.setPixelColor(i, matrix.gamma32(matrix.ColorHSV(hue + i * 1024)));
+    hue += 256;
+  } else if (effect == "pulse") {
+    int level = matrix.sine8(step);
+    int r = ((color >> 16) & 0xFF) * level / 255;
+    int g = ((color >> 8) & 0xFF) * level / 255;
+    int b = (color & 0xFF) * level / 255;
+    matrix.fill(matrix.Color(r, g, b));
+    step += 4;
   } else {
-    matriz.fill(cor);
+    matrix.fill(color);
   }
-  matriz.show();
+  matrix.show();
   delay(30);
 }
 ''', c, '''
-Luminaria NeoPixel por MQTT, num ESP-12F.
+NeoPixel lamp over MQTT, on an ESP-12F.
 
-O que esta demo mostra:
-- tres topicos MQTT (cor, brilho e efeito) comandando uma matriz 8x8;
-- o estado publicado como mensagem retida, para quem chegar depois.
+What this demo shows:
+- three MQTT topics (color, brightness and effect) driving an 8x8 matrix;
+- the state published as a retained message, for whoever arrives later.
 
-Aperte F5 e, no painel REDE, publique "arco-iris" em casa/luminaria/efeito
-ou "azul" em casa/luminaria/cor.
+Press F5 and, in the NETWORK panel, publish "rainbow" to home/lamp/effect
+or "blue" to home/lamp/color.
 ''')
 demo('esp12f-luminaria-mqtt', 'Luminária NeoPixel por MQTT', 'ESP-12F')
 
@@ -2000,103 +2025,103 @@ c.led('aberta', 'GPIO16', 'GND', 'verde', 170, 260, VERDE)
 c.buzzer('buzzer', 'GPIO15', 'GND', 60, 260)
 
 gravar('esp13-fechadura', r'''
-// Fechadura com senha, num ESP-13.
+// Keypad lock with a code, on an ESP-13.
 //
-// Digite a senha no teclado e aperte # para confirmar (* apaga). Certa, a
-// fechadura abre por 5 s (LED verde) com um bipe duplo. Errada, bipe
-// grave -- e tres erros seguidos travam o teclado por 30 s.
+// Type the code on the keypad and press # to confirm (* clears). Right,
+// and the lock opens for 5 s (green LED) with a double beep. Wrong, a low
+// beep -- and three wrong tries in a row lock the keypad for 30 s.
 //
-// A senha e 1234. So as tres primeiras colunas do teclado sao usadas.
+// The code is 1234. Only the keypad's first three columns are used.
 
 #include <Keypad.h>
 
-const byte LINHAS = 4;
-const byte COLUNAS = 3;
-char teclas[LINHAS][COLUNAS] = {
+const byte ROWS = 4;
+const byte COLS = 3;
+char keys[ROWS][COLS] = {
   {'1', '2', '3'},
   {'4', '5', '6'},
   {'7', '8', '9'},
   {'*', '0', '#'},
 };
-byte pinosLinhas[LINHAS] = {14, 12, 13, 5};
-byte pinosColunas[COLUNAS] = {4, 0, 2};
+byte rowPins[ROWS] = {14, 12, 13, 5};
+byte colPins[COLS] = {4, 0, 2};
 
-Keypad teclado = Keypad(makeKeymap(teclas), pinosLinhas, pinosColunas, LINHAS, COLUNAS);
+Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
-const int ABERTA = 16;   // LED verde: fechadura aberta
+const int OPEN = 16;     // green LED: lock open
 const int BUZZER = 15;
-const String SENHA = "1234";
+const String CODE = "1234";
 
-String digitado = "";
-int erros = 0;
+String typed = "";
+int wrongTries = 0;
 
-void bipe(int nota, int ms) {
-  tone(BUZZER, nota, ms);
+void beep(int note, int ms) {
+  tone(BUZZER, note, ms);
   delay(ms + 40);
 }
 
-void conferir() {
-  if (digitado == SENHA) {
-    Serial.println("SENHA CERTA: aberta por 5 s");
-    erros = 0;
-    digitalWrite(ABERTA, HIGH);
-    bipe(1319, 100);
-    bipe(1760, 150);
+void check() {
+  if (typed == CODE) {
+    Serial.println("CODE OK: open for 5 s");
+    wrongTries = 0;
+    digitalWrite(OPEN, HIGH);
+    beep(1319, 100);
+    beep(1760, 150);
     delay(5000);
-    digitalWrite(ABERTA, LOW);
-    Serial.println("trancada de novo");
+    digitalWrite(OPEN, LOW);
+    Serial.println("locked again");
     return;
   }
 
-  erros++;
-  Serial.print("senha errada (");
-  Serial.print(erros);
-  Serial.println(" de 3)");
-  bipe(150, 500);
-  if (erros >= 3) {
-    Serial.println("teclado travado por 30 s");
+  wrongTries++;
+  Serial.print("wrong code (");
+  Serial.print(wrongTries);
+  Serial.println(" of 3)");
+  beep(150, 500);
+  if (wrongTries >= 3) {
+    Serial.println("keypad locked for 30 s");
     delay(30000);
-    erros = 0;
+    wrongTries = 0;
   }
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(ABERTA, OUTPUT);
-  Serial.println("Fechadura: digite a senha e aperte #");
+  pinMode(OPEN, OUTPUT);
+  Serial.println("Lock: type the code and press #");
 }
 
 void loop() {
-  char tecla = teclado.getKey();
-  if (!tecla) {
+  char key = keypad.getKey();
+  if (!key) {
     delay(10);
     return;
   }
 
-  bipe(2000, 30);   // o clique de cada tecla
+  beep(2000, 30);   // the click of each key
 
-  if (tecla == '*') {
-    digitado = "";
-    Serial.println("apagado");
-  } else if (tecla == '#') {
-    conferir();
-    digitado = "";
+  if (key == '*') {
+    typed = "";
+    Serial.println("cleared");
+  } else if (key == '#') {
+    check();
+    typed = "";
   } else {
-    digitado += tecla;
-    Serial.print("digitado: ");
-    for (unsigned int i = 0; i < digitado.length(); i++) Serial.print('*');
+    typed += key;
+    Serial.print("typed: ");
+    for (unsigned int i = 0; i < typed.length(); i++) Serial.print('*');
     Serial.println();
   }
 }
 ''', c, '''
-Fechadura com teclado e senha, num ESP-13.
+Keypad lock with a code, on an ESP-13.
 
-O que esta demo mostra:
-- o teclado matricial com a biblioteca Keypad (4 linhas e 3 colunas);
-- senha montada letra a letra numa String, e o bloqueio depois de tres
-  erros.
+What this demo shows:
+- the matrix keypad with the Keypad library (4 rows and 3 columns);
+- a code built key by key in a String, and the lockout after three wrong
+  tries.
 
-Aperte F5 e clique nas teclas: 1, 2, 3, 4 e #.
+Press F5 and click the keys: 1, 2, 3, 4 and #.
 ''')
 demo('esp13-fechadura', 'Fechadura com teclado e senha', 'ESP-13')
 
@@ -2106,108 +2131,113 @@ demo('esp13-fechadura', 'Fechadura com teclado e senha', 'ESP-13')
 # =====================================================================
 
 c = Circuito('placa', 'esp-14', 80, 100)
+c.pecas[0]['Usb'] = True
 c.peca('anel', 'led-ring', 320, 20)
+# o anel puxa mais do que o regulador da placa: os LEDs comem do power bank
+c.peca('fonte', 'power-bank', 300, 330, Volts=5.0, MiliAmperes=2100, MiliAmperesHora=6500)
 c.ligar('anel', 'GND', 'placa', 'GND', PRETO)
-c.ligar('anel', 'VCC', 'placa', 'VCC', VERMELHO)
 c.ligar('anel', 'DIN', 'placa', 'GPIO0', VERDE)
+c.ligar('anel', 'VCC', 'fonte', '+', VERMELHO)
+c.ligar('fonte', '-', 'placa', 'GND', PRETO)
 
 gravar('esp14-placar', r'''
-// Placar no anel de LEDs, pelo MQTT, num ESP-14.
+// Scoreboard on an LED ring, over MQTT, on an ESP-14.
 //
-// O ESP-14 junta um ESP8266 e um STM8S003 num modulo so, e quase todos os
-// pinos de fora sao do STM8: do ESP8266 so sai o GPIO0. Aqui roda so o
-// ESP8266 (e ele que o Arduino programa) -- e um pino basta, porque o anel
-// de 16 NeoPixels conversa por um fio so.
+// The ESP-14 puts an ESP8266 and an STM8S003 in one module, and almost all
+// the outside pins belong to the STM8: from the ESP8266 only GPIO0 comes
+// out. Here only the ESP8266 runs (it is the one the Arduino programs) --
+// and one pin is enough, because the ring of 16 NeoPixels talks over a
+// single wire.
 //
-// Os pontos chegam pelo MQTT:
-//   placar/ponto   "a" ou "b" (um ponto para o time)
-//   placar/zerar   qualquer coisa
-// O time A acende em vermelho a partir do topo, no sentido horario; o B em
-// azul, no anti-horario. Quem chega a 8 vence, e o anel pisca na cor dele.
+// Points arrive over MQTT:
+//   scoreboard/point   "a" or "b" (one point for that team)
+//   scoreboard/reset   anything
+// Team A lights in red from the top, clockwise; team B in blue,
+// counterclockwise. First to 8 wins, and the ring blinks in its color.
 //
-// Na bancada: o GPIO0 precisa estar em HIGH na partida, e o DIN do anel nao
-// puxa o pino para lado nenhum. A serial do ESP8266 vai para o STM8 de
-// dentro do modulo; o monitor mostra o que ela diria.
+// On the bench: GPIO0 must be HIGH at boot, and the ring's DIN does not
+// pull the pin either way. The ESP8266's serial goes to the STM8 inside the
+// module; the monitor shows what it would say.
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <Adafruit_NeoPixel.h>
 
-const int PINO_ANEL = 0;     // E_GPIO0, o unico do ESP8266 para fora
-const int QUANTOS = 16;
-const int VENCE = 8;
+const int RING_PIN = 0;      // E_GPIO0, the only ESP8266 pin outside
+const int COUNT = 16;
+const int WINS_AT = 8;
 
-Adafruit_NeoPixel anel(QUANTOS, PINO_ANEL, NEO_GRB + NEO_KHZ800);
-WiFiClient rede;
-PubSubClient mqtt(rede);
+Adafruit_NeoPixel ring(COUNT, RING_PIN, NEO_GRB + NEO_KHZ800);
+WiFiClient net;
+PubSubClient mqtt(net);
 
-int pontosA = 0;
-int pontosB = 0;
+int pointsA = 0;
+int pointsB = 0;
 
-void desenhar() {
-  anel.clear();
-  for (int i = 0; i < pontosA; i++) anel.setPixelColor(i, anel.Color(255, 0, 0));
-  for (int i = 0; i < pontosB; i++) anel.setPixelColor(QUANTOS - 1 - i, anel.Color(0, 0, 255));
-  anel.show();
+void draw() {
+  ring.clear();
+  for (int i = 0; i < pointsA; i++) ring.setPixelColor(i, ring.Color(255, 0, 0));
+  for (int i = 0; i < pointsB; i++) ring.setPixelColor(COUNT - 1 - i, ring.Color(0, 0, 255));
+  ring.show();
 }
 
-void comemorar(uint32_t cor) {
-  for (int vez = 0; vez < 4; vez++) {
-    anel.fill(cor);
-    anel.show();
+void celebrate(uint32_t color) {
+  for (int flash = 0; flash < 4; flash++) {
+    ring.fill(color);
+    ring.show();
     delay(250);
-    anel.clear();
-    anel.show();
+    ring.clear();
+    ring.show();
     delay(250);
   }
 }
 
-void publicar() {
-  String placar = String(pontosA) + " x " + String(pontosB);
-  mqtt.publish("placar/estado", placar.c_str(), true);
-  Serial.print("placar: ");
-  Serial.println(placar);
+void publishScore() {
+  String score = String(pointsA) + " x " + String(pointsB);
+  mqtt.publish("scoreboard/state", score.c_str(), true);
+  Serial.print("score: ");
+  Serial.println(score);
 }
 
-void chegou(char* topico, byte* dados, unsigned int tamanho) {
-  String valor;
-  for (unsigned int i = 0; i < tamanho; i++) valor += (char)dados[i];
-  valor.trim();
-  valor.toLowerCase();
-  bool emJogo = pontosA < VENCE && pontosB < VENCE;
+void received(char* topic, byte* payload, unsigned int length) {
+  String value;
+  for (unsigned int i = 0; i < length; i++) value += (char)payload[i];
+  value.trim();
+  value.toLowerCase();
+  bool playing = pointsA < WINS_AT && pointsB < WINS_AT;
 
-  if (String(topico) == "placar/zerar") {
-    pontosA = 0;
-    pontosB = 0;
-  } else if (valor == "a" && emJogo) {
-    pontosA++;
-  } else if (valor == "b" && emJogo) {
-    pontosB++;
+  if (String(topic) == "scoreboard/reset") {
+    pointsA = 0;
+    pointsB = 0;
+  } else if (value == "a" && playing) {
+    pointsA++;
+  } else if (value == "b" && playing) {
+    pointsB++;
   }
-  desenhar();
-  publicar();
+  draw();
+  publishScore();
 
-  if (emJogo && (pontosA == VENCE || pontosB == VENCE)) {
-    Serial.println(pontosA == VENCE ? "o time A venceu!" : "o time B venceu!");
-    comemorar(pontosA == VENCE ? anel.Color(255, 0, 0) : anel.Color(0, 0, 255));
-    desenhar();
+  if (playing && (pointsA == WINS_AT || pointsB == WINS_AT)) {
+    Serial.println(pointsA == WINS_AT ? "team A wins!" : "team B wins!");
+    celebrate(pointsA == WINS_AT ? ring.Color(255, 0, 0) : ring.Color(0, 0, 255));
+    draw();
   }
 }
 
-void conectar() {
-  // ID unico no broker: o MAC da placa.
-  String id = "placar-" + WiFi.macAddress();
+void reconnect() {
+  // Unique ID on the broker: the board's MAC.
+  String id = "scoreboard-" + WiFi.macAddress();
   id.replace(":", "");
 
   while (!mqtt.connected()) {
     Serial.print("broker... ");
     if (mqtt.connect(id.c_str())) {
       Serial.println("ok");
-      mqtt.subscribe("placar/ponto");
-      mqtt.subscribe("placar/zerar");
-      publicar();
+      mqtt.subscribe("scoreboard/point");
+      mqtt.subscribe("scoreboard/reset");
+      publishScore();
     } else {
-      Serial.println("falhou, tento de novo em 2 s");
+      Serial.println("failed, trying again in 2 s");
       delay(2000);
     }
   }
@@ -2215,31 +2245,32 @@ void conectar() {
 
 void setup() {
   Serial.begin(115200);
-  anel.begin();
-  anel.setBrightness(40);
-  desenhar();
+  ring.begin();
+  ring.setBrightness(40);
+  draw();
 
   WiFi.begin("Wokwi-GUEST", "");
   while (WiFi.status() != WL_CONNECTED) delay(250);
   mqtt.setServer("broker.hivemq.com", 1883);
-  mqtt.setCallback(chegou);
+  mqtt.setCallback(received);
 }
 
 void loop() {
-  if (!mqtt.connected()) conectar();
+  if (!mqtt.connected()) reconnect();
   mqtt.loop();
   delay(10);
 }
 ''', c, '''
-Placar no anel de LEDs, pelo MQTT, num ESP-14.
+Scoreboard on an LED ring, over MQTT, on an ESP-14.
 
-O que esta demo mostra:
-- o ESP-14 por dentro: dos pinos de fora, so o GPIO0 e do ESP8266, e um
-  pino basta para um anel de NeoPixels;
-- os pontos chegando pelo MQTT e o placar publicado como mensagem retida.
+What this demo shows:
+- the ESP-14 inside: of the outside pins, only GPIO0 belongs to the
+  ESP8266, and one pin is enough for a NeoPixel ring;
+- points arriving over MQTT and the score published as a retained
+  message.
 
-Aperte F5 e, no painel REDE, publique "a" ou "b" em placar/ponto (e
-qualquer coisa em placar/zerar para recomecar).
+Press F5 and, in the NETWORK panel, publish "a" or "b" to
+scoreboard/point (and anything to scoreboard/reset to start over).
 ''')
 demo('esp14-placar', 'Placar no anel de LEDs, pelo MQTT', 'ESP-14')
 
@@ -2254,60 +2285,60 @@ c.led('chama2', 'PB1', 'GND.1', 'laranja', 480, 20, LARANJA)
 c.botao('sopro', 'PB2', 'GND.1', 400, 160)
 
 gravar('franzininho-vela', r'''
-// Vela eletronica, na Franzininho.
+// Electronic candle, on the Franzininho.
 //
-// Dois LEDs (amarelo e laranja) tremulam como chama de vela, com brilho
-// sorteado a cada instante. O botao "sopra" a vela -- ela se apaga
-// devagar -- e acende de novo no proximo aperto.
+// Two LEDs (yellow and orange) flicker like a candle flame, with a random
+// brightness at every instant. The button "blows out" the candle -- it
+// fades away slowly -- and lights it again on the next press.
 //
-// PB0 e PB1 tem PWM: e o analogWrite que faz a chama variar.
+// PB0 and PB1 have PWM: analogWrite is what makes the flame vary.
 
-const int CHAMA_AMARELA = 0;   // PB0
-const int CHAMA_LARANJA = 1;   // PB1
-const int BOTAO = 2;           // PB2
+const int YELLOW_FLAME = 0;   // PB0
+const int ORANGE_FLAME = 1;   // PB1
+const int BUTTON = 2;         // PB2
 
-bool acesa = true;
-int botaoAntes = HIGH;
+bool lit = true;
+int lastButton = HIGH;
 
-void apagarDevagar() {
-  for (int brilho = 200; brilho >= 0; brilho -= 5) {
-    analogWrite(CHAMA_AMARELA, brilho);
-    analogWrite(CHAMA_LARANJA, brilho / 2);
+void fadeOut() {
+  for (int brightness = 200; brightness >= 0; brightness -= 5) {
+    analogWrite(YELLOW_FLAME, brightness);
+    analogWrite(ORANGE_FLAME, brightness / 2);
     delay(15);
   }
 }
 
 void setup() {
-  pinMode(CHAMA_AMARELA, OUTPUT);
-  pinMode(CHAMA_LARANJA, OUTPUT);
-  pinMode(BOTAO, INPUT_PULLUP);
+  pinMode(YELLOW_FLAME, OUTPUT);
+  pinMode(ORANGE_FLAME, OUTPUT);
+  pinMode(BUTTON, INPUT_PULLUP);
 }
 
 void loop() {
-  int botao = digitalRead(BOTAO);
-  if (botaoAntes == HIGH && botao == LOW) {
-    acesa = !acesa;
-    if (!acesa) apagarDevagar();
+  int button = digitalRead(BUTTON);
+  if (lastButton == HIGH && button == LOW) {
+    lit = !lit;
+    if (!lit) fadeOut();
   }
-  botaoAntes = botao;
+  lastButton = button;
 
-  if (acesa) {
-    // A chama: um brilho de base com um tremido sorteado por cima.
-    analogWrite(CHAMA_AMARELA, random(120, 256));
-    analogWrite(CHAMA_LARANJA, random(40, 140));
+  if (lit) {
+    // The flame: a base brightness with a random flicker on top.
+    analogWrite(YELLOW_FLAME, random(120, 256));
+    analogWrite(ORANGE_FLAME, random(40, 140));
     delay(random(30, 110));
   } else {
     delay(20);
   }
 }
 ''', c, '''
-Vela eletronica, na Franzininho.
+Electronic candle, on the Franzininho.
 
-O que esta demo mostra:
-- PWM com analogWrite nos pinos do ATtiny85 que tem PWM (PB0 e PB1);
-- random() dando vida a chama, num chip de meio KB de RAM.
+What this demo shows:
+- PWM with analogWrite on the ATtiny85 pins that have PWM (PB0 and PB1);
+- random() bringing the flame to life, on a chip with half a KB of RAM.
 
-Aperte F5 e o botao para soprar e reacender a vela.
+Press F5, then the button to blow out and relight the candle.
 ''')
 demo('franzininho-vela', 'Vela eletrônica', 'Franzininho')
 
@@ -2324,39 +2355,40 @@ c.ligar('ldr', 'AO', 'placa', 'PB3', AMARELO)
 c.led('luz', 'PB0', 'GND', 'branco', 330, 150, BRANCO)
 
 gravar('attiny85-luz-noturna', r'''
-// Luz noturna automatica, no ATtiny85.
+// Automatic night light, on the ATtiny85.
 //
-// O modulo de LDR mede a luz do ambiente. De dia o LED fica apagado; ao
-// escurecer ele acende aos poucos, e no escuro fica no maximo.
+// The LDR module measures the ambient light. During the day the LED stays
+// off; as it gets dark it slowly turns on, and in the dark it is at full
+// brightness.
 //
-// Como o modulo de verdade: MAIS luz, MENOR a leitura no AO.
+// Like the real module: MORE light, LOWER the reading on AO.
 
-const int SENSOR = A3;   // o PB3
-const int LED = 0;       // o PB0, que tem PWM
+const int SENSOR = A3;   // PB3
+const int LED = 0;       // PB0, which has PWM
 
 void setup() {
   pinMode(LED, OUTPUT);
 }
 
 void loop() {
-  int leitura = analogRead(SENSOR);   // perto de 0 com sol, perto de 1023 no escuro
+  int reading = analogRead(SENSOR);   // near 0 in sunlight, near 1023 in the dark
 
-  // Abaixo de 600 e dia: apagado. De 600 a 1000, acende aos poucos.
-  int brilho = 0;
-  if (leitura > 600) brilho = map(constrain(leitura, 600, 1000), 600, 1000, 10, 255);
+  // Below 600 it is day: off. From 600 to 1000, it slowly turns on.
+  int brightness = 0;
+  if (reading > 600) brightness = map(constrain(reading, 600, 1000), 600, 1000, 10, 255);
 
-  analogWrite(LED, brilho);
+  analogWrite(LED, brightness);
   delay(100);
 }
 ''', c, '''
-Luz noturna automatica, no ATtiny85.
+Automatic night light, on the ATtiny85.
 
-O que esta demo mostra:
-- o chip ATtiny85 sozinho, com os nomes do encapsulamento (A3 e o PB3);
-- o modulo de LDR com a fisica de verdade: mais luz, leitura menor.
+What this demo shows:
+- the bare ATtiny85 chip, with the package names (A3 is PB3);
+- the LDR module with real physics: more light, lower reading.
 
-A demo comeca a noite (3 lux) e o LED acende. Clique no modulo de LDR e
-aumente a luz para ver o LED apagar.
+The demo starts at night (3 lux) and the LED is on. Click the LDR module
+and raise the light to watch the LED turn off.
 ''')
 demo('attiny85-luz-noturna', 'Luz noturna automática', 'ATtiny85')
 
@@ -2371,51 +2403,53 @@ for i, pino in enumerate(['GP2', 'GP3', 'GP4', 'GP5', 'GP6', 'GP7', 'GP8', 'GP9'
 c.buzzer('buzzer', 'GP15', 'GND.4', 420, 240)
 
 gravar('pico-piano', r'''
-// Piano de oito teclas, na Raspberry Pi Pico (Arduino).
+// Eight-key piano, on the Raspberry Pi Pico (Arduino).
 //
-// Cada botao e uma nota da escala de do maior. Segure para a nota durar;
-// solte e ela para. O monitor serial mostra o nome da nota.
+// Each button is a note of the C major scale. Hold it for the note to
+// last; release it and the note stops. The serial monitor shows the note's
+// name.
 
-const int TECLAS[] = {2, 3, 4, 5, 6, 7, 8, 9};
-const int NOTAS[] = {262, 294, 330, 349, 392, 440, 494, 523};
-const char* NOMES[] = {"do", "re", "mi", "fa", "sol", "la", "si", "do agudo"};
+const int KEYS[] = {2, 3, 4, 5, 6, 7, 8, 9};
+const int NOTES[] = {262, 294, 330, 349, 392, 440, 494, 523};
+const char* NAMES[] = {"C", "D", "E", "F", "G", "A", "B", "high C"};
 const int BUZZER = 15;
 
-int tocando = -1;
+int playing = -1;
 
 void setup() {
   Serial.begin(115200);
-  for (int i = 0; i < 8; i++) pinMode(TECLAS[i], INPUT_PULLUP);
+  for (int i = 0; i < 8; i++) pinMode(KEYS[i], INPUT_PULLUP);
 }
 
 void loop() {
-  int apertada = -1;
+  int pressed = -1;
   for (int i = 0; i < 8; i++) {
-    if (digitalRead(TECLAS[i]) == LOW) {
-      apertada = i;
+    if (digitalRead(KEYS[i]) == LOW) {
+      pressed = i;
       break;
     }
   }
 
-  if (apertada != tocando) {
-    if (apertada < 0) {
+  if (pressed != playing) {
+    if (pressed < 0) {
       noTone(BUZZER);
     } else {
-      tone(BUZZER, NOTAS[apertada]);
-      Serial.println(NOMES[apertada]);
+      tone(BUZZER, NOTES[pressed]);
+      Serial.println(NAMES[pressed]);
     }
-    tocando = apertada;
+    playing = pressed;
   }
   delay(10);
 }
 ''', c, '''
-Piano de oito teclas, na Raspberry Pi Pico (Arduino).
+Eight-key piano, on the Raspberry Pi Pico (Arduino).
 
-O que esta demo mostra:
-- a Pico programada com o core do Arduino (o numero do pino e o do GP);
-- tone() e noTone() seguindo a tecla segurada.
+What this demo shows:
+- the Pico programmed with the Arduino core (the pin number is the GP
+  number);
+- tone() and noTone() following the key being held.
 
-Aperte F5 e clique nas teclas (segure para a nota durar).
+Press F5 and click the keys (hold for the note to last).
 ''')
 demo('pico-piano', 'Piano de oito teclas (Arduino)', 'Raspberry Pi Pico')
 
@@ -2438,55 +2472,56 @@ c.ligar('oled', 'SDA', 'placa', 'GP4', AZUL)
 c.ligar('oled', 'SCL', 'placa', 'GP5', ROXO)
 
 gravar('pico-joystick-oled', r'''
-# Joystick e OLED na Raspberry Pi Pico, em MicroPython.
+# Joystick and OLED on the Raspberry Pi Pico, in MicroPython.
 #
-# O joystick move um simbolo pela tela do OLED, e o botao dele troca o
-# simbolo. As leituras cruas aparecem na linha de cima.
+# The joystick moves a symbol around the OLED screen, and its button
+# changes the symbol. The raw readings show on the top line.
 #
-# Na Pico, ADC(0) e o canal 0 -- o GP26 --, e o read_u16 vai de 0 a 65535.
+# On the Pico, ADC(0) is channel 0 -- GP26 -- and read_u16 goes from 0 to
+# 65535.
 
 from machine import Pin, ADC, I2C
 import ssd1306
 import time
 
-eixo_x = ADC(0)          # GP26
-eixo_y = ADC(1)          # GP27
-botao = Pin(22, Pin.IN, Pin.PULL_UP)
+axis_x = ADC(0)          # GP26
+axis_y = ADC(1)          # GP27
+button = Pin(22, Pin.IN, Pin.PULL_UP)
 
 i2c = I2C(0, sda=Pin(4), scl=Pin(5))
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 
-simbolos = ["o", "*", "+", "@"]
-qual = 0
-antes = 1
+symbols = ["o", "*", "+", "@"]
+which = 0
+before = 1
 
 while True:
-    x = eixo_x.read_u16()
-    y = eixo_y.read_u16()
+    x = axis_x.read_u16()
+    y = axis_y.read_u16()
 
-    agora = botao.value()
-    if antes == 1 and agora == 0:
-        qual = (qual + 1) % len(simbolos)
-    antes = agora
+    now = button.value()
+    if before == 1 and now == 0:
+        which = (which + 1) % len(symbols)
+    before = now
 
-    # 0..65535 vira coluna 0..20 e linha 2..7 (as de cima sao do texto).
-    coluna = x * 20 // 65535
-    linha = 2 + y * 5 // 65535
+    # 0..65535 becomes column 0..20 and row 2..7 (the top ones hold text).
+    column = x * 20 // 65535
+    row = 2 + y * 5 // 65535
 
     oled.fill(0)
     oled.text("X " + str(x) + " Y " + str(y), 0, 0)
-    oled.text(simbolos[qual], coluna * 6, linha * 8)
+    oled.text(symbols[which], column * 6, row * 8)
     oled.show()
     time.sleep_ms(50)
 ''', c, '''
-Joystick e OLED na Raspberry Pi Pico, em MicroPython.
+Joystick and OLED on the Raspberry Pi Pico, in MicroPython.
 
-O que esta demo mostra:
-- MicroPython na Pico: ADC por canal (ADC(0) e o GP26), read_u16 de 0 a
-  65535 e o driver ssd1306 no I2C 0;
-- entrada analogica virando posicao na tela.
+What this demo shows:
+- MicroPython on the Pico: ADC by channel (ADC(0) is GP26), read_u16 from
+  0 to 65535 and the ssd1306 driver on I2C 0;
+- an analog input turning into a position on the screen.
 
-Aperte F5 e clique no joystick para mexer nos eixos X e Y.
+Press F5 and click the joystick to move the X and Y axes.
 ''')
 demo('pico-joystick-oled', 'Joystick e OLED (MicroPython)', 'Raspberry Pi Pico')
 
@@ -2502,15 +2537,15 @@ c.ligar('placa', 'GP15', 'la', 'D0', AZUL)
 c.ligar('la', 'GND', 'placa', 'GND.4', PRETO)
 
 gravar('pico-sdk-respirar', r'''
-// LED respirando na Raspberry Pi Pico, com o SDK em C.
+// Breathing LED on the Raspberry Pi Pico, with the C SDK.
 //
-// O PWM de hardware do RP2040 faz o brilho: o pino passa para o PWM com
-// gpio_set_function, o contador da fatia conta ate 65535 e o nivel sobe e
-// desce. O nivel vai ao quadrado -- a correcao de gama --, porque o olho
-// percebe o brilho assim, e a respiracao fica suave.
+// The RP2040's hardware PWM makes the brightness: the pin is handed to the
+// PWM with gpio_set_function, the slice counter counts up to 65535 and the
+// level rises and falls. The level is squared -- gamma correction --
+// because that is how the eye perceives brightness, and the breathing
+// looks smooth.
 //
-// O analisador logico esta no GP15: abra-o para ver a largura do pulso
-// mudar.
+// The logic analyzer is on GP15: open it to watch the pulse width change.
 
 #include "pico/stdlib.h"
 #include "hardware/pwm.h"
@@ -2521,32 +2556,33 @@ int main() {
     stdio_init_all();
 
     gpio_set_function(LED, GPIO_FUNC_PWM);
-    uint fatia = pwm_gpio_to_slice_num(LED);
+    uint slice = pwm_gpio_to_slice_num(LED);
 
     pwm_config config = pwm_get_default_config();
     pwm_config_set_clkdiv(&config, 16.f);   // 125 MHz / 16
     pwm_config_set_wrap(&config, 65535);     // ~119 Hz
-    pwm_init(fatia, &config, true);
+    pwm_init(slice, &config, true);
 
-    int nivel = 0;
-    int passo = 1;
+    int level = 0;
+    int step = 1;
     while (true) {
-        pwm_set_gpio_level(LED, nivel * nivel);   // 0 a 65025
-        nivel += passo;
-        if (nivel == 255 || nivel == 0) passo = -passo;
+        pwm_set_gpio_level(LED, level * level);   // 0 to 65025
+        level += step;
+        if (level == 255 || level == 0) step = -step;
         sleep_ms(8);
     }
 }
 ''', c, '''
-LED respirando com o PWM de hardware, na Raspberry Pi Pico (SDK em C).
+Breathing LED with the hardware PWM, on the Raspberry Pi Pico (C SDK).
 
-O que esta demo mostra:
-- o SDK da Raspberry: main() em vez de setup/loop, gpio_set_function, a
-  fatia de PWM configurada por struct e o nivel com correcao de gama;
-- o analisador logico mostrando o ciclo do PWM subir e descer.
+What this demo shows:
+- the Raspberry SDK: main() instead of setup/loop, gpio_set_function, the
+  PWM slice configured through a struct and the level with gamma
+  correction;
+- the logic analyzer showing the PWM duty cycle rise and fall.
 
-Aperte F5 e abra o analisador (selecione-o e clique em "Abrir o
-analisador").
+Press F5 and open the analyzer (select it and click "Open the
+analyzer").
 ''')
 demo('pico-sdk-respirar', 'LED respirando com PWM (SDK em C)', 'Raspberry Pi Pico')
 
@@ -2562,84 +2598,85 @@ c.ligar('dht', 'SDA', 'placa', 'GP16', AMARELO)
 c.ligar('dht', 'GND', 'placa', 'GND.7', PRETO)
 
 gravar('picow-estacao-web', r'''
-// Estacao do tempo na web, na Raspberry Pi Pico W (Arduino).
+// Weather station on the web, on the Raspberry Pi Pico W (Arduino).
 //
-// O DHT22 mede a temperatura e a umidade, e a Pico W serve duas coisas:
-//   /        uma pagina que se atualiza sozinha a cada 5 s
-//   /dados   os mesmos numeros em JSON, para outro programa ler
+// The DHT22 measures temperature and humidity, and the Pico W serves two
+// things:
+//   /       a page that refreshes itself every 5 s
+//   /data   the same numbers in JSON, for another program to read
 
 #include <WiFi.h>
 #include <WebServer.h>
 #include <DHT.h>
 
 DHT dht(16, DHT22);
-WebServer servidor(80);
+WebServer server(80);
 
-float temperatura = 0;
-float umidade = 0;
-unsigned long ultimaLeitura = 0;
+float temperature = 0;
+float humidity = 0;
+unsigned long lastReading = 0;
 
-void ler() {
+void readSensor() {
   float t = dht.readTemperature();
-  float u = dht.readHumidity();
-  if (!isnan(t)) temperatura = t;
-  if (!isnan(u)) umidade = u;
+  float h = dht.readHumidity();
+  if (!isnan(t)) temperature = t;
+  if (!isnan(h)) humidity = h;
 }
 
-void pagina() {
+void page() {
   String html = "<!DOCTYPE html><html><head><meta charset='utf-8'>";
-  html += "<meta http-equiv='refresh' content='5'><title>Estacao</title></head>";
+  html += "<meta http-equiv='refresh' content='5'><title>Station</title></head>";
   html += "<body style='font-family:sans-serif;text-align:center'>";
-  html += "<h2>Estacao do tempo (Pico W)</h2>";
-  html += "<p style='font-size:3em'>" + String(temperatura, 1) + " &deg;C</p>";
-  html += "<p style='font-size:2em'>" + String(umidade, 0) + " % de umidade</p>";
-  html += "<p><a href='/dados'>ver em JSON</a></p></body></html>";
-  servidor.send(200, "text/html", html);
+  html += "<h2>Weather station (Pico W)</h2>";
+  html += "<p style='font-size:3em'>" + String(temperature, 1) + " &deg;C</p>";
+  html += "<p style='font-size:2em'>" + String(humidity, 0) + " % humidity</p>";
+  html += "<p><a href='/data'>view as JSON</a></p></body></html>";
+  server.send(200, "text/html", html);
 }
 
-void dados() {
-  String json = "{\"temperatura\":" + String(temperatura, 1)
-              + ",\"umidade\":" + String(umidade, 0)
-              + ",\"segundos_ligada\":" + String(millis() / 1000) + "}";
-  servidor.send(200, "application/json", json);
+void data() {
+  String json = "{\"temperature\":" + String(temperature, 1)
+              + ",\"humidity\":" + String(humidity, 0)
+              + ",\"uptime_seconds\":" + String(millis() / 1000) + "}";
+  server.send(200, "application/json", json);
 }
 
 void setup() {
   Serial.begin(115200);
   dht.begin();
-  ler();
+  readSensor();
 
   WiFi.begin("Wokwi-GUEST", "");
   while (WiFi.status() != WL_CONNECTED) delay(250);
-  Serial.print("abra http://");
+  Serial.print("open http://");
   Serial.println(WiFi.localIP());
 
-  servidor.on("/", pagina);
-  servidor.on("/dados", dados);
-  servidor.begin();
+  server.on("/", page);
+  server.on("/data", data);
+  server.begin();
 }
 
 void loop() {
-  servidor.handleClient();
-  if (millis() - ultimaLeitura > 2000) {
-    ultimaLeitura = millis();
-    ler();
-    Serial.print(temperatura, 1);
+  server.handleClient();
+  if (millis() - lastReading > 2000) {
+    lastReading = millis();
+    readSensor();
+    Serial.print(temperature, 1);
     Serial.print(" C  ");
-    Serial.print(umidade, 0);
+    Serial.print(humidity, 0);
     Serial.println(" %");
   }
   delay(2);
 }
 ''', c, '''
-Estacao do tempo na web, na Raspberry Pi Pico W (Arduino).
+Weather station on the web, on the Raspberry Pi Pico W (Arduino).
 
-O que esta demo mostra:
-- a Pico W no WiFi com o core do Arduino, servindo uma pagina e um
-  endereco em JSON (/dados) para outro programa ler;
-- o DHT22 lido de 2 em 2 s, sem travar o servidor.
+What this demo shows:
+- the Pico W on WiFi with the Arduino core, serving a page and a JSON
+  address (/data) for another program to read;
+- the DHT22 read every 2 s, without blocking the server.
 
-Aperte F5 e abra o endereco do painel REDE no navegador.
+Press F5 and open the address from the NETWORK panel in a browser.
 ''')
 demo('picow-estacao-web', 'Estação do tempo na web (Arduino)', 'Raspberry Pi Pico W')
 
@@ -2656,10 +2693,11 @@ c.ligar('pot', 'GND', 'placa', 'AGND', PRETO)
 c.led('led', 'GP15', 'GND.4', 'verde', 330, 200, VERDE)
 
 gravar('picow-mqtt', r'''
-# MQTT em MicroPython, na Raspberry Pi Pico W.
+# MQTT in MicroPython, on the Raspberry Pi Pico W.
 #
-# A cada 2 s a placa publica a posicao do potenciometro (0 a 100 %) em
-# "pico/pot", e obedece ao topico "pico/led": "on" acende, "off" apaga.
+# Every 2 s the board publishes the potentiometer position (0 to 100 %) to
+# "pico/pot", and obeys the topic "pico/led": "on" lights it, "off" turns
+# it off.
 
 import network
 import time
@@ -2676,43 +2714,43 @@ wlan.active(True)
 wlan.connect("Wokwi-GUEST", "")
 while not wlan.isconnected():
     time.sleep_ms(250)
-print("conectado:", wlan.ifconfig()[0])
+print("connected:", wlan.ifconfig()[0])
 
-def chegou(topico, mensagem):
-    texto = mensagem.decode()
-    print("recebi", topico.decode(), texto)
-    if texto == "on":
+def received(topic, message):
+    text = message.decode()
+    print("got", topic.decode(), text)
+    if text == "on":
         led.value(1)
-    elif texto == "off":
+    elif text == "off":
         led.value(0)
 
-# Um id por placa: no broker publico, duas com o mesmo id se derrubam uma
-# a outra -- e a turma inteira roda este mesmo codigo.
-cliente = MQTTClient(b"pico-w-" + ubinascii.hexlify(machine.unique_id()), "broker.hivemq.com")
-cliente.set_callback(chegou)
-cliente.connect()
-cliente.subscribe(b"pico/led")
-print("pronto: publique on ou off em pico/led")
+# One id per board: on the public broker, two with the same id knock each
+# other off -- and the whole class runs this same code.
+client = MQTTClient(b"pico-w-" + ubinascii.hexlify(machine.unique_id()), "broker.hivemq.com")
+client.set_callback(received)
+client.connect()
+client.subscribe(b"pico/led")
+print("ready: publish on or off to pico/led")
 
-ultimo = 0
+last = 0
 while True:
-    cliente.check_msg()
-    if time.ticks_diff(time.ticks_ms(), ultimo) > 2000:
-        ultimo = time.ticks_ms()
-        porcento = pot.read_u16() * 100 // 65535
-        cliente.publish(b"pico/pot", str(porcento))
-        print("pot:", porcento, "%")
+    client.check_msg()
+    if time.ticks_diff(time.ticks_ms(), last) > 2000:
+        last = time.ticks_ms()
+        percent = pot.read_u16() * 100 // 65535
+        client.publish(b"pico/pot", str(percent))
+        print("pot:", percent, "%")
     time.sleep_ms(20)
 ''', c, '''
-MQTT em MicroPython, na Raspberry Pi Pico W.
+MQTT in MicroPython, on the Raspberry Pi Pico W.
 
-O que esta demo mostra:
-- WiFi com network.WLAN e MQTT com umqtt.simple, o jeito do MicroPython;
-- publicar uma leitura e obedecer a um topico no mesmo laco, com
-  check_msg() e ticks_diff().
+What this demo shows:
+- WiFi with network.WLAN and MQTT with umqtt.simple, the MicroPython way;
+- publishing a reading and obeying a topic in the same loop, with
+  check_msg() and ticks_diff().
 
-Aperte F5 e, no painel REDE, publique "on" ou "off" em pico/led. Gire o
-potenciometro e veja pico/pot mudar.
+Press F5 and, in the NETWORK panel, publish "on" or "off" to pico/led.
+Turn the potentiometer and watch pico/pot change.
 ''')
 demo('picow-mqtt', 'MQTT em MicroPython', 'Raspberry Pi Pico W')
 
@@ -2729,55 +2767,55 @@ c.ligar('pot', 'GND', 'placa', 'AGND', PRETO)
 c.led('alerta', 'GP15', 'GND.4', 'vermelho', 330, 200, VERMELHO)
 
 gravar('picow-sdk-voltimetro', r'''
-// Voltimetro na Raspberry Pi Pico W, com o SDK em C.
+// Voltmeter on the Raspberry Pi Pico W, with the C SDK.
 //
-// O ADC le a tensao do potenciometro no GP26 (canal 0), em 12 bits, e o
-// printf mostra em volts. Acima de 2,5 V o LED de alerta acende. A cada
-// 2 s, a temperatura de dentro do chip (canal 4) aparece tambem.
+// The ADC reads the potentiometer voltage on GP26 (channel 0), in 12 bits,
+// and printf shows it in volts. Above 2.5 V the alert LED lights. Every
+// 2 s, the temperature inside the chip (channel 4) shows up too.
 
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/adc.h"
 
-#define ALERTA 15
-#define LIMITE 2.5f
+#define ALERT 15
+#define LIMIT 2.5f
 
 int main() {
     stdio_init_all();
 
-    gpio_init(ALERTA);
-    gpio_set_dir(ALERTA, GPIO_OUT);
+    gpio_init(ALERT);
+    gpio_set_dir(ALERT, GPIO_OUT);
 
     adc_init();
     adc_gpio_init(26);
     adc_set_temp_sensor_enabled(true);
 
-    int voltas = 0;
+    int rounds = 0;
     while (true) {
         adc_select_input(0);
-        uint16_t bruto = adc_read();
-        float volts = bruto * 3.3f / 4096;
-        gpio_put(ALERTA, volts > LIMITE);
-        printf("%.2f V (leitura %d)%s\n", volts, bruto, volts > LIMITE ? "  ALERTA" : "");
+        uint16_t raw = adc_read();
+        float volts = raw * 3.3f / 4096;
+        gpio_put(ALERT, volts > LIMIT);
+        printf("%.2f V (reading %d)%s\n", volts, raw, volts > LIMIT ? "  ALERT" : "");
 
-        voltas++;
-        if (voltas % 8 == 0) {
+        rounds++;
+        if (rounds % 8 == 0) {
             adc_select_input(4);
-            float graus = 27 - (adc_read() * 3.3f / 4096 - 0.706f) / 0.001721f;
-            printf("temperatura do chip: %.1f C\n", graus);
+            float degrees = 27 - (adc_read() * 3.3f / 4096 - 0.706f) / 0.001721f;
+            printf("chip temperature: %.1f C\n", degrees);
         }
         sleep_ms(250);
     }
 }
 ''', c, '''
-Voltimetro com o ADC, na Raspberry Pi Pico W (SDK em C).
+Voltmeter with the ADC, on the Raspberry Pi Pico W (C SDK).
 
-O que esta demo mostra:
-- o conversor de 12 bits pelo SDK: adc_select_input e adc_read, com a
-  conta que transforma a leitura em volts;
-- o sensor de temperatura de dentro do RP2040, no canal 4.
+What this demo shows:
+- the 12-bit converter through the SDK: adc_select_input and adc_read,
+  with the math that turns the reading into volts;
+- the temperature sensor inside the RP2040, on channel 4.
 
-Aperte F5 e gire o potenciometro. Acima de 2,5 V o LED acende.
+Press F5 and turn the potentiometer. Above 2.5 V the LED lights.
 ''')
 demo('picow-sdk-voltimetro', 'Voltímetro com o ADC (SDK em C)', 'Raspberry Pi Pico W')
 
@@ -2796,54 +2834,56 @@ c.led('quente', 'D5', 'GND.2', 'vermelho', 430, 180, VERMELHO)
 c.buzzer('buzzer', 'D3', 'GND.2', 520, 170)
 
 gravar('nucleo-l031-termometro', r'''
-// Termometro com NTC e alarme, na ST Nucleo-L031K6.
+// Thermometer with an NTC and an alarm, on the ST Nucleo-L031K6.
 //
-// O NTC do modulo fica num divisor de tensao; a formula abaixo (a do
-// exemplo do modulo, com beta 3950) transforma a leitura em graus. Acima
-// de 30 C o LED vermelho acende e o buzzer apita; abaixo, fica o verde.
+// The module's NTC sits in a voltage divider; the formula below (the one
+// from the module's example, with beta 3950) turns the reading into
+// degrees. Above 30 C the red LED lights and the buzzer beeps; below it,
+// the green one stays on.
 //
-// O ADC da STM32 tem 12 bits, mas o core do Arduino entrega 10 de fabrica.
-// O analogReadResolution(12) pede os 12 -- e a formula usa 4095.
+// The STM32 ADC has 12 bits, but the Arduino core delivers 10 by default.
+// analogReadResolution(12) asks for all 12 -- and the formula uses 4095.
 
 const float BETA = 3950;
-const float LIMITE = 30.0;
+const float LIMIT = 30.0;
 
 const int SENSOR = A0;
-const int VERDE = 4;           // D4
-const int VERMELHO = 5;        // D5
+const int GREEN = 4;           // D4
+const int RED = 5;             // D5
 const int BUZZER = 3;          // D3
 
 void setup() {
   Serial.begin(115200);
-  pinMode(VERDE, OUTPUT);
-  pinMode(VERMELHO, OUTPUT);
+  pinMode(GREEN, OUTPUT);
+  pinMode(RED, OUTPUT);
   analogReadResolution(12);
 }
 
 void loop() {
-  int leitura = analogRead(SENSOR);
-  float celsius = 1 / (log(1 / (4095.0 / leitura - 1)) / BETA + 1.0 / 298.15) - 273.15;
+  int reading = analogRead(SENSOR);
+  float celsius = 1 / (log(1 / (4095.0 / reading - 1)) / BETA + 1.0 / 298.15) - 273.15;
 
-  bool quente = celsius > LIMITE;
-  digitalWrite(VERDE, !quente);
-  digitalWrite(VERMELHO, quente);
-  if (quente) tone(BUZZER, 2200, 150);
+  bool hot = celsius > LIMIT;
+  digitalWrite(GREEN, !hot);
+  digitalWrite(RED, hot);
+  if (hot) tone(BUZZER, 2200, 150);
 
-  Serial.print("temperatura: ");
+  Serial.print("temperature: ");
   Serial.print(celsius, 1);
-  Serial.println(quente ? " C  <- ALARME" : " C");
+  Serial.println(hot ? " C  <- ALARM" : " C");
   delay(1000);
 }
 ''', c, '''
-Termometro com NTC e alarme, na ST Nucleo-L031K6.
+Thermometer with an NTC and an alarm, on the ST Nucleo-L031K6.
 
-O que esta demo mostra:
-- o termistor NTC e a formula beta que todo tutorial usa -- a leitura
-  daqui segue a curva de verdade do sensor;
-- analogReadResolution(12) na STM32, cujo core entrega 10 bits de fabrica.
+What this demo shows:
+- the NTC thermistor and the beta formula every tutorial uses -- the
+  reading here follows the sensor's real curve;
+- analogReadResolution(12) on the STM32, whose core delivers 10 bits by
+  default.
 
-Aperte F5 e clique no sensor NTC para mudar a temperatura (acima de 30 C
-dispara o alarme).
+Press F5 and click the NTC sensor to change the temperature (above 30 C
+sets off the alarm).
 ''')
 demo('nucleo-l031-termometro', 'Termômetro com NTC e alarme', 'ST Nucleo-L031K6')
 
@@ -2866,14 +2906,15 @@ c.ligar('lcd', 'SCL', 'placa', 'D15', ROXO)
 c.botao('botao', 'D7', 'GND.3', 400, 20)
 
 gravar('nucleo-c031-relogio-rtc', r'''
-// Relogio com RTC e LCD, na ST Nucleo-C031C6.
+// Clock with an RTC and an LCD, on the ST Nucleo-C031C6.
 //
-// O DS1307 guarda a hora mesmo com a placa desligada (a bateria dele
-// segura). O LCD mostra a hora e a data, e o botao troca entre 24 h e
-// 12 h. O RTC e o LCD dividem o mesmo I2C -- D14 e D15, como no Uno.
+// The DS1307 keeps the time even with the board off (its battery holds
+// it). The LCD shows the time and the date, and the button switches
+// between 24 h and 12 h. The RTC and the LCD share the same I2C -- D14 and
+// D15, like on the Uno.
 //
-// Na primeira vez, o RTC e acertado com a hora em que o sketch foi
-// compilado (__DATE__ e __TIME__).
+// The first time, the RTC is set to the time the sketch was compiled
+// (__DATE__ and __TIME__).
 
 #include <Wire.h>
 #include <RTClib.h>
@@ -2882,25 +2923,25 @@ gravar('nucleo-c031-relogio-rtc', r'''
 RTC_DS1307 rtc;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-const int BOTAO = 7;   // D7
-const char* DIAS[] = {"Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"};
+const int BUTTON = 7;   // D7
+const char* DAYS[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
-bool dozeHoras = false;
-int botaoAntes = HIGH;
+bool twelveHour = false;
+int lastButton = HIGH;
 
-void doisDigitos(int n) {
+void twoDigits(int n) {
   if (n < 10) lcd.print('0');
   lcd.print(n);
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(BOTAO, INPUT_PULLUP);
+  pinMode(BUTTON, INPUT_PULLUP);
   lcd.init();
   lcd.backlight();
 
   if (!rtc.begin()) {
-    lcd.print("RTC nao achado");
+    lcd.print("RTC not found");
     while (true) delay(1000);
   }
   if (!rtc.isrunning()) {
@@ -2909,40 +2950,41 @@ void setup() {
 }
 
 void loop() {
-  int botao = digitalRead(BOTAO);
-  if (botaoAntes == HIGH && botao == LOW) dozeHoras = !dozeHoras;
-  botaoAntes = botao;
+  int button = digitalRead(BUTTON);
+  if (lastButton == HIGH && button == LOW) twelveHour = !twelveHour;
+  lastButton = button;
 
-  DateTime agora = rtc.now();
+  DateTime now = rtc.now();
 
   lcd.setCursor(0, 0);
-  if (dozeHoras) doisDigitos(agora.twelveHour());
-  else doisDigitos(agora.hour());
+  if (twelveHour) twoDigits(now.twelveHour());
+  else twoDigits(now.hour());
   lcd.print(':');
-  doisDigitos(agora.minute());
+  twoDigits(now.minute());
   lcd.print(':');
-  doisDigitos(agora.second());
-  lcd.print(dozeHoras ? (agora.isPM() ? " PM   " : " AM   ") : "      ");
+  twoDigits(now.second());
+  lcd.print(twelveHour ? (now.isPM() ? " PM   " : " AM   ") : "      ");
 
   lcd.setCursor(0, 1);
-  lcd.print(DIAS[agora.dayOfTheWeek()]);
+  lcd.print(DAYS[now.dayOfTheWeek()]);
   lcd.print(' ');
-  doisDigitos(agora.day());
+  twoDigits(now.day());
   lcd.print('/');
-  doisDigitos(agora.month());
+  twoDigits(now.month());
   lcd.print('/');
-  lcd.print(agora.year());
+  lcd.print(now.year());
 
   delay(200);
 }
 ''', c, '''
-Relogio com RTC e LCD, na ST Nucleo-C031C6.
+Clock with an RTC and an LCD, on the ST Nucleo-C031C6.
 
-O que esta demo mostra:
-- o RTC DS1307 com a RTClib: DateTime, now() e adjust();
-- dois aparelhos no mesmo I2C (RTC e LCD, D14 e D15 no cabecalho do Uno).
+What this demo shows:
+- the DS1307 RTC with RTClib: DateTime, now() and adjust();
+- two devices on the same I2C (RTC and LCD, D14 and D15 on the Uno
+  header).
 
-Aperte F5. O botao troca entre 24 h e 12 h.
+Press F5. The button switches between 24 h and 12 h.
 ''')
 demo('nucleo-c031-relogio-rtc', 'Relógio com RTC e LCD', 'ST Nucleo-C031C6')
 

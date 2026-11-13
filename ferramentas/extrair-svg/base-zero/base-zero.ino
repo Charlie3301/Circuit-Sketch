@@ -1,29 +1,31 @@
-// BASE ZERO -- tiro em primeira pessoa no estilo do DOOM (1993), feito com
-// raycasting numa ESP32-S3 e num display ILI9341 de 320x240.
+// BASE ZERO -- a first-person shooter in the style of DOOM (1993), made with
+// raycasting on an ESP32-S3 and a 320x240 ILI9341 display.
 //
-// Como sai o 3D: para cada coluna da tela sai um raio do jogador. O raio
-// anda pelo mapa de quadrado em quadrado (o algoritmo DDA) ate bater numa
-// parede, e a distancia do batido diz a altura da parede naquela coluna.
-// Sao 160 raios por quadro, um a cada duas colunas -- e so as colunas que
-// mudaram vao para o display, que e o que deixa o SPI dar conta.
+// How the 3D comes out: for each column of the screen a ray leaves the
+// player. The ray walks through the map square by square (the DDA
+// algorithm) until it hits a wall, and the distance of the hit gives the
+// height of the wall in that column. That is 160 rays per frame, one every
+// two columns -- and only the columns that changed go to the display, which
+// is what lets the SPI keep up.
 //
-// As fases estao no cartao microSD: /E1M1.TXT e /E1M2.TXT. Abra a peca do
-// cartao (Arquivos...), mude as paredes e rode de novo: a fase muda. Sem
-// cartao, o jogo usa a fase que esta no proprio codigo.
+// The levels are on the microSD card: /E1M1.TXT and /E1M2.TXT. Open the
+// card part (Files...), change the walls and run again: the level changes.
+// Without a card, the game uses the level that is in the code itself.
 //
-// Controles: as setas andam e viram, A atira, B abre as portas e aperta o
-// painel verde da saida, START pausa.
+// Controls: the arrows walk and turn, A fires, B opens the doors and
+// presses the green exit panel, START pauses.
 //
-// A chave liga e desliga o console de verdade. Desligada, a ESP32 apaga a
-// luz da tela e entra no sono profundo (o chip gasta microamperes); ligada,
-// ela acorda e volta para a fase -- a fase e os pontos ficam na memoria
-// RTC, que o sono profundo nao apaga. O recorde fica no cartao.
+// The switch really turns the console on and off. Off, the ESP32 turns off
+// the screen's light and goes into deep sleep (the chip uses microamps);
+// on, it wakes up and goes back to the level -- the level and the score
+// stay in the RTC memory, which deep sleep does not erase. The high score
+// stays on the card.
 //
-// Na bancada: o display e o cartao dividem o SPI (SCK 12, MOSI 11, MISO
-// 13), cada um com o seu CS. O LED do display vai num pino para o jogo
-// poder apagar a luz de fundo -- no modulo vermelho ele passa por um
-// transistor, e o GPIO so manda o sinal. Ligado direto no 3V3, a tela
-// ficaria acesa com a placa dormindo.
+// On the bench: the display and the card share the SPI (SCK 12, MOSI 11,
+// MISO 13), each with its own CS. The display's LED goes to a pin so the
+// game can turn off the backlight -- on the red module it goes through a
+// transistor, and the GPIO only sends the signal. Wired straight to 3V3,
+// the screen would stay lit with the board asleep.
 
 #include <SPI.h>
 #include <SD.h>
@@ -31,53 +33,53 @@
 #include <Adafruit_ILI9341.h>
 #include "driver/rtc_io.h"
 
-// ---------------- pinos ----------------
+// ---------------- pins ----------------
 const int TFT_CS = 10;
 const int TFT_DC = 9;
 const int TFT_RST = 8;
-const int TFT_LUZ = 7;        // o LED do display: a luz de fundo
+const int TFT_LIGHT = 7;      // the display's LED: the backlight
 const int SD_CS = 14;
-const int BT_CIMA = 4;
-const int BT_BAIXO = 5;
-const int BT_ESQ = 6;
-const int BT_DIR = 15;
-const int BT_START = 16;      // pausa
-const int BT_A = 17;          // atirar
-const int BT_B = 18;          // abrir porta, apertar a saida
+const int BTN_UP = 4;
+const int BTN_DOWN = 5;
+const int BTN_LEFT = 6;
+const int BTN_RIGHT = 15;
+const int BTN_START = 16;     // pause
+const int BTN_A = 17;         // fire
+const int BTN_B = 18;         // open a door, press the exit
 const int BUZZER = 21;
-const int CHAVE = 1;          // chave liga/desliga: ligada = LOW
+const int POWER_SWITCH = 1;   // on/off switch: on = LOW
 
 Adafruit_ILI9341 tft(TFT_CS, TFT_DC, TFT_RST);
 
-// ---------------- tela ----------------
-const int LARG = 320;
-const int VISTA = 192;        // a vista 3D; embaixo fica o painel
-const int COL = 2;            // cada raio pinta duas colunas
-const int RAIOS = LARG / COL;
-const int HORIZONTE = VISTA / 2;
+// ---------------- screen ----------------
+const int SCREEN_W = 320;
+const int VIEW_H = 192;       // the 3D view; the panel sits below it
+const int COL = 2;            // each ray paints two columns
+const int RAYS = SCREEN_W / COL;
+const int HORIZON = VIEW_H / 2;
 
-const uint16_t PRETO = 0x0000;
-const uint16_t BRANCO = 0xFFFF;
-const uint16_t VERMELHO = 0xF800;
-const uint16_t AMARELO = 0xFFE0;
-const uint16_t PAINEL = 0x31A6;
-const uint16_t PAINEL_CLARO = 0x6B4D;
-const uint16_t LETREIRO = 0xBDF7;
+const uint16_t C_BLACK = 0x0000;
+const uint16_t C_WHITE = 0xFFFF;
+const uint16_t C_RED = 0xF800;
+const uint16_t C_YELLOW = 0xFFE0;
+const uint16_t C_PANEL = 0x31A6;
+const uint16_t C_PANEL_LIGHT = 0x6B4D;
+const uint16_t C_LABEL = 0xBDF7;
 
-// Teto e chao em faixas: mais escuros perto do horizonte, que e longe.
-uint16_t tetoLonge, tetoPerto, chaoLonge, chaoMedio, chaoPerto;
+// Ceiling and floor in bands: darker near the horizon, which is far away.
+uint16_t ceilingFar, ceilingNear, floorFar, floorMiddle, floorNear;
 
-// Cada tipo de parede tem 8 tons, do perto (claro) ao longe (escuro).
-const int TIPOS = 5;          // # concreto, B tijolo, M metal, D porta, X saida
-uint16_t tons[TIPOS][8];
+// Each kind of wall has 8 shades, from near (light) to far (dark).
+const int KINDS = 5;          // # concrete, B brick, M metal, D door, X exit
+uint16_t shades[KINDS][8];
 
-// ---------------- o mapa ----------------
-const int TAM = 16;
-char mapa[TAM][TAM + 1];
-char nomeDaFase[32];
+// ---------------- the map ----------------
+const int SIZE = 16;
+char grid[SIZE][SIZE + 1];
+char levelName[32];
 
-// A fase que vem no codigo, para jogar sem cartao.
-const char* FASE_INTERNA[TAM] = {
+// The level that comes in the code, to play without a card.
+const char* BUILT_IN_LEVEL[SIZE] = {
   "################",
   "#P..#......R...#",
   "#...#..........#",
@@ -87,29 +89,29 @@ const char* FASE_INTERNA[TAM] = {
   "#.......BDBB...#",
   "#..R...........#",
   "#.......MMMMMM.#",
-  "#..V....M....M.#",
+  "#..H....M....M.#",
   "#.......M.R..M.#",
   "######..M....D.#",
   "#....#..MMMMMM.#",
   "#.A..D......R..#",
-  "#....#.......V.X",
+  "#....#.......H.X",
   "################"
 };
 
-// ---------------- robos, kits e municao ----------------
-struct Coisa {
+// ---------------- robots, kits and ammo ----------------
+struct Thing {
   float x, y;
-  char tipo;                  // 'R' robo, 'V' kit de vida, 'A' municao
-  int vida;
-  bool ativa;                 // pega ou destruida: nao e mais do jogo
-  unsigned long ultimoAtaque;
+  char kind;                  // 'R' robot, 'H' health kit, 'A' ammo
+  int health;
+  bool active;                // picked up or destroyed: no longer in the game
+  unsigned long lastAttack;
 };
-const int MAX_COISAS = 24;
-Coisa coisas[MAX_COISAS];
-int nCoisas = 0;
+const int MAX_THINGS = 24;
+Thing things[MAX_THINGS];
+int thingCount = 0;
 
-// Os desenhos: 12x16 quadradinhos, uma letra por cor, '.' transparente.
-const char* ROBO[16] = {
+// The drawings: 12x16 little squares, one letter per color, '.' transparent.
+const char* ROBOT[16] = {
   "....kkkk....",
   "...kmmmmk...",
   "..kmmrrmmk..",
@@ -127,7 +129,7 @@ const char* ROBO[16] = {
   "..kkk..kkk..",
   "............"
 };
-const char* SUCATA[16] = {
+const char* SCRAP[16] = {
   "............", "............", "............", "............",
   "............", "............", "............", "............",
   "............", "............", "............", "....k..k....",
@@ -139,15 +141,15 @@ const char* KIT[16] = {
   ".kkkkkkkkkk.", ".kwwwrrwwwk.", ".kwwwrrwwwk.", ".kwrrrrrrwk.",
   ".kwrrrrrrwk.", ".kwwwrrwwwk.", ".kwwwrrwwwk.", ".kkkkkkkkkk."
 };
-const char* CAIXA[16] = {
+const char* CRATE[16] = {
   "............", "............", "............", "............",
   "............", "............", "............", "............",
   "............", "..y.y.y.y...", "..y.y.y.y...", ".kkkkkkkkkk.",
   ".kooooooook.", ".koOOOOOOok.", ".kooooooook.", ".kkkkkkkkkk."
 };
 
-// A arma, vista de tras: 16x16 quadradinhos de 4x3 pixels.
-const char* ARMA[16] = {
+// The gun, seen from behind: 16x16 little squares of 4x3 pixels.
+const char* GUN[16] = {
   "......kkkk......",
   "......kmmk......",
   ".....kmmmmk.....",
@@ -165,90 +167,90 @@ const char* ARMA[16] = {
   "kqppppppppppppqk",
   "kqqqppppppppqqqk"
 };
-const int ARMA_X = 128;       // 16 quadradinhos de 4 pixels: de 128 a 191
-const int ARMA_Y = 144;       // 16 de 3: de 144 a 191
-int16_t armaTopo[RAIOS];      // onde a arma comeca, em cada raio
+const int GUN_X = 128;        // 16 little squares of 4 pixels: from 128 to 191
+const int GUN_Y = 144;        // 16 of 3: from 144 to 191
+int16_t gunTop[RAYS];         // where the gun starts, in each ray
 
-// ---------------- o jogador ----------------
-float px, py;                 // posicao, em quadrados do mapa
-float dirX, dirY;             // para onde olha
-float planoX, planoY;         // o plano da camera: o campo de visao
-int vida = 100;
-int municao = 30;
+// ---------------- the player ----------------
+float px, py;                 // position, in map squares
+float dirX, dirY;             // where they look
+float planeX, planeY;         // the camera plane: the field of view
+int health = 100;
+int ammo = 30;
 
-RTC_DATA_ATTR int fase = 1;   // sobrevivem ao sono profundo
-RTC_DATA_ATTR int pontos = 0;
-int recorde = 0;              // este fica no cartao, em /RECORDE.TXT
-bool temCartao = false;
-bool faseDoCartao = false;
-bool telaIniciada = false;
+RTC_DATA_ATTR int level = 1;  // these survive deep sleep
+RTC_DATA_ATTR int score = 0;
+int highScore = 0;            // this one stays on the card, in /HISCORE.TXT
+bool hasCard = false;
+bool levelFromCard = false;
+bool screenStarted = false;
 
-// ---------------- estado ----------------
-enum Estado { TITULO, JOGANDO, PAUSA, MORTO, VITORIA };
-Estado estado = TITULO;
+// ---------------- state ----------------
+enum State { TITLE, PLAYING, PAUSED, DEAD, VICTORY };
+State state = TITLE;
 
-float zbuf[RAIOS];            // a distancia da parede em cada raio
-int16_t topoAntes[RAIOS];
-int16_t baseAntes[RAIOS];
-uint16_t corAntes[RAIOS];
-bool sujo[RAIOS];             // coluna que precisa ir de novo para a tela
+float zbuf[RAYS];             // the distance of the wall in each ray
+int16_t prevTop[RAYS];
+int16_t prevBottom[RAYS];
+uint16_t prevColor[RAYS];
+bool dirty[RAYS];             // a column that has to go to the screen again
 
-bool aAntes = false, bAntes = false, startAntes = false;
-unsigned long quadroAntes = 0;
-unsigned long ultimoTiro = 0;
-unsigned long clarao = 0;     // ate quando o clarao do tiro aparece
-unsigned long ferido = 0;     // ate quando a borda vermelha aparece
-bool armaNaTela = false;
-int vidaMostrada = -1, municaoMostrada = -1, pontosMostrados = -1, rostoMostrado = -1;
+bool aBefore = false, bBefore = false, startBefore = false;
+unsigned long lastFrame = 0;
+unsigned long lastShot = 0;
+unsigned long flashUntil = 0; // until when the muzzle flash shows
+unsigned long hurtUntil = 0;  // until when the red border shows
+bool gunOnScreen = false;
+int shownHealth = -1, shownAmmo = -1, shownScore = -1, shownFace = -1;
 
 // =====================================================================
-//  Cores
+//  Colors
 // =====================================================================
 
-uint16_t corDaLetra(char c) {
+uint16_t letterColor(char c) {
   switch (c) {
-    case 'k': return 0x18E3;              // quase preto: o contorno
+    case 'k': return 0x18E3;              // almost black: the outline
     case 'm': return 0x6B4D;              // metal
-    case 'l': return 0xAD55;              // brilho do metal
-    case 'r': return 0xF800;              // o olho do robo, a cruz do kit
-    case 'b': return 0x4A9F;              // o corpo do robo
+    case 'l': return 0xAD55;              // the metal's shine
+    case 'r': return 0xF800;              // the robot's eye, the kit's cross
+    case 'b': return 0x4A9F;              // the robot's body
     case 'w': return 0xFFFF;
     case 'y': return 0xFFE0;
-    case 'o': return 0x5AC0;              // a caixa de municao
+    case 'o': return 0x5AC0;              // the ammo crate
     case 'O': return 0x8C40;
-    case 'p': return tft.color565(214, 150, 110);  // a mao
+    case 'p': return tft.color565(214, 150, 110);  // the hand
     case 'q': return tft.color565(160, 100, 70);
   }
-  return PRETO;
+  return C_BLACK;
 }
 
-void prepararCores() {
-  // R, G, B de cada parede: concreto, tijolo, metal, porta, saida.
-  const int base[TIPOS][3] = {
+void prepareColors() {
+  // R, G, B of each wall: concrete, brick, metal, door, exit.
+  const int base[KINDS][3] = {
     {150, 150, 150}, {176, 72, 48}, {84, 116, 160}, {150, 104, 40}, {40, 180, 70}
   };
-  for (int t = 0; t < TIPOS; t++)
+  for (int t = 0; t < KINDS; t++)
     for (int n = 0; n < 8; n++) {
-      float luz = 1.0 - n * 0.11;
-      tons[t][n] = tft.color565(base[t][0] * luz, base[t][1] * luz, base[t][2] * luz);
+      float light = 1.0 - n * 0.11;
+      shades[t][n] = tft.color565(base[t][0] * light, base[t][1] * light, base[t][2] * light);
     }
 
-  tetoPerto = tft.color565(64, 64, 72);
-  tetoLonge = tft.color565(36, 36, 44);
-  chaoLonge = tft.color565(48, 40, 32);
-  chaoMedio = tft.color565(72, 60, 44);
-  chaoPerto = tft.color565(96, 80, 58);
+  ceilingNear = tft.color565(64, 64, 72);
+  ceilingFar = tft.color565(36, 36, 44);
+  floorFar = tft.color565(48, 40, 32);
+  floorMiddle = tft.color565(72, 60, 44);
+  floorNear = tft.color565(96, 80, 58);
 }
 
 // =====================================================================
-//  O mapa
+//  The map
 // =====================================================================
 
-bool ehParede(char c) {
+bool isWall(char c) {
   return c == '#' || c == 'B' || c == 'M' || c == 'D' || c == 'X';
 }
 
-int tipoDaParede(char c) {
+int wallKind(char c) {
   switch (c) {
     case 'B': return 1;
     case 'M': return 2;
@@ -258,468 +260,469 @@ int tipoDaParede(char c) {
   return 0;
 }
 
-// "/E1M1.TXT": a primeira linha e o nome da fase, as 16 seguintes o mapa.
-bool lerFaseDoCartao(int numero) {
-  if (!temCartao) return false;
-  char caminho[16];
-  snprintf(caminho, sizeof(caminho), "/E1M%d.TXT", numero);
-  File arquivo = SD.open(caminho);
-  if (!arquivo) return false;
+// "/E1M1.TXT": the first line is the level's name, the next 16 the map.
+bool readLevelFromCard(int number) {
+  if (!hasCard) return false;
+  char path[16];
+  snprintf(path, sizeof(path), "/E1M%d.TXT", number);
+  File file = SD.open(path);
+  if (!file) return false;
 
-  String titulo = arquivo.readStringUntil('\n');
-  titulo.trim();
-  titulo.toCharArray(nomeDaFase, sizeof(nomeDaFase));
+  String title = file.readStringUntil('\n');
+  title.trim();
+  title.toCharArray(levelName, sizeof(levelName));
 
   int y = 0;
-  while (arquivo.available() && y < TAM) {
-    String linha = arquivo.readStringUntil('\n');
-    linha.trim();
-    if (linha.length() == 0) continue;
-    for (int x = 0; x < TAM; x++)
-      mapa[y][x] = x < (int)linha.length() ? linha.charAt(x) : '#';
-    mapa[y][TAM] = '\0';
+  while (file.available() && y < SIZE) {
+    String line = file.readStringUntil('\n');
+    line.trim();
+    if (line.length() == 0) continue;
+    for (int x = 0; x < SIZE; x++)
+      grid[y][x] = x < (int)line.length() ? line.charAt(x) : '#';
+    grid[y][SIZE] = '\0';
     y++;
   }
-  arquivo.close();
+  file.close();
 
-  for (; y < TAM; y++) {
-    for (int x = 0; x < TAM; x++) mapa[y][x] = '#';
-    mapa[y][TAM] = '\0';
+  for (; y < SIZE; y++) {
+    for (int x = 0; x < SIZE; x++) grid[y][x] = '#';
+    grid[y][SIZE] = '\0';
   }
   return true;
 }
 
-void usarFaseInterna() {
-  for (int y = 0; y < TAM; y++) {
-    for (int x = 0; x < TAM; x++) mapa[y][x] = FASE_INTERNA[y][x];
-    mapa[y][TAM] = '\0';
+void useBuiltInLevel() {
+  for (int y = 0; y < SIZE; y++) {
+    for (int x = 0; x < SIZE; x++) grid[y][x] = BUILT_IN_LEVEL[y][x];
+    grid[y][SIZE] = '\0';
   }
-  strcpy(nomeDaFase, "E1M1: HANGAR");
+  strcpy(levelName, "E1M1: HANGAR");
 }
 
-// Tira do mapa o jogador, os robos e os itens, e fecha a borda: um mapa
-// editado com um buraco na beira faria o raio sair da memoria do mapa.
-void prepararFase() {
-  nCoisas = 0;
-  bool achouJogador = false;
+// Takes the player, the robots and the items out of the map, and closes
+// the border: an edited map with a hole at the edge would send the ray out
+// of the map's memory.
+void prepareLevel() {
+  thingCount = 0;
+  bool foundPlayer = false;
 
-  for (int y = 0; y < TAM; y++)
-    for (int x = 0; x < TAM; x++) {
-      char c = mapa[y][x];
-      bool naBorda = x == 0 || y == 0 || x == TAM - 1 || y == TAM - 1;
+  for (int y = 0; y < SIZE; y++)
+    for (int x = 0; x < SIZE; x++) {
+      char c = grid[y][x];
+      bool onEdge = x == 0 || y == 0 || x == SIZE - 1 || y == SIZE - 1;
 
-      if (c == 'P' && !naBorda) {
+      if (c == 'P' && !onEdge) {
         px = x + 0.5;
         py = y + 0.5;
-        achouJogador = true;
-        mapa[y][x] = '.';
-      } else if ((c == 'R' || c == 'V' || c == 'A') && !naBorda && nCoisas < MAX_COISAS) {
-        coisas[nCoisas] = {x + 0.5f, y + 0.5f, c, c == 'R' ? 2 : 1, true, 0};
-        nCoisas++;
-        mapa[y][x] = '.';
-      } else if (!ehParede(c) || (naBorda && c == 'D')) {
-        mapa[y][x] = naBorda ? '#' : '.';   // porta na beira levaria para fora
+        foundPlayer = true;
+        grid[y][x] = '.';
+      } else if ((c == 'R' || c == 'H' || c == 'A') && !onEdge && thingCount < MAX_THINGS) {
+        things[thingCount] = {x + 0.5f, y + 0.5f, c, c == 'R' ? 2 : 1, true, 0};
+        thingCount++;
+        grid[y][x] = '.';
+      } else if (!isWall(c) || (onEdge && c == 'D')) {
+        grid[y][x] = onEdge ? '#' : '.';    // a door at the edge would lead outside
       }
     }
 
-  if (!achouJogador) {
+  if (!foundPlayer) {
     px = 1.5;
     py = 1.5;
   }
   dirX = 1;
   dirY = 0;
-  planoX = 0;
-  planoY = 0.66;              // 0,66 da um campo de visao de 66 graus
-  vida = 100;
-  municao = 30;
+  planeX = 0;
+  planeY = 0.66;              // 0.66 gives a 66-degree field of view
+  health = 100;
+  ammo = 30;
 }
 
 // =====================================================================
-//  O desenho 3D
+//  The 3D drawing
 // =====================================================================
 
-// Um pedaco de coluna, cortado ate onde a arma comeca.
-void faixa(int x, int y0, int y1, int limite, uint16_t cor) {
-  if (y1 > limite) y1 = limite;
-  if (y1 > y0) tft.fillRect(x, y0, COL, y1 - y0, cor);
+// A piece of column, cut where the gun starts.
+void stripe(int x, int y0, int y1, int limit, uint16_t color) {
+  if (y1 > limit) y1 = limit;
+  if (y1 > y0) tft.fillRect(x, y0, COL, y1 - y0, color);
 }
 
-void teto(int x, int y0, int y1, int limite) {
-  int meio = HORIZONTE / 2;
-  if (y0 < meio) faixa(x, y0, y1 < meio ? y1 : meio, limite, tetoPerto);
-  if (y1 > meio) faixa(x, y0 > meio ? y0 : meio, y1, limite, tetoLonge);
+void drawCeiling(int x, int y0, int y1, int limit) {
+  int middle = HORIZON / 2;
+  if (y0 < middle) stripe(x, y0, y1 < middle ? y1 : middle, limit, ceilingNear);
+  if (y1 > middle) stripe(x, y0 > middle ? y0 : middle, y1, limit, ceilingFar);
 }
 
-void chao(int x, int y0, int y1, int limite) {
-  const int corte1 = HORIZONTE + 24, corte2 = HORIZONTE + 56;
-  if (y0 < corte1) faixa(x, y0, y1 < corte1 ? y1 : corte1, limite, chaoLonge);
-  if (y1 > corte1 && y0 < corte2)
-    faixa(x, y0 > corte1 ? y0 : corte1, y1 < corte2 ? y1 : corte2, limite, chaoMedio);
-  if (y1 > corte2) faixa(x, y0 > corte2 ? y0 : corte2, y1, limite, chaoPerto);
+void drawFloor(int x, int y0, int y1, int limit) {
+  const int cut1 = HORIZON + 24, cut2 = HORIZON + 56;
+  if (y0 < cut1) stripe(x, y0, y1 < cut1 ? y1 : cut1, limit, floorFar);
+  if (y1 > cut1 && y0 < cut2)
+    stripe(x, y0 > cut1 ? y0 : cut1, y1 < cut2 ? y1 : cut2, limit, floorMiddle);
+  if (y1 > cut2) stripe(x, y0 > cut2 ? y0 : cut2, y1, limit, floorNear);
 }
 
-void desenharVista() {
-  for (int r = 0; r < RAIOS; r++) {
-    float camera = 2.0 * r / RAIOS - 1;         // -1 na esquerda, +1 na direita
-    float raioX = dirX + planoX * camera;
-    float raioY = dirY + planoY * camera;
+void drawView() {
+  for (int r = 0; r < RAYS; r++) {
+    float camera = 2.0 * r / RAYS - 1;          // -1 on the left, +1 on the right
+    float rayX = dirX + planeX * camera;
+    float rayY = dirY + planeY * camera;
 
     int mx = (int)px, my = (int)py;
-    float passoX = raioX == 0 ? 1e30 : fabsf(1 / raioX);
-    float passoY = raioY == 0 ? 1e30 : fabsf(1 / raioY);
+    float stepX = rayX == 0 ? 1e30 : fabsf(1 / rayX);
+    float stepY = rayY == 0 ? 1e30 : fabsf(1 / rayY);
     int sx, sy;
-    float ladoX, ladoY;
-    if (raioX < 0) { sx = -1; ladoX = (px - mx) * passoX; }
-    else { sx = 1; ladoX = (mx + 1.0 - px) * passoX; }
-    if (raioY < 0) { sy = -1; ladoY = (py - my) * passoY; }
-    else { sy = 1; ladoY = (my + 1.0 - py) * passoY; }
+    float sideX, sideY;
+    if (rayX < 0) { sx = -1; sideX = (px - mx) * stepX; }
+    else { sx = 1; sideX = (mx + 1.0 - px) * stepX; }
+    if (rayY < 0) { sy = -1; sideY = (py - my) * stepY; }
+    else { sy = 1; sideY = (my + 1.0 - py) * stepY; }
 
-    // O DDA: um quadrado por vez, sempre pelo lado mais perto.
-    int lado = 0;
-    char bateu = '#';
+    // The DDA: one square at a time, always through the nearest side.
+    int side = 0;
+    char hit = '#';
     for (int n = 0; n < 40; n++) {
-      if (ladoX < ladoY) { ladoX += passoX; mx += sx; lado = 0; }
-      else { ladoY += passoY; my += sy; lado = 1; }
-      bateu = mapa[my][mx];
-      if (ehParede(bateu)) break;
+      if (sideX < sideY) { sideX += stepX; mx += sx; side = 0; }
+      else { sideY += stepY; my += sy; side = 1; }
+      hit = grid[my][mx];
+      if (isWall(hit)) break;
     }
 
-    float dist = lado == 0 ? ladoX - passoX : ladoY - passoY;
+    float dist = side == 0 ? sideX - stepX : sideY - stepY;
     if (dist < 0.05) dist = 0.05;
     zbuf[r] = dist;
 
-    int altura = (int)(VISTA / dist);
-    int topo = HORIZONTE - altura / 2;
-    int base = topo + altura;
-    if (topo < 0) topo = 0;
-    if (base > VISTA) base = VISTA;
+    int height = (int)(VIEW_H / dist);
+    int top = HORIZON - height / 2;
+    int bottom = top + height;
+    if (top < 0) top = 0;
+    if (bottom > VIEW_H) bottom = VIEW_H;
 
-    // Onde o raio bateu dentro do quadrado: a beira de cada bloco sai mais
-    // escura, e e ela que desenha as juntas da parede.
-    float ponto = lado == 0 ? py + dist * raioY : px + dist * raioX;
-    ponto -= floorf(ponto);
-    int tom = (int)(dist * 1.1) + lado;
-    if (ponto < 0.06 || ponto > 0.94) tom += 2;
-    if (tom > 7) tom = 7;
-    uint16_t cor = tons[tipoDaParede(bateu)][tom];
+    // Where the ray hit inside the square: the edge of each block comes out
+    // darker, and that is what draws the wall's joints.
+    float spot = side == 0 ? py + dist * rayY : px + dist * rayX;
+    spot -= floorf(spot);
+    int shade = (int)(dist * 1.1) + side;
+    if (spot < 0.06 || spot > 0.94) shade += 2;
+    if (shade > 7) shade = 7;
+    uint16_t color = shades[wallKind(hit)][shade];
 
-    if (!sujo[r] && topo == topoAntes[r] && base == baseAntes[r] && cor == corAntes[r]) continue;
-    topoAntes[r] = topo;
-    baseAntes[r] = base;
-    corAntes[r] = cor;
-    sujo[r] = false;
+    if (!dirty[r] && top == prevTop[r] && bottom == prevBottom[r] && color == prevColor[r]) continue;
+    prevTop[r] = top;
+    prevBottom[r] = bottom;
+    prevColor[r] = color;
+    dirty[r] = false;
 
     int x = r * COL;
-    int limite = armaTopo[r];
-    teto(x, 0, topo, limite);
-    faixa(x, topo, base, limite, cor);
-    chao(x, base, VISTA, limite);
+    int limit = gunTop[r];
+    drawCeiling(x, 0, top, limit);
+    stripe(x, top, bottom, limit, color);
+    drawFloor(x, bottom, VIEW_H, limit);
   }
 }
 
-// Um desenho de 12x16 em pe no chao, em (x, y) do mapa, com o z-buffer:
-// o que esta atras de uma parede nao aparece.
-void desenharCoisa(float cx, float cy, const char** arte) {
+// A 12x16 drawing standing on the floor, at (x, y) of the map, with the
+// z-buffer: what is behind a wall does not show.
+void drawThing(float cx, float cy, const char** art) {
   float sx = cx - px, sy = cy - py;
-  float inverso = 1.0 / (planoX * dirY - dirX * planoY);
-  float lateral = inverso * (dirY * sx - dirX * sy);
-  float fundo = inverso * (-planoY * sx + planoX * sy);   // a profundidade
-  if (fundo < 0.2) return;
+  float inverse = 1.0 / (planeX * dirY - dirX * planeY);
+  float lateral = inverse * (dirY * sx - dirX * sy);
+  float depth = inverse * (-planeY * sx + planeX * sy);
+  if (depth < 0.2) return;
 
-  int centro = (int)((LARG / 2) * (1 + lateral / fundo));
-  int altura = (int)(VISTA / fundo * 0.9);
-  int largura = altura * 12 / 16;
-  if (largura < 2) return;    // longe demais: e a largura que divide ali embaixo
-  int chaoAqui = HORIZONTE + (int)(VISTA / fundo) / 2;
-  int topo = chaoAqui - altura;
-  int esquerda = centro - largura / 2;
+  int center = (int)((SCREEN_W / 2) * (1 + lateral / depth));
+  int height = (int)(VIEW_H / depth * 0.9);
+  int width = height * 12 / 16;
+  if (width < 2) return;      // too far: it is the width that divides down there
+  int floorHere = HORIZON + (int)(VIEW_H / depth) / 2;
+  int top = floorHere - height;
+  int left = center - width / 2;
 
-  for (int x = esquerda < 0 ? 0 : esquerda - esquerda % COL; x < esquerda + largura && x < LARG; x += COL) {
+  for (int x = left < 0 ? 0 : left - left % COL; x < left + width && x < SCREEN_W; x += COL) {
     int r = x / COL;
-    if (r < 0 || r >= RAIOS || fundo >= zbuf[r]) continue;
-    int coluna = (x - esquerda) * 12 / largura;
-    if (coluna < 0 || coluna > 11) continue;
-    int limite = armaTopo[r];
+    if (r < 0 || r >= RAYS || depth >= zbuf[r]) continue;
+    int column = (x - left) * 12 / width;
+    if (column < 0 || column > 11) continue;
+    int limit = gunTop[r];
 
-    // As linhas da mesma cor vao juntas, num retangulo so.
-    int linha = 0;
-    while (linha < 16) {
-      char c = arte[linha][coluna];
-      int fim = linha + 1;
-      while (fim < 16 && arte[fim][coluna] == c) fim++;
+    // Rows of the same color go together, in a single rectangle.
+    int row = 0;
+    while (row < 16) {
+      char c = art[row][column];
+      int end = row + 1;
+      while (end < 16 && art[end][column] == c) end++;
       if (c != '.') {
-        int y0 = topo + linha * altura / 16;
-        int y1 = topo + fim * altura / 16;
+        int y0 = top + row * height / 16;
+        int y1 = top + end * height / 16;
         if (y0 < 0) y0 = 0;
-        faixa(x, y0, y1, limite, corDaLetra(c));
+        stripe(x, y0, y1, limit, letterColor(c));
       }
-      linha = fim;
+      row = end;
     }
-    sujo[r] = true;           // no proximo quadro a coluna volta a ser parede
+    dirty[r] = true;          // on the next frame the column is a wall again
   }
 }
 
-void desenharCoisas() {
-  // Do mais longe para o mais perto: o de perto pinta por cima.
-  int ordem[MAX_COISAS];
-  float dist[MAX_COISAS];
+void drawThings() {
+  // From the farthest to the nearest: the near one paints on top.
+  int order[MAX_THINGS];
+  float dist[MAX_THINGS];
   int n = 0;
-  for (int i = 0; i < nCoisas; i++) {
-    if (!coisas[i].ativa && coisas[i].tipo != 'R') continue;
-    float ex = coisas[i].x - px, ey = coisas[i].y - py;
+  for (int i = 0; i < thingCount; i++) {
+    if (!things[i].active && things[i].kind != 'R') continue;
+    float ex = things[i].x - px, ey = things[i].y - py;
     dist[n] = ex * ex + ey * ey;
-    ordem[n] = i;
+    order[n] = i;
     n++;
   }
   for (int i = 1; i < n; i++)
     for (int j = i; j > 0 && dist[j] > dist[j - 1]; j--) {
       float d = dist[j]; dist[j] = dist[j - 1]; dist[j - 1] = d;
-      int o = ordem[j]; ordem[j] = ordem[j - 1]; ordem[j - 1] = o;
+      int o = order[j]; order[j] = order[j - 1]; order[j - 1] = o;
     }
 
   for (int i = 0; i < n; i++) {
-    Coisa &c = coisas[ordem[i]];
-    const char** arte = c.tipo == 'V' ? KIT : c.tipo == 'A' ? CAIXA : c.vida > 0 ? ROBO : SUCATA;
-    desenharCoisa(c.x, c.y, arte);
+    Thing &t = things[order[i]];
+    const char** art = t.kind == 'H' ? KIT : t.kind == 'A' ? CRATE : t.health > 0 ? ROBOT : SCRAP;
+    drawThing(t.x, t.y, art);
   }
 }
 
 // =====================================================================
-//  A arma e o painel
+//  The gun and the panel
 // =====================================================================
 
-void prepararArma() {
-  for (int r = 0; r < RAIOS; r++) {
-    armaTopo[r] = VISTA;
+void prepareGun() {
+  for (int r = 0; r < RAYS; r++) {
+    gunTop[r] = VIEW_H;
     int x = r * COL;
-    if (x < ARMA_X || x >= ARMA_X + 64) continue;
-    int coluna = (x - ARMA_X) / 4;
-    for (int linha = 0; linha < 16; linha++)
-      if (ARMA[linha][coluna] != '.') {
-        armaTopo[r] = ARMA_Y + linha * 3;
+    if (x < GUN_X || x >= GUN_X + 64) continue;
+    int column = (x - GUN_X) / 4;
+    for (int row = 0; row < 16; row++)
+      if (GUN[row][column] != '.') {
+        gunTop[r] = GUN_Y + row * 3;
         break;
       }
   }
 }
 
-void desenharArma() {
-  for (int coluna = 0; coluna < 16; coluna++) {
-    int linha = 0;
-    while (linha < 16) {
-      char c = ARMA[linha][coluna];
-      int fim = linha + 1;
-      while (fim < 16 && ARMA[fim][coluna] == c) fim++;
+void drawGun() {
+  for (int column = 0; column < 16; column++) {
+    int row = 0;
+    while (row < 16) {
+      char c = GUN[row][column];
+      int end = row + 1;
+      while (end < 16 && GUN[end][column] == c) end++;
       if (c != '.')
-        tft.fillRect(ARMA_X + coluna * 4, ARMA_Y + linha * 3, 4, (fim - linha) * 3, corDaLetra(c));
-      linha = fim;
+        tft.fillRect(GUN_X + column * 4, GUN_Y + row * 3, 4, (end - row) * 3, letterColor(c));
+      row = end;
     }
   }
-  armaNaTela = true;
+  gunOnScreen = true;
 }
 
-void desenharClarao() {
-  tft.fillCircle(160, 134, 9, AMARELO);
-  tft.fillCircle(160, 134, 4, BRANCO);
-  for (int r = 72; r < 88; r++) sujo[r] = true;
+void drawFlash() {
+  tft.fillCircle(160, 134, 9, C_YELLOW);
+  tft.fillCircle(160, 134, 4, C_WHITE);
+  for (int r = 72; r < 88; r++) dirty[r] = true;
 }
 
-void desenharRosto() {
-  int humor = vida > 60 ? 0 : vida > 30 ? 1 : vida > 0 ? 2 : 3;
-  if (humor == rostoMostrado) return;
-  rostoMostrado = humor;
+void drawFace() {
+  int mood = health > 60 ? 0 : health > 30 ? 1 : health > 0 ? 2 : 3;
+  if (mood == shownFace) return;
+  shownFace = mood;
 
-  tft.fillRect(138, 194, 44, 44, PAINEL);
+  tft.fillRect(138, 194, 44, 44, C_PANEL);
   tft.fillCircle(160, 216, 18, tft.color565(226, 176, 120));
-  if (humor == 3) {
-    tft.drawLine(151, 208, 157, 214, PRETO); tft.drawLine(157, 208, 151, 214, PRETO);
-    tft.drawLine(163, 208, 169, 214, PRETO); tft.drawLine(169, 208, 163, 214, PRETO);
+  if (mood == 3) {
+    tft.drawLine(151, 208, 157, 214, C_BLACK); tft.drawLine(157, 208, 151, 214, C_BLACK);
+    tft.drawLine(163, 208, 169, 214, C_BLACK); tft.drawLine(169, 208, 163, 214, C_BLACK);
     return;
   }
-  tft.fillRect(152, 209, 5, 5, PRETO);
-  tft.fillRect(164, 209, 5, 5, PRETO);
-  if (humor == 0) {
-    tft.drawLine(151, 222, 156, 227, PRETO);
-    tft.drawFastHLine(156, 227, 9, PRETO);
-    tft.drawLine(164, 227, 169, 222, PRETO);
-  } else if (humor == 1) {
-    tft.drawFastHLine(153, 225, 15, PRETO);
+  tft.fillRect(152, 209, 5, 5, C_BLACK);
+  tft.fillRect(164, 209, 5, 5, C_BLACK);
+  if (mood == 0) {
+    tft.drawLine(151, 222, 156, 227, C_BLACK);
+    tft.drawFastHLine(156, 227, 9, C_BLACK);
+    tft.drawLine(164, 227, 169, 222, C_BLACK);
+  } else if (mood == 1) {
+    tft.drawFastHLine(153, 225, 15, C_BLACK);
   } else {
-    tft.drawLine(151, 228, 156, 223, PRETO);
-    tft.drawFastHLine(156, 223, 9, PRETO);
-    tft.drawLine(164, 223, 169, 228, PRETO);
-    tft.fillRect(146, 205, 3, 6, VERMELHO);
+    tft.drawLine(151, 228, 156, 223, C_BLACK);
+    tft.drawFastHLine(156, 223, 9, C_BLACK);
+    tft.drawLine(164, 223, 169, 228, C_BLACK);
+    tft.fillRect(146, 205, 3, 6, C_RED);
   }
 }
 
-void desenharPainel() {
-  tft.fillRect(0, VISTA, LARG, 240 - VISTA, PAINEL);
-  tft.drawFastHLine(0, VISTA, LARG, PAINEL_CLARO);
+void drawPanel() {
+  tft.fillRect(0, VIEW_H, SCREEN_W, 240 - VIEW_H, C_PANEL);
+  tft.drawFastHLine(0, VIEW_H, SCREEN_W, C_PANEL_LIGHT);
   tft.setTextSize(1);
-  tft.setTextColor(LETREIRO, PAINEL);
+  tft.setTextColor(C_LABEL, C_PANEL);
   tft.setCursor(10, 195);
-  tft.print("MUNICAO");
+  tft.print("AMMO");
   tft.setCursor(226, 195);
-  tft.print("VIDA");
-  // O nome cabe em 21 letras, antes do rosto: o resto fica de fora.
-  char curto[22];
-  strncpy(curto, nomeDaFase, 21);
-  curto[21] = '\0';
+  tft.print("HEALTH");
+  // The name fits in 21 letters, before the face: the rest is left out.
+  char shortName[22];
+  strncpy(shortName, levelName, 21);
+  shortName[21] = '\0';
   tft.setCursor(10, 231);
-  tft.print(curto);
-  vidaMostrada = municaoMostrada = pontosMostrados = rostoMostrado = -1;
+  tft.print(shortName);
+  shownHealth = shownAmmo = shownScore = shownFace = -1;
 }
 
-void atualizarPainel() {
+void updatePanel() {
   tft.setTextSize(3);
-  tft.setTextColor(VERMELHO, PAINEL);
-  if (municao != municaoMostrada) {
-    municaoMostrada = municao;
+  tft.setTextColor(C_RED, C_PANEL);
+  if (ammo != shownAmmo) {
+    shownAmmo = ammo;
     tft.setCursor(10, 205);
-    tft.printf("%3d", municao);
+    tft.printf("%3d", ammo);
   }
-  if (vida != vidaMostrada) {
-    vidaMostrada = vida;
+  if (health != shownHealth) {
+    shownHealth = health;
     tft.setCursor(226, 205);
-    tft.printf("%3d%%", vida < 0 ? 0 : vida);
+    tft.printf("%3d%%", health < 0 ? 0 : health);
   }
-  if (pontos != pontosMostrados) {
-    pontosMostrados = pontos;
+  if (score != shownScore) {
+    shownScore = score;
     tft.setTextSize(1);
-    tft.setTextColor(AMARELO, PAINEL);
+    tft.setTextColor(C_YELLOW, C_PANEL);
     tft.setCursor(226, 231);
-    tft.printf("PTS %05d", pontos);
+    tft.printf("PTS %05d", score);
   }
-  desenharRosto();
+  drawFace();
 }
 
 // =====================================================================
-//  O jogo
+//  The game
 // =====================================================================
 
-bool livre(float x, float y) {
-  return !ehParede(mapa[(int)y][(int)x]);
+bool isFree(float x, float y) {
+  return !isWall(grid[(int)y][(int)x]);
 }
 
-// Da para ver o jogador de (x, y)? Anda pela reta ate ele, de pouco em pouco.
-bool enxerga(float x, float y) {
+// Can the player be seen from (x, y)? Walks the line to them, bit by bit.
+bool canSee(float x, float y) {
   float ex = px - x, ey = py - y;
   float d = sqrtf(ex * ex + ey * ey);
-  int passos = (int)(d / 0.2);
-  for (int i = 1; i < passos; i++) {
-    float t = (float)i / passos;
-    if (!livre(x + ex * t, y + ey * t)) return false;
+  int steps = (int)(d / 0.2);
+  for (int i = 1; i < steps; i++) {
+    float t = (float)i / steps;
+    if (!isFree(x + ex * t, y + ey * t)) return false;
   }
   return true;
 }
 
-void somDoTiro() { tone(BUZZER, 160, 70); }
+void shotSound() { tone(BUZZER, 160, 70); }
 
-void atirar(unsigned long agora) {
-  ultimoTiro = agora;
-  if (municao <= 0) {
-    tone(BUZZER, 2000, 15);   // o clique da arma vazia
+void fire(unsigned long now) {
+  lastShot = now;
+  if (ammo <= 0) {
+    tone(BUZZER, 2000, 15);   // the click of the empty gun
     return;
   }
-  municao--;
-  clarao = agora + 90;
-  somDoTiro();
+  ammo--;
+  flashUntil = now + 90;
+  shotSound();
 
-  // O tiro vai reto pelo meio da tela: acerta o robo mais perto que esteja
-  // na frente da parede do meio.
-  int alvo = -1;
-  float melhor = zbuf[RAIOS / 2];
-  float inverso = 1.0 / (planoX * dirY - dirX * planoY);
-  for (int i = 0; i < nCoisas; i++) {
-    Coisa &c = coisas[i];
-    if (c.tipo != 'R' || c.vida <= 0) continue;
-    float sx = c.x - px, sy = c.y - py;
-    float lateral = inverso * (dirY * sx - dirX * sy);
-    float fundo = inverso * (-planoY * sx + planoX * sy);
-    if (fundo < 0.2 || fundo >= melhor) continue;
-    int centro = (int)((LARG / 2) * (1 + lateral / fundo));
-    int meiaLargura = (int)(VISTA / fundo * 0.9) * 12 / 16 / 2;
-    if (abs(centro - LARG / 2) > meiaLargura * 2 / 3) continue;
-    melhor = fundo;
-    alvo = i;
+  // The shot goes straight through the middle of the screen: it hits the
+  // nearest robot that is in front of the middle wall.
+  int target = -1;
+  float best = zbuf[RAYS / 2];
+  float inverse = 1.0 / (planeX * dirY - dirX * planeY);
+  for (int i = 0; i < thingCount; i++) {
+    Thing &t = things[i];
+    if (t.kind != 'R' || t.health <= 0) continue;
+    float sx = t.x - px, sy = t.y - py;
+    float lateral = inverse * (dirY * sx - dirX * sy);
+    float depth = inverse * (-planeY * sx + planeX * sy);
+    if (depth < 0.2 || depth >= best) continue;
+    int center = (int)((SCREEN_W / 2) * (1 + lateral / depth));
+    int halfWidth = (int)(VIEW_H / depth * 0.9) * 12 / 16 / 2;
+    if (abs(center - SCREEN_W / 2) > halfWidth * 2 / 3) continue;
+    best = depth;
+    target = i;
   }
-  if (alvo < 0) return;
+  if (target < 0) return;
 
-  Coisa &robo = coisas[alvo];
-  robo.vida--;
-  if (robo.vida > 0) {
+  Thing &robot = things[target];
+  robot.health--;
+  if (robot.health > 0) {
     tone(BUZZER, 90, 120);
   } else {
     tone(BUZZER, 60, 250);
-    pontos += 100;
-    Serial.println("robo destruido: +100 pontos");
+    score += 100;
+    Serial.println("robot destroyed: +100 points");
   }
 }
 
-void usar() {
+void use() {
   int cx = (int)(px + dirX * 0.9);
   int cy = (int)(py + dirY * 0.9);
-  char c = mapa[cy][cx];
+  char c = grid[cy][cx];
   if (c == 'D') {
-    mapa[cy][cx] = '.';
+    grid[cy][cx] = '.';
     tone(BUZZER, 220, 150);
-    Serial.println("porta aberta");
+    Serial.println("door open");
   } else if (c == 'X') {
-    concluirFase();
+    finishLevel();
   }
 }
 
-void andar(float dx, float dy) {
-  // Separado em x e em y: encostado na parede, o jogador escorrega nela.
-  float folga = 0.25;
+void walk(float dx, float dy) {
+  // Split into x and y: against a wall, the player slides along it.
+  float margin = 0.25;
   float nx = px + dx, ny = py + dy;
-  if (livre(nx + (dx > 0 ? folga : -folga), py)) px = nx;
-  if (livre(px, ny + (dy > 0 ? folga : -folga))) py = ny;
+  if (isFree(nx + (dx > 0 ? margin : -margin), py)) px = nx;
+  if (isFree(px, ny + (dy > 0 ? margin : -margin))) py = ny;
 }
 
-void girar(float angulo) {
-  float c = cosf(angulo), s = sinf(angulo);
+void turn(float angle) {
+  float c = cosf(angle), s = sinf(angle);
   float d = dirX;
   dirX = dirX * c - dirY * s;
   dirY = d * s + dirY * c;
-  float p = planoX;
-  planoX = planoX * c - planoY * s;
-  planoY = p * s + planoY * c;
+  float p = planeX;
+  planeX = planeX * c - planeY * s;
+  planeY = p * s + planeY * c;
 }
 
-void atualizarCoisas(unsigned long agora, float dt) {
-  for (int i = 0; i < nCoisas; i++) {
-    Coisa &c = coisas[i];
-    if (!c.ativa) continue;
-    float ex = px - c.x, ey = py - c.y;
+void updateThings(unsigned long now, float dt) {
+  for (int i = 0; i < thingCount; i++) {
+    Thing &t = things[i];
+    if (!t.active) continue;
+    float ex = px - t.x, ey = py - t.y;
     float d = sqrtf(ex * ex + ey * ey);
 
-    if (c.tipo == 'V' && d < 0.6 && vida < 100) {
-      vida = vida + 25 > 100 ? 100 : vida + 25;
-      c.ativa = false;
-      pontos += 10;
+    if (t.kind == 'H' && d < 0.6 && health < 100) {
+      health = health + 25 > 100 ? 100 : health + 25;
+      t.active = false;
+      score += 10;
       tone(BUZZER, 1200, 60);
-    } else if (c.tipo == 'A' && d < 0.6 && municao < 99) {
-      municao = municao + 12 > 99 ? 99 : municao + 12;
-      c.ativa = false;
-      pontos += 10;
+    } else if (t.kind == 'A' && d < 0.6 && ammo < 99) {
+      ammo = ammo + 12 > 99 ? 99 : ammo + 12;
+      t.active = false;
+      score += 10;
       tone(BUZZER, 1500, 60);
-    } else if (c.tipo == 'R') {
-      if (c.vida <= 0) { c.ativa = false; continue; }
-      if (d > 9 || !enxerga(c.x, c.y)) continue;
+    } else if (t.kind == 'R') {
+      if (t.health <= 0) { t.active = false; continue; }
+      if (d > 9 || !canSee(t.x, t.y)) continue;
 
-      // Anda na direcao do jogador ate ficar perto.
+      // Walks toward the player until it is close.
       if (d > 1.1) {
-        float nx = c.x + ex / d * 1.1 * dt, ny = c.y + ey / d * 1.1 * dt;
-        if (livre(nx, c.y)) c.x = nx;
-        if (livre(c.x, ny)) c.y = ny;
+        float nx = t.x + ex / d * 1.1 * dt, ny = t.y + ey / d * 1.1 * dt;
+        if (isFree(nx, t.y)) t.x = nx;
+        if (isFree(t.x, ny)) t.y = ny;
       }
 
-      // E atira de vez em quando: de perto erra menos.
-      if (d < 7 && agora - c.ultimoAtaque > 1300) {
-        c.ultimoAtaque = agora;
+      // And shoots now and then: up close it misses less.
+      if (d < 7 && now - t.lastAttack > 1300) {
+        t.lastAttack = now;
         if (random(100) < (d < 2.5 ? 70 : 35)) {
-          vida -= random(5, 13);
-          ferido = agora + 150;
+          health -= random(5, 13);
+          hurtUntil = now + 150;
           tone(BUZZER, 110, 90);
         }
       }
@@ -728,146 +731,146 @@ void atualizarCoisas(unsigned long agora, float dt) {
 }
 
 // =====================================================================
-//  Fases, telas e a chave
+//  Levels, screens and the switch
 // =====================================================================
 
-void comecarFase() {
-  faseDoCartao = lerFaseDoCartao(fase);
-  if (!faseDoCartao) {
-    if (fase > 1) {            // acabaram as fases do cartao
-      mostrarVitoria();
+void startLevel() {
+  levelFromCard = readLevelFromCard(level);
+  if (!levelFromCard) {
+    if (level > 1) {           // the card's levels ran out
+      showVictory();
       return;
     }
-    usarFaseInterna();
+    useBuiltInLevel();
   }
-  prepararFase();
-  Serial.printf("fase %d: %s (%s)\n", fase, nomeDaFase, faseDoCartao ? "do cartao" : "do codigo");
+  prepareLevel();
+  Serial.printf("level %d: %s (%s)\n", level, levelName, levelFromCard ? "from the card" : "from the code");
 
-  tft.fillScreen(PRETO);
+  tft.fillScreen(C_BLACK);
   tft.setTextSize(2);
-  tft.setTextColor(VERMELHO);
+  tft.setTextColor(C_RED);
   tft.setCursor(20, 100);
-  tft.print(nomeDaFase);
+  tft.print(levelName);
   delay(1200);
 
-  tft.fillScreen(PRETO);
-  for (int r = 0; r < RAIOS; r++) sujo[r] = true;
-  desenharPainel();
-  armaNaTela = false;
-  estado = JOGANDO;
-  quadroAntes = millis();
+  tft.fillScreen(C_BLACK);
+  for (int r = 0; r < RAYS; r++) dirty[r] = true;
+  drawPanel();
+  gunOnScreen = false;
+  state = PLAYING;
+  lastFrame = millis();
 }
 
-void concluirFase() {
-  pontos += 500 + vida;
-  Serial.printf("fase %d concluida: %d pontos\n", fase, pontos);
+void finishLevel() {
+  score += 500 + health;
+  Serial.printf("level %d complete: %d points\n", level, score);
   tone(BUZZER, 660, 120);
-  fase++;
-  comecarFase();
+  level++;
+  startLevel();
 }
 
-void mostrarTitulo() {
-  estado = TITULO;
-  tft.fillScreen(PRETO);
+void showTitle() {
+  state = TITLE;
+  tft.fillScreen(C_BLACK);
   for (int i = 0; i < 12; i++)
-    tft.fillRect(0, 168 + i * 6, LARG, 6, tft.color565(255, i * 18, 0));
-  tft.setTextColor(VERMELHO);
+    tft.fillRect(0, 168 + i * 6, SCREEN_W, 6, tft.color565(255, i * 18, 0));
+  tft.setTextColor(C_RED);
   tft.setTextSize(5);
   tft.setCursor(25, 40);
   tft.print("BASE ZERO");
   tft.setTextSize(1);
-  tft.setTextColor(LETREIRO);
+  tft.setTextColor(C_LABEL);
   tft.setCursor(40, 92);
-  tft.print("tiro em primeira pessoa com raycasting");
+  tft.print("first-person shooter with raycasting");
   tft.setCursor(40, 110);
-  tft.printf("recorde: %d", recorde);
+  tft.printf("high score: %d", highScore);
   tft.setCursor(40, 122);
-  tft.print(temCartao ? "fases: cartao microSD" : "sem cartao: fase do codigo");
+  tft.print(hasCard ? "levels: microSD card" : "no card: built-in level");
   tft.setTextSize(2);
-  tft.setTextColor(AMARELO);
-  tft.setCursor(88, 140);
-  tft.print("APERTE START");
+  tft.setTextColor(C_YELLOW);
+  tft.setCursor(94, 140);
+  tft.print("PRESS START");
 }
 
-void mostrarMorte() {
-  estado = MORTO;
-  salvarRecorde();
-  tft.fillRect(0, 0, LARG, VISTA, 0x7800);
-  tft.setTextColor(BRANCO);
+void showDeath() {
+  state = DEAD;
+  saveHighScore();
+  tft.fillRect(0, 0, SCREEN_W, VIEW_H, 0x7800);
+  tft.setTextColor(C_WHITE);
   tft.setTextSize(3);
-  tft.setCursor(52, 70);
-  tft.print("VOCE MORREU");
+  tft.setCursor(88, 70);
+  tft.print("YOU DIED");
   tft.setTextSize(1);
   tft.setCursor(88, 110);
-  tft.print("START recomeca a fase");
-  Serial.println("o jogador morreu");
+  tft.print("START restarts the level");
+  Serial.println("the player died");
 }
 
-void mostrarVitoria() {
-  estado = VITORIA;
-  salvarRecorde();
-  tft.fillScreen(PRETO);
-  tft.setTextColor(AMARELO);
+void showVictory() {
+  state = VICTORY;
+  saveHighScore();
+  tft.fillScreen(C_BLACK);
+  tft.setTextColor(C_YELLOW);
   tft.setTextSize(3);
   tft.setCursor(16, 60);
-  tft.print("MISSAO CUMPRIDA");
+  tft.print("MISSION COMPLETE");
   tft.setTextSize(2);
-  tft.setTextColor(BRANCO);
+  tft.setTextColor(C_WHITE);
   tft.setCursor(60, 110);
-  tft.printf("pontos: %d", pontos);
+  tft.printf("score: %d", score);
   tft.setCursor(60, 136);
-  tft.printf("recorde: %d", recorde);
+  tft.printf("high score: %d", highScore);
   tft.setTextSize(1);
   tft.setCursor(100, 180);
-  tft.print("START joga de novo");
-  Serial.printf("vitoria com %d pontos\n", pontos);
+  tft.print("START plays again");
+  Serial.printf("victory with %d points\n", score);
 }
 
-void lerRecorde() {
-  if (!temCartao) return;
-  File arquivo = SD.open("/RECORDE.TXT");
-  if (!arquivo) return;
-  recorde = arquivo.readStringUntil('\n').toInt();
-  arquivo.close();
+void readHighScore() {
+  if (!hasCard) return;
+  File file = SD.open("/HISCORE.TXT");
+  if (!file) return;
+  highScore = file.readStringUntil('\n').toInt();
+  file.close();
 }
 
-void salvarRecorde() {
-  if (!temCartao || pontos <= recorde) return;
-  recorde = pontos;
-  // Na ESP32 o FILE_WRITE comeca o arquivo do zero: o recorde velho sai.
-  File arquivo = SD.open("/RECORDE.TXT", FILE_WRITE);
-  if (!arquivo) return;
-  arquivo.println(recorde);
-  arquivo.close();
-  Serial.printf("recorde novo: %d\n", recorde);
+void saveHighScore() {
+  if (!hasCard || score <= highScore) return;
+  highScore = score;
+  // On the ESP32, FILE_WRITE starts the file from scratch: the old score goes.
+  File file = SD.open("/HISCORE.TXT", FILE_WRITE);
+  if (!file) return;
+  file.println(highScore);
+  file.close();
+  Serial.printf("new high score: %d\n", highScore);
 }
 
-// A chave desligou: apaga tudo e dorme ate ela voltar.
-void desligar() {
-  Serial.println("chave desligada: sono profundo ate ela voltar");
-  if (telaIniciada) {
-    salvarRecorde();
+// The switch went off: turns everything off and sleeps until it comes back.
+void powerOff() {
+  Serial.println("switch off: deep sleep until it comes back");
+  if (screenStarted) {
+    saveHighScore();
     tone(BUZZER, 300, 120);
-    // O desligar da TV antiga: a imagem vira uma linha e some.
-    tft.fillScreen(PRETO);
-    tft.fillRect(0, 118, LARG, 4, BRANCO);
+    // The old TV switching off: the picture becomes a line and disappears.
+    tft.fillScreen(C_BLACK);
+    tft.fillRect(0, 118, SCREEN_W, 4, C_WHITE);
     delay(120);
-    tft.fillRect(0, 118, LARG, 4, PRETO);
-    tft.fillRect(150, 118, 20, 4, BRANCO);
+    tft.fillRect(0, 118, SCREEN_W, 4, C_BLACK);
+    tft.fillRect(150, 118, 20, 4, C_WHITE);
     delay(120);
-    tft.fillScreen(PRETO);
+    tft.fillScreen(C_BLACK);
     tft.sendCommand(ILI9341_DISPOFF);
     tft.sendCommand(ILI9341_SLPIN);
   }
 
-  // A luz apagada e segura em LOW durante o sono; a chave acorda a placa
-  // quando for ligada (LOW), com o pull-up do RTC segurando o nivel.
-  digitalWrite(TFT_LUZ, LOW);
-  gpio_hold_en((gpio_num_t)TFT_LUZ);
+  // The light is held off (LOW) during sleep; the switch wakes the board
+  // when it is turned on (LOW), with the RTC pull-up holding the level.
+  digitalWrite(TFT_LIGHT, LOW);
+  gpio_hold_en((gpio_num_t)TFT_LIGHT);
   gpio_deep_sleep_hold_en();
-  rtc_gpio_pullup_en((gpio_num_t)CHAVE);
-  rtc_gpio_pulldown_dis((gpio_num_t)CHAVE);
-  esp_sleep_enable_ext0_wakeup((gpio_num_t)CHAVE, 0);
+  rtc_gpio_pullup_en((gpio_num_t)POWER_SWITCH);
+  rtc_gpio_pulldown_dis((gpio_num_t)POWER_SWITCH);
+  esp_sleep_enable_ext0_wakeup((gpio_num_t)POWER_SWITCH, 0);
   Serial.flush();
   esp_deep_sleep_start();
 }
@@ -877,119 +880,119 @@ void desligar() {
 void setup() {
   Serial.begin(115200);
 
-  // O pino da luz pode ter ficado segurado pelo sono: ele volta ao sketch.
-  gpio_hold_dis((gpio_num_t)TFT_LUZ);
-  pinMode(TFT_LUZ, OUTPUT);
-  digitalWrite(TFT_LUZ, LOW);
-  pinMode(CHAVE, INPUT_PULLUP);
-  int botoes[7] = {BT_CIMA, BT_BAIXO, BT_ESQ, BT_DIR, BT_A, BT_B, BT_START};
-  for (int i = 0; i < 7; i++) pinMode(botoes[i], INPUT_PULLUP);
+  // The light pin may have been held by the sleep: it goes back to the sketch.
+  gpio_hold_dis((gpio_num_t)TFT_LIGHT);
+  pinMode(TFT_LIGHT, OUTPUT);
+  digitalWrite(TFT_LIGHT, LOW);
+  pinMode(POWER_SWITCH, INPUT_PULLUP);
+  int buttons[7] = {BTN_UP, BTN_DOWN, BTN_LEFT, BTN_RIGHT, BTN_A, BTN_B, BTN_START};
+  for (int i = 0; i < 7; i++) pinMode(buttons[i], INPUT_PULLUP);
 
-  // Ligou pela USB com a chave desligada: volta a dormir sem acender nada.
-  if (digitalRead(CHAVE) == HIGH) desligar();
+  // Powered over USB with the switch off: goes back to sleep without lighting anything.
+  if (digitalRead(POWER_SWITCH) == HIGH) powerOff();
 
   tft.begin();
   tft.setRotation(1);
-  tft.fillScreen(PRETO);
-  telaIniciada = true;
-  digitalWrite(TFT_LUZ, HIGH);
-  prepararCores();
-  prepararArma();
+  tft.fillScreen(C_BLACK);
+  screenStarted = true;
+  digitalWrite(TFT_LIGHT, HIGH);
+  prepareColors();
+  prepareGun();
 
-  temCartao = SD.begin(SD_CS);
-  lerRecorde();
-  Serial.printf("BASE ZERO -- cartao: %s, recorde: %d\n", temCartao ? "sim" : "nao", recorde);
+  hasCard = SD.begin(SD_CS);
+  readHighScore();
+  Serial.printf("BASE ZERO -- card: %s, high score: %d\n", hasCard ? "yes" : "no", highScore);
 
   if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT0) {
-    Serial.printf("acordou pela chave: voltando para a fase %d com %d pontos\n", fase, pontos);
-    comecarFase();
+    Serial.printf("woke up by the switch: back to level %d with %d points\n", level, score);
+    startLevel();
   } else {
-    fase = 1;
-    pontos = 0;
-    mostrarTitulo();
+    level = 1;
+    score = 0;
+    showTitle();
   }
 }
 
 void loop() {
-  unsigned long agora = millis();
-  if (digitalRead(CHAVE) == HIGH) desligar();
+  unsigned long now = millis();
+  if (digitalRead(POWER_SWITCH) == HIGH) powerOff();
 
-  bool start = digitalRead(BT_START) == LOW;
-  bool apertouStart = start && !startAntes;
-  startAntes = start;
+  bool start = digitalRead(BTN_START) == LOW;
+  bool pressedStart = start && !startBefore;
+  startBefore = start;
 
-  if (estado == TITULO || estado == MORTO || estado == VITORIA) {
-    if (apertouStart) {
-      if (estado == VITORIA) { fase = 1; pontos = 0; }
-      comecarFase();
+  if (state == TITLE || state == DEAD || state == VICTORY) {
+    if (pressedStart) {
+      if (state == VICTORY) { level = 1; score = 0; }
+      startLevel();
     }
     delay(30);
     return;
   }
 
-  if (estado == PAUSA) {
-    if (apertouStart) {
-      estado = JOGANDO;
-      for (int r = 0; r < RAIOS; r++) sujo[r] = true;
-      armaNaTela = false;
-      quadroAntes = millis();
+  if (state == PAUSED) {
+    if (pressedStart) {
+      state = PLAYING;
+      for (int r = 0; r < RAYS; r++) dirty[r] = true;
+      gunOnScreen = false;
+      lastFrame = millis();
     }
     delay(30);
     return;
   }
 
-  if (apertouStart) {
-    estado = PAUSA;
-    tft.fillRect(100, 80, 120, 32, PRETO);
-    tft.drawRect(100, 80, 120, 32, AMARELO);
+  if (pressedStart) {
+    state = PAUSED;
+    tft.fillRect(100, 80, 120, 32, C_BLACK);
+    tft.drawRect(100, 80, 120, 32, C_YELLOW);
     tft.setTextSize(2);
-    tft.setTextColor(AMARELO);
-    tft.setCursor(118, 89);
-    tft.print("PAUSADO");
+    tft.setTextColor(C_YELLOW);
+    tft.setCursor(124, 89);
+    tft.print("PAUSED");
     return;
   }
 
-  float dt = (agora - quadroAntes) / 1000.0;
-  quadroAntes = agora;
+  float dt = (now - lastFrame) / 1000.0;
+  lastFrame = now;
   if (dt > 0.1) dt = 0.1;
 
-  // ---- os botoes ----
-  if (digitalRead(BT_CIMA) == LOW) andar(dirX * 2.6 * dt, dirY * 2.6 * dt);
-  if (digitalRead(BT_BAIXO) == LOW) andar(-dirX * 2.0 * dt, -dirY * 2.0 * dt);
-  if (digitalRead(BT_ESQ) == LOW) girar(-2.4 * dt);
-  if (digitalRead(BT_DIR) == LOW) girar(2.4 * dt);
+  // ---- the buttons ----
+  if (digitalRead(BTN_UP) == LOW) walk(dirX * 2.6 * dt, dirY * 2.6 * dt);
+  if (digitalRead(BTN_DOWN) == LOW) walk(-dirX * 2.0 * dt, -dirY * 2.0 * dt);
+  if (digitalRead(BTN_LEFT) == LOW) turn(-2.4 * dt);
+  if (digitalRead(BTN_RIGHT) == LOW) turn(2.4 * dt);
 
-  bool a = digitalRead(BT_A) == LOW;
-  if (a && (!aAntes || agora - ultimoTiro > 350)) atirar(agora);
-  aAntes = a;
+  bool a = digitalRead(BTN_A) == LOW;
+  if (a && (!aBefore || now - lastShot > 350)) fire(now);
+  aBefore = a;
 
-  bool b = digitalRead(BT_B) == LOW;
-  if (b && !bAntes) usar();
-  bAntes = b;
-  if (estado != JOGANDO) return;        // o B pode ter terminado a fase
+  bool b = digitalRead(BTN_B) == LOW;
+  if (b && !bBefore) use();
+  bBefore = b;
+  if (state != PLAYING) return;         // B may have finished the level
 
-  atualizarCoisas(agora, dt);
-  if (vida <= 0) {
-    vida = 0;
-    atualizarPainel();
-    mostrarMorte();
+  updateThings(now, dt);
+  if (health <= 0) {
+    health = 0;
+    updatePanel();
+    showDeath();
     return;
   }
 
-  // ---- o quadro ----
-  desenharVista();
-  desenharCoisas();
-  if (!armaNaTela) desenharArma();
-  if (agora < clarao) desenharClarao();
-  if (agora < ferido) {
-    tft.drawRect(0, 0, LARG, VISTA, VERMELHO);
-    tft.drawRect(1, 1, LARG - 2, VISTA - 2, VERMELHO);
-    for (int r = 0; r < RAIOS; r++) sujo[r] = true;
+  // ---- the frame ----
+  drawView();
+  drawThings();
+  if (!gunOnScreen) drawGun();
+  if (now < flashUntil) drawFlash();
+  if (now < hurtUntil) {
+    tft.drawRect(0, 0, SCREEN_W, VIEW_H, C_RED);
+    tft.drawRect(1, 1, SCREEN_W - 2, VIEW_H - 2, C_RED);
+    for (int r = 0; r < RAYS; r++) dirty[r] = true;
   }
-  atualizarPainel();
+  updatePanel();
 
-  // No maximo 30 quadros por segundo: o SPI agradece, e o computador fraco
-  // do laboratorio tambem.
-  unsigned long gasto = millis() - agora;
-  if (gasto < 33) delay(33 - gasto);
+  // At most 30 frames per second: the SPI is grateful, and so is the weak
+  // computer in the lab.
+  unsigned long spent = millis() - now;
+  if (spent < 33) delay(33 - spent);
 }

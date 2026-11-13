@@ -420,6 +420,9 @@ public class Circuito
         ["esp32-h2-devkit"] = new() { ["24"] = "TX", ["23"] = "RX" },
         // Na Nucleo-C031C6 o furo do AREF do Arduino e o AVDD (Alpha 25).
         ["st-nucleo-c031c6"] = new() { ["AREF"] = "AVDD" },
+        // Os fios do 28BYJ-48 passaram a ter o nome em ingles (a lingua
+        // principal do programa), como na ficha do motor.
+        ["motor-28byj48"] = new() { ["azul"] = "blue", ["rosa"] = "pink", ["amarelo"] = "yellow", ["laranja"] = "orange", ["vermelho"] = "red" },
     };
 
     /// <summary>Passa os fios de um projeto antigo para os nomes de pino de agora.</summary>

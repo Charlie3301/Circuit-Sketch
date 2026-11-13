@@ -40,53 +40,53 @@ c.led('amarelo', '9', 'GND.1', 'amarelo', 500, 20, AMARELO)
 c.led('verde', '8', 'GND.1', 'verde', 580, 20, VERDE)
 
 gravar('ada-semaforo', '''
---  Semaforo em Ada.
+--  Traffic light in Ada.
 --
---  Tres LEDs e uma sub-rotina que acende um so de cada vez. O ":=" atribui
---  e o "=" compara; o laco "loop ... end loop" roda para sempre, que e o
---  que todo firmware faz.
+--  Three LEDs and a subprogram that lights only one at a time. ":="
+--  assigns and "=" compares; the "loop ... end loop" runs forever, which is
+--  what every firmware does.
 
 with Ada.Text_IO; use Ada.Text_IO;
 
-procedure Semaforo is
-   Vermelho : constant Integer := 10;
-   Amarelo  : constant Integer := 9;
-   Verde    : constant Integer := 8;
-   Ciclos   : Integer := 0;
+procedure Traffic_Light is
+   Red    : constant Integer := 10;
+   Yellow : constant Integer := 9;
+   Green  : constant Integer := 8;
+   Cycles : Integer := 0;
 
-   procedure Acender (Pino : Integer; Tempo : Integer) is
+   procedure Light_Up (Pin : Integer; Ms : Integer) is
    begin
-      Digital_Write (Vermelho, Low);
-      Digital_Write (Amarelo, Low);
-      Digital_Write (Verde, Low);
-      Digital_Write (Pino, High);
-      Delay_Ms (Tempo);
-   end Acender;
+      Digital_Write (Red, Low);
+      Digital_Write (Yellow, Low);
+      Digital_Write (Green, Low);
+      Digital_Write (Pin, High);
+      Delay_Ms (Ms);
+   end Light_Up;
 
 begin
-   Pin_Mode (Vermelho, Output);
-   Pin_Mode (Amarelo, Output);
-   Pin_Mode (Verde, Output);
-   Put_Line ("Semaforo em Ada");
+   Pin_Mode (Red, Output);
+   Pin_Mode (Yellow, Output);
+   Pin_Mode (Green, Output);
+   Put_Line ("Traffic light in Ada");
 
    loop
-      Acender (Vermelho, 3000);
-      Acender (Verde, 3000);
-      Acender (Amarelo, 1000);
-      Ciclos := Ciclos + 1;
-      Put ("ciclos completos: ");
-      Put_Line (Ciclos);
+      Light_Up (Red, 3000);
+      Light_Up (Green, 3000);
+      Light_Up (Yellow, 1000);
+      Cycles := Cycles + 1;
+      Put ("cycles completed: ");
+      Put_Line (Cycles);
    end loop;
-end Semaforo;
+end Traffic_Light;
 ''', c, '''
-Semaforo em Ada.
+Traffic light in Ada.
 
-O que esta demo mostra:
-- uma sub-rotina (procedure) com parametros, declarada dentro do programa;
-- variavel e constante com tipo, e o laco infinito do firmware.
+What this demo shows:
+- a subprogram (procedure) with parameters, declared inside the program;
+- typed variables and constants, and the firmware's endless loop.
 
-O simulador descobre a linguagem pelo proprio codigo, e mostra qual
-entendeu no canto do editor.
+The simulator detects the language from the code itself, and shows which
+one it understood in the corner of the editor.
 ''')
 demo('ada-semaforo', 'Semáforo em Ada', 'Arduino Uno')
 
@@ -103,72 +103,73 @@ c.ligar('pot', 'GND', 'placa', 'GND.2', PRETO)
 c.led('aquecedor', '8', 'GND.1', 'vermelho', 540, 30, VERMELHO)
 
 gravar('spark-termostato', '''
---  Termostato com contratos, em SPARK.
+--  Thermostat with contracts, in SPARK.
 --
---  SPARK e Ada com contratos: o "Pre" diz o que a funcao exige de quem a
---  chama. Uma ferramenta de prova (o GNATprove) confere que ninguem quebra
---  o contrato -- aqui ele e lido e guardado, e o programa roda com ele no
---  lugar.
+--  SPARK is Ada with contracts: "Pre" states what the function requires
+--  from its caller. A proof tool (GNATprove) checks that nobody breaks the
+--  contract -- here it is read and kept, and the program runs with it in
+--  place.
 --
---  O potenciometro faz o papel do sensor, de 0 a 50 graus. O aquecedor
---  (LED vermelho) liga abaixo de 18 e so desliga acima de 22: a folga -- a
---  histerese -- evita que ele fique ligando e desligando.
+--  The potentiometer plays the sensor, from 0 to 50 degrees. The heater
+--  (red LED) turns on below 18 and only turns off above 22: the gap -- the
+--  hysteresis -- keeps it from switching on and off all the time.
 
 pragma SPARK_Mode (On);
 
-procedure Termostato is
-   Sensor     : constant Integer := A0;
-   Aquecedor  : constant Integer := 8;
-   Liga_Em    : constant Integer := 18;
-   Desliga_Em : constant Integer := 22;
-   Ligado     : Boolean := False;
-   Graus      : Integer := 0;
+procedure Thermostat is
+   Sensor  : constant Integer := A0;
+   Heater  : constant Integer := 8;
+   On_At   : constant Integer := 18;
+   Off_At  : constant Integer := 22;
+   Heating : Boolean := False;
+   Degrees : Integer := 0;
 
-   function Para_Graus (Leitura : Integer) return Integer
-     with Pre => Leitura >= 0 and Leitura <= 1023;
+   function To_Degrees (Reading : Integer) return Integer
+     with Pre => Reading >= 0 and Reading <= 1023;
 
-   function Para_Graus (Leitura : Integer) return Integer is
+   function To_Degrees (Reading : Integer) return Integer is
    begin
-      return Leitura * 50 / 1023;
-   end Para_Graus;
+      return Reading * 50 / 1023;
+   end To_Degrees;
 
 begin
-   Pin_Mode (Aquecedor, Output);
+   Pin_Mode (Heater, Output);
 
    loop
-      Graus := Para_Graus (Analog_Read (Sensor));
+      Degrees := To_Degrees (Analog_Read (Sensor));
 
-      if Graus < Liga_Em then
-         Ligado := True;
-      elsif Graus > Desliga_Em then
-         Ligado := False;
+      if Degrees < On_At then
+         Heating := True;
+      elsif Degrees > Off_At then
+         Heating := False;
       end if;
 
-      if Ligado then
-         Digital_Write (Aquecedor, High);
+      if Heating then
+         Digital_Write (Heater, High);
       else
-         Digital_Write (Aquecedor, Low);
+         Digital_Write (Heater, Low);
       end if;
 
-      Put ("temperatura: ");
-      Put (Graus);
-      if Ligado then
-         Put_Line (" C, aquecendo");
+      Put ("temperature: ");
+      Put (Degrees);
+      if Heating then
+         Put_Line (" C, heating");
       else
          Put_Line (" C");
       end if;
 
       Delay_Ms (500);
    end loop;
-end Termostato;
+end Thermostat;
 ''', c, '''
-Termostato com contratos, em SPARK.
+Thermostat with contracts, in SPARK.
 
-O que esta demo mostra:
-- uma funcao com contrato (Pre) e o if/elsif do Ada;
-- histerese: o aquecedor liga abaixo de 18 graus e so desliga acima de 22.
+What this demo shows:
+- a function with a contract (Pre) and Ada's if/elsif;
+- hysteresis: the heater turns on below 18 degrees and only turns off
+  above 22.
 
-Aperte F5 e gire o potenciometro, que faz o papel do sensor (0 a 50 C).
+Press F5 and turn the potentiometer, which plays the sensor (0 to 50 C).
 ''')
 demo('spark-termostato', 'Termostato com contratos em SPARK', 'Arduino Uno')
 
@@ -183,57 +184,58 @@ for i, cor in enumerate(['vermelho', 'amarelo', 'verde', 'azul']):
     c.led(f'bit{i}', str(8 + i), 'GND.1', cor, 420 + i * 80, 20, VERDE)
 
 gravar('cowgol-contador', '''
-# Contador de apertos em Cowgol.
+# Press counter in Cowgol.
 #
-# Cada aperto do botao soma um, e os quatro LEDs mostram a contagem em
-# binario (de 0 a 15). O monitor serial mostra o numero.
+# Each button press adds one, and the four LEDs show the count in binary
+# (from 0 to 15). The serial monitor shows the number.
 #
-# Cowgol e uma linguagem de sistemas com jeito de Ada: "sub" no lugar de
-# "procedure", tipos com o tamanho escrito no nome (uint8 sao oito bits)
-# e comentario com cerquilha.
+# Cowgol is a systems language in the style of Ada: "sub" instead of
+# "procedure", types with their size in the name (uint8 is eight bits)
+# and comments with a hash sign.
 
 sub main() is
-    var botao: uint8 := 2;
-    var contagem: uint8 := 0;
-    var antes: uint8 := 1;
-    var agora: uint8 := 1;
-    var resto: uint8 := 0;
+    var button: uint8 := 2;
+    var count: uint8 := 0;
+    var before: uint8 := 1;
+    var now: uint8 := 1;
+    var rest: uint8 := 0;
     var i: uint8 := 0;
 
-    pin_mode(botao, INPUT_PULLUP);
+    pin_mode(button, INPUT_PULLUP);
     while i < 4 loop
         pin_mode(8 + i, OUTPUT);
         i := i + 1;
     end loop;
 
     loop
-        agora := digital_read(botao);
-        if antes == 1 and agora == 0 then
-            contagem := (contagem + 1) % 16;
-            print("contagem: ");
-            println(contagem);
+        now := digital_read(button);
+        if before == 1 and now == 0 then
+            count := (count + 1) % 16;
+            print("count: ");
+            println(count);
 
-            # Um bit por LED: o resto da divisao por 2 e o bit de baixo.
-            resto := contagem;
+            # One bit per LED: the remainder of dividing by 2 is the low bit.
+            rest := count;
             i := 0;
             while i < 4 loop
-                digital_write(8 + i, resto % 2);
-                resto := resto / 2;
+                digital_write(8 + i, rest % 2);
+                rest := rest / 2;
                 i := i + 1;
             end loop;
         end if;
-        antes := agora;
+        before := now;
         delay_ms(20);
     end loop;
 end sub;
 ''', c, '''
-Contador de apertos em Cowgol.
+Press counter in Cowgol.
 
-O que esta demo mostra:
-- variaveis com o tamanho no tipo (uint8), while e if do Cowgol;
-- um numero virando binario nos LEDs, bit a bit, com o resto da divisao.
+What this demo shows:
+- variables with the size in the type (uint8), Cowgol's while and if;
+- a number turning into binary on the LEDs, bit by bit, with the
+  remainder of a division.
 
-Aperte F5 e o botao: os LEDs contam de 0 a 15 em binario.
+Press F5, then the button: the LEDs count from 0 to 15 in binary.
 ''')
 demo('cowgol-contador', 'Contador de apertos em Cowgol', 'Arduino Uno')
 
@@ -246,38 +248,38 @@ c = Circuito('placa', 'arduino-uno', 60, 160)
 c.led('led', '9', 'GND.1', 'azul', 460, 30, AZUL)
 
 gravar('millipascal-respirar', '''
-# LED respirando em Millipascal.
+# Breathing LED in Millipascal.
 #
-# O analogWrite vai de 0 a 255 e volta: o LED no pino 9 (que tem PWM)
-# acende e apaga devagar, como quem respira.
+# analogWrite goes from 0 to 255 and back: the LED on pin 9 (which has PWM)
+# slowly brightens and dims, like breathing.
 #
-# Millipascal e um Pascal enxuto: "proc" abre o procedimento, "begin" e
-# "end" delimitam os blocos, e "set" atribui.
+# Millipascal is a lean Pascal: "proc" opens the procedure, "begin" and
+# "end" delimit the blocks, and "set" assigns.
 
 proc main
-var brilho:i32, passo:i32
+var level:i32, change:i32
 begin
     pin_mode(9, OUTPUT);
-    set brilho = 0;
-    set passo = 5;
+    set level = 0;
+    set change = 5;
 
     while true begin
-        analog_write(9, brilho);
-        set brilho = brilho + passo;
-        if brilho >= 255 or brilho <= 0 begin
-            set passo = 0 - passo;
+        analog_write(9, level);
+        set level = level + change;
+        if level >= 255 or level <= 0 begin
+            set change = 0 - change;
         end
         delay_ms(30);
     end
 end proc
 ''', c, '''
-LED respirando em Millipascal.
+Breathing LED in Millipascal.
 
-O que esta demo mostra:
-- variaveis com tipo, "set" para atribuir e blocos com begin/end;
-- PWM com analogWrite no pino 9 do Uno.
+What this demo shows:
+- typed variables, "set" to assign and blocks with begin/end;
+- PWM with analogWrite on the Uno's pin 9.
 
-Aperte F5 e veja o LED respirar.
+Press F5 and watch the LED breathe.
 ''')
 demo('millipascal-respirar', 'LED respirando em Millipascal', 'Arduino Uno')
 
@@ -292,14 +294,14 @@ c.led('giro_a', '12', 'GND.1', 'vermelho', 560, 20, VERMELHO)
 c.led('giro_b', '13', 'GND.1', 'azul', 640, 20, AZUL)
 
 gravar('rust-sirene', '''
-// Sirene em Rust.
+// Siren in Rust.
 //
-// O buzzer sobe e desce de frequencia como a sirene de uma ambulancia, e
-// os dois LEDs piscam alternados, como o giroflex.
+// The buzzer sweeps up and down in frequency like an ambulance siren, and
+// the two LEDs blink in turn, like the rotating beacon.
 //
-// "#![no_std]" diz que nao ha sistema operacional embaixo -- a situacao de
-// todo microcontrolador. "let mut" declara uma variavel que pode mudar;
-// sem o "mut" ela e so leitura.
+// "#![no_std]" says there is no operating system underneath -- the case on
+// every microcontroller. "let mut" declares a variable that can change;
+// without "mut" it is read-only.
 
 #![no_std]
 #![no_main]
@@ -308,8 +310,8 @@ const BUZZER: u8 = 8;
 const LED_A: u8 = 12;
 const LED_B: u8 = 13;
 
-fn giroflex(lado: bool) {
-    if lado {
+fn beacon(side: bool) {
+    if side {
         digital_write(LED_A, HIGH);
         digital_write(LED_B, LOW);
     } else {
@@ -321,35 +323,35 @@ fn giroflex(lado: bool) {
 fn main() {
     pin_mode(LED_A, OUTPUT);
     pin_mode(LED_B, OUTPUT);
-    println!("Sirene ligada");
+    println!("Siren on");
 
-    let mut voltas: u32 = 0;
+    let mut sweeps: u32 = 0;
     loop {
         let mut f: u32 = 400;
         while f < 1200 {
             tone(BUZZER, f);
-            giroflex(f % 200 < 100);
+            beacon(f % 200 < 100);
             delay_ms(10);
             f += 20;
         }
         while f > 400 {
             tone(BUZZER, f);
-            giroflex(f % 200 < 100);
+            beacon(f % 200 < 100);
             delay_ms(10);
             f -= 20;
         }
-        voltas += 1;
-        println!("voltas da sirene: {}", voltas);
+        sweeps += 1;
+        println!("siren sweeps: {}", sweeps);
     }
 }
 ''', c, '''
-Sirene com giroflex, em Rust.
+Siren with a rotating beacon, in Rust.
 
-O que esta demo mostra:
-- funcao com parametro bool, if/else e while do Rust;
-- tone() varrendo a frequencia e o println! com "{}".
+What this demo shows:
+- a function with a bool parameter, and Rust's if/else and while;
+- tone() sweeping the frequency and println! with "{}".
 
-Aperte F5 e escute a sirene.
+Press F5 and listen to the siren.
 ''')
 demo('rust-sirene', 'Sirene em Rust', 'Arduino Uno')
 
@@ -368,13 +370,14 @@ c.led('nivel2', 'D26', 'GND.2', 'amarelo', 420, 140, AMARELO)
 c.led('nivel3', 'D27', 'GND.2', 'amarelo', 510, 140, AMARELO)
 
 gravar('csharp-medidor-de-luz', '''
-// Medidor de luz em C#.
+// Light meter in C#.
 //
-// E o jeito do .NET nanoFramework, que roda na ESP32: uma classe com um
-// Main, e o Console.WriteLine indo para o monitor serial. O modulo de LDR
-// mede a luz, e tres LEDs mostram o nivel: nenhum no escuro, tres no sol.
+// This is the .NET nanoFramework way, which runs on the ESP32: a class with
+// a Main, and Console.WriteLine going to the serial monitor. The LDR
+// module measures the light, and three LEDs show the level: none in the
+// dark, three in sunlight.
 //
-// Como o modulo de verdade: MAIS luz, MENOR a leitura.
+// Like the real module: MORE light, LOWER the reading.
 
 using System;
 
@@ -386,34 +389,34 @@ public class Program
         int[] leds = { 25, 26, 27 };
 
         for (int i = 0; i < 3; i++) PinMode(leds[i], OUTPUT);
-        Console.WriteLine("Medidor de luz");
+        Console.WriteLine("Light meter");
 
         while (true)
         {
-            int leitura = AnalogRead(sensor);       // perto de 0 no sol, de 4095 no escuro
-            int acesos = 3 - leitura * 4 / 4096;
-            if (acesos < 0) acesos = 0;
+            int reading = AnalogRead(sensor);       // near 0 in sunlight, 4095 in the dark
+            int lit = 3 - reading * 4 / 4096;
+            if (lit < 0) lit = 0;
 
             for (int i = 0; i < 3; i++)
             {
-                if (i < acesos) DigitalWrite(leds[i], HIGH);
+                if (i < lit) DigitalWrite(leds[i], HIGH);
                 else DigitalWrite(leds[i], LOW);
             }
 
-            Console.WriteLine($"leitura {leitura}, LEDs acesos: {acesos}");
+            Console.WriteLine($"reading {reading}, LEDs lit: {lit}");
             Delay(300);
         }
     }
 }
 ''', c, '''
-Medidor de luz em C#.
+Light meter in C#.
 
-O que esta demo mostra:
-- o estilo do .NET nanoFramework na ESP32: uma classe, um Main e o
-  Console.WriteLine com texto interpolado ($"...{valor}...");
-- um vetor do C# (int[]) e o nivel de luz virando LEDs acesos.
+What this demo shows:
+- the .NET nanoFramework style on the ESP32: a class, a Main and
+  Console.WriteLine with interpolated text ($"...{value}...");
+- a C# array (int[]) and the light level turning into lit LEDs.
 
-Aperte F5 e clique no modulo de LDR para mudar a luz.
+Press F5 and click the LDR module to change the light.
 ''')
 demo('csharp-medidor-de-luz', 'Medidor de luz em C#', 'ESP32')
 
@@ -427,51 +430,51 @@ for i, pino in enumerate(['8', '9', '10', '11', '12', '13']):
     c.led(f'bit{i}', pino, 'GND.1', 'vermelho', 380 + (5 - i) * 70, 20, VERMELHO)
 
 gravar('assembly-contador', '''
-; Contador binario em Assembly AVR.
+; Binary counter in AVR Assembly.
 ;
-; Seis LEDs nos pinos 8 a 13 -- que no ATmega328P sao os bits 0 a 5 do
-; PORTB -- mostram um numero que sobe de 0 a 63, um a cada quarto de
-; segundo. O LED da direita e o bit 0.
+; Six LEDs on pins 8 to 13 -- which on the ATmega328P are bits 0 to 5 of
+; PORTB -- show a number that climbs from 0 to 63, one step every quarter
+; of a second. The rightmost LED is bit 0.
 ;
-;   DDRB  diz quais pinos sao saida (aqui, os seis de baixo)
-;   PORTB recebe o numero inteiro de uma vez: um OUT acende todos juntos
-;   INC   soma um, e o ANDI corta o que passa de seis bits
+;   DDRB  says which pins are outputs (here, the lower six)
+;   PORTB takes the whole number at once: one OUT lights them all together
+;   INC   adds one, and ANDI cuts off anything past six bits
 
-    ldi r16, 0x3F         ; 0011 1111: PB0 a PB5 sao saida
+    ldi r16, 0x3F         ; 0011 1111: PB0 to PB5 are outputs
     out DDRB, r16
-    clr r17               ; o contador comeca em zero
+    clr r17               ; the counter starts at zero
 
-principal:
-    out PORTB, r17        ; o numero aparece nos LEDs
-    rcall espera
+main_loop:
+    out PORTB, r17        ; the number shows on the LEDs
+    rcall wait
     inc r17
-    andi r17, 0x3F        ; depois do 63 volta para 0
-    rjmp principal
+    andi r17, 0x3F        ; after 63 it wraps back to 0
+    rjmp main_loop
 
-; Espera por contagem, a mesma do pisca-pisca: tres lacos, um dentro do
-; outro, que a 16 MHz somam perto de um quarto de segundo.
-espera:
+; Busy-wait by counting, the same as the blink: three loops, one inside the
+; other, that add up to about a quarter of a second at 16 MHz.
+wait:
     ldi r20, 20
-nivel3:
+level3:
     ldi r18, 255
-nivel2:
+level2:
     ldi r19, 255
-nivel1:
+level1:
     dec r19
-    brne nivel1
+    brne level1
     dec r18
-    brne nivel2
+    brne level2
     dec r20
-    brne nivel3
+    brne level3
     ret
 ''', c, '''
-Contador binario em Assembly AVR.
+Binary counter in AVR Assembly.
 
-O que esta demo mostra:
-- o registrador PORTB inteiro de uma vez: seis pinos mudam num OUT so;
-- INC, ANDI e o laco de espera contado em ciclos do ATmega328P.
+What this demo shows:
+- the whole PORTB register at once: six pins change with a single OUT;
+- INC, ANDI and the wait loop counted in ATmega328P cycles.
 
-Aperte F5 e veja os seis LEDs contarem de 0 a 63.
+Press F5 and watch the six LEDs count from 0 to 63.
 ''')
 demo('assembly-contador', 'Contador binário em Assembly', 'Arduino Uno')
 

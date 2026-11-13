@@ -226,6 +226,66 @@ def poligono(d, pts, fill, stroke=None, sw=0.0, op=None):
     d.partes[-1] = d.partes[-1].replace('<path ', '<path stroke-linejoin="round" ', 1)
 
 
+def dentro_do_poligono(x, y, pts):
+    dentro = False
+    for (x1, y1), (x2, y2) in zip(pts, pts[1:] + pts[:1]):
+        if (y1 > y) != (y2 > y) and x < x1 + (y - y1) * (x2 - x1) / (y2 - y1):
+            dentro = not dentro
+    return dentro
+
+
+def estator_pela_janela(d, cx, cy, janela, r0, r1, ranhuras, desloc=0.0):
+    """O que se ve do estator por uma janela do sino: as bobinas de cobre entre os
+    raios r0 e r1 (as espiras de fio em volta de cada dente), a fenda escura entre
+    duas bobinas (uma por ranhura) e a ponta de aco dos dentes logo depois de r1.
+    So o pedaco dentro da janela aparece."""
+    def ve(x, y, ra, rb):
+        return ra <= math.hypot(x - cx, y - cy) <= rb and dentro_do_poligono(x, y, janela)
+
+    def regiao(ra, rb):
+        mx = sum(p[0] for p in janela) / len(janela)
+        my = sum(p[1] for p in janela) / len(janela)
+        rm = math.hypot(mx - cx, my - cy)
+        alvo = min(max(rm, ra + 0.1), rb - 0.1)
+        ox, oy = cx + (mx - cx) * alvo / rm, cy + (my - cy) * alvo / rm
+        if not ve(ox, oy, ra, rb):
+            return None
+        pts = []
+        for i in range(96):
+            a = 2 * math.pi * i / 96
+            t = 0.0
+            while ve(ox + (t + 0.03) * math.cos(a), oy + (t + 0.03) * math.sin(a), ra, rb):
+                t += 0.03
+            pts.append((ox + t * math.cos(a), oy + t * math.sin(a)))
+        return pts
+
+    def tracos(amostras, cor, sw, op):
+        trecho = []
+        for x, y in amostras + [(None, None)]:
+            if x is not None and ve(x, y, r0, r1):
+                trecho.append((x, y))
+                continue
+            if len(trecho) > 1:
+                d.poli(trecho, None, stroke=cor, sw=sw, op=op, fechado=False)
+            trecho = []
+
+    dentes = regiao(r1 + 0.1, r1 + 0.9)
+    if dentes:
+        poligono(d, dentes, '#5d646b')
+    cobre = regiao(r0, r1)
+    if not cobre:
+        return
+    poligono(d, cobre, 'url(#cobre-bob)')
+    for j in range(1, int((r1 - r0) / 0.5)):                      # as espiras
+        r = r0 + 0.5 * j
+        tracos([(cx + r * math.cos(a / 400 * 2 * math.pi), cy + r * math.sin(a / 400 * 2 * math.pi))
+                for a in range(400)], '#6a3412', 0.12, 0.55)
+    for k in range(ranhuras):                                      # as fendas entre as bobinas
+        a = 2 * math.pi * k / ranhuras + math.radians(desloc)
+        tracos([(cx + (r0 + (r1 - r0) * t / 60) * math.cos(a), cy + (r0 + (r1 - r0) * t / 60) * math.sin(a))
+                for t in range(61)], '#120d09', 0.55, None)
+
+
 def arco_anel(cx, cy, r0, r1, a0, a1):
     """O anel entre os raios r0 e r1, de a0 a a1 (graus), como caminho."""
     p = lambda r, a: (cx + r * math.cos(math.radians(a)), cy + r * math.sin(math.radians(a)))
@@ -444,7 +504,7 @@ def byj48():
         d.circ(ex, ey, 0.55, '#b48a3c')
 
     gravar_tres('motor-28byj48', L, H, corpo, movel)
-    guardar('motor-28byj48', L, H, [(n, x, 46.95) for n, x in zip(['azul', 'rosa', 'amarelo', 'laranja', 'vermelho'], xs)])
+    guardar('motor-28byj48', L, H, [(n, x, 46.95) for n, x in zip(['blue', 'pink', 'yellow', 'orange', 'red'], xs)])
     eixos.append(('motor-28byj48', ex, ey, L, H))
 
 
@@ -517,9 +577,16 @@ def motor_dc():
         ficha, D, ressalto, anel, eixo_mm, roscados, lisos, _ = MODELOS_DC[modelo]
         R = D / 2
         s = 20.0 / D
-        # os fios saem de tras da lata, por baixo (vermelho +, preto -)
-        for x, cor in zip(xs, ('#d23b33', '#25262a')):
-            fio(d, [(x, cy + 5.0), (x, cy + 10.5), (x, 25.4)], cor, 0.9)
+        # os fios (vermelho +, preto -): no 130 saem dos terminais da tampa, em cima, e
+        # descem por fora da lata; nos outros saem de tras da lata, por baixo
+        for x, cor, lado in zip(xs, ('#d23b33', '#25262a'), (-1, 1)):
+            if modelo == '130':
+                s = 20.0 / D
+                fio(d, [(cx + lado * 4.25 * s, cy - 8.6 * s), (cx + lado * 5.4, cy - 10.9), (cx + lado * 10.2, cy - 6.6),
+                        (cx + lado * 11.0, cy), (cx + lado * 10.2, cy + 6.6), (cx + lado * 4.6, cy + 10.9),
+                        (x, cy + 12.4), (x, 25.4)], cor, 0.9)
+            else:
+                fio(d, [(x, cy + 5.0), (x, cy + 10.5), (x, 25.4)], cor, 0.9)
             ponta_estanhada(d, x, 25.3, 29.7, 0.9)
         d.entrar(mover(cx, cy) * T(s, 0, 0, s, 0, 0))
         if modelo == '130':
@@ -528,6 +595,7 @@ def motor_dc():
             d.ret(-6.36, -hp - 1.4, 12.73, 2.2, '#efece4', rx=0.5, stroke='#bcb6a8', sw=0.1)
             for x in (-4.25, 4.25):
                 d.ret_c(x, -hp - 1.1, 1.6, 1.0, 'url(#latao)', rx=0.15)
+                d.circ(x, -hp - 1.1, 0.5, ESTANHO)                                 # a solda do fio
             a = math.degrees(math.asin(hp / R))
             pts = []
             for k in range(0, 41):
@@ -728,13 +796,15 @@ def motor_brushless():
             d.circ(cx + 0.25, cy + 0.3, RB, '#000000', op=0.35)
             d.circ(cx, cy, RB, 'url(#dourado)', stroke='#8a5a14', sw=0.18)
             d.circ(cx, cy, RB - 0.7, None, '#ffe9a8', 0.25)
+            # por cada furo, o estator 12N14P de 22 mm (as bobinas de 5 a 9,9 mm do centro)
             for k in range(4):
                 a = math.radians(90 * k)
                 x, y = cx + 8.0 * math.cos(a), cy + 8.0 * math.sin(a)
-                d.circ(x, y, 3.5, '#1c140d', stroke='#7a4f12', sw=0.16)
-                d.circ(x + 0.6 * math.cos(a), y + 0.6 * math.sin(a), 2.3, 'url(#cobre-bob)')
-                d.circ(x + 0.6 * math.cos(a), y + 0.6 * math.sin(a), 1.1, '#3a2414', op=0.6)
-                d.circ(x, y, 3.5, None, '#000000', 0.5, op=None)
+                d.circ(x, y, 3.5, '#1c140d')
+                furo = [(x + 3.5 * math.cos(t * math.pi / 24), y + 3.5 * math.sin(t * math.pi / 24)) for t in range(48)]
+                estator_pela_janela(d, cx, cy, furo, 5.0, 9.9, 12, 15)
+                d.circ(x, y, 3.5, None, '#7a4f12', 0.3)
+                d.circ(x, y, 3.25, None, '#000000', 0.3, op=0.5)
             d.circ(cx + 0.12, cy + 0.15, 4.0, '#000000', op=0.3)
             d.circ(cx, cy, 4.0, 'url(#dourado)', stroke='#8a5a14', sw=0.14)
             d.circ(cx, cy, 3.3, None, '#ffe9a8', 0.15)
@@ -749,17 +819,13 @@ def motor_brushless():
             d.circ(cx + 0.25, cy + 0.3, RB, '#000000', op=0.35)
             d.circ(cx, cy, RB, '#2b2d32' if familia == 'corrida' else '#23252a', stroke='#0f1012', sw=0.18)
             d.circ(cx, cy, RB - 0.45, None, '#a7adb4', 0.3)
+            # o estator 12N14P visto pelas janelas (22 mm no 2207, 35 mm no 3508)
+            rs = (11.0 if familia == 'corrida' else 17.5) * k
             for jan in sino_d['janelas']:
                 pts = [(cx + x * k, cy + y * k) for x, y in jan]
-                poligono(d, pts, '#120d09', stroke='#9aa1a8', sw=0.16)
-                # o estator visto pela janela: o enrolamento de cobre e a ponta do dente
-                mx = sum(p[0] for p in pts) / len(pts)
-                my = sum(p[1] for p in pts) / len(pts)
-                rr = math.hypot(mx - cx, my - cy)
-                ux, uy = (mx - cx) / rr, (my - cy) / rr
-                d.circ(cx + ux * 9.4, cy + uy * 9.4, 1.55, 'url(#cobre-bob)')
-                d.circ(cx + ux * 9.4, cy + uy * 9.4, 1.55, None, '#3a2414', 0.12)
-                d.ret_c(cx + ux * 11.4, cy + uy * 11.4, 0.9, 0.9, '#6b7178', rx=0.2)
+                poligono(d, pts, '#120d09')
+                estator_pela_janela(d, cx, cy, pts, rs * 0.45, rs * 0.9, 12, 15)
+                poligono(d, pts, None, stroke='#9aa1a8', sw=0.16)
             if familia == 'corrida':
                 # o cubo serrilhado de 9 mm e o eixo M5 com a rosca
                 d.circ(cx, cy, 4.9 * k, '#3a3d42', stroke='#9aa1a8', sw=0.2)
@@ -800,9 +866,10 @@ def motor_brushless():
                         a = a0 + (a1 - a0) * t / 10
                         a += da if t == 0 else -da if t == 10 else 0
                         pts.append((cx + raio * math.cos(a), cy + raio * math.sin(a)))
-                poligono(d, pts, '#120d09', stroke='#8d949b', sw=0.15)
-                am = (a0 + a1) / 2
-                d.circ(cx + 5.5 * k * math.cos(am), cy + 5.5 * k * math.sin(am), 0.65 * k, 'url(#cobre-bob)')
+                # o estator 9N12P de 11 mm pela janela
+                poligono(d, pts, '#120d09')
+                estator_pela_janela(d, cx, cy, pts, 5.5 * k * 0.45, 5.5 * k * 0.9, 9, 20)
+                poligono(d, pts, None, stroke='#8d949b', sw=0.15)
             d.circ(cx, cy, 4.3 * k, '#26282c', stroke='#8d949b', sw=0.2)
             for i in range(4):
                 a = math.radians(90 * i)

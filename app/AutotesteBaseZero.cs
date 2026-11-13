@@ -110,13 +110,13 @@ public static partial class Autoteste
             bool ligou = EsperarPor(() => LinhasDoSerial(maquina).Any(l => l.StartsWith("BASE ZERO")), 6000);
             saida.AppendLine($"        ligou: {string.Join(" | ", LinhasDoSerial(maquina))}");
             Conferir("base zero: o jogo liga e acha o cartao", ligou
-                && LinhasDoSerial(maquina).Any(l => l.Contains("cartao: sim")), string.Join(" | ", LinhasDoSerial(maquina)));
+                && LinhasDoSerial(maquina).Any(l => l.Contains("card: yes")), string.Join(" | ", LinhasDoSerial(maquina)));
 
             // O START por um instante, como um dedo.
             janela.TesteEditorCircuito.BotoesPressionados.Add("start");
             EsperarPor(() => false, 300);
             janela.TesteEditorCircuito.BotoesPressionados.Remove("start");
-            bool comecou = EsperarPor(() => LinhasDoSerial(maquina).Any(l => l.Contains("E1M1: HANGAR (do cartao)")), 6000);
+            bool comecou = EsperarPor(() => LinhasDoSerial(maquina).Any(l => l.Contains("E1M1: HANGAR (from the card)")), 6000);
             Conferir("base zero: o START comeca a fase lida do cartao", comecou,
                 string.Join(" | ", LinhasDoSerial(maquina)));
 
@@ -138,10 +138,10 @@ public static partial class Autoteste
 
             // Ligar de novo: o ext0 acorda, e a RTC traz a fase.
             chave.Giro = 1;
-            bool voltou = EsperarPor(() => LinhasDoSerial(maquina).Any(l => l.StartsWith("acordou pela chave")), 6000);
+            bool voltou = EsperarPor(() => LinhasDoSerial(maquina).Any(l => l.StartsWith("woke up by the switch")), 6000);
             saida.AppendLine($"        ligada de novo: {string.Join(" | ", LinhasDoSerial(maquina))}");
             Conferir("base zero: ligar a chave acorda a placa e volta para a fase guardada na RTC",
-                voltou && LinhasDoSerial(maquina).Any(l => l.Contains("voltando para a fase 1")),
+                voltou && LinhasDoSerial(maquina).Any(l => l.Contains("back to level 1")),
                 string.Join(" | ", LinhasDoSerial(maquina)));
         }
         finally

@@ -414,14 +414,14 @@ public static partial class Autoteste
 
             // ---- a bateria acaba: o player guarda onde parou e a placa dorme ----
             bateria.Volts = 3.2;
-            bool vazia = EsperarPor(() => LinhasDoSerial(maquina).Any(l => l.Contains("Bateria vazia")), 8000);
+            bool vazia = EsperarPor(() => LinhasDoSerial(maquina).Any(l => l.Contains("Battery empty")), 8000);
             Conferir("bateria: abaixo de 3,3 V o player desliga e a placa dorme", vazia, Serial());
 
             // ---- carregada, desliga e liga a chave: a placa acorda e o player volta ----
             bateria.Volts = 4.0;
             EsperarPor(() => false, 1500);
             janela.TesteEditorCircuito.DefinirGiro(chave, 0);
-            bool dormiu = EsperarPor(() => LinhasDoSerial(maquina).Any(l => l.Contains("dorme ate a chave ligar")), 15000);
+            bool dormiu = EsperarPor(() => LinhasDoSerial(maquina).Any(l => l.Contains("sleeps until the switch turns on")), 15000);
             janela.TesteEditorCircuito.DefinirGiro(chave, 1);
             int leiturasAntes = Leituras();
             bool acordou = EsperarPor(() => Leituras() > leiturasAntes || LinhasDoSerial(maquina).Any(l => l.Contains("musicas na biblioteca")), 40000);

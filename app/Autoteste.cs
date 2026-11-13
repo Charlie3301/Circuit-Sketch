@@ -13763,7 +13763,7 @@ public static partial class Autoteste
             {
                 var maq = janela.TesteMaquinaDa("placa");
                 bool conectou = false;
-                EsperarPor(() => (conectou = janela.TesteConectarCelular("ESP32-Sala")), 4000);
+                EsperarPor(() => (conectou = janela.TesteConectarCelular("ESP32-Room")), 4000);
                 if (!conectou)
                 {
                     janela.TesteAtualizarPaineis();
@@ -13771,7 +13771,7 @@ public static partial class Autoteste
                     saida.AppendLine($"        painel bt: {janela.TesteTextoDoBluetooth.Replace(Environment.NewLine, " / ")}");
                     saida.AppendLine($"        avisos: {string.Join(" / ", maq.Avisos)}");
                 }
-                Conferir("bluetooth: o celular acha e conecta na ESP32-Sala", conectou);
+                Conferir("bluetooth: o celular acha e conecta na ESP32-Room", conectou);
 
                 string Mandar(string comando, string esperado)
                 {
@@ -13784,31 +13784,31 @@ public static partial class Autoteste
                     return janela.TesteTextoDoBluetooth;
                 }
 
-                string painel = Mandar("vermelho", "LED vermelho");
-                Conferir("bluetooth: 'vermelho' responde e acende o vermelho",
-                    painel.Contains("LED vermelho") && maq.Pwm[25] == 255 && maq.Pwm[26] == 0,
+                string painel = Mandar("red", "LED red");
+                Conferir("bluetooth: 'red' responde e acende o vermelho",
+                    painel.Contains("LED red") && maq.Pwm[25] == 255 && maq.Pwm[26] == 0,
                     $"R={maq.Pwm[25]} G={maq.Pwm[26]} B={maq.Pwm[27]}");
 
-                painel = Mandar("AZUL", "LED azul");
+                painel = Mandar("BLUE", "LED blue");
                 Conferir("bluetooth: o comando vale em maiusculas tambem (toLowerCase)",
-                    painel.Contains("LED azul") && maq.Pwm[27] == 255 && maq.Pwm[25] == 0,
+                    painel.Contains("LED blue") && maq.Pwm[27] == 255 && maq.Pwm[25] == 0,
                     $"R={maq.Pwm[25]} G={maq.Pwm[26]} B={maq.Pwm[27]}");
 
-                painel = Mandar("temp", "umidade:");
+                painel = Mandar("temp", "humidity:");
                 Conferir("bluetooth: 'temp' devolve temperatura e umidade do DHT22",
-                    painel.Contains("temperatura:") && painel.Contains("umidade:"), painel);
+                    painel.Contains("temperature:") && painel.Contains("humidity:"), painel);
 
-                painel = Mandar("bip", "bip!");
-                Conferir("bluetooth: 'bip' responde", painel.Contains("bip!"), painel);
+                painel = Mandar("beep", "beep!");
+                Conferir("bluetooth: 'beep' responde", painel.Contains("beep!"), painel);
 
-                painel = Mandar("dancar", "Mande: ajuda");
+                painel = Mandar("dance", "Send: help");
                 Conferir("bluetooth: comando desconhecido explica o que mandar",
-                    painel.Contains("nao conheco 'dancar'"), painel);
+                    painel.Contains("unknown 'dance'"), painel);
 
                 string lcd = TextoDoLcd(maq.Lcd);
                 saida.AppendLine($"        lcd: {lcd}");
                 Conferir("bluetooth: o LCD mostra o ultimo comando",
-                    lcd.Contains("Ultimo comando:") && lcd.Contains("dancar"), lcd);
+                    lcd.Contains("Last command:") && lcd.Contains("dance"), lcd);
             }
             finally { janela.TesteParar(); }
         }
@@ -13831,7 +13831,7 @@ public static partial class Autoteste
                 // A segunda linha vem logo depois da primeira: esperar por
                 // ela, e nao julgar no meio da escrita (com o PC ocupado, o
                 // teste pegava "Temp:" com a linha de baixo ainda vazia).
-                bool comUmidade = EsperarPor(() => TextoDoLcd(painel?.Lcd).Contains("Umid:"), 3000);
+                bool comUmidade = EsperarPor(() => TextoDoLcd(painel?.Lcd).Contains("Hum:"), 3000);
                 Conferir("esp-now: com a umidade junto", comUmidade, TextoDoLcd(painel?.Lcd));
 
                 // O potenciometro de la vira o angulo do servo daqui.
@@ -13868,7 +13868,7 @@ public static partial class Autoteste
 
                 var serialDoSensor = LinhasDoSerial(sensor);
                 Conferir("esp-now: difusao nunca e dada como perdida no callback",
-                    !serialDoSensor.Any(l => l.Contains("nao ouviu")),
+                    !serialDoSensor.Any(l => l.Contains("did not hear")),
                     string.Join(" | ", serialDoSensor.TakeLast(4)));
             }
             finally { janela.TesteParar(); }
@@ -14230,36 +14230,36 @@ public static partial class Autoteste
                     bool arco = EsperarPor(() => m.Fitas.Values.Any(f => f.Envios > 5
                                                                         && f.Cores.Distinct().Count() > 8), 4000);
                     Apertar("botao");
-                    return (arco && TemNaSerial("efeito: cometa"), Serial());
+                    return (arco && TemNaSerial("effect: comet"), Serial());
                 }
 
                 case "esp32c3-estufa":
                 {
                     bool quente = EsperarPor(() => m.AnguloServo[5] == 90 && m.DigitalRead(6) == 1
-                                                   && TextoDe(m.Lcd).Contains("Ventilando"), 6000);
+                                                   && TextoDe(m.Lcd).Contains("Venting"), 6000);
                     Girar("dht", (15 + 40) / 120.0);
                     bool frio = EsperarPor(() => m.AnguloServo[5] == 0 && m.DigitalRead(7) == 1
-                                                 && TextoDe(m.Lcd).Contains("Aquecendo"), 6000);
+                                                 && TextoDe(m.Lcd).Contains("Heating"), 6000);
                     return (quente && frio, $"servo {m.AnguloServo[5]}, lcd {TextoDe(m.Lcd)}");
                 }
 
                 case "esp32c6-alarme":
                 {
-                    TemNaSerial("desarmado");
+                    TemNaSerial("disarmed");
                     Apertar("botao");
-                    bool armou = TemNaSerial("ARMADO", 8000);
+                    bool armou = TemNaSerial("ARMED", 8000);
                     Girar("pir", 1);
-                    bool disparou = TemNaSerial("INVASAO", 3000)
+                    bool disparou = TemNaSerial("INTRUDER", 3000)
                                     && EsperarPor(() => m.Frequencia[3] > 0, 2000);
                     Girar("pir", 0);
                     Apertar("botao");
-                    bool desarmou = EsperarPor(() => Linhas().Count(l => l == "desarmado") >= 2, 3000);
+                    bool desarmou = EsperarPor(() => Linhas().Count(l => l == "disarmed") >= 2, 3000);
                     return (armou && disparou && desarmou, Serial());
                 }
 
                 case "esp32h2-estacionamento":
                 {
-                    bool amarelo = EsperarPor(() => Linhas().Any(l => l == "distancia: 35 cm")
+                    bool amarelo = EsperarPor(() => Linhas().Any(l => l == "distance: 35 cm")
                                                     && m.Pwm[10] == 255 && m.Pwm[11] == 160, 4000);
                     Girar("sonar", 10 / 400.0);
                     bool encostou = EsperarPor(() => m.Frequencia[22] == 2000 && m.Pwm[11] == 0, 4000);
@@ -14267,14 +14267,14 @@ public static partial class Autoteste
                 }
 
                 case "nodemcu-servidor":
-                    return (TemNaSerial("servidor no ar", 6000), Serial());
+                    return (TemNaSerial("server is up", 6000), Serial());
 
                 case "esp01-tomada-mqtt":
                 {
                     bool conectou = TemNaSerial("broker... ok", 6000);
-                    janela.TestePublicarNoBroker("casa/tomada", "liga", retida: false);
+                    janela.TestePublicarNoBroker("home/plug", "on", retida: false);
                     bool ligou = EsperarPor(() => m.DigitalRead(2) == 0
-                                                  && Linhas().Contains("tomada LIGADA"), 4000);
+                                                  && Linhas().Contains("plug ON"), 4000);
                     // Um aperto de dedo (400 ms): com o PC ocupado, o loop() de
                     // 20 ms podia nao ver um aperto curto demais.
                     Apertar("botao", 400);
@@ -14283,13 +14283,13 @@ public static partial class Autoteste
                 }
 
                 case "esp02-campainha":
-                    TemNaSerial("Campainha pronta");
+                    TemNaSerial("Doorbell ready");
                     Apertar("botao");
-                    return (TemNaSerial("Visita numero 1"), Serial());
+                    return (TemNaSerial("Visit number 1"), Serial());
 
                 case "esp03-termo-higrometro":
                     // O seco (umidade de 35 %) fica no GPIO15: o ESP-03 nao tem o GPIO4.
-                    return (EsperarPor(() => Linhas().Any(l => l.Contains("umidade: 35 %"))
+                    return (EsperarPor(() => Linhas().Any(l => l.Contains("humidity: 35 %"))
                                              && m.DigitalRead(15) == 1 && m.DigitalRead(13) == 1, 4000),
                             Serial());
 
@@ -14298,16 +14298,16 @@ public static partial class Autoteste
                     // O sketch tem que ter comecado: o verde dos carros e o
                     // estado de partida, e o botao apertado antes do setup se
                     // perderia.
-                    bool verde = TemNaSerial("Verde para os carros")
+                    bool verde = TemNaSerial("Green for the cars")
                                  && EsperarPor(() => m.DigitalRead(13) == 1, 2000);
                     Apertar("botao");
-                    bool pediu = TemNaSerial("pedido de travessia");
+                    bool pediu = TemNaSerial("crossing requested");
                     bool amarelo = EsperarPor(() => m.DigitalRead(12) == 1, 3000);
                     return (verde && pediu && amarelo, Serial());
                 }
 
                 case "esp05-calculadora":
-                    TemNaSerial("Calculadora");
+                    TemNaSerial("Calculator");
                     janela.TesteDigitarNoSerial("12 + 30");
                     bool somou = TemNaSerial("12 + 30 = 42");
                     janela.TesteDigitarNoSerial("2 ^ 10");
@@ -14316,7 +14316,7 @@ public static partial class Autoteste
                 case "esp06-genius":
                     TemNaSerial("Genius:");
                     Apertar("b_vermelho");
-                    return (TemNaSerial("Rodada 1"), Serial());
+                    return (TemNaSerial("Round 1"), Serial());
 
                 case "esp07-scanner-wifi":
                     return (TemNaSerial("dBm", 6000), Serial());
@@ -14325,18 +14325,18 @@ public static partial class Autoteste
                 {
                     bool verde = EsperarPor(() => m.DigitalRead(14) == 1, 7000);
                     Apertar("botao");
-                    return (verde && TemNaSerial("Seu tempo:"), Serial());
+                    return (verde && TemNaSerial("Your time:"), Serial());
                 }
 
                 case "esp09-dado":
-                    TemNaSerial("Dado eletronico");
+                    TemNaSerial("Electronic die");
                     Apertar("botao");
-                    return (TemNaSerial("Saiu "), Serial());
+                    return (TemNaSerial("Rolled "), Serial());
 
                 case "esp10-ponte-serial-web":
-                    TemNaSerial("pagina em http://", 6000);
-                    janela.TesteDigitarNoSerial("ola mundo");
-                    return (TemNaSerial("ok, esta na pagina: ola mundo"), Serial());
+                    TemNaSerial("page at http://", 6000);
+                    janela.TesteDigitarNoSerial("hello world");
+                    return (TemNaSerial("ok, it is on the page: hello world"), Serial());
 
                 case "esp11-minuteria":
                 {
@@ -14358,26 +14358,26 @@ public static partial class Autoteste
 
                 case "esp12f-luminaria-mqtt":
                 {
-                    bool pronta = TemNaSerial("broker... ok", 6000) && TemNaSerial("efeito=fixo", 3000);
-                    janela.TestePublicarNoBroker("casa/luminaria/efeito", "arco-iris", retida: false);
-                    bool arco = TemNaSerial("efeito=arco-iris")
+                    bool pronta = TemNaSerial("broker... ok", 6000) && TemNaSerial("effect=solid", 3000);
+                    janela.TestePublicarNoBroker("home/lamp/effect", "rainbow", retida: false);
+                    bool arco = TemNaSerial("effect=rainbow")
                                 && EsperarPor(() => m.Fitas.Values.Any(f => f.Cores.Distinct().Count() > 8), 3000);
                     return (pronta && arco, Serial());
                 }
 
                 case "esp13-fechadura":
-                    TemNaSerial("Fechadura");
+                    TemNaSerial("Lock");
                     foreach (string t in new[] { "1", "2", "3", "4", "#" }) Tecla("teclado", t);
-                    return (TemNaSerial("SENHA CERTA") && EsperarPor(() => m.DigitalRead(16) == 1, 2000),
+                    return (TemNaSerial("CODE OK") && EsperarPor(() => m.DigitalRead(16) == 1, 2000),
                             Serial());
 
                 case "esp14-placar":
                 {
                     // Do ESP8266 do ESP-14 so sai o GPIO0: o placar e o anel
                     // NeoPixel nele, e os pontos chegam pelo MQTT.
-                    bool pronto = TemNaSerial("broker... ok", 6000) && TemNaSerial("placar: 0 x 0", 3000);
-                    janela.TestePublicarNoBroker("placar/ponto", "a", retida: false);
-                    bool ponto = TemNaSerial("placar: 1 x 0")
+                    bool pronto = TemNaSerial("broker... ok", 6000) && TemNaSerial("score: 0 x 0", 3000);
+                    janela.TestePublicarNoBroker("scoreboard/point", "a", retida: false);
+                    bool ponto = TemNaSerial("score: 1 x 0")
                                  && EsperarPor(() => m.Fitas.Values.Any(f => f.Cores[0] != 0 && f.Cores.Count(c => c != 0) == 1), 3000);
                     return (pronto && ponto, Serial());
                 }
@@ -14405,7 +14405,8 @@ public static partial class Autoteste
                     var bt = Peca("tecla3");
                     var capa = EditorCircuito.CapasDeBotao[bt.Tipo];
                     ed.Apertar(new System.Windows.Point(bt.X + capa.X, bt.Y + capa.Y));
-                    bool tocou = EsperarPor(() => m.Frequencia[15] == 330, 3000) && TemNaSerial("mi");
+                    bool tocou = EsperarPor(() => m.Frequencia[15] == 330, 3000)
+                                 && EsperarPor(() => Linhas().Contains("E"), 5000);
                     ed.Soltar();
                     bool parou = EsperarPor(() => m.Frequencia[15] == 0, 3000);
                     return (tocou && parou, $"f={m.Frequencia[15]} {Serial()}");
@@ -14427,7 +14428,7 @@ public static partial class Autoteste
 
                 case "picow-mqtt":
                 {
-                    bool pronta = TemNaSerial("pronto: publique", 6000);
+                    bool pronta = TemNaSerial("ready: publish", 6000);
                     bool publicou = TemNaSerial("pot: 40 %", 4000);
                     janela.TestePublicarNoBroker("pico/led", "on", retida: false);
                     bool acendeu = EsperarPor(() => m.DigitalRead(15) == 1, 3000);
@@ -14438,17 +14439,17 @@ public static partial class Autoteste
                 {
                     // A temperatura sai a cada 8 leituras (2 s de placa): sob a
                     // carga da bateria inteira, 4 s de parede nao bastavam.
-                    bool mediu = TemNaSerial(" V (leitura") && TemNaSerial("temperatura do chip: 27", 8000);
+                    bool mediu = TemNaSerial(" V (reading") && TemNaSerial("chip temperature: 27", 8000);
                     Girar("pot", 0.9);
-                    bool alerta = TemNaSerial("ALERTA") && EsperarPor(() => m.DigitalRead(15) == 1, 2000);
+                    bool alerta = TemNaSerial("ALERT") && EsperarPor(() => m.DigitalRead(15) == 1, 2000);
                     return (mediu && alerta, Serial());
                 }
 
                 case "nucleo-l031-termometro":
                 {
-                    bool mediu = TemNaSerial("temperatura: 26.0 C");
+                    bool mediu = TemNaSerial("temperature: 26.0 C");
                     Girar("ntc", (35 + 24) / 104.0);
-                    bool alarme = TemNaSerial("ALARME", 4000) && EsperarPor(() => m.DigitalRead(5) == 1, 2000);
+                    bool alarme = TemNaSerial("ALARM", 4000) && EsperarPor(() => m.DigitalRead(5) == 1, 2000);
                     return (mediu && alarme, Serial());
                 }
 
@@ -14464,12 +14465,12 @@ public static partial class Autoteste
                 }
 
                 case "ada-semaforo":
-                    return (TemNaSerial("Semaforo em Ada") && EsperarPor(() => m.DigitalRead(10) == 1, 2000),
+                    return (TemNaSerial("Traffic light in Ada") && EsperarPor(() => m.DigitalRead(10) == 1, 2000),
                             Serial());
 
                 case "spark-termostato":
                 {
-                    bool aquece = TemNaSerial("aquecendo") && EsperarPor(() => m.DigitalRead(8) == 1, 2000);
+                    bool aquece = TemNaSerial("heating") && EsperarPor(() => m.DigitalRead(8) == 1, 2000);
                     Girar("pot", 0.6);
                     bool parou = EsperarPor(() => m.DigitalRead(8) == 0
                                                   && Linhas().LastOrDefault()?.EndsWith(" C") == true, 4000);
@@ -14479,17 +14480,17 @@ public static partial class Autoteste
                 case "cowgol-contador":
                     EsperarPor(() => m.Modo[2] == 2, 3000);   // o pin_mode(INPUT_PULLUP) ja rodou
                     Apertar("botao");
-                    return (TemNaSerial("contagem: 1") && EsperarPor(() => m.DigitalRead(8) == 1, 2000), Serial());
+                    return (TemNaSerial("count: 1") && EsperarPor(() => m.DigitalRead(8) == 1, 2000), Serial());
 
                 case "millipascal-respirar":
                     return (ValoresDistintos(() => m.Pwm[9], 1500) > 5, $"PWM no 9: {m.Pwm[9]}");
 
                 case "rust-sirene":
-                    return (TemNaSerial("Sirene ligada") && ValoresDistintos(() => m.Frequencia[8], 1500) > 5,
+                    return (TemNaSerial("Siren on") && ValoresDistintos(() => m.Frequencia[8], 1500) > 5,
                             $"f={m.Frequencia[8]}");
 
                 case "csharp-medidor-de-luz":
-                    return (TemNaSerial("LEDs acesos: 2"), Serial());
+                    return (TemNaSerial("LEDs lit: 2"), Serial());
 
                 case "assembly-contador":
                 {

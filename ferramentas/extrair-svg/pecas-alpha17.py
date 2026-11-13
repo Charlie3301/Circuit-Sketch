@@ -132,7 +132,7 @@ bateria = f'''<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
   </g>
 
   <text x="{lbat - 4.0:.2f}" y="10.6" fill="#cfe6d8" font-size="2.0px"
-        text-anchor="end" font-family="Verdana">BATERIA</text>
+        text-anchor="end" font-family="Verdana">BATTERY</text>
 
   <!-- terminais -->
   <g stroke="#9aa0a6" stroke-width="0.5" stroke-linecap="round" fill="none">

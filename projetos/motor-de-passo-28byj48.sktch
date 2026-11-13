@@ -97,35 +97,35 @@
     "DePeca": "driver",
     "DePino": "A",
     "ParaPeca": "motor",
-    "ParaPino": "azul",
+    "ParaPino": "blue",
     "Cor": "#1F6FD1"
    },
    {
     "DePeca": "driver",
     "DePino": "B",
     "ParaPeca": "motor",
-    "ParaPino": "rosa",
+    "ParaPino": "pink",
     "Cor": "#8E44AD"
    },
    {
     "DePeca": "driver",
     "DePino": "C",
     "ParaPeca": "motor",
-    "ParaPino": "amarelo",
+    "ParaPino": "yellow",
     "Cor": "#E8B400"
    },
    {
     "DePeca": "driver",
     "DePino": "D",
     "ParaPeca": "motor",
-    "ParaPino": "laranja",
+    "ParaPino": "orange",
     "Cor": "#F07F1A"
    },
    {
     "DePeca": "driver",
     "DePino": "COM",
     "ParaPeca": "motor",
-    "ParaPino": "vermelho",
+    "ParaPino": "red",
     "Cor": "#D23B33"
    }
   ]

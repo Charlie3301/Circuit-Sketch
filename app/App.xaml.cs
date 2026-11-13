@@ -184,14 +184,13 @@ public partial class App : Application
             Exit += (_, _) => Armazem.Descartar();
         }
 
-        // O idioma (Alpha 25): o escolhido nas configuracoes. Enquanto os
-        // catalogos estao pela metade, o padrao e o portugues original (e nao
-        // o do Windows, que daria metade da tela em cada lingua). Os testes
+        // O idioma (Alpha 25): o escolhido nas configuracoes; quem nunca
+        // escolheu abre em ingles, a lingua principal do programa. Os testes
         // conferem os textos em portugues: neles, sempre o original -- a nao
         // ser que o comando peca outro com "--idioma en" (a varredura da tela
         // em ingles roda assim, num processo so dela).
         int iIdioma = Array.IndexOf(e.Args, "--idioma");
-        Idioma.Usar(!Armazem.Isolado ? Preferencias.Texto(Preferencias.Idioma, Idioma.Original)
+        Idioma.Usar(!Armazem.Isolado ? Preferencias.Texto(Preferencias.Idioma, Idioma.Principal)
                     : iIdioma >= 0 && iIdioma + 1 < e.Args.Length ? e.Args[iIdioma + 1] : Idioma.Original);
 
         // O chines (e o japones e o coreano) tem os mesmos ideogramas com

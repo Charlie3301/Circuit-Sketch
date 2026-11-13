@@ -863,11 +863,11 @@ def uln2003(nome_peca):
         ligar('placa', 'D27', driver, 'IN2', AMARELO),
         ligar('placa', 'D26', driver, 'IN3', ROXO),
         ligar('placa', 'D25', driver, 'IN4', AZUL),
-        ligar(motor, 'laranja', driver, 'A', LARANJA),
-        ligar(motor, 'amarelo', driver, 'B', AMARELO),
-        ligar(motor, 'rosa', driver, 'C', ROXO),
-        ligar(motor, 'azul', driver, 'D', AZUL),
-        ligar(motor, 'vermelho', driver, 'COM', VERMELHO),
+        ligar(motor, 'orange', driver, 'A', LARANJA),
+        ligar(motor, 'yellow', driver, 'B', AMARELO),
+        ligar(motor, 'pink', driver, 'C', ROXO),
+        ligar(motor, 'blue', driver, 'D', AZUL),
+        ligar(motor, 'red', driver, 'COM', VERMELHO),
     ]
     return pecas, fios
 

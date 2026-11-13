@@ -98,35 +98,35 @@
    },
    {
     "DePeca": "motor",
-    "DePino": "laranja",
+    "DePino": "orange",
     "ParaPeca": "peca",
     "ParaPino": "A",
     "Cor": "#F07F1A"
    },
    {
     "DePeca": "motor",
-    "DePino": "amarelo",
+    "DePino": "yellow",
     "ParaPeca": "peca",
     "ParaPino": "B",
     "Cor": "#E8B400"
    },
    {
     "DePeca": "motor",
-    "DePino": "rosa",
+    "DePino": "pink",
     "ParaPeca": "peca",
     "ParaPino": "C",
     "Cor": "#8E44AD"
    },
    {
     "DePeca": "motor",
-    "DePino": "azul",
+    "DePino": "blue",
     "ParaPeca": "peca",
     "ParaPino": "D",
     "Cor": "#1F6FD1"
    },
    {
     "DePeca": "motor",
-    "DePino": "vermelho",
+    "DePino": "red",
     "ParaPeca": "peca",
     "ParaPino": "COM",
     "Cor": "#D23B33"

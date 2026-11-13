@@ -797,7 +797,7 @@ public class JanelaConfiguracoes : Window
         // a porcentagem traduzida ao lado do nome ("English — 62%"), para
         // ninguem escolher achando que a tela inteira vai mudar.
         var idiomas = Idioma.Disponiveis();
-        EscolhaGuardada(grupo, Idioma.T("Idioma da interface"), Preferencias.Idioma, Idioma.Original,
+        EscolhaGuardada(grupo, Idioma.T("Idioma da interface"), Preferencias.Idioma, Idioma.Principal,
             [.. idiomas.Select(i => (i.Codigo, NomeDoIdioma(i.Codigo, i.Nome)))]);
         Nota(grupo, Idioma.T("O idioma novo vale ao reabrir o CircuitSketch."));
         if (idiomas.Any(i => Idioma.Progresso(i.Codigo) < 1))

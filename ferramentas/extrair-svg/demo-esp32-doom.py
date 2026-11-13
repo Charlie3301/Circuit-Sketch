@@ -8,7 +8,7 @@ do simulador.
 O circuito e o da BASE ZERO (display, cartao, sete botoes e a chave nos
 mesmos pinos), com o buzzer trocado por um amplificador I2S MAX98357A e um
 alto-falante. O WAD NAO vem junto: e da id Software. O cartao leva so o
-LEIAME.TXT, que explica como pôr o DOOM1.WAD do computador.
+README.TXT, que explica como pôr o DOOM1.WAD do computador.
 
 O sketch mora em esp32-doom/esp32-doom.ino, como arquivo de verdade: compila
 na Arduino IDE com a biblioteca instalada.
@@ -52,8 +52,8 @@ for pino, gpio, cor in [('VCC', '3V3', VERMELHO), ('GND', 'GND', PRETO),
     c.ligar('tela', pino, 'placa', gpio, cor)
 
 # O cartao divide o SPI com o display. O WAD entra pela janela do cartao.
-c.peca('cartao', 'microsd-card', 262, BY + 245, Nome='cartão: DOOM1.WAD',
-       Arquivos={'LEIAME.TXT': ler('LEIAME.TXT')})
+c.peca('cartao', 'microsd-card', 262, BY + 245, Nome='card: DOOM1.WAD',
+       Arquivos={'README.TXT': ler('README.TXT')})
 for pino, gpio, cor in [('VCC', '3V3', VERMELHO), ('GND', 'GND', PRETO),
                         ('CS', '14', LARANJA), ('SCK', '12', AMARELO),
                         ('DI', '11', AZUL), ('DO', '13', CINZA)]:
@@ -69,49 +69,49 @@ def botao(id, pino, gnd, x, y, nome, teclas, lado):
 
 # As teclas de sempre do DOOM no PC: setas, Ctrl atira, Espaco usa, Esc e o
 # menu. O "atirar" tambem e o OK dos menus (o Enter).
-botao('cima', '4', 'GND', 112, BY + 262, '↑ andar', 't:Up|g:Cima', 'r')
-botao('esquerda', '6', 'GND', 40, BY + 308, '← virar', 't:Left|g:Esquerda', 'r')
-botao('direita', '15', 'GND', 184, BY + 308, '→ virar', 't:Right|g:Direita', 'r')
-botao('baixo', '5', 'GND', 112, BY + 354, '↓ voltar', 't:Down|g:Baixo', 'r')
+botao('cima', '4', 'GND', 112, BY + 262, '↑ walk', 't:Up|g:Cima', 'r')
+botao('esquerda', '6', 'GND', 40, BY + 308, '← turn', 't:Left|g:Esquerda', 'r')
+botao('direita', '15', 'GND', 184, BY + 308, '→ turn', 't:Right|g:Direita', 'r')
+botao('baixo', '5', 'GND', 112, BY + 354, '↓ back', 't:Down|g:Baixo', 'r')
 botao('menu', '16', 'GND', 262, BY + 360, 'MENU (Esc)', 't:Escape|g:Start', 'r')
-botao('atirar', '17', 'GND.2', 540, BY + 20, 'A: atirar / OK (Ctrl)', 't:LeftCtrl|g:A', 'l')
-botao('usar', '18', 'GND.2', 540, BY + 90, 'B: usar (Espaço)', 't:Space|g:B', 'l')
+botao('atirar', '17', 'GND.2', 540, BY + 20, 'A: fire / OK (Ctrl)', 't:LeftCtrl|g:A', 'l')
+botao('usar', '18', 'GND.2', 540, BY + 90, 'B: use (Space)', 't:Space|g:B', 'l')
 
 # O som: o I2S da placa no MAX98357A, e o alto-falante no borne dele. O
 # amplificador se alimenta do 5V (o VIN dele aceita de 2,5 a 5,5 V).
-c.peca('amplificador', 'max98357a', 548, BY + 158, Nome='amplificador I2S')
+c.peca('amplificador', 'max98357a', 548, BY + 158, Nome='I2S amplifier')
 for pino, gpio, cor in [('BCLK', '40', AMARELO), ('LRC', '41', LARANJA), ('DIN', '42', AZUL),
                         ('VIN', '5V', VERMELHO), ('GND', 'GND.2', PRETO)]:
     c.ligar('amplificador', pino, 'placa', gpio, cor)
-c.peca('falante', 'alto-falante', 640, BY + 120, Nome='alto-falante 8 Ω')
+c.peca('falante', 'alto-falante', 640, BY + 120, Nome='8 Ω speaker')
 c.ligar('amplificador', 'OUT+', 'falante', '+', VERMELHO)
 c.ligar('amplificador', 'OUT-', 'falante', '-', PRETO)
 
 # A chave do correr: o comum no GPIO 1 e um lado no GND. Comeca desligada
 # (o pino fica no pull-up, em HIGH); ligada, o jogo corre sem o Shift.
-c.peca('chave', 'slide-switch', 330, BY - 44, Giro=0, Nome='correr (Caps Lock)',
+c.peca('chave', 'slide-switch', 330, BY - 44, Giro=0, Nome='run (Caps Lock)',
        Teclas={'alternar': 't:CapsLock|g:Back'})
 c.ligar('chave', '2', 'placa', '1', VERDE)
 c.ligar('chave', '3', 'placa', 'GND', PRETO)   # o lado da direita: alavanca a direita (o 2 no 3, como no Wokwi) = ligada
 
 gravar('esp32s3-doom', sketch, c, '''
-ESP32-DOOM: o DOOM de verdade (motor PrBoom 2.5.0) numa ESP32-S3.
+ESP32-DOOM: the real DOOM (PrBoom 2.5.0 engine) on an ESP32-S3.
 
-O jogo e a biblioteca ESP32-DOOM, em C, com o codigo junto (GPL). No
-simulador ela roda no modo nativo: o C e compilado de verdade, com o
-ESP-IDF do simulador por baixo -- tarefas do FreeRTOS, o SPI do display e
-do cartao, o I2S do som e o servidor HTTP do ESP-IDF.
+The game is the ESP32-DOOM library, in C, with the source included (GPL).
+In the simulator it runs in native mode: the C is really compiled, with
+the simulator's ESP-IDF underneath -- FreeRTOS tasks, the SPI of the
+display and the card, the I2S of the sound and the ESP-IDF HTTP server.
 
-ANTES DE RODAR: o cartao precisa do DOOM1.WAD (o shareware serve). Clique
-duas vezes no cartao e use "Carregar do computador". O WAD nao vem junto:
-e da id Software. DOOM e marca da id Software.
+BEFORE RUNNING: the card needs DOOM1.WAD (the shareware one works).
+Double-click the card and use "Load from the computer". The WAD is not
+included: it belongs to id Software. DOOM is a trademark of id Software.
 
-Aperte F5 e clique no circuito. Setas andam, Ctrl atira (e e o OK dos
-menus), Espaco abre as portas, Esc abre o menu e o Caps Lock liga o
-correr. Um controle de video game tambem vale. A tela tambem vai para o
-navegador: o painel Rede mostra o endereco.
+Press F5 and click the circuit. The arrows walk, Ctrl fires (and is OK in
+the menus), Space opens doors, Esc opens the menu and Caps Lock turns
+running on. A game controller works too. The screen also goes to the
+browser: the Network panel shows the address.
 
-Na placa de verdade: ESP32-S3 N8R8, PSRAM "OPI PSRAM", particao "Huge
-APP", e a biblioteca de bibliotecas/ESP32-DOOM na pasta libraries da
-Arduino IDE.
+On the real board: ESP32-S3 N8R8, PSRAM "OPI PSRAM", partition "Huge
+APP", and the library from bibliotecas/ESP32-DOOM in the Arduino IDE's
+libraries folder.
 ''')

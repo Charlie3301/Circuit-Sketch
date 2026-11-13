@@ -8,12 +8,18 @@ olha) e na escala real. Giram inteiras: o desenho todo e a parte "-movel" e o
                   Yahboom: o pneu de 65 mm, o aro de 46 mm, o cubo de 11,3 mm
                   com o furo de duplo D 5,4/3,7; os cinco raios da foto);
   - helice-130  : a helice vermelha de duas pas e 75 mm dos kits de ventilador
-                  do motor 130 (o contorno da pa tracado da foto de cima, o
-                  cubo redondo com o furo de 2 mm);
-  - helice-1045 : a 10 x 4,5" (254 mm) do A2212 (a pa tracada da foto de cima
-                  da Wikimedia Commons, preta);
-  - helice-5045 : a 5 x 4,5" de tres pas (127 mm) do drone de 5" (a pa tracada
-                  da foto de cima; azul translucida, como as Gemfan).
+                  do motor 130 (o contorno da pa tracado da foto de cima, as
+                  bordas alisadas, a ponta redonda; o cubo de 8,8 mm com o
+                  furo de 2 mm);
+  - helice-1045 : a APC 10 x 4,5MR (254 mm, a do A2212 nos quadricopteros),
+                  pela tabela de geometria do fabricante (PE0-FILES_WEB, de
+                  apcprop.com): a corda, o enflechamento e a torcao de cada
+                  estacao, projetados no plano do giro; o cubo de 0,32";
+  - helice-5045 : a de tres pas de 5" (127 mm) do drone, pela tabela da APC
+                  5 x 4E-3 (a de tres pas e 5" do fabricante), o cubo de
+                  0,25"; azul translucida.
+As pas giram no sentido anti-horario da tela (a helice normal vista de frente):
+o bordo de ataque fica do lado -y da pa deitada em +x.
 """
 import importlib.util
 import io
@@ -67,36 +73,53 @@ def poligono(d, pts, fill, stroke=None, sw=0.0, op=None):
     d.partes[-1] = d.partes[-1].replace('<path ', '<path stroke-linejoin="round" ', 1)
 
 
-def suavizar(pts, n=2):
-    """Media movel circular: tira o serrilhado do tracado da foto."""
-    for _ in range(n):
-        m = len(pts)
-        pts = [((pts[i - 1][0] + 2 * pts[i][0] + pts[(i + 1) % m][0]) / 4,
-                (pts[i - 1][1] + 2 * pts[i][1] + pts[(i + 1) % m][1]) / 4) for i in range(m)]
-    return pts
+POL = 25.4
 
 
-def contorno_pa(chave, R, ponta_redonda=False):
-    """O contorno tracado (fracao do raio) em mm, com a pa ao longo de +x."""
+def suavizar_borda(ys, janela=4):
+    """Media movel de uma borda ao longo do raio (as pontas ficam onde estao)."""
+    saida = []
+    for i in range(len(ys)):
+        a, b = max(0, i - janela), min(len(ys), i + janela + 1)
+        saida.append(sum(ys[a:b]) / (b - a))
+    return saida
+
+
+def planta_apc(chave):
+    """A pa da APC vista de frente (ao longo do eixo), pela tabela de geometria do
+    fabricante: em cada estacao o bordo de ataque fica no enflechamento e o de fuga
+    a corda x cos(torcao) atras dele (a corda inclinada pela torcao, projetada no
+    plano do giro). A pa ao longo de +x, girando no sentido anti-horario da tela (o
+    de uma helice normal vista de frente): o bordo de ataque no lado -y. Devolve
+    (estacoes [(x, y do ataque, y da fuga)] em mm, raio do cubo em mm)."""
+    g = PAS[chave]
+    cubo = g['cubo'] * POL
+    est = [(r * POL, -s * POL, (c * math.cos(math.radians(tw)) - s) * POL)
+           for r, c, s, tw in g['estacoes'] if r >= g['cubo'] * 0.7]
+    return est, cubo
+
+
+def planta_foto(chave, R, cubo):
+    """A pa tracada da foto de cima (fracao do raio): as duas bordas alisadas ao
+    longo do raio, a raiz levada reta ate dentro do cubo e a ponta fechada redonda."""
     c = PAS[chave]['contorno']
     meio = len(c) // 2
     l1, l2 = c[:meio], c[meio:][::-1]
-    if ponta_redonda:
-        # a foto corta a ponta na borda: fecha com um arco (a ponta das slow fly e redonda)
-        corte = 0.955
-        l1 = [p for p in l1 if p[0] <= corte]
-        l2 = [p for p in l2 if p[0] <= corte]
-        y1, y2 = l1[-1][1], l2[-1][1]
-        rm, ym = (y2 - y1) / 2, (y1 + y2) / 2
-        arco = [(corte + (1 - corte) * math.sin(math.radians(t)), ym - rm * math.cos(math.radians(t)))
-                for t in range(10, 171, 20)]
-        pts = l1 + arco + l2[::-1]
-    else:
-        pts = l1 + l2[::-1]
-    # a raiz entra no cubo (a foto so mede a pa fora dele)
-    pts = [(0.02, pts[0][1] * 0.85)] + pts + [(0.02, pts[-1][1] * 0.85)]
-    pts = suavizar([(x * R, y * R) for x, y in pts], 2)
-    return pts
+    xs = [p[0] * R for p in l1]
+    ya = suavizar_borda([p[1] * R for p in l1])
+    yf = suavizar_borda([p[1] * R for p in l2])
+    corte = 0.955 * R
+    est = [(x, a, f) for x, a, f in zip(xs, ya, yf) if x <= corte]
+    x0, a0, f0 = est[0]
+    raiz = [(cubo + (x0 - cubo) * t / 4, a0, f0) for t in range(4)]
+    # a ponta: meia elipse do corte ate o raio
+    xc, ac, fc = est[-1]
+    meia, ym = (fc - ac) / 2, (ac + fc) / 2
+    ponta = []
+    for t in range(15, 90, 15):
+        s = math.radians(t)
+        ponta.append((xc + (R - xc) * math.sin(s), ym - meia * math.cos(s), ym + meia * math.cos(s)))
+    return raiz + est + ponta + [(R, ym, ym)], cubo
 
 
 # =====================================================================
@@ -156,37 +179,56 @@ def roda():
 # =====================================================================
 #  as helices
 # =====================================================================
-def helice(nome, L, H, chave, R, n_pas, cor, borda, cubo, furo, op=None, ponta_redonda=False, marca=None):
+def helice(nome, L, H, planta, n_pas, cor, borda, furo, op=None, marca=None):
+    """planta = (estacoes [(x, y do ataque, y da fuga)] em mm, raio do cubo em mm).
+    O cubo e o cilindro visto de topo: a face plana com o chanfro e o furo."""
     cx, cy = L / 2, H / 2
-    pts = contorno_pa(chave, R, ponta_redonda)
+    est, cubo = planta
+    R = est[-1][0]
+    # a raiz encosta no cilindro do cubo: cada borda comeca no ponto do circulo na
+    # altura dela (nada da pa sobra para fora do cubo antes da primeira estacao)
+    est = [e for e in est if e[0] >= cubo]
+    _, a0, f0 = est[0]
+    assert abs(a0) < cubo and abs(f0) < cubo, (nome, a0, f0, cubo)
+    pts = ([(math.sqrt(cubo * cubo - a0 * a0) - 0.05, a0)] + [(x, a) for x, a, f in est] +
+           [(x, f) for x, a, f in est[::-1]] + [(math.sqrt(cubo * cubo - f0 * f0) - 0.05, f0)])
+    # o brilho da face de cima (o extradorso): a faixa do bordo de ataque ate 40% da corda
+    brilho = ([(x, a + (f - a) * 0.12) for x, a, f in est[:-1]] +
+              [(x, a + (f - a) * 0.45) for x, a, f in est[-2::-1]])
+    # a sombra do bordo de fuga (a face cai para tras)
+    fuga = ([(x, a + (f - a) * 0.78) for x, a, f in est[:-1]] + [(x, f) for x, a, f in est[-2::-1]])
 
     def desenho(d):
         for k in range(n_pas):
             ang = -90 + k * 360 / n_pas if n_pas == 3 else k * 180
             t = math.radians(ang)
             co, si = math.cos(t), math.sin(t)
-            rot = [(cx + x * co - y * si, cy + x * si + y * co) for x, y in pts]
+
+            def girar(lista):
+                return [(cx + x * co - y * si, cy + x * si + y * co) for x, y in lista]
+            rot = girar(pts)
             poligono(d, [(x + 0.3, y + 0.4) for x, y in rot], '#000000', op=0.3)
-            poligono(d, rot, cor, stroke=borda, sw=0.35, op=op)
-            # o brilho da face (a curvatura da pa): o mesmo contorno encolhido para o bordo de ataque
-            meio = [(cx + (x * 0.92) * co - (y * 0.55 - R * 0.012) * si, cy + (x * 0.92) * si + (y * 0.55 - R * 0.012) * co)
-                    for x, y in pts]
-            poligono(d, meio, '#ffffff', op=0.08)
-        d.circ(cx + 0.2, cy + 0.3, cubo, '#000000', op=0.3)
-        d.circ(cx, cy, cubo, cor, stroke=borda, sw=0.35, op=op)
-        d.circ(cx, cy, cubo, 'url(#cupula)')
-        d.circ(cx, cy, furo, '#0b0b0c', stroke=borda, sw=0.2)
+            poligono(d, rot, cor, stroke=borda, sw=0.3, op=op)
+            poligono(d, girar(brilho), '#ffffff', op=0.12)
+            poligono(d, girar(fuga), '#000000', op=0.18)
+        # o cubo: a sombra, o cilindro, a face plana e o chanfro do furo
+        d.circ(cx + 0.25, cy + 0.35, cubo, '#000000', op=0.3)
+        d.circ(cx, cy, cubo, cor, stroke=borda, sw=0.3)
+        d.circ(cx, cy, cubo, 'url(#luz)')
+        d.circ(cx, cy, cubo * 0.8, None, '#ffffff', 0.12, op=0.12)
+        d.circ(cx, cy, furo + 0.5, borda, op=0.6)
+        d.circ(cx, cy, furo, '#0b0b0c')
         if marca:
-            d.texto(cx + R * 0.32, cy + cubo * 0.1, marca, R * 0.045, '#8d949b', alinhar='center', peso='bold')
+            d.texto(cx + R * 0.36, cy - 1.0, marca, R * 0.04, '#8d949b', alinhar='center', peso='bold')
 
     tres(nome, L, H, desenho)
 
 
 roda()
-helice('helice-130', 76.0, 76.0, 'p130', 37.5, 2, '#e2342b', '#8a1a14', 4.4, 1.0)
-helice('helice-1045', 256.0, 34.0, 'p1045', 127.0, 2, '#1f2126', '#060607', 7.0, 3.0, ponta_redonda=True,
-       marca='10x4.5')
-helice('helice-5045', 128.0, 128.0, 'p5045', 63.5, 3, '#2f8fe0', '#0d3f66', 6.0, 2.5, op=0.88)
+helice('helice-130', 76.0, 76.0, planta_foto('p130', 37.5, 4.4), 2, '#e2342b', '#8a1a14', 1.0)
+helice('helice-1045', 256.0, 34.0, planta_apc('apc10x45mr'), 2, '#1f2126', '#060607', 3.175,
+       marca='10x4.5MR')
+helice('helice-5045', 128.0, 128.0, planta_apc('apc5x4e3'), 3, '#2f8fe0', '#0d3f66', 2.5, op=0.88)
 
 if __name__ == '__main__':
     cam = pa.BASE + 'app/assets/pecas.json'

@@ -269,7 +269,7 @@ for k in range(1, 8):
     d.linha(TX + 0.4, TY + k * TA / 8, TX + TL - 0.4, TY + k * TA / 8, '#18222b', 0.1, cap='butt')
 for k in range(1, 10):
     d.linha(TX + k * TL / 10, TY + 0.3, TX + k * TL / 10, TY + TA - 0.3, '#121a21', 0.08, cap='butt')
-d.texto(TX + TL / 2, (TY + TA + H - 0.3) / 2, 'ANALISADOR LÓGICO · 8 CANAIS', 0.95, APAGADO, alinhar='center')
+d.texto(TX + TL / 2, (TY + TA + H - 0.3) / 2, 'LOGIC ANALYZER · 8 CHANNELS', 0.95, APAGADO, alinhar='center')
 gravar('logic-analyzer', d, L, H)
 guardar('logic-analyzer', L, H, [(n, 0, y, ['power'] if n == 'GND' else [],
                                   'GND: o terra do circuito medido' if n == 'GND' else f'Canal {n[1]}: desenha o nivel do fio na tela')

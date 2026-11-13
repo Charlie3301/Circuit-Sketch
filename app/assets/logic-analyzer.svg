@@ -55,5 +55,5 @@
 <path d="M168.659 12.698 L168.659 93.302" fill="none" stroke="#121a21" stroke-width="0.302" stroke-linecap="butt"/>
 <path d="M185.909 12.698 L185.909 93.302" fill="none" stroke="#121a21" stroke-width="0.302" stroke-linecap="butt"/>
 <path d="M203.159 12.698 L203.159 93.302" fill="none" stroke="#121a21" stroke-width="0.302" stroke-linecap="butt"/>
-<text transform="translate(134.159 99.651) rotate(0)" x="0" y="1.795" font-family="Arial" font-weight="bold" font-size="4.488" fill="#93a6b8" text-anchor="middle">ANALISADOR LÓGICO · 8 CANAIS</text>
+<text transform="translate(134.159 99.651) rotate(0)" x="0" y="1.795" font-family="Arial" font-weight="bold" font-size="4.488" fill="#93a6b8" text-anchor="middle">LOGIC ANALYZER · 8 CHANNELS</text>
 </svg>

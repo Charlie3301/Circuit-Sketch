@@ -33,7 +33,7 @@ def ler(nome):
 # ---------------------------------------------------------------------
 
 BORDA = set('#BMX')          # porta na beira levaria para fora do mapa
-CAMINHO = set('.PRVAD')      # chao, largada, robo, item e porta (o B abre)
+CAMINHO = set('.PRHAD')      # chao, largada, robo, item e porta (o B abre)
 
 
 def conferir_fase(nome, texto):
@@ -43,7 +43,7 @@ def conferir_fase(nome, texto):
     for y, linha in enumerate(mapa):
         assert len(linha) == 16, (nome, 'linha', y, len(linha), linha)
         for x, c in enumerate(linha):
-            assert c in '#BMDX.PRVA', (nome, 'letra', x, y, c)
+            assert c in '#BMDX.PRHA', (nome, 'letra', x, y, c)
             if x in (0, 15) or y in (0, 15):
                 assert c in BORDA, (nome, 'borda aberta', x, y, c)
 
@@ -66,7 +66,7 @@ def conferir_fase(nome, texto):
     assert alcanca, (nome, 'a saida nao e alcancavel da largada')
 
     robos = sum(linha.count('R') for linha in mapa)
-    itens = sum(linha.count('V') + linha.count('A') for linha in mapa)
+    itens = sum(linha.count('H') + linha.count('A') for linha in mapa)
     print(f'  {nome}: "{titulo}" -- {robos} robos, {itens} itens, saida alcancavel')
     return '\n'.join([titulo] + mapa) + '\n'
 
@@ -76,7 +76,7 @@ fases = {nome: conferir_fase(nome, ler(nome)) for nome in ('E1M1.TXT', 'E1M2.TXT
 # A fase que esta no codigo tem que ser a mesma do cartao: sem cartao, o
 # jogo e o mesmo.
 sketch = ler('base-zero.ino')
-interna = [linha.split('"')[1] for linha in sketch.split('const char* FASE_INTERNA[TAM] = {')[1]
+interna = [linha.split('"')[1] for linha in sketch.split('const char* BUILT_IN_LEVEL[SIZE] = {')[1]
            .split('};')[0].strip().split('\n')]
 assert interna == fases['E1M1.TXT'].split('\n')[1:17], 'a fase do codigo e a E1M1.TXT estao diferentes'
 
@@ -102,8 +102,8 @@ for pino, gpio, cor in [('VCC', '3V3', VERMELHO), ('GND', 'GND', PRETO),
     c.ligar('tela', pino, 'placa', gpio, cor)
 
 # O cartao divide o SPI com o display; o CS e so dele.
-c.peca('cartao', 'microsd-card', 262, BY + 245, Nome='fases do jogo',
-       Arquivos={**fases, 'LEIAME.TXT': ler('LEIAME.TXT')})
+c.peca('cartao', 'microsd-card', 262, BY + 245, Nome='game levels',
+       Arquivos={**fases, 'README.TXT': ler('README.TXT')})
 for pino, gpio, cor in [('VCC', '3V3', VERMELHO), ('GND', 'GND', PRETO),
                         ('CS', '14', LARANJA), ('SCK', '12', AMARELO),
                         ('DI', '11', AZUL), ('DO', '13', CINZA)]:
@@ -118,41 +118,42 @@ def botao(id, pino, gnd, x, y, nome, teclas, lado):
 
 
 # Cada botao vale pela tecla e pelo controle de video game.
-botao('cima', '4', 'GND', 112, BY + 262, '↑ andar', 't:Up|g:Cima', 'r')
-botao('esquerda', '6', 'GND', 40, BY + 308, '← virar', 't:Left|g:Esquerda', 'r')
-botao('direita', '15', 'GND', 184, BY + 308, '→ virar', 't:Right|g:Direita', 'r')
-botao('baixo', '5', 'GND', 112, BY + 354, '↓ voltar', 't:Down|g:Baixo', 'r')
+botao('cima', '4', 'GND', 112, BY + 262, '↑ walk', 't:Up|g:Cima', 'r')
+botao('esquerda', '6', 'GND', 40, BY + 308, '← turn', 't:Left|g:Esquerda', 'r')
+botao('direita', '15', 'GND', 184, BY + 308, '→ turn', 't:Right|g:Direita', 'r')
+botao('baixo', '5', 'GND', 112, BY + 354, '↓ back', 't:Down|g:Baixo', 'r')
 botao('start', '16', 'GND', 262, BY + 360, 'START (Enter)', 't:Return|g:Start', 'r')
-botao('atirar', '17', 'GND.2', 540, BY + 20, 'A: atirar (Espaço)', 't:Space|g:A', 'l')
-botao('abrir', '18', 'GND.2', 540, BY + 90, 'B: abrir (E)', 't:E|g:B', 'l')
+botao('atirar', '17', 'GND.2', 540, BY + 20, 'A: fire (Space)', 't:Space|g:A', 'l')
+botao('abrir', '18', 'GND.2', 540, BY + 90, 'B: open (E)', 't:E|g:B', 'l')
 
 c.buzzer('buzzer', '21', 'GND.2', 540, BY + 150)
-c.pecas[-1]['Nome'] = 'som'
+c.pecas[-1]['Nome'] = 'sound'
 
 # A chave liga/desliga: o comum no GPIO 1 (que o RTC enxerga, e e por ele
 # que o ext0 acorda a placa) e um lado no GND. Comeca ligada.
-c.peca('chave', 'slide-switch', 330, BY - 44, Giro=1, Nome='liga/desliga (L)',
+c.peca('chave', 'slide-switch', 330, BY - 44, Giro=1, Nome='on/off (L)',
        Teclas={'alternar': 't:L|g:Back'})
 c.ligar('chave', '2', 'placa', '1', VERDE)
 c.ligar('chave', '3', 'placa', 'GND', PRETO)   # o lado da direita: alavanca a direita (o 2 no 3, como no Wokwi) = ligada
 
 gravar('esp32s3-base-zero', sketch, c, '''
-BASE ZERO: tiro em primeira pessoa no estilo do DOOM (1993), na ESP32-S3.
+BASE ZERO: a first-person shooter in the style of DOOM (1993), on the ESP32-S3.
 
-O que esta demo mostra:
-- raycasting: 160 raios por quadro, o DDA andando no mapa quadrado a
-  quadrado, e o z-buffer que esconde os robos atras das paredes;
-- o display ILI9341 com a Adafruit_GFX: so as colunas que mudaram vao
-  pelo SPI, que e o que da 30 quadros por segundo na placa de verdade;
-- as fases no cartao microSD (/E1M1.TXT e /E1M2.TXT): mude as paredes
-  pela peca do cartao e rode de novo -- o LEIAME.TXT explica as letras;
-- a chave liga/desliga de verdade: desligada, a ESP32 apaga a tela e
-  dorme (sono profundo); ligada, o ext0 acorda a placa, e a memoria RTC
-  devolve a fase e os pontos.
+What this demo shows:
+- raycasting: 160 rays per frame, the DDA walking through the map square
+  by square, and the z-buffer that hides the robots behind the walls;
+- the ILI9341 display with Adafruit_GFX: only the columns that changed go
+  over the SPI, which is what gives 30 frames per second on the real board;
+- the levels on the microSD card (/E1M1.TXT and /E1M2.TXT): change the
+  walls through the card part and run again -- README.TXT explains the
+  letters;
+- a real on/off switch: off, the ESP32 turns off the screen and sleeps
+  (deep sleep); on, ext0 wakes the board up, and the RTC memory brings
+  back the level and the score.
 
-Aperte F5, clique no circuito e aperte Enter (START). As setas andam,
-Espaco atira, E abre as portas e o painel verde da saida, L liga e
-desliga. Um controle de video game tambem vale.
+Press F5, click the circuit and press Enter (START). The arrows walk,
+Space fires, E opens the doors and the green exit panel, L turns it on
+and off. A game controller works too.
 ''')
 
 print('\n--- para o Recentes.cs ---')

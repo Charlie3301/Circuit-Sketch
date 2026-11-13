@@ -288,9 +288,9 @@ public static partial class Autoteste
             {
                 bool motor = tipo == "motor-28byj48"; string d = motor ? "driver" : t.P.Id, m = motor ? t.P.Id : "motor";
                 t.Adicionar(motor ? d : m, motor ? "uln2003" : "motor-28byj48"); t.Fonte(5, "+", "-", d);
-                int[] gpios = [13, 14, 25, 26]; string[] fases = ["laranja", "amarelo", "rosa", "azul"];
+                int[] gpios = [13, 14, 25, 26]; string[] fases = ["orange", "yellow", "pink", "blue"];
                 for (int k = 0; k < 4; k++) { t.Sinal($"IN{k + 1}", gpios[k], d); t.Fio(d, "ABCD"[k].ToString(), m, fases[k]); }
-                t.Fio(d, "COM", m, "vermelho"); t.Quadro();
+                t.Fio(d, "COM", m, "red"); t.Quadro();
                 int[][] seq = [[1, 0, 0, 0], [1, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 0], [0, 0, 1, 0], [0, 0, 1, 1], [0, 0, 0, 1], [1, 0, 0, 1]];
                 void Fase(int i) { for (int k = 0; k < 4; k++) t.M.DigitalWrite(gpios[k], seq[(i % 8 + 8) % 8][k]); t.Quadro(1); }
                 Fase(0); double inicio = t.Ed.AnguloDoPassoParaTeste(m);

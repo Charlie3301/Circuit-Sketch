@@ -196,7 +196,7 @@ public partial class EditorCircuito
         if (!eixosDePasso.TryGetValue(motor.Id, out var eixos))
             eixosDePasso[motor.Id] = eixos = [new EixoDePasso(EixoDePasso.GrausPorPasso28byj)];
 
-        string[] fases = ["laranja", "amarelo", "rosa", "azul"];
+        string[] fases = ["orange", "yellow", "pink", "blue"];
         PecaNoCircuito uln = null;
         var gpios = new int[4];
         Maquina maq = null;
@@ -227,7 +227,7 @@ public partial class EditorCircuito
         // O comum (vermelho) no + do ULN2003 com 4 V ou mais, e o GND do
         // ULN2003 sendo o da placa: sem isso as fases nao fecham.
         double volts = VoltsEntre(uln, "+", "-");
-        bool alimentado = volts >= 4.0 && rede.RaizDe(Netlist.No(motor.Id, "vermelho")) == rede.RaizDe(Netlist.No(uln.Id, "+"));
+        bool alimentado = volts >= 4.0 && rede.RaizDe(Netlist.No(motor.Id, "red")) == rede.RaizDe(Netlist.No(uln.Id, "+"));
         bool gnd = GndComumComPlaca(uln, "-", rede);
         if (!alimentado)
             avisosDePasso.Add(new Estouro(uln.Id,

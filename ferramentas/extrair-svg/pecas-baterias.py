@@ -154,7 +154,7 @@ def bateria_9v():
     s += f'  <path d="M{f(x0 + 1.0)} {f(y0 + 0.7)} H{f(x0 + c - 1.0)}" stroke="#ffffff" stroke-opacity="0.25" stroke-width="0.4"/>\n'
     s += f'  <path d="M{f(x0 + 1.2)} {f(y0 + 0.4)} V{f(y0 + w - 0.4)}" stroke="#0a0f1c" stroke-width="0.5"/>\n'
     s += texto(x0 + 15.5, cy - 1.0, '9V', 11.0, '#ffffff', 'bold')
-    s += texto(x0 + 15.5, cy + 7.6, 'ALCALINA', 2.6, '#c8d2e4', 'bold')
+    s += texto(x0 + 15.5, cy + 7.6, 'ALKALINE', 2.6, '#c8d2e4', 'bold')
     s += texto(x0 + 31.5, cy - 5.5, '6LR61', 2.4, '#c8d2e4')
     s += texto(x0 + 31.5, cy - 2.2, '1604A', 2.0, '#8e9bb4')
     # a polaridade, perto dos terminais
@@ -271,7 +271,7 @@ def power_bank():
           f'  <path d="M{f(x0 + 7.0)} {f(y0 + 1.0)} H{f(x0 + c - 7.0)}" stroke="#7d828b" stroke-width="0.4"/>\n')
     s += texto(x0 + 36.0, cy - 4.0, '10000', 11.0, '#e9ebee', 'bold')
     s += texto(x0 + 36.0, cy + 5.4, 'mAh  ·  37Wh', 3.6, '#a9aeb6')
-    s += texto(x0 + 36.0, cy + 11.5, 'SAÍDA 5V 2.1A    ENTRADA 5V 2A', 2.4, '#8a9099')
+    s += texto(x0 + 36.0, cy + 11.5, 'OUTPUT 5V 2.1A    INPUT 5V 2A', 2.4, '#8a9099')
     # os quatro LEDs da carga e o botao
     for k in range(4):
         s += (f'  <circle cx="{f(x0 + c - 13.5)}" cy="{f(cy - 9.0 + k * 3.6)}" r="0.9" fill="#3aa0ff"/>\n'
@@ -308,9 +308,9 @@ def chumbo():
         vx = x0 + 18.0 + k * 19.5
         s += f'  <rect x="{f(vx)}" y="{f(y0 + 4.2)}" width="7.0" height="2.6" rx="1.3" fill="#1d1e22" stroke="#111215" stroke-width="0.2"/>\n'
     s += texto(x0 + 66.9, cy - 6.0, '12V  7Ah', 13.0, '#f0f1f3', 'bold')
-    s += texto(x0 + 66.9, cy + 6.0, 'BATERIA SELADA  ·  VRLA', 3.6, '#c9cdd3', 'bold')
-    s += texto(x0 + 66.9, cy + 12.0, 'Recarregável  ·  Não abrir  ·  Uso cíclico 14,5–14,9 V', 2.6, '#9da2aa')
-    s += texto(x0 + 66.9, cy + 17.0, 'Uso em flutuação 13,6–13,8 V', 2.6, '#9da2aa')
+    s += texto(x0 + 66.9, cy + 6.0, 'SEALED LEAD-ACID  ·  VRLA', 3.6, '#c9cdd3', 'bold')
+    s += texto(x0 + 66.9, cy + 12.0, 'Rechargeable  ·  Do not open  ·  Cycle use 14.5–14.9 V', 2.6, '#9da2aa')
+    s += texto(x0 + 66.9, cy + 17.0, 'Standby use 13.6–13.8 V', 2.6, '#9da2aa')
     # os terminais faston (F1, 4,8 mm), na ponta: + vermelho em cima, - preto embaixo
     tx = x0 + c - 12.0
     pinos = []
