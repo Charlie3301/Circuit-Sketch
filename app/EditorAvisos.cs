@@ -93,16 +93,33 @@ public partial class EditorCircuito
     {
         if (!string.IsNullOrEmpty(aviso.Marca)) return aviso.Marca;
         string motivo = (aviso.Motivo ?? "").Trim();
-        int corte = motivo.IndexOfAny([':', '.', ';', '—']);
+        int corte = Pausa(motivo, 0);
         // "curto: alimentação ligada direto no GND": o primeiro pedaco sozinho diz pouco.
         if (corte is > 0 and < 12)
         {
-            int segundo = motivo.IndexOfAny(['.', ';', '—', ':'], corte + 1);
+            int segundo = Pausa(motivo, corte + 1);
             corte = segundo > 0 ? segundo : motivo.Length;
         }
         string curto = corte > 0 ? motivo[..corte] : motivo;
         if (curto.Length > 46) curto = curto[..45].TrimEnd(' ', ',') + "…";
         return curto.Length > 0 ? char.ToUpperInvariant(curto[0]) + curto[1..] : Idioma.T("Aviso");
+    }
+
+    /// <summary>
+    /// A primeira pausa do texto a partir de <paramref name="de"/>, ou -1. O ponto
+    /// entre dois algarismos e o decimal ("4.5 V" no ingles, no hindi, no chines),
+    /// e nao o fim da frase; o "।" do hindi e o "。" do chines sao.
+    /// </summary>
+    static int Pausa(string texto, int de)
+    {
+        for (int i = de; i < texto.Length; i++)
+        {
+            char c = texto[i];
+            if (c is ':' or ';' or '—' or '।' or '。' or '：' or '；') return i;
+            if (c == '.' && !(i > 0 && i + 1 < texto.Length && char.IsDigit(texto[i - 1]) && char.IsDigit(texto[i + 1])))
+                return i;
+        }
+        return -1;
     }
 
     void DesenharAvisos()

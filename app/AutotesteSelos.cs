@@ -18,6 +18,14 @@ public static partial class Autoteste
             && EditorCircuito.TextoDoSelo(new Estouro("x", "qualquer coisa", false) { Marca = "5 V numa porta de 3,3 V" }) == "5 V numa porta de 3,3 V",
             EditorCircuito.TextoDoSelo(new Estouro("x", "curto: alimentação ligada direto no GND")));
 
+        // Nas linguas de ponto decimal o "4.5 V" nao e o fim da frase -- antes o selo do
+        // hindi saia "पिन 3V3 पर 4"; e o "।" do hindi fecha a frase como o ponto.
+        string decimalComPonto = EditorCircuito.TextoDoSelo(new Estouro("x", "pin 3V3 got 4.5 V, max 3.6 V. Use VIN.", false));
+        string comDanda = EditorCircuito.TextoDoSelo(new Estouro("x", "पिन 3V3 पर 4.5 V मिले। VIN पर जोड़ें।", false));
+        Conferir("selos: o ponto entre algarismos e decimal, e o \"।\" fecha a frase",
+            decimalComPonto == "Pin 3V3 got 4.5 V, max 3.6 V" && comDanda == "पिन 3V3 पर 4.5 V मिले",
+            decimalComPonto + " | " + comDanda);
+
         // A ESP32 com tres erros diferentes: o LED sem resistor no D14, o DS18B20 sem
         // pull-up e o HC-SR04 no 3V3. E o Uno com um LED direto no 13 (esse queima).
         var c = new Circuito();
