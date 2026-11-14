@@ -617,6 +617,10 @@ public partial class App : Application
         if (sketch != null) janela.CarregarSketch(sketch);
         janela.Show();
 
+        // A versao nova no GitHub, fora da tela: o programa ja esta aberto
+        // e usavel enquanto isso (Atualizacoes.cs).
+        Atualizacoes.ComecarAoAbrir();
+
         // Reabrir o ultimo projeto, se as configuracoes pedirem -- e se
         // ele ainda existir. E o lugar da tela de abertura.
         string ultimo = Preferencias.Texto(Preferencias.UltimoProjeto);

@@ -29,6 +29,12 @@
 //    /sketchbook=<pasta>    pasta de sketches da Arduino IDE
 //    /sem-plugin /sem-atalhos /sem-registro
 //    /desinstalar           força o modo desinstalador
+//    /atualizar             o que o programa chama para se atualizar (as
+//                           atualizações do GitHub): sem perguntas, só a
+//                           barra; repete as escolhas da instalação que está
+//                           em /destino (plugin, atalho na Área de Trabalho)
+//    /esperar=<pid>         com /atualizar: espera esse processo fechar antes
+//    /abrir                 com /atualizar: abre o programa no fim
 //    /pasta-atalhos=<pasta> teste: atalhos numa pasta qualquer
 //    /chave-registro=<chave> teste: outra chave em HKCU
 //    /captura=<png> [/captura-pronto]  teste: foto da janela
@@ -67,6 +73,7 @@ static class Programa
 
         try
         {
+            if (temPacote && opcoes.Atualizar) return Atualizador.Rodar(opcoes);
             if (temPacote && !opcoes.Desinstalar) return Instalador.Rodar(opcoes);
             return Desinstalador.Rodar(opcoes);
         }
@@ -94,7 +101,8 @@ static class Produto
 
 sealed class Opcoes
 {
-    public bool Silencioso, Desinstalar, SemAtalhos, SemRegistro, SemPlugin, CapturaPronto;
+    public bool Silencioso, Desinstalar, SemAtalhos, SemRegistro, SemPlugin, CapturaPronto, Atualizar, Abrir;
+    public int Esperar;
     public string Destino, Sketchbook, PastaAtalhos, Captura;
     public string ChaveRegistro = Produto.Chave;
     public int LimiteCaminho = Instalacao.MaiorPasta;
@@ -112,6 +120,9 @@ sealed class Opcoes
             {
                 case "silencioso": o.Silencioso = true; break;
                 case "desinstalar": o.Desinstalar = true; break;
+                case "atualizar": o.Atualizar = true; break;
+                case "abrir": o.Abrir = true; break;
+                case "esperar": if (int.TryParse(valor, out int pid)) o.Esperar = pid; break;
                 case "sem-atalhos": o.SemAtalhos = true; break;
                 case "sem-registro": o.SemRegistro = true; break;
                 case "sem-plugin": o.SemPlugin = true; break;
@@ -582,6 +593,237 @@ static class Atalhos
 
     static void Definir(object alvo, string propriedade, object valor)
         => alvo.GetType().InvokeMember(propriedade, BindingFlags.SetProperty, null, alvo, new[] { valor });
+}
+
+// ================= atualizar (chamado pelo programa) =================
+
+/// <summary>
+/// O CircuitSketch baixa este instalador do GitHub e o chama com
+/// /atualizar /destino=<pasta dele> /esperar=<pid dele>. Aqui não há o que
+/// perguntar: a pasta é a que já está instalada, e o plugin e o atalho da
+/// Área de Trabalho seguem o que a instalação anterior anotou no
+/// desinstalar.txt -- quem não quis o atalho não ganha um a cada versão.
+/// </summary>
+static class Atualizador
+{
+    /// <summary>Quanto esperar o programa fechar (salvar um projeto grande demora).</summary>
+    const int EsperaMs = 120000;
+
+    public static int Rodar(Opcoes o)
+    {
+        string destino = o.Destino != null ? Path.GetFullPath(o.Destino) : Instalacao.PastaInstalada(o);
+        if (destino == null || !File.Exists(Path.Combine(destino, Produto.Manifesto)))
+        {
+            Diario.Anotar("atualizar: nenhuma instalacao em " + (destino ?? "(sem pasta)"));
+            Avisar(o, "Não achei o CircuitSketch instalado" + (destino != null ? " em:\n" + destino : ".")
+                      + "\n\nRode o instalador normalmente.");
+            return 2;
+        }
+
+        // O programa que pediu a atualização ainda está fechando.
+        if (o.Esperar > 0)
+        {
+            try { using var p = Process.GetProcessById(o.Esperar); p.WaitForExit(EsperaMs); }
+            catch (ArgumentException) { }       // já fechou
+            catch (InvalidOperationException) { }
+        }
+        var limite = DateTime.UtcNow.AddMilliseconds(EsperaMs);
+        while (Instalacao.ProgramaAberto(destino))
+        {
+            if (DateTime.UtcNow > limite)
+            {
+                Diario.Anotar("atualizar: o CircuitSketch continua aberto");
+                Avisar(o, "O CircuitSketch continua aberto, e a atualização ficou para a próxima vez que ele fechar.");
+                return 4;
+            }
+            Thread.Sleep(300);
+        }
+
+        var plano = PlanoDe(destino, o);
+        Diario.Anotar("atualizar: " + destino + " | plugin: " + (plano.Plugin ? plano.Sketchbook : "nao")
+                      + " | atalho na mesa: " + (plano.AtalhoNaAreaDeTrabalho ? "sim" : "nao"));
+
+        if (o.Silencioso)
+        {
+            Instalacao.Executar(plano, o, (_, _) => { });
+            if (o.Abrir) Abrir(Instalacao.ExeEm(destino));
+            return 0;
+        }
+
+        var janela = new JanelaAtualizando(plano, o);
+        Application.Run(janela);
+        return janela.Codigo;
+    }
+
+    /// <summary>
+    /// O que a instalação anterior fez, lido do manifesto dela: o plugin
+    /// (se a pasta dele ainda existe e é nossa) e o atalho da Área de
+    /// Trabalho (se a pessoa não o apagou).
+    /// </summary>
+    internal static Plano PlanoDe(string destino, Opcoes o)
+    {
+        var itens = Manifesto.Ler(Path.Combine(destino, Produto.Manifesto));
+
+        string sketchbook = null;
+        foreach (var (tipo, valor) in itens)
+        {
+            if (tipo != "plugin" || !Directory.Exists(valor) || !Arduino.EhPluginNosso(valor)) continue;
+            // <sketchbook>\hardware\circuitsketch\esp32
+            string candidato = Directory.GetParent(valor)?.Parent?.Parent?.FullName;
+            if (candidato != null && string.Equals(Path.GetFullPath(Arduino.PastaDoPlugin(candidato)),
+                    Path.GetFullPath(valor).TrimEnd('\\'), StringComparison.OrdinalIgnoreCase))
+                sketchbook = candidato;
+        }
+
+        string mesa = o.PastaAtalhos != null
+            ? Path.Combine(o.PastaAtalhos, "area-de-trabalho")
+            : Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+        bool naMesa = itens.Any(i => i.Tipo == "atalho" && File.Exists(i.Valor)
+            && string.Equals(Path.GetDirectoryName(i.Valor)?.TrimEnd('\\'), mesa.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase));
+
+        return new Plano
+        {
+            Destino = destino,
+            Plugin = sketchbook != null,
+            Sketchbook = sketchbook,
+            AtalhoNaAreaDeTrabalho = naMesa,
+        };
+    }
+
+    internal static void Abrir(string exe)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(exe) { UseShellExecute = true, WorkingDirectory = Path.GetDirectoryName(exe) });
+        }
+        catch (Exception ex) { Diario.Anotar("nao abriu: " + ex.Message); }
+    }
+
+    static void Avisar(Opcoes o, string texto)
+    {
+        if (!o.Silencioso)
+            MessageBox.Show(texto, "Atualizar CircuitSketch", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+}
+
+/// <summary>A janela da atualização: o nome da versão, a barra e mais nada.</summary>
+sealed class JanelaAtualizando : Form
+{
+    readonly Plano plano;
+    readonly Opcoes opcoes;
+    readonly ProgressBar barra;
+    readonly Label lblStatus;
+    bool trabalhando;
+
+    public int Codigo { get; private set; } = 1;
+
+    public JanelaAtualizando(Plano plano, Opcoes opcoes)
+    {
+        this.plano = plano;
+        this.opcoes = opcoes;
+
+        SuspendLayout();
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+        Font = new Font("Segoe UI", 9F);
+        Text = "Atualizando o CircuitSketch";
+        ClientSize = new Size(440, 168);
+        FormBorderStyle = FormBorderStyle.FixedDialog;
+        MaximizeBox = MinimizeBox = false;
+        StartPosition = FormStartPosition.CenterScreen;
+        BackColor = Color.White;
+        try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }
+
+        var topo = new Panel { Location = new Point(0, 0), Size = new Size(440, 72), BackColor = Color.FromArgb(0x1B, 0x1F, 0x24) };
+        topo.Controls.Add(new PictureBox
+        {
+            Image = Logo(), SizeMode = PictureBoxSizeMode.Zoom,
+            Location = new Point(18, 12), Size = new Size(48, 48),
+        });
+        topo.Controls.Add(new Label
+        {
+            Text = "CircuitSketch " + Versao.Curta, Font = new Font("Segoe UI Semibold", 14F),
+            ForeColor = Color.White, AutoSize = true, Location = new Point(76, 12),
+        });
+        topo.Controls.Add(new Label
+        {
+            Text = opcoes.Abrir ? "Instalando a versão nova. O programa abre de novo no fim." : "Instalando a versão nova.",
+            ForeColor = Color.FromArgb(0xAE, 0xB6, 0xBF), AutoSize = true, Location = new Point(78, 44),
+        });
+        Controls.Add(topo);
+
+        barra = new ProgressBar { Location = new Point(20, 94), Size = new Size(400, 14), Maximum = 1000 };
+        lblStatus = new Label
+        {
+            Location = new Point(20, 116), Size = new Size(400, 40), AutoSize = false,
+            ForeColor = Color.FromArgb(0x6B, 0x72, 0x7A), Text = "Preparando...",
+        };
+        Controls.Add(barra);
+        Controls.Add(lblStatus);
+        ResumeLayout(false);
+
+        FormClosing += (_, e) => { if (trabalhando) e.Cancel = true; };
+        Shown += (_, _) => Comecar();
+    }
+
+    static Image Logo()
+    {
+        using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream("logo.png");
+        if (s == null) return null;
+        using var imagem = Image.FromStream(s);
+        return new Bitmap(imagem);
+    }
+
+    void Comecar()
+    {
+        trabalhando = true;
+        var trabalho = new Thread(() =>
+        {
+            Exception erro = null;
+            Resultado r = null;
+            try
+            {
+                r = Instalacao.Executar(plano, opcoes, (fracao, texto) => BeginInvoke((Action)(() =>
+                {
+                    barra.Value = Math.Max(0, Math.Min(1000, (int)(fracao * 1000)));
+                    lblStatus.Text = texto;
+                })));
+            }
+            catch (Exception ex)
+            {
+                Diario.Anotar("falha na atualizacao: " + ex);
+                erro = ex;
+            }
+            BeginInvoke((Action)(() => Terminou(r, erro)));
+        });
+        // STA: os atalhos passam por COM.
+        trabalho.SetApartmentState(ApartmentState.STA);
+        trabalho.IsBackground = true;
+        trabalho.Start();
+    }
+
+    void Terminou(Resultado r, Exception erro)
+    {
+        trabalhando = false;
+        if (erro != null)
+        {
+            Codigo = 1;
+            MessageBox.Show(this,
+                "Não deu para atualizar:\n\n" + erro.Message
+                + "\n\nPara arrumar, rode o instalador da versão nova (\"Instalar CircuitSketch\")."
+                + "\nDetalhes em " + Diario.Arquivo,
+                Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Close();
+            return;
+        }
+
+        Codigo = 0;
+        barra.Value = 1000;
+        lblStatus.Text = "Pronto.";
+        lblStatus.Refresh();
+        if (opcoes.Abrir) Atualizador.Abrir(r.Exe);
+        Close();
+    }
 }
 
 // ================= desinstalar =================

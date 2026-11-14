@@ -156,6 +156,7 @@ public static partial class Autoteste
         Bloco("Queima_NivelDeTensao", Queima_NivelDeTensao);
         Bloco("Avisos_SelosNoCircuito", Avisos_SelosNoCircuito);
         Bloco("Frames_ChassisEBases", Frames_ChassisEBases);
+        Bloco("Atualizacoes_GitHubReleases", Atualizacoes_GitHubReleases);
         Bloco("Sensores_Redesenhados", Sensores_Redesenhados);
         Bloco("Esp8266_Redesenhadas", Esp8266_Redesenhadas);
         Bloco("Pcb_Base", Pcb_Base);
@@ -10785,6 +10786,22 @@ public static partial class Autoteste
     /// peca, um ponto que esta DENTRO do corpo girado tem que ser aceito,
     /// e um que esta fora tem que ser recusado.
     /// </summary>
+    /// <summary>O ponto da chapa do frame mais perto do meio (em px locais), numa varredura de 1 px.</summary>
+    static System.Windows.Point? ChapaPertoDoMeio(PecaDef def)
+    {
+        System.Windows.Point? melhor = null;
+        double menor = double.MaxValue, cx = def.Largura / 2, cy = def.Altura / 2;
+        for (double y = 0.5; y < def.Altura; y += 1)
+            for (double x = 0.5; x < def.Largura; x += 1)
+            {
+                double d = (x - cx) * (x - cx) + (y - cy) * (y - cy);
+                if (d >= menor || !Frames.NaPlaca(def.Id, new System.Windows.Point(x, y))) continue;
+                menor = d;
+                melhor = new System.Windows.Point(x, y);
+            }
+        return melhor;
+    }
+
     static void Clique_GiraComAPeca()
     {
         saida.AppendLine("a area de clique gira com a peca");
@@ -10850,6 +10867,14 @@ public static partial class Autoteste
                 // ponto que o giro nao mexe.
                 var meio = Geometria.PosicaoLocal(peca, def, def.Largura / 2, def.Altura / 2);
 
+                // Frame com furo no meio (os chassis do carrinho): o clique
+                // no furo nao e do frame, de proposito. Vale o ponto da
+                // chapa mais perto do meio, que gira junto do mesmo jeito.
+                bool meioNoFuro = Frames.EhFrame(def.Id)
+                    && !Frames.NaPlaca(def.Id, new System.Windows.Point(def.Largura / 2, def.Altura / 2));
+                if (meioNoFuro && ChapaPertoDoMeio(def) is { } chapa)
+                    meio = Geometria.PosicaoLocal(peca, def, chapa.X, chapa.Y);
+
                 conferidas++;
 
                 if (editor.Resolver(meio).Peca?.Id != "alvo")
@@ -10871,7 +10896,7 @@ public static partial class Autoteste
                 // A 0 e a 180 o retangulo ocupa o mesmo lugar, e nenhum
                 // ponto distingue as duas contas: esses angulos provam
                 // so o meio, e esta certo assim.
-                if (giro is not (90 or 270)) continue;
+                if (giro is not (90 or 270) || meioNoFuro) continue;
 
                 // Quanto a peca ocupa na horizontal DEPOIS de deitada:
                 // e a altura dela, mais a folga do alvo minimo (20 px),

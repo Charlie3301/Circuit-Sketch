@@ -31,7 +31,8 @@ REQUISITOS
 
   - Windows 10 ou 11, 64 bits.
   - Uns 200 MB livres.
-  - Não precisa de internet, nem de senha de administrador.
+  - Não precisa de internet, nem de senha de administrador. Com
+    internet, o programa só procura as versões novas (seção ATUALIZAR).
   - A Arduino IDE só é necessária para usar o plugin, que é opcional.
     O CircuitSketch funciona sozinho.
 
@@ -65,8 +66,16 @@ REQUISITOS
 
   4) Clique em "Instalar". No fim, "Abrir o CircuitSketch".
 
-  ATUALIZAR: rode o instalador da versão nova, sem desinstalar antes.
-  Ele troca o programa e o plugin no mesmo lugar.
+  ATUALIZAR: é automático. Ao abrir, o CircuitSketch procura a versão
+  nova nos Releases do GitHub, sem atrapalhar o uso. Achando, baixa,
+  confere o arquivo e aparece um aviso no alto da janela. A versão nova
+  é instalada quando você fechar o programa, ou na hora pelo "Atualizar
+  agora" do aviso (o programa fecha, instala e abre de novo). O plugin e
+  o atalho continuam como foram instalados.
+  Para desligar: Configurações > Ao abrir o programa > Atualizações.
+  Sem internet, nada muda: dá para rodar o instalador da versão nova à
+  mão, sem desinstalar antes. Ele troca o programa e o plugin no mesmo
+  lugar.
 
 
 ==========================================================================

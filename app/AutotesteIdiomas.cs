@@ -195,6 +195,7 @@ public static partial class Autoteste
             Janela("celular", () => janela.TesteAbrirCelular());
             Janela("mqtt", () => new JanelaMqtt(janela, janela.RedeParaTeste) { ShowActivated = false });
             Janela("ajuda", () => janela.JanelaDaAjuda());
+            Janela("atualizacao", () => new JanelaAtualizacao(janela, JanelaAtualizacao.Modo.Ver) { ShowActivated = false });
             string analisador = circuito.Pecas.FirstOrDefault(p => p.Tipo == "logic-analyzer")?.Id;
             if (analisador is not null) Janela("analisador", () => janela.TesteAbrirAnalisador(analisador));
 

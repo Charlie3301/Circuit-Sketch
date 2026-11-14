@@ -22,6 +22,9 @@ public sealed record AjustesDoPrograma(
     /// <summary>Abre o acervo de bibliotecas.</summary>
     public Action AbrirBibliotecas { get; init; }
 
+    /// <summary>Procura a versão nova no GitHub agora (Atualizacoes.cs).</summary>
+    public Action BuscarAtualizacoes { get; init; }
+
     /// <summary>Traz de volta os avisos fechados no X dos selos.</summary>
     public Action EsquecerAvisosFechados { get; init; }
 
@@ -340,7 +343,7 @@ public class JanelaConfiguracoes : Window
             Palavras(Idioma.N("salvar sozinho automático cópia backup bak recentes placa circuito novo")), MontarArquivos));
 
         assuntos.Add(new("entrada", Idioma.T("Atalhos do teclado"), Palavras(Idioma.N("teclas comandos")), MontarAtalhos));
-        assuntos.Add(new("entrada", Idioma.T("Ao abrir o programa"), Palavras(Idioma.N("abertura splash reabrir último")), MontarAbertura));
+        assuntos.Add(new("entrada", Idioma.T("Ao abrir o programa"), Palavras(Idioma.N("abertura splash reabrir último") + " " + Idioma.N("atualização atualizar versão github")), MontarAbertura));
 
         assuntos.Add(new("rede", Idioma.T("Rede e servidor"), Palavras(Idioma.N("internet wifi http servidor")), MontarRede));
         assuntos.Add(new("rede", Idioma.T("Bluetooth"), Palavras(Idioma.N("bt serial celular")), MontarBluetooth));
@@ -720,6 +723,13 @@ public class JanelaConfiguracoes : Window
         CaixaGuardada(ultimo, Idioma.T("Reabrir o último projeto no lugar da tela de abertura"),
             Preferencias.ReabrirUltimo, false);
         Nota(ultimo, Idioma.T("Para quem continua sempre de onde parou. Se o arquivo tiver sido apagado ou movido, volta a tela de abertura."));
+
+        var atualizacoes = Grupo(painel, Idioma.T("Atualizações"));
+        CaixaGuardada(atualizacoes, Idioma.T("Procurar versão nova ao abrir o programa"),
+            Preferencias.ProcurarAtualizacoes, true);
+        Nota(atualizacoes, Idioma.T("Procura nos Releases do GitHub sem atrapalhar o uso. Achando, baixa e instala quando você fechar o programa, ou na hora pelo aviso no alto da janela. Só a cópia instalada pelo instalador se atualiza."));
+        if (ajustes.BuscarAtualizacoes is { } buscar)
+            Botao(atualizacoes, Idioma.T("Buscar atualizações agora"), () => buscar());
     }
 
     void MontarRede(StackPanel painel)

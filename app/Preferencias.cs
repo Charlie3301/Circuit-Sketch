@@ -95,6 +95,7 @@ public static class Preferencias
     public const string EstiloDoFio = "estilo-do-fio";
     public const string UsarInternet = "usar-internet";
     public const string MostrarAbertura = "mostrar-abertura";
+    public const string ProcurarAtualizacoes = "procurar-atualizacoes";
     public const string UltimaPlaca = "ultima-placa";
     public const string UltimoProjeto = "ultimo-projeto";
     public const string CorDoFio = "cor-do-fio";

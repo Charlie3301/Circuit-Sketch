@@ -310,6 +310,11 @@ public partial class MainWindow : Window
         Closing += AoFechar;
         ComecarVigiaDaUsb();
 
+        // A versao nova do GitHub, no aviso do alto (Atualizacoes.cs).
+        Atualizacoes.Mudou += MostrarAtualizacao;
+        Closed += (_, _) => Atualizacoes.Mudou -= MostrarAtualizacao;
+        MostrarAtualizacao();
+
         // O salvamento automatico olha a cada meio minuto se esta na hora.
         salvador = new DispatcherTimer { Interval = TimeSpan.FromSeconds(30) };
         salvador.Tick += (_, _) => SalvarSozinhoSePrecisar();
@@ -946,15 +951,18 @@ public partial class MainWindow : Window
                 Idioma.T("Alterações não salvas"),
                 MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
 
-            if (r == MessageBoxResult.Cancel) { e.Cancel = true; return; }
+            if (r == MessageBoxResult.Cancel) { e.Cancel = true; reabrirAoAtualizar = false; return; }
             if (r == MessageBoxResult.Yes)
             {
                 SalvarCircuito();
                 // Cancelou o diálogo de salvar: não fecha sem querer.
                 if (AssinaturaAtual() != circuitoSalvo)
-                { e.Cancel = true; return; }
+                { e.Cancel = true; reabrirAoAtualizar = false; return; }
             }
         }
+
+        // Vai fechar mesmo: a hora de instalar a versao nova, se houver.
+        if (!Autoteste.Rodando && !Passeio.Ativo) InstalarAtualizacaoAoFechar();
 
         // Os paineis soltos voltam para a janela: fechar o programa com
         // uma janela filha aberta deixaria o WPF sem encerrar.
@@ -964,6 +972,79 @@ public partial class MainWindow : Window
         bancada.Parar();
         buzina.Dispose();
         falante.Dispose();
+    }
+
+    // ================= atualizacoes =================
+
+    /// <summary>Fechar pelo "Atualizar agora": o programa abre de novo depois de instalar.</summary>
+    bool reabrirAoAtualizar;
+
+    /// <summary>O aviso do alto da janela: so com versao nova achada.</summary>
+    void MostrarAtualizacao()
+    {
+        var nova = Atualizacoes.Nova;
+        var estado = Atualizacoes.Agora;
+        bool aparece = nova is not null && estado is Atualizacoes.Estado.Baixando
+            or Atualizacoes.Estado.Pronta or Atualizacoes.Estado.Erro;
+        btAtualizacao.Visibility = aparece ? Visibility.Visible : Visibility.Collapsed;
+        if (!aparece) return;
+        txtAtualizacao.Text = estado switch
+        {
+            Atualizacoes.Estado.Baixando => Idioma.T("{0}: baixando {1:0}%", nova.Nome, Atualizacoes.Progresso * 100),
+            Atualizacoes.Estado.Pronta => Idioma.T("{0}: pronta para instalar", nova.Nome),
+            _ => Idioma.T("{0} disponível", nova.Nome),
+        };
+    }
+
+    void AbrirAtualizacao(object s = null, RoutedEventArgs e = null)
+    {
+        var janela = new JanelaAtualizacao(this, JanelaAtualizacao.Modo.Ver);
+        if (janela.ShowDialog() == true && janela.QuerAtualizarAgora) AtualizarAgora();
+    }
+
+    /// <summary>O "Buscar atualizações..." do menu e das configurações.</summary>
+    void BuscarAtualizacoes(object s = null, RoutedEventArgs e = null)
+    {
+        if (!Atualizacoes.Instalado)
+        {
+            MessageBox.Show(this,
+                Idioma.T("Esta cópia do CircuitSketch não veio do instalador, por isso não se atualiza sozinha.\n\nAs versões ficam em:\n{0}", Atualizacoes.PaginaDosReleases),
+                Idioma.T("Atualização do CircuitSketch"), MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        if (Atualizacoes.Agora is not (Atualizacoes.Estado.Baixando or Atualizacoes.Estado.Pronta))
+            Atualizacoes.Verificar();
+        AbrirAtualizacao();
+    }
+
+    /// <summary>Fecha (perguntando de salvar, como sempre), instala e abre de novo.</summary>
+    void AtualizarAgora()
+    {
+        reabrirAoAtualizar = true;
+        Close();
+    }
+
+    /// <summary>
+    /// Ao fechar: com o instalador pronto, chama-o (ele espera o programa
+    /// sair). Com o download no meio, espera numa janela que da para
+    /// dispensar -- quem tem pressa fecha sem atualizar e fica para a proxima.
+    /// </summary>
+    void InstalarAtualizacaoAoFechar()
+    {
+        if (!Atualizacoes.Instalado || Atualizacoes.Nova is null) return;
+        if (Atualizacoes.Agora == Atualizacoes.Estado.Erro) Atualizacoes.BaixarDeNovo();
+        if (Atualizacoes.Agora is not (Atualizacoes.Estado.Baixando or Atualizacoes.Estado.Pronta)) return;
+
+        if (Atualizacoes.Agora != Atualizacoes.Estado.Pronta)
+        {
+            var janela = new JanelaAtualizacao(this, JanelaAtualizacao.Modo.Fechando);
+            if (janela.ShowDialog() != true)
+            {
+                Atualizacoes.Cancelar();
+                return;
+            }
+        }
+        Atualizacoes.Instalar(reabrirAoAtualizar);
     }
 
     // ================= circuito inicial =================
@@ -2788,6 +2869,7 @@ public partial class MainWindow : Window
         {
             CaberNaTela = CaberNaTela,
             AbrirBibliotecas = () => AbrirBibliotecas(),
+            BuscarAtualizacoes = () => BuscarAtualizacoes(),
             EsquecerAvisosFechados = () =>
             {
                 int quantos = editor.AvisosFechados;
